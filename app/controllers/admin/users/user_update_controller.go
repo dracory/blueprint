@@ -8,12 +8,12 @@ import (
 	"project/internal/helpers"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 )
 
 // == CONTROLLER ==============================================================
@@ -235,11 +235,11 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 		return data, "User store is not configured"
 	}
 
-	data.formFirstName = utils.Req(r, "user_first_name", "")
-	data.formLastName = utils.Req(r, "user_last_name", "")
-	data.formEmail = utils.Req(r, "user_email", "")
-	data.formMemo = utils.Req(r, "user_memo", "")
-	data.formStatus = utils.Req(r, "user_status", "")
+	data.formFirstName = req.Value(r, "user_first_name")
+	data.formLastName = req.Value(r, "user_last_name")
+	data.formEmail = req.Value(r, "user_email")
+	data.formMemo = req.Value(r, "user_memo")
+	data.formStatus = req.Value(r, "user_status")
 
 	if data.formStatus == "" {
 		data.formErrorMessage = "Status is required"
@@ -295,8 +295,8 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 		return data, "User store is not configured"
 	}
 
-	data.action = utils.Req(r, "action", "")
-	data.userID = utils.Req(r, "user_id", "")
+	data.action = req.Value(r, "action")
+	data.userID = req.Value(r, "user_id")
 
 	if data.userID == "" {
 		return data, "User ID is required"

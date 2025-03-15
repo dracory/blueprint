@@ -11,6 +11,7 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/blindindexstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
@@ -19,7 +20,6 @@ import (
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -479,18 +479,18 @@ func (controller *userManagerController) tablePagination(data userManagerControl
 func (controller *userManagerController) prepareData(r *http.Request) (data userManagerControllerData, errorMessage string) {
 	var err error
 	data.request = r
-	data.action = utils.Req(r, "action", "")
-	data.page = utils.Req(r, "page", "0")
+	data.action = req.Value(r, "action")
+	data.page = req.ValueOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(utils.Req(r, "per_page", "10"))
-	data.sortOrder = utils.Req(r, "sort_order", sb.DESC)
-	data.sortBy = utils.Req(r, "by", userstore.COLUMN_CREATED_AT)
-	data.formEmail = utils.Req(r, "email", "")
-	data.formFirstName = utils.Req(r, "first_name", "")
-	data.formLastName = utils.Req(r, "last_name", "")
-	data.formStatus = utils.Req(r, "status", "")
-	data.formCreatedFrom = utils.Req(r, "created_from", "")
-	data.formCreatedTo = utils.Req(r, "created_to", "")
+	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
+	data.sortOrder = req.ValueOr(r, "sort_order", sb.DESC)
+	data.sortBy = req.ValueOr(r, "by", userstore.COLUMN_CREATED_AT)
+	data.formEmail = req.Value(r, "email")
+	data.formFirstName = req.Value(r, "first_name")
+	data.formLastName = req.Value(r, "last_name")
+	data.formStatus = req.Value(r, "status")
+	data.formCreatedFrom = req.Value(r, "created_from")
+	data.formCreatedTo = req.Value(r, "created_to")
 
 	userList, userCount, err := controller.fetchUserList(data)
 

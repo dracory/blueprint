@@ -5,8 +5,8 @@ import (
 	"project/config"
 	"strings"
 
+	"github.com/dracory/base/str"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -33,9 +33,9 @@ func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return "File storage not configured"
 	}
 
-	filePath := lo.IfF(strings.HasPrefix(r.URL.Path, "/files"), func() string { return utils.StrRightFrom(r.URL.Path, "/files") }).
-		ElseIfF(strings.HasPrefix(r.URL.Path, "/file"), func() string { return utils.StrRightFrom(r.URL.Path, "/file") }).
-		ElseIfF(strings.HasPrefix(r.URL.Path, "/media"), func() string { return utils.StrRightFrom(r.URL.Path, "/media") }).
+	filePath := lo.IfF(strings.HasPrefix(r.URL.Path, "/files"), func() string { return str.RightFrom(r.URL.Path, "/files") }).
+		ElseIfF(strings.HasPrefix(r.URL.Path, "/file"), func() string { return str.RightFrom(r.URL.Path, "/file") }).
+		ElseIfF(strings.HasPrefix(r.URL.Path, "/media"), func() string { return str.RightFrom(r.URL.Path, "/media") }).
 		Else(r.URL.Path)
 
 	exists, err := config.SqlFileStorage.Exists(filePath)

@@ -6,11 +6,12 @@ import (
 	"project/config"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
 var _ Widget = (*blogPostListWidget)(nil) // verify it extends the interface
@@ -75,10 +76,8 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 		"page": "",
 	})
 
-	postCountInt, _ := utils.StrToInt(utils.ToString(data.postCount))
-
 	pagination := bs.Pagination(bs.PaginationOptions{
-		NumberItems:       postCountInt,
+		NumberItems:       cast.ToInt(data.postCount),
 		CurrentPageNumber: data.page,
 		PagesToShow:       10,
 		PerPage:           data.perPage,
@@ -166,12 +165,8 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 }
 
 func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostListWidgetData, errorMessage string) {
-	pageStr := strings.TrimSpace(utils.Req(r, "page", ""))
-	page, err := utils.StrToInt(pageStr)
-
-	if err != nil {
-		page = 0
-	}
+	pageStr := strings.TrimSpace(req.Value(r, "page"))
+	page := cast.ToInt(pageStr)
 
 	if page < 0 {
 		page = 0

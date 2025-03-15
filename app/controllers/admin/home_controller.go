@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"project/app/layouts"
@@ -15,8 +16,8 @@ import (
 	"github.com/gouniverse/icons"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/statsstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
 // == CONTROLLER ===============================================================
@@ -78,13 +79,13 @@ func (c *homeController) cardDailyVisitors() *hb.Tag {
 	labels := dates
 	values := visits
 
-	labelsJSON, err := utils.ToJSON(labels)
+	labelsJSON, err := json.MarshalIndent(labels, "", "  ")
 
 	if err != nil {
 		return hb.Div().Class("alert alert-danger").Text(err.Error())
 	}
 
-	valuesJSON, err := utils.ToJSON(values)
+	valuesJSON, err := json.MarshalIndent(values, "", "  ")
 
 	if err != nil {
 		return hb.Div().Class("alert alert-danger").Text(err.Error())
@@ -96,7 +97,7 @@ func (c *homeController) cardDailyVisitors() *hb.Tag {
 			}, 1000);
 			function generateVisitorsChart() {
 				var visitorData = {
-					labels: ` + labelsJSON + `,
+					labels: ` + cast.ToString(labelsJSON) + `,
 					datasets:
 							[
 								{
@@ -104,7 +105,7 @@ func (c *homeController) cardDailyVisitors() *hb.Tag {
 									strokeColor: "#ACC26D",
 									pointColor: "#fff",
 									pointStrokeColor: "#9DB86D",
-									data: ` + valuesJSON + `
+									data: ` + cast.ToString(valuesJSON) + `
 								}
 							]
 				};

@@ -7,11 +7,11 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/gouniverse/base/req"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 )
 
 type postCreateController struct{}
@@ -129,7 +129,7 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	data.title = strings.TrimSpace(utils.Req(r, "post_title", ""))
+	data.title = strings.TrimSpace(req.Value(r, "post_title"))
 
 	if r.Method != "POST" {
 		return data, ""

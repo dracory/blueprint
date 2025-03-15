@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gouniverse/utils"
+	"github.com/dracory/base/str"
 )
 
 func TestFlash(t *testing.T) {
@@ -61,7 +61,7 @@ func TestFlashMessage_Info(t *testing.T) {
 
 	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(infoUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{
@@ -102,7 +102,7 @@ func TestFlashMessage_Error(t *testing.T) {
 
 	errorUrl := helpers.ToFlashErrorURL("This is an error message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(errorUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(errorUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{
@@ -143,7 +143,7 @@ func TestFlashMessage_Success(t *testing.T) {
 
 	successUrl := helpers.ToFlashSuccessURL("This is a success message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(successUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(successUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{
@@ -184,7 +184,7 @@ func TestFlashMessage_Warning(t *testing.T) {
 
 	warningUrl := helpers.ToFlashWarningURL("This is a warning message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(warningUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(warningUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{
@@ -225,7 +225,7 @@ func TestFlashMessage_Get(t *testing.T) {
 
 	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(infoUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodGet, NewFlashController().Handler, testutils.NewRequestOptions{
 		GetValues: url.Values{
@@ -266,7 +266,7 @@ func TestFlashMessage_Delete(t *testing.T) {
 
 	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(infoUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodDelete, NewFlashController().Handler, testutils.NewRequestOptions{
 		GetValues: url.Values{
@@ -307,7 +307,7 @@ func TestFlashMessage_Post(t *testing.T) {
 
 	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(infoUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{
@@ -348,7 +348,7 @@ func TestFlashMessage_Put(t *testing.T) {
 
 	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
 
-	flashMessageID := utils.StrRightFrom(infoUrl, `/flash?message_id=`)
+	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
 	body, response, err := testutils.CallHtmlEndpoint(http.MethodPut, NewFlashController().Handler, testutils.NewRequestOptions{
 		PostValues: url.Values{

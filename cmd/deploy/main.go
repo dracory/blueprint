@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"os/user"
 
+	"github.com/dracory/base/cmd"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/utils"
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 	"github.com/sfreiberg/simplessh"
@@ -41,54 +41,54 @@ func main() {
 	cfmt.Infoln("2. Uploading files...")
 
 	for _, file := range otherFilesToDeploy {
-		cmd := `scp -o stricthostkeychecking=no -i ` + privateKeyPath(sshKey) + ` ` + file.LocalPath + ` ` + sshLogin + `:` + remDeployDir + `/` + file.RemotePath
-		cfmt.Infoln(" - Executing:" + cmd)
-		utils.ExecLine(cmd)
+		command := `scp -o stricthostkeychecking=no -i ` + privateKeyPath(sshKey) + ` ` + file.LocalPath + ` ` + sshLogin + `:` + remDeployDir + `/` + file.RemotePath
+		cfmt.Infoln(" - Executing:" + command)
+		cmd.ExecLine(command)
 	}
 
 	cfmt.Infoln("3. Uploading executable...")
 
-	cmd := `scp -o stricthostkeychecking=no -i ` + privateKeyPath(sshKey) + ` ` + buildExecutablePath + ` ` + sshLogin + `:` + remDeployDir + `/` + remTempDeployName
+	command := `scp -o stricthostkeychecking=no -i ` + privateKeyPath(sshKey) + ` ` + buildExecutablePath + ` ` + sshLogin + `:` + remDeployDir + `/` + remTempDeployName
 
-	cfmt.Infoln(" - Executing:" + cmd)
-	utils.ExecLine(cmd)
+	cfmt.Infoln(" - Executing:" + command)
+	cmd.ExecLine(command)
 
 	cfmt.Infoln("3. Replace current executable...")
 
-	cmds := []struct {
-		cmd      string
+	commands := []struct {
+		command  string
 		required bool
 	}{
 		{
-			cmd:      `chmod 750 ` + remDeployDir + `/` + remTempDeployName,
+			command:  `chmod 750 ` + remDeployDir + `/` + remTempDeployName,
 			required: true,
 		},
 		{
-			cmd:      `mv ` + remDeployDir + `/application  ` + remDeployDir + `/` + timestamp + `_backup_application`,
+			command:  `mv ` + remDeployDir + `/application  ` + remDeployDir + `/` + timestamp + `_backup_application`,
 			required: true,
 		},
 		{
-			cmd:      `mv ` + remDeployDir + `/` + remTempDeployName + `  ` + remDeployDir + `/application`,
+			command:  `mv ` + remDeployDir + `/` + remTempDeployName + `  ` + remDeployDir + `/application`,
 			required: true,
 		},
 		{
-			cmd:      `mv ` + remDeployDir + `/application.error.log ` + remDeployDir + `/` + timestamp + `_backup_application.error.log`,
+			command:  `mv ` + remDeployDir + `/application.error.log ` + remDeployDir + `/` + timestamp + `_backup_application.error.log`,
 			required: false,
 		},
 		{
-			cmd:      `mv ` + remDeployDir + `/application.log ` + remDeployDir + `/` + timestamp + `_backup_application.log`,
+			command:  `mv ` + remDeployDir + `/application.log ` + remDeployDir + `/` + timestamp + `_backup_application.log`,
 			required: false,
 		},
 		{
-			cmd:      `pm2 restart ` + pm2ProcessName,
+			command:  `pm2 restart ` + pm2ProcessName,
 			required: true,
 		},
 	}
 
-	for _, entry := range cmds {
-		cfmt.Infoln(" - Executing:" + entry.cmd)
+	for _, entry := range commands {
+		cfmt.Infoln(" - Executing:" + entry.command)
 
-		output, error := ssh(sshHost, sshUser, sshKey, entry.cmd)
+		output, error := ssh(sshHost, sshUser, sshKey, entry.command)
 
 		if error != nil {
 			cfmt.Errorln("  - Error:", error)

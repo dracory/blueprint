@@ -13,11 +13,14 @@ import (
 
 	"strings"
 
+	"github.com/dracory/base/str"
+
 	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
 	"github.com/go-chi/chi/v5"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
+	"github.com/spf13/cast"
+
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 )
@@ -48,7 +51,7 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 		return errorMessage
 	}
 
-	cacheKey := utils.StrToMD5Hash(fmt.Sprint(data.path, data.extension, data.width, "x", data.height, data.quality))
+	cacheKey := str.MD5(fmt.Sprint(data.path, data.extension, data.width, "x", data.height, data.quality))
 
 	if config.CacheFile != nil {
 		if config.CacheFile.Contains(cacheKey) {
@@ -141,9 +144,9 @@ func (controller *thumbnailController) prepareData(r *http.Request) (data thumbn
 		widthStr = size
 	}
 
-	widthInt, _ := utils.StrToInt64(widthStr)
-	heightInt, _ := utils.StrToInt64(heightStr)
-	qualityInt, _ := utils.StrToInt64(quality)
+	widthInt := cast.ToInt64(widthStr)
+	heightInt := cast.ToInt64(heightStr)
+	qualityInt := cast.ToInt64(quality)
 
 	data.width = widthInt
 	data.height = heightInt

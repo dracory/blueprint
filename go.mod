@@ -2,6 +2,8 @@ module project
 
 go 1.24.0
 
+replace github.com/dracory/base => ../base
+
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2

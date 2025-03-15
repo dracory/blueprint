@@ -8,11 +8,13 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
+	"github.com/spf13/cast"
+
 	"github.com/samber/lo"
 )
 
@@ -51,10 +53,8 @@ func (controller *blogController) page(data blogControllerData) string {
 		"page": "",
 	})
 
-	postCountInt, _ := utils.StrToInt(utils.ToString(data.postCount))
-
 	pagination := bs.Pagination(bs.PaginationOptions{
-		NumberItems:       postCountInt,
+		NumberItems:       cast.ToInt(data.postCount),
 		CurrentPageNumber: data.page,
 		PagesToShow:       10,
 		PerPage:           data.perPage,
@@ -170,12 +170,8 @@ func (controller *blogController) page(data blogControllerData) string {
 
 func (controller blogController) prepareData(r *http.Request) (data blogControllerData, errorMessage string) {
 	perPage := 12 // 3 rows x 4 postss
-	pageStr := strings.TrimSpace(utils.Req(r, "page", ""))
-	page, err := utils.StrToInt(pageStr)
-
-	if err != nil {
-		page = 0
-	}
+	pageStr := strings.TrimSpace(req.Value(r, "page"))
+	page := cast.ToInt(pageStr)
 
 	if page < 0 {
 		page = 0

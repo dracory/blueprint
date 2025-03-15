@@ -9,10 +9,11 @@ import (
 
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
+	"github.com/spf13/cast"
 )
 
 // == CONTROLLER ==============================================================
@@ -59,7 +60,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 }
 
 func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
-	messageID := utils.Req(r, "message_id", "")
+	messageID := req.Value(r, "message_id")
 	msgData, err := config.CacheStore.GetJSON(messageID+"_flash_message", "")
 
 	msgType := "error"
@@ -77,10 +78,10 @@ func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
 
 	if msgData != "" {
 		msgDataAny := msgData.(map[string]interface{})
-		msgType = utils.ToString(msgDataAny["type"])
-		message = utils.ToString(msgDataAny["message"])
-		url = utils.ToString(msgDataAny["url"])
-		time = utils.ToString(msgDataAny["time"])
+		msgType = cast.ToString(msgDataAny["type"])
+		message = cast.ToString(msgDataAny["message"])
+		url = cast.ToString(msgDataAny["url"])
+		time = cast.ToString(msgDataAny["time"])
 	}
 
 	alert := hb.Div()

@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"project/app/links"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/blockeditor"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/ui"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
 
@@ -48,7 +48,7 @@ func (w *blockeditorWidget) Render(r *http.Request, content string, params map[s
 	example := lo.ValueOr(params, "example", "")
 
 	if example == "" {
-		example = utils.Req(r, "example", "")
+		example = req.Value(r, "example")
 	}
 
 	if example == "example1" {
@@ -65,7 +65,7 @@ func (w *blockeditorWidget) Render(r *http.Request, content string, params map[s
 // == EXAMPLES ==============================================================
 
 func (w *blockeditorWidget) Example1(r *http.Request, content string, params map[string]string) string {
-	render := utils.Req(r, "render", "no")
+	render := req.ValueOr(r, "render", "no")
 
 	definitions := []blockeditor.BlockDefinition{
 		{
@@ -140,7 +140,7 @@ func (w *blockeditorWidget) Example1(r *http.Request, content string, params map
 }
 
 func (w *blockeditorWidget) Example2(r *http.Request, content string, params map[string]string) string {
-	render := utils.Req(r, "render", "no")
+	render := req.ValueOr(r, "render", "no")
 
 	definitions := []blockeditor.BlockDefinition{
 		{
