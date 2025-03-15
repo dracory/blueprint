@@ -1,48 +1,126 @@
-# Dracory Web Framework
+# Blueprint 
 
-Dracory is a lightweight and efficient Golang web framework designed to simplify the development of web applications. It emphasizes clarity, speed, and ease of use, providing a solid foundation for building scalable and maintainable applications.
+![tests](https://github.com/gouniverse/blueprint/workflows/tests/badge.svg)
 
-## Key Features
+## Development IDE
 
-* **Simple and Efficient Routing:** Dracory uses declarative routing as in "github.com/gouniverse/router"
-* **Clean Architecture:** The framework adheres to the MVC (Model-View-Controller) pattern, promoting a clear separation of concerns and organized code structure.
-* **Configuration Management:** Dracory uses flexible configuration loading from .env files and environment variables, simplifying deployment and environment-specific setups.
-* **Database Integration:** Seamless integration with `database/sql` and `sqlx` facilitates efficient database interactions and data modeling.
-* **Middleware Support:** Robust middleware capabilities enable easy implementation of cross-cutting concerns like authentication, logging, and request processing.
-* **Testing Focus:** Dracory encourages test-driven development with easy-to-use testing utilities and configuration isolation for concurrent testing.
-* **Web Server:** Built-in web server functionality simplifies setting up a web server.
-* **Web Authentication:** Built-in web authentication middleware simplifies securing your web applications.
-* **Minimalistic Templating:** Basic HTML templating using the pure Go HTML builder library `github.com/gouniverse/hb` provides a straightforward approach to server-side rendering.
+<a href="https://gitpod.io/#https://github.com/gouniverse/blueprint" style="float:right:" target="_blank">
+    <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy">
+</a>
+<a href="https://app.codeanywhere.com/#https://github.com/gouniverse/blueprint/blob/b7b76728d496499527c9bfd6476b3f0784708958/README.md" style="float:right:" target="_blank">
+    <img src="https://codeanywhere.com/img/open-in-codeanywhere-btn.svg" alt="Open in Gitpod" loading="lazy">
+</a>
 
-## Getting Started
+## URLS
 
-1. Clone this repository
-2. Copy `.env.example` to `.env` and configure your environment variables
-3. Run `go run cmd/web/main.go` to start the server
+- https://YOURAPPURL
+- https://YOURAPPURL.a.run.app (Dev)
 
-## Project Structure
+## Description
 
-```
-dracory-project/
-├── cmd/
-│   └── web/            # Main application entry point
-├── internal/
-│   ├── app/
-│   │   ├── controllers/ # HTTP handlers and business logic
-│   │   ├── models/      # Data models and database interactions
-│   │   ├── config/      # Configuration handling
-│   │   └── routes/      # Routing definitions
-│   └── platform/
-│       └── database/   # Database connection and utilities
-├── web/                # Static assets (HTML, CSS, JS)
-│   ├── static/
-│   └── templates/
-├── test/               # Integration and end-to-end tests
-├── .env                # Environment variables
-├── go.mod              # Go module definition
-└── README.md           # Project documentation
+This is a quick start blueprint for an MVC web applications
+
+- Ready to develop in the cloud (Gitpod / Github CodeSpaces)
+- Database connection setup (SQLite example)
+- Router setup
+- Background tasks setup
+- Scheduler setup
+- Controllers setup
+- CMS setup (optional)
+- Data Vault (optional)
+- Blind Index (optional)
+
+## Installation
+
+```bash
+git clone https://github.com/gouniverse/blueprint
 ```
 
-## License
+## Environment Variables
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Copy the `.env_example` file to `.env`
+
+```bash
+cp .env_example .env
+```
+
+- Set the dev vault values
+
+```bash
+task env-dev
+```
+
+- Set the prod vault values
+
+```bash
+task env-prod
+```
+
+
+## Local Development
+
+- Just starting
+```bash
+task dev:init
+```
+
+- Run in development mode
+```bash
+task dev
+```
+
+## Development on Gitpod
+
+Use the link on the top of this README
+
+## Testing
+
+Running all tests
+
+```bash
+task test
+```
+
+-Running individual test
+
+```
+go test -run ^TestGuestFunnelTestSuite$
+```
+
+## Coverage Report
+
+```bash
+task cover
+```
+
+## CLI Commands
+
+Deploy Live:
+
+```bash
+task deploy:live
+```
+
+Deploy Staging:
+
+```bash
+task deploy:staging
+```
+
+List Routes:
+
+```bash
+go run . routes list
+```
+
+Run task:
+
+```bash
+go run . task run ...
+```
+
+Run job:
+
+```bash
+go run . job run ...
+```

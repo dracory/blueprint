@@ -9,7 +9,7 @@
 version: '3'
 
 vars:
-  APPNAME: Welcome to Dracory Blueprint Project
+  APPNAME: Welcome to Gouniverse Blueprint Project
   DATETIME: '{{now | date "20060102_150405"}}'
 
 tasks:
@@ -55,10 +55,10 @@ tasks:
   #     - gcloud builds submit --tag gcr.io/YOURPROJECT/YOURPACKAGENAME
   #     - gcloud run deploy YOURAPPNAME --image gcr.io/YOURPROJECT/YOURPACKAGENAME --platform managed --region europe-west4 --allow-unauthenticated
 
-  # deploy-live:
-  #   desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
-  #   cmds:
-  #     - go run cmd/deploy/main.go
+  deploy-live:
+    desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
+    cmds:
+      - go run cmd/deploy/main.go
 
   dev-init:
     desc: Initialize development environment (copies the .env_example to .env)
@@ -70,18 +70,17 @@ tasks:
   dev:
     desc: Start development locally
     cmds:
-      # - go run cmd/web/main.go
-      - cd cmd/web; air
+      - air
 
-  # env-dev:
-  #   cmds:
-  #     # - go run . task EnvEnc ui ./internal/resources/.env.development.vault
-  #     - go run ./cmd/envenc/main.go ui ./internal/resources/.env.development.vault
+  env-dev:
+    cmds:
+      # - go run . task EnvEnc ui ./internal/resources/.env.development.vault
+      - go run ./cmd/envenc/main.go ui ./internal/resources/.env.development.vault
 
-  # env-prod:
-  #   cmds:
-  #     # - go run . task EnvEnc ui ./internal/resources/.env.production.vault
-  #     - go run ./cmd/envenc/main.go ui ./internal/resources/.env.production.vault
+  env-prod:
+    cmds:
+      # - go run . task EnvEnc ui ./internal/resources/.env.production.vault
+      - go run ./cmd/envenc/main.go ui ./internal/resources/.env.production.vault
 
   errcheck-install:
     desc: Install errcheck or update to latest

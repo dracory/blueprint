@@ -1,8 +1,8 @@
 package emails
 
 import (
-	"project/app/config"
-	"project/internal/links"
+	"project/app/links"
+	"project/config"
 
 	"github.com/gouniverse/hb"
 )
@@ -14,17 +14,17 @@ func NewEmailToAdminOnNewContactFormSubmitted() *emailToAdminOnNewContactFormSub
 type emailToAdminOnNewContactFormSubmitted struct{}
 
 // EmailSendOnRegister sends the email when user registers
-func (e *emailToAdminOnNewContactFormSubmitted) Send(cfg config.Config) error {
-	emailSubject := cfg.AppName + ". New Contact Form Submitted"
-	emailContent := e.template(cfg)
+func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
+	emailSubject := config.AppName + ". New Contact Form Submitted"
+	emailContent := e.template()
 
 	finalHtml := blankEmailTemplate(emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 
 	errSend := Send(SendOptions{
-		From:     cfg.MailFromEmailAddress,
-		FromName: cfg.AppName,
+		From:     config.MailFromEmailAddress,
+		FromName: config.AppName,
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -32,9 +32,9 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send(cfg config.Config) error {
 	return errSend
 }
 
-func (e *emailToAdminOnNewContactFormSubmitted) template(cfg config.Config) string {
+func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 	urlHome := hb.Hyperlink().
-		HTML(cfg.AppName).
+		HTML(config.AppName).
 		Href(links.NewWebsiteLinks().Home()).
 		ToHTML()
 
@@ -43,7 +43,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) template(cfg config.Config) stri
 		Style(STYLE_HEADING)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new contact form request submitted into ` + cfg.AppName + `.`).
+		HTML(`There is a new contact form request submitted into ` + config.AppName + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().

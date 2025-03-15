@@ -3,14 +3,14 @@ package helpers
 import (
 	"errors"
 	"net/http"
-	"project/app/config"
+	"project/config"
 
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/utils"
 )
 
-func UserSettingGet(r *http.Request, cfg config.Config, key string, defaultValue string) string {
-	if cfg.SessionStore == nil {
+func UserSettingGet(r *http.Request, key string, defaultValue string) string {
+	if config.SessionStore == nil {
 		return defaultValue
 	}
 
@@ -20,7 +20,7 @@ func UserSettingGet(r *http.Request, cfg config.Config, key string, defaultValue
 		return defaultValue
 	}
 
-	session, err := cfg.SessionStore.SessionFindByKey(r.Context(), key)
+	session, err := config.SessionStore.SessionFindByKey(r.Context(), key)
 
 	if err != nil {
 		return defaultValue
@@ -45,8 +45,8 @@ func UserSettingGet(r *http.Request, cfg config.Config, key string, defaultValue
 	return session.GetValue()
 }
 
-func UserSettingSet(r *http.Request, cfg config.Config, key string, value string) error {
-	if cfg.SessionStore == nil {
+func UserSettingSet(r *http.Request, key string, value string) error {
+	if config.SessionStore == nil {
 		return errors.New("session store is nil")
 	}
 
@@ -56,7 +56,7 @@ func UserSettingSet(r *http.Request, cfg config.Config, key string, value string
 		return errors.New("auth user is nil")
 	}
 
-	session, err := cfg.SessionStore.SessionFindByKey(r.Context(), key)
+	session, err := config.SessionStore.SessionFindByKey(r.Context(), key)
 
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func UserSettingSet(r *http.Request, cfg config.Config, key string, value string
 	session.SetValue(value)
 	session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(1).ToDateTimeString(carbon.UTC))
 
-	err = cfg.SessionStore.SessionUpdate(r.Context(), session)
+	err = config.SessionStore.SessionUpdate(r.Context(), session)
 
 	return err
 }

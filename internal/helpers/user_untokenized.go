@@ -3,13 +3,13 @@ package helpers
 import (
 	"context"
 	"errors"
-	"project/app/config"
+	"project/config"
 
 	"github.com/gouniverse/userstore"
 )
 
-func UserUntokenized(ctx context.Context, cfg config.Config, authUser userstore.UserInterface) (firstName string, lastName string, email string, err error) {
-	if cfg.VaultStore == nil {
+func UserUntokenized(ctx context.Context, authUser userstore.UserInterface) (firstName string, lastName string, email string, err error) {
+	if config.VaultStore == nil {
 		return "", "", "", errors.New("vaultstore is nil")
 	}
 
@@ -17,24 +17,24 @@ func UserUntokenized(ctx context.Context, cfg config.Config, authUser userstore.
 	lastNameToken := authUser.LastName()
 	emailToken := authUser.Email()
 
-	firstName, err = cfg.VaultStore.TokenRead(ctx, firstNameToken, cfg.VaultKey)
+	firstName, err = config.VaultStore.TokenRead(ctx, firstNameToken, config.VaultKey)
 
 	if err != nil {
-		cfg.Logger.Error("Error reading first name", "error", err.Error())
+		config.LogStore.ErrorWithContext("Error reading first name", err.Error())
 		return "", "", "", err
 	}
 
-	lastName, err = cfg.VaultStore.TokenRead(ctx, lastNameToken, cfg.VaultKey)
+	lastName, err = config.VaultStore.TokenRead(ctx, lastNameToken, config.VaultKey)
 
 	if err != nil {
-		cfg.Logger.Error("Error reading last name", "error", err.Error())
+		config.LogStore.ErrorWithContext("Error reading last name", err.Error())
 		return "", "", "", err
 	}
 
-	email, err = cfg.VaultStore.TokenRead(ctx, emailToken, cfg.VaultKey)
+	email, err = config.VaultStore.TokenRead(ctx, emailToken, config.VaultKey)
 
 	if err != nil {
-		cfg.Logger.Error("Error reading email", "error", err.Error())
+		config.LogStore.ErrorWithContext("Error reading email", err.Error())
 		return "", "", "", err
 	}
 

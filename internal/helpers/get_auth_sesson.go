@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"net/http"
-	"project/app/config"
+	"project/config"
 
 	"github.com/gouniverse/sessionstore"
 )
