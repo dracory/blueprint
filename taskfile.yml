@@ -1,0 +1,200 @@
+#
+# This task file allows you to:
+#  1. Serve the application for development
+#  2. Deploy to cloud run
+#
+# Task file usage: https://taskfile.dev
+#
+
+version: '3'
+
+vars:
+  APPNAME: Welcome to Dracory Blueprint Project
+  DATETIME: '{{now | date "20060102_150405"}}'
+
+tasks:
+  # ========================== #
+  # START: Help screem (Default)
+  # ========================== #
+  default:
+    cmds:
+        - echo "================================================================"
+        - echo "=                                                              ="
+        - echo "= Welcome to {{.APPNAME}}                                      ="
+        - echo "=                                                              ="
+        - echo "= Select an option from the list below                         ="
+        - echo "=                                                              ="
+        - echo "= 1. To run tests type 'task test'                             ="
+        - echo "= 2. To create coverage report type 'task cover'               ="
+        - echo "= 3. To initialize dev environment 'task dev:init'             ="
+        - echo "= 4. To start development type 'task dev'                      ="
+        - echo "= 5. To deploy to live type 'task deploy'                      ="
+        - echo "=                                                              ="
+        - echo "================================================================"
+    silent: true
+  # ========================== #
+  # END: Help screem (Default) #
+  # ========================== #
+
+  cover:
+    desc: Builds a test coverage report
+    cmds:
+      - echo "Generating cover report..."
+      - go test ./... -coverprofile=tmp/coverage.out  -covermode=count
+      - go tool cover -html=tmp/coverage.out
+      # Eventually add to workflow! - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken=$COVERALLS_TOKEN
+      - echo "Done!"
+    silent: true
+
+  # deploy-cloudrun:
+  #   desc: Builds and deploys the app to Google Cloud Run, you may need to run "gcloud auth login"
+  #   cmds:
+  #     - gcloud config set account YOUREMAIL
+  #     - gcloud config set project YOURPROJECT
+  #     - gcloud config set run/region europe-west4
+  #     - gcloud builds submit --tag gcr.io/YOURPROJECT/YOURPACKAGENAME
+  #     - gcloud run deploy YOURAPPNAME --image gcr.io/YOURPROJECT/YOURPACKAGENAME --platform managed --region europe-west4 --allow-unauthenticated
+
+  # deploy-live:
+  #   desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
+  #   cmds:
+  #     - go run cmd/deploy/main.go
+
+  dev-init:
+    desc: Initialize development environment (copies the .env_example to .env)
+    cmds:
+      - cp .env_example .env
+      - echo "Done!"
+    silent: true
+
+  dev:
+    desc: Start development locally
+    cmds:
+      # - go run cmd/web/main.go
+      - cd cmd/web; air
+
+  # env-dev:
+  #   cmds:
+  #     # - go run . task EnvEnc ui ./internal/resources/.env.development.vault
+  #     - go run ./cmd/envenc/main.go ui ./internal/resources/.env.development.vault
+
+  # env-prod:
+  #   cmds:
+  #     # - go run . task EnvEnc ui ./internal/resources/.env.production.vault
+  #     - go run ./cmd/envenc/main.go ui ./internal/resources/.env.production.vault
+
+  errcheck-install:
+    desc: Install errcheck or update to latest
+    cmds:
+      - echo "Installing/updating errcheck..."
+      - go install github.com/kisielk/errcheck@latest
+      - echo "Done!"
+    silent: true
+
+  errcheck:
+    desc: Tests for errors
+    cmds:
+      - echo "Checking for errors..."
+      - errcheck ./...
+      - echo "Done!"
+    silent: true
+
+  gocritic-install:
+    desc: Install gocritic or update to latest
+    cmds:
+      - echo "Installing/updating gocritic..."
+      - go install github.com/go-critic/go-critic/cmd/gocritic@latest
+      - echo "Done!"
+    silent: true
+
+  gocritic:
+    desc: Tests for errors
+    cmds:
+      - echo "Checking for errors..."
+      - gocritic check -enableAll -disable=ifElseChain ./...
+      - echo "Done!"
+    silent: true
+
+  golangci-lint-install:
+    desc: Install golangci-lint or update to latest
+    cmds:
+      - echo "Installing/updating golangci-lint..."
+      - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - echo "Done!"
+    silent: true
+
+  golangci-lint:
+    desc: Tests for errors
+    cmds:
+      - echo "Checking for errors..."
+      - golangci-lint run ./...
+      - echo "Done!"
+    silent: true
+
+  gosec-install:
+    desc: Install gosec or update to latest
+    cmds:
+      - echo "Installing/updating gosec..."
+      - go install github.com/securego/gosec/v2/cmd/gosec@latest
+      - echo "Done!"
+    silent: true
+
+  gosec:
+    desc: Tests for security
+    cmds:
+      - echo "Checking for security..."
+      - gosec ./...
+      - echo "Done!"
+    silent: true
+
+  nilaway-install:
+    desc: Install nilaway or update to latest
+    cmds:
+      - echo "installing/updating nilaway..."
+      - go install go.uber.org/nilaway/cmd/nilaway@latest
+
+  nilaway:
+    desc: Tests for nils
+    cmds:
+      - echo "testing for nils..."
+      - nilaway ./...
+      - echo "Done!"
+    silent: true
+    
+  profile:
+    cmds:
+      - echo "Running profiling..."
+      - go test -cpuprofile=cpu.out ./...
+      - go tool pprof cpu.out
+      - go tool pprof -aloc_objects -top -cup mem.profile
+      - go tool pprof -aloc_space -top -cup mem.out
+      - go test -gcflags 'm = m'
+      - echo "Done!"
+    silent: true
+
+  routes:
+    desc: List app routes
+    cmds:
+      - echo "Listing routes..."
+      - go run  . routes list
+      - echo "Done!"
+    silent: true
+
+  test:
+    desc: Run tests
+    cmds:
+      - echo "Running tests..."
+      - go test ./...
+      - echo "Done!"
+    silent: true
+
+  swagger-spec:
+    desc: Generate Swagger specification
+    cmds:
+      - go get -u github.com/go-swagger/go-swagger/cmd/swagger
+      - swagger generate spec -o ./swagger.json
+      
+  swagger-ui:
+    desc: Run the Swagger UI
+    cmds:
+      - docker run --rm -it -p 8081:8080 swaggerapi/swagger-ui
