@@ -13,16 +13,18 @@ func NewEmailToAdminOnNewContactFormSubmitted() *emailToAdminOnNewContactFormSub
 
 type emailToAdminOnNewContactFormSubmitted struct{}
 
-// EmailSendOnRegister sends the email when user registers
+// Send sends an email notification to the admin when a new contact form is submitted
 func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 	emailSubject := config.AppName + ". New Contact Form Submitted"
 	emailContent := e.template()
 
-	finalHtml := blankEmailTemplate(emailSubject, emailContent)
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 
-	errSend := Send(SendOptions{
+	// Use the new SendEmail function instead of Send
+	errSend := SendEmail(SendOptions{
 		From:     config.MailFromEmailAddress,
 		FromName: config.AppName,
 		To:       []string{recipientEmail},

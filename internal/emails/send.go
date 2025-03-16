@@ -1,78 +1,82 @@
 package emails
 
-import (
-	"errors"
-	"net/smtp"
-	"project/config"
+// This file has been commented out as the email functionality has been moved to the base project.
+// The new implementation is now using github.com/dracory/base/email package.
+// See adapter.go for the new implementation.
 
-	"github.com/darkoatanasovski/htmltags"
-	"github.com/jordan-wright/email"
-)
+// import (
+// 	"errors"
+// 	"net/smtp"
+// 	"project/config"
 
-type SendOptions struct {
-	From     string
-	FromName string // unused for now
-	To       []string
-	Bcc      []string
-	Cc       []string
-	Subject  string
-	HtmlBody string
-	TextBody string
-}
+// 	"github.com/darkoatanasovski/htmltags"
+// 	"github.com/jordan-wright/email"
+// )
 
-// Send sends an email
-func Send(options SendOptions) error {
-	host := config.MailHost
-	port := config.MailPort
-	user := config.MailUsername
-	pass := config.MailPassword
-	addr := host + ":" + port
+// type SendOptions struct {
+// 	From     string
+// 	FromName string // unused for now
+// 	To       []string
+// 	Bcc      []string
+// 	Cc       []string
+// 	Subject  string
+// 	HtmlBody string
+// 	TextBody string
+// }
 
-	if options.From == "" {
-		return errors.New("from is required")
-	}
+// // Send sends an email
+// func Send(options SendOptions) error {
+// 	host := config.MailHost
+// 	port := config.MailPort
+// 	user := config.MailUsername
+// 	pass := config.MailPassword
+// 	addr := host + ":" + port
 
-	if len(options.To) == 0 {
-		return errors.New("to is required")
-	}
+// 	if options.From == "" {
+// 		return errors.New("from is required")
+// 	}
 
-	if options.Subject == "" {
-		return errors.New("subject is required")
-	}
+// 	if len(options.To) == 0 {
+// 		return errors.New("to is required")
+// 	}
 
-	if options.HtmlBody == "" {
-		return errors.New("html is required")
-	}
+// 	if options.Subject == "" {
+// 		return errors.New("subject is required")
+// 	}
 
-	if options.TextBody == "" {
-		nodes, errStripped := htmltags.Strip(options.HtmlBody, []string{}, true)
+// 	if options.HtmlBody == "" {
+// 		return errors.New("html is required")
+// 	}
 
-		if errStripped == nil {
-			options.TextBody = nodes.ToString() // returns stripped HTML string
-		}
-	}
+// 	if options.TextBody == "" {
+// 		nodes, errStripped := htmltags.Strip(options.HtmlBody, []string{}, true)
 
-	e := email.NewEmail()
-	e.From = options.From
-	e.To = options.To
-	e.Bcc = options.Bcc
-	e.Cc = options.Cc
-	e.Subject = options.Subject
-	e.Text = []byte(options.TextBody)
-	e.HTML = []byte(options.HtmlBody)
-	var auth smtp.Auth
-	if user == "" {
-		auth = nil
-	} else {
-		auth = smtp.PlainAuth("", user, pass, host)
-	}
+// 		if errStripped == nil {
+// 			options.TextBody = nodes.ToString() // returns stripped HTML string
+// 		}
+// 	}
 
-	err := e.Send(addr, auth)
+// 	e := email.NewEmail()
+// 	e.From = options.From
+// 	e.To = options.To
+// 	e.Bcc = options.Bcc
+// 	e.Cc = options.Cc
+// 	e.Subject = options.Subject
+// 	e.Text = []byte(options.TextBody)
+// 	e.HTML = []byte(options.HtmlBody)
+// 	var auth smtp.Auth
+// 	if user == "" {
+// 		auth = nil
+// 	} else {
+// 		auth = smtp.PlainAuth("", user, pass, host)
+// 	}
 
-	if err != nil {
-		config.Logger.Error("Error at Send", "error", err.Error())
-		return err
-	}
+// 	err := e.Send(addr, auth)
 
-	return nil
-}
+// 	if err != nil {
+// 		config.Logger.Error("Error at Send", "error", err.Error())
+// 		return err
+// 	}
+
+// 	return nil
+// }

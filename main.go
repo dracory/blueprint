@@ -10,6 +10,7 @@ import (
 	"project/app/widgets"
 	"project/config"
 	"project/internal/cli"
+	"project/internal/emails"
 
 	"github.com/mingrammer/cfmt"
 
@@ -112,6 +113,9 @@ func startBackgroundProcesses() {
 	if config.SessionStore != nil {
 		go config.SessionStore.SessionExpiryGoroutine() // Initialize the session expiration goroutine
 	}
+
+	// Initialize email sender
+	emails.InitEmailSender()
 
 	middlewares.CmsAddMiddlewares() // Add CMS middlewares
 	widgets.CmsAddShortcodes()      // Add CMS shortcodes

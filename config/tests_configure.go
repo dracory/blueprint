@@ -1,8 +1,7 @@
 package config
 
 import (
-	"os"
-
+	"github.com/dracory/base/testutils"
 	_ "modernc.org/sqlite"
 )
 
@@ -19,6 +18,34 @@ import (
 // Returns:
 // - none
 func TestsConfigureAndInitialize() {
+	// Create a test configuration using the base testutils package
+	config := testutils.DefaultTestConfig()
+	
+	// Customize the configuration for the blueprint project
+	config.AppName = "TEST APP NAME"
+	config.AppURL = "http://localhost:8080"
+	
+	// Add blueprint-specific environment variables
+	config.AdditionalEnvVars = map[string]string{
+		"CMS_TEMPLATE_ID":    "default",
+		"OPENAI_API_KEY":     "openai_api_key",
+		"STRIPE_KEY_PRIVATE": "sk_test_yoursecretkey",
+		"STRIPE_KEY_PUBLIC":  "pk_test_yourpublickey",
+		"VERTEX_PROJECT_ID":  "vertex_project_id",
+		"VERTEX_REGION_ID":   "vertex_region_id",
+		"VERTEX_MODEL_ID":    "vertex_model_id",
+	}
+	
+	// Set up the test environment
+	testutils.SetupTestEnvironment(config)
+	
+	// Initialize the application
+	Initialize()
+}
+
+/*
+// Original implementation
+func TestsConfigureAndInitializeOriginal() {
 	os.Setenv("APP_NAME", "TEST APP NAME")
 	os.Setenv("APP_URL", "http://localhost:8080")
 	os.Setenv("APP_ENV", APP_ENVIRONMENT_TESTING)
@@ -60,3 +87,4 @@ func TestsConfigureAndInitialize() {
 
 	Initialize()
 }
+*/

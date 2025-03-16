@@ -15,7 +15,7 @@ func NewInviteFriendEmail() *inviteFriendEmail {
 
 type inviteFriendEmail struct{}
 
-// EmailSendOnRegister sends the email when user registers
+// Send sends an invitation email to a friend
 func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipientEmail string, recipientName string) error {
 	if config.UserStore == nil {
 		return errors.New("user store not configured")
@@ -40,9 +40,11 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 	emailSubject := config.AppName + ". Invitation by a Friend"
 	emailContent := e.template(userName, userNote, recipientName)
 
-	finalHtml := blankEmailTemplate(emailSubject, emailContent)
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
 
-	errSend := Send(SendOptions{
+	// Use the new SendEmail function instead of Send
+	errSend := SendEmail(SendOptions{
 		From:     config.MailFromEmailAddress,
 		FromName: config.MailFromName,
 		To:       []string{recipientEmail},

@@ -13,16 +13,18 @@ func NewEmailToAdminOnNewUserRegistered() *emailToAdminOnNewUserRegistered {
 
 type emailToAdminOnNewUserRegistered struct{}
 
-// EmailSendOnRegister sends the email when user registers
+// Send sends an email notification to the admin when a new user registers
 func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 	emailSubject := config.AppName + ". New User Registered"
 	emailContent := e.template(userID)
 
-	finalHtml := blankEmailTemplate(emailSubject, emailContent)
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 
-	errSend := Send(SendOptions{
+	// Use the new SendEmail function instead of Send
+	errSend := SendEmail(SendOptions{
 		From:     config.MailFromEmailAddress,
 		FromName: config.AppName,
 		To:       []string{recipientEmail},
