@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/dracory/base/testutils"
+	"github.com/dracory/base/test"
 	_ "modernc.org/sqlite"
 )
 
@@ -19,12 +19,12 @@ import (
 // - none
 func TestsConfigureAndInitialize() {
 	// Create a test configuration using the base testutils package
-	config := testutils.DefaultTestConfig()
-	
+	config := test.DefaultTestConfig()
+
 	// Customize the configuration for the blueprint project
 	config.AppName = "TEST APP NAME"
 	config.AppURL = "http://localhost:8080"
-	
+
 	// Add blueprint-specific environment variables
 	config.AdditionalEnvVars = map[string]string{
 		"CMS_TEMPLATE_ID":    "default",
@@ -35,10 +35,10 @@ func TestsConfigureAndInitialize() {
 		"VERTEX_REGION_ID":   "vertex_region_id",
 		"VERTEX_MODEL_ID":    "vertex_model_id",
 	}
-	
+
 	// Set up the test environment
-	testutils.SetupTestEnvironment(config)
-	
+	test.SetupTestEnvironment(config)
+
 	// Initialize the application
 	Initialize()
 }
