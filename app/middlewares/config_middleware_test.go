@@ -7,6 +7,8 @@ import (
 	"project/internal/testutils"
 	"strings"
 	"testing"
+
+	"github.com/dracory/base/test"
 )
 
 func TestConfigMiddleware_AttachesConfigToContext(t *testing.T) {
@@ -14,7 +16,7 @@ func TestConfigMiddleware_AttachesConfigToContext(t *testing.T) {
 	testutils.SetupV2SetEnvironmentVariablesOnly()
 
 	// Act
-	body, response, err := testutils.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		// Extract the config from the context
 		cfg := config_v2.FromContext(r.Context())
 		if cfg == nil {
@@ -25,7 +27,7 @@ func TestConfigMiddleware_AttachesConfigToContext(t *testing.T) {
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(cfg.AppEnvironment))
-	}, testutils.NewRequestOptions{})
+	}, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {
@@ -51,9 +53,9 @@ func TestConfigMiddleware_HandlesErrorGracefully(t *testing.T) {
 	os.Setenv("APP_ENV", "")
 
 	// Act
-	body, response, err := testutils.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
-	}, testutils.NewRequestOptions{})
+	}, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {
@@ -88,7 +90,7 @@ func TestConfigMiddleware_PreservesExistingContextValues(t *testing.T) {
 	var retrievedValue string
 	var configFromContext interface{}
 
-	_, response, err := testutils.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	_, response, err := test.CallMiddleware("GET", NewConfigMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		// Extract the test value from the context
 		if val, ok := r.Context().Value(testKey).(string); ok {
 			retrievedValue = val
@@ -98,7 +100,7 @@ func TestConfigMiddleware_PreservesExistingContextValues(t *testing.T) {
 		configFromContext = config_v2.FromContext(r.Context())
 
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			testKey: testValue,
 		},

@@ -55,15 +55,14 @@ func ResourceWithParams(path string, params map[string]string) string {
 func ImageToBase64String(path string) string {
 	data, _ := files.ReadFile(path)
 
-	// Check if it's an SVG file based on extension
-	isSvg := filepath.Ext(path) == ".svg"
+	ext := filepath.Ext(path)
 
-	var mimeType string
-	if isSvg {
-		mimeType = "image/svg+xml"
-	} else {
-		mimeType = http.DetectContentType(data)
+	if ext == ".svg" {
+		base64Encoding := "data:image/svg+xml;base64," + base64.StdEncoding.EncodeToString(data)
+		return base64Encoding
 	}
+
+	mimeType := http.DetectContentType(data)
 
 	base64Encoding := ""
 
@@ -80,12 +79,8 @@ func ImageToBase64String(path string) string {
 		base64Encoding += "data:image/png;base64,"
 	case "image/webp":
 		base64Encoding += "data:image/webp;base64,"
-	case "image/svg+xml":
-		base64Encoding += "data:image/svg+xml;base64,"
-	default:
-		base64Encoding += "data:image/*;base64,"
 	}
 
-	base64Encoding += base64.StdEncoding.EncodeToString(data)
+	base64Encoding += base64.URLEncoding.EncodeToString([]byte(data))
 	return base64Encoding
 }

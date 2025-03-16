@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dracory/base/test"
 	"github.com/gouniverse/userstore"
 )
 
@@ -19,10 +20,10 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	testutils.Setup()
 
 	// Act
-	body, response, err := testutils.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{})
+	}, test.NewRequestOptions{})
 
 	// Assert
 
@@ -77,10 +78,10 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,
@@ -152,10 +153,10 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,
@@ -230,10 +231,10 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,
@@ -309,10 +310,10 @@ func TestAdminMiddleware_Success(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Success"))
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,

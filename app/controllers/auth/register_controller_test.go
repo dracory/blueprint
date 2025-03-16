@@ -9,13 +9,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dracory/base/test"
 	"github.com/gouniverse/auth"
 )
 
 func TestRegisterController_RequiresAuthenticatedUser(t *testing.T) {
 	testutils.Setup()
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodGet, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController().Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -76,7 +77,7 @@ func TestRegisterController_ShowsRegisterForm(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodGet, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController().Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
 			auth.AuthenticatedUserID{}:           user.ID(),
@@ -125,7 +126,7 @@ func TestRegisterController_RequiresFirstName(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController().Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email": {user.Email()},
 		},
@@ -177,7 +178,7 @@ func TestRegisterController_RequiresLastName(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController().Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -230,7 +231,7 @@ func TestRegisterController_RequiresCountry(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController().Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -284,7 +285,7 @@ func TestRegisterController_RequiresTimezone(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController().Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -339,7 +340,7 @@ func TestRegisterController_Success(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := testutils.CallHtmlEndpoint(http.MethodPost, NewRegisterController().Handler, testutils.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController().Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},

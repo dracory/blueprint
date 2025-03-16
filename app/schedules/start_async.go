@@ -8,6 +8,14 @@ import (
 	"github.com/mingrammer/cfmt"
 )
 
+// scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task
+func scheduleStatsVisitorEnhanceTask() {
+	_, err := tasks.NewStatsVisitorEnhanceTask().Enqueue()
+	if err != nil {
+		cfmt.Errorln(err.Error())
+	}
+}
+
 // StartAsync starts the scheduler in the background without blocking the main thread
 func StartAsync() {
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -40,12 +48,7 @@ func StartAsync() {
 	// }
 
 	// Schedule Building the Stats Every 2 Minutes
-	scheduler.Every(2).Minutes().Do(func() {
-		_, err := tasks.NewStatsVisitorEnhanceTask().Enqueue()
-		if err != nil {
-			cfmt.Errorln(err.Error())
-		}
-	})
+	scheduler.Every(2).Minutes().Do(scheduleStatsVisitorEnhanceTask)
 
 	scheduler.StartAsync()
 }

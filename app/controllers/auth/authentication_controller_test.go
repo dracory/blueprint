@@ -9,13 +9,14 @@ import (
 	"project/internal/testutils"
 	"testing"
 
+	"github.com/dracory/base/test"
 	"github.com/gouniverse/responses"
 )
 
 func TestAuthControllerOnceIsRequired(t *testing.T) {
 	testutils.Setup()
 
-	req, err := testutils.NewRequest(http.MethodPost, "/", testutils.NewRequestOptions{
+	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{},
 	})
 
@@ -54,7 +55,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 func TestAuthControllerOnceMustBeValid(t *testing.T) {
 	testutils.Setup()
 
-	req, err := testutils.NewRequest(http.MethodPost, "/", testutils.NewRequestOptions{
+	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
 			"once": {"test"},
 		},
@@ -96,7 +97,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 	testutils.Setup()
 
-	req, err := testutils.NewRequest(http.MethodPost, "/", testutils.NewRequestOptions{
+	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
 			"once": {testutils.TestKey()},
 		},
@@ -161,7 +162,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req, err := testutils.NewRequest(http.MethodPost, "/", testutils.NewRequestOptions{
+	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
 			"once": {testutils.TestKey()},
 		},

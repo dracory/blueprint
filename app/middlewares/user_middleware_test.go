@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dracory/base/test"
 	"github.com/gouniverse/userstore"
 )
 
@@ -19,10 +20,10 @@ func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	testutils.Setup()
 
 	// Act
-	body, response, err := testutils.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{})
+	}, test.NewRequestOptions{})
 
 	// Assert
 
@@ -84,10 +85,10 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,
@@ -161,10 +162,10 @@ func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 	}
 
 	// Act
-	body, response, err := testutils.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,
@@ -248,10 +249,10 @@ func TestUserMiddleware_Success(t *testing.T) {
 
 	// Act
 
-	body, response, err := testutils.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Success"))
 		w.WriteHeader(http.StatusOK)
-	}, testutils.NewRequestOptions{
+	}, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,

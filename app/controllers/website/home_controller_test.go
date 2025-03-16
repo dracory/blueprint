@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"project/internal/testutils"
+
+	"github.com/dracory/base/test"
 )
 
 func TestHomeController_Handler(t *testing.T) {
@@ -13,7 +15,7 @@ func TestHomeController_Handler(t *testing.T) {
 	testutils.Setup()
 
 	// Execute
-	body, response, err := testutils.CallHtmlEndpoint(http.MethodPost, newHomeController().Handler, testutils.NewRequestOptions{})
+	body, response, err := test.CallStringEndpoint(http.MethodPost, newHomeController().Handler, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {
