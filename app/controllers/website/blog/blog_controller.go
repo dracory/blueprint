@@ -40,7 +40,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 		return helpers.ToFlashError(w, r, errorMessage, links.NewWebsiteLinks().Home(), 10)
 	}
 
-	return layouts.NewWebsiteLayout(layouts.Options{
+	return layouts.NewCmsLayout(layouts.Options{
 		Request:        r,
 		WebsiteSection: "Blog",
 		Title:          "Recent Posts",

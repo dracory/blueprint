@@ -32,13 +32,13 @@ func ResourceExists(path string) bool {
 	return err == nil
 }
 
-func Resource(path string) string {
+func Resource(path string) (string, error) {
 	str, err := files.ReadFile(path)
 	if err != nil {
 		log.Println("Resource: " + path + " NOT FOUND")
-		return ""
+		return "", err
 	}
-	return string(str)
+	return string(str), nil
 }
 
 func ResourceWithParams(path string, params map[string]string) string {

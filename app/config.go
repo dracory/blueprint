@@ -9,6 +9,6 @@ import (
 // GetConfig retrieves the configuration from the context.
 // This helps transition from the global configuration system
 // to a context-based approach for better testability and parallel test execution.
-func GetConfig(ctx context.Context) interface{} {
+func GetConfig(ctx context.Context) *config_v2.Config {
 	return config_v2.FromContext(ctx)
 }

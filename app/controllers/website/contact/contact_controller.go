@@ -1,4 +1,4 @@
-package website
+package contact
 
 import (
 	"context"

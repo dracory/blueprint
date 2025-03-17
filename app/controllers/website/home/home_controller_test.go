@@ -1,4 +1,4 @@
-package website
+package home
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ func TestHomeController_Handler(t *testing.T) {
 	testutils.Setup()
 
 	// Execute
-	body, response, err := test.CallStringEndpoint(http.MethodPost, newHomeController().Handler, test.NewRequestOptions{})
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewHomeController().Handler, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {

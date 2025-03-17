@@ -172,7 +172,11 @@ func intializeEnvEncVariables(appEnvironment string) {
 
 	vaultFilePath := ".env." + appEnvironment + ".vault"
 
-	vaultContent := resources.Resource(".env." + appEnvironment + ".vault")
+	vaultContent, err := resources.Resource(".env." + appEnvironment + ".vault")
+
+	if err != nil {
+		panic(err.Error())
+	}
 
 	derivedEnvEncKey, err := deriveEnvEncKey(envEncryptionKey)
 

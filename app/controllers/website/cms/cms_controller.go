@@ -1,4 +1,4 @@
-package website
+package cms
 
 import (
 	"net/http"

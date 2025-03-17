@@ -69,9 +69,12 @@ func (c *Config) initializeEnvVariables() error {
 	}
 
 	// Enable if you use envenc
-	intializeEnvEncVariables(appEnvironment)
+	//err = c.intializeEnvEncVariables(appEnvironment)
+	// if err != nil {
+	// 	return err
+	// }
 
-	c.AppEnvironment = env.Value("APP_ENV")
+	c.AppEnvironment = appEnvironment
 	c.AppName = env.Value("APP_NAME")
 	c.AppUrl = env.Value("APP_URL")
 	c.CmsUserTemplateID = env.Value("CMS_TEMPLATE_ID")
@@ -156,17 +159,25 @@ func (c *Config) initializeEnvVariables() error {
 //
 // Returns:
 // - none
-func intializeEnvEncVariables(appEnvironment string) {
+func (c *Config) intializeEnvEncVariables(appEnvironment string) error {
 	if appEnvironment == APP_ENVIRONMENT_TESTING {
-		return
+		return nil
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)
-	envEncryptionKey := utils.EnvMust("ENV_ENCRYPTION_KEY")
+	envEncryptionKey, err := env.ValueOrError("ENVENC_KEY_PRIVATE")
+
+	if err != nil {
+		return errors.New("ENVENC_KEY_PRIVATE is required")
+	}
 
 	vaultFilePath := ".env." + appEnvironment + ".vault"
 
-	vaultContent := resources.Resource(".env." + appEnvironment + ".vault")
+	vaultContent, err := resources.Resource(".env." + appEnvironment + ".vault")
+
+	if err != nil {
+		return err
+	}
 
 	derivedEnvEncKey, err := deriveEnvEncKey(envEncryptionKey)
 
@@ -185,8 +196,10 @@ func intializeEnvEncVariables(appEnvironment string) {
 	})
 
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
+
+	return nil
 }
 
 // if c.Database == nil {

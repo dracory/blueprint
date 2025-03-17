@@ -10,8 +10,8 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-func NewWebsiteLayout(options Options) *websiteLayout {
-	layout := &websiteLayout{}
+func NewCmsLayout(options Options) *cmsLayout {
+	layout := &cmsLayout{}
 	layout.request = options.Request
 	layout.title = options.Title // + " | " + config.AppName
 	layout.content = options.Content
@@ -22,7 +22,7 @@ func NewWebsiteLayout(options Options) *websiteLayout {
 	return layout
 }
 
-type websiteLayout struct {
+type cmsLayout struct {
 	request *http.Request
 	// websiteSection string // i.e. Blog, Website
 	title      string
@@ -33,7 +33,7 @@ type websiteLayout struct {
 	styles     []string
 }
 
-func (layout *websiteLayout) ToHTML() string {
+func (layout *cmsLayout) ToHTML() string {
 	list := widgets.WidgetRegistry()
 
 	shortcodes := []cmsstore.ShortcodeInterface{}

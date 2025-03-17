@@ -1,4 +1,4 @@
-package website
+package home
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 
 // == CONSTRUCTOR ==============================================================
 
-func newHomeController() router.HTMLControllerInterface {
+func NewHomeController() router.HTMLControllerInterface {
 	return &homeController{}
 }
 

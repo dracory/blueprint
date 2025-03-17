@@ -56,4 +56,5 @@
 /vendor/*
 
 .gitlab-ci.yaml
+taskfile.yml
 Taskfile.yml

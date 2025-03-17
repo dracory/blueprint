@@ -52,7 +52,11 @@ func (controller resourceController) Handler(w http.ResponseWriter, r *http.Requ
 		ElseIf(strings.HasSuffix(uri, ".woff2"), "font/woff2").
 		Else("text/plain")
 
-	resourceContent := resources.Resource(uri)
+	resourceContent, err := resources.Resource(uri)
+
+	if err != nil {
+		return PageNotFoundController().Handler(w, r)
+	}
 
 	if resourceContent == "" {
 		return PageNotFoundController().Handler(w, r)

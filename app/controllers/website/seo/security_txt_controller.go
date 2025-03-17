@@ -1,4 +1,4 @@
-package website
+package seo
 
 import (
 	"net/http"

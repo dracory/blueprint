@@ -52,8 +52,8 @@ github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1
 github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
 github.com/doug-martin/goqu/v9 v9.19.0 h1:PD7t1X3tRcUiSdc5TEyOFKujZA5gs3VSA7wxSvBx7qo=
 github.com/doug-martin/goqu/v9 v9.19.0/go.mod h1:nf0Wc2/hV3gYK9LiyqIrzBEVGlI8qW3GuDCEobC4wBQ=
-github.com/dracory/base v0.2.0 h1:2a0lTJJYOkoxElcufKAtPmRz2Qk7eKu8/y1r2C4cLy0=
-github.com/dracory/base v0.2.0/go.mod h1:dKLQvbxVNmWm3J2tl0ghPxbl/WewEYvL+1kX1Bey0n0=
+github.com/dracory/base v0.3.0 h1:s10RrnLJ7wRuDjvBEWt1+hrVLKt6efoIEeBekt3Pw1I=
+github.com/dracory/base v0.3.0/go.mod h1:y8EmScb0z3NhxTxV2zhF8HvVYmhMcCgBS2qNzj02Co0=
 github.com/dromara/carbon/v2 v2.5.4 h1:BkftNHVCkEwzv6ZuFiB/R1rLHaw6ufbCVkyLDCf3GeY=
 github.com/dromara/carbon/v2 v2.5.4/go.mod h1:zyPlND2o27sKKkRmdgLbk/qYxkmmH6Z4eE8OoM0w3DM=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
@@ -101,8 +101,8 @@ github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm4
 github.com/google/uuid v1.4.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/goravel/framework v1.15.4 h1:tYK+tX4e7+782OjnVX9uqDB5EPnGaoUaaXoLvozppgA=
-github.com/goravel/framework v1.15.4/go.mod h1:9KQcHT8xO7al1b2vQYe+v7RKRZvXLcllq1Ib5RhU3hQ=
+github.com/goravel/framework v1.15.5 h1:EHYPxomXkxIlG3ptbIZWBuxtJbXab1+2tP4ZK8NC5G8=
+github.com/goravel/framework v1.15.5/go.mod h1:9KQcHT8xO7al1b2vQYe+v7RKRZvXLcllq1Ib5RhU3hQ=
 github.com/gouniverse/api v1.6.0 h1:qIW5NHJna/Qd6AGoRJm1HhPAcA3QTEzdCe1FMQ+VwMI=
 github.com/gouniverse/api v1.6.0/go.mod h1:rm5dXyrksJSHwUCVEs9+TenJeBBC34R4FPjtwZ/TvQ8=
 github.com/gouniverse/auth v0.22.0 h1:BNBzqkFG6hrRj3rPVrF8lA8jG0PIWlqZTBtIfrAT7vo=
@@ -133,10 +133,10 @@ github.com/gouniverse/csrf v0.1.0 h1:Snlx5iuuSzJnMXRBmTZEFxX88ocQ3de2a2+zsLiDiuM
 github.com/gouniverse/csrf v0.1.0/go.mod h1:wTfDatvfFO40VJKlX7iXfZs7v6PHTNfnIdRSD3G11RQ=
 github.com/gouniverse/customstore v0.6.0 h1:ahzuNhyIuWebcwfhADh/57nYXn1emRQqGQGZeV0f3n4=
 github.com/gouniverse/customstore v0.6.0/go.mod h1:pvrne25CSXYLiKvNw8TC4Rd2yxQlqAY8vNH/oQ0IINI=
-github.com/gouniverse/dashboard v1.6.1 h1:gyOerX+JEytwYZjwsKjv7SgzjePsGQAAvTzhRjqAaSo=
-github.com/gouniverse/dashboard v1.6.1/go.mod h1:7Lger91NF+SqfC7CO+BnlvWVQtlFeA5izoSjoj6RKDw=
-github.com/gouniverse/dataobject v0.3.0 h1:4m6zH8q3/Z159MrkX64gZO884SC2RE35FFzM186ohU8=
-github.com/gouniverse/dataobject v0.3.0/go.mod h1:kGYa0bv14xCmkTCW2CpF9dIkh+S1N3O04c5eJY1jFqg=
+github.com/gouniverse/dashboard v1.7.1 h1:AEZfDXzQGh17rYQBsXjUz2AnU6Lkvqcbm4KqPtS7mIQ=
+github.com/gouniverse/dashboard v1.7.1/go.mod h1:ml8jWMy9a8XnHHbOrDZWNtWQfJVjLBU2GHu2E/0qKdA=
+github.com/gouniverse/dataobject v1.0.0 h1:bwzNw/gJrZHIESABcKWH9+DhmiP/2i2ejgJq72d0QOc=
+github.com/gouniverse/dataobject v1.0.0/go.mod h1:kGYa0bv14xCmkTCW2CpF9dIkh+S1N3O04c5eJY1jFqg=
 github.com/gouniverse/entitystore v0.65.1 h1:8dHxWSrR3hLoQ4k87ln9nzu7R1dLo8xWnITNzU4M05g=
 github.com/gouniverse/entitystore v0.65.1/go.mod h1:iuSEYXgBFXbsjz4WTWI2ewtJ9s+J/DW3NhDb0BxjtQ0=
 github.com/gouniverse/envenc v0.8.0 h1:pt1DVRrRXdxk4eA6vm0SBCdPrgXaF1EsDUq6tgXfpFs=
