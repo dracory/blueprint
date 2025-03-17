@@ -8,9 +8,9 @@ type AuthenticatedUserContextKey struct{}
 // AuthenticatedSessionContextKey is a context key for the authenticated session.
 type AuthenticatedSessionContextKey struct{}
 
-// configContextKey is a context key for the configuration.
+// ConfigContextKey is a context key for the configuration.
 // it is deliberatly not exported
-type configContextKey struct{}
+type ConfigContextKey struct{}
 
 // == CONSTANTS ============================================================= //
 
