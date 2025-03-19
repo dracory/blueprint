@@ -2,7 +2,6 @@ package testutils
 
 import (
 	"project/config"
-	"project/config_v2"
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 )
 
@@ -27,20 +26,6 @@ func Setup() {
 	// jobs.Initialize()
 	// setupMailServer()
 	// tasks.RegisterTasks()
-}
-
-func SetupV2SetEnvironmentVariablesOnly() {
-	config_v2.TestsSetEnvironmentVariables()
-}
-
-func SetupV2() (*config_v2.Config, error) {
-	cfg, err := config_v2.TestsConfigureAndInitialize()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return cfg, nil
 }
 
 // func setupMailServer() {

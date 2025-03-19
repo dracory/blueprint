@@ -3,11 +3,9 @@ package website
 import (
 	"net/http"
 	"project/app/links"
-	"project/app/middlewares"
 	"project/config"
 
 	"github.com/gouniverse/router"
-	"github.com/samber/lo"
 
 	"project/app/controllers/shared"
 
@@ -20,16 +18,6 @@ import (
 )
 
 func Routes() []router.RouteInterface {
-	websiteRoutes := websiteRoutes()
-	routes := []router.RouteInterface{}
-	lo.ForEach(websiteRoutes, func(route router.RouteInterface, index int) {
-		route.AddMiddlewares(middlewares.NewConfigMiddleware())
-		routes = append(routes, route)
-	})
-	return routes
-}
-
-func websiteRoutes() []router.RouteInterface {
 	homeRoute := &router.Route{
 		Name:        "Website > Home Controller",
 		Path:        links.HOME,
