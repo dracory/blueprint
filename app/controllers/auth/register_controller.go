@@ -475,8 +475,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 
 	if r.Method == http.MethodGet {
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading email", err.Error())
-			return registerControllerData{}, "Error reading email"
+			return registerControllerData{}, "Error reading user data"
 		}
 
 		data = registerControllerData{
