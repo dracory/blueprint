@@ -22,9 +22,3 @@ tasks:
   - name: Install Dependencies and Run
     init: go get && go build ./... && go test ./...
     command: go run
-
-ports:
-  - name: Mail test server
-    description: The mail mock test server
-    port: 32435
-    onOpen: ignore

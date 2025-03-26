@@ -1,6 +1,7 @@
 package user
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
-	"github.com/samber/lo"
 )
 
 // == CONTROLLER ==============================================================
@@ -56,26 +56,25 @@ func (controller *homeController) view(data homeControllerData) hb.TagInterface 
 }
 
 func (controller *homeController) prepareData(r *http.Request) (data homeControllerData, errorMessage string) {
+	var err error
 	authUser := helpers.GetAuthUser(r)
 
 	if authUser == nil {
 		return data, "User not found"
 	}
 
-	untokenized, err := helpers.Untokenize(r.Context(), map[string]string{
-		"first_name": authUser.FirstName(),
-		"last_name":  authUser.LastName(),
-		"email":      authUser.Email(),
-	})
+	userFirstName := authUser.FirstName()
+	userLastName := authUser.LastName()
+	userEmail := authUser.Email()
 
-	if err != nil {
-		config.LogStore.ErrorWithContext("At orderListController > prepareData", err.Error())
-		return data, "User data failed to be fetched"
+	if config.VaultStoreUsed {
+		userFirstName, userLastName, userEmail, err = helpers.UserUntokenized(r.Context(), authUser)
+
+		if err != nil {
+			config.Logger.Error("Error: user > home > prepareData", slog.String("error", err.Error()))
+			return data, "User data failed to be fetched"
+		}
 	}
-
-	userFirstName := lo.ValueOr(untokenized, "first_name", "")
-	userLastName := lo.ValueOr(untokenized, "last_name", "")
-	userEmail := lo.ValueOr(untokenized, "email", "n/a")
 
 	return homeControllerData{
 		request:       r,

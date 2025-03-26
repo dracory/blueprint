@@ -9,7 +9,7 @@
 version: '3'
 
 vars:
-  APPNAME: Welcome to Gouniverse Blueprint Project
+  APPNAME: The Dracory Blueprint Project
   DATETIME: '{{now | date "20060102_150405"}}'
 
 tasks:
