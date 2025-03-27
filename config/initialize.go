@@ -107,6 +107,7 @@ func initializeEnvVariables() error {
 		return utils.EnvMust("DB_PASSWORD")
 	})
 	Debug = utils.Env("DEBUG") == "yes"
+	GoogleGeminiApiKey = utils.Env("GOOGLE_GEMINI_API_KEY")
 	MailDriver = utils.Env("MAIL_DRIVER")
 	MailFromEmailAddress = utils.Env("EMAIL_FROM_ADDRESS")
 	MailFromName = utils.Env("EMAIL_FROM_NAME")

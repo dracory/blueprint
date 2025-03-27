@@ -23,6 +23,11 @@ func (l *websiteLinks) BlogPost(postID string, postSlug string) string {
 	return URL(uri, map[string]string{})
 }
 
+func (l *websiteLinks) Chat(params ...map[string]string) string {
+	p := lo.Ternary(len(params) > 0, params[0], map[string]string{})
+	return URL(CHAT_HOME, p)
+}
+
 func (l *websiteLinks) Contact() string {
 	return URL(CONTACT, map[string]string{})
 }

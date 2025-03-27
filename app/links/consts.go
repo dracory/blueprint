@@ -21,6 +21,8 @@ const ADMIN_BLOG_POST_MANAGER = "/admin/blog/post-manager"
 const ADMIN_BLOG_POST_CREATE = "/admin/blog/post-create"
 const ADMIN_BLOG_POST_DELETE = "/admin/blog/post-delete"
 const ADMIN_BLOG_POST_UPDATE = "/admin/blog/post-update"
+const ADMIN_CHAT = "/admin/chat"
+const ADMIN_CHAT_RAG = "/admin/chat/rag"
 const ADMIN_CMS = "/admin/cms"
 const ADMIN_CMS_NEW = "/admin/cmsnew"
 const ADMIN_FILE_MANAGER = "/admin/file-manager"
@@ -47,6 +49,12 @@ const USER_ORDER_DELETE = USER_ORDERS + "/delete"
 const USER_ORDER_LIST = USER_ORDERS + "/list"
 const USER_PROFILE = USER_HOME + "/profile"
 const USER_PROFILE_UPDATE = USER_HOME + "/profile/update"
+
+// ===========================================================================
+// == CHAT LINKS
+// ===========================================================================
+
+const CHAT_HOME = "/chat"
 
 // ===========================================================================
 // == WEBSITE LINKS

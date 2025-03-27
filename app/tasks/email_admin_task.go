@@ -12,7 +12,7 @@ import (
 // =================================================================
 // Example:
 //
-// go run . task email-to-admin --html=HTML
+// go run . task EmailToAdminTask --html=HTML
 //
 // =================================================================
 func NewEmailToAdminTaskHandler() *emailToAdminTaskHandler {
@@ -27,7 +27,7 @@ type emailToAdminTaskHandler struct {
 var _ taskstore.TaskHandlerInterface = (*emailToAdminTaskHandler)(nil) // verify it extends the task interface
 
 func (handler *emailToAdminTaskHandler) Alias() string {
-	return "email-to-admin"
+	return "EmailToAdminTask"
 }
 
 func (handler *emailToAdminTaskHandler) Title() string {

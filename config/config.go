@@ -81,6 +81,9 @@ var DbUser string
 // Debug is a boolean indicating whether the application is in debug mode.
 var Debug bool
 
+// GoogleGeminiApiKey is the Google Gemini API key.
+var GoogleGeminiApiKey string
+
 // MailDriver is the mail driver to use (e.g., smtp, sendgrid).
 var MailDriver string
 
