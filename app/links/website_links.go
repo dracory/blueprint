@@ -1,6 +1,10 @@
 package links
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/samber/lo"
+)
 
 type websiteLinks struct{}
 
