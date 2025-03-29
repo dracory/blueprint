@@ -9,7 +9,7 @@ func Admin() *adminLinks {
 	return NewAdminLinks()
 }
 
-// NewAdminLinks returns a new instance of adminLinks
+// Deprecated: Use Admin() instead. NewAdminLinks will be removed in the next major version.
 func NewAdminLinks() *adminLinks {
 	return &adminLinks{}
 }

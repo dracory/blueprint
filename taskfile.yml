@@ -59,6 +59,7 @@ tasks:
     desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
     cmds:
       - go run cmd/deploy/main.go
+      - echo "Done!"
 
   dev-init:
     desc: Initialize development environment (copies the .env_example to .env)
@@ -74,13 +75,15 @@ tasks:
 
   env-dev:
     cmds:
-      # - go run . task EnvEnc ui ./internal/resources/.env.development.vault
-      - go run ./cmd/envenc/main.go ui ./internal/resources/.env.development.vault
+      - go run cmd/envenc/main.go ui ./resources/.env.development.vault
+      - echo "Done!"
+    silent: true
 
   env-prod:
     cmds:
-      # - go run . task EnvEnc ui ./internal/resources/.env.production.vault
-      - go run ./cmd/envenc/main.go ui ./internal/resources/.env.production.vault
+      - go run cmd/envenc/main.go ui ./resources/.env.production.vault
+      - echo "Done!"
+    silent: true
 
   errcheck-install:
     desc: Install errcheck or update to latest

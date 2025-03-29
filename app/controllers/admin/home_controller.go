@@ -145,7 +145,7 @@ func (*homeController) tiles() []hb.TagInterface {
 	cmsTileNew := map[string]string{
 		"title": "Website Manager (New)",
 		"icon":  "bi-globe",
-		"link":  links.NewAdminLinks().CmsNew(map[string]string{}),
+		"link":  links.NewAdminLinks().CmsNew(),
 	}
 
 	blogTile := map[string]string{

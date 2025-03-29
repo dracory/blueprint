@@ -2,6 +2,12 @@ package links
 
 type userLinks struct{}
 
+// User is a shortcut for NewUserLinks
+func User() *userLinks {
+	return NewUserLinks()
+}
+
+// Deprecated: Use User() instead. NewUserLinks will be removed in the next major version.
 func NewUserLinks() *userLinks {
 	return &userLinks{}
 }

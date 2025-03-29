@@ -8,6 +8,12 @@ import (
 
 type websiteLinks struct{}
 
+// Website is a shortcut for NewWebsiteLinks
+func Website() *websiteLinks {
+	return NewWebsiteLinks()
+}
+
+// Deprecated: Use Website() instead. NewWebsiteLinks will be removed in the next major version.
 func NewWebsiteLinks() *websiteLinks {
 	return &websiteLinks{}
 }

@@ -83,7 +83,7 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 	}
 
 	homeURL := links.NewWebsiteLinks().Home()
-	email, errorMessage := c.emailFromAuthKnightRequest(r)
+	email, backUrl, errorMessage := c.emailAndBackUrlFromAuthKnightRequest(r)
 
 	if errorMessage != "" {
 		return helpers.ToFlashError(w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
@@ -125,6 +125,10 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 
 	redirectUrl := c.calculateRedirectURL(user)
 
+	if backUrl != "" {
+		redirectUrl = backUrl
+	}
+
 	return helpers.ToFlashSuccess(w, r, "Login was successful", redirectUrl, 5)
 }
 
@@ -147,17 +151,20 @@ func (c *authenticationController) findUserIDInBlindIndex(email string) (userID 
 	return recordsFound[0].SourceReferenceID(), nil
 }
 
-func (c *authenticationController) emailFromAuthKnightRequest(r *http.Request) (email string, errorMessage string) {
+func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.Request) (email, backUrl, errorMessage string) {
 	once := strings.TrimSpace(utils.Req(r, "once", ""))
 
 	if once == "" {
-		return "", "Once is required field"
+		return "", "", "Once is required field"
 	}
 
 	response, err := c.callAuthKnight(once)
+
+	config.Logger.Info("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Response: ", "response", response)
+
 	if err != nil {
 		config.Logger.Error("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Error: ", "error", err.Error())
-		return "", "No response from authentication provider"
+		return "", "", "No response from authentication provider"
 	}
 
 	status := lo.ValueOr(response, "status", "")
@@ -165,31 +172,35 @@ func (c *authenticationController) emailFromAuthKnightRequest(r *http.Request) (
 	data := lo.ValueOr(response, "data", "")
 
 	if status == "" {
-		return "", "No status found"
+		return "", "", "No status found"
 	}
 
 	if message == "" {
-		return "", "No message found"
+		return "", "", "No message found"
 	}
 
 	if data == "" {
-		return "", "No data found"
+		return "", "", "No data found"
 	}
 
 	if status != "success" {
 		config.Logger.Error("At Auth Controller > AnyIndex > Response Status: ", "error", message.(string))
-		return "", "Invalid authentication response status"
+		return "", "", "Invalid authentication response status"
 	}
 
 	mapData := data.(map[string]any)
 
+	// Required
 	email = strings.TrimSpace(lo.ValueOr(mapData, "email", "").(string))
 
 	if email == "" {
-		return "", "No email found"
+		return "", "", "No email found"
 	}
 
-	return email, ""
+	// Optional
+	backUrl = strings.TrimSpace(lo.ValueOr(mapData, "back_url", "").(string))
+
+	return email, backUrl, ""
 }
 
 // callAuthKnight makes a request to the authentication server

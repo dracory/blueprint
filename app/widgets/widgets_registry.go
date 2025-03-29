@@ -13,6 +13,7 @@ func WidgetRegistry() []Widget {
 	return []Widget{
 		NewAuthenticatedWidget(),
 		NewContactFormWidget(),
+		NewTermsOfUseWidget(),
 		NewUnauthenticatedWidget(),
 		NewVisibleWidget(),
 	}

@@ -7,6 +7,7 @@ import (
 	"project/app/links"
 	"project/config"
 	"project/internal/helpers"
+	"project/pkg/blogtheme"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
@@ -65,30 +66,16 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 		config.LogStore.ErrorWithContext("ERROR: anyPost: post Title is missing for ID "+postID, "Redirecting to correct URL")
 		helpers.ToFlash(w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
-
-		// return guestshared.WebsiteTemplate(guestshared.WebsiteTemplateOptions{
-		// 	Title:           post.Title() + " | Blog Post",
-		// 	MetaDescription: post.MetaDescription(),
-		// 	Content:         c.htmlPost(*post) + sharedWidget.HTML(),
-		// 	Scripts: []string{
-		// 		// uncdn.NotifyJs(),
-		// 		c.commentsJs(helpers.SafeDereference(post)),
-		// 		sharedWidget.JS(),
-		// 	},
-		// 	Styles: []string{
-		// 		c.cssSectionIntro(),
-		// 		c.cssPost(),
-		// 		sharedWidget.CSS(),
-		// 	},
-		// 	HTTPRequest: r,
-		// })
 	}
 
 	return layouts.NewCmsLayout(layouts.Options{
 		Request:        r,
 		WebsiteSection: "Blog.",
 		Title:          post.Title(),
-		Content:        hb.Wrap().HTML(c.page(*post)),
+		StyleURLs: []string{
+			"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+		},
+		Content: hb.Wrap().HTML(c.page(*post)),
 	}).ToHTML()
 }
 
@@ -117,7 +104,7 @@ func (c blogPostController) page(post blogstore.Post) string {
 	return hb.Wrap().Children([]hb.TagInterface{
 		// hb.Style(c.cssSectionIntro()),
 		hb.Style(c.css()),
-		hb.Raw(sectionBanner),
+		sectionBanner,
 		// c.sectionIntro(),
 		c.sectionPost(post),
 	}).ToHTML()
@@ -136,7 +123,7 @@ func (c blogPostController) css() string {
 #SectionNewsItem .BlogTitle {
 	padding:10px 0px 20px 0px;
 	font-size:35px;
-	font-family: 'Crimson Text', serif;
+	font-family: 'Roboto', serif;
 	color:#224b8e;
 	text-align:centre;
 }
@@ -144,100 +131,118 @@ func (c blogPostController) css() string {
 #SectionNewsItem .BlogContent {
 	padding:10px 0px 20px 0px;
 	text-align:left;
-	font-family:"Times New Roman", Times, serif;
+	font-family: 'Roboto', Times, serif;
 	font-size:20px;
 }
 	`
 }
 
-func (controller *blogPostController) processContent(content string, editor string) string {
+func (controller *blogPostController) processContent(content string, editor string) (html string, css string) {
 	if editor == blogstore.POST_EDITOR_BLOCKAREA {
-		return helpers.BlogPostBlocksToString(content)
+		return helpers.BlogPostBlocksToString(content), ""
+	}
+	if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
+		theme, err := blogtheme.New(content)
+
+		if err != nil {
+			return "Error parsing content. Please try again later.", ""
+		}
+
+		return theme.ToHtml(), theme.Style()
 	}
 	if editor == blogstore.POST_EDITOR_MARKDOWN {
-		return controller.markdownToHtml(content)
+		return controller.markdownToHtml(content), ""
 	}
-	return content
+
+	return content, ""
 }
 
 func (c *blogPostController) sectionPost(post blogstore.Post) *hb.Tag {
+	postHtml, themeStyle := c.processContent(post.Content(), post.Editor())
+
 	// nextPost, _ := models.NewBlogRepository().PostFindNext(post)
 	// prevPost, _ := models.NewBlogRepository().PostFindPrevious(post)
-	sectionPost := hb.Section().ID("SectionNewsItem").Style(`background:#fff;`).Children([]hb.TagInterface{
-		bs.Container().Children([]hb.TagInterface{
-			bs.Row().Children([]hb.TagInterface{
-				bs.Column(12).Children([]hb.TagInterface{
-					hb.Div().Class("BlogTitle").Children([]hb.TagInterface{
-						hb.Heading1().Style("color:#794FC6;").HTML(post.Title()),
+	sectionPost := hb.Section().
+		ID("SectionNewsItem").
+		Style(`background:#fff;`).
+		Child(hb.Style(themeStyle)).
+		Children([]hb.TagInterface{
+			bs.Container().
+				Children([]hb.TagInterface{
+					bs.Row().
+						Child(bs.Column(12).
+							Child(hb.Div().
+								Class("BlogTitle").
+								Child(hb.Heading1().
+									HTML(post.Title())))),
+					bs.Row().
+						Children([]hb.TagInterface{
+							bs.Column(12).Children([]hb.TagInterface{
+								hb.Div().Class("BlogImage float-end").Style("padding-top:30px; padding-left:30px; padding-bottom:30px; width:600px; max-width:100%;").Children([]hb.TagInterface{
+									hb.Image(post.ImageUrlOrDefault()).
+										Class("img img-responsive img-thumbnail"),
+								}),
+								hb.Div().
+									Class("BlogContent").
+									HTML(postHtml),
+							}),
+							// bs.Column(8).Children([]hb.TagInterface{
+							// 	hb.Div().Class("BlogContent").Children([]hb.TagInterface{
+							// 		hb.HTML(post.Content()),
+							// 	}),
+							// }),
+							// bs.Column(4).Children([]hb.TagInterface{
+							// 	hb.Div().Class("BlogImage").Children([]hb.TagInterface{
+							// 		hb.Image().Class("img img-responsive img-thumbnail").Attrs(map[string]string{
+							// 			"src": post.ImageUrlOrDefault(),
+							// 		}),
+							// 	}),
+							// }),
+						}),
+					// bs.Row().Children([]hb.TagInterface{
+					// 	bs.Column(6).Children([]hb.TagInterface{
+					// 		lo.IfF(prevPost != nil, func() *hb.Tag {
+					// 			link := links.NewWebsiteLinks().BlogPost(prevPost.ID(), prevPost.Title(), map[string]string{})
+					// 			return hb.Div().Children([]hb.TagInterface{
+					// 				hb.Hyperlink().Children([]hb.TagInterface{
+					// 					icons.Icon("bi-chevron-left", 20, 20, "#333").Style("margin-right:5px;"),
+					// 					hb.Span().HTML("Previous"),
+					// 				}).Attr("href", link).
+					// 					Style("font-weight:bold; font-size:20px;"),
+					// 				hb.Div().HTML(prevPost.Title()),
+					// 			})
+					// 		}).ElseF(func() *hb.Tag {
+					// 			return hb.Span().HTML("")
+					// 		}),
+					// 	}),
+					// 	bs.Column(6).Children([]hb.TagInterface{
+					// 		lo.IfF(nextPost != nil, func() *hb.Tag {
+					// 			link := links.NewWebsiteLinks().BlogPost(nextPost.ID(), nextPost.Title(), map[string]string{})
+					// 			return hb.Div().Children([]hb.TagInterface{
+					// 				hb.Hyperlink().Children([]hb.TagInterface{
+					// 					hb.Span().HTML("Next"),
+					// 					icons.Icon("bi-chevron-right", 20, 20, "#333").Style("margin-right:5px;"),
+					// 				}).Attr("href", link).
+					// 					Style("font-weight:bold; font-size:20px;"),
+					// 				hb.Div().HTML(nextPost.Title()),
+					// 			}).Style("text-align:right;")
+					// 		}).ElseF(func() *hb.Tag {
+					// 			return hb.Span().HTML("")
+					// 		}),
+					// 	}),
+					// }),
+					bs.Row().Style("margin-top:40px;").Children([]hb.TagInterface{
+						bs.Column(12).Children([]hb.TagInterface{
+							hb.Div().Children([]hb.TagInterface{
+								hb.Hyperlink().Class("btn text-white text-center").Style(`background:#1ba1b6;color:#fff;width:600px;max-width:100%;`).Children([]hb.TagInterface{
+									// icons.Icon("bi-arrow-left", 16, 16, "#333").Style("margin-right:5px;"),
+									hb.Span().HTML("View All Posts"),
+								}).Attr("href", links.NewWebsiteLinks().Blog(map[string]string{})),
+							}),
+						}),
 					}),
 				}),
-			}),
-			bs.Row().Children([]hb.TagInterface{
-				bs.Column(12).Children([]hb.TagInterface{
-					hb.Div().Class("BlogImage float-end").Style("padding-top:30px; padding-left:30px; padding-bottom:30px; width:600px; max-width:100%;").Children([]hb.TagInterface{
-						hb.Image(post.ImageUrlOrDefault()).Class("img img-responsive img-thumbnail"),
-					}),
-					hb.Div().Class("BlogContent").Children([]hb.TagInterface{
-						hb.Raw(c.processContent(post.Content(), post.Editor())),
-					}),
-				}),
-				// bs.Column(8).Children([]hb.TagInterface{
-				// 	hb.Div().Class("BlogContent").Children([]hb.TagInterface{
-				// 		hb.Raw(post.Content()),
-				// 	}),
-				// }),
-				// bs.Column(4).Children([]hb.TagInterface{
-				// 	hb.Div().Class("BlogImage").Children([]hb.TagInterface{
-				// 		hb.Image().Class("img img-responsive img-thumbnail").Attrs(map[string]string{
-				// 			"src": post.ImageUrlOrDefault(),
-				// 		}),
-				// 	}),
-				// }),
-			}),
-			// bs.Row().Children([]hb.TagInterface{
-			// 	bs.Column(6).Children([]hb.TagInterface{
-			// 		lo.IfF(prevPost != nil, func() *hb.Tag {
-			// 			link := links.NewWebsiteLinks().BlogPost(prevPost.ID(), prevPost.Title(), map[string]string{})
-			// 			return hb.Div().Children([]hb.TagInterface{
-			// 				hb.Hyperlink().Children([]hb.TagInterface{
-			// 					icons.Icon("bi-chevron-left", 20, 20, "#333").Style("margin-right:5px;"),
-			// 					hb.Span().HTML("Previous"),
-			// 				}).Attr("href", link).
-			// 					Style("font-weight:bold; font-size:20px;"),
-			// 				hb.Div().HTML(prevPost.Title()),
-			// 			})
-			// 		}).ElseF(func() *hb.Tag {
-			// 			return hb.Span().HTML("")
-			// 		}),
-			// 	}),
-			// 	bs.Column(6).Children([]hb.TagInterface{
-			// 		lo.IfF(nextPost != nil, func() *hb.Tag {
-			// 			link := links.NewWebsiteLinks().BlogPost(nextPost.ID(), nextPost.Title(), map[string]string{})
-			// 			return hb.Div().Children([]hb.TagInterface{
-			// 				hb.Hyperlink().Children([]hb.TagInterface{
-			// 					hb.Span().HTML("Next"),
-			// 					icons.Icon("bi-chevron-right", 20, 20, "#333").Style("margin-right:5px;"),
-			// 				}).Attr("href", link).
-			// 					Style("font-weight:bold; font-size:20px;"),
-			// 				hb.Div().HTML(nextPost.Title()),
-			// 			}).Style("text-align:right;")
-			// 		}).ElseF(func() *hb.Tag {
-			// 			return hb.Span().HTML("")
-			// 		}),
-			// 	}),
-			// }),
-			bs.Row().Style("margin-top:40px;").Children([]hb.TagInterface{
-				bs.Column(12).Children([]hb.TagInterface{
-					hb.Div().Children([]hb.TagInterface{
-						hb.Hyperlink().Class("btn text-white text-center").Style(`background:#1ba1b6;color:#fff;width:600px;max-width:100%;`).Children([]hb.TagInterface{
-							// icons.Icon("bi-arrow-left", 16, 16, "#333").Style("margin-right:5px;"),
-							hb.Span().HTML("View All Posts"),
-						}).Attr("href", links.NewWebsiteLinks().Blog(map[string]string{})),
-					}),
-				}),
-			}),
-		}),
-	})
+		})
 	return sectionPost
 }
 
