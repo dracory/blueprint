@@ -38,7 +38,12 @@ import (
 // Returns:
 // - none
 func main() {
-	config.Initialize()    // 1. Initialize the environment
+	if err := config.Initialize(); err != nil {
+		// 1. Initialize the environment
+		cfmt.Errorf("Failed to initialize environment: %v", err)
+		return
+	}
+
 	defer closeResources() // 2. Defer Closing the database
 	tasks.RegisterTasks()  // 3. Register the task handlers
 

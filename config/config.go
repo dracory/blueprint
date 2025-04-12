@@ -198,7 +198,7 @@ var BlindIndexStoreLastName blindindexstore.StoreInterface
 var BlogStoreUsed = true
 var BlogStore blogstore.StoreInterface
 
-var CmsStoreUsed = false
+var CmsStoreUsed = true
 var CmsStore cmsstore.StoreInterface
 
 // CmsUserTemplateID is the CMS user template ID.
@@ -209,7 +209,7 @@ var CacheStore cachestore.StoreInterface
 
 // var CommentStore *commentstore.Store
 
-var CustomStoreUsed = false
+var CustomStoreUsed = true
 var CustomStore customstore.StoreInterface
 
 // used by the testimonials package
@@ -222,16 +222,16 @@ var GeoStore geostore.StoreInterface
 var LogStoreUsed = true
 var LogStore logstore.StoreInterface
 
-var MetaStoreUsed = false
+var MetaStoreUsed = true
 var MetaStore metastore.StoreInterface
 
 var SessionStoreUsed = true
 var SessionStore sessionstore.StoreInterface
 
-var ShopStoreUsed = false
+var ShopStoreUsed = true
 var ShopStore shopstore.StoreInterface
 
-var SqlFileStoreUsed = false
+var SqlFileStoreUsed = true
 var SqlFileStorage filesystem.StorageInterface
 
 var StatsStoreUsed = true
@@ -245,7 +245,7 @@ var TaskStore taskstore.StoreInterface
 var UserStoreUsed = true
 var UserStore userstore.StoreInterface
 
-var VaultStoreUsed = false
+var VaultStoreUsed = true
 var VaultStore vaultstore.StoreInterface
 
 var Logger slog.Logger
