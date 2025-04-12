@@ -37,4 +37,18 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	if false {
 		t.Errorf("Background processes should be started")
 	}
+	
+	// Verify that the background processes started correctly
+	if config.TaskStore == nil {
+		t.Errorf("Task store should not be nil after starting background processes")
+	}
+	if config.CacheStore == nil {
+		t.Errorf("Cache store should not be nil after starting background processes")
+	}
+	if config.SessionStore == nil {
+		t.Errorf("Session store should not be nil after starting background processes")
+	}
+	if config.ShopStore == nil {
+		t.Errorf("Shop store should not be nil after starting background processes")
+	}
 }

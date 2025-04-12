@@ -17,7 +17,7 @@ import (
 //
 // Returns:
 // - none
-func TestsConfigureAndInitialize() {
+func TestsConfigureAndInitialize() error {
 	// Create a test configuration using the base testutils package
 	config := test.DefaultTestConfig()
 
@@ -40,7 +40,14 @@ func TestsConfigureAndInitialize() {
 	test.SetupTestEnvironment(config)
 
 	// Initialize the application
-	Initialize()
+	err := Initialize()
+
+	if err != nil {
+		cfmt.Errorf("Failed to initialize: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 /*

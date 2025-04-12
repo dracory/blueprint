@@ -66,23 +66,23 @@ func NewAuthenticationController() *authenticationController {
 // Return:
 // - string: the result of the authentication request.
 func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Request) string {
+	homeURL := links.Website().Home()
 	if !config.UserStoreUsed || config.UserStore == nil {
-		return helpers.ToFlashError(w, r, `user store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `user store is required`, homeURL, 5)
 	}
 
 	if config.VaultStoreUsed && config.VaultStore == nil {
-		return helpers.ToFlashError(w, r, `vault store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `vault store is required`, homeURL, 5)
 	}
 
 	if config.VaultStoreUsed && !config.BlindIndexStoreUsed {
-		return helpers.ToFlashError(w, r, `blind index store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `blind index store is required`, homeURL, 5)
 	}
 
 	if config.SessionStore == nil {
-		return helpers.ToFlashError(w, r, `session store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `session store is required`, homeURL, 5)
 	}
 
-	homeURL := links.NewWebsiteLinks().Home()
 	email, backUrl, errorMessage := c.emailAndBackUrlFromAuthKnightRequest(r)
 
 	if errorMessage != "" {
@@ -263,16 +263,16 @@ func (*authenticationController) callAuthKnight(once string) (map[string]interfa
 // - string: The redirect URL.
 func (c *authenticationController) calculateRedirectURL(user userstore.UserInterface) string {
 	// 1. By default all users redirect to home
-	redirectUrl := links.NewUserLinks().Home(map[string]string{})
+	redirectUrl := links.User().Home()
 
 	// 2. If user is manager or admin, redirect to admin panel
 	if user.IsManager() || user.IsAdministrator() || user.IsSuperuser() {
-		redirectUrl = links.NewAdminLinks().Home(map[string]string{})
+		redirectUrl = links.Admin().Home()
 	}
 
 	// 3. If user does not have any names, redirect to profile
 	if !user.IsRegistrationCompleted() {
-		redirectUrl = links.NewAuthLinks().Register(map[string]string{})
+		redirectUrl = links.Auth().Register()
 		redirectUrl = helpers.ToFlashInfoURL("Thank you for logging in. Please complete your data to finish your registration", redirectUrl, 5)
 	}
 

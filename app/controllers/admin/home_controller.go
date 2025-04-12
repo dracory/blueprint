@@ -69,7 +69,11 @@ func (c *homeController) view() *hb.Tag {
 		Child(sectionDailyVisitors)
 }
 
-func (c *homeController) cardDailyVisitors() *hb.Tag {
+func (c *homeController) cardDailyVisitors() hb.TagInterface {
+	if !config.StatsStoreUsed {
+		return nil
+	}
+
 	dates, visits, err := c.visitorsData()
 
 	if err != nil {

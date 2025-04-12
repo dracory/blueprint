@@ -18,20 +18,25 @@ func NewLoginController() router.HTMLControllerInterface {
 }
 
 func (controller *loginController) Handler(w http.ResponseWriter, r *http.Request) string {
+	homeURL := links.Website().Home()
+	userURL := links.User().Home()
+
 	if !config.UserStoreUsed || config.UserStore == nil {
-		return helpers.ToFlashError(w, r, `user store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `user store is required`, homeURL, 5)
 	}
 
 	if config.VaultStoreUsed && config.VaultStore == nil {
-		return helpers.ToFlashError(w, r, `vault store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `vault store is required`, homeURL, 5)
 	}
 
-	backUrl := req.ValueOr(r, "back_url", links.NewWebsiteLinks().Home())
-	if !strings.HasPrefix(backUrl, links.NewWebsiteLinks().Home()) {
-		backUrl = links.NewWebsiteLinks().Home()
+	backUrl := req.ValueOr(r, "back_url", homeURL)
+	
+    // Ensure back_url is part of our domain (contains our root URL)
+	if !strings.HasPrefix(backUrl, homeURL) {
+		backUrl = userURL
 	}
 
-	loginUrl := links.NewAuthLinks().AuthKnightLogin(backUrl)
+	loginUrl := links.Auth().AuthKnightLogin(backUrl)
 
 	http.Redirect(w, r, loginUrl, http.StatusSeeOther)
 	return ""
