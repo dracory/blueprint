@@ -14,12 +14,12 @@ import (
 	"project/internal/helpers"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/shopstore"
-	"github.com/gouniverse/utils"
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -445,12 +445,12 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 		return data, "error retrieving shop store"
 	}
 
-	data.formDescription = utils.Req(r, "product_description", "")
-	data.formMemo = utils.Req(r, "product_memo", "")
-	data.formPrice = utils.Req(r, "product_price", "")
-	data.formQuantity = utils.Req(r, "product_quantity", "")
-	data.formStatus = utils.Req(r, "product_status", "")
-	data.formTitle = utils.Req(r, "product_title", "")
+	data.formDescription = req.Value(r, "product_description")
+	data.formMemo = req.Value(r, "product_memo")
+	data.formPrice = req.Value(r, "product_price")
+	data.formQuantity = req.Value(r, "product_quantity")
+	data.formStatus = req.Value(r, "product_status")
+	data.formTitle = req.Value(r, "product_title")
 
 	if data.formStatus == "" {
 		data.formErrorMessage = "Status is required"
@@ -517,7 +517,7 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 }
 
 func ReqArrayOfMaps(r *http.Request, key string, defaultValue []map[string]string) []map[string]string {
-	all := utils.ReqAll(r)
+	all := req.All(r)
 
 	reqArrayOfMaps := []map[string]string{}
 
@@ -622,8 +622,8 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 	}
 
 	data.request = r
-	data.action = utils.Req(r, "action", "")
-	data.productID = utils.Req(r, "product_id", "")
+	data.action = req.Value(r, "action")
+	data.productID = req.Value(r, "product_id")
 
 	if data.productID == "" {
 		return data, "Product ID is required"

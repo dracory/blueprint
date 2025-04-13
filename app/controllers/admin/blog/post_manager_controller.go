@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/dromara/carbon/v2"
+	"github.com/gouniverse/base/req"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -89,16 +89,16 @@ func (controller *blogPostManagerController) page(data blogPostManagerController
 func (controller *blogPostManagerController) prepareData(r *http.Request) (data blogPostManagerControllerData, errorMessage string) {
 	var err error
 
-	data.page = utils.Req(r, "page", "0")
+	data.page = req.ValueOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(utils.Req(r, "per_page", "10"))
-	data.sortOrder = utils.Req(r, "sort_order", sb.DESC)
-	data.sortBy = utils.Req(r, "by", blogstore.COLUMN_CREATED_AT)
-	data.status = utils.Req(r, "status", "")
-	data.search = utils.Req(r, "search", "")
-	data.dateFrom = utils.Req(r, "date_from", carbon.Now().AddYears(-1).ToDateString())
-	data.dateTo = utils.Req(r, "date_to", carbon.Now().ToDateString())
-	data.customerID = utils.Req(r, "customer_id", "")
+	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
+	data.sortOrder = req.ValueOr(r, "sort_order", sb.DESC)
+	data.sortBy = req.ValueOr(r, "by", blogstore.COLUMN_CREATED_AT)
+	data.status = req.Value(r, "status")
+	data.search = req.Value(r, "search")
+	data.dateFrom = req.ValueOr(r, "date_from", carbon.Now().AddYears(-1).ToDateString())
+	data.dateTo = req.ValueOr(r, "date_to", carbon.Now().ToDateString())
+	data.customerID = req.ValueOr(r, "customer_id", "")
 
 	query := blogstore.PostQueryOptions{
 		Search:               data.search,

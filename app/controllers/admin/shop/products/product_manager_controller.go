@@ -12,6 +12,7 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
@@ -19,7 +20,6 @@ import (
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/shopstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -482,19 +482,19 @@ func (controller *productManagerController) tablePagination(data productManagerC
 func (controller *productManagerController) prepareData(r *http.Request) (data productManagerControllerData, errorMessage string) {
 	var err error
 	data.request = r
-	data.action = utils.Req(r, "action", "")
-	data.page = utils.Req(r, "page", "0")
+	data.action = req.Value(r, "action")
+	data.page = req.ValueOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(utils.Req(r, "per_page", "10"))
-	data.sortOrder = utils.Req(r, "sort", sb.DESC)
-	data.sortBy = utils.Req(r, "by", shopstore.COLUMN_CREATED_AT)
-	data.formProductID = utils.Req(r, "filter_product_id", "")
-	data.formTitle = utils.Req(r, "filter_title", "")
-	data.formStatus = utils.Req(r, "filter_status", "")
-	data.formCreatedFrom = utils.Req(r, "filter_created_from", "")
-	data.formCreatedTo = utils.Req(r, "filter_created_to", "")
-	data.formUpdatedFrom = utils.Req(r, "filter_updated_from", "")
-	data.formUpdatedTo = utils.Req(r, "filter_updated_to", "")
+	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
+	data.sortOrder = req.ValueOr(r, "sort", sb.DESC)
+	data.sortBy = req.ValueOr(r, "by", shopstore.COLUMN_CREATED_AT)
+	data.formProductID = req.Value(r, "filter_product_id")
+	data.formTitle = req.Value(r, "filter_title")
+	data.formStatus = req.Value(r, "filter_status")
+	data.formCreatedFrom = req.Value(r, "filter_created_from")
+	data.formCreatedTo = req.Value(r, "filter_created_to")
+	data.formUpdatedFrom = req.Value(r, "filter_updated_from")
+	data.formUpdatedTo = req.Value(r, "filter_updated_to")
 
 	productList, productCount, err := controller.fetchProductList(data)
 

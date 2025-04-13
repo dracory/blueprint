@@ -8,11 +8,11 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/shopstore"
-	"github.com/gouniverse/utils"
 )
 
 type productCreateController struct{}
@@ -134,7 +134,7 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 		return data, "Shop store is not configured. Please contact an administrator."
 	}
 
-	data.formTitle = strings.TrimSpace(utils.Req(r, "product_title", ""))
+	data.formTitle = strings.TrimSpace(req.Value(r, "product_title"))
 
 	if r.Method != http.MethodPost {
 		return data, ""

@@ -6,8 +6,8 @@ import (
 	"project/app/links"
 	"project/internal/helpers"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 )
 
 // == CONTROLLER ==============================================================
@@ -36,7 +36,7 @@ func (c *userImpersonateController) Handler(w http.ResponseWriter, r *http.Reque
 		return helpers.ToFlashError(w, r, "Not authorized", links.NewAdminLinks().Users(map[string]string{}), 15)
 	}
 
-	userID := utils.Req(r, "user_id", "")
+	userID := req.Value(r, "user_id")
 
 	if userID == "" {
 		return helpers.ToFlashError(w, r, "User ID not found", links.NewAdminLinks().Users(map[string]string{}), 15)

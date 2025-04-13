@@ -11,6 +11,7 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/geostore"
@@ -18,7 +19,6 @@ import (
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
 
@@ -393,13 +393,13 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 	}
 
 	if r.Method == http.MethodPost {
-		data.email = strings.TrimSpace(utils.Req(r, "email", ""))
-		data.firstName = strings.TrimSpace(utils.Req(r, "first_name", ""))
-		data.lastName = strings.TrimSpace(utils.Req(r, "last_name", ""))
-		data.buinessName = strings.TrimSpace(utils.Req(r, "business_name", ""))
-		data.phone = strings.TrimSpace(utils.Req(r, "phone", ""))
-		data.timezone = strings.TrimSpace(utils.Req(r, "timezone", ""))
-		data.country = strings.TrimSpace(utils.Req(r, "country", ""))
+		data.email = strings.TrimSpace(req.Value(r, "email"))
+		data.firstName = strings.TrimSpace(req.Value(r, "first_name"))
+		data.lastName = strings.TrimSpace(req.Value(r, "last_name"))
+		data.buinessName = strings.TrimSpace(req.Value(r, "business_name"))
+		data.phone = strings.TrimSpace(req.Value(r, "phone"))
+		data.timezone = strings.TrimSpace(req.Value(r, "timezone"))
+		data.country = strings.TrimSpace(req.Value(r, "country"))
 	}
 
 	return data, ""

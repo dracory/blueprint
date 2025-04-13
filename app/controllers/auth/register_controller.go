@@ -10,13 +10,13 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/geostore"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
 
@@ -454,7 +454,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 		return registerControllerData{}, "User store is nil"
 	}
 
-	action := utils.Req(r, "action", "")
+	action := req.Value(r, "action")
 	authUser := helpers.GetAuthUser(r)
 
 	if authUser == nil {
@@ -498,12 +498,12 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 			action:      action,
 			authUser:    authUser,
 			email:       email,
-			firstName:   strings.TrimSpace(utils.Req(r, controller.formFirstName, "")),
-			lastName:    strings.TrimSpace(utils.Req(r, controller.formLastName, "")),
-			buinessName: strings.TrimSpace(utils.Req(r, controller.formBusinessName, "")),
-			phone:       strings.TrimSpace(utils.Req(r, controller.formPhone, "")),
-			timezone:    strings.TrimSpace(utils.Req(r, controller.formTimezone, "")),
-			country:     strings.TrimSpace(utils.Req(r, controller.formCountry, "")),
+			firstName:   strings.TrimSpace(req.Value(r, controller.formFirstName)),
+			lastName:    strings.TrimSpace(req.Value(r, controller.formLastName)),
+			buinessName: strings.TrimSpace(req.Value(r, controller.formBusinessName)),
+			phone:       strings.TrimSpace(req.Value(r, controller.formPhone)),
+			timezone:    strings.TrimSpace(req.Value(r, controller.formTimezone)),
+			country:     strings.TrimSpace(req.Value(r, controller.formCountry)),
 			countryList: countries,
 		}
 	}

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/app/widgets"
 
-	"github.com/gouniverse/utils"
+	"github.com/dracory/base/req"
 )
 
 // == CONTROLLER ===============================================================
@@ -20,7 +20,7 @@ func NewWidgetController() *widgetController {
 // == PUBLIC METHODS ==========================================================
 
 func (controller *widgetController) Handler(w http.ResponseWriter, r *http.Request) string {
-	alias := utils.Req(r, "alias", "")
+	alias := req.Value(r, "alias")
 
 	if alias == "" {
 		return "Widget type not specified"

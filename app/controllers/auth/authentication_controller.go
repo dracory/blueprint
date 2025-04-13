@@ -14,6 +14,7 @@ import (
 	"project/internal/testutils"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/auth"
 	"github.com/gouniverse/blindindexstore"
@@ -152,7 +153,7 @@ func (c *authenticationController) findUserIDInBlindIndex(email string) (userID 
 }
 
 func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.Request) (email, backUrl, errorMessage string) {
-	once := strings.TrimSpace(utils.Req(r, "once", ""))
+	once := strings.TrimSpace(req.Value(r, "once"))
 
 	if once == "" {
 		return "", "", "Once is required field"

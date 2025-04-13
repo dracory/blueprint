@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"project/app/links"
 
+	"github.com/gouniverse/base/req"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 
 	shopDiscounts "project/app/controllers/admin/shop/discounts"
 	shopProducts "project/app/controllers/admin/shop/products"
@@ -13,7 +13,7 @@ import (
 
 func ShopRoutes() []router.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
-		controller := utils.Req(r, "controller", "")
+		controller := req.Value(r, "controller")
 
 		if controller == "discounts" {
 			return shopDiscounts.NewDiscountController().AnyIndex(w, r)
