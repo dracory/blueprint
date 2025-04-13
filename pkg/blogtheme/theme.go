@@ -145,7 +145,7 @@ func (t *theme) blockToTag(block ui.BlockInterface) *hb.Tag {
 // }
 
 // func BlogPostBlocksToString(blocksString string) string {
-// 	blocksAny, err := utils.FromJSON(blocksString, []map[string]any{})
+// 	blocksAny, err := cast.FromJSON(blocksString, []map[string]any{})
 
 // 	if err != nil {
 // 		return "Error parsing content. Please try again later."
@@ -160,7 +160,7 @@ func (t *theme) blockToTag(block ui.BlockInterface) *hb.Tag {
 // 		parentID := blockMap["ParentId"].(string)
 // 		attributes := blockMap["Attributes"].(map[string]any)
 // 		sequence := blockMap["Sequence"].(float64)
-// 		sequenceInt, _ := utils.ToInt(sequence)
+// 		sequenceInt, _ := cast.ToInt(sequence)
 
 // 		block := Block{
 // 			ID:         blockID,
@@ -208,8 +208,8 @@ func (t *theme) blockToTag(block ui.BlockInterface) *hb.Tag {
 // func blockEditorBlockHeadingToHtml(block Block) string {
 // 	level := lo.ValueOr(block.Attributes, "Level", "1").(string)
 // 	text := lo.ValueOr(block.Attributes, "Text", "").(string)
-// 	levelInt, _ := utils.ToInt(level)
-// 	levelStr := utils.ToString(levelInt)
+// 	levelInt, _ := cast.ToInt(level)
+// 	levelStr := cast.ToString(levelInt)
 
 // 	return `<h` + levelStr + ` style="margin-bottom:20px;margin-top:20px;">` + text + `</h` + levelStr + `>`
 // }

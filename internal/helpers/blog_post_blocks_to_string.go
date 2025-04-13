@@ -4,6 +4,7 @@ import (
 	"github.com/gouniverse/maputils"
 	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
 type Block struct {
@@ -31,7 +32,7 @@ func BlogPostBlocksToString(blocksString string) string {
 		parentID := blockMap["ParentId"].(string)
 		attributes := blockMap["Attributes"].(map[string]any)
 		sequence := blockMap["Sequence"].(float64)
-		sequenceInt, _ := utils.ToInt(sequence)
+		sequenceInt := cast.ToInt(sequence)
 
 		block := Block{
 			ID:         blockID,
@@ -79,8 +80,8 @@ func blockEditorBlockCodeToHtml(block Block) string {
 func blockEditorBlockHeadingToHtml(block Block) string {
 	level := lo.ValueOr(block.Attributes, "Level", "1").(string)
 	text := lo.ValueOr(block.Attributes, "Text", "").(string)
-	levelInt, _ := utils.ToInt(level)
-	levelStr := utils.ToString(levelInt)
+	levelInt := cast.ToInt32(level)
+	levelStr := cast.ToString(levelInt)
 
 	return `<h` + levelStr + ` style="margin-bottom:20px;margin-top:20px;">` + text + `</h` + levelStr + `>`
 }

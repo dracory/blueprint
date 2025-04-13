@@ -15,8 +15,8 @@ import (
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/shopstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 )
 
 type discountController struct {
@@ -255,7 +255,7 @@ func (discountController *discountController) FuncRows() ([]crud.Row, error) {
 				discount.Title(),
 				discount.Status(),
 				discount.Type(),
-				utils.ToString(discount.Amount()),
+				cast.ToString(discount.Amount()),
 				discount.StartsAtCarbon().Format("d M Y") + " - " + discount.EndsAtCarbon().Format("d M Y"),
 				discount.Code(),
 				discount.CreatedAtCarbon().Format("d M Y"),
@@ -317,7 +317,7 @@ func (discountController *discountController) FuncUpdate(entityID string, data m
 		amountStr = "0"
 	}
 
-	amount, _ := utils.ToFloat(amountStr)
+	amount := cast.ToFloat64(amountStr)
 	startsAt = carbon.Parse(startsAt).ToDateTimeString(carbon.UTC)
 	endsAt = carbon.Parse(endsAt).ToDateTimeString(carbon.UTC)
 
@@ -359,7 +359,7 @@ func (discountController *discountController) FuncFetchReadData(discountID strin
 		{"Status", discount.Status()},
 		{"Description", discount.Description()},
 		{"Type", discount.Type()},
-		{"Amount", utils.ToString(discount.Amount())},
+		{"Amount", cast.ToString(discount.Amount())},
 		{"Starts At", discount.StartsAtCarbon().Format("d M Y")},
 		{"Ends At", discount.EndsAtCarbon().Format("d M Y")},
 		{"Created", discount.CreatedAtCarbon().Format("d M Y")},
@@ -387,7 +387,7 @@ func (discountController *discountController) FuncFetchUpdateData(discountID str
 	return map[string]string{
 		"title":       discount.Title(),
 		"status":      discount.Status(),
-		"amount":      utils.ToString(discount.Amount()),
+		"amount":      cast.ToString(discount.Amount()),
 		"description": discount.Description(),
 		"type":        discount.Type(),
 		"code":        discount.Code(),

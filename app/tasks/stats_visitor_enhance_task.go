@@ -107,7 +107,7 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 	// 	return true
 	// }
 
-	// t.LogInfo("TaskFingerprintCountryPopulate. Found: " + utils.ToString(len(fingerprintList)) + " fingerprints without countries to process")
+	// t.LogInfo("TaskFingerprintCountryPopulate. Found: " + cast.ToString(len(fingerprintList)) + " fingerprints without countries to process")
 	// for i := 0; i < len(fingerprintList); i++ {
 	// 	fingerprint := fingerprintList[i]
 	// 	country := taskFingerprintCountryFindCountryByIp(fingerprint.IpAddress())

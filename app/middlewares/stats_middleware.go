@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"project/config"
 
+	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/statsstore"
-	"github.com/gouniverse/utils"
 )
 
 func NewStatsMiddleware() router.Middleware {
@@ -41,7 +41,7 @@ func (m statsMiddleware) Handler(next http.Handler) http.Handler {
 			return
 		}
 
-		ip := utils.IP(r)
+		ip := req.IP(r)
 		userAgent := r.UserAgent()
 		userAcceptLanguage := r.Header.Get("Accept-Language")
 		country := "" // empty by default (will be filled in later in the backend)

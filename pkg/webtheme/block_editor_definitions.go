@@ -1,11 +1,11 @@
 package webtheme
 
 import (
+	"github.com/dracory/base/img"
 	"github.com/gouniverse/blockeditor"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/ui"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
 
@@ -540,7 +540,7 @@ func blockImageDefinition() blockeditor.BlockDefinition {
 			imageUrl := block.Parameter("image_url")
 
 			if imageUrl == "" {
-				imageUrl = utils.PicsumURL(100, 100, utils.PicsumURLOptions{
+				imageUrl = img.PicsumURL(100, 100, img.PicsumURLOptions{
 					Grayscale: true,
 					Seed:      "no image",
 				})

@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dracory/base/files"
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/filesystem"
 
@@ -23,7 +24,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/responses"
-	"github.com/gouniverse/utils"
 
 	"github.com/samber/lo"
 )
@@ -181,7 +181,7 @@ func (c *mediaManagerController) fileUploadAjax(r *http.Request) string {
 	}
 	defer file.Close() // Cleanup
 
-	filePath, errSave := utils.FileSaveToTempDir(fileHeader.Filename, file)
+	filePath, errSave := files.SaveToTempDir(fileHeader.Filename, file)
 	if errSave != nil {
 		log.Println(errSave.Error())
 		return api.Error(errSave.Error()).ToString()

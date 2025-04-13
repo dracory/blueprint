@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"project/config"
 
+	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/utils"
 	"github.com/spf13/cast"
 )
 
@@ -21,7 +21,7 @@ func ExtendSession(r *http.Request, seconds int64) error {
 		return errors.New("session not found")
 	}
 
-	if session.GetIPAddress() != utils.IP(r) {
+	if session.GetIPAddress() != req.IP(r) {
 		return errors.New("session ip address does not match request ip address")
 	}
 

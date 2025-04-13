@@ -5,8 +5,8 @@ import (
 	"project/config"
 	"strings"
 
+	"github.com/dracory/base/req"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 )
 
 // LogRequestMiddleware logs every request to the database using the LogStore logger
@@ -23,7 +23,7 @@ func NewLogRequestMiddleware() router.Middleware {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				uri := r.RequestURI
 
-				ip := utils.IP(r)
+				ip := req.IP(r)
 
 				method := r.Method
 

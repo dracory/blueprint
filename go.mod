@@ -7,13 +7,12 @@ go 1.24.0
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dracory/base v0.13.0
+	github.com/dracory/base v0.16.0
 	github.com/dromara/carbon/v2 v2.6.2
 	github.com/faabiosr/cachego v0.26.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-co-op/gocron v1.37.0
 	github.com/gouniverse/auth v0.22.0
-	github.com/gouniverse/base v0.9.0
 	github.com/gouniverse/blindindexstore v1.3.0
 	github.com/gouniverse/blockeditor v0.21.2
 	github.com/gouniverse/blogstore v1.0.0
@@ -77,6 +76,7 @@ require (
 	github.com/go-openapi/errors v0.22.1 // indirect
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/goravel/framework v1.15.6 // indirect
+	github.com/gouniverse/base v0.9.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/settingstore v1.0.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect

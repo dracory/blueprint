@@ -9,10 +9,10 @@ import (
 	"project/app/links"
 	"strings"
 
+	"github.com/dracory/base/str"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/utils"
 	"github.com/mingrammer/cfmt"
 )
 
@@ -97,7 +97,7 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
-	if postSlug == "" || postSlug != utils.StrSlugify(post.Title(), '-') {
+	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
 		blogPostURL := links.NewWebsiteLinks().BlogPost(post.ID(), post.Title())
 		config.LogStore.ErrorWithContext("ERROR: anyPost: post Title is missing for ID "+postID, "Redirecting to correct URL")
 		url := helpers.ToFlashWarningURL("The post location has changed. Redirecting to the new address...", blogPostURL, 5)

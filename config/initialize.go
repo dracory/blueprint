@@ -81,48 +81,48 @@ func Initialize() error {
 func initializeEnvVariables() error {
 	env.Initialize(".env")
 
-	AppEnvironment = utils.Env("APP_ENV")
-	AppName = utils.Env("APP_NAME")
-	AppUrl = utils.Env("APP_URL")
+	AppEnvironment = env.Value("APP_ENV")
+	AppName = env.Value("APP_NAME")
+	AppUrl = env.Value("APP_URL")
 
 	// Enable if you use envenc
 	// if err := intializeEnvEncVariables(AppEnvironment); err != nil {
 	// 	return err
 	// }
 
-	CmsUserTemplateID = utils.Env("CMS_TEMPLATE_ID")
-	DbDriver = utils.Env("DB_DRIVER")
-	DbHost = utils.Env("DB_HOST")
-	DbPort = utils.Env("DB_PORT")
-	DbName = utils.EnvMust("DB_DATABASE")
-	DbUser = utils.Env("DB_USERNAME")
-	DbPass = utils.Env("DB_PASSWORD")
-	Debug = utils.Env("DEBUG") == "yes"
-	GoogleGeminiApiKey = utils.Env("GOOGLE_GEMINI_API_KEY")
-	MailDriver = utils.Env("MAIL_DRIVER")
-	MailFromEmailAddress = utils.Env("EMAIL_FROM_ADDRESS")
-	MailFromName = utils.Env("EMAIL_FROM_NAME")
-	MailHost = utils.Env("MAIL_HOST")
-	MailPassword = utils.Env("MAIL_PASSWORD")
-	MailPort = utils.Env("MAIL_PORT")
-	MailUsername = utils.Env("MAIL_USERNAME")
-	MediaBucket = utils.Env("MEDIA_BUCKET")
-	MediaDriver = utils.Env("MEDIA_DRIVER")
-	MediaEndpoint = utils.Env("MEDIA_ENDPOINT")
-	MediaKey = utils.Env("MEDIA_KEY")
-	MediaRoot = utils.Env("MEDIA_ROOT")
-	MediaSecret = utils.Env("MEDIA_SECRET")
-	MediaRegion = utils.Env("MEDIA_REGION")
-	MediaUrl = utils.Env("MEDIA_URL")
-	OpenAiApiKey = utils.Env("OPENAI_API_KEY")
-	StripeKeyPrivate = utils.Env("STRIPE_KEY_PRIVATE")
-	StripeKeyPublic = utils.Env("STRIPE_KEY_PUBLIC")
-	VaultKey = utils.Env("VAULT_KEY")
-	VertexModelID = utils.Env("VERTEX_MODEL_ID")
-	VertexProjectID = utils.Env("VERTEX_PROJECT_ID")
-	VertexRegionID = utils.Env("VERTEX_REGION_ID")
-	WebServerHost = utils.Env("SERVER_HOST")
-	WebServerPort = utils.Env("SERVER_PORT")
+	CmsUserTemplateID = env.Value("CMS_TEMPLATE_ID")
+	DbDriver = env.Value("DB_DRIVER")
+	DbHost = env.Value("DB_HOST")
+	DbPort = env.Value("DB_PORT")
+	DbName = env.Value("DB_DATABASE")
+	DbUser = env.Value("DB_USERNAME")
+	DbPass = env.Value("DB_PASSWORD")
+	Debug = env.Value("DEBUG") == "yes"
+	GoogleGeminiApiKey = env.Value("GOOGLE_GEMINI_API_KEY")
+	MailDriver = env.Value("MAIL_DRIVER")
+	MailFromEmailAddress = env.Value("EMAIL_FROM_ADDRESS")
+	MailFromName = env.Value("EMAIL_FROM_NAME")
+	MailHost = env.Value("MAIL_HOST")
+	MailPassword = env.Value("MAIL_PASSWORD")
+	MailPort = env.Value("MAIL_PORT")
+	MailUsername = env.Value("MAIL_USERNAME")
+	MediaBucket = env.Value("MEDIA_BUCKET")
+	MediaDriver = env.Value("MEDIA_DRIVER")
+	MediaEndpoint = env.Value("MEDIA_ENDPOINT")
+	MediaKey = env.Value("MEDIA_KEY")
+	MediaRoot = env.Value("MEDIA_ROOT")
+	MediaSecret = env.Value("MEDIA_SECRET")
+	MediaRegion = env.Value("MEDIA_REGION")
+	MediaUrl = env.Value("MEDIA_URL")
+	OpenAiApiKey = env.Value("OPENAI_API_KEY")
+	StripeKeyPrivate = env.Value("STRIPE_KEY_PRIVATE")
+	StripeKeyPublic = env.Value("STRIPE_KEY_PUBLIC")
+	VaultKey = env.Value("VAULT_KEY")
+	VertexModelID = env.Value("VERTEX_MODEL_ID")
+	VertexProjectID = env.Value("VERTEX_PROJECT_ID")
+	VertexRegionID = env.Value("VERTEX_REGION_ID")
+	WebServerHost = env.Value("SERVER_HOST")
+	WebServerPort = env.Value("SERVER_PORT")
 
 	// Check required variables
 
@@ -222,7 +222,11 @@ func intializeEnvEncVariables(appEnvironment string) error {
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)
-	envEncryptionKey := utils.EnvMust("ENV_ENCRYPTION_KEY")
+	envEncryptionKey := env.Value("ENV_ENCRYPTION_KEY")
+
+	if envEncryptionKey == "" {
+		return errors.New("ENV_ENCRYPTION_KEY is required")
+	}
 
 	vaultFilePath := ".env." + appEnvironment + ".vault"
 

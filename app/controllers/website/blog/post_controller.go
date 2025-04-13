@@ -10,12 +10,12 @@ import (
 	"project/pkg/blogtheme"
 	"strings"
 
+	"github.com/dracory/base/str"
 	"github.com/go-chi/chi/v5"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
-	"github.com/gouniverse/utils"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -61,8 +61,8 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 		return ""
 	}
 
-	if postSlug == "" || postSlug != utils.StrSlugify(post.Title(), '-') {
-		url := links.NewWebsiteLinks().BlogPost(post.ID(), post.Title())
+	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
+		url := links.Website().BlogPost(post.ID(), post.Title())
 		config.LogStore.ErrorWithContext("ERROR: anyPost: post Title is missing for ID "+postID, "Redirecting to correct URL")
 		helpers.ToFlash(w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""

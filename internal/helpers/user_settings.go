@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"project/config"
 
+	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/utils"
 )
 
 func UserSettingGet(r *http.Request, key string, defaultValue string) string {
@@ -34,7 +34,7 @@ func UserSettingGet(r *http.Request, key string, defaultValue string) string {
 		return defaultValue
 	}
 
-	if session.GetIPAddress() != utils.IP(r) {
+	if session.GetIPAddress() != req.IP(r) {
 		return defaultValue
 	}
 
@@ -70,7 +70,7 @@ func UserSettingSet(r *http.Request, key string, value string) error {
 		return errors.New("session user id does not match auth user id")
 	}
 
-	if session.GetIPAddress() != utils.IP(r) {
+	if session.GetIPAddress() != req.IP(r) {
 		return errors.New("session ip address does not match request ip address")
 	}
 

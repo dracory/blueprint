@@ -44,7 +44,7 @@ func NewPool() *pool {
 // 	if item == nil {
 // 		return ""
 // 	}
-// 	return utils.ToString(item.Value())
+// 	return cast.ToString(item.Value())
 // }
 
 // func (p *pool) SetBlock(key string, value string) {
@@ -56,7 +56,7 @@ func NewPool() *pool {
 // 	if item == nil {
 // 		return ""
 // 	}
-// 	return utils.ToString(item.Value())
+// 	return cast.ToString(item.Value())
 // }
 
 // func (p *pool) SetPage(key string, value string) {
@@ -68,7 +68,7 @@ func NewPool() *pool {
 // 	if item == nil {
 // 		return ""
 // 	}
-// 	return utils.ToString(item.Value())
+// 	return cast.ToString(item.Value())
 // }
 
 // func (p *pool) SetTemplate(key string, value string) {
@@ -80,7 +80,7 @@ func NewPool() *pool {
 // 	if item == nil {
 // 		return ""
 // 	}
-// 	return utils.ToString(item.Value())
+// 	return cast.ToString(item.Value())
 // }
 
 // func (p *pool) SetTranslation(key string, value string) {
