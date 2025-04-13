@@ -7,9 +7,6 @@
 <a href="https://gitpod.io/#https://github.com/dracory/blueprint" style="float:right:" target="_blank">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy">
 </a>
-<a href="https://app.codeanywhere.com/#https://github.com/dracory/blueprint/blob/b7b76728d496499527c9bfd6476b3f0784708958/README.md" style="float:right:" target="_blank">
-    <img src="https://codeanywhere.com/img/open-in-codeanywhere-btn.svg" alt="Open in Gitpod" loading="lazy">
-</a>
 
 ## URLS
 
