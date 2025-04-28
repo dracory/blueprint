@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"project/app/controllers/admin/shop/shared"
 	"project/config"
@@ -506,7 +507,7 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 	err := config.ShopStore.ProductUpdate(context.Background(), data.product)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving details failed"
 		return data, ""
 	}
@@ -606,7 +607,7 @@ func (controller *productUpdateController) saveProductMetadata(r *http.Request, 
 	err := config.ShopStore.ProductUpdate(context.Background(), data.product)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving metas failed"
 		return data, ""
 	}
@@ -632,7 +633,7 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 	product, err := config.ShopStore.ProductFindByID(context.Background(), data.productID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product not found"
 	}
 
@@ -645,7 +646,7 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 	metas, err := product.Metas()
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product metas not found"
 	}
 

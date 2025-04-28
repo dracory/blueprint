@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -149,7 +150,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		lastNameToken, err := config.VaultStore.TokenCreate(ctx, data.lastName, config.VaultKey, 20)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error creating last name token", err.Error())
+			config.Logger.Error("Error creating last name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(data).ToHTML()
 		}
@@ -157,7 +158,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		businessNameToken, err := config.VaultStore.TokenCreate(ctx, data.buinessName, config.VaultKey, 20)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error creating business name token", err.Error())
+			config.Logger.Error("Error creating business name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(data).ToHTML()
 		}
@@ -165,7 +166,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		phoneToken, err := config.VaultStore.TokenCreate(ctx, data.phone, config.VaultKey, 20)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error creating phone token", err.Error())
+			config.Logger.Error("Error creating phone token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(data).ToHTML()
 		}
@@ -188,14 +189,13 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 	err := config.UserStore.UserUpdate(context.Background(), data.authUser)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error updating user profile", err.Error())
-
+		config.Logger.Error("Error updating user profile", slog.String("error", err.Error()))
 		data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 		return controller.formRegister(data).ToHTML()
 	}
 
 	data.formSuccessMessage = "Your registration completed successfully. You can now continue browsing the website."
-	data.formRedirectURL = links.NewUserLinks().Home(map[string]string{})
+	data.formRedirectURL = links.User().Home()
 	return controller.formRegister(data).ToHTML()
 }
 
@@ -404,7 +404,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		email, err = config.VaultStore.TokenRead(ctx, emailToken, config.VaultKey)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading email", err.Error())
+			config.Logger.Error("Error reading email", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -413,7 +413,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		firstName, err = config.VaultStore.TokenRead(ctx, firstNameToken, config.VaultKey)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading first name", err.Error())
+			config.Logger.Error("Error reading first name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -422,7 +422,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		lastName, err = config.VaultStore.TokenRead(ctx, lastNameToken, config.VaultKey)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading last name", err.Error())
+			config.Logger.Error("Error reading last name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -431,7 +431,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		businessName, err = config.VaultStore.TokenRead(ctx, businessNameToken, config.VaultKey)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading business name", err.Error())
+			config.Logger.Error("Error reading business name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -440,7 +440,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		phone, err = config.VaultStore.TokenRead(ctx, phoneToken, config.VaultKey)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading phone", err.Error())
+			config.Logger.Error("Error reading phone", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -466,7 +466,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 	})
 
 	if errCountries != nil {
-		config.LogStore.ErrorWithContext("Error listing countries", errCountries.Error())
+		config.Logger.Error("Error listing countries", slog.String("error", errCountries.Error()))
 		return registerControllerData{}, "Error listing countries"
 	}
 
@@ -474,7 +474,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 
 	if r.Method == http.MethodGet {
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error reading email", err.Error())
+			config.Logger.Error("Error reading email", slog.String("error", err.Error()))
 			return registerControllerData{}, "Error reading email"
 		}
 
@@ -523,7 +523,7 @@ func (controller *registerController) selectTimezoneByCountry(country string, se
 	timezones, errZones := config.GeoStore.TimezoneList(query)
 
 	if errZones != nil {
-		config.LogStore.ErrorWithContext("Error listing timezones", errZones.Error())
+		config.Logger.Error("Error listing timezones", slog.String("error", errZones.Error()))
 		return hb.Text("Error listing timezones")
 	}
 

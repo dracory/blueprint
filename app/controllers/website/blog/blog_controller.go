@@ -1,6 +1,7 @@
 package blog
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -188,14 +189,14 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 	postList, errList := config.BlogStore.PostList(options)
 
 	if errList != nil {
-		config.LogStore.ErrorWithContext("Error. At blogController.page", errList.Error())
+		config.Logger.Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
 	postCount, errCount := config.BlogStore.PostCount(options)
 
 	if errCount != nil {
-		config.LogStore.ErrorWithContext("Error. At blogController.page", errCount.Error())
+		config.Logger.Error("Error. At blogController.page", slog.String("error", errCount.Error()))
 		return data, "Sorry, there was an error loading the posts count. Please try again later."
 	}
 

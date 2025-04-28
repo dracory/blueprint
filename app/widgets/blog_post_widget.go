@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"log/slog"
 	"net/http"
 	"project/config"
 	"project/internal/helpers"
@@ -60,7 +61,7 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 
 	uriParts := strings.Split(r.RequestURI, "/")
 	if len(uriParts) < 5 {
-		config.LogStore.ErrorWithContext("At blogPostWidget: URI mismatch", map[string]any{"uri": r.RequestURI})
+		config.Logger.Error("At blogPostWidget: URI mismatch", slog.String("uri", r.RequestURI))
 		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
@@ -71,35 +72,34 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 	cfmt.Infoln("BlogPost: ", postID, postSlug)
 
 	if postID == "" {
-		config.LogStore.ErrorWithContext("anyPost: post ID is missing", map[string]any{"uri": r.RequestURI})
+		config.Logger.Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
 		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
-
 	}
 
 	post, errPost := config.BlogStore.PostFindByID(postID)
 
 	if errPost != nil {
-		config.LogStore.ErrorWithContext("Error. At BlogPostController.AnyIndex. Post not found", errPost.Error())
+		config.Logger.Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
 		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if post == nil {
-		config.LogStore.ErrorWithContext("ERROR: anyPost: post with ID "+postID+" is missing", map[string]any{"postID": postID})
+		config.Logger.Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
 		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if post.IsUnpublished() {
-		config.LogStore.WarnWithContext("WARNING: anyPost: post with ID "+postID+" is unpublished", map[string]any{"postID": postID})
+		config.Logger.Warn("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
 		url := helpers.ToFlashWarningURL("The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
-		blogPostURL := links.NewWebsiteLinks().BlogPost(post.ID(), post.Title())
-		config.LogStore.ErrorWithContext("ERROR: anyPost: post Title is missing for ID "+postID, "Redirecting to correct URL")
+		blogPostURL := links.Website().BlogPost(post.ID(), post.Title())
+		config.Logger.Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
 		url := helpers.ToFlashWarningURL("The post location has changed. Redirecting to the new address...", blogPostURL, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}

@@ -3,6 +3,7 @@ package helpers
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"project/config"
 
 	"github.com/gouniverse/userstore"
@@ -30,7 +31,7 @@ func UserUntokenized(ctx context.Context, authUser userstore.UserInterface) (fir
 	untokenized, err := Untokenize(ctx, keyTokenMap) // use Untokenize as more resource optimized
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error reading tokens", err.Error())
+		config.Logger.Error("Error reading tokens", slog.String("error", err.Error()))
 		return "", "", "", err
 	}
 

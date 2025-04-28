@@ -2,6 +2,7 @@ package blog
 
 import (
 	"bytes"
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -33,10 +34,10 @@ var _ router.HTMLControllerInterface = (*blogPostController)(nil)
 func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
 	postID := chi.URLParam(r, "id")
 	postSlug := chi.URLParam(r, "title")
-	blogsUrl := links.NewWebsiteLinks().Blog(map[string]string{})
+	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {
-		config.LogStore.ErrorWithContext("anyPost: post ID is missing", map[string]any{"uri": r.RequestURI})
+		config.Logger.Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
 		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
@@ -44,26 +45,26 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 	post, errPost := config.BlogStore.PostFindByID(postID)
 
 	if errPost != nil {
-		config.LogStore.ErrorWithContext("Error. At BlogPostController.AnyIndex. Post not found", errPost.Error())
+		config.Logger.Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
 		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
 
 	if post == nil {
-		config.LogStore.ErrorWithContext("ERROR: anyPost: post with ID "+postID+" is missing", map[string]any{"postID": postID})
+		config.Logger.Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
 		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if !c.accessAllowed(r, *post) {
-		config.LogStore.WarnWithContext("WARNING: anyPost: post with ID "+postID+" is unpublished", map[string]any{"postID": postID})
+		config.Logger.Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
 		helpers.ToFlash(w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
 		url := links.Website().BlogPost(post.ID(), post.Title())
-		config.LogStore.ErrorWithContext("ERROR: anyPost: post Title is missing for ID "+postID, "Redirecting to correct URL")
+		config.Logger.Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
 		helpers.ToFlash(w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
 	}

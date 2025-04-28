@@ -125,7 +125,7 @@ package admin
 // 	err = models.NewFaqRepository().FaqCreate(faq)
 
 // 	if err != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqCreate", err.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqCreate", err.Error())
 // 		return "", errors.New("faq failed to be created")
 // 	}
 
@@ -136,7 +136,7 @@ package admin
 // 	faq, err := models.NewFaqRepository().FaqFindByID(entityID)
 
 // 	if err != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqFetchUpdateData", err.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqFetchUpdateData", err.Error())
 // 		return nil, errors.New("user fetch failed")
 // 	}
 
@@ -151,7 +151,7 @@ package admin
 // func (c faqController) faqTrash(entityID string) error {
 // 	faq, err := models.NewFaqRepository().FaqFindByID(entityID)
 // 	if err != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqTrash", err.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqTrash", err.Error())
 // 		return err
 // 	}
 // 	return models.NewFaqRepository().FaqTrash(faq)
@@ -161,7 +161,7 @@ package admin
 // 	faq, err := models.NewFaqRepository().FaqFindByID(entityID)
 
 // 	if err != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqUpdate", err.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqUpdate", err.Error())
 // 		return errors.New("faq find failed")
 // 	}
 
@@ -191,7 +191,7 @@ package admin
 // 	errUpdate := models.NewFaqRepository().FaqUpdate(faq)
 
 // 	if errUpdate != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqUpdate", errUpdate.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqUpdate", errUpdate.Error())
 // 		return errUpdate
 // 	}
 
@@ -213,7 +213,7 @@ package admin
 // 	})
 
 // 	if err != nil {
-// 		config.Cms.LogStore.ErrorWithContext("At faqController > faqRows", err.Error())
+// 		config.Cms.Logger.ErrorWithContext("At faqController > faqRows", err.Error())
 // 		return []crud.Row{}, err
 // 	}
 

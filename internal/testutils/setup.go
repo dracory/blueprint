@@ -18,7 +18,7 @@ func Setup() {
 	// var errAuthInit error
 	// config.Auth, errAuthInit = authentication.SetupAuth()
 	// if errAuthInit != nil {
-	// 	config.LogStore.Error("Auth Initialization Failed: " + errAuthInit.Error())
+	// 	config.Logger.Error("Auth Initialization Failed: " + errAuthInit.Error())
 	// 	log.Panicln("Auth Initialization Failed: " + errAuthInit.Error())
 	// }
 	// database.Initialize()

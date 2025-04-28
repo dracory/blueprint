@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"project/config"
 
 	"github.com/gouniverse/userstore"
@@ -26,21 +27,21 @@ func userTokenize(user userstore.UserInterface, firstName string, lastName strin
 	err = config.VaultStore.TokenUpdate(ctx, firstNameToken, firstName, config.VaultKey)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error updating first name", err.Error())
+		config.Logger.Error("Error updating first name", slog.String("error", err.Error()))
 		return err
 	}
 
 	err = config.VaultStore.TokenUpdate(ctx, lastNameToken, lastName, config.VaultKey)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error updating last name", err.Error())
+		config.Logger.Error("Error updating last name", slog.String("error", err.Error()))
 		return err
 	}
 
 	err = config.VaultStore.TokenUpdate(ctx, emailToken, email, config.VaultKey)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error updating email", err.Error())
+		config.Logger.Error("Error updating email", slog.String("error", err.Error()))
 		return err
 	}
 
