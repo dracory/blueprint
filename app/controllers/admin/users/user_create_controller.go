@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"project/app/links"
 	"project/config"
@@ -176,7 +177,7 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 	err := config.UserStore.UserCreate(context.Background(), user)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At userCreateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating user failed. Please contact an administrator."
 	}
 

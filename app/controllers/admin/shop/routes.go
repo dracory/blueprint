@@ -9,33 +9,34 @@ import (
 
 	shopDiscounts "project/app/controllers/admin/shop/discounts"
 	shopProducts "project/app/controllers/admin/shop/products"
+	"project/app/controllers/admin/shop/shared"
 )
 
 func ShopRoutes() []router.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.Value(r, "controller")
 
-		if controller == "discounts" {
+		if controller == shared.CONTROLLER_DISCOUNTS {
 			return shopDiscounts.NewDiscountController().AnyIndex(w, r)
 		}
 
-		if controller == "product_create" {
+		if controller == shared.CONTROLLER_PRODUCT_CREATE {
 			return shopProducts.NewProductCreateController().Handler(w, r)
 		}
 
-		if controller == "product_delete" {
+		if controller == shared.CONTROLLER_PRODUCT_DELETE {
 			return shopProducts.NewProductDeleteController().Handler(w, r)
 		}
 
-		if controller == "products" {
+		if controller == shared.CONTROLLER_PRODUCTS {
 			return shopProducts.NewProductManagerController().Handler(w, r)
 		}
 
-		if controller == "product_update" {
+		if controller == shared.CONTROLLER_PRODUCT_UPDATE {
 			return shopProducts.NewProductUpdateController().Handler(w, r)
 		}
 
-		if controller == "orders" {
+		if controller == shared.CONTROLLER_ORDERS {
 			return NewOrderManagerController().Handler(w, r)
 		}
 

@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"project/app/controllers/admin/shop/shared"
 	"project/config"
@@ -143,7 +144,7 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 	product, err := config.ShopStore.ProductFindByID(context.Background(), data.productID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At productDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product not found"
 	}
 
@@ -160,7 +161,7 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 	err = config.ShopStore.ProductSoftDelete(context.Background(), product)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At productDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting product failed. Please contact an administrator."
 	}
 

@@ -7,8 +7,8 @@ go 1.24.0
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dracory/base v0.16.0
-	github.com/dromara/carbon/v2 v2.6.2
+	github.com/dracory/base v0.17.0
+	github.com/dromara/carbon/v2 v2.6.3
 	github.com/faabiosr/cachego v0.26.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-co-op/gocron v1.37.0
@@ -25,8 +25,8 @@ require (
 	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/envenc v0.10.0
 	github.com/gouniverse/filesystem v0.3.1
-	github.com/gouniverse/form v0.16.0
-	github.com/gouniverse/hb v1.83.4
+	github.com/gouniverse/form v0.17.0
+	github.com/gouniverse/hb v1.85.0
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/logstore v1.7.0
 	github.com/gouniverse/metastore v1.2.0
@@ -34,7 +34,7 @@ require (
 	github.com/gouniverse/router v1.4.2
 	github.com/gouniverse/sessionstore v1.0.0
 	github.com/gouniverse/shopstore v1.0.0
-	github.com/gouniverse/statsstore v0.4.0
+	github.com/gouniverse/statsstore v0.5.0
 	github.com/gouniverse/taskstore v1.5.0
 	github.com/gouniverse/ui v0.14.0
 	github.com/gouniverse/userstore v1.0.0
@@ -106,7 +106,7 @@ require (
 	golang.org/x/term v0.31.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.62.1 // indirect
+	modernc.org/libc v1.63.0 // indirect
 )
 
 require (
@@ -135,5 +135,5 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.9.1 // indirect
+	modernc.org/memory v1.10.0 // indirect
 )

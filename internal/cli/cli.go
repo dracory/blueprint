@@ -31,6 +31,11 @@ var commandHandlers = map[string]commandHandler{
 
 // ExecuteCliCommand executes a CLI command based on the provided arguments using a handler map.
 //
+// The command can be one of the following:
+// - task <alias> <arguments>
+// - job <arguments>
+// - routes list
+//
 // Business logic:
 // 1. Logs the command being executed.
 // 2. Validates that at least one argument (the command) is provided.

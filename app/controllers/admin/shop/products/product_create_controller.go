@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"project/app/controllers/admin/shop/shared"
 	"project/config"
@@ -150,7 +151,7 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 	err := config.ShopStore.ProductCreate(context.Background(), product)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At productCreateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At productCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating product failed. Please contact an administrator."
 	}
 

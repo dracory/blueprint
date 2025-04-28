@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"project/config"
@@ -20,7 +21,7 @@ func TestImpersonate(t *testing.T) {
 
 	// Assert
 	if err != nil {
-		config.LogStore.ErrorWithContext("At Impersonate", err.Error())
+		config.Logger.Error("At Impersonate", slog.String("error", err.Error()))
 		t.Fail()
 	}
 }

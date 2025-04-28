@@ -1,16 +1,17 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/links"
 	"project/config"
 	"project/internal/helpers"
 
-	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
+	"github.com/gouniverse/utils"
 )
 
 type userDeleteController struct{}
@@ -54,7 +55,7 @@ func (controller userDeleteController) Handler(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *userDeleteController) modal(data userDeleteControllerData) hb.TagInterface {
-	submitUrl := links.NewAdminLinks().UsersUserDelete(map[string]string{
+	submitUrl := links.Admin().UsersUserDelete(map[string]string{
 		"user_id": data.userID,
 	})
 
@@ -129,7 +130,7 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 	}
 
 	authUser := helpers.GetAuthUser(r)
-	data.userID = req.Value(r, "user_id")
+	data.userID = utils.Req(r, "user_id", "")
 
 	if authUser == nil {
 		return data, "You are not logged in. Please login to continue."
@@ -142,7 +143,7 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 	user, err := config.UserStore.UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At userDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "User not found"
 	}
 
@@ -159,7 +160,7 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 	err = config.UserStore.UserSoftDelete(r.Context(), user)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At userDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting user failed. Please contact an administrator."
 	}
 

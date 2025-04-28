@@ -31,7 +31,7 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewUserLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(w, r, errorMessage, links.User().Home(map[string]string{}), 10)
 	}
 
 	return layouts.NewUserLayout(r, layouts.Options{

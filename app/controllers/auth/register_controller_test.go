@@ -374,7 +374,7 @@ func TestRegisterController_Success(t *testing.T) {
 		`name="country"`,
 		`name="timezone"`,
 		`Your registration completed successfully. You can now continue browsing the website.`,
-		`<script>window.location.href = '` + links.NewUserLinks().Home(map[string]string{}) + `'</script>`,
+		`<script>window.location.href = '` + links.User().Home() + `'</script>`,
 	}
 
 	for _, expected := range expecteds {

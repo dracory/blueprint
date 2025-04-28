@@ -1,4 +1,4 @@
-package admin
+package stats
 
 import (
 	"project/app/links"
@@ -6,17 +6,17 @@ import (
 	"github.com/gouniverse/router"
 )
 
-func StatsRoutes() []router.RouteInterface {
+func Routes() []router.RouteInterface {
 	return []router.RouteInterface{
 		&router.Route{
-			Name:        "Admin > Stats > Orders",
-			Path:        links.ADMIN_STATS,
-			HTMLHandler: StatsController().Handler,
+			Name:    "Admin > Visitor Analytics > Home",
+			Path:    links.ADMIN_STATS,
+			Handler: StatsController().Handler,
 		},
 		&router.Route{
-			Name:        "Admin > Stats > Catchall",
-			Path:        links.ADMIN_STATS + links.CATCHALL,
-			HTMLHandler: StatsController().Handler,
+			Name:    "Admin > Visitor Analytics > Catchall",
+			Path:    links.ADMIN_STATS + links.CATCHALL,
+			Handler: StatsController().Handler,
 		},
 	}
 }

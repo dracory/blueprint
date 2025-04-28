@@ -1,19 +1,21 @@
-package admin
+package stats
 
 import (
 	"log/slog"
 	"net/http"
 	"project/app/layouts"
+	"project/app/links"
 	"project/config"
+	"project/internal/helpers"
 
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/router"
-	"github.com/samber/lo"
 
 	statsAdmin "github.com/gouniverse/statsstore/admin"
+	statsAdminShared "github.com/gouniverse/statsstore/admin/shared"
 )
 
-func StatsController() router.HTMLControllerInterface {
+func StatsController() router.ControllerInterface {
 	return &statsController{
 		logger: config.Logger,
 	}
@@ -23,25 +25,24 @@ type statsController struct {
 	logger slog.Logger
 }
 
-func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) string {
-	statsUI, err := statsAdmin.UI(statsAdmin.UIOptions{
+func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
+	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
 		ResponseWriter: w,
 		Request:        r,
 		Logger:         &config.Logger,
 		Store:          config.StatsStore,
 		Layout:         &adminLayout{},
-		HomeURL:        "/admin",
+		HomeURL:        links.Admin().Home(),
 		WebsiteUrl:     "https://lesichkov.co.uk",
 	})
 
-	ui := lo.IfF(err != nil, func() hb.TagInterface {
+	if err != nil {
 		c.logger.Error("At admin > statsController > Handler", "error", err.Error())
-		return hb.Raw(err.Error())
-	}).ElseF(func() hb.TagInterface {
-		return statsUI
-	})
+		helpers.ToFlashError(w, r, err.Error(), links.Admin().Home(), 30)
+		return
+	}
 
-	return ui.ToHTML()
+	visitorAnalyticsAdmin.ServeHTTP(w, r)
 }
 
 type adminLayout struct {
@@ -90,4 +91,4 @@ func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
 	}).ToHTML()
 }
 
-var _ statsAdmin.Layout = (*adminLayout)(nil)
+var _ statsAdminShared.LayoutInterface = (*adminLayout)(nil)

@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"project/config"
 
@@ -227,6 +228,7 @@ func (controller *userManagerController) page(data userManagerControllerData) hb
 
 	return hb.Div().
 		Class("container").
+		Child(hb.BR()).
 		Child(breadcrumbs).
 		Child(hb.HR()).
 		Child(title).
@@ -266,7 +268,7 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 				firstName, lastName, email, err := helpers.UserUntokenized(context.Background(), user)
 
 				if err != nil {
-					config.LogStore.ErrorWithContext("At userManagerController > tableUsers", err.Error())
+					config.Logger.Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
 					firstName = "n/a"
 					lastName = "n/a"
 					email = "n/a"
@@ -495,11 +497,12 @@ func (controller *userManagerController) prepareData(r *http.Request) (data user
 	userList, userCount, err := controller.fetchUserList(data)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
-		return data, "error retrieving users"
+		config.Logger.Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		return data, "Creating user failed. Please contact an administrator."
 	}
 
 	data.userList = userList
+
 	data.userCount = userCount
 
 	return data, ""
@@ -516,7 +519,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 		firstNameUserIDs, err := config.BlindIndexStoreFirstName.Search(data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
+			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -531,7 +534,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 		lastNameUserIDs, err := config.BlindIndexStoreLastName.Search(data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
+			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -546,7 +549,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 		emailUserIDs, err := config.BlindIndexStoreEmail.Search(data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
+			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -558,12 +561,18 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	query := userstore.NewUserQuery().
-		SetIDIn(userIDs).
-		SetStatus(data.formStatus).
 		SetSortDirection(data.sortOrder).
 		SetOrderBy(data.sortBy).
 		SetOffset(data.pageInt * data.perPage).
 		SetLimit(data.perPage)
+
+	if len(userIDs) > 0 {
+		query.SetIDIn(userIDs)
+	}
+
+	if data.formStatus != "" {
+		query.SetStatus(data.formStatus)
+	}
 
 	if data.formCreatedFrom != "" {
 		query.SetCreatedAtGte(data.formCreatedFrom + " 00:00:00")
@@ -576,18 +585,19 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	userList, err := config.UserStore.UserList(data.request.Context(), query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
+		config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 
 	userCount, err := config.UserStore.UserCount(data.request.Context(), query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userManagerController > prepareData", err.Error())
+		config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 
 	return userList, userCount, nil
+
 }
 
 type userManagerControllerData struct {

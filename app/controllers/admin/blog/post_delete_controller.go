@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/links"
 	"project/config"
@@ -138,7 +139,7 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 	post, err := config.BlogStore.PostFindByID(data.postID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At postDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Post not found"
 	}
 
@@ -155,7 +156,7 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 	err = config.BlogStore.PostTrash(post)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At postDeleteController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting post failed. Please contact an administrator."
 	}
 

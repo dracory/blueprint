@@ -29,9 +29,9 @@ func (controller *loginController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(w, r, `vault store is required`, homeURL, 5)
 	}
 
-	backUrl := req.ValueOr(r, "back_url", homeURL)
-	
-    // Ensure back_url is part of our domain (contains our root URL)
+	backUrl := req.ValueOr(r, "back_url", userURL)
+
+	// Ensure back_url is part of our domain (contains our root URL)
 	if !strings.HasPrefix(backUrl, homeURL) {
 		backUrl = userURL
 	}

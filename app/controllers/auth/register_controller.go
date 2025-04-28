@@ -68,17 +68,17 @@ func NewRegisterController() *registerController {
 
 func (controller *registerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	if !config.UserStoreUsed || config.UserStore == nil {
-		return helpers.ToFlashError(w, r, `user store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `user store is required`, links.Website().Home(), 5)
 	}
 
 	if config.VaultStoreUsed && config.VaultStore == nil {
-		return helpers.ToFlashError(w, r, `vault store is required`, links.NewWebsiteLinks().Home(), 5)
+		return helpers.ToFlashError(w, r, `vault store is required`, links.Website().Home(), 5)
 	}
 
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewWebsiteLinks().Home(), 10)
+		return helpers.ToFlashError(w, r, errorMessage, links.Website().Home(), 10)
 	}
 
 	if data.action == controller.actionOnCountrySelectedTimezoneOptions {

@@ -82,14 +82,14 @@ func initializeEnvVariables() error {
 	env.Initialize(".env")
 
 	AppEnvironment = env.Value("APP_ENV")
-	AppName = env.Value("APP_NAME")
-	AppUrl = env.Value("APP_URL")
 
 	// Enable if you use envenc
 	// if err := intializeEnvEncVariables(AppEnvironment); err != nil {
 	// 	return err
 	// }
 
+	AppName = env.Value("APP_NAME")
+	AppUrl = env.Value("APP_URL")
 	CmsUserTemplateID = env.Value("CMS_TEMPLATE_ID")
 	DbDriver = env.Value("DB_DRIVER")
 	DbHost = env.Value("DB_HOST")
@@ -97,8 +97,8 @@ func initializeEnvVariables() error {
 	DbName = env.Value("DB_DATABASE")
 	DbUser = env.Value("DB_USERNAME")
 	DbPass = env.Value("DB_PASSWORD")
-	Debug = env.Value("DEBUG") == "yes"
-	GoogleGeminiApiKey = env.Value("GOOGLE_GEMINI_API_KEY")
+	Debug = env.Bool("DEBUG")
+	GoogleGeminiApiKey = env.Value("GEMINI_API_KEY")
 	MailDriver = env.Value("MAIL_DRIVER")
 	MailFromEmailAddress = env.Value("EMAIL_FROM_ADDRESS")
 	MailFromName = env.Value("EMAIL_FROM_NAME")
@@ -118,9 +118,9 @@ func initializeEnvVariables() error {
 	StripeKeyPrivate = env.Value("STRIPE_KEY_PRIVATE")
 	StripeKeyPublic = env.Value("STRIPE_KEY_PUBLIC")
 	VaultKey = env.Value("VAULT_KEY")
-	VertexModelID = env.Value("VERTEX_MODEL_ID")
-	VertexProjectID = env.Value("VERTEX_PROJECT_ID")
-	VertexRegionID = env.Value("VERTEX_REGION_ID")
+	VertexAiModelID = env.Value("VERTEX_MODEL_ID")
+	VertexAiProjectID = env.Value("VERTEX_PROJECT_ID")
+	VertexAiRegionID = env.Value("VERTEX_REGION_ID")
 	WebServerHost = env.Value("SERVER_HOST")
 	WebServerPort = env.Value("SERVER_PORT")
 
@@ -159,11 +159,11 @@ func initializeEnvVariables() error {
 		return errors.New("DB_PASSWORD is required")
 	}
 
-	if GoogleGeminiApiUsed == "yes" && GoogleGeminiApiKey == "" {
-		return errors.New("GOOGLE_GEMINI_API_KEY is required")
+	if GoogleGeminiApiUsed && GoogleGeminiApiKey == "" {
+		return errors.New("GEMINI_API_KEY is required")
 	}
 
-	if OpenAiUsed && OpenAiApiKey == "" {
+	if OpenAiApiUsed && OpenAiApiKey == "" {
 		return errors.New("OPENAI_API_KEY is required")
 	}
 
@@ -179,13 +179,13 @@ func initializeEnvVariables() error {
 		return errors.New("VAULT_KEY is required")
 	}
 
-	if VertexUsed && VertexModelID == "" {
+	if VertexAiUsed && VertexAiModelID == "" {
 		return errors.New("VERTEX_MODEL_ID is required")
 	}
-	if VertexUsed && VertexProjectID == "" {
+	if VertexAiUsed && VertexAiProjectID == "" {
 		return errors.New("VERTEX_PROJECT_ID is required")
 	}
-	if VertexUsed && VertexRegionID == "" {
+	if VertexAiUsed && VertexAiRegionID == "" {
 		return errors.New("VERTEX_REGION_ID is required")
 	}
 
@@ -219,6 +219,10 @@ func initializeEnvVariables() error {
 func intializeEnvEncVariables(appEnvironment string) error {
 	if appEnvironment == APP_ENVIRONMENT_TESTING {
 		return nil
+	}
+
+	if appEnvironment == "" {
+		return errors.New("APP_ENV is required")
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)

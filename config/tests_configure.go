@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/dracory/base/cfmt"
 	"github.com/dracory/base/test"
 	_ "modernc.org/sqlite"
 )
@@ -28,10 +27,12 @@ func TestsConfigureAndInitialize() error {
 
 	// Add blueprint-specific environment variables
 	config.AdditionalEnvVars = map[string]string{
+		"DEBUG":              "1",
 		"CMS_TEMPLATE_ID":    "default",
 		"OPENAI_API_KEY":     "openai_api_key",
 		"STRIPE_KEY_PRIVATE": "sk_test_yoursecretkey",
 		"STRIPE_KEY_PUBLIC":  "pk_test_yourpublickey",
+		"GEMINI_API_KEY":     "gemini_api_key",
 		"VERTEX_PROJECT_ID":  "vertex_project_id",
 		"VERTEX_REGION_ID":   "vertex_region_id",
 		"VERTEX_MODEL_ID":    "vertex_model_id",
@@ -41,14 +42,7 @@ func TestsConfigureAndInitialize() error {
 	test.SetupTestEnvironment(config)
 
 	// Initialize the application
-	err := Initialize()
-
-	if err != nil {
-		cfmt.Errorf("Failed to initialize: %v", err)
-		return err
-	}
-
-	return nil
+	return Initialize()
 }
 
 /*

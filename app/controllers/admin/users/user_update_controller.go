@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -272,7 +273,7 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 	err := config.UserStore.UserUpdate(r.Context(), data.user)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving user failed"
 		return data, ""
 	}
@@ -280,7 +281,7 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 	err = userTokenize(data.user, data.formFirstName, data.formLastName, data.formEmail)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving user failed"
 		return data, ""
 	}
@@ -305,7 +306,7 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 	user, err := config.UserStore.UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "User not found"
 	}
 
@@ -318,7 +319,7 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), data.user)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At userManagerController > tableUsers", err.Error())
+		config.Logger.Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
 		return data, "Tokens failed to be read"
 	}
 

@@ -39,19 +39,20 @@ import (
 // - none
 func main() {
 	if err := config.Initialize(); err != nil {
-		// 1. Initialize the environment
+		// Initialize the environment
 		cfmt.Errorf("Failed to initialize environment: %v", err)
 		return
 	}
 
-	defer closeResources() // 2. Defer Closing the database
-	tasks.RegisterTasks()  // 3. Register the task handlers
+	defer closeResources() // Defer Closing the database
+
+	tasks.RegisterTasks() // Register the task handlers
 
 	if isCliMode() {
 		if len(os.Args) < 2 {
 			return
 		}
-		cli.ExecuteCliCommand(os.Args[1:]) // 4. Execute the command
+		cli.ExecuteCliCommand(os.Args[1:]) // Execute the command
 		return
 	}
 
@@ -113,7 +114,9 @@ func startBackgroundProcesses() {
 
 	schedules.StartAsync() // Initialize the scheduler
 
-	go config.CacheStore.ExpireCacheGoroutine() // Initialize the cache expiration goroutine
+	if config.CacheStore != nil {
+		go config.CacheStore.ExpireCacheGoroutine() // Initialize the cache expiration goroutine
+	}
 
 	if config.SessionStore != nil {
 		go config.SessionStore.SessionExpiryGoroutine() // Initialize the session expiration goroutine

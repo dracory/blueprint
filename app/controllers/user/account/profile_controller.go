@@ -62,7 +62,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	breadcrumbs := layouts.NewUserBreadcrumbsSectionWithContainer([]bs.Breadcrumb{
 		{
 			Name: "My Profile",
-			URL:  links.NewUserLinks().Profile(map[string]string{}),
+			URL:  links.User().Profile(),
 		},
 	})
 
@@ -77,6 +77,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	formProfile := controller.formProfile(data)
 
 	page := hb.Section().
+		Child(hb.BR()).
 		Child(breadcrumbs).
 		Child(hb.HR()).
 		Child(partials.UserQuickLinks(data.request)).

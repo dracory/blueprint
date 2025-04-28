@@ -45,7 +45,7 @@ func (controller *homeController) view(r *http.Request) *hb.Tag {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(map[string]string{}),
 		},
 		{
 			Name: "Shop",

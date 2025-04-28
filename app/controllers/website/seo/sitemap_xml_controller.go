@@ -1,6 +1,7 @@
 package seo
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/links"
 	"project/config"
@@ -47,7 +48,7 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 	})
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At sitemapXmlController > anySitemapXML", err.Error())
+		config.Logger.Error("At sitemapXmlController > anySitemapXML", slog.String("error", err.Error()))
 		return ""
 	}
 

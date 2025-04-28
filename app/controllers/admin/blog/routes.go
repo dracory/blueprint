@@ -23,7 +23,7 @@ func Routes() []router.RouteInterface {
 	postManager := &router.Route{
 		Name:        "Admin > Blog > Post Manager",
 		Path:        links.ADMIN_BLOG_POST_MANAGER,
-		HTMLHandler: NewBlogPostManagerController().Handler,
+		HTMLHandler: NewManagerController().Handler,
 	}
 
 	postUpdate := &router.Route{
@@ -35,13 +35,13 @@ func Routes() []router.RouteInterface {
 	blogHome := &router.Route{
 		Name:        "Admin > Blog",
 		Path:        links.ADMIN_BLOG,
-		HTMLHandler: NewBlogPostManagerController().Handler,
+		HTMLHandler: NewManagerController().Handler,
 	}
 
 	blogCatchAll := &router.Route{
 		Name:        "Admin > Blog > Catch All",
 		Path:        links.ADMIN_BLOG + links.CATCHALL,
-		HTMLHandler: NewBlogPostManagerController().Handler,
+		HTMLHandler: NewManagerController().Handler,
 	}
 
 	return []router.RouteInterface{

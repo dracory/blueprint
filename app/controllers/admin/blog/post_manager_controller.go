@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/config"
 
@@ -23,17 +24,17 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type blogPostManagerController struct{}
+type managerController struct{}
 
-var _ router.HTMLControllerInterface = (*blogPostManagerController)(nil)
+var _ router.HTMLControllerInterface = (*managerController)(nil)
 
 // == CONSTRUCTOR =============================================================
 
-func NewBlogPostManagerController() *blogPostManagerController {
-	return &blogPostManagerController{}
+func NewManagerController() *managerController {
+	return &managerController{}
 }
 
-func (controller *blogPostManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (controller *managerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
@@ -51,7 +52,7 @@ func (controller *blogPostManagerController) Handler(w http.ResponseWriter, r *h
 	}).ToHTML()
 }
 
-func (controller *blogPostManagerController) page(data blogPostManagerControllerData) hb.TagInterface {
+func (controller *managerController) page(data managerControllerData) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
@@ -86,7 +87,7 @@ func (controller *blogPostManagerController) page(data blogPostManagerController
 		Child(controller.tablePosts(data))
 }
 
-func (controller *blogPostManagerController) prepareData(r *http.Request) (data blogPostManagerControllerData, errorMessage string) {
+func (controller *managerController) prepareData(r *http.Request) (data managerControllerData, errorMessage string) {
 	var err error
 
 	data.page = req.ValueOr(r, "page", "0")
@@ -98,7 +99,7 @@ func (controller *blogPostManagerController) prepareData(r *http.Request) (data 
 	data.search = req.Value(r, "search")
 	data.dateFrom = req.ValueOr(r, "date_from", carbon.Now().AddYears(-1).ToDateString())
 	data.dateTo = req.ValueOr(r, "date_to", carbon.Now().ToDateString())
-	data.customerID = req.ValueOr(r, "customer_id", "")
+	data.customerID = req.Value(r, "customer_id")
 
 	query := blogstore.PostQueryOptions{
 		Search:               data.search,
@@ -116,7 +117,7 @@ func (controller *blogPostManagerController) prepareData(r *http.Request) (data 
 		PostList(query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At blogPostManagerController > prepareData", err.Error())
+		config.Logger.Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving posts"
 	}
 
@@ -127,14 +128,15 @@ func (controller *blogPostManagerController) prepareData(r *http.Request) (data 
 		PostCount(query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At blogPostManagerController > prepareData", err.Error())
+		config.Logger.Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "Error retrieving posts count"
 	}
 
 	return data, ""
+
 }
 
-func (controller *blogPostManagerController) tablePosts(data blogPostManagerControllerData) hb.TagInterface {
+func (controller *managerController) tablePosts(data managerControllerData) hb.TagInterface {
 	table := hb.Table().
 		Class("table table-striped table-hover table-bordered").
 		Children([]hb.TagInterface{
@@ -232,7 +234,7 @@ func (controller *blogPostManagerController) tablePosts(data blogPostManagerCont
 	})
 }
 
-func (controller *blogPostManagerController) sortableColumnLabel(data blogPostManagerControllerData, tableLabel string, columnName string) hb.TagInterface {
+func (controller *managerController) sortableColumnLabel(data managerControllerData, tableLabel string, columnName string) hb.TagInterface {
 	isSelected := strings.EqualFold(data.sortBy, columnName)
 
 	direction := lo.If(data.sortOrder == "asc", "desc").Else("asc")
@@ -257,7 +259,7 @@ func (controller *blogPostManagerController) sortableColumnLabel(data blogPostMa
 		Href(link)
 }
 
-func (controller *blogPostManagerController) sortingIndicator(columnName string, sortByColumnName string, sortOrder string) hb.TagInterface {
+func (controller *managerController) sortingIndicator(columnName string, sortByColumnName string, sortOrder string) hb.TagInterface {
 	isSelected := strings.EqualFold(sortByColumnName, columnName)
 
 	direction := lo.If(isSelected && sortOrder == "asc", "up").
@@ -273,7 +275,7 @@ func (controller *blogPostManagerController) sortingIndicator(columnName string,
 	return sortingIndicator
 }
 
-func (controller *blogPostManagerController) tableFilter(data blogPostManagerControllerData) hb.TagInterface {
+func (controller *managerController) tableFilter(data managerControllerData) hb.TagInterface {
 	statusList := []map[string]string{
 		{"id": "", "name": "All Statuses"},
 		{"id": blogstore.POST_STATUS_DRAFT, "name": "Draft"},
@@ -369,7 +371,7 @@ func (controller *blogPostManagerController) tableFilter(data blogPostManagerCon
 		})
 }
 
-func (controller *blogPostManagerController) tablePagination(data blogPostManagerControllerData, count int, page int, perPage int) hb.TagInterface {
+func (controller *managerController) tablePagination(data managerControllerData, count int, page int, perPage int) hb.TagInterface {
 	url := links.NewAdminLinks().BlogPostManager(map[string]string{
 		"search":    data.search,
 		"status":    data.status,
@@ -394,7 +396,7 @@ func (controller *blogPostManagerController) tablePagination(data blogPostManage
 		HTML(pagination)
 }
 
-type blogPostManagerControllerData struct {
+type managerControllerData struct {
 	// r            *http.Request
 	page       string
 	pageInt    int

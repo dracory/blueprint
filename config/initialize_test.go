@@ -6,7 +6,11 @@ import (
 )
 
 func TestInitialize_AppServerHostAndPort(t *testing.T) {
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if WebServerHost == "" {
 		t.Fatal("WebServerHost SHOULD NOT BE empty")
@@ -43,7 +47,11 @@ func TestInitialize_AppServerHostAndPort(t *testing.T) {
 
 func TestInitialize_Debug(t *testing.T) {
 	os.Setenv("DEBUG", "yes")
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if Debug == false {
 		t.Fatal("Debug SHOULD NOT BE false")

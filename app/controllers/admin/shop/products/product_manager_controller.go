@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"project/app/controllers/admin/shop/shared"
 	"project/config"
@@ -499,7 +500,7 @@ func (controller *productManagerController) prepareData(r *http.Request) (data p
 	productList, productCount, err := controller.fetchProductList(data)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productManagerController > prepareData", err.Error())
+		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving products"
 	}
 
@@ -555,14 +556,14 @@ func (controller *productManagerController) fetchProductList(data productManager
 	productList, err := config.ShopStore.ProductList(context.Background(), query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productManagerController > prepareData", err.Error())
+		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return []shopstore.ProductInterface{}, 0, err
 	}
 
 	productCount, err := config.ShopStore.ProductCount(context.Background(), query)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At productManagerController > prepareData", err.Error())
+		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return []shopstore.ProductInterface{}, 0, err
 	}
 

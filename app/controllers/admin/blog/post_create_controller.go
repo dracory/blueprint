@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/links"
 	"project/config"
@@ -145,7 +146,7 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 	err := config.BlogStore.PostCreate(post)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("Error. At postCreateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating post failed. Please contact an administrator."
 	}
 

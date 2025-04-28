@@ -1,0 +1,26 @@
+openapi: 3.0.3
+info:
+  title: API
+  description: API documentation
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  # Health Check
+  /healthcheck:
+    get:
+      summary: Health Check
+      description: Returns OK if the service is up
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok

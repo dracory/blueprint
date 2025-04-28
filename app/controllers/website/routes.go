@@ -14,6 +14,7 @@ import (
 	"project/app/controllers/website/contact"
 	"project/app/controllers/website/home"
 	"project/app/controllers/website/seo"
+	"project/app/controllers/website/swagger"
 	// paypalControllers "project/controllers/website/paypal"
 )
 
@@ -51,6 +52,21 @@ func Routes() []router.RouteInterface {
 		HTMLHandler: contact.NewContactController().AnyIndex,
 	}
 
+	// Serve Swagger UI using a controller
+	swaggerUiRoute := &router.Route{
+		Name:    "Swagger UI",
+		Path:    "/swagger",
+		Handler: swagger.SwaggerUIController,
+		Methods: []string{"GET"},
+	}
+	// Serve embedded YAML
+	swaggerYamlRoute := &router.Route{
+		Name:    "Swagger YAML",
+		Path:    "/docs/swagger.yaml",
+		Handler: swagger.SwaggerYAMLController,
+		Methods: []string{"GET"},
+	}
+
 	// paymentSuccess := &router.Route{
 	// 	Name:        "Website > Payment Success Controller",
 	// 	Path:        links.PAYMENT_SUCCESS,
@@ -71,6 +87,9 @@ func Routes() []router.RouteInterface {
 		// paymentSuccess,
 		// paymentCancel,
 	}
+
+	websiteRoutes = append(websiteRoutes, swaggerUiRoute)
+	websiteRoutes = append(websiteRoutes, swaggerYamlRoute)
 
 	// Comment if you do not use the blog routes
 	websiteRoutes = append(websiteRoutes, blog.Routes()...)

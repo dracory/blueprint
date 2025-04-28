@@ -7,7 +7,11 @@ func TestIsDebugEnabled(t *testing.T) {
 		t.Fatal(`Must be in debug, if debug enabled (1)`)
 	}
 
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if Debug && !IsDebugEnabled() {
 		t.Fatal(`Must not be in debug, if debug enabled (2)`)
@@ -25,7 +29,11 @@ func TestIsEnvDevelopment(t *testing.T) {
 		t.Fatal(`Must be in development`)
 	}
 
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if IsEnvDevelopment() {
 		t.Fatal(`Must not be in development`)
@@ -43,7 +51,11 @@ func TestIsEnvProduction(t *testing.T) {
 		t.Fatal(`Must be in production`)
 	}
 
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if IsEnvProduction() {
 		t.Fatal(`Must not be in production`)
@@ -61,10 +73,14 @@ func TestIsEnvLocal(t *testing.T) {
 		t.Fatal(`Must be in local`)
 	}
 
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if IsEnvLocal() {
-		t.Fatal(`Must not be in testing`)
+		t.Fatal(`Must not be in local`)
 	}
 }
 
@@ -75,7 +91,11 @@ func TestIsEnvTesting(t *testing.T) {
 		t.Fatal(`Must not be in testing`)
 	}
 
-	TestsConfigureAndInitialize()
+	err := TestsConfigureAndInitialize()
+
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	if !IsEnvTesting() {
 		t.Fatal(`Must not be in testing`)

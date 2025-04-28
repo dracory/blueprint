@@ -143,31 +143,31 @@ func (*homeController) tiles() []hb.TagInterface {
 	cmsTileOld := map[string]string{
 		"title": "Website Manager (Old)",
 		"icon":  "bi-globe",
-		"link":  links.NewAdminLinks().Cms(map[string]string{}),
+		"link":  links.Admin().Cms(map[string]string{}),
 	}
 
 	cmsTileNew := map[string]string{
 		"title": "Website Manager (New)",
 		"icon":  "bi-globe",
-		"link":  links.NewAdminLinks().CmsNew(),
+		"link":  links.Admin().CmsNew(),
 	}
 
 	blogTile := map[string]string{
 		"title": "Blog Manager",
 		"icon":  "bi-newspaper",
-		"link":  links.NewAdminLinks().Blog(map[string]string{}),
+		"link":  links.Admin().Blog(map[string]string{}),
 	}
 
 	userTile := map[string]string{
 		"title": "User Manager",
 		"icon":  "bi-people",
-		"link":  links.NewAdminLinks().Users(map[string]string{}),
+		"link":  links.Admin().Users(map[string]string{}),
 	}
 
 	shopTile := map[string]string{
 		"title": "Shop Manager",
 		"icon":  "bi-shop",
-		"link":  links.NewAdminLinks().Shop(map[string]string{}),
+		"link":  links.Admin().Shop(map[string]string{}),
 	}
 
 	// faqTile := map[string]string{
@@ -179,13 +179,13 @@ func (*homeController) tiles() []hb.TagInterface {
 	fileManagerTile := map[string]string{
 		"title": "File Manager (New, DB)",
 		"icon":  "bi-box",
-		"link":  links.NewAdminLinks().FileManager(map[string]string{}),
+		"link":  links.Admin().FileManager(map[string]string{}),
 	}
 
 	mediaManagerTile := map[string]string{
 		"title": "Media Manager (Old, S3)",
 		"icon":  "bi-box",
-		"link":  links.NewAdminLinks().MediaManager(map[string]string{}),
+		"link":  links.Admin().MediaManager(map[string]string{}),
 	}
 
 	// cdnManagerTile := map[string]string{
@@ -197,13 +197,13 @@ func (*homeController) tiles() []hb.TagInterface {
 	queueTile := map[string]string{
 		"title": "Queue Manager",
 		"icon":  "bi-heart-pulse",
-		"link":  links.NewAdminLinks().Tasks(map[string]string{}),
+		"link":  links.Admin().Tasks(map[string]string{}),
 	}
 
 	visitStatsTile := map[string]string{
 		"title": "Visit Stats",
 		"icon":  "bi-graph-up",
-		"link":  links.NewAdminLinks().Stats(map[string]string{}),
+		"link":  links.Admin().Stats(map[string]string{}),
 	}
 
 	tiles := []map[string]string{}

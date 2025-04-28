@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"log/slog"
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
@@ -696,7 +697,7 @@ func (controller postUpdateController) savePost(r *http.Request, data postUpdate
 	err := config.BlogStore.PostUpdate(data.post)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At postUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving post failed"
 		return data, ""
 	}
@@ -723,7 +724,7 @@ func (controller postUpdateController) prepareDataAndValidate(r *http.Request) (
 	data.post, err = config.BlogStore.PostFindByID(data.postID)
 
 	if err != nil {
-		config.LogStore.ErrorWithContext("At postUpdateController > prepareDataAndValidate", err.Error())
+		config.Logger.Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Post not found"
 	}
 
