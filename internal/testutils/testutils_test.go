@@ -28,6 +28,13 @@ func TestTestConfigIntegration(t *testing.T) {
 	// Clean up after ourselves
 	defer test.CleanupTestEnvironment(testConfig)
 
+	// os.Setenv("CMS_TEMPLATE_ID", "TEST_TEMPLATE_ID")
+	// os.Setenv("STRIPE_KEY_PRIVATE", "TEST_STRIPE_KEY_PRIVATE")
+	// os.Setenv("STRIPE_KEY_PUBLIC", "TEST_STRIPE_KEY_PUBLIC")
+	// os.Setenv("VERTEX_MODEL_ID", "TEST_VERTEX_MODEL_ID")
+	// os.Setenv("VERTEX_PROJECT_ID", "TEST_VERTEX_PROJECT_ID")
+	// os.Setenv("VERTEX_REGION_ID", "TEST_VERTEX_REGION_ID")
+
 	// Initialize the application with test configuration
 	config.Initialize()
 

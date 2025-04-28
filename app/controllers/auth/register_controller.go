@@ -142,7 +142,6 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		firstNameToken, err := config.VaultStore.TokenCreate(ctx, data.firstName, config.VaultKey, 20)
 
 		if err != nil {
-			config.LogStore.ErrorWithContext("Error creating first name token", err.Error())
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(data).ToHTML()
 		}

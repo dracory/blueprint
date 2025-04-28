@@ -15,7 +15,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func setupVaultStore(t *testing.T) (vaultStore *vaultstore.Store, err error) {
+func setupVaultStore(_ *testing.T) (vaultStore *vaultstore.Store, err error) {
 	// Create a mock database connection
 	mockDB, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
@@ -24,8 +24,9 @@ func setupVaultStore(t *testing.T) (vaultStore *vaultstore.Store, err error) {
 
 	// Initialize the vault store
 	vaultStore, err = vaultstore.NewStore(vaultstore.NewStoreOptions{
-		DB:             mockDB,
-		VaultTableName: "snv_vault_vault",
+		DB:                 mockDB,
+		VaultTableName:     "snv_vault_vault",
+		AutomigrateEnabled: true,
 	})
 	if err != nil {
 		return nil, err
