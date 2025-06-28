@@ -290,7 +290,8 @@ func initializeDatabase() error {
 		SetDatabaseName(DbName).
 		SetCharset(`utf8mb4`).
 		SetUserName(DbUser).
-		SetPassword(DbPass))
+		SetPassword(DbPass).
+		SetSSLMode("require"))
 
 	if err != nil {
 		return err

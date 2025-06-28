@@ -2,6 +2,7 @@ package config
 
 import (
 	"log/slog"
+	"os"
 
 	"github.com/faabiosr/cachego"
 	"github.com/gouniverse/blindindexstore"
@@ -24,6 +25,7 @@ import (
 	"github.com/gouniverse/vaultstore"
 	"github.com/gouniverse/webserver"
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/lmittmann/tint"
 )
 
 // == TYPES ================================================================= //
@@ -153,7 +155,7 @@ var CacheFile cachego.Cache
 // == CMS OLD ============================================================== //
 
 // Cms is the old CMS package (replaced by CmsStore).
-var CmsUsed = true
+var CmsUsed = false
 var Cms cms.Cms
 
 // == STORES =============================================================== //
@@ -217,3 +219,5 @@ var VaultStoreUsed = false
 var VaultStore vaultstore.StoreInterface
 
 var Logger slog.Logger
+
+var Console *slog.Logger = slog.New(tint.NewHandler(os.Stdout, nil))

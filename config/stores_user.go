@@ -30,7 +30,7 @@ func UserStoreInitialize(db *sql.DB) error {
 	}
 
 	if userStoreInstance == nil {
-		panic("UserStore is nil")
+		return errors.New("UserStore is nil")
 	}
 
 	UserStore = userStoreInstance

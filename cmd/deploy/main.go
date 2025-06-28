@@ -79,6 +79,10 @@ func main() {
 			command:  `mv ` + remDeployDir + `/application.log ` + remDeployDir + `/` + timestamp + `_backup_application.log`,
 			required: false,
 		},
+		// {
+		// 	command:  `cd ` + remDeployDir + ` && pm2 start "application" --name ` + pm2ProcessName + ` --log="` + remDeployDir + `/application.log" --error="` + remDeployDir + `/application.error.log" --time`,
+		// 	required: true,
+		// },
 		{
 			command:  `pm2 restart ` + pm2ProcessName,
 			required: true,

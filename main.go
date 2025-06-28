@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"os"
 
 	"project/app/middlewares"
@@ -12,7 +13,7 @@ import (
 	"project/internal/cli"
 	"project/internal/emails"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 
 	"github.com/dracory/base/server"
 )
@@ -40,7 +41,7 @@ import (
 func main() {
 	if err := config.Initialize(); err != nil {
 		// Initialize the environment
-		cfmt.Errorf("Failed to initialize environment: %v", err)
+		config.Console.Error("Failed to initialize environment:", slog.Any("error", err))
 		return
 	}
 

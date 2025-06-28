@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/dracory/base/req"
+	"log/slog"
 	"github.com/gouniverse/router"
 )
 
@@ -21,21 +22,21 @@ func NewLogRequestMiddleware() router.Middleware {
 		Name: "Log Request Middleware",
 		Handler: func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				uri := r.RequestURI
+				// uri := r.RequestURI
 
 				ip := req.IP(r)
 
 				method := r.Method
 
-				config.LogStore.InfoWithContext(method+": "+uri, map[string]string{
-					"host":           r.Host,
-					"path":           strings.TrimLeft(r.URL.Path, "/"),
-					"ip":             ip,
-					"method":         method,
-					"useragent":      r.Header.Get("User-Agent"),
-					"acceptlanguage": r.Header.Get("Accept-Language"),
-					"referer":        r.Header.Get("Referer"),
-				})
+				config.Logger.Info("request",
+					slog.String("host", r.Host),
+					slog.String("path", strings.TrimLeft(r.URL.Path, "/")),
+					slog.String("ip", ip),
+					slog.String("method", method),
+					slog.String("useragent", r.Header.Get("User-Agent")),
+					slog.String("acceptlanguage", r.Header.Get("Accept-Language")),
+					slog.String("referer", r.Header.Get("Referer")),
+				)
 
 				next.ServeHTTP(w, r)
 			})
