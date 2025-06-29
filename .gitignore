@@ -24,13 +24,24 @@ go.work
 .env
 .env.vault
 
+# Temp files
+*.tmp
 tmp/
+
+# Database files
+*.db
+*.sqlite
 
 database.sqlite
 database.db
 database.db-journal
 
+# Google Cloud
 google-cloud-cli-*
 google-cloud-sdk/
 
+# Git
+.git/
+
+# Cache
 .cache/
