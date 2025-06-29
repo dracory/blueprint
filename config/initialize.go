@@ -10,8 +10,8 @@ import (
 
 	"github.com/faabiosr/cachego/file"
 
-	"github.com/dracory/base/database"
-	"github.com/dracory/base/env"
+	"github.com/dracory/database"
+	"github.com/dracory/env"
 	"github.com/gouniverse/logstore"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/utils"

@@ -7,7 +7,9 @@ go 1.24.0
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dracory/base v0.22.0
+	github.com/dracory/base v0.23.0
+	github.com/dracory/database v0.2.0
+	github.com/dracory/env v0.3.0
 	github.com/dromara/carbon/v2 v2.6.9
 	github.com/faabiosr/cachego v0.26.0
 	github.com/go-chi/chi/v5 v5.2.2
