@@ -6,16 +6,14 @@ import (
 	"net/http"
 	"project/config"
 
+	"github.com/dracory/rtr"
 	"github.com/gouniverse/auth"
-	"github.com/gouniverse/router"
 )
 
-func NewAuthMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name:    "Auth Middleware",
-		Handler: authHandler,
-	}
-	return m
+func AuthMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("Auth Middleware").
+		SetHandler(authHandler)
 }
 
 // authHandler adds the user and session to the context.

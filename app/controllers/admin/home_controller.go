@@ -14,7 +14,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
-	"github.com/dracory/rtr"
 	"github.com/gouniverse/statsstore"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -26,7 +25,7 @@ type homeController struct{}
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController() router.HTMLControllerInterface {
+func NewHomeController() *homeController {
 	return &homeController{}
 }
 

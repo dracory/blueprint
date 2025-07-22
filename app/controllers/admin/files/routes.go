@@ -3,15 +3,16 @@ package admin
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	return []router.RouteInterface{
-		&router.Route{
-			Name:        "Admin > File Manager",
-			Path:        links.ADMIN_FILE_MANAGER,
-			HTMLHandler: NewFileManagerController().Handler,
-		},
+func Routes() []rtr.RouteInterface {
+	fileManager := rtr.NewRoute().
+		SetName("Admin > File Manager").
+		SetPath(links.ADMIN_FILE_MANAGER).
+		SetHTMLHandler(NewFileManagerController().Handler)
+
+	return []rtr.RouteInterface{
+		fileManager,
 	}
 }

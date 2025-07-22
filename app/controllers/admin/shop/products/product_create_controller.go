@@ -13,12 +13,9 @@ import (
 	"github.com/dracory/shopstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type productCreateController struct{}
-
-var _ router.HTMLControllerInterface = (*productCreateController)(nil)
 
 type productCreateControllerData struct {
 	formTitle      string

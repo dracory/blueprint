@@ -4,27 +4,34 @@ import (
 	"project/app/links"
 	"project/app/middlewares"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	return []router.RouteInterface{
-		&router.Route{
-			Name:        "Website > Widget Controller > Handler",
-			Path:        links.WIDGET,
-			HTMLHandler: NewWidgetController().Handler,
-		},
-		&router.Route{
-			Name:        "Website > Cms > Home Page",
-			Middlewares: []router.Middleware{middlewares.NewStatsMiddleware()},
-			Path:        links.HOME,
-			HTMLHandler: NewCmsController().Handler,
-		},
-		&router.Route{
-			Name:        "Website > Cms > Catch All Pages",
-			Middlewares: []router.Middleware{middlewares.NewStatsMiddleware()},
-			Path:        links.CATCHALL,
-			HTMLHandler: NewCmsController().Handler,
-		},
+func Routes() []rtr.RouteInterface {
+	// Create routes
+	routes := []rtr.RouteInterface{
+		rtr.NewRoute().
+			SetName("Website > Widget Controller > Handler").
+			SetPath(links.WIDGET).
+			SetHTMLHandler(NewWidgetController().Handler),
+
+		rtr.NewRoute().
+			SetName("Website > Cms > Home Page").
+			SetPath(links.HOME).
+			SetHTMLHandler(NewCmsController().Handler),
+
+		rtr.NewRoute().
+			SetName("Website > Cms > Catch All Pages").
+			SetPath(links.CATCHALL).
+			SetHTMLHandler(NewCmsController().Handler),
 	}
+
+	// Apply stats middleware to specific routes
+	for i, route := range routes {
+		if route.GetName() == "Website > Cms > Home Page" || route.GetName() == "Website > Cms > Catch All Pages" {
+			routes[i] = route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewStatsMiddleware()})
+		}
+	}
+
+	return routes
 }

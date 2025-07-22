@@ -9,13 +9,12 @@ import (
 	"project/internal/helpers"
 
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 
 	statsAdmin "github.com/gouniverse/statsstore/admin"
 	statsAdminShared "github.com/gouniverse/statsstore/admin/shared"
 )
 
-func StatsController() router.ControllerInterface {
+func StatsController() *statsController {
 	return &statsController{
 		logger: config.Logger,
 	}

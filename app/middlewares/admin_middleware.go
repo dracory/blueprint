@@ -5,7 +5,7 @@ import (
 	"project/app/links"
 	"project/internal/helpers"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 // NewAdminMiddleware checks if the user is an administrator or superuser
@@ -16,10 +16,10 @@ import (
 //  2. user must be active
 //  3. user must be registered
 //  4. user must be an admin or superuser
-func NewAdminMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name: "Admin Middleware",
-		Handler: func(next http.Handler) http.Handler {
+func NewAdminMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("Admin Middleware").
+		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Admin validation logic here. CHange with your own
 
@@ -55,7 +55,5 @@ func NewAdminMiddleware() router.Middleware {
 
 				next.ServeHTTP(w, r)
 			})
-		},
-	}
-	return m
+		})
 }

@@ -8,7 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 // LogRequestMiddleware logs every request to the database using the LogStore logger
@@ -18,10 +18,10 @@ import (
 // malicious spiders, DDOS, etc
 // ==================================================================
 // it is useful to detect spamming bots
-func NewLogRequestMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name: "Log Request Middleware",
-		Handler: func(next http.Handler) http.Handler {
+func LogRequestMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("Log Request Middleware").
+		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// uri := r.RequestURI
 
@@ -42,7 +42,5 @@ func NewLogRequestMiddleware() router.Middleware {
 				next.ServeHTTP(w, r)
 			})
 		},
-	}
-
-	return m
+		)
 }

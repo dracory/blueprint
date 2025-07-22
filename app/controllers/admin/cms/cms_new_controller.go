@@ -9,13 +9,10 @@ import (
 
 	adminCmsStore "github.com/gouniverse/cmsstore/admin"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type cmsNewController struct {
 }
-
-var _ router.ControllerInterface = (*cmsNewController)(nil)
 
 func NewCmsNewController() *cmsNewController {
 	return &cmsNewController{}

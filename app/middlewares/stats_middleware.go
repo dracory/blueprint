@@ -6,20 +6,17 @@ import (
 	"project/config"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/rtr"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/statsstore"
 )
 
-func NewStatsMiddleware() router.Middleware {
+func NewStatsMiddleware() rtr.MiddlewareInterface {
 	stats := new(statsMiddleware)
 
-	m := router.Middleware{
-		Name:    stats.Name(),
-		Handler: stats.Handler,
-	}
-
-	return m
+	return rtr.NewMiddleware().
+		SetName(stats.Name()).
+		SetHandler(stats.Handler)
 }
 
 type statsMiddleware struct{}

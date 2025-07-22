@@ -8,12 +8,11 @@ import (
 	"strings"
 
 	"github.com/dracory/base/req"
-	"github.com/dracory/rtr"
 )
 
 type loginController struct{}
 
-func NewLoginController() router.HTMLControllerInterface {
+func NewLoginController() *loginController {
 	return &loginController{}
 }
 

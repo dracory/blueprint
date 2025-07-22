@@ -31,7 +31,7 @@ func CmsAddMiddlewares() {
 		SetIdentifier("CmsLayoutMiddleware").
 		SetName("Cms Layout Middleware").
 		SetType(cmsstore.MIDDLEWARE_TYPE_AFTER).
-		SetHandler(NewCmsLayoutMiddleware().Handler)
+		SetHandler(NewCmsLayoutMiddleware().GetHandler())
 
 	config.CmsStore.AddMiddleware(helloMiddleware)
 	config.CmsStore.AddMiddleware(afterMiddleware)

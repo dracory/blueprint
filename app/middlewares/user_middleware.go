@@ -6,7 +6,7 @@ import (
 	"project/internal/helpers"
 	"strings"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 // NewUserMiddleware checks if the user is authenticated and active
@@ -16,10 +16,10 @@ import (
 //  1. user must be authenticated
 //  2. user must be active
 //  3. user must be registered
-func NewUserMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name: "User Middleware",
-		Handler: func(next http.Handler) http.Handler {
+func NewUserMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("User Middleware").
+		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// User validation logic here. Change with your own
 
@@ -52,7 +52,5 @@ func NewUserMiddleware() router.Middleware {
 
 				next.ServeHTTP(w, r)
 			})
-		},
-	}
-	return m
+		})
 }

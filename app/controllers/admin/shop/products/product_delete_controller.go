@@ -12,12 +12,9 @@ import (
 	"github.com/dracory/shopstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type productDeleteController struct{}
-
-var _ router.HTMLControllerInterface = (*productDeleteController)(nil)
 
 type productDeleteControllerData struct {
 	productID      string

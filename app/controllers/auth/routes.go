@@ -6,27 +6,23 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	return []router.RouteInterface{
-		&router.Route{
-			Name:        "Auth > Auth Controller",
-			Path:        links.AUTH_AUTH,
-			HTMLHandler: NewAuthenticationController().Handler,
-		},
-		&router.Route{
-			Name:        "Auth > Login Controller",
-			Path:        links.AUTH_LOGIN,
-			HTMLHandler: NewLoginController().Handler,
-		},
-		&router.Route{
-			Name:        "Auth > Logout Controller",
-			Path:        links.AUTH_LOGOUT,
-			HTMLHandler: NewLogoutController().AnyIndex,
-		},
-		&router.Route{
-			Name:        "Auth > Register Controller",
-			Path:        links.AUTH_REGISTER,
-			HTMLHandler: NewRegisterController().Handler,
-		},
+func Routes() []rtr.RouteInterface {
+	return []rtr.RouteInterface{
+		rtr.NewRoute().
+			SetName("Auth > Auth Controller").
+			SetPath(links.AUTH_AUTH).
+			SetHTMLHandler(NewAuthenticationController().Handler),
+		rtr.NewRoute().
+			SetName("Auth > Login Controller").
+			SetPath(links.AUTH_LOGIN).
+			SetHTMLHandler(NewLoginController().Handler),
+		rtr.NewRoute().
+			SetName("Auth > Logout Controller").
+			SetPath(links.AUTH_LOGOUT).
+			SetHTMLHandler(NewLogoutController().AnyIndex),
+		rtr.NewRoute().
+			SetName("Auth > Register Controller").
+			SetPath(links.AUTH_REGISTER).
+			SetHTMLHandler(NewRegisterController().Handler),
 	}
 }

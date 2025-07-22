@@ -18,7 +18,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/userstore"
 	"github.com/samber/lo"
@@ -30,8 +29,6 @@ const ActionModalUserFilterShow = "modal_user_filter_show"
 // == CONTROLLER ==============================================================
 
 type userManagerController struct{}
-
-var _ router.HTMLControllerInterface = (*userManagerController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

@@ -56,8 +56,8 @@ github.com/dracory/database v0.2.0 h1:BxYrBIS8rERq2pl/FVyUiaSaT+ZeXqmT2xT6PPLkNT
 github.com/dracory/database v0.2.0/go.mod h1:t8rL9bBvOieguEKaRn8Q/LUP9mxJ9bTDaamsNR4qyXA=
 github.com/dracory/env v0.3.0 h1:764cVWQbOceB5+MWg2/G2pAoxROb5YAaBpKzsAi7CLY=
 github.com/dracory/env v0.3.0/go.mod h1:2LwE4U2qIGxxH7zLINcFhs3U5B4Ty3Tm2fByzLEAa+Q=
-github.com/dracory/rtr v0.9.0 h1:Ux7u2rWvgBCeo0vhcW8SLt6w+27VgaPGUuNLpjyaEmA=
-github.com/dracory/rtr v0.9.0/go.mod h1:sjd68NDLGSeHCLZIPlCqdplAnfy9WaLKi27fcwnuzAI=
+github.com/dracory/rtr v0.10.0 h1:nxipkOJT85a4bmxyf+yMoN/SjgBUJHNlpribR04AX0s=
+github.com/dracory/rtr v0.10.0/go.mod h1:Db1vclgTuIYzbLIK60DXK5ZPHtQT5XCbEv/dRw+sk94=
 github.com/dracory/shopstore v1.1.2 h1:R9JnmVUrwDPuPsAMeg27kIEPQgzqqBlboXDoTq1D0t0=
 github.com/dracory/shopstore v1.1.2/go.mod h1:a94MxfIlIMeIsd/ZcdA4jh2SW0Da0GL0ZN2EN3bYQbg=
 github.com/dromara/carbon/v2 v2.6.11 h1:wnAWZ+sbza1uXw3r05hExNSCaBPFaarWfUvYAX86png=

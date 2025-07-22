@@ -10,7 +10,6 @@ import (
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 )
 
@@ -23,10 +22,6 @@ type homeController struct{}
 func NewHomeController() *homeController {
 	return &homeController{}
 }
-
-// == INTERFACES ===============================================================
-
-var _ router.HTMLControllerInterface = (*homeController)(nil)
 
 // == PUBLIC METHODS ===========================================================
 

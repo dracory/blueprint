@@ -9,19 +9,18 @@ import (
 	"time"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/rtr"
 	"github.com/gouniverse/responses"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 )
 
-func NewJailBotsMiddleware(config JailBotsConfig) router.Middleware {
+func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 	jb := new(jailBotsMiddleware)
 	jb.exclude = config.Exclude
 
-	m := router.Middleware{
-		Name:    jb.Name(),
-		Handler: jb.Handler,
-	}
+	m := rtr.NewMiddleware().
+		SetName(jb.Name()).
+		SetHandler(jb.Handler)
 
 	return m
 }

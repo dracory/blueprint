@@ -3,11 +3,11 @@ package admin
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func TaskRoutes() []router.RouteInterface {
-	return []router.RouteInterface{
+func TaskRoutes() []rtr.RouteInterface {
+	return []rtr.RouteInterface{
 		// &router.Route{
 		// 	Name:        "Admin > Users > User Create",
 		// 	Path:        links.ADMIN_USERS_USER_CREATE,
@@ -33,15 +33,13 @@ func TaskRoutes() []router.RouteInterface {
 		// 	Path:        links.ADMIN_USERS_USER_UPDATE,
 		// 	HTMLHandler: NewUserUpdateController().Handler,
 		// },
-		&router.Route{
-			Name:        "Admin > Tasks > Home",
-			Path:        links.ADMIN_TASKS,
-			HTMLHandler: TaskController().Handler,
-		},
-		&router.Route{
-			Name:        "Admin > Tasks > Catchall",
-			Path:        links.ADMIN_TASKS + links.CATCHALL,
-			HTMLHandler: TaskController().Handler,
-		},
+		rtr.NewRoute().
+			SetName("Admin > Tasks > Home").
+			SetPath(links.ADMIN_TASKS).
+			SetHTMLHandler(TaskController().Handler),
+		rtr.NewRoute().
+			SetName("Admin > Tasks > Catchall").
+			SetPath(links.ADMIN_TASKS + links.CATCHALL).
+			SetHTMLHandler(TaskController().Handler),
 	}
 }

@@ -19,7 +19,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -30,8 +29,6 @@ const ActionModalProductFilterShow = "modal_product_filter_show"
 // == CONTROLLER ==============================================================
 
 type productManagerController struct{}
-
-var _ router.HTMLControllerInterface = (*productManagerController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

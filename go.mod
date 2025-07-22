@@ -10,7 +10,7 @@ require (
 	github.com/dracory/base v0.23.0
 	github.com/dracory/database v0.2.0
 	github.com/dracory/env v0.3.0
-	github.com/dracory/rtr v0.9.0
+	github.com/dracory/rtr v0.10.0
 	github.com/dracory/shopstore v1.1.2
 	github.com/dromara/carbon/v2 v2.6.11
 	github.com/faabiosr/cachego v0.26.0

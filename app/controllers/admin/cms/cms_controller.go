@@ -6,13 +6,10 @@ import (
 	"project/config"
 
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type cmsController struct {
 }
-
-var _ router.HTMLControllerInterface = (*cmsController)(nil)
 
 func NewCmsController() *cmsController {
 	return &cmsController{}

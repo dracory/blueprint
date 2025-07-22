@@ -16,20 +16,18 @@ import (
 )
 
 // Routes these are the routes for the administrator
-func Routes() []router.RouteInterface {
-	home := &router.Route{
-		Name:        "Admin > Home",
-		Path:        links.ADMIN_HOME,
-		HTMLHandler: NewHomeController().Handler,
-	}
+func Routes() []rtr.RouteInterface {
+	home := rtr.NewRoute().
+		SetName("Admin > Home").
+		SetPath(links.ADMIN_HOME).
+		SetHTMLHandler(NewHomeController().Handler)
 
-	homeCatchAll := &router.Route{
-		Name:        "Admin > Catch All",
-		Path:        links.ADMIN_HOME + links.CATCHALL,
-		HTMLHandler: NewHomeController().Handler,
-	}
+	homeCatchAll := rtr.NewRoute().
+		SetName("Admin > Catch All").
+		SetPath(links.ADMIN_HOME + links.CATCHALL).
+		SetHTMLHandler(NewHomeController().Handler)
 
-	adminRoutes := []router.RouteInterface{}
+	adminRoutes := []rtr.RouteInterface{}
 	adminRoutes = append(adminRoutes, adminBlog.Routes()...)
 	adminRoutes = append(adminRoutes, adminCms.Routes()...)
 	adminRoutes = append(adminRoutes, adminFiles.Routes()...)
@@ -38,12 +36,13 @@ func Routes() []router.RouteInterface {
 	adminRoutes = append(adminRoutes, stats.Routes()...)
 	adminRoutes = append(adminRoutes, adminTasks.TaskRoutes()...)
 	adminRoutes = append(adminRoutes, adminUsers.UserRoutes()...)
-	// adminRoutes = append(adminRoutes, []router.RouteInterface{subscriptionPlans}...)
-	adminRoutes = append(adminRoutes, []router.RouteInterface{home, homeCatchAll}...)
+	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)
+	adminRoutes = append(adminRoutes, []rtr.RouteInterface{home, homeCatchAll}...)
 
-	router.RoutesPrependMiddlewares(adminRoutes, []router.Middleware{
-		middlewares.NewAdminMiddleware(),
-	})
+	// Apply middlewares to all admin routes
+	for _, route := range adminRoutes {
+		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewAdminMiddleware()})
+	}
 
 	return adminRoutes
 }

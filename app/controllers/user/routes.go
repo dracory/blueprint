@@ -7,37 +7,34 @@ import (
 	"project/app/links"
 	"project/app/middlewares"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	home := &router.Route{
-		Name:        "User > Home",
-		Path:        links.USER_HOME,
-		HTMLHandler: userHome.NewHomeController().Handler,
-	}
+func Routes() []rtr.RouteInterface {
+	home := rtr.NewRoute().
+		SetName("User > Home").
+		SetPath(links.USER_HOME).
+		SetHTMLHandler(userHome.NewHomeController().Handler)
 
-	homeCatchAll := &router.Route{
-		Name:        "User > Catch All Controller > Index Page",
-		Path:        links.USER_HOME + links.CATCHALL,
-		HTMLHandler: userHome.NewHomeController().Handler,
-	}
+	homeCatchAll := rtr.NewRoute().
+		SetName("User > Catch All Controller > Index Page").
+		SetPath(links.USER_HOME + links.CATCHALL).
+		SetHTMLHandler(userHome.NewHomeController().Handler)
 
-	profile := &router.Route{
-		Name:        "User > Profile",
-		Path:        links.USER_PROFILE,
-		HTMLHandler: userAccount.NewProfileController().Handler,
-	}
+	profile := rtr.NewRoute().
+		SetName("User > Profile").
+		SetPath(links.USER_PROFILE).
+		SetHTMLHandler(userAccount.NewProfileController().Handler)
 
-	userRoutes := []router.RouteInterface{
+	userRoutes := []rtr.RouteInterface{
 		profile,
 		home,
 		homeCatchAll,
 	}
 
-	router.RoutesPrependMiddlewares(userRoutes, []router.Middleware{
-		middlewares.NewUserMiddleware(),
-	})
+	for _, route := range userRoutes {
+		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewUserMiddleware()})
+	}
 
 	return userRoutes
 }

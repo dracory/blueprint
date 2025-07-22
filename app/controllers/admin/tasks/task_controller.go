@@ -7,13 +7,12 @@ import (
 	"project/config"
 
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 
 	taskAdmin "github.com/gouniverse/taskstore/admin"
 )
 
-func TaskController() router.HTMLControllerInterface {
+func TaskController() *taskController {
 	return &taskController{
 		logger: config.Logger,
 	}

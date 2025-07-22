@@ -20,7 +20,7 @@ func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	testutils.Setup()
 
 	// Act
-	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{})
@@ -84,8 +84,9 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 	}
 
 	// Act
-
-	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	middleware := NewUserMiddleware()
+	handler := middleware.GetHandler()
+	body, response, err := test.CallMiddleware("GET", handler, func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -162,7 +163,7 @@ func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 	}
 
 	// Act
-	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -248,8 +249,9 @@ func TestUserMiddleware_Success(t *testing.T) {
 	}
 
 	// Act
-
-	body, response, err := test.CallMiddleware("GET", NewUserMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	middleware := NewUserMiddleware()
+	handler := middleware.GetHandler()
+	body, response, err := test.CallMiddleware("GET", handler, func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Success"))
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{

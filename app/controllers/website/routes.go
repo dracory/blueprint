@@ -14,58 +14,54 @@ import (
 	"project/app/controllers/website/seo"
 	"project/app/controllers/website/swagger"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 	// paypalControllers "project/controllers/website/paypal"
 )
 
-func Routes() []router.RouteInterface {
-	homeRoute := &router.Route{
-		Name:        "Website > Home Controller",
-		Path:        links.HOME,
-		HTMLHandler: home.NewHomeController().Handler,
-	}
+func Routes() []rtr.RouteInterface {
+	homeRoute := rtr.NewRoute().
+		SetName("Website > Home Controller").
+		SetPath(links.HOME).
+		SetHTMLHandler(home.NewHomeController().Handler)
 
-	pageNotFoundRoute := &router.Route{
-		Name:        "Shared > Page Not Found Controller",
-		Path:        links.CATCHALL,
-		HTMLHandler: shared.PageNotFoundController().Handler,
-	}
+	pageNotFoundRoute := rtr.NewRoute().
+		SetName("Shared > Page Not Found Controller").
+		SetPath(links.CATCHALL).
+		SetHTMLHandler(shared.PageNotFoundController().Handler)
 
-	faviconRoute := &router.Route{
-		Name: "Website Favicon",
-		Path: "/favicon.svg",
-		HTMLHandler: func(w http.ResponseWriter, r *http.Request) string {
+	faviconRoute := rtr.NewRoute().
+		SetName("Website Favicon").
+		SetPath("/favicon.svg").
+		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
 			w.Header().Add("Content-Type", "image/svg+xml .svg .svgz")
 			return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><circle cx="20" cy="8" r="1" fill="currentColor"></circle><circle cx="23" cy="8" r="1" fill="currentColor"></circle><circle cx="26" cy="8" r="1" fill="currentColor"></circle><path d="M28 4H4a2.002 2.002 0 0 0-2 2v20a2.002 2.002 0 0 0 2 2h24a2.002 2.002 0 0 0 2-2V6a2.002 2.002 0 0 0-2-2zm0 2v4H4V6zM4 12h6v14H4zm8 14V12h16v14z" fill="currentColor"></path></svg>`
-		},
-	}
+		})
 
-	contactRoute := &router.Route{
-		Path:        links.CONTACT,
-		Methods:     []string{http.MethodGet, http.MethodPost},
-		HTMLHandler: contact.NewContactController().AnyIndex,
-	}
+	contactRoute := rtr.NewRoute().
+		SetName("Website > Contact Controller").
+		SetPath(links.CONTACT).
+		SetMethod(http.MethodGet).
+		SetHTMLHandler(contact.NewContactController().AnyIndex)
 
-	contactSubmitRoute := &router.Route{
-		Path:        links.CONTACT,
-		Methods:     []string{http.MethodPost},
-		HTMLHandler: contact.NewContactController().AnyIndex,
-	}
+	contactSubmitRoute := rtr.NewRoute().
+		SetName("Website > Contact Submit Controller").
+		SetPath(links.CONTACT).
+		SetMethod(http.MethodPost).
+		SetHTMLHandler(contact.NewContactController().AnyIndex)
 
-	// Serve Swagger UI using a controller
-	swaggerUiRoute := &router.Route{
-		Name:    "Swagger UI",
-		Path:    "/swagger",
-		Handler: swagger.SwaggerUIController,
-		Methods: []string{"GET"},
-	}
+		// Serve Swagger UI using a controller
+	swaggerUiRoute := rtr.NewRoute().
+		SetName("Swagger UI").
+		SetPath("/swagger").
+		SetHandler(swagger.SwaggerUIController).
+		SetMethod(http.MethodGet)
+
 	// Serve embedded YAML
-	swaggerYamlRoute := &router.Route{
-		Name:    "Swagger YAML",
-		Path:    "/docs/swagger.yaml",
-		Handler: swagger.SwaggerYAMLController,
-		Methods: []string{"GET"},
-	}
+	swaggerYamlRoute := rtr.NewRoute().
+		SetName("Swagger YAML").
+		SetPath("/docs/swagger.yaml").
+		SetHandler(swagger.SwaggerYAMLController).
+		SetMethod(http.MethodGet)
 
 	// paymentSuccess := &router.Route{
 	// 	Name:        "Website > Payment Success Controller",
@@ -80,7 +76,7 @@ func Routes() []router.RouteInterface {
 	// }
 
 	// These are custom routes for the website, that cannot be served by the CMS
-	websiteRoutes := []router.RouteInterface{
+	websiteRoutes := []rtr.RouteInterface{
 		faviconRoute,
 		contactRoute,
 		contactSubmitRoute,

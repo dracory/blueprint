@@ -7,7 +7,6 @@ import (
 	"project/config"
 	"project/internal/cmds"
 
-	"github.com/gouniverse/router"
 	"github.com/mingrammer/cfmt"
 )
 
@@ -105,7 +104,10 @@ func handleRoutesCommand(args []string) error {
 	if len(args) == 0 || args[0] != SubcommandList {
 		return fmt.Errorf("invalid or missing subcommand for '%s'. Use '%s %s'", CommandRoutes, CommandRoutes, SubcommandList)
 	}
-	m, r := routes.RoutesList()
-	router.List(m, r)
+	// m, r := routes.RoutesList()
+	// router.List(m, r)
+	r := routes.Routes()
+	r.List()
+
 	return nil
 }

@@ -3,15 +3,16 @@ package admin
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	return []router.RouteInterface{
-		&router.Route{
-			Name:        "Admin > Media Manager",
-			Path:        links.ADMIN_MEDIA,
-			HTMLHandler: NewMediaManagerController().AnyIndex,
-		},
+func Routes() []rtr.RouteInterface {
+	mediaManager := rtr.NewRoute().
+		SetName("Admin > Media Manager").
+		SetPath(links.ADMIN_MEDIA).
+		SetHTMLHandler(NewMediaManagerController().AnyIndex)
+
+	return []rtr.RouteInterface{
+		mediaManager,
 	}
 }

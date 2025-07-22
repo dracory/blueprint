@@ -5,9 +5,9 @@ import (
 	"net/http/httptest"
 	"project/app/layouts"
 
+	"github.com/dracory/rtr"
 	"github.com/gouniverse/cmsstore"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 )
 
@@ -23,10 +23,10 @@ import (
 //
 // It uses the "page" context value to transfer the page data (i.e. title,
 // meta keywords, description) from the CMS frontend to the layout.
-func NewCmsLayoutMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name: "CmsLayoutMiddleware",
-		Handler: func(next http.Handler) http.Handler {
+func NewCmsLayoutMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("CmsLayoutMiddleware").
+		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				page, ok := r.Context().Value("page").(cmsstore.PageInterface)
 				if !ok {
@@ -54,8 +54,5 @@ func NewCmsLayoutMiddleware() router.Middleware {
 				w.Write([]byte(fullPage))
 				return
 			})
-		},
-	}
-
-	return m
+		})
 }

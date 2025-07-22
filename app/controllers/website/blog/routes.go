@@ -3,42 +3,39 @@ package blog
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	blogRoutes := []router.RouteInterface{
-		&router.Route{
-			Name:        "Guest > Articles",
-			Path:        "/articles",
-			HTMLHandler: NewBlogController().Handler,
-		},
-		&router.Route{
-			Name:        "Guest > Articles > Post with ID > Index",
-			Path:        "/article/{id:[0-9]+}",
-			HTMLHandler: NewBlogPostController().Handler,
-		},
-		&router.Route{
-			Name:        "Guest > Articles > Post with ID && Title > Index",
-			Path:        "/article/{id:[0-9]+}/{title}",
-			HTMLHandler: NewBlogPostController().Handler,
-		},
-		&router.Route{
-			Name:        "Guest > Blog",
-			Path:        links.BLOG,
-			HTMLHandler: NewBlogController().Handler,
-		},
-		&router.Route{
-			Name:        "Guest > Blog > Post with ID > Index",
-			Path:        links.BLOG_POST_WITH_REGEX,
-			HTMLHandler: NewBlogPostController().Handler,
-		},
-		&router.Route{
-			Name:        "Guest > Blog > Post with ID && Title > Index",
-			Path:        links.BLOG_POST_WITH_REGEX2,
-			HTMLHandler: NewBlogPostController().Handler,
-		},
-	}
+func Routes() []rtr.RouteInterface {
+	return []rtr.RouteInterface{
+		rtr.NewRoute().
+			SetName("Guest > Articles").
+			SetPath("/articles").
+			SetHTMLHandler(NewBlogController().Handler),
 
-	return blogRoutes
+		rtr.NewRoute().
+			SetName("Guest > Articles > Post with ID > Index").
+			SetPath("/article/{id:[0-9]+}").
+			SetHTMLHandler(NewBlogPostController().Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Articles > Post with ID && Title > Index").
+			SetPath("/article/{id:[0-9]+}/{title}").
+			SetHTMLHandler(NewBlogPostController().Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Blog").
+			SetPath(links.BLOG).
+			SetHTMLHandler(NewBlogController().Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Blog > Post with ID > Index").
+			SetPath(links.BLOG_POST_WITH_REGEX).
+			SetHTMLHandler(NewBlogPostController().Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Blog > Post with ID && Title > Index").
+			SetPath(links.BLOG_POST_WITH_REGEX2).
+			SetHTMLHandler(NewBlogPostController().Handler),
+	}
 }

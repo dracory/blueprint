@@ -8,12 +8,11 @@ import (
 	"project/app/controllers/website"
 	"project/app/widgets"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func routes() []router.RouteInterface {
-	routes := []router.RouteInterface{}
+func routes() []rtr.RouteInterface {
+	routes := []rtr.RouteInterface{}
 
 	routes = append(routes, admin.Routes()...)
 	routes = append(routes, auth.Routes()...)
@@ -25,12 +24,22 @@ func routes() []router.RouteInterface {
 	return routes
 }
 
-func RoutesList() (globalMiddlewareList []router.Middleware, routeList []router.RouteInterface) {
+func RoutesList() (globalMiddlewareList []rtr.MiddlewareInterface, routeList []rtr.RouteInterface) {
 	return globalMiddlewares(), routes()
 }
 
 // Routes returns the routes of the application
-func Routes() *chi.Mux {
+func Routes() rtr.RouterInterface {
+	r := rtr.NewRouter()
+
+	// Add global middlewares
 	globalMiddlewares, routes := RoutesList()
-	return router.NewChiRouter(globalMiddlewares, routes)
+	r.AddBeforeMiddlewares(globalMiddlewares)
+
+	// Add all routes
+	for _, route := range routes {
+		r.AddRoute(route)
+	}
+
+	return r
 }

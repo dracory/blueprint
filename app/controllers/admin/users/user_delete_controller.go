@@ -9,14 +9,11 @@ import (
 
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
 	"github.com/gouniverse/utils"
 )
 
 type userDeleteController struct{}
-
-var _ router.HTMLControllerInterface = (*userDeleteController)(nil)
 
 type userDeleteControllerData struct {
 	userID         string

@@ -3,20 +3,18 @@ package stats
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	return []router.RouteInterface{
-		&router.Route{
-			Name:    "Admin > Visitor Analytics > Home",
-			Path:    links.ADMIN_STATS,
-			Handler: StatsController().Handler,
-		},
-		&router.Route{
-			Name:    "Admin > Visitor Analytics > Catchall",
-			Path:    links.ADMIN_STATS + links.CATCHALL,
-			Handler: StatsController().Handler,
-		},
+func Routes() []rtr.RouteInterface {
+	return []rtr.RouteInterface{
+		rtr.NewRoute().
+			SetName("Admin > Visitor Analytics > Home").
+			SetPath(links.ADMIN_STATS).
+			SetHandler(StatsController().Handler),
+		rtr.NewRoute().
+			SetName("Admin > Visitor Analytics > Catchall").
+			SetPath(links.ADMIN_STATS + links.CATCHALL).
+			SetHandler(StatsController().Handler),
 	}
 }

@@ -12,13 +12,10 @@ import (
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
 )
 
 type userCreateController struct{}
-
-var _ router.HTMLControllerInterface = (*userCreateController)(nil)
 
 type userCreateControllerData struct {
 	firstName      string

@@ -3,39 +3,34 @@ package seo
 import (
 	"net/http"
 
-	"github.com/gouniverse/responses"
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	adsRoute := &router.Route{
-		Name: "Website > ads.txt",
-		Path: "/ads.txt",
-		HTMLHandler: responses.HTMLHandler(func(w http.ResponseWriter, r *http.Request) string {
+func Routes() []rtr.RouteInterface {
+	adsRoute := rtr.NewRoute().
+		SetName("Website > ads.txt").
+		SetPath("/ads.txt").
+		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
 			//return "google.com, pub-8821108004642146, DIRECT, f08c47fec0942fa0"
 			return "google.com, pub-YOURNUMBER, DIRECT, YOURSTRING"
-		}),
-	}
+		})
 
-	robotsRoute := &router.Route{
-		Name:        "Website > RobotsTxt",
-		Path:        "/robots.txt",
-		HTMLHandler: NewRobotsTxtController().Handler,
-	}
+	robotsRoute := rtr.NewRoute().
+		SetName("Website > RobotsTxt").
+		SetPath("/robots.txt").
+		SetHTMLHandler(NewRobotsTxtController().Handler)
 
-	securityRoute := &router.Route{
-		Name:        "Website > SecurityTxt",
-		Path:        "/security.txt",
-		HTMLHandler: NewSecurityTxtController().Handler,
-	}
+	securityRoute := rtr.NewRoute().
+		SetName("Website > SecurityTxt").
+		SetPath("/security.txt").
+		SetHTMLHandler(NewSecurityTxtController().Handler)
 
-	sitemapRoute := &router.Route{
-		Name:        "Website > Sitemap",
-		Path:        "/sitemap.xml",
-		HTMLHandler: NewSitemapXmlController().Handler,
-	}
+	sitemapRoute := rtr.NewRoute().
+		SetName("Website > Sitemap").
+		SetPath("/sitemap.xml").
+		SetHTMLHandler(NewSitemapXmlController().Handler)
 
-	return []router.RouteInterface{
+	return []rtr.RouteInterface{
 		adsRoute,
 		robotsRoute,
 		securityRoute,

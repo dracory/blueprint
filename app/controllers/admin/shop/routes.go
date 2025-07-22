@@ -5,14 +5,14 @@ import (
 	"project/app/links"
 
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 
 	shopDiscounts "project/app/controllers/admin/shop/discounts"
 	shopProducts "project/app/controllers/admin/shop/products"
 	"project/app/controllers/admin/shop/shared"
 )
 
-func ShopRoutes() []router.RouteInterface {
+func ShopRoutes() []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.Value(r, "controller")
 
@@ -43,16 +43,14 @@ func ShopRoutes() []router.RouteInterface {
 		return NewHomeController().Handler(w, r)
 	}
 
-	return []router.RouteInterface{
-		&router.Route{
-			Name:        "Admin > Shop > Orders",
-			Path:        links.ADMIN_SHOP,
-			HTMLHandler: handler,
-		},
-		&router.Route{
-			Name:        "Admin > Shop > Catchall",
-			Path:        links.ADMIN_USERS + links.CATCHALL,
-			HTMLHandler: handler,
-		},
+	return []rtr.RouteInterface{
+		rtr.NewRoute().
+			SetName("Admin > Shop > Orders").
+			SetPath(links.ADMIN_SHOP).
+			SetHTMLHandler(handler),
+		rtr.NewRoute().
+			SetName("Admin > Shop > Catchall").
+			SetPath(links.ADMIN_USERS + links.CATCHALL).
+			SetHTMLHandler(handler),
 	}
 }

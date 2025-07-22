@@ -4,59 +4,51 @@ import (
 	"net/http"
 	"project/app/links"
 
+	"github.com/dracory/rtr"
 	"github.com/gouniverse/dashboard"
-	"github.com/gouniverse/responses"
-	"github.com/gouniverse/router"
 )
 
-func Routes() []router.RouteInterface {
-	adsTxt := &router.Route{
-		Name: "Shared > ads.txt",
-		Path: "/ads.txt",
-		HTMLHandler: responses.HTMLHandler(func(w http.ResponseWriter, r *http.Request) string {
+func Routes() []rtr.RouteInterface {
+	adsTxt := rtr.NewRoute().
+		SetName("Shared > ads.txt").
+		SetPath("/ads.txt").
+		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
 			return "google.com, pub-8821108004642146, DIRECT, f08c47fec0942fa0"
-		}),
-	}
+		})
 
-	files := &router.Route{
-		Name:        "Shared > Files Controller",
-		Path:        links.FILES,
-		Methods:     []string{http.MethodGet},
-		HTMLHandler: NewFileController().Handler,
-	}
+	files := rtr.NewRoute().
+		SetName("Shared > Files Controller").
+		SetPath(links.FILES).
+		SetMethod(http.MethodGet).
+		SetHTMLHandler(NewFileController().Handler)
 
-	flash := &router.Route{
-		Name:        "Shared > Flash Controller",
-		Path:        links.FLASH,
-		HTMLHandler: NewFlashController().Handler,
-	}
+	flash := rtr.NewRoute().
+		SetName("Shared > Flash Controller").
+		SetPath(links.FLASH).
+		SetHTMLHandler(NewFlashController().Handler)
 
-	media := &router.Route{
-		Name:        "Shared > Media Controller",
-		Path:        links.MEDIA,
-		Methods:     []string{http.MethodGet},
-		HTMLHandler: NewMediaController().Handler,
-	}
+	media := rtr.NewRoute().
+		SetName("Shared > Media Controller").
+		SetPath(links.MEDIA).
+		SetMethod(http.MethodGet).
+		SetHTMLHandler(NewMediaController().Handler)
 
-	resources := &router.Route{
-		Name:        "Shared > Resources Controller",
-		Path:        links.RESOURCES,
-		HTMLHandler: NewResourceController().Handler,
-	}
+	resources := rtr.NewRoute().
+		SetName("Shared > Resources Controller").
+		SetPath(links.RESOURCES).
+		SetHTMLHandler(NewResourceController().Handler)
 
-	theme := &router.Route{
-		Name:    "Shared > Theme Controller",
-		Path:    links.THEME,
-		Handler: dashboard.ThemeHandler,
-	}
+	theme := rtr.NewRoute().
+		SetName("Shared > Theme Controller").
+		SetPath(links.THEME).
+		SetHandler(dashboard.ThemeHandler)
 
-	thumb := &router.Route{
-		Name:        "Shared > Thumb Controller",
-		Path:        links.THUMB,
-		HTMLHandler: NewThumbController().Handler,
-	}
+	thumb := rtr.NewRoute().
+		SetName("Shared > Thumb Controller").
+		SetPath(links.THUMB).
+		SetHTMLHandler(NewThumbController().Handler)
 
-	return []router.RouteInterface{
+	return []rtr.RouteInterface{
 		adsTxt,
 		files,
 		flash,

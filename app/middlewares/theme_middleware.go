@@ -1,14 +1,12 @@
 package middlewares
 
 import (
+	"github.com/dracory/rtr"
 	"github.com/gouniverse/dashboard"
-	"github.com/gouniverse/router"
 )
 
-func NewThemeMiddleware() router.Middleware {
-	m := router.Middleware{
-		Name:    "Theme Middleware",
-		Handler: dashboard.ThemeMiddleware,
-	}
-	return m
+func ThemeMiddleware() rtr.MiddlewareInterface {
+	return rtr.NewMiddleware().
+		SetName("Theme Middleware").
+		SetHandler(dashboard.ThemeMiddleware)
 }

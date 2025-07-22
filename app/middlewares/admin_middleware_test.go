@@ -20,7 +20,7 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	testutils.Setup()
 
 	// Act
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{})
@@ -78,7 +78,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -153,7 +153,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -231,7 +231,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -310,7 +310,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().Handler, func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Success"))
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{

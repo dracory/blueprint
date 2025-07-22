@@ -3,23 +3,22 @@ package admin
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
-	cmsOld := &router.Route{
-		Name:        "Admin > Cms Manager",
-		Path:        links.ADMIN_CMS,
-		HTMLHandler: NewCmsController().Handler,
-	}
-	cmsNew := &router.Route{
-		Name:    "Admin > Cms New Manager",
-		Path:    links.ADMIN_CMS_NEW,
-		Handler: NewCmsNewController().Handler,
-	}
+func Routes() []rtr.RouteInterface {
+	cmsManager := rtr.NewRoute().
+		SetName("Admin > CMS Manager").
+		SetPath(links.ADMIN_CMS).
+		SetHTMLHandler(NewCmsController().Handler)
 
-	return []router.RouteInterface{
-		cmsOld,
-		cmsNew,
+	cmsNewManager := rtr.NewRoute().
+		SetName("Admin > CMS New Manager").
+		SetPath(links.ADMIN_CMS_NEW).
+		SetHandler(NewCmsNewController().Handler)
+
+	return []rtr.RouteInterface{
+		cmsManager,
+		cmsNewManager,
 	}
 }

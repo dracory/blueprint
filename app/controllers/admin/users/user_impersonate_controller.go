@@ -7,7 +7,6 @@ import (
 	"project/internal/helpers"
 
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/router"
 )
 
 // == CONTROLLER ==============================================================
@@ -20,8 +19,6 @@ type userImpersonateController struct{}
 func NewUserImpersonateController() *userImpersonateController {
 	return &userImpersonateController{}
 }
-
-var _ router.HTMLControllerInterface = (*userImpersonateController)(nil)
 
 // == PUBLIC METHODS ==========================================================
 

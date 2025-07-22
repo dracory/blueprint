@@ -20,7 +20,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -29,8 +28,6 @@ import (
 // == CONTROLLER ==============================================================
 
 type productUpdateController struct{}
-
-var _ router.HTMLControllerInterface = (*productUpdateController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

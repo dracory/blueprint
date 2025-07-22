@@ -13,15 +13,12 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
 )
 
 // == CONTROLLER ==============================================================
 
 type userUpdateController struct{}
-
-var _ router.HTMLControllerInterface = (*userUpdateController)(nil)
 
 // == CONSTRUCTOR =============================================================
 
