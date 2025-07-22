@@ -5,15 +5,12 @@ import (
 	"project/resources"
 	"strings"
 
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 )
 
 // == CONTROLLER ==============================================================
 
 type resourceController struct{}
-
-var _ router.HTMLControllerInterface = (*resourceController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

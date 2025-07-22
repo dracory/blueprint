@@ -2,13 +2,11 @@ package home
 
 import (
 	"net/http"
-
-	"github.com/gouniverse/router"
 )
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController() router.HTMLControllerInterface {
+func NewHomeController() *homeController {
 	return &homeController{}
 }
 

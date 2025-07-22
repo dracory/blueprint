@@ -10,7 +10,6 @@ import (
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/responses"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 )
@@ -21,8 +20,6 @@ type sitemapXmlController struct{}
 func NewSitemapXmlController() *sitemapXmlController {
 	return &sitemapXmlController{}
 }
-
-var _ router.HTMLControllerInterface = (*sitemapXmlController)(nil)
 
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
 	responses.XMLResponseF(w, r, c.buildSitemapXML)

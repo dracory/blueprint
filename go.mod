@@ -35,7 +35,6 @@ require (
 	github.com/gouniverse/logstore v1.7.0
 	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
-	github.com/gouniverse/router v1.4.2
 	github.com/gouniverse/sessionstore v1.0.0
 	github.com/gouniverse/statsstore v0.5.0
 	github.com/gouniverse/taskstore v1.5.0
@@ -82,6 +81,7 @@ require (
 	github.com/goravel/framework v1.16.0 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
+	github.com/gouniverse/router v1.4.2 // indirect
 	github.com/gouniverse/settingstore v1.0.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/sqlfilestore v0.2.0 // indirect

@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/dracory/base/str"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -21,10 +20,6 @@ type fileController struct {
 func NewFileController() *fileController {
 	return &fileController{}
 }
-
-// == INTERFACES ==============================================================
-
-var _ router.HTMLControllerInterface = (*fileController)(nil)
 
 // == PUBLIC METHODS ==========================================================
 

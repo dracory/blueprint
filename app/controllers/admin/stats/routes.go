@@ -7,14 +7,18 @@ import (
 )
 
 func Routes() []rtr.RouteInterface {
+	statsHome := rtr.NewRoute().
+		SetName("Admin > Visitor Analytics > Home").
+		SetPath(links.ADMIN_STATS).
+		SetHandler(StatsController().Handler)
+
+	statsCatchAll := rtr.NewRoute().
+		SetName("Admin > Visitor Analytics > Catchall").
+		SetPath(links.ADMIN_STATS + links.CATCHALL).
+		SetHandler(StatsController().Handler)
+
 	return []rtr.RouteInterface{
-		rtr.NewRoute().
-			SetName("Admin > Visitor Analytics > Home").
-			SetPath(links.ADMIN_STATS).
-			SetHandler(StatsController().Handler),
-		rtr.NewRoute().
-			SetName("Admin > Visitor Analytics > Catchall").
-			SetPath(links.ADMIN_STATS + links.CATCHALL).
-			SetHandler(StatsController().Handler),
+		statsHome,
+		statsCatchAll,
 	}
 }

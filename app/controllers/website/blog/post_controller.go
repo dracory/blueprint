@@ -16,7 +16,6 @@ import (
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -28,8 +27,6 @@ type blogPostController struct {
 func NewBlogPostController() *blogPostController {
 	return &blogPostController{}
 }
-
-var _ router.HTMLControllerInterface = (*blogPostController)(nil)
 
 func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
 	postID := chi.URLParam(r, "id")

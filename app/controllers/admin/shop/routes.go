@@ -43,14 +43,18 @@ func ShopRoutes() []rtr.RouteInterface {
 		return NewHomeController().Handler(w, r)
 	}
 
+	shopOrders := rtr.NewRoute().
+		SetName("Admin > Shop > Orders").
+		SetPath(links.ADMIN_SHOP).
+		SetHTMLHandler(handler)
+
+	shopCatchAll := rtr.NewRoute().
+		SetName("Admin > Shop > Catchall").
+		SetPath(links.ADMIN_USERS + links.CATCHALL).
+		SetHTMLHandler(handler)
+
 	return []rtr.RouteInterface{
-		rtr.NewRoute().
-			SetName("Admin > Shop > Orders").
-			SetPath(links.ADMIN_SHOP).
-			SetHTMLHandler(handler),
-		rtr.NewRoute().
-			SetName("Admin > Shop > Catchall").
-			SetPath(links.ADMIN_USERS + links.CATCHALL).
-			SetHTMLHandler(handler),
+		shopOrders,
+		shopCatchAll,
 	}
 }

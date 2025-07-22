@@ -2,13 +2,11 @@ package shared
 
 import (
 	"net/http"
-
-	"github.com/gouniverse/router"
 )
 
 // == CONSTRUCTOR =============================================================
 
-func PageNotFoundController() router.HTMLControllerInterface {
+func PageNotFoundController() *pageNotFoundController {
 	return &pageNotFoundController{}
 }
 

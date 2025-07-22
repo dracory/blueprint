@@ -9,7 +9,6 @@ import (
 	"project/internal/helpers"
 	"strings"
 
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
 
 	"github.com/gouniverse/hb"
@@ -21,7 +20,7 @@ type homeController struct{}
 
 // == CONSTRUCTOR =============================================================
 
-func NewHomeController() router.HTMLControllerInterface {
+func NewHomeController() *homeController {
 	return &homeController{}
 }
 

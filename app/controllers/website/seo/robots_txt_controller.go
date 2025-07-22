@@ -3,8 +3,6 @@ package seo
 import (
 	"net/http"
 	"project/app/links"
-
-	"github.com/gouniverse/router"
 )
 
 type robotsTxtController struct{}
@@ -16,8 +14,6 @@ type robotsTxtController struct{}
 func NewRobotsTxtController() *robotsTxtController {
 	return &robotsTxtController{}
 }
-
-var _ router.HTMLControllerInterface = (*robotsTxtController)(nil)
 
 func (c robotsTxtController) Handler(w http.ResponseWriter, r *http.Request) string {
 

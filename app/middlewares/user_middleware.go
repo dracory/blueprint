@@ -17,40 +17,45 @@ import (
 //  2. user must be active
 //  3. user must be registered
 func NewUserMiddleware() rtr.MiddlewareInterface {
-	return rtr.NewMiddleware().
+	m := rtr.NewMiddleware().
 		SetName("User Middleware").
-		SetHandler(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// User validation logic here. Change with your own
+		SetHandler(userMiddlewareHandler)
 
-				authUser := helpers.GetAuthUser(r)
+	return m
+}
 
-				// Check if user is authenticated? No => redirect to login
-				if authUser == nil {
-					returnURL := links.URL(r.URL.Path, map[string]string{})
-					loginURL := links.NewAuthLinks().Login(returnURL)
-					helpers.ToFlashError(w, r, "Only authenticated users can access this page", loginURL, 15)
-					return
-				}
+func userMiddlewareHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		returnURL := links.URL(r.URL.Path, map[string]string{})
+		loginURL := links.Auth().Login(returnURL)
+		homeURL := links.Website().Home()
+		registerURL := links.Auth().Register()
 
-				// Check if user is active? No => redirect to website home
-				if !authUser.IsActive() {
-					homeURL := links.NewWebsiteLinks().Home()
-					helpers.ToFlashError(w, r, "User account not active", homeURL, 15)
-					return
-				}
+		// User validation logic here. Change with your own
 
-				// Check if user has completed registration? No => redirect to profile to complete registration
-				notOnProfilePage := strings.Trim(r.URL.Path, "/") != strings.Trim(links.USER_PROFILE, "/") &&
-					strings.Trim(r.URL.Path, "/") != strings.Trim(links.AUTH_REGISTER, "/")
+		authUser := helpers.GetAuthUser(r)
 
-				if !authUser.IsRegistrationCompleted() && notOnProfilePage {
-					registerURL := links.NewAuthLinks().Register(map[string]string{})
-					helpers.ToFlashInfo(w, r, "Please complete your registration to continue", registerURL, 15)
-					return
-				}
+		// Check if user is authenticated? No => redirect to login
+		if authUser == nil {
+			helpers.ToFlashError(w, r, "Only authenticated users can access this page", loginURL, 15)
+			return
+		}
 
-				next.ServeHTTP(w, r)
-			})
-		})
+		// Check if user is active? No => redirect to website home
+		if !authUser.IsActive() {
+			helpers.ToFlashError(w, r, "User account not active", homeURL, 15)
+			return
+		}
+
+		// Check if user has completed registration? No => redirect to profile to complete registration
+		notOnProfilePage := strings.Trim(r.URL.Path, "/") != strings.Trim(links.USER_PROFILE, "/") &&
+			strings.Trim(r.URL.Path, "/") != strings.Trim(links.AUTH_REGISTER, "/")
+
+		if !authUser.IsRegistrationCompleted() && notOnProfilePage {
+			helpers.ToFlashInfo(w, r, "Please complete your registration to continue", registerURL, 15)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

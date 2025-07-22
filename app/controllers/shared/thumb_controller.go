@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"github.com/dracory/base/str"
-	"github.com/gouniverse/router"
 
 	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
@@ -27,7 +26,7 @@ import (
 
 // == CONSTRUCTOR =============================================================
 
-func NewThumbController() router.HTMLControllerInterface {
+func NewThumbController() *thumbnailController {
 	return &thumbnailController{}
 }
 

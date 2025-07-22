@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/dracory/base/str"
-	"github.com/gouniverse/router"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -15,8 +14,6 @@ import (
 
 type mediaController struct {
 }
-
-var _ router.HTMLControllerInterface = (*mediaController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

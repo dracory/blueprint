@@ -12,15 +12,12 @@ import (
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
-	"github.com/gouniverse/router"
 	"github.com/spf13/cast"
 )
 
 // == CONTROLLER ==============================================================
 
 type flashController struct{}
-
-var _ router.HTMLControllerInterface = (*flashController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

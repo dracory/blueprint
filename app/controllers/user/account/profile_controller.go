@@ -16,7 +16,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/geostore"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/userstore"
 	"github.com/samber/lo"
@@ -29,8 +28,6 @@ type profileController struct {
 	formCountry                            string
 	formTimezone                           string
 }
-
-var _ router.HTMLControllerInterface = (*profileController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

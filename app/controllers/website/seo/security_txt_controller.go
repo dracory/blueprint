@@ -3,8 +3,6 @@ package seo
 import (
 	"net/http"
 	"strings"
-
-	"github.com/gouniverse/router"
 )
 
 type securityTxtController struct{}
@@ -16,8 +14,6 @@ type securityTxtController struct{}
 func NewSecurityTxtController() *securityTxtController {
 	return &securityTxtController{}
 }
-
-var _ router.HTMLControllerInterface = &securityTxtController{}
 
 func (c securityTxtController) Handler(w http.ResponseWriter, r *http.Request) string {
 	text := `

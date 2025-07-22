@@ -9,7 +9,6 @@ import (
 
 	"github.com/gouniverse/cmsstore"
 	cmsFrontend "github.com/gouniverse/cmsstore/frontend"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/ui"
 )
 
@@ -20,8 +19,6 @@ const CMS_ENABLE_CACHE = false
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
 }
-
-var _ router.HTMLControllerInterface = (*cmsController)(nil)
 
 // == CONSTRUCTOR ==============================================================
 

@@ -13,7 +13,6 @@ import (
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/spf13/cast"
 
 	"github.com/samber/lo"
@@ -27,8 +26,6 @@ type blogControllerData struct {
 	page      int
 	perPage   int
 }
-
-var _ router.HTMLControllerInterface = (*blogController)(nil)
 
 func NewBlogController() *blogController {
 	return &blogController{}
