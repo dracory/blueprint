@@ -24,13 +24,13 @@ import (
 func ExecuteJob(args []string) {
 	name := "No name"
 	argumentsMap := utils.ArgsToMap(args)
-	cfmt.Infoln("Executing job: ", name, " with arguments: ", argumentsMap)
+	cfmt.Infoln("Executing job: ", name, " with arguments: ", argumentsMap, " ...")
 
 	queuedTaskID := lo.ValueOr(argumentsMap, "task_id", "")
 	force := lo.ValueOr(argumentsMap, "force", "")
 
 	if queuedTaskID == "" {
-		cfmt.Errorln("Task ID is required")
+		cfmt.Errorln("Task ID is required and must be the first argument")
 		return
 	}
 
