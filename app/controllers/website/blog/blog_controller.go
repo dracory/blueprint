@@ -35,7 +35,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewWebsiteLinks().Home(), 10)
+		return helpers.ToFlashError(w, r, errorMessage, links.Website().Home(), 10)
 	}
 
 	return layouts.NewCmsLayout(layouts.Options{
@@ -47,7 +47,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 }
 
 func (controller *blogController) page(data blogControllerData) string {
-	url := links.NewWebsiteLinks().Blog(map[string]string{
+	url := links.Website().Blog(map[string]string{
 		"page": "",
 	})
 

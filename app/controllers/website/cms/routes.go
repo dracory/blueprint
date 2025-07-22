@@ -8,8 +8,7 @@ import (
 )
 
 func Routes() []rtr.RouteInterface {
-	// Create routes
-	routes := []rtr.RouteInterface{
+	return []rtr.RouteInterface{
 		rtr.NewRoute().
 			SetName("Website > Widget Controller > Handler").
 			SetPath(links.WIDGET).
@@ -17,21 +16,22 @@ func Routes() []rtr.RouteInterface {
 
 		rtr.NewRoute().
 			SetName("Website > Cms > Home Page").
+			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
+				rtr.NewMiddleware().
+					SetName("stats").
+					SetHandler(middlewares.NewStatsMiddleware().Handler),
+			}).
 			SetPath(links.HOME).
 			SetHTMLHandler(NewCmsController().Handler),
 
 		rtr.NewRoute().
 			SetName("Website > Cms > Catch All Pages").
+			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
+				rtr.NewMiddleware().
+					SetName("stats").
+					SetHandler(middlewares.NewStatsMiddleware().Handler),
+			}).
 			SetPath(links.CATCHALL).
 			SetHTMLHandler(NewCmsController().Handler),
 	}
-
-	// Apply stats middleware to specific routes
-	for i, route := range routes {
-		if route.GetName() == "Website > Cms > Home Page" || route.GetName() == "Website > Cms > Catch All Pages" {
-			routes[i] = route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewStatsMiddleware()})
-		}
-	}
-
-	return routes
 }
