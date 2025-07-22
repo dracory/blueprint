@@ -5,7 +5,7 @@ import (
 	"errors"
 	"project/config"
 
-	"github.com/gouniverse/shopstore"
+	"github.com/dracory/shopstore"
 )
 
 func SeedProduct(productID string, price float64) (shopstore.ProductInterface, error) {

@@ -6,8 +6,8 @@ import (
 	"project/app/links"
 	"project/config"
 
+	"github.com/dracory/shopstore"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/shopstore"
 	"github.com/spf13/cast"
 )
 

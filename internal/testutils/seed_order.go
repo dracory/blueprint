@@ -5,7 +5,7 @@ import (
 	"errors"
 	"project/config"
 
-	"github.com/gouniverse/shopstore"
+	"github.com/dracory/shopstore"
 )
 
 func SeedOrder(orderID string, customerID string) (shopstore.OrderInterface, error) {

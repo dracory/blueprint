@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/shopstore"
+	"github.com/dracory/shopstore"
 )
 
 func init() {

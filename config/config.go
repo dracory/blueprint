@@ -4,6 +4,7 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/dracory/shopstore"
 	"github.com/faabiosr/cachego"
 	"github.com/gouniverse/blindindexstore"
 	"github.com/gouniverse/blogstore"
@@ -18,7 +19,6 @@ import (
 	"github.com/gouniverse/metastore"
 	"github.com/gouniverse/sb"
 	"github.com/gouniverse/sessionstore"
-	"github.com/gouniverse/shopstore"
 	"github.com/gouniverse/statsstore"
 	"github.com/gouniverse/taskstore"
 	"github.com/gouniverse/userstore"
