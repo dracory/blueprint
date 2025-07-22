@@ -1,8 +1,6 @@
 package widgets
 
-import (
-	"github.com/gouniverse/router"
-)
+import "github.com/dracory/base/router"
 
 const PATH_COMMENTABLE = "/widgets/commentable"
 

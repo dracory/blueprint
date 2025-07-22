@@ -10,6 +10,7 @@ require (
 	github.com/dracory/base v0.23.0
 	github.com/dracory/database v0.2.0
 	github.com/dracory/env v0.3.0
+	github.com/dracory/rtr v0.9.0
 	github.com/dracory/shopstore v1.1.2
 	github.com/dromara/carbon/v2 v2.6.11
 	github.com/faabiosr/cachego v0.26.0
@@ -89,6 +90,7 @@ require (
 	github.com/gouniverse/validator v0.11.0 // indirect
 	github.com/gouniverse/versionstore v0.4.2 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
+	github.com/jedib0t/go-pretty/v6 v6.6.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect

@@ -18,7 +18,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 )
@@ -29,8 +28,6 @@ const VIEW_SEO = "seo"
 const ACTION_BLOCKEDITOR_HANDLE = "blockeditor_handle"
 
 type postUpdateController struct{}
-
-var _ router.HTMLControllerInterface = (*postUpdateController)(nil)
 
 func NewPostUpdateController() *postUpdateController {
 	return &postUpdateController{}

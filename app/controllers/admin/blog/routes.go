@@ -3,48 +3,42 @@ package admin
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
-func Routes() []router.RouteInterface {
+func Routes() []rtr.RouteInterface {
 
-	postCreate := &router.Route{
-		Name:        "Admin > Blog > Post Create",
-		Path:        links.ADMIN_BLOG_POST_CREATE,
-		HTMLHandler: NewPostCreateController().Handler,
-	}
+	postCreate := rtr.NewRoute().
+		SetName("Admin > Blog > Post Create").
+		SetPath(links.ADMIN_BLOG_POST_CREATE).
+		SetHTMLHandler(NewPostCreateController().Handler)
 
-	postDelete := &router.Route{
-		Name:        "Admin > Blog > Post Delete",
-		Path:        links.ADMIN_BLOG_POST_DELETE,
-		HTMLHandler: NewPostDeleteController().Handler,
-	}
+	postDelete := rtr.NewRoute().
+		SetName("Admin > Blog > Post Delete").
+		SetPath(links.ADMIN_BLOG_POST_DELETE).
+		SetHTMLHandler(NewPostDeleteController().Handler)
 
-	postManager := &router.Route{
-		Name:        "Admin > Blog > Post Manager",
-		Path:        links.ADMIN_BLOG_POST_MANAGER,
-		HTMLHandler: NewManagerController().Handler,
-	}
+	postManager := rtr.NewRoute().
+		SetName("Admin > Blog > Post Manager").
+		SetPath(links.ADMIN_BLOG_POST_MANAGER).
+		SetHTMLHandler(NewManagerController().Handler)
 
-	postUpdate := &router.Route{
-		Name:        "Admin > Blog > Post Update",
-		Path:        links.ADMIN_BLOG_POST_UPDATE,
-		HTMLHandler: NewPostUpdateController().Handler,
-	}
+	postUpdate := rtr.NewRoute().
+		SetName("Admin > Blog > Post Update").
+		SetPath(links.ADMIN_BLOG_POST_UPDATE).
+		SetHTMLHandler(NewPostUpdateController().Handler)
 
-	blogHome := &router.Route{
-		Name:        "Admin > Blog",
-		Path:        links.ADMIN_BLOG,
-		HTMLHandler: NewManagerController().Handler,
-	}
+	blogHome := rtr.NewRoute().
+		SetName("Admin > Blog").
+		SetPath(links.ADMIN_BLOG).
+		SetHTMLHandler(NewManagerController().Handler)
 
-	blogCatchAll := &router.Route{
-		Name:        "Admin > Blog > Catch All",
-		Path:        links.ADMIN_BLOG + links.CATCHALL,
-		HTMLHandler: NewManagerController().Handler,
-	}
+	blogCatchAll := rtr.NewRoute().
+		SetName("Admin > Blog > Catch All").
+		SetPath(links.ADMIN_BLOG + links.CATCHALL).
+		SetHTMLHandler(NewManagerController().Handler)
 
-	return []router.RouteInterface{
+	return []rtr.RouteInterface{
 		postCreate,
 		postDelete,
 		postManager,

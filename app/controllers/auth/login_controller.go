@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 type loginController struct{}

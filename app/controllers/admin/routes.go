@@ -12,7 +12,7 @@ import (
 	"project/app/links"
 	"project/app/middlewares"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 // Routes these are the routes for the administrator

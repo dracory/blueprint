@@ -9,7 +9,6 @@ import (
 	"project/app/widgets"
 
 	"github.com/go-chi/chi/v5"
-
 	"github.com/gouniverse/router"
 )
 

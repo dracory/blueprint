@@ -12,17 +12,13 @@ import (
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type postCreateController struct{}
 
-var _ router.HTMLControllerInterface = (*postCreateController)(nil)
-
 type postCreateControllerData struct {
 	title          string
 	successMessage string
-	//errorMessage   string
 }
 
 func NewPostCreateController() *postCreateController {

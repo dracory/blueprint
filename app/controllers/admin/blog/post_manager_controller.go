@@ -16,7 +16,6 @@ import (
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -25,8 +24,6 @@ import (
 // == CONTROLLER ==============================================================
 
 type managerController struct{}
-
-var _ router.HTMLControllerInterface = (*managerController)(nil)
 
 // == CONSTRUCTOR =============================================================
 

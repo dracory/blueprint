@@ -5,8 +5,6 @@ import (
 	"project/app/links"
 	"project/config"
 
-	"github.com/gouniverse/router"
-
 	"project/app/controllers/shared"
 
 	"project/app/controllers/website/blog"
@@ -15,6 +13,8 @@ import (
 	"project/app/controllers/website/home"
 	"project/app/controllers/website/seo"
 	"project/app/controllers/website/swagger"
+
+	"github.com/gouniverse/router"
 	// paypalControllers "project/controllers/website/paypal"
 )
 

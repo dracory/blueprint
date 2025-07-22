@@ -56,6 +56,8 @@ github.com/dracory/database v0.2.0 h1:BxYrBIS8rERq2pl/FVyUiaSaT+ZeXqmT2xT6PPLkNT
 github.com/dracory/database v0.2.0/go.mod h1:t8rL9bBvOieguEKaRn8Q/LUP9mxJ9bTDaamsNR4qyXA=
 github.com/dracory/env v0.3.0 h1:764cVWQbOceB5+MWg2/G2pAoxROb5YAaBpKzsAi7CLY=
 github.com/dracory/env v0.3.0/go.mod h1:2LwE4U2qIGxxH7zLINcFhs3U5B4Ty3Tm2fByzLEAa+Q=
+github.com/dracory/rtr v0.9.0 h1:Ux7u2rWvgBCeo0vhcW8SLt6w+27VgaPGUuNLpjyaEmA=
+github.com/dracory/rtr v0.9.0/go.mod h1:sjd68NDLGSeHCLZIPlCqdplAnfy9WaLKi27fcwnuzAI=
 github.com/dracory/shopstore v1.1.2 h1:R9JnmVUrwDPuPsAMeg27kIEPQgzqqBlboXDoTq1D0t0=
 github.com/dracory/shopstore v1.1.2/go.mod h1:a94MxfIlIMeIsd/ZcdA4jh2SW0Da0GL0ZN2EN3bYQbg=
 github.com/dromara/carbon/v2 v2.6.11 h1:wnAWZ+sbza1uXw3r05hExNSCaBPFaarWfUvYAX86png=
@@ -253,6 +255,8 @@ github.com/jackc/puddle v1.1.3 h1:JnPg/5Q9xVJGfjsO5CPUOjnJps1JaRUm8I9FXVCFK94=
 github.com/jackc/puddle v1.1.3/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/jedib0t/go-pretty v4.3.0+incompatible h1:CGs8AVhEKg/n9YbUenWmNStRW2PHJzaeDodcfvRAbIo=
 github.com/jedib0t/go-pretty v4.3.0+incompatible/go.mod h1:XemHduiw8R651AF9Pt4FwCTKeG3oo7hrHJAoznj9nag=
+github.com/jedib0t/go-pretty/v6 v6.6.7 h1:m+LbHpm0aIAPLzLbMfn8dc3Ht8MW7lsSO4MPItz/Uuo=
+github.com/jedib0t/go-pretty/v6 v6.6.7/go.mod h1:YwC5CE4fJ1HFUDeivSV1r//AmANFHyqczZk+U6BDALU=
 github.com/jellydator/ttlcache/v3 v3.4.0 h1:YS4P125qQS0tNhtL6aeYkheEaB/m8HCqdMMP4mnWdTY=
 github.com/jellydator/ttlcache/v3 v3.4.0/go.mod h1:Hw9EgjymziQD3yGsQdf1FqFdpp7YjFMd4Srg5EJlgD4=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=

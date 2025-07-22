@@ -3,7 +3,7 @@ package auth
 import (
 	"project/app/links"
 
-	"github.com/gouniverse/router"
+	"github.com/dracory/rtr"
 )
 
 func Routes() []router.RouteInterface {

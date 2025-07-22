@@ -11,18 +11,14 @@ import (
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 type postDeleteController struct{}
-
-var _ router.HTMLControllerInterface = (*postDeleteController)(nil)
 
 type postDeleteControllerData struct {
 	postID         string
 	post           *blogstore.Post
 	successMessage string
-	//errorMessage   string
 }
 
 func NewPostDeleteController() *postDeleteController {

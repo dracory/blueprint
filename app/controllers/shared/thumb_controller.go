@@ -14,11 +14,11 @@ import (
 	"strings"
 
 	"github.com/dracory/base/str"
+	"github.com/gouniverse/router"
 
 	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
 	"github.com/go-chi/chi/v5"
-	"github.com/gouniverse/router"
 	"github.com/spf13/cast"
 
 	"github.com/mingrammer/cfmt"

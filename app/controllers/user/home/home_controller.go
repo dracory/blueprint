@@ -9,10 +9,10 @@ import (
 	"project/internal/helpers"
 	"strings"
 
+	"github.com/gouniverse/router"
 	"github.com/gouniverse/userstore"
 
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/router"
 )
 
 // == CONTROLLER ==============================================================
