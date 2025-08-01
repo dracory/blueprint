@@ -7,10 +7,10 @@ import (
 	"project/app/middlewares"
 	"project/app/routes"
 	"project/app/schedules"
-	"project/app/tasks"
 	"project/config"
 	"project/internal/cli"
 	"project/internal/emails"
+	"project/internal/tasks"
 	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"

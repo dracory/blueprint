@@ -1,7 +1,7 @@
 package schedules
 
 import (
-	"project/app/tasks"
+	"project/internal/tasks"
 	"time"
 
 	"github.com/go-co-op/gocron"

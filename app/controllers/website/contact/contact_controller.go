@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"project/app/layouts"
 	"project/app/links"
-	"project/app/tasks"
 	"project/config"
 	"project/internal/helpers"
+	"project/internal/tasks"
 	"strings"
 
 	"github.com/dracory/base/req"
