@@ -19,7 +19,7 @@ func Routes() []rtr.RouteInterface {
 			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 				rtr.NewMiddleware().
 					SetName("stats").
-					SetHandler(middlewares.NewStatsMiddleware().Handler),
+					SetHandler(middlewares.NewStatsMiddleware().GetHandler()),
 			}).
 			SetPath(links.HOME).
 			SetHTMLHandler(NewCmsController().Handler),
@@ -29,7 +29,7 @@ func Routes() []rtr.RouteInterface {
 			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 				rtr.NewMiddleware().
 					SetName("stats").
-					SetHandler(middlewares.NewStatsMiddleware().Handler),
+					SetHandler(middlewares.NewStatsMiddleware().GetHandler()),
 			}).
 			SetPath(links.CATCHALL).
 			SetHTMLHandler(NewCmsController().Handler),
