@@ -4,8 +4,8 @@ import (
 	userAccount "project/app/controllers/user/account"
 	userHome "project/app/controllers/user/home"
 
-	"project/app/middlewares"
 	"project/internal/links"
+	"project/internal/middlewares"
 
 	"github.com/dracory/rtr"
 )

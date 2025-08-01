@@ -1,8 +1,8 @@
 package cms
 
 import (
-	"project/app/middlewares"
 	"project/internal/links"
+	"project/internal/middlewares"
 
 	"github.com/dracory/rtr"
 )
