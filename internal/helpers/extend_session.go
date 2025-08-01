@@ -3,7 +3,7 @@ package helpers
 import (
 	"errors"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"

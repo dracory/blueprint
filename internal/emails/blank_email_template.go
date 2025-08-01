@@ -5,8 +5,8 @@ package emails
 // See adapter.go for the new implementation.
 
 // import (
-// 	"project/app/links"
-// 	"project/config"
+// 	"project/internal/links"
+// 	"project/internal/config"
 
 // 	"github.com/dromara/carbon/v2"
 // 	"github.com/gouniverse/hb"

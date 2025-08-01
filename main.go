@@ -4,14 +4,14 @@ import (
 	"log/slog"
 	"os"
 
-	"project/app/middlewares"
-	"project/app/routes"
-	"project/app/schedules"
-	"project/app/tasks"
-	"project/app/widgets"
-	"project/config"
 	"project/internal/cli"
+	"project/internal/config"
 	"project/internal/emails"
+	"project/internal/middlewares"
+	"project/internal/routes"
+	"project/internal/schedules"
+	"project/internal/tasks"
+	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
 

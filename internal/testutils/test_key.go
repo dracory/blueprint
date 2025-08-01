@@ -1,7 +1,7 @@
 package testutils
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	"github.com/dracory/base/test"
 )

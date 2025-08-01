@@ -7,7 +7,7 @@ package emails
 // import (
 // 	"errors"
 // 	"net/smtp"
-// 	"project/config"
+// 	"project/internal/config"
 
 // 	"github.com/darkoatanasovski/htmltags"
 // 	"github.com/jordan-wright/email"

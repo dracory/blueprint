@@ -1,7 +1,7 @@
 package emails
 
 import (
-	"project/config"
+	"project/internal/config"
 )
 
 func NewEmailNotifyAdmin() *emailNotifyAdmin {

@@ -1,7 +1,7 @@
 package emails
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	baseEmail "github.com/dracory/base/email"
 )
@@ -60,12 +60,12 @@ func SendEmail(options SendOptions) error {
 func CreateEmailTemplate(title string, htmlContent string) string {
 	// Create header links
 	headerLinks := map[string]string{}
-	
+
 	// Use the base email template
 	return baseEmail.DefaultTemplate(baseEmail.TemplateOptions{
-		Title:   title,
-		Content: htmlContent,
-		AppName: config.AppName,
+		Title:       title,
+		Content:     htmlContent,
+		AppName:     config.AppName,
 		HeaderLinks: headerLinks,
 	})
 }

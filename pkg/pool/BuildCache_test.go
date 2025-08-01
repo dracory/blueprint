@@ -1,7 +1,7 @@
 package pool
 
 // import (
-// 	"project/config"
+// 	"project/internal/config"
 // 	"project/internal/testutils"
 // 	"testing"
 

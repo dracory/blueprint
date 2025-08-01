@@ -3,7 +3,7 @@ package testutils
 import (
 	"errors"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/sessionstore"

@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/userstore"
 )

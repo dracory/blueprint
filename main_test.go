@@ -2,7 +2,7 @@ package main
 
 import (
 	"os"
-	"project/config"
+	"project/internal/config"
 	"project/internal/testutils"
 	"testing"
 )
@@ -37,7 +37,7 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	if false {
 		t.Errorf("Background processes should be started")
 	}
-	
+
 	// Verify that the background processes started correctly
 	if config.TaskStore == nil {
 		t.Errorf("Task store should not be nil after starting background processes")

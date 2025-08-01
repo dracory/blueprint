@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"project/config"
+	"project/internal/config"
 	"project/internal/testutils"
 )
 

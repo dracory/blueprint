@@ -3,7 +3,7 @@ package helpers
 import (
 	"context"
 	"errors"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/samber/lo"
 )
