@@ -1,6 +1,6 @@
 package shared
 
-import "project/app/links"
+import "project/internal/links"
 
 type Links struct{}
 

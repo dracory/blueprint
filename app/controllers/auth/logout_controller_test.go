@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 	"net/http/httptest"
-	"project/app/links"
+	"project/internal/links"
 	"project/internal/testutils"
 	"testing"
 	"time"

@@ -2,7 +2,7 @@ package partials
 
 import (
 	"net/http"
-	"project/app/links"
+	"project/internal/links"
 	"strings"
 
 	"github.com/gouniverse/hb"

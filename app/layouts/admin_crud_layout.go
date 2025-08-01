@@ -2,7 +2,7 @@ package layouts
 
 import (
 	"net/http"
-	"project/app/links"
+	"project/internal/links"
 
 	"github.com/gouniverse/hb"
 )

@@ -2,7 +2,7 @@ package seo
 
 import (
 	"net/http"
-	"project/app/links"
+	"project/internal/links"
 )
 
 type robotsTxtController struct{}

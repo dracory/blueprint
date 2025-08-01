@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"net/http"
-	"project/app/links"
+	"project/internal/links"
 
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/blockeditor"

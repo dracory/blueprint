@@ -9,8 +9,8 @@ import (
 	"project/app/controllers/admin/stats"
 	adminTasks "project/app/controllers/admin/tasks"
 	adminUsers "project/app/controllers/admin/users"
-	"project/app/links"
 	"project/app/middlewares"
+	"project/internal/links"
 
 	"github.com/dracory/rtr"
 )

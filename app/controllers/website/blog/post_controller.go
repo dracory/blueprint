@@ -5,9 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 	"project/app/layouts"
-	"project/app/links"
 	"project/config"
 	"project/internal/helpers"
+	"project/internal/links"
 	"project/pkg/blogtheme"
 	"strings"
 

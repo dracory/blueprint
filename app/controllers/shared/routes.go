@@ -2,7 +2,7 @@ package shared
 
 import (
 	"net/http"
-	"project/app/links"
+	"project/internal/links"
 
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/dashboard"

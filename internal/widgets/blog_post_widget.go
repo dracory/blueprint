@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 
 	// "project/app/layouts"
-	"project/app/links"
+	"project/internal/links"
 	"strings"
 
 	"github.com/dracory/base/str"

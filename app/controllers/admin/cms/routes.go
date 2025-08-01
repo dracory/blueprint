@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"project/app/links"
+	"project/internal/links"
 
 	"github.com/dracory/rtr"
 )

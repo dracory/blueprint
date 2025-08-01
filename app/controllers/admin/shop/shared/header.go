@@ -3,8 +3,8 @@ package shared
 import (
 	"log/slog"
 	"net/http"
-	"project/app/links"
 	"project/config"
+	"project/internal/links"
 
 	"github.com/dracory/shopstore"
 	"github.com/gouniverse/hb"

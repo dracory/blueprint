@@ -6,10 +6,10 @@ import (
 
 	"project/app/middlewares"
 	"project/app/routes"
-	"project/app/schedules"
 	"project/config"
 	"project/internal/cli"
 	"project/internal/emails"
+	"project/internal/schedules"
 	"project/internal/tasks"
 	"project/internal/widgets"
 
