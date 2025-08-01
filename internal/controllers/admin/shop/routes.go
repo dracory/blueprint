@@ -7,9 +7,9 @@ import (
 	"github.com/dracory/base/req"
 	"github.com/dracory/rtr"
 
-	shopDiscounts "project/app/controllers/admin/shop/discounts"
-	shopProducts "project/app/controllers/admin/shop/products"
-	"project/app/controllers/admin/shop/shared"
+	shopDiscounts "project/internal/controllers/admin/shop/discounts"
+	shopProducts "project/internal/controllers/admin/shop/products"
+	"project/internal/controllers/admin/shop/shared"
 )
 
 func ShopRoutes() []rtr.RouteInterface {

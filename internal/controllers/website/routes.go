@@ -5,14 +5,14 @@ import (
 	"project/config"
 	"project/internal/links"
 
-	"project/app/controllers/shared"
+	"project/internal/controllers/shared"
 
-	"project/app/controllers/website/blog"
-	"project/app/controllers/website/cms"
-	"project/app/controllers/website/contact"
-	"project/app/controllers/website/home"
-	"project/app/controllers/website/seo"
-	"project/app/controllers/website/swagger"
+	"project/internal/controllers/website/blog"
+	"project/internal/controllers/website/cms"
+	"project/internal/controllers/website/contact"
+	"project/internal/controllers/website/home"
+	"project/internal/controllers/website/seo"
+	"project/internal/controllers/website/swagger"
 
 	"github.com/dracory/rtr"
 	// paypalControllers "project/controllers/website/paypal"

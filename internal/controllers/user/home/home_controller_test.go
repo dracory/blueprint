@@ -3,7 +3,7 @@ package user_test
 import (
 	"net/http"
 	"net/url"
-	user "project/app/controllers/user/home"
+	user "project/internal/controllers/user/home"
 	"project/internal/testutils"
 	"strings"
 	"testing"

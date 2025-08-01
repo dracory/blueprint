@@ -1,14 +1,14 @@
 package admin
 
 import (
-	adminBlog "project/app/controllers/admin/blog"
-	adminCms "project/app/controllers/admin/cms"
-	adminFiles "project/app/controllers/admin/files"
-	adminMedia "project/app/controllers/admin/media"
-	adminShop "project/app/controllers/admin/shop"
-	"project/app/controllers/admin/stats"
-	adminTasks "project/app/controllers/admin/tasks"
-	adminUsers "project/app/controllers/admin/users"
+	adminBlog "project/internal/controllers/admin/blog"
+	adminCms "project/internal/controllers/admin/cms"
+	adminFiles "project/internal/controllers/admin/files"
+	adminMedia "project/internal/controllers/admin/media"
+	adminShop "project/internal/controllers/admin/shop"
+	"project/internal/controllers/admin/stats"
+	adminTasks "project/internal/controllers/admin/tasks"
+	adminUsers "project/internal/controllers/admin/users"
 	"project/internal/links"
 	"project/internal/middlewares"
 

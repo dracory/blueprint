@@ -1,8 +1,8 @@
 package user
 
 import (
-	userAccount "project/app/controllers/user/account"
-	userHome "project/app/controllers/user/home"
+	userAccount "project/internal/controllers/user/account"
+	userHome "project/internal/controllers/user/home"
 
 	"project/internal/links"
 	"project/internal/middlewares"

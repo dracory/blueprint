@@ -4,11 +4,11 @@ import (
 	"log/slog"
 	"os"
 
-	"project/app/routes"
 	"project/config"
 	"project/internal/cli"
 	"project/internal/emails"
 	"project/internal/middlewares"
+	"project/internal/routes"
 	"project/internal/schedules"
 	"project/internal/tasks"
 	"project/internal/widgets"

@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"project/app/controllers/admin"
-	"project/app/controllers/auth"
-	"project/app/controllers/shared"
-	"project/app/controllers/user"
-	"project/app/controllers/website"
+	"project/internal/controllers/admin"
+	"project/internal/controllers/auth"
+	"project/internal/controllers/shared"
+	"project/internal/controllers/user"
+	"project/internal/controllers/website"
 	"project/internal/widgets"
 
 	"github.com/dracory/rtr"
