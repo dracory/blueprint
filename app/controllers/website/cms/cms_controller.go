@@ -2,8 +2,8 @@ package cms
 
 import (
 	"net/http"
-	"project/app/widgets"
 	"project/config"
+	"project/internal/widgets"
 	"project/pkg/webtheme"
 	"sync"
 

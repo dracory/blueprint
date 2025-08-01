@@ -6,7 +6,7 @@ import (
 	"project/app/controllers/shared"
 	"project/app/controllers/user"
 	"project/app/controllers/website"
-	"project/app/widgets"
+	"project/internal/widgets"
 
 	"github.com/dracory/rtr"
 )

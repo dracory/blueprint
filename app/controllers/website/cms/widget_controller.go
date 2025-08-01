@@ -2,7 +2,7 @@ package cms
 
 import (
 	"net/http"
-	"project/app/widgets"
+	"project/internal/widgets"
 
 	"github.com/dracory/base/req"
 )

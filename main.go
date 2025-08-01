@@ -8,10 +8,10 @@ import (
 	"project/app/routes"
 	"project/app/schedules"
 	"project/app/tasks"
-	"project/app/widgets"
 	"project/config"
 	"project/internal/cli"
 	"project/internal/emails"
+	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
 
