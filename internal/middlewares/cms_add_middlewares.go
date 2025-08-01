@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/cmsstore"
 	"github.com/mingrammer/cfmt"

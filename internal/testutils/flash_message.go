@@ -2,7 +2,7 @@ package testutils
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/types"
 
 	"github.com/dracory/base/str"

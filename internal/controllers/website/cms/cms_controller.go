@@ -2,7 +2,7 @@ package cms
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/widgets"
 	"project/pkg/webtheme"
 	"sync"

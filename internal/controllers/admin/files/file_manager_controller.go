@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"project/config"
+	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
 	"strings"

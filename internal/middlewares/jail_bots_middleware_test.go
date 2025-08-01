@@ -4,7 +4,7 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
-	"project/config"
+	"project/internal/config"
 	"testing"
 
 	"github.com/gouniverse/auth/tests"

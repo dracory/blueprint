@@ -3,7 +3,7 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/layouts"
 
 	"github.com/gouniverse/hb"

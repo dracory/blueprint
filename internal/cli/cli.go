@@ -3,8 +3,8 @@ package cli
 import (
 	"errors"
 	"fmt"
-	"project/config"
 	"project/internal/cmds"
+	"project/internal/config"
 	"project/internal/routes"
 
 	"github.com/mingrammer/cfmt"

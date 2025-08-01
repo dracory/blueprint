@@ -2,7 +2,7 @@ package shared
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"strings"
 
 	"github.com/dracory/base/str"

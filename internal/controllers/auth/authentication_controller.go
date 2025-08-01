@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/testutils"

@@ -3,7 +3,7 @@ package shared
 import (
 	"log/slog"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 
 	"github.com/dracory/shopstore"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"project/config"
+	"project/internal/config"
 	"project/internal/testutils"
 	"testing"
 

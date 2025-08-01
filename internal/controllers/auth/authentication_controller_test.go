@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"project/config"
+	"project/internal/config"
 	"project/internal/testutils"
 	"testing"
 

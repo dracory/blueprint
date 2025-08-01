@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/userstore"
 )

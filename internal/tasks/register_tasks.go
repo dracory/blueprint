@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/taskstore"
 )

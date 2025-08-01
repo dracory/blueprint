@@ -1,7 +1,7 @@
 package layouts
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"

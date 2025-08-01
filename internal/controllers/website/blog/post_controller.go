@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log/slog"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"

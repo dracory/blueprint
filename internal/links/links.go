@@ -2,7 +2,7 @@ package links
 
 import (
 	"net/url"
-	"project/config"
+	"project/internal/config"
 )
 
 // RootURL returns a URL to the current website

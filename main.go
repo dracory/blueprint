@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"os"
 
-	"project/config"
 	"project/internal/cli"
+	"project/internal/config"
 	"project/internal/emails"
 	"project/internal/middlewares"
 	"project/internal/routes"

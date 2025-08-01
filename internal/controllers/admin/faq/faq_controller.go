@@ -3,7 +3,7 @@ package admin
 // import (
 // 	"errors"
 // 	"net/http"
-// 	"project/config"
+// 	"project/internal/config"
 // 	"project/controllers/admin/partials"
 // 	"project/internal/links"
 // 	"project/models"

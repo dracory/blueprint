@@ -2,7 +2,7 @@ package auth
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
 	"strings"

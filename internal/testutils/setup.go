@@ -1,7 +1,7 @@
 package testutils
 
 import (
-	"project/config"
+	"project/internal/config"
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 )
 

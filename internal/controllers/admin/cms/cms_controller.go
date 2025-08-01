@@ -2,7 +2,7 @@ package admin
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/layouts"
 
 	"github.com/gouniverse/hb"

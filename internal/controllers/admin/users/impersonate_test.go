@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"project/config"
+	"project/internal/config"
 	"testing"
 )
 

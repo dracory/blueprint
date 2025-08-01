@@ -3,7 +3,7 @@ package layouts
 import (
 	"errors"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 
 	"github.com/gouniverse/userstore"

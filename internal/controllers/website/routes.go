@@ -2,7 +2,7 @@ package website
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 
 	"project/internal/controllers/shared"

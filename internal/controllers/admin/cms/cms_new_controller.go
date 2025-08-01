@@ -2,7 +2,7 @@ package admin
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/pkg/webtheme"

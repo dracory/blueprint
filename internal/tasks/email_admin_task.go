@@ -2,7 +2,7 @@ package tasks
 
 import (
 	"errors"
-	"project/config"
+	"project/internal/config"
 	"project/internal/emails"
 
 	"github.com/gouniverse/taskstore"

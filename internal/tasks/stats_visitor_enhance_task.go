@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"strings"
 
 	"github.com/gouniverse/statsstore"

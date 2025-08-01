@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"project/config"
+	"project/internal/config"
 	"project/internal/middlewares"
 
 	"github.com/dracory/rtr"

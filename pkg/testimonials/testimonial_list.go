@@ -1,7 +1,7 @@
 package testimonials
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/entitystore"
 )

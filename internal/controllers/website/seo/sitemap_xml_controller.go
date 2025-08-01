@@ -3,7 +3,7 @@ package seo
 import (
 	"log/slog"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 	"strings"
 

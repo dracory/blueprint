@@ -3,7 +3,7 @@ package testutils
 import (
 	"context"
 	"errors"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/userstore"
 )

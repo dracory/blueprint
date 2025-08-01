@@ -6,7 +6,7 @@ package emails
 
 // import (
 // 	"project/internal/links"
-// 	"project/config"
+// 	"project/internal/config"
 
 // 	"github.com/dromara/carbon/v2"
 // 	"github.com/gouniverse/hb"

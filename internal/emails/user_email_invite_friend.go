@@ -3,7 +3,7 @@ package emails
 import (
 	"context"
 	"errors"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 
 	"github.com/gouniverse/hb"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/controllers/user/partials"
 	"project/internal/helpers"
 	"project/internal/layouts"

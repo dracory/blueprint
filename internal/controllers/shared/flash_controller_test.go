@@ -3,7 +3,7 @@ package shared
 import (
 	"net/http"
 	"net/url"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/testutils"
 	"strings"

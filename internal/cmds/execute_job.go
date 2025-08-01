@@ -6,7 +6,7 @@ import (
 
 	// "project/jobs"
 
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/taskstore"
 	"github.com/gouniverse/utils"

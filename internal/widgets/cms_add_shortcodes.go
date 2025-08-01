@@ -1,7 +1,7 @@
 package widgets
 
 import (
-	"project/config"
+	"project/internal/config"
 
 	"github.com/gouniverse/cmsstore"
 )

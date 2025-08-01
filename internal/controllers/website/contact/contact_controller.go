@@ -3,7 +3,7 @@ package contact
 import (
 	"context"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"

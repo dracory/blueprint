@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"strings"
 
 	"log/slog"

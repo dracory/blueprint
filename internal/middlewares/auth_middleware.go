@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/auth"

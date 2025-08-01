@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/helpers"
 	"slices"
 

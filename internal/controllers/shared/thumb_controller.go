@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 	"project/resources"
 	"time"

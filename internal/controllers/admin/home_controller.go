@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
 

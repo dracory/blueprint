@@ -2,7 +2,7 @@ package layouts
 
 import (
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"project/internal/widgets"
 
 	"github.com/gouniverse/cmsstore"

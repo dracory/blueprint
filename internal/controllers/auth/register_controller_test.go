@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 	"net/url"
-	"project/config"
+	"project/internal/config"
 	"project/internal/links"
 	"project/internal/testutils"
 	"strings"

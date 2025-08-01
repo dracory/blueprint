@@ -3,7 +3,7 @@ package middlewares
 import (
 	"log/slog"
 	"net/http"
-	"project/config"
+	"project/internal/config"
 	"slices"
 	"strings"
 	"time"
