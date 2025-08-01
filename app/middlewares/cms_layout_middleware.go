@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 	"net/http/httptest"
-	"project/app/layouts"
+	"project/internal/layouts"
 
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/cmsstore"

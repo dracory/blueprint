@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"project/app/layouts"
 	"project/config"
 	"project/internal/helpers"
+	"project/internal/layouts"
 	"project/internal/links"
 	"strings"
 

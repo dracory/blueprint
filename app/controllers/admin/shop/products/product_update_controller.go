@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"project/app/layouts"
 	"project/internal/helpers"
+	"project/internal/layouts"
 	"project/internal/links"
 
 	"github.com/asaskevich/govalidator"
