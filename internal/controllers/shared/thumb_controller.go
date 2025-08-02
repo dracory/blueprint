@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"project/internal/config"
 	"project/internal/links"
-	"project/resources"
+	"project/internal/resources"
 	"time"
 
 	"strings"
