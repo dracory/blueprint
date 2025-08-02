@@ -2,7 +2,7 @@ package shared
 
 import (
 	"net/http"
-	"project/resources"
+	"project/internal/resources"
 	"strings"
 
 	"github.com/samber/lo"

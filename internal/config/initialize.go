@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
-	"project/resources"
+	"project/internal/resources"
 	"strings"
 
 	"github.com/faabiosr/cachego/file"
