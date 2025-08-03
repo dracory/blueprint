@@ -17,10 +17,9 @@ func RegisterTasks() {
 	tasks := []taskstore.TaskHandlerInterface{
 		NewBlindIndexRebuildTask(),
 		NewCmsTransferTask(),
-		NewEmailToAdminTaskHandler(),
+		NewEmailToAdminTask(),
 		NewEmailToAdminOnNewContactFormSubmittedTaskHandler(),
 		NewEmailToAdminOnNewUserRegisteredTaskHandler(),
-		NewEnvencTask(),
 		NewHelloWorldTask(),
 		NewStatsVisitorEnhanceTask(),
 	}

@@ -75,13 +75,13 @@ tasks:
 
   env-dev:
     cmds:
-      - go run cmd/envenc/main.go ui ./resources/.env.development.vault
+      - go run cmd/envenc/main.go ui ./internal/resources/.env.development.vault
       - echo "Done!"
     silent: true
 
   env-prod:
     cmds:
-      - go run cmd/envenc/main.go ui ./resources/.env.production.vault
+      - go run cmd/envenc/main.go ui ./internal/resources/.env.production.vault
       - echo "Done!"
     silent: true
 
