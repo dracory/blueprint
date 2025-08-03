@@ -3,6 +3,7 @@ package routes
 import (
 	"project/internal/config"
 	"project/internal/middlewares"
+	"time"
 
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
@@ -17,7 +18,7 @@ func globalMiddlewares() []rtr.MiddlewareInterface {
 		rtrMiddleware.CleanPathMiddleware(),
 		rtrMiddleware.RedirectSlashesMiddleware(),
 		//router.NewNakedDomainToWwwMiddleware([]string{"localhost", "127.0.0.1", "http://sinevia.local"}),
-		rtrMiddleware.TimeoutMiddleware(30),                 // 30s timeout
+		rtrMiddleware.TimeoutMiddleware(30 * time.Second),   // 30s timeout
 		rtrMiddleware.RateLimitByIPMiddleware(20, 1),        // 20 req per second
 		rtrMiddleware.RateLimitByIPMiddleware(180, 1*60),    // 180 req per minute
 		rtrMiddleware.RateLimitByIPMiddleware(12000, 60*60), // 12000 req hour

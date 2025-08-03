@@ -289,6 +289,7 @@ func initializeDatabase() error {
 		SetDatabasePort(DbPort).
 		SetDatabaseName(DbName).
 		SetCharset(`utf8mb4`).
+		SetTimeZone("UTC").
 		SetUserName(DbUser).
 		SetPassword(DbPass).
 		SetSSLMode("require"))
@@ -300,6 +301,11 @@ func initializeDatabase() error {
 	if db == nil {
 		return errors.New("db is nil")
 	}
+
+	// Add connection pool settings
+	// db.SetMaxOpenConns(25)                 // Maximum number of open connections
+	// db.SetMaxIdleConns(5)                  // Maximum number of idle connections
+	// db.SetConnMaxLifetime(5 * time.Minute) // Maximum connection lifetime
 
 	dbInstance := sb.NewDatabase(db, DbDriver)
 
