@@ -60,7 +60,7 @@ func IsHxHistoryRestoreRequest(r *http.Request) bool {
 // Returns:
 //   - bool: true if it's an HTMX request, false otherwise
 func IsHxRequest(r *http.Request) bool {
-	value := req.ValueOr(r, "HX-Request", "")
+	value := r.Header.Get("HX-Request")
 	return value == "true"
 }
 

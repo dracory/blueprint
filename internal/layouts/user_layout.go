@@ -3,6 +3,7 @@ package layouts
 import (
 	"net/http"
 	"project/internal/config"
+	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/links"
 
@@ -54,6 +55,7 @@ func userLayout(r *http.Request, options Options) *dashboard.Dashboard {
 
 	// Prepare styles
 	styles := []string{ // prepend any if required
+		ext.HxHideIndicatorCSS(),
 		`nav#Toolbar {border-bottom: 8px solid blue;}`,
 	}
 	styles = append(styles, options.Styles...)

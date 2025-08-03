@@ -90,10 +90,10 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
 	}
 
-	user, errUser := c.userFindByEmailOrCreate(r.Context(), email, userstore.USER_STATUS_ACTIVE)
+	user, err := c.userFindByEmailOrCreate(r.Context(), email, userstore.USER_STATUS_ACTIVE)
 
-	if errUser != nil {
-		config.Logger.Error("At Auth Controller > AnyIndex > User Create Error: ", "error", errUser.Error())
+	if err != nil {
+		config.Logger.Error("At Auth Controller > AnyIndex > User Create Error: ", "error", err.Error())
 		return helpers.ToFlashError(w, r, msgUserNotFound, homeURL, 5)
 	}
 
@@ -115,7 +115,7 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
 	}
 
-	err := config.SessionStore.SessionCreate(r.Context(), session)
+	err = config.SessionStore.SessionCreate(r.Context(), session)
 
 	if err != nil {
 		config.Logger.Error("At Auth Controller > AnyIndex > Session Store Error: ", "error", err.Error())
