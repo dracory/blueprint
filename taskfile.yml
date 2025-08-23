@@ -13,9 +13,9 @@ vars:
   DATETIME: '{{now | date "20060102_150405"}}'
 
 tasks:
-  # ========================== #
-  # START: Help screem (Default)
-  # ========================== #
+  # ======================================================================== #
+  # START: Help screem (Default)                                             #
+  # ======================================================================== #
   default:
     cmds:
         - echo "================================================================"
@@ -32,9 +32,13 @@ tasks:
         - echo "=                                                              ="
         - echo "================================================================"
     silent: true
-  # ========================== #
-  # END: Help screem (Default) #
-  # ========================== #
+  # ======================================================================== #
+  # END: Help screem (Default)                                               #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Deploy                                                            #
+  # ======================================================================== #
 
   cover:
     desc: Builds a test coverage report
@@ -61,6 +65,14 @@ tasks:
       - go run cmd/deploy/main.go
       - echo "Done!"
 
+  # ======================================================================== #
+  # END: Deploy                                                              #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Development                                                       #
+  # ======================================================================== #
+
   dev-init:
     desc: Initialize development environment (copies the .env_example to .env)
     cmds:
@@ -73,6 +85,14 @@ tasks:
     cmds:
       - air
 
+  # ======================================================================== #
+  # END: Development                                                         #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Environment                                                       #
+  # ======================================================================== #
+
   env-dev:
     cmds:
       - go run cmd/envenc/main.go ui ./internal/resources/.env.development.vault
@@ -84,6 +104,84 @@ tasks:
       - go run cmd/envenc/main.go ui ./internal/resources/.env.production.vault
       - echo "Done!"
     silent: true
+
+  # ======================================================================== #
+  # END: Environment                                                         #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Profiling                                                         #
+  # ======================================================================== #
+
+  profile:
+    cmds:
+      - echo "Running profiling..."
+      - go test -cpuprofile=cpu.out ./...
+      - go tool pprof cpu.out
+      - go tool pprof -aloc_objects -top -cup mem.profile
+      - go tool pprof -aloc_space -top -cup mem.out
+      - go test -gcflags 'm = m'
+      - echo "Done!"
+    silent: true
+
+  # ======================================================================== #
+  # END: Profiling                                                           #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Routes                                                            #
+  # ======================================================================== #
+
+  routes:
+    desc: List app routes
+    cmds:
+      - echo "Listing routes..."
+      - go run  . routes list
+      - echo "Done!"
+    silent: true
+
+  # ======================================================================== #
+  # END: Routes                                                              #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Tests                                                             #
+  # ======================================================================== #
+  
+  test:
+    desc: Run tests
+    cmds:
+      - echo "Running tests..."
+      - go test ./...
+      - echo "Done!"
+    silent: true
+
+  # ======================================================================== #
+  # END: Tests                                                               #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Swagger                                                           #
+  # ======================================================================== #
+
+  swagger-spec:
+    desc: Generate Swagger specification
+    cmds:
+      - go get -u github.com/go-swagger/go-swagger/cmd/swagger
+      - swagger generate spec -o ./swagger.json
+      
+  swagger-ui:
+    desc: Run the Swagger UI
+    cmds:
+      - docker run --rm -it -p 8081:8080 swaggerapi/swagger-ui
+  
+  # ======================================================================== #
+  # END: Swagger                                                             #
+  # ======================================================================== #
+
+  # ======================================================================== #
+  # START: Tools                                                             #
+  # ======================================================================== #
 
   errcheck-install:
     desc: Install errcheck or update to latest
@@ -162,41 +260,24 @@ tasks:
       - nilaway ./...
       - echo "Done!"
     silent: true
-    
-  profile:
+
+  noctx-install:
+    desc: Install noctx or update to latest
     cmds:
-      - echo "Running profiling..."
-      - go test -cpuprofile=cpu.out ./...
-      - go tool pprof cpu.out
-      - go tool pprof -aloc_objects -top -cup mem.profile
-      - go tool pprof -aloc_space -top -cup mem.out
-      - go test -gcflags 'm = m'
+      - echo "Installing/updating noctx..."
+      - go install github.com/sonatard/noctx/cmd/noctx@latest
       - echo "Done!"
     silent: true
 
-  routes:
-    desc: List app routes
+  noctx:
+    desc: Tests for noctx
     cmds:
-      - echo "Listing routes..."
-      - go run  . routes list
+      - echo "testing for noctx..."
+      - go vet -vettool=`which noctx` main.go
       - echo "Done!"
     silent: true
 
-  test:
-    desc: Run tests
-    cmds:
-      - echo "Running tests..."
-      - go test ./...
-      - echo "Done!"
-    silent: true
+  # ======================================================================== #
+  # END: Tools                                                               #
+  # ======================================================================== #
 
-  swagger-spec:
-    desc: Generate Swagger specification
-    cmds:
-      - go get -u github.com/go-swagger/go-swagger/cmd/swagger
-      - swagger generate spec -o ./swagger.json
-      
-  swagger-ui:
-    desc: Run the Swagger UI
-    cmds:
-      - docker run --rm -it -p 8081:8080 swaggerapi/swagger-ui

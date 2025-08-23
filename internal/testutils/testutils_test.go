@@ -2,16 +2,24 @@ package testutils
 
 import (
 	"project/internal/config"
+	"project/internal/types"
 	"testing"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 )
 
 func TestTestKeyIntegration(t *testing.T) {
 	// Test that the TestKey function from the blueprint project
 	// produces the same result as the TestKey function from the base project
-	blueprintKey := TestKey()
-	baseKey := test.TestKey(config.DbDriver, config.DbHost, config.DbPort, config.DbName, config.DbUser, config.DbPass)
+	cfg := &types.Config{}
+	cfg.SetDatabaseDriver("sqlite")
+	cfg.SetDatabaseHost("")
+	cfg.SetDatabasePort("")
+	cfg.SetDatabaseName("file::memory:?cache=shared")
+	cfg.SetDatabaseUsername("")
+	cfg.SetDatabasePassword("")
+	blueprintKey := TestKey(cfg)
+	baseKey := test.TestKey(cfg.GetDatabaseDriver(), cfg.GetDatabaseHost(), cfg.GetDatabasePort(), cfg.GetDatabaseName(), cfg.GetDatabaseUsername(), cfg.GetDatabasePassword())
 
 	if blueprintKey != baseKey {
 		t.Errorf("Blueprint TestKey and base TestKey should produce the same result")
@@ -20,27 +28,41 @@ func TestTestKeyIntegration(t *testing.T) {
 
 func TestTestConfigIntegration(t *testing.T) {
 	// Create a test configuration
-	testConfig := test.DefaultTestConfig()
+	testConfig := types.Config{}
+	testConfig.SetAppName("Test App")
+	testConfig.SetAppUrl("http://localhost:8080")
+	testConfig.SetAppEnv(config.APP_ENVIRONMENT_TESTING)
+	testConfig.SetDatabaseDriver("sqlite")
+	testConfig.SetDatabaseHost("")
+	testConfig.SetDatabasePort("")
+	testConfig.SetDatabaseName("file::memory:?cache=shared")
+	testConfig.SetDatabaseUsername("")
+	testConfig.SetDatabasePassword("")
+	testConfig.SetAppDebug(true)
+	testConfig.SetEnvEncryptionKey("123456")
+	testConfig.SetAppHost("localhost")
+	testConfig.SetAppPort("8080")
+	testConfig.SetMailDriver("smtp")
+	testConfig.SetMailHost("127.0.0.1")
+	testConfig.SetMailPort(32435)
+	testConfig.SetMailUsername("")
+	testConfig.SetMailPassword("")
+	testConfig.SetMailFromEmail("admintest@test.com")
+	testConfig.SetMailFromName("Admin Test")
+	testConfig.SetCMSTemplateID("default")
+	testConfig.SetVaultKey("abcdefghijklmnopqrstuvwxyz1234567890")
+	testConfig.SetOpenAIKey("openai_api_key")
+	testConfig.SetStripeKeyPrivate("sk_test_yoursecretkey")
+	testConfig.SetStripeKeyPublic("pk_test_yourpublickey")
+	testConfig.SetVertexProjectID("vertex_project_id")
+	testConfig.SetVertexRegionID("vertex_region_id")
+	testConfig.SetVertexModelID("vertex_model_id")
 
-	// Set up the test environment
-	test.SetupTestEnvironment(testConfig)
-
-	// Clean up after ourselves
-	defer test.CleanupTestEnvironment(testConfig)
-
-	// os.Setenv("CMS_TEMPLATE_ID", "TEST_TEMPLATE_ID")
-	// os.Setenv("STRIPE_KEY_PRIVATE", "TEST_STRIPE_KEY_PRIVATE")
-	// os.Setenv("STRIPE_KEY_PUBLIC", "TEST_STRIPE_KEY_PUBLIC")
-	// os.Setenv("VERTEX_MODEL_ID", "TEST_VERTEX_MODEL_ID")
-	// os.Setenv("VERTEX_PROJECT_ID", "TEST_VERTEX_PROJECT_ID")
 	// os.Setenv("VERTEX_REGION_ID", "TEST_VERTEX_REGION_ID")
 
-	// Initialize the application with test configuration
-	config.Initialize()
-
 	// Verify that the configuration was applied
-	if config.AppName != testConfig.AppName {
-		t.Errorf("Expected AppName to be %s, got %s", testConfig.AppName, config.AppName)
+	if "Test App" != testConfig.GetAppName() {
+		t.Errorf("Expected AppName to be %s, got %s", "Test App", testConfig.GetAppName())
 	}
 }
 

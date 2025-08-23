@@ -3,18 +3,18 @@ package layouts
 import (
 	"errors"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
+	"project/internal/types"
 
 	"github.com/gouniverse/userstore"
 )
 
-func getUserData(r *http.Request, authUser userstore.UserInterface) (firstName string, lastName string, err error) {
+func getUserData(app types.AppInterface, r *http.Request, authUser userstore.UserInterface, vaultKey string) (firstName string, lastName string, err error) {
 	if authUser == nil {
 		return "n/a", "", errors.New("user is nil")
 	}
 
-	if !config.VaultStoreUsed {
+	if !app.GetConfig().GetVaultStoreUsed() {
 		firstName = authUser.FirstName()
 		lastName = authUser.LastName()
 
@@ -25,7 +25,7 @@ func getUserData(r *http.Request, authUser userstore.UserInterface) (firstName s
 		return firstName, lastName, nil
 	}
 
-	firtsName, lastName, _, err := helpers.UserUntokenized(r.Context(), authUser)
+	firstName, lastName, _, err = helpers.UserUntokenized(r.Context(), app, vaultKey, authUser)
 
-	return firtsName, lastName, err
+	return firstName, lastName, err
 }

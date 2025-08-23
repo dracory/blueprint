@@ -2,19 +2,18 @@ package layouts
 
 import (
 	"net/http"
-	"project/internal/config"
-	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 
-	"github.com/gouniverse/cdn"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/cmsstore"
 	"github.com/gouniverse/dashboard"
 	"github.com/samber/lo"
 )
 
-func NewUserLayout(r *http.Request, options Options) *dashboard.Dashboard {
-	return userLayout(r, options)
+func NewUserLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
+	return userLayout(app, r, options)
 }
 
 // layout generates a dashboard based on the provided request and layout options.
@@ -25,12 +24,12 @@ func NewUserLayout(r *http.Request, options Options) *dashboard.Dashboard {
 //
 // Returns:
 // - a pointer to a dashboard.Dashboard object representing the generated dashboard.
-func userLayout(r *http.Request, options Options) *dashboard.Dashboard {
+func userLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
 	authUser := helpers.GetAuthUser(r)
 
 	dashboardUser := dashboard.User{}
 	if authUser != nil {
-		firstName, lastName, err := getUserData(r, authUser)
+		firstName, lastName, err := getUserData(app, r, authUser, options.VaultKey)
 		if err == nil {
 			dashboardUser = dashboard.User{
 				FirstName: firstName,
@@ -55,14 +54,13 @@ func userLayout(r *http.Request, options Options) *dashboard.Dashboard {
 
 	// Prepare styles
 	styles := []string{ // prepend any if required
-		ext.HxHideIndicatorCSS(),
 		`nav#Toolbar {border-bottom: 8px solid blue;}`,
 	}
 	styles = append(styles, options.Styles...)
 
-	homeLink := links.NewUserLinks().Home(map[string]string{})
+	homeLink := links.User().Home()
 
-	titlePostfix := ` | ` + lo.Ternary(authUser == nil, `Guest`, `User`) + ` | ` + config.AppName
+	titlePostfix := ` | ` + lo.Ternary(authUser == nil, `Guest`, `User`) + ` | ` + app.GetConfig().GetAppName()
 
 	_, isPage := r.Context().Value("page").(cmsstore.PageInterface)
 
@@ -74,7 +72,7 @@ func userLayout(r *http.Request, options Options) *dashboard.Dashboard {
 		HTTPRequest: r,
 		Content:     options.Content.ToHTML(),
 		Title:       options.Title + titlePostfix,
-		LoginURL:    links.NewAuthLinks().Login(homeLink),
+		LoginURL:    links.Auth().Login(homeLink),
 		MenuItems:   userLayoutMainMenuItems(authUser),
 		// LogoImageURL:              "/media/user/dashboard-logo.jpg",
 		NavbarBackgroundColorMode: "primary",
@@ -82,7 +80,7 @@ func userLayout(r *http.Request, options Options) *dashboard.Dashboard {
 		LogoRedirectURL:           homeLink,
 		User:                      dashboardUser,
 		UserMenu:                  userLayoutUserMenuItems(authUser),
-		ThemeHandlerUrl:           links.NewWebsiteLinks().Theme(map[string]string{"redirect": r.URL.Path}),
+		ThemeHandlerUrl:           links.Website().Theme(map[string]string{"redirect": r.URL.Path}),
 		Scripts:                   scripts,
 		ScriptURLs:                scriptURLs,
 		Styles:                    styles,

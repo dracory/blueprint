@@ -3,8 +3,8 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/layouts"
+	"project/internal/types"
 
 	"github.com/gouniverse/hb"
 	"github.com/samber/lo"
@@ -12,23 +12,25 @@ import (
 	taskAdmin "github.com/gouniverse/taskstore/admin"
 )
 
-func TaskController() *taskController {
+func NewTaskController(app types.AppInterface) *taskController {
 	return &taskController{
-		logger: config.Logger,
+		app:    app,
+		logger: app.GetLogger(),
 	}
 }
 
 type taskController struct {
-	logger slog.Logger
+	app    types.AppInterface
+	logger *slog.Logger
 }
 
 func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string {
 	uptimeAdminUi, err := taskAdmin.UI(taskAdmin.UIOptions{
 		ResponseWriter: w,
 		Request:        r,
-		Logger:         &config.Logger,
-		Store:          config.TaskStore,
-		Layout:         &adminLayout{},
+		Logger:         c.logger,
+		Store:          c.app.GetTaskStore(),
+		Layout:         &adminLayout{app: c.app},
 	})
 
 	ui := lo.IfF(err != nil, func() hb.TagInterface {
@@ -42,6 +44,7 @@ func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string 
 }
 
 type adminLayout struct {
+	app   types.AppInterface
 	title string
 	body  string
 
@@ -77,7 +80,7 @@ func (a *adminLayout) SetStyles(styles []string) {
 }
 
 func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(a.app, r, layouts.Options{
 		Title:      a.title,
 		Content:    hb.Raw(a.body),
 		ScriptURLs: a.scriptURLs,

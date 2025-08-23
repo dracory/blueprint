@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/controllers/admin/shop/shared"
 	"slices"
 	"strconv"
@@ -13,11 +12,12 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/base/req"
+	"github.com/dracory/cdn"
 	"github.com/dracory/shopstore"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/mingrammer/cfmt"
@@ -27,19 +27,21 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type productUpdateController struct{}
+type productUpdateController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductUpdateController() *productUpdateController {
-	return &productUpdateController{}
+func NewProductUpdateController(app types.AppInterface) *productUpdateController {
+	return &productUpdateController{app: app}
 }
 
 func (controller *productUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
 	}
 
 	if r.Method == http.MethodPost && data.action == "update-details" {
@@ -50,7 +52,7 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 		return controller.formMetadata(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Product | Shop",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -155,7 +157,7 @@ func (controller *productUpdateController) page(data productUpdateControllerData
 		Class("container").
 		Child(breadcrumbs).
 		Child(hb.HR()).
-		Child(shared.Header(config.ShopStore, &config.Logger, data.request)).
+		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request)).
 		Child(hb.HR()).
 		Child(heading).
 		Child(productTitle).
@@ -439,7 +441,7 @@ func (controller *productUpdateController) formMetadata(data productUpdateContro
 }
 
 func (controller *productUpdateController) saveProductDetails(r *http.Request, data productUpdateControllerData) (d productUpdateControllerData, errorMessage string) {
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "error retrieving shop store"
 	}
 
@@ -501,10 +503,10 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 	data.product.SetStatus(data.formStatus)
 	data.product.SetTitle(data.formTitle)
 
-	err := config.ShopStore.ProductUpdate(context.Background(), data.product)
+	err := controller.app.GetShopStore().ProductUpdate(context.Background(), data.product)
 
 	if err != nil {
-		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving details failed"
 		return data, ""
 	}
@@ -552,6 +554,10 @@ func ReqArrayOfMaps(r *http.Request, key string, defaultValue []map[string]strin
 		index, key := split[0], split[1]
 
 		if lo.HasKey(mapIndexMap, index) {
+			// Ensure inner map is initialized before writing at index
+			if mapIndexMap[index] == nil {
+				mapIndexMap[index] = map[string]string{}
+			}
 			mapIndexMap[index][key] = mapValue
 		} else {
 			mapIndexMap[index] = map[string]string{
@@ -571,7 +577,7 @@ func ReqArrayOfMaps(r *http.Request, key string, defaultValue []map[string]strin
 }
 
 func (controller *productUpdateController) saveProductMetadata(r *http.Request, data productUpdateControllerData) (d productUpdateControllerData, errorMessage string) {
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "error retrieving shop store"
 	}
 
@@ -601,10 +607,10 @@ func (controller *productUpdateController) saveProductMetadata(r *http.Request, 
 
 	data.product.SetMetas(data.formMetas)
 
-	err := config.ShopStore.ProductUpdate(context.Background(), data.product)
+	err := controller.app.GetShopStore().ProductUpdate(context.Background(), data.product)
 
 	if err != nil {
-		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving metas failed"
 		return data, ""
 	}
@@ -615,7 +621,7 @@ func (controller *productUpdateController) saveProductMetadata(r *http.Request, 
 }
 
 func (controller *productUpdateController) prepareDataAndValidate(r *http.Request) (data productUpdateControllerData, errorMessage string) {
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "ShopStore is nil"
 	}
 
@@ -627,10 +633,10 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 		return data, "Product ID is required"
 	}
 
-	product, err := config.ShopStore.ProductFindByID(context.Background(), data.productID)
+	product, err := controller.app.GetShopStore().ProductFindByID(context.Background(), data.productID)
 
 	if err != nil {
-		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product not found"
 	}
 
@@ -643,7 +649,7 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 	metas, err := product.Metas()
 
 	if err != nil {
-		config.Logger.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product metas not found"
 	}
 

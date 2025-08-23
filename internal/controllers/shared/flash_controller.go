@@ -2,10 +2,10 @@ package shared
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
 	"strings"
 
@@ -17,12 +17,14 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type flashController struct{}
+type flashController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewFlashController() *flashController {
-	return &flashController{}
+func NewFlashController(app types.AppInterface) *flashController {
+	return &flashController{app: app}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -31,7 +33,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 	authUser := helpers.GetAuthUser(r)
 
 	if authUser != nil && authUser.IsRegistrationCompleted() {
-		return layouts.NewUserLayout(r, layouts.Options{
+		return layouts.NewUserLayout(controller.app, r, layouts.Options{
 			Title:      "System Message",
 			Content:    controller.pageHTML(r),
 			ScriptURLs: []string{},
@@ -39,16 +41,19 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		}).ToHTML()
 	}
 
-	if config.CmsStoreUsed && config.CmsStore != nil {
-		return layouts.NewCmsLayout(layouts.Options{
-			Request:    r,
-			Title:      "System Message",
-			Content:    controller.pageHTML(r),
-			ScriptURLs: []string{},
-			Styles:     []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
-		}).ToHTML()
+	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCMSTemplateID() != "" {
+		return layouts.NewCmsLayout(
+			controller.app,
+			layouts.Options{
+				Request:    r,
+				Title:      "System Message",
+				Content:    controller.pageHTML(r),
+				ScriptURLs: []string{},
+				Styles:     []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
+			},
+		).ToHTML()
 	} else {
-		return layouts.NewUserLayout(r, layouts.Options{
+		return layouts.NewUserLayout(controller.app, r, layouts.Options{
 			Title:      "System Message",
 			Content:    controller.pageHTML(r),
 			ScriptURLs: []string{},
@@ -58,7 +63,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 
 func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
 	messageID := req.Value(r, "message_id")
-	msgData, err := config.CacheStore.GetJSON(messageID+"_flash_message", "")
+	msgData, err := c.app.GetCacheStore().GetJSON(messageID+"_flash_message", "")
 
 	msgType := "error"
 	message := "The message is no longer available"

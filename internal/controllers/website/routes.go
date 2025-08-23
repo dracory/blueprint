@@ -2,8 +2,8 @@ package website
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/links"
+	"project/internal/types"
 
 	"project/internal/controllers/shared"
 
@@ -18,11 +18,15 @@ import (
 	// paypalControllers "project/controllers/website/paypal"
 )
 
-func Routes() []rtr.RouteInterface {
+func Routes(app types.AppInterface) []rtr.RouteInterface {
+	if app == nil || app.GetConfig() == nil {
+		return []rtr.RouteInterface{}
+	}
+
 	homeRoute := rtr.NewRoute().
 		SetName("Website > Home Controller").
 		SetPath(links.HOME).
-		SetHTMLHandler(home.NewHomeController().Handler)
+		SetHTMLHandler(home.NewHomeController(app).Handler)
 
 	pageNotFoundRoute := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
@@ -41,15 +45,15 @@ func Routes() []rtr.RouteInterface {
 		SetName("Website > Contact Controller").
 		SetPath(links.CONTACT).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(contact.NewContactController().AnyIndex)
+		SetHTMLHandler(contact.NewContactController(app).AnyIndex)
 
 	contactSubmitRoute := rtr.NewRoute().
 		SetName("Website > Contact Submit Controller").
 		SetPath(links.CONTACT).
 		SetMethod(http.MethodPost).
-		SetHTMLHandler(contact.NewContactController().AnyIndex)
+		SetHTMLHandler(contact.NewContactController(app).PostSubmit)
 
-		// Serve Swagger UI using a controller
+	// Serve Swagger UI using a controller
 	swaggerUiRoute := rtr.NewRoute().
 		SetName("Swagger UI").
 		SetPath("/swagger").
@@ -88,14 +92,17 @@ func Routes() []rtr.RouteInterface {
 	websiteRoutes = append(websiteRoutes, swaggerYamlRoute)
 
 	// Comment if you do not use the blog routes
-	websiteRoutes = append(websiteRoutes, blog.Routes()...)
+	websiteRoutes = append(websiteRoutes,
+		blog.Routes(app)...)
 
 	// Comment if you do not use the payment routes
 	// websiteRoutes = append(websiteRoutes, paymentRoutes...)
-	websiteRoutes = append(websiteRoutes, seo.Routes()...)
+	websiteRoutes = append(websiteRoutes, seo.Routes(app)...)
 
-	if config.CmsStoreUsed {
-		websiteRoutes = append(websiteRoutes, cms.Routes()...)
+	isCmsUsed := app.GetConfig().GetCmsStoreUsed() && app.GetCmsStore() != nil
+
+	if isCmsUsed {
+		websiteRoutes = append(websiteRoutes, cms.Routes(app)...)
 	} else {
 		websiteRoutes = append(websiteRoutes, homeRoute)
 		websiteRoutes = append(websiteRoutes, pageNotFoundRoute)

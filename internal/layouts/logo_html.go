@@ -12,12 +12,12 @@ func LogoHTML() string {
 	left := hb.Span().
 		Style("padding: 5px;").
 		Style("color: " + secondaryColor + "; font-size: 20px;").
-		Text("BLUE")
+		Text("Market")
 
 	right := hb.Span().
 		Style("padding: 5px;").
 		Style("background: " + secondaryColor + "; color: " + primaryColor + ";").
-		Text("PRINT")
+		Text("Pinpoint")
 
 	frame := hb.Div().
 		Style("display: inline-block; justify-content: space-between; align-items: center; width: fit-content;").

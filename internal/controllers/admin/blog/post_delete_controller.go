@@ -3,9 +3,9 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/blogstore"
@@ -13,7 +13,9 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-type postDeleteController struct{}
+type postDeleteController struct {
+	app types.AppInterface
+}
 
 type postDeleteControllerData struct {
 	postID         string
@@ -21,11 +23,11 @@ type postDeleteControllerData struct {
 	successMessage string
 }
 
-func NewPostDeleteController() *postDeleteController {
-	return &postDeleteController{}
+func NewPostDeleteController(app types.AppInterface) *postDeleteController {
+	return &postDeleteController{app: app}
 }
 
-func (controller postDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (controller *postDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
@@ -132,10 +134,10 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, "post id is required"
 	}
 
-	post, err := config.BlogStore.PostFindByID(data.postID)
+	post, err := controller.app.GetBlogStore().PostFindByID(data.postID)
 
 	if err != nil {
-		config.Logger.Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Post not found"
 	}
 
@@ -149,10 +151,10 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, ""
 	}
 
-	err = config.BlogStore.PostTrash(post)
+	err = controller.app.GetBlogStore().PostTrash(post)
 
 	if err != nil {
-		config.Logger.Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting post failed. Please contact an administrator."
 	}
 

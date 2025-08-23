@@ -6,14 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"project/internal/config"
+	"project/internal/cache"
 	"project/internal/links"
 	"project/internal/resources"
+	"project/internal/types"
 	"time"
 
 	"strings"
 
-	"github.com/dracory/base/str"
+	"github.com/dracory/str"
 
 	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
@@ -26,13 +27,15 @@ import (
 
 // == CONSTRUCTOR =============================================================
 
-func NewThumbController() *thumbnailController {
-	return &thumbnailController{}
+func NewThumbController(app types.AppInterface) *thumbnailController {
+	return &thumbnailController{app: app}
 }
 
 // == CONTROLLER ==============================================================
 
-type thumbnailController struct{}
+type thumbnailController struct {
+	app types.AppInterface
+}
 
 // ThumbnailHandler
 // ================================================================
@@ -52,9 +55,9 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 
 	cacheKey := str.MD5(fmt.Sprint(data.path, data.extension, data.width, "x", data.height, data.quality))
 
-	if config.CacheFile != nil {
-		if config.CacheFile.Contains(cacheKey) {
-			thumb, err := config.CacheFile.Fetch(cacheKey)
+	if cache.File != nil {
+		if cache.File.Contains(cacheKey) {
+			thumb, err := cache.File.Fetch(cacheKey)
 
 			if err == nil {
 				controller.setHeaders(w, data.extension)
@@ -69,8 +72,8 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 		return errorMessage
 	}
 
-	if config.CacheFile != nil {
-		err := config.CacheFile.Save(cacheKey, thumb, 5*time.Minute) // cache for 5 minutes
+	if cache.File != nil {
+		err := cache.File.Save(cacheKey, thumb, 5*time.Minute) // cache for 5 minutes
 
 		if err != nil {
 			cfmt.Errorln("Error at thumbnailController > CacheFile.Save", "error", err.Error())
@@ -179,7 +182,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = controller.urlToBytes(data.path)
 
 		if err != nil {
-			config.Logger.Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
 			return "", err.Error()
 		}
 	} else {
@@ -187,7 +190,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = resources.ToBytes(data.path)
 
 		if err != nil {
-			config.Logger.Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
 			return "", err.Error()
 		}
 	}
@@ -195,7 +198,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 	imgBytesResized, err := img.Resize(imgBytes, int(data.width), int(data.height), ext)
 
 	if err != nil {
-		config.Logger.Error("Error at thumbnailController > generateThumb", "error", err.Error())
+		controller.app.GetLogger().Error("Error at thumbnailController > generateThumb", "error", err.Error())
 		return "", err.Error()
 	}
 

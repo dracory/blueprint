@@ -3,8 +3,8 @@ package widgets
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
@@ -26,8 +26,10 @@ var _ Widget = (*blogPostListWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *blogPostListWidget - A pointer to the show widget
-func NewBlogPostListWidget() *blogPostListWidget {
-	return &blogPostListWidget{}
+func NewBlogPostListWidget(app types.AppInterface) *blogPostListWidget {
+	return &blogPostListWidget{
+		app: app,
+	}
 }
 
 // == WIDGET ================================================================
@@ -39,7 +41,9 @@ func NewBlogPostListWidget() *blogPostListWidget {
 //
 // Example:
 // <x-blog-post-list>content</x-blog-post-list>
-type blogPostListWidget struct{}
+type blogPostListWidget struct {
+	app types.AppInterface
+}
 type blogPostListWidgetData struct {
 	postList  []blogstore.Post
 	page      int
@@ -173,7 +177,7 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		page = 0
 	}
 
-	perPage := 12 // 3 rows x 4 postss
+	perPage := 12 // 3 rows x 4 posts
 
 	options := blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
@@ -183,17 +187,21 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		Limit:     perPage,
 	}
 
-	postList, errList := config.BlogStore.PostList(options)
+	postList, errList := widget.app.GetBlogStore().PostList(options)
 
 	if errList != nil {
-		config.Logger.Error("Error. At blogController.page", slog.String("error", errList.Error()))
+		if widget.app.GetLogger() != nil {
+			widget.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
+		}
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := config.BlogStore.PostCount(options)
+	postCount, errCount := widget.app.GetBlogStore().PostCount(options)
 
 	if errCount != nil {
-		config.Logger.Error("Error. At blogController.page", slog.String("error", errCount.Error()))
+		if widget.app.GetLogger() != nil {
+			widget.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
+		}
 		return data, "Sorry, there was an error loading the posts count. Please try again later."
 	}
 

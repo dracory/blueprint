@@ -3,9 +3,9 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
@@ -13,7 +13,9 @@ import (
 	"github.com/gouniverse/utils"
 )
 
-type userDeleteController struct{}
+type userDeleteController struct {
+	app types.AppInterface
+}
 
 type userDeleteControllerData struct {
 	userID         string
@@ -22,8 +24,8 @@ type userDeleteControllerData struct {
 	//errorMessage   string
 }
 
-func NewUserDeleteController() *userDeleteController {
-	return &userDeleteController{}
+func NewUserDeleteController(app types.AppInterface) *userDeleteController {
+	return &userDeleteController{app: app}
 }
 
 func (controller userDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -122,8 +124,8 @@ func (controller *userDeleteController) modal(data userDeleteControllerData) hb.
 }
 
 func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) (data userDeleteControllerData, errorMessage string) {
-	if config.UserStore == nil {
-		return data, "UserStore is nil"
+	if controller.app.GetUserStore() == nil {
+		return data, "User store is not configured"
 	}
 
 	authUser := helpers.GetAuthUser(r)
@@ -137,10 +139,12 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, "user id is required"
 	}
 
-	user, err := config.UserStore.UserFindByID(r.Context(), data.userID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		config.Logger.Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		return data, "User not found"
 	}
 
@@ -154,15 +158,16 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, ""
 	}
 
-	err = config.UserStore.UserSoftDelete(r.Context(), user)
+	err = controller.app.GetUserStore().UserSoftDelete(r.Context(), user)
 
 	if err != nil {
-		config.Logger.Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		return data, "Deleting user failed. Please contact an administrator."
 	}
 
 	data.successMessage = "user deleted successfully."
 
 	return data, ""
-
 }

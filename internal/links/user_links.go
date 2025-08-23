@@ -20,6 +20,6 @@ func (l *userLinks) Home(params ...map[string]string) string {
 }
 
 func (l *userLinks) Profile(params ...map[string]string) string {
-	p := lo.IfF(len(params) > 0, func() map[string]string { return params[0] }).Else(map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(USER_PROFILE, p)
 }

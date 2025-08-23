@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
+	"github.com/dracory/cdn"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
 	"github.com/gouniverse/statsstore"
@@ -21,18 +21,20 @@ import (
 
 // == CONTROLLER ===============================================================
 
-type homeController struct{}
+type homeController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController() *homeController {
-	return &homeController{}
+func NewHomeController(app types.AppInterface) *homeController {
+	return &homeController{app: app}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Home",
 		Content: controller.view(),
 		ScriptURLs: []string{
@@ -69,7 +71,7 @@ func (c *homeController) view() *hb.Tag {
 }
 
 func (c *homeController) cardDailyVisitors() hb.TagInterface {
-	if !config.StatsStoreUsed {
+	if !c.app.GetConfig().GetStatsStoreUsed() {
 		return nil
 	}
 
@@ -138,12 +140,12 @@ func (c *homeController) cardDailyVisitors() hb.TagInterface {
 	return dailyReport
 }
 
-func (*homeController) tiles() []hb.TagInterface {
-	cmsTileOld := map[string]string{
-		"title": "Website Manager (Old)",
-		"icon":  "bi-globe",
-		"link":  links.Admin().Cms(map[string]string{}),
-	}
+func (c *homeController) tiles() []hb.TagInterface {
+	// cmsTileOld := map[string]string{
+	// 	"title": "Website Manager (Old)",
+	// 	"icon":  "bi-globe",
+	// 	"link":  links.Admin().Cms(map[string]string{}),
+	// }
 
 	cmsTileNew := map[string]string{
 		"title": "Website Manager (New)",
@@ -207,11 +209,11 @@ func (*homeController) tiles() []hb.TagInterface {
 
 	tiles := []map[string]string{}
 
-	if config.CmsUsed {
-		tiles = append(tiles, cmsTileOld)
-	}
+	// if c.app.GetConfig().GetCmsUsed() {
+	// 	tiles = append(tiles, cmsTileOld)
+	// }
 
-	if config.CmsStoreUsed {
+	if c.app.GetConfig().GetCmsStoreUsed() {
 		tiles = append(tiles, cmsTileNew)
 	}
 
@@ -283,7 +285,7 @@ func (c *homeController) datesInRange(timeStart, timeEnd *carbon.Carbon) []strin
 }
 
 func (c *homeController) visitorsData() (dates []string, visits []int64, err error) {
-	if config.StatsStore == nil {
+	if c.app.GetStatsStore() == nil {
 		return nil, nil, errors.New("statsstore is nil")
 	}
 
@@ -294,7 +296,7 @@ func (c *homeController) visitorsData() (dates []string, visits []int64, err err
 
 	ctx := context.Background()
 	for _, date := range datesInRange {
-		visitorCount, err := config.StatsStore.VisitorCount(ctx, statsstore.VisitorQueryOptions{
+		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, statsstore.VisitorQueryOptions{
 			CreatedAtGte: date + " 00:00:00",
 			CreatedAtLte: date + " 23:59:59",
 			Distinct:     statsstore.COLUMN_IP_ADDRESS,

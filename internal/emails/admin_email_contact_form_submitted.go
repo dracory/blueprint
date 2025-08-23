@@ -1,21 +1,27 @@
 package emails
 
 import (
-	"project/internal/config"
+	"project/internal/types"
 	"project/internal/links"
 
 	"github.com/gouniverse/hb"
 )
 
-func NewEmailToAdminOnNewContactFormSubmitted() *emailToAdminOnNewContactFormSubmitted {
-	return &emailToAdminOnNewContactFormSubmitted{}
+func NewEmailToAdminOnNewContactFormSubmitted(cfg types.ConfigInterface) *emailToAdminOnNewContactFormSubmitted {
+	return &emailToAdminOnNewContactFormSubmitted{cfg: cfg}
 }
 
-type emailToAdminOnNewContactFormSubmitted struct{}
+type emailToAdminOnNewContactFormSubmitted struct {
+	cfg types.ConfigInterface
+}
 
 // Send sends an email notification to the admin when a new contact form is submitted
 func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
-	emailSubject := config.AppName + ". New Contact Form Submitted"
+	appName := ""
+	if e.cfg != nil {
+		appName = e.cfg.GetAppName()
+	}
+	emailSubject := appName + ". New Contact Form Submitted"
 	emailContent := e.template()
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
@@ -25,8 +31,8 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     config.MailFromEmailAddress,
-		FromName: config.AppName,
+		From:     func() string { if e.cfg != nil { return e.cfg.GetMailFromEmail() }; return "" }(),
+		FromName: func() string { if e.cfg != nil { return e.cfg.GetMailFromName() }; return appName }(),
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -36,7 +42,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 
 func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 	urlHome := hb.Hyperlink().
-		HTML(config.AppName).
+		HTML(func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }()).
 		Href(links.NewWebsiteLinks().Home()).
 		ToHTML()
 
@@ -45,7 +51,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 		Style(STYLE_HEADING)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new contact form request submitted into ` + config.AppName + `.`).
+		HTML(`There is a new contact form request submitted into ` + func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }() + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().

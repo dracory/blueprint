@@ -3,7 +3,6 @@ package middlewares
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"slices"
 	"strings"
 	"time"
@@ -11,13 +10,14 @@ import (
 	"github.com/dracory/base/req"
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/responses"
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/samber/lo"
 )
 
 func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 	jb := new(jailBotsMiddleware)
 	jb.exclude = config.Exclude
-
+	jb.cache = ttlcache.New[string, struct{}]()
 	m := rtr.NewMiddleware().
 		SetName(jb.Name()).
 		SetHandler(jb.Handler)
@@ -31,6 +31,7 @@ type JailBotsConfig struct {
 
 type jailBotsMiddleware struct {
 	exclude []string
+	cache   *ttlcache.Cache[string, struct{}]
 }
 
 func (j *jailBotsMiddleware) Name() string {
@@ -53,7 +54,7 @@ func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 		if jailable {
 			m.jail(ip)
 
-			config.Logger.Info("Jailed bot from "+ip+" for 5 minutes",
+			slog.Default().Info("Jailed bot from "+ip+" for 5 minutes",
 				slog.String("reason", reason),
 				slog.String("uri", uri),
 				slog.String("ip", ip),
@@ -70,11 +71,17 @@ func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 }
 
 func (j *jailBotsMiddleware) isJailed(ip string) bool {
-	return config.CacheMemory.Has("jail:" + ip)
+	if j.cache == nil {
+		return false
+	}
+	return j.cache.Has("jail:" + ip)
 }
 
 func (j *jailBotsMiddleware) jail(ip string) {
-	config.CacheMemory.Set("jail:"+ip, ip, 5*time.Minute)
+	if j.cache == nil {
+		return
+	}
+	j.cache.Set("jail:"+ip, struct{}{}, 5*time.Minute)
 }
 
 func (m *jailBotsMiddleware) isJailable(uri string) (jailable bool, reason string) {

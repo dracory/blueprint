@@ -3,12 +3,12 @@ package tasks
 import (
 	"context"
 	"errors"
-	"project/internal/config"
 	"project/internal/helpers"
+	"project/internal/types"
 	"slices"
 	"strings"
 
-	"github.com/gouniverse/blindindexstore"
+	"github.com/dracory/blindindexstore"
 	"github.com/gouniverse/taskstore"
 	"github.com/gouniverse/userstore"
 )
@@ -29,6 +29,8 @@ import (
 type blindIndexRebuildTask struct {
 	taskstore.TaskHandlerBase
 
+	app types.AppInterface
+
 	// allowed indexes
 	allowedIndexes []string
 
@@ -43,8 +45,9 @@ var _ taskstore.TaskHandlerInterface = (*blindIndexRebuildTask)(nil) // verify i
 
 // == CONSTRUCTOR =============================================================
 
-func NewBlindIndexRebuildTask() *blindIndexRebuildTask {
+func NewBlindIndexRebuildTask(app types.AppInterface) *blindIndexRebuildTask {
 	return &blindIndexRebuildTask{
+		app:            app,
 		allowedIndexes: []string{"all", "email", "first_name", "last_name"},
 	}
 }
@@ -64,11 +67,11 @@ func (task *blindIndexRebuildTask) Description() string {
 }
 
 func (task *blindIndexRebuildTask) Enqueue(index string) (queuedTask taskstore.QueueInterface, err error) {
-	if config.TaskStore == nil {
+	if task.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
-	return config.TaskStore.TaskEnqueueByAlias(task.Alias(), map[string]any{
+	return task.app.GetTaskStore().TaskEnqueueByAlias(task.Alias(), map[string]any{
 		"index": index,
 	})
 }
@@ -115,14 +118,18 @@ func (task *blindIndexRebuildTask) Handle() bool {
 func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding email index:")
 
-	if config.UserStore == nil {
+	if task.app.GetUserStore() == nil {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table...")
-		err := config.BlindIndexStoreEmail.Truncate()
+		if task.app.GetBlindIndexStoreEmail() == nil {
+			task.LogError("BlindIndexStoreEmail is nil. Aborted.")
+			return false
+		}
+		err := task.app.GetBlindIndexStoreEmail().Truncate()
 
 		if err != nil {
 			task.LogError("Error truncating blind index table: " + err.Error())
@@ -131,7 +138,7 @@ func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 	}
 
 	task.LogInfo(" - Fetching users list...")
-	users, err := config.UserStore.UserList(ctx, userstore.NewUserQuery())
+	users, err := task.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
 
 	if err != nil {
 		task.LogError("Error retrieving users: " + err.Error())
@@ -153,14 +160,18 @@ func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding first name index:")
 
-	if config.UserStore == nil {
+	if task.app.GetUserStore() == nil {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table")
-		err := config.BlindIndexStoreFirstName.Truncate()
+		if task.app.GetBlindIndexStoreFirstName() == nil {
+			task.LogError("BlindIndexStoreFirstName is nil. Aborted.")
+			return false
+		}
+		err := task.app.GetBlindIndexStoreFirstName().Truncate()
 
 		if err != nil {
 			task.LogError("Error truncating blind index table: " + err.Error())
@@ -169,7 +180,7 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 	}
 
 	task.LogInfo(" - Fetching users list")
-	users, err := config.UserStore.UserList(ctx, userstore.NewUserQuery())
+	users, err := task.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
 
 	if err != nil {
 		task.LogError("Error retrieving users: " + err.Error())
@@ -191,19 +202,18 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding last name index:")
 
-	if config.UserStore == nil {
-		task.LogError("User store is nil. Aborted.")
-		return false
-	}
-
-	if config.UserStore == nil {
+	if task.app.GetUserStore() == nil {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table")
-		err := config.BlindIndexStoreLastName.Truncate()
+		if task.app.GetBlindIndexStoreLastName() == nil {
+			task.LogError("BlindIndexStoreLastName is nil. Aborted.")
+			return false
+		}
+		err := task.app.GetBlindIndexStoreLastName().Truncate()
 
 		if err != nil {
 			task.LogError("Error truncating blind index table: " + err.Error())
@@ -212,7 +222,7 @@ func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) boo
 	}
 
 	task.LogInfo(" - Fetching users list")
-	users, err := config.UserStore.UserList(ctx, userstore.NewUserQuery())
+	users, err := task.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
 
 	if err != nil {
 		task.LogError("Error retrieving users: " + err.Error())
@@ -232,7 +242,7 @@ func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) boo
 }
 
 func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user userstore.UserInterface) bool {
-	searchValue, err := config.BlindIndexStoreEmail.SearchValueFindBySourceReferenceID(user.ID())
+	searchValue, err := task.app.GetBlindIndexStoreEmail().SearchValueFindBySourceReferenceID(user.ID())
 
 	if err != nil {
 		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
@@ -246,7 +256,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 	// No need to index an empty email
 	if emailToken == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreEmail.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreEmail().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -254,7 +264,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		return true // empty email, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, map[string]string{"email": emailToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"email": emailToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + emailToken + " - " + err.Error())
@@ -265,7 +275,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 
 	if email == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreEmail.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreEmail().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -276,13 +286,13 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 	// Upsert
 	if isIndexed {
 		searchValue.SetSearchValue(email)
-		err = config.BlindIndexStoreEmail.SearchValueUpdate(searchValue)
+		err = task.app.GetBlindIndexStoreEmail().SearchValueUpdate(searchValue)
 		if err != nil {
 			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
 			return false
 		}
 	} else {
-		err = config.BlindIndexStoreEmail.SearchValueCreate(blindindexstore.NewSearchValue().
+		err = task.app.GetBlindIndexStoreEmail().SearchValueCreate(blindindexstore.NewSearchValue().
 			SetSourceReferenceID(user.ID()).
 			SetSearchValue(email))
 		if err != nil {
@@ -295,7 +305,11 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 }
 
 func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, user userstore.UserInterface) bool {
-	searchValue, err := config.BlindIndexStoreFirstName.SearchValueFindBySourceReferenceID(user.ID())
+	if task.app.GetBlindIndexStoreFirstName() == nil {
+		task.LogError("BlindIndexStoreFirstName is nil. Aborted.")
+		return false
+	}
+	searchValue, err := task.app.GetBlindIndexStoreFirstName().SearchValueFindBySourceReferenceID(user.ID())
 
 	if err != nil {
 		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
@@ -309,7 +323,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 	// No need to index an empty first name
 	if firstNameToken == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreFirstName.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreFirstName().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -317,7 +331,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return true // empty first name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, map[string]string{"first_name": firstNameToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"first_name": firstNameToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + firstNameToken + " - " + err.Error())
@@ -329,7 +343,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 	// No need to index an empty first name
 	if firstName == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreFirstName.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreFirstName().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -340,13 +354,13 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 	// Upsert the search value
 	if isIndexed {
 		searchValue.SetSearchValue(firstName)
-		err = config.BlindIndexStoreFirstName.SearchValueUpdate(searchValue)
+		err = task.app.GetBlindIndexStoreFirstName().SearchValueUpdate(searchValue)
 		if err != nil {
 			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
 			return false
 		}
 	} else {
-		err = config.BlindIndexStoreFirstName.SearchValueCreate(blindindexstore.NewSearchValue().
+		err = task.app.GetBlindIndexStoreFirstName().SearchValueCreate(blindindexstore.NewSearchValue().
 			SetSourceReferenceID(user.ID()).
 			SetSearchValue(firstName))
 		if err != nil {
@@ -359,7 +373,11 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 }
 
 func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, user userstore.UserInterface) bool {
-	searchValue, err := config.BlindIndexStoreLastName.SearchValueFindBySourceReferenceID(user.ID())
+	if task.app.GetBlindIndexStoreLastName() == nil {
+		task.LogError("BlindIndexStoreLastName is nil. Aborted.")
+		return false
+	}
+	searchValue, err := task.app.GetBlindIndexStoreLastName().SearchValueFindBySourceReferenceID(user.ID())
 
 	if err != nil {
 		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
@@ -373,7 +391,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 	// No need to index an empty last name
 	if lastNameToken == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreLastName.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreLastName().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -381,7 +399,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		return true // empty last name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, map[string]string{"last_name": lastNameToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"last_name": lastNameToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + lastNameToken + " - " + err.Error())
@@ -393,7 +411,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 	// No need to index an empty last name
 	if lastName == "" {
 		if isIndexed {
-			err = config.BlindIndexStoreLastName.SearchValueDelete(searchValue)
+			err = task.app.GetBlindIndexStoreLastName().SearchValueDelete(searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
 			}
@@ -404,13 +422,13 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 	// Upsert the search value
 	if isIndexed {
 		searchValue.SetSearchValue(lastName)
-		err = config.BlindIndexStoreLastName.SearchValueUpdate(searchValue)
+		err = task.app.GetBlindIndexStoreLastName().SearchValueUpdate(searchValue)
 		if err != nil {
 			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
 			return false
 		}
 	} else {
-		err = config.BlindIndexStoreLastName.SearchValueCreate(blindindexstore.NewSearchValue().
+		err = task.app.GetBlindIndexStoreLastName().SearchValueCreate(blindindexstore.NewSearchValue().
 			SetSourceReferenceID(user.ID()).
 			SetSearchValue(lastName))
 		if err != nil {
@@ -423,7 +441,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 }
 
 func (task *blindIndexRebuildTask) checkAndEnqueueTask() bool {
-	// 1. Is the task already enqueued?
+	// ... (rest of the code remains the same)
 	if task.HasQueuedTask() {
 		return false
 	}

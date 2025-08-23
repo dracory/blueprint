@@ -1,13 +1,11 @@
 package testimonials
 
 import (
-	"project/internal/config"
-
 	"github.com/gouniverse/entitystore"
 )
 
-func TestimonialList() ([]Testimonial, error) {
-	result, err := config.EntityStore.EntityList(entitystore.EntityQueryOptions{
+func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
+	result, err := store.EntityList(entitystore.EntityQueryOptions{
 		EntityType: "testimonial",
 	})
 

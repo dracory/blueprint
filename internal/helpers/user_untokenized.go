@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/gouniverse/userstore"
 )
 
-func UserUntokenized(ctx context.Context, authUser userstore.UserInterface) (firstName string, lastName string, email string, err error) {
-	if config.VaultStore == nil {
+func UserUntokenized(ctx context.Context, app types.AppInterface, vaultKey string, authUser userstore.UserInterface) (firstName string, lastName string, email string, err error) {
+	if app.GetVaultStore() == nil {
 		return "", "", "", errors.New("vaultstore is nil")
 	}
 
@@ -28,10 +28,10 @@ func UserUntokenized(ctx context.Context, authUser userstore.UserInterface) (fir
 		keyEmail:     emailToken,
 	}
 
-	untokenized, err := Untokenize(ctx, keyTokenMap) // use Untokenize as more resource optimized
+	untokenized, err := Untokenize(ctx, app.GetVaultStore(), vaultKey, keyTokenMap) // use Untokenize as more resource optimized
 
 	if err != nil {
-		config.Logger.Error("Error reading tokens", slog.String("error", err.Error()))
+		app.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))
 		return "", "", "", err
 	}
 

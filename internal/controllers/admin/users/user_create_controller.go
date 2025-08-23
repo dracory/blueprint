@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
@@ -15,7 +15,9 @@ import (
 	"github.com/gouniverse/userstore"
 )
 
-type userCreateController struct{}
+type userCreateController struct {
+	app types.AppInterface
+}
 
 type userCreateControllerData struct {
 	firstName      string
@@ -25,8 +27,8 @@ type userCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewUserCreateController() *userCreateController {
-	return &userCreateController{}
+func NewUserCreateController(app types.AppInterface) *userCreateController {
+	return &userCreateController{app: app}
 }
 
 func (controller userCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -136,8 +138,8 @@ func (controller *userCreateController) modal(data userCreateControllerData) hb.
 }
 
 func (controller *userCreateController) prepareDataAndValidate(r *http.Request) (data userCreateControllerData, errorMessage string) {
-	if config.UserStore == nil {
-		return data, "UserStore is not initialized"
+	if controller.app.GetUserStore() == nil {
+		return data, "User store is not configured"
 	}
 
 	authUser := helpers.GetAuthUser(r)
@@ -171,15 +173,16 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 	user.SetLastName(data.lastName)
 	user.SetEmail(data.email)
 
-	err := config.UserStore.UserCreate(context.Background(), user)
+	err := controller.app.GetUserStore().UserCreate(context.Background(), user)
 
 	if err != nil {
-		config.Logger.Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		return data, "Creating user failed. Please contact an administrator."
 	}
 
 	data.successMessage = "user created successfully."
 
 	return data, ""
-
 }

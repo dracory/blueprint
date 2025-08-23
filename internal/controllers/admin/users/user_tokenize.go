@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"project/internal/config"
 
 	"github.com/gouniverse/userstore"
+	"github.com/gouniverse/vaultstore"
 )
 
-func userTokenize(user userstore.UserInterface, firstName string, lastName string, email string) (err error) {
-	if config.VaultStore == nil {
+func userTokenize(ctx context.Context, vaultStore vaultstore.StoreInterface, logger *slog.Logger, vaultKey string, user userstore.UserInterface, firstName string, lastName string, email string) (err error) {
+	if vaultStore == nil {
 		return errors.New("vault store is nil")
 	}
 
@@ -22,26 +22,30 @@ func userTokenize(user userstore.UserInterface, firstName string, lastName strin
 	lastNameToken := user.LastName()
 	emailToken := user.Email()
 
-	ctx := context.Background()
-
-	err = config.VaultStore.TokenUpdate(ctx, firstNameToken, firstName, config.VaultKey)
+	err = vaultStore.TokenUpdate(ctx, firstNameToken, firstName, vaultKey)
 
 	if err != nil {
-		config.Logger.Error("Error updating first name", slog.String("error", err.Error()))
+		if logger != nil {
+			logger.Error("Error updating first name", slog.String("error", err.Error()))
+		}
 		return err
 	}
 
-	err = config.VaultStore.TokenUpdate(ctx, lastNameToken, lastName, config.VaultKey)
+	err = vaultStore.TokenUpdate(ctx, lastNameToken, lastName, vaultKey)
 
 	if err != nil {
-		config.Logger.Error("Error updating last name", slog.String("error", err.Error()))
+		if logger != nil {
+			logger.Error("Error updating last name", slog.String("error", err.Error()))
+		}
 		return err
 	}
 
-	err = config.VaultStore.TokenUpdate(ctx, emailToken, email, config.VaultKey)
+	err = vaultStore.TokenUpdate(ctx, emailToken, email, vaultKey)
 
 	if err != nil {
-		config.Logger.Error("Error updating email", slog.String("error", err.Error()))
+		if logger != nil {
+			logger.Error("Error updating email", slog.String("error", err.Error()))
+		}
 		return err
 	}
 

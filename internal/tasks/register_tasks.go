@@ -1,7 +1,8 @@
 package tasks
 
 import (
-	"project/internal/config"
+	taskStats "project/internal/tasks/stats"
+	"project/internal/types"
 
 	"github.com/gouniverse/taskstore"
 )
@@ -13,26 +14,26 @@ import (
 //
 // Returns:
 // - none
-func RegisterTasks() {
-	tasks := []taskstore.TaskHandlerInterface{
-		NewBlindIndexRebuildTask(),
-		NewCmsTransferTask(),
-		NewEmailToAdminTask(),
-		NewEmailToAdminOnNewContactFormSubmittedTaskHandler(),
-		NewEmailToAdminOnNewUserRegisteredTaskHandler(),
-		NewHelloWorldTask(),
-		NewStatsVisitorEnhanceTask(),
-	}
-
-	if config.TaskStore == nil {
+func RegisterTasks(app types.AppInterface) {
+	if app.GetTaskStore() == nil {
 		return
 	}
 
+	tasks := []taskstore.TaskHandlerInterface{
+		NewBlindIndexRebuildTask(app),
+		NewCleanUpTask(app),
+		NewEmailToAdminTask(app),
+		NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
+		NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
+		NewHelloWorldTask(app),
+		taskStats.NewStatsVisitorEnhanceTask(app),
+	}
+
 	for _, task := range tasks {
-		err := config.TaskStore.TaskHandlerAdd(task, true)
+		err := app.GetTaskStore().TaskHandlerAdd(task, true)
 
 		if err != nil {
-			config.Logger.Error("At registerTaskHandlers", "error", "Error registering task: "+task.Alias()+" - "+err.Error())
+			app.GetLogger().Error("At registerTaskHandlers", "error", "Error registering task: "+task.Alias()+" - "+err.Error())
 		}
 	}
 }

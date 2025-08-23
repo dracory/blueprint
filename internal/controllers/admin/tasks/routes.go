@@ -2,11 +2,12 @@ package admin
 
 import (
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 )
 
-func TaskRoutes() []rtr.RouteInterface {
+func TaskRoutes(app types.AppInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		// &router.Route{
 		// 	Name:        "Admin > Users > User Create",
@@ -36,10 +37,10 @@ func TaskRoutes() []rtr.RouteInterface {
 		rtr.NewRoute().
 			SetName("Admin > Tasks > Home").
 			SetPath(links.ADMIN_TASKS).
-			SetHTMLHandler(TaskController().Handler),
+			SetHTMLHandler(NewTaskController(app).Handler),
 		rtr.NewRoute().
 			SetName("Admin > Tasks > Catchall").
 			SetPath(links.ADMIN_TASKS + links.CATCHALL).
-			SetHTMLHandler(TaskController().Handler),
+			SetHTMLHandler(NewTaskController(app).Handler),
 	}
 }

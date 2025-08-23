@@ -5,8 +5,8 @@ import (
 	"project/internal/links"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/blockeditor"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/ui"

@@ -3,21 +3,16 @@ package testutils
 import (
 	"context"
 	"errors"
-	"project/internal/config"
 
 	"github.com/dracory/shopstore"
 )
 
-func SeedProduct(productID string, price float64) (shopstore.ProductInterface, error) {
-	if !config.ShopStoreUsed {
-		return nil, errors.New("shopstore is not used")
-	}
-
-	if config.ShopStore == nil {
+func SeedProduct(shopStore shopstore.StoreInterface, productID string, price float64) (shopstore.ProductInterface, error) {
+	if shopStore == nil {
 		return nil, errors.New("shopstore is nil")
 	}
 
-	product, err := config.ShopStore.ProductFindByID(context.Background(), productID)
+	product, err := shopStore.ProductFindByID(context.Background(), productID)
 
 	if err != nil {
 		return nil, err
@@ -34,7 +29,7 @@ func SeedProduct(productID string, price float64) (shopstore.ProductInterface, e
 	product.SetPriceFloat(price)
 	product.SetQuantityInt(10)
 
-	if err := config.ShopStore.ProductCreate(context.Background(), product); err != nil {
+	if err := shopStore.ProductCreate(context.Background(), product); err != nil {
 		return nil, err
 	}
 

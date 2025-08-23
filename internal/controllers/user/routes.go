@@ -3,6 +3,7 @@ package user
 import (
 	userAccount "project/internal/controllers/user/account"
 	userHome "project/internal/controllers/user/home"
+	"project/internal/types"
 
 	"project/internal/links"
 	"project/internal/middlewares"
@@ -10,21 +11,21 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes() []rtr.RouteInterface {
+func Routes(app types.AppInterface) []rtr.RouteInterface {
 	home := rtr.NewRoute().
 		SetName("User > Home").
 		SetPath(links.USER_HOME).
-		SetHTMLHandler(userHome.NewHomeController().Handler)
+		SetHTMLHandler(userHome.NewHomeController(app).Handler)
 
 	homeCatchAll := rtr.NewRoute().
 		SetName("User > Catch All Controller > Index Page").
 		SetPath(links.USER_HOME + links.CATCHALL).
-		SetHTMLHandler(userHome.NewHomeController().Handler)
+		SetHTMLHandler(userHome.NewHomeController(app).Handler)
 
 	profile := rtr.NewRoute().
 		SetName("User > Profile").
 		SetPath(links.USER_PROFILE).
-		SetHTMLHandler(userAccount.NewProfileController().Handler)
+		SetHTMLHandler(userAccount.NewProfileController(app).Handler)
 
 	userRoutes := []rtr.RouteInterface{
 		profile,
@@ -33,7 +34,9 @@ func Routes() []rtr.RouteInterface {
 	}
 
 	for _, route := range userRoutes {
-		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewUserMiddleware()})
+		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
+			middlewares.NewUserMiddleware(app),
+		})
 	}
 
 	return userRoutes

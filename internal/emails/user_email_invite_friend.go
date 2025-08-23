@@ -3,25 +3,29 @@ package emails
 import (
 	"context"
 	"errors"
-	"project/internal/config"
+	"project/internal/types"
 	"project/internal/links"
 
 	"github.com/gouniverse/hb"
+	"github.com/gouniverse/userstore"
 )
 
-func NewInviteFriendEmail() *inviteFriendEmail {
-	return &inviteFriendEmail{}
+func NewInviteFriendEmail(cfg types.ConfigInterface, us userstore.StoreInterface) *inviteFriendEmail {
+	return &inviteFriendEmail{cfg: cfg, userStore: us}
 }
 
-type inviteFriendEmail struct{}
+type inviteFriendEmail struct {
+	cfg       types.ConfigInterface
+	userStore userstore.StoreInterface
+}
 
 // Send sends an invitation email to a friend
 func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipientEmail string, recipientName string) error {
-	if config.UserStore == nil {
+	if e.userStore == nil {
 		return errors.New("user store not configured")
 	}
 
-	user, err := config.UserStore.UserFindByID(context.Background(), sendingUserID)
+	user, err := e.userStore.UserFindByID(context.Background(), sendingUserID)
 
 	if err != nil {
 		return err
@@ -37,7 +41,11 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 		userName = user.Email()
 	}
 
-	emailSubject := config.AppName + ". Invitation by a Friend"
+	appName := ""
+	if e.cfg != nil {
+		appName = e.cfg.GetAppName()
+	}
+	emailSubject := appName + ". Invitation by a Friend"
 	emailContent := e.template(userName, userNote, recipientName)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
@@ -45,8 +53,8 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     config.MailFromEmailAddress,
-		FromName: config.MailFromName,
+		From:     func() string { if e.cfg != nil { return e.cfg.GetMailFromEmail() }; return "" }(),
+		FromName: func() string { if e.cfg != nil { return e.cfg.GetMailFromName() }; return appName }(),
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -71,7 +79,7 @@ func (e *inviteFriendEmail) template(userName string, userNote string, recipient
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().
-		HTML(`You have been invited by a friend who thinks you will like ` + config.AppName + `.`).
+		HTML(`You have been invited by a friend who thinks you will like ` + func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }() + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p3 := hb.Paragraph().

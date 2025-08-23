@@ -2,14 +2,14 @@ package links
 
 import (
 	"net/url"
-	"project/internal/config"
+	"os"
 )
 
 // RootURL returns a URL to the current website
 func RootURL() string {
-	appURL := config.AppUrl
-	if config.IsEnvTesting() {
-		appURL = ""
+	appURL := os.Getenv("APP_URL")
+	if os.Getenv("APP_ENV") == "testing" {
+		return ""
 	}
 	return appURL
 }

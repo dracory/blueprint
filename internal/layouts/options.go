@@ -4,11 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gouniverse/hb"
+	"github.com/gouniverse/vaultstore"
 )
 
 // Options defines the options for the layout
 type Options struct {
 	Request        *http.Request
+	AppName        string
 	WebsiteSection string
 	Title          string
 	Content        hb.TagInterface
@@ -16,4 +18,6 @@ type Options struct {
 	Scripts        []string
 	StyleURLs      []string
 	Styles         []string
+	VaultStore     vaultstore.StoreInterface
+	VaultKey       string
 }

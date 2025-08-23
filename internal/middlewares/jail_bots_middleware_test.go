@@ -4,7 +4,6 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
-	"project/internal/config"
 	"testing"
 
 	"github.com/gouniverse/auth/tests"
@@ -13,8 +12,6 @@ import (
 )
 
 func TestJailBotsMiddlewareName(t *testing.T) {
-
-	config.TestsConfigureAndInitialize()
 
 	// Act
 	m := JailBotsMiddleware(JailBotsConfig{})
@@ -26,7 +23,6 @@ func TestJailBotsMiddlewareName(t *testing.T) {
 }
 
 func TestJailBotsMiddlewareAllowedResponse(t *testing.T) {
-	config.TestsConfigureAndInitialize()
 
 	allowedUris := []string{
 		"/robots.txt",
@@ -66,7 +62,6 @@ func TestJailBotsMiddlewareAllowedResponse(t *testing.T) {
 }
 
 func TestJailBotsMiddlewareJailedResponse(t *testing.T) {
-	config.TestsConfigureAndInitialize()
 
 	allowedUris := []string{
 		"/.env",
@@ -112,7 +107,6 @@ func TestJailBotsMiddlewareJailedResponse(t *testing.T) {
 }
 
 func TestJailBotsMiddlewareHandler(t *testing.T) {
-	config.TestsConfigureAndInitialize()
 
 	// Act
 	m := JailBotsMiddleware(JailBotsConfig{})
@@ -124,7 +118,6 @@ func TestJailBotsMiddlewareHandler(t *testing.T) {
 }
 
 func TestJailBotsMiddlewareIsJailable(t *testing.T) {
-	config.TestsConfigureAndInitialize()
 
 	data := []struct {
 		uri      string

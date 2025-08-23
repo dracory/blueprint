@@ -5,15 +5,16 @@ import (
 	"log"
 	"net/http"
 	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/auth"
 )
 
-func AuthMiddleware() rtr.MiddlewareInterface {
+func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Auth Middleware").
-		SetHandler(authHandler)
+		SetHandler(func(next http.Handler) http.Handler { return authHandler(app, next) })
 }
 
 // authHandler adds the user and session to the context.
@@ -31,7 +32,7 @@ func AuthMiddleware() rtr.MiddlewareInterface {
 //
 // Returns
 // - an http.Handler which represents the modified handler with the user.
-func authHandler(next http.Handler) http.Handler {
+func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionKey := authHandlerSessionKey(r)
 
@@ -40,10 +41,10 @@ func authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		session, err := config.SessionStore.SessionFindByKey(r.Context(), sessionKey)
+		session, err := app.GetSessionStore().SessionFindByKey(r.Context(), sessionKey)
 
 		if err != nil {
-			config.Logger.Error("auth_middleware", "error", err.Error())
+			app.GetLogger().Error("auth_middleware", "error", err.Error())
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -65,10 +66,10 @@ func authHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := config.UserStore.UserFindByID(r.Context(), userID)
+		user, err := app.GetUserStore().UserFindByID(r.Context(), userID)
 
 		if err != nil {
-			config.Logger.Error("auth_middleware", "error", err.Error())
+			app.GetLogger().Error("auth_middleware", "error", err.Error())
 			next.ServeHTTP(w, r)
 			return
 		}

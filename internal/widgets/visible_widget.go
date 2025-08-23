@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"project/internal/config"
 	"project/internal/helpers"
+	"project/internal/types"
 	"slices"
 
 	"github.com/samber/lo"
@@ -20,8 +21,10 @@ var _ Widget = (*visibleWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget
-func NewVisibleWidget() *visibleWidget {
-	return &visibleWidget{}
+func NewVisibleWidget(cfg types.ConfigInterface) *visibleWidget {
+	return &visibleWidget{
+		cfg: cfg,
+	}
 }
 
 // == WIDGET ================================================================
@@ -36,7 +39,9 @@ func NewVisibleWidget() *visibleWidget {
 // <x-visible environment="development" auth="yes">content</x-visible>
 // <x-visible environment="staging" auth="no">content</x-visible>
 // <x-visible environment="local" auth="yes">content</x-visible>
-type visibleWidget struct{}
+type visibleWidget struct {
+	cfg types.ConfigInterface
+}
 
 // == PUBLIC METHODS =========================================================
 
@@ -153,23 +158,23 @@ func (t *visibleWidget) isEnvironmentMatch(environment string) bool {
 		return false
 	}
 
-	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && config.IsEnvDevelopment() {
+	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && t.cfg.IsEnvDevelopment() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_LOCAL && config.IsEnvLocal() {
+	if environment == config.APP_ENVIRONMENT_LOCAL && t.cfg.IsEnvLocal() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_PRODUCTION && config.IsEnvProduction() {
+	if environment == config.APP_ENVIRONMENT_PRODUCTION && t.cfg.IsEnvProduction() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_STAGING && config.IsEnvStaging() {
+	if environment == config.APP_ENVIRONMENT_STAGING && t.cfg.IsEnvStaging() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_TESTING && config.IsEnvTesting() {
+	if environment == config.APP_ENVIRONMENT_TESTING && t.cfg.IsEnvTesting() {
 		return true
 	}
 

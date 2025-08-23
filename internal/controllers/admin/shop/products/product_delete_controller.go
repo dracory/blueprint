@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/helpers"
+	"project/internal/types"
 
 	"github.com/dracory/base/req"
 	"github.com/dracory/shopstore"
@@ -14,7 +14,9 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-type productDeleteController struct{}
+type productDeleteController struct {
+	app types.AppInterface
+}
 
 type productDeleteControllerData struct {
 	productID      string
@@ -23,8 +25,8 @@ type productDeleteControllerData struct {
 	//errorMessage   string
 }
 
-func NewProductDeleteController() *productDeleteController {
-	return &productDeleteController{}
+func NewProductDeleteController(app types.AppInterface) *productDeleteController {
+	return &productDeleteController{app: app}
 }
 
 func (controller productDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -123,7 +125,7 @@ func (controller *productDeleteController) modal(data productDeleteControllerDat
 }
 
 func (controller *productDeleteController) prepareDataAndValidate(r *http.Request) (data productDeleteControllerData, errorMessage string) {
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "ShopStore is nil"
 	}
 
@@ -138,10 +140,10 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 		return data, "product id is required"
 	}
 
-	product, err := config.ShopStore.ProductFindByID(context.Background(), data.productID)
+	product, err := controller.app.GetShopStore().ProductFindByID(context.Background(), data.productID)
 
 	if err != nil {
-		config.Logger.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Product not found"
 	}
 
@@ -155,15 +157,14 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 		return data, ""
 	}
 
-	err = config.ShopStore.ProductSoftDelete(context.Background(), product)
+	err = controller.app.GetShopStore().ProductSoftDelete(context.Background(), product)
 
 	if err != nil {
-		config.Logger.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting product failed. Please contact an administrator."
 	}
 
 	data.successMessage = "product deleted successfully."
 
 	return data, ""
-
 }

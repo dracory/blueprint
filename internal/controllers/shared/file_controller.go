@@ -2,29 +2,30 @@ package shared
 
 import (
 	"net/http"
-	"project/internal/config"
 	"strings"
 
-	"github.com/dracory/base/str"
+	"github.com/dracory/str"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
+	"github.com/gouniverse/filesystem"
 )
 
 // == CONTROLLER ==============================================================
 
 type fileController struct {
+	storage filesystem.StorageInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewFileController() *fileController {
-	return &fileController{}
+func NewFileController(storage filesystem.StorageInterface) *fileController {
+	return &fileController{storage: storage}
 }
 
 // == PUBLIC METHODS ==========================================================
 
 func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string {
-	if config.SqlFileStorage == nil {
+	if c.storage == nil {
 		return "File storage not configured"
 	}
 
@@ -33,7 +34,7 @@ func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string 
 		ElseIfF(strings.HasPrefix(r.URL.Path, "/media"), func() string { return str.RightFrom(r.URL.Path, "/media") }).
 		Else(r.URL.Path)
 
-	exists, err := config.SqlFileStorage.Exists(filePath)
+	exists, err := c.storage.Exists(filePath)
 
 	if err != nil {
 		return err.Error()
@@ -43,7 +44,7 @@ func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return "File not found"
 	}
 
-	content, err := config.SqlFileStorage.ReadFile(filePath)
+	content, err := c.storage.ReadFile(filePath)
 
 	if err != nil {
 		return err.Error()

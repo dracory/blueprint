@@ -6,17 +6,16 @@ import (
 	"os"
 	"testing"
 
-	"project/internal/config"
 	"project/internal/testutils"
 )
 
 func TestExecuteCliCommand_NilTaskStore(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test task execution with TaskStore nil
 	os.Args = []string{"main", "task", "testTask"}
-	config.TaskStore = nil // Ensure TaskStore is nil for this specific test case
-	err := ExecuteCliCommand(os.Args[1:])
+	app.SetTaskStore(nil) // Ensure TaskStore is nil for this specific test case
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	if err == nil {
 		t.Errorf("Expected error when TaskStore is nil, but got nil")
@@ -29,15 +28,15 @@ func TestExecuteCliCommand_NilTaskStore(t *testing.T) {
 }
 
 func TestExecuteCliCommand_TaskExecution(t *testing.T) {
-	testutils.Setup() // Sets up necessary config, including potentially a mock TaskStore
+	app := testutils.Setup() // Sets up necessary config, including potentially a mock TaskStore
 
 	// Test task execution with TaskStore not nil
 	os.Args = []string{"main", "task", "testTask"}
 	// Ensure TaskStore is not nil (testutils.Setup should handle this, or mock it)
-	if config.TaskStore == nil {
+	if app.GetTaskStore() == nil {
 		t.Skip("Skipping test: TaskStore is nil, cannot test task execution.") // Or setup a mock TaskStore here
 	}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 	if err != nil {
 		t.Errorf("Expected no error during task execution, got: %v", err)
 	}
@@ -45,11 +44,11 @@ func TestExecuteCliCommand_TaskExecution(t *testing.T) {
 }
 
 func TestExecuteCliCommand_JobExecution(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test job execution
 	os.Args = []string{"main", "job", "testJob"}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 	if err != nil {
 		t.Errorf("Expected no error during job execution, got: %v", err)
 	}
@@ -57,11 +56,11 @@ func TestExecuteCliCommand_JobExecution(t *testing.T) {
 }
 
 func TestExecuteCliCommand_RoutesList(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test routes list
 	os.Args = []string{"main", "routes", "list"}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 	if err != nil {
 		t.Errorf("Expected no error during routes list execution, got: %v", err)
 	}
@@ -69,12 +68,12 @@ func TestExecuteCliCommand_RoutesList(t *testing.T) {
 }
 
 func TestExecuteCliCommand_UnrecognizedCommand(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test unrecognized command
 	commandName := "unknownCommand"
 	os.Args = []string{"main", commandName}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	// Expect an error for unrecognized commands
 	if err == nil {
@@ -89,11 +88,11 @@ func TestExecuteCliCommand_UnrecognizedCommand(t *testing.T) {
 }
 
 func TestExecuteCliCommand_NoCommand(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test with no command provided
 	os.Args = []string{"main"} // Only program name
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	if err == nil {
 		t.Errorf("Expected an error when no command is provided, but got nil")
@@ -106,11 +105,11 @@ func TestExecuteCliCommand_NoCommand(t *testing.T) {
 }
 
 func TestExecuteCliCommand_TaskMissingAlias(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test task command without alias
 	os.Args = []string{"main", CommandTask}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	if err == nil {
 		t.Errorf("Expected an error when task alias is missing, but got nil")
@@ -123,11 +122,11 @@ func TestExecuteCliCommand_TaskMissingAlias(t *testing.T) {
 }
 
 func TestExecuteCliCommand_RoutesMissingSubcommand(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test routes command without subcommand
 	os.Args = []string{"main", CommandRoutes}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	if err == nil {
 		t.Errorf("Expected an error when routes subcommand is missing, but got nil")
@@ -140,11 +139,11 @@ func TestExecuteCliCommand_RoutesMissingSubcommand(t *testing.T) {
 }
 
 func TestExecuteCliCommand_RoutesInvalidSubcommand(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Test routes command with invalid subcommand
 	os.Args = []string{"main", CommandRoutes, "invalidsub"}
-	err := ExecuteCliCommand(os.Args[1:])
+	err := ExecuteCliCommand(app, os.Args[1:])
 
 	if err == nil {
 		t.Errorf("Expected an error when routes subcommand is invalid, but got nil")

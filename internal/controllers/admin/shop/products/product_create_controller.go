@@ -4,9 +4,9 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/helpers"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
@@ -15,7 +15,9 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-type productCreateController struct{}
+type productCreateController struct {
+	app types.AppInterface
+}
 
 type productCreateControllerData struct {
 	formTitle      string
@@ -23,8 +25,8 @@ type productCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewProductCreateController() *productCreateController {
-	return &productCreateController{}
+func NewProductCreateController(app types.AppInterface) *productCreateController {
+	return &productCreateController{app: app}
 }
 
 func (controller productCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -128,7 +130,7 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "Shop store is not configured. Please contact an administrator."
 	}
 
@@ -145,10 +147,10 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 	product := shopstore.NewProduct()
 	product.SetTitle(data.formTitle)
 
-	err := config.ShopStore.ProductCreate(context.Background(), product)
+	err := controller.app.GetShopStore().ProductCreate(context.Background(), product)
 
 	if err != nil {
-		config.Logger.Error("At productCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		slog.Error("At productCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating product failed. Please contact an administrator."
 	}
 

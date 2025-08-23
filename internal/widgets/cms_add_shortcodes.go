@@ -1,7 +1,7 @@
 package widgets
 
 import (
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/gouniverse/cmsstore"
 )
@@ -19,22 +19,22 @@ import (
 //
 // Returns:
 //   - None
-func CmsAddShortcodes() {
-	if !config.CmsStoreUsed {
+func CmsAddShortcodes(app types.AppInterface) {
+	if !app.GetConfig().GetCmsStoreUsed() {
 		return
 	}
 
-	if config.CmsStore == nil {
+	if app.GetCmsStore() == nil {
 		return
 	}
 
 	shortcodes := []cmsstore.ShortcodeInterface{}
 
-	list := WidgetRegistry()
+	list := WidgetRegistry(app.GetConfig())
 
 	for _, widget := range list {
 		shortcodes = append(shortcodes, widget)
 	}
 
-	config.CmsStore.AddShortcodes(shortcodes)
+	app.GetCmsStore().AddShortcodes(shortcodes)
 }

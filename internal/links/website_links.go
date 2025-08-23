@@ -34,12 +34,17 @@ func (l *websiteLinks) BlogPost(postID string, postSlug string) string {
 }
 
 func (l *websiteLinks) Chat(params ...map[string]string) string {
-	p := lo.Ternary(len(params) > 0, params[0], map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(CHAT_HOME, p)
 }
 
 func (l *websiteLinks) Contact() string {
 	return URL(CONTACT, map[string]string{})
+}
+
+func (l *websiteLinks) File(filePath string) string {
+	path := strings.TrimSuffix(FILES, CATCHALL) + "/" + filePath
+	return URL(path, map[string]string{})
 }
 
 func (l *websiteLinks) Flash(params map[string]string) string {

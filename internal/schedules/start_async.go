@@ -1,7 +1,10 @@
 package schedules
 
 import (
+	taskStats "project/internal/tasks/stats"
+	
 	"project/internal/tasks"
+	"project/internal/types"
 	"time"
 
 	"github.com/go-co-op/gocron"
@@ -9,15 +12,20 @@ import (
 )
 
 // scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task
-func scheduleStatsVisitorEnhanceTask() {
-	_, err := tasks.NewStatsVisitorEnhanceTask().Enqueue()
+func scheduleStatsVisitorEnhanceTask(app types.AppInterface) {
+	_, err := taskStats.NewStatsVisitorEnhanceTask(app).Enqueue()
 	if err != nil {
 		cfmt.Errorln(err.Error())
 	}
 }
 
+// scheduleCleanUpTask schedules the clean up task
+func scheduleCleanUpTask(app types.AppInterface) {
+	tasks.NewCleanUpTask(app).Handle()
+}
+
 // StartAsync starts the scheduler in the background without blocking the main thread
-func StartAsync() {
+func StartAsync(app types.AppInterface) {
 	scheduler := gocron.NewScheduler(time.UTC)
 
 	// Example of task scheduled every 2 minutes
@@ -48,7 +56,8 @@ func StartAsync() {
 	// }
 
 	// Schedule Building the Stats Every 2 Minutes
-	scheduler.Every(2).Minutes().Do(scheduleStatsVisitorEnhanceTask)
+	scheduler.Every(2).Minutes().Do(func() { scheduleStatsVisitorEnhanceTask(app) })
+	scheduler.Every(20).Minutes().Do(func() { scheduleCleanUpTask(app) })
 
 	scheduler.StartAsync()
 }

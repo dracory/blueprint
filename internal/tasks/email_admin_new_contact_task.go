@@ -2,8 +2,8 @@ package tasks
 
 import (
 	"errors"
-	"project/internal/config"
 	"project/internal/emails"
+	"project/internal/types"
 
 	"github.com/gouniverse/taskstore"
 )
@@ -15,13 +15,16 @@ import (
 // go run . task email-to-admin-on-new-contact-form-submitted --html=HTML
 //
 // =================================================================
-func NewEmailToAdminOnNewContactFormSubmittedTaskHandler() *emailToAdminOnNewContactFormSubmittedTaskHandler {
-	return &emailToAdminOnNewContactFormSubmittedTaskHandler{}
+func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app types.AppInterface) *emailToAdminOnNewContactFormSubmittedTaskHandler {
+	return &emailToAdminOnNewContactFormSubmittedTaskHandler{
+		app: app,
+	}
 }
 
 // emailToAdminOnNewContactFormSubmittedTaskHandler sends a notification email to admin
 type emailToAdminOnNewContactFormSubmittedTaskHandler struct {
 	taskstore.TaskHandlerBase
+	app types.AppInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewContactFormSubmittedTaskHandler)(nil) // verify it extends the task interface
@@ -35,14 +38,18 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Title() string 
 }
 
 func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Description() string {
-	return "Sends a notofication email to admin when a new contact form is submitted"
+	return "Sends a notification email to admin when a new contact form is submitted"
 }
 
 func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task taskstore.QueueInterface, err error) {
-	if config.TaskStore == nil {
+	if handler.app == nil {
+		return nil, errors.New("app is nil")
+	}
+
+	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return config.TaskStore.TaskEnqueueByAlias(handler.Alias(), map[string]any{})
+	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{})
 }
 
 func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {
@@ -60,7 +67,9 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {
 
 	handler.LogInfo("Parameters ok ...")
 
-	err := emails.NewEmailToAdminOnNewContactFormSubmitted().Send()
+	// Initialize emails package with config and send using DI
+	emails.Init(handler.app.GetConfig())
+	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.app.GetConfig()).Send()
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

@@ -7,15 +7,16 @@ import (
 
 	"project/internal/testutils"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 )
 
 func TestHomeController_Handler(t *testing.T) {
 	// Setup
-	testutils.Setup()
+	app := testutils.Setup()
+	app.GetConfig().SetAppName("TEST APP NAME")
 
 	// Execute
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewHomeController().Handler, test.NewRequestOptions{})
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewHomeController(app).Handler, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {

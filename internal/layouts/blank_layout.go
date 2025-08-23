@@ -1,9 +1,7 @@
 package layouts
 
 import (
-	"project/internal/config"
-
-	"github.com/gouniverse/cdn"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/hb"
 )
 
@@ -30,7 +28,7 @@ type blankLayout struct {
 // NewBlankLayout creates a new guest layout
 func NewBlankLayout(options Options) *blankLayout {
 	layout := &blankLayout{}
-	layout.title = options.Title + " | " + config.AppName
+	layout.title = options.Title + " | " + options.AppName
 	layout.content = options.Content
 	layout.scriptURLs = options.ScriptURLs
 	layout.scripts = options.Scripts

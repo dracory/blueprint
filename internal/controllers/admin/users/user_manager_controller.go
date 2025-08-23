@@ -5,17 +5,17 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/blindindexstore"
+	"github.com/dracory/blindindexstore"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
@@ -28,26 +28,26 @@ const ActionModalUserFilterShow = "modal_user_filter_show"
 
 // == CONTROLLER ==============================================================
 
-type userManagerController struct{}
+type userManagerController struct{ app types.AppInterface }
 
 // == CONSTRUCTOR =============================================================
 
-func NewUserManagerController() *userManagerController {
-	return &userManagerController{}
+func NewUserManagerController(app types.AppInterface) *userManagerController {
+	return &userManagerController{app: app}
 }
 
 func (controller *userManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
 	}
 
 	if data.action == ActionModalUserFilterShow {
 		return controller.onModalUserFilterShow(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Users | User Manager",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -262,10 +262,10 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 				}),
 			}),
 			hb.Tbody().Children(lo.Map(data.userList, func(user userstore.UserInterface, _ int) hb.TagInterface {
-				firstName, lastName, email, err := helpers.UserUntokenized(context.Background(), user)
+				firstName, lastName, email, err := helpers.UserUntokenized(context.Background(), controller.app, controller.app.GetConfig().GetVaultKey(), user)
 
 				if err != nil {
-					config.Logger.Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
+					controller.app.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
 					firstName = "n/a"
 					lastName = "n/a"
 					email = "n/a"
@@ -334,8 +334,6 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 				})
 			})),
 		})
-
-	// cfmt.Successln("Table: ", table)
 
 	return hb.Wrap().Children([]hb.TagInterface{
 		controller.tableFilter(data),
@@ -494,7 +492,7 @@ func (controller *userManagerController) prepareData(r *http.Request) (data user
 	userList, userCount, err := controller.fetchUserList(data)
 
 	if err != nil {
-		config.Logger.Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating user failed. Please contact an administrator."
 	}
 
@@ -506,17 +504,17 @@ func (controller *userManagerController) prepareData(r *http.Request) (data user
 }
 
 func (controller *userManagerController) fetchUserList(data userManagerControllerData) ([]userstore.UserInterface, int64, error) {
-	if config.UserStore == nil {
+	if controller.app == nil || controller.app.GetUserStore() == nil {
 		return []userstore.UserInterface{}, 0, errors.New("UserStore is not initialized")
 	}
 
 	userIDs := []string{}
 
 	if data.formFirstName != "" {
-		firstNameUserIDs, err := config.BlindIndexStoreFirstName.Search(data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		firstNameUserIDs, err := controller.app.GetBlindIndexStoreFirstName().Search(data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -528,10 +526,10 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formLastName != "" {
-		lastNameUserIDs, err := config.BlindIndexStoreLastName.Search(data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		lastNameUserIDs, err := controller.app.GetBlindIndexStoreLastName().Search(data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -543,10 +541,10 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formEmail != "" {
-		emailUserIDs, err := config.BlindIndexStoreEmail.Search(data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
+		emailUserIDs, err := controller.app.GetBlindIndexStoreEmail().Search(data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -579,17 +577,17 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 		query.SetCreatedAtLte(data.formCreatedTo + " 23:59:59")
 	}
 
-	userList, err := config.UserStore.UserList(data.request.Context(), query)
+	userList, err := controller.app.GetUserStore().UserList(data.request.Context(), query)
 
 	if err != nil {
-		config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 
-	userCount, err := config.UserStore.UserCount(data.request.Context(), query)
+	userCount, err := controller.app.GetUserStore().UserCount(data.request.Context(), query)
 
 	if err != nil {
-		config.Logger.Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 

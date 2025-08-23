@@ -2,7 +2,7 @@ package layouts
 
 import (
 	"net/http"
-	"project/internal/config"
+	"project/internal/types"
 	"project/internal/widgets"
 
 	"github.com/gouniverse/cmsstore"
@@ -10,8 +10,15 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-func NewCmsLayout(options Options) *cmsLayout {
+func NewCmsLayout(
+	app types.AppInterface,
+	options Options,
+) *cmsLayout {
 	layout := &cmsLayout{}
+	layout.app = app
+	// layout.cfg = cfg
+	// layout.cmsStore = cmsStore
+	// layout.cmsTemplateID = cmsTemplateID
 	layout.request = options.Request
 	layout.title = options.Title // + " | " + config.AppName
 	layout.content = options.Content
@@ -23,8 +30,11 @@ func NewCmsLayout(options Options) *cmsLayout {
 }
 
 type cmsLayout struct {
+	app types.AppInterface
+	// cfg           types.ConfigInterface
 	request *http.Request
-	// websiteSection string // i.e. Blog, Website
+	// cmsStore      cmsstore.StoreInterface
+	// cmsTemplateID string
 	title      string
 	content    hb.TagInterface
 	scriptURLs []string
@@ -34,7 +44,7 @@ type cmsLayout struct {
 }
 
 func (layout *cmsLayout) ToHTML() string {
-	list := widgets.WidgetRegistry()
+	list := widgets.WidgetRegistry(layout.app.GetConfig())
 
 	shortcodes := []cmsstore.ShortcodeInterface{}
 	for _, widget := range list {
@@ -42,11 +52,11 @@ func (layout *cmsLayout) ToHTML() string {
 	}
 
 	fe := frontend.New(frontend.Config{
-		Store:  config.CmsStore,
-		Logger: &config.Logger,
+		Store:  layout.app.GetCmsStore(),
+		Logger: layout.app.GetLogger(),
 	})
 
-	html, err := fe.TemplateRenderHtmlByID(layout.request, config.CmsUserTemplateID, struct {
+	html, err := fe.TemplateRenderHtmlByID(layout.request, layout.app.GetConfig().GetCMSTemplateID(), struct {
 		PageContent         string
 		PageCanonicalURL    string
 		PageMetaDescription string
@@ -65,7 +75,7 @@ func (layout *cmsLayout) ToHTML() string {
 	})
 
 	if err != nil {
-		config.Logger.Error("At WebsiteLayout", "error", err.Error())
+		layout.app.GetLogger().Error("At WebsiteLayout", "error", err.Error())
 		return "Template error. Please try again later"
 	}
 

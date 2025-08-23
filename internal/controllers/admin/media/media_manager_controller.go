@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 	"time"
 
@@ -19,9 +19,9 @@ import (
 
 	"github.com/mingrammer/cfmt"
 
+	"github.com/dracory/cdn"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/api"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/responses"
 
@@ -35,41 +35,16 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewMediaManagerController() *mediaManagerController {
-	// //        $this->user = \App\Helpers\AppHelper::getUser('admin');
-	// //        if ($this->user == null) {
-	// //            die('User authentication needed to use this service');
-	// //            exit;
-	// //        }
-
-	//         $this->disk = 'media_manager';
-	// //        $rootDir = trim(request('root_dir', ''));
-	// //        if ($rootDir == '') {
-	// //            die('Root directory is required');
-	// //        }
-	// //        $this->filesRootDir = public_path('media'); //public_path() . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR;
-	// //        $this->filesRootUrl = url('/') . '/media/';
-	// //        $rootDir = trim(request('root_dir', ''));
-	// //        if ($rootDir == '') {
-	// //            die('Root directory is required');
-	// //        }
-	// //        $rootDir = trim($rootDir, '/');
-	// //        $rootDir = trim($rootDir, '.');
-	// //        $this->fileManagerRootDir = $this->filesRootDir . $rootDir . DIRECTORY_SEPARATOR;
-	// //        $this->fileManagerRootUrl = $this->filesRootUrl . $rootDir . '/';
-	// //
-	// //        $dirExists = \Storage::disk($this->disk)->exists($this->fileManagerRootDir);
-	// //
-	// //        if($dirExists==false){
-	// //            $result = \Storage::disk($this->disk)->makeDirectory($this->fileManagerRootDir);
-	// //        }
-	rootDirPath := strings.TrimSpace(config.MediaRoot)
+func NewMediaManagerController(app types.AppInterface) *mediaManagerController {
+	cfg := app.GetConfig()
+	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
 	rootDirPath = "/" + rootDirPath
 
 	return &mediaManagerController{
 		rootDirPath: rootDirPath,
+		app:         app,
 	}
 }
 
@@ -87,6 +62,7 @@ type FileEntry struct {
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
+	app         types.AppInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }
@@ -97,11 +73,11 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	controller.storage, err = filesystem.NewStorage(filesystem.Disk{
 		DiskName:             "S3",
 		Driver:               filesystem.DRIVER_S3,
-		Url:                  config.MediaUrl,
-		Region:               config.MediaRegion,
-		Key:                  config.MediaKey,
-		Secret:               config.MediaSecret,
-		Bucket:               config.MediaBucket,
+		Url:                  controller.app.GetConfig().GetMediaUrl(),
+		Region:               controller.app.GetConfig().GetMediaRegion(),
+		Key:                  controller.app.GetConfig().GetMediaKey(),
+		Secret:               controller.app.GetConfig().GetMediaSecret(),
+		Bucket:               controller.app.GetConfig().GetMediaBucket(),
 		UsePathStyleEndpoint: true,
 	})
 
@@ -111,7 +87,7 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	}
 
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(r, layouts.Options{
+		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 			Title:   "Media Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()

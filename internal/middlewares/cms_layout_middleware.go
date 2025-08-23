@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/layouts"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/cmsstore"
@@ -23,7 +24,7 @@ import (
 //
 // It uses the "page" context value to transfer the page data (i.e. title,
 // meta keywords, description) from the CMS frontend to the layout.
-func NewCmsLayoutMiddleware() rtr.MiddlewareInterface {
+func NewCmsLayoutMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("CmsLayoutMiddleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -44,7 +45,7 @@ func NewCmsLayoutMiddleware() rtr.MiddlewareInterface {
 				next.ServeHTTP(rec, r)
 				finalContent := rec.Body.String()
 
-				fullPage := layouts.NewUserLayout(r, layouts.Options{
+				fullPage := layouts.NewUserLayout(app, r, layouts.Options{
 					Title:      title,
 					Content:    hb.Raw(finalContent),
 					ScriptURLs: []string{},
@@ -52,7 +53,6 @@ func NewCmsLayoutMiddleware() rtr.MiddlewareInterface {
 				}).ToHTML()
 
 				w.Write([]byte(fullPage))
-				return
 			})
 		})
 }

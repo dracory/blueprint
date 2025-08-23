@@ -3,6 +3,7 @@ package admin
 import (
 	"net/http"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/dracory/base/req"
 	"github.com/dracory/rtr"
@@ -12,35 +13,35 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 )
 
-func ShopRoutes() []rtr.RouteInterface {
+func ShopRoutes(app types.AppInterface) []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.Value(r, "controller")
 
 		if controller == shared.CONTROLLER_DISCOUNTS {
-			return shopDiscounts.NewDiscountController().AnyIndex(w, r)
+			return shopDiscounts.NewDiscountController(app).AnyIndex(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_CREATE {
-			return shopProducts.NewProductCreateController().Handler(w, r)
+			return shopProducts.NewProductCreateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_DELETE {
-			return shopProducts.NewProductDeleteController().Handler(w, r)
+			return shopProducts.NewProductDeleteController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCTS {
-			return shopProducts.NewProductManagerController().Handler(w, r)
+			return shopProducts.NewProductManagerController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_UPDATE {
-			return shopProducts.NewProductUpdateController().Handler(w, r)
+			return shopProducts.NewProductUpdateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_ORDERS {
 			return NewOrderManagerController().Handler(w, r)
 		}
 
-		return NewHomeController().Handler(w, r)
+		return NewHomeController(app).Handler(w, r)
 	}
 
 	shopOrders := rtr.NewRoute().

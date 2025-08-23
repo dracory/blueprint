@@ -2,17 +2,14 @@ package main
 
 import (
 	"os"
-	"project/internal/config"
-	"project/internal/testutils"
 	"testing"
+
+	"project/internal/testutils"
 )
 
 func TestCloseResources(t *testing.T) {
-	closeResources()
-	// Assuming config.Database is a global variable that should be nil after closing
-	if config.Database != nil {
-		t.Errorf("Database should be closed and set to nil")
-	}
+	// Should not panic when db handle is nil
+	closeResourcesDB(nil)
 }
 
 func TestIsCliMode(t *testing.T) {
@@ -28,27 +25,25 @@ func TestIsCliMode(t *testing.T) {
 }
 
 func TestStartBackgroundProcesses(t *testing.T) {
-	testutils.Setup()
-	startBackgroundProcesses()
-	// Assuming we can verify background processes by checking if certain goroutines are running
-	// This is a placeholder assertion; actual verification would depend on the implementation
-	// Assuming we can verify background processes by checking if certain goroutines are running
-	// This is a placeholder assertion; actual verification would depend on the implementation
-	if false {
-		t.Errorf("Background processes should be started")
-	}
+	// Initialize minimal stores for background processes
+	userStore, sessionStore, cacheStore, cleanup := testutils.SetupTestAuth(t)
+	defer cleanup()
 
-	// Verify that the background processes started correctly
-	if config.TaskStore == nil {
-		t.Errorf("Task store should not be nil after starting background processes")
-	}
-	if config.CacheStore == nil {
+	// Build application via testutils to ensure cfg, DB, and stores are initialized
+	application := testutils.Setup()
+
+	// Inject required stores
+	application.SetUserStore(userStore)
+	application.SetSessionStore(sessionStore)
+	application.SetCacheStore(cacheStore)
+
+	// Should not panic
+	startBackgroundProcesses(application)
+
+	if application.GetCacheStore() == nil {
 		t.Errorf("Cache store should not be nil after starting background processes")
 	}
-	if config.SessionStore == nil {
+	if application.GetSessionStore() == nil {
 		t.Errorf("Session store should not be nil after starting background processes")
-	}
-	if config.ShopStore == nil {
-		t.Errorf("Shop store should not be nil after starting background processes")
 	}
 }

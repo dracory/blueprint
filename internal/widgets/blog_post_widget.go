@@ -3,14 +3,12 @@ package widgets
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
-
-	// "project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/str"
+	"github.com/dracory/str"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
@@ -28,8 +26,10 @@ var _ Widget = (*blogPostWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *blogPostWidget - A pointer to the show widget
-func NewBlogPostWidget() *blogPostWidget {
-	return &blogPostWidget{}
+func NewBlogPostWidget(app types.AppInterface) *blogPostWidget {
+	return &blogPostWidget{
+		app: app,
+	}
 }
 
 // == WIDGET ================================================================
@@ -41,7 +41,9 @@ func NewBlogPostWidget() *blogPostWidget {
 //
 // Example:
 // <x-blog-post>content</x-blog-post>
-type blogPostWidget struct{}
+type blogPostWidget struct {
+	app types.AppInterface
+}
 
 // == PUBLIC METHODS =========================================================
 
@@ -61,8 +63,10 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 
 	uriParts := strings.Split(r.RequestURI, "/")
 	if len(uriParts) < 5 {
-		config.Logger.Error("At blogPostWidget: URI mismatch", slog.String("uri", r.RequestURI))
-		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Error("At blogPostWidget: URI mismatch", slog.String("uri", r.RequestURI))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
@@ -72,35 +76,45 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 	cfmt.Infoln("BlogPost: ", postID, postSlug)
 
 	if postID == "" {
-		config.Logger.Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
-		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
-	post, errPost := config.BlogStore.PostFindByID(postID)
+	post, errPost := w.app.GetBlogStore().PostFindByID(postID)
 
 	if errPost != nil {
-		config.Logger.Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
-		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if post == nil {
-		config.Logger.Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
-		url := helpers.ToFlashWarningURL("The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if post.IsUnpublished() {
-		config.Logger.Warn("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
-		url := helpers.ToFlashWarningURL("The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Warn("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
 	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
 		blogPostURL := links.Website().BlogPost(post.ID(), post.Title())
-		config.Logger.Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
-		url := helpers.ToFlashWarningURL("The post location has changed. Redirecting to the new address...", blogPostURL, 5)
+		if w.app.GetLogger() != nil {
+			w.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
+		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post location has changed. Redirecting to the new address...", blogPostURL, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 

@@ -3,14 +3,14 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/base/req"
-	"github.com/gouniverse/cdn"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/userstore"
@@ -18,26 +18,28 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type userUpdateController struct{}
+type userUpdateController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewUserUpdateController() *userUpdateController {
-	return &userUpdateController{}
+func NewUserUpdateController(app types.AppInterface) *userUpdateController {
+	return &userUpdateController{app: app}
 }
 
 func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().UsersUserManager(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().UsersUserManager(map[string]string{}), 10)
 	}
 
 	if r.Method == http.MethodPost {
 		return controller.form(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit User | Blog",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -229,7 +231,7 @@ func (controller userUpdateController) form(data userUpdateControllerData) hb.Ta
 }
 
 func (controller userUpdateController) saveUser(r *http.Request, data userUpdateControllerData) (d userUpdateControllerData, errorMessage string) {
-	if config.UserStore == nil {
+	if controller.app.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -267,29 +269,40 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 	data.user.SetMemo(data.formMemo)
 	data.user.SetStatus(data.formStatus)
 
-	err := config.UserStore.UserUpdate(r.Context(), data.user)
+	err := controller.app.GetUserStore().UserUpdate(r.Context(), data.user)
 
 	if err != nil {
-		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		data.formErrorMessage = "System error. Saving user failed"
 		return data, ""
 	}
 
-	err = userTokenize(data.user, data.formFirstName, data.formLastName, data.formEmail)
+	err = userTokenize(
+		r.Context(),
+		controller.app.GetVaultStore(),
+		controller.app.GetLogger(),
+		controller.app.GetConfig().GetVaultKey(),
+		data.user,
+		data.formFirstName,
+		data.formLastName,
+		data.formEmail,
+	)
 
 	if err != nil {
-		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		data.formErrorMessage = "System error. Saving user failed"
 		return data, ""
 	}
-
-	data.formSuccessMessage = "User saved successfully"
 
 	return data, ""
 }
 
 func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (data userUpdateControllerData, errorMessage string) {
-	if config.UserStore == nil {
+	if controller.app.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -300,10 +313,12 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 		return data, "User ID is required"
 	}
 
-	user, err := config.UserStore.UserFindByID(r.Context(), data.userID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		config.Logger.Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		}
 		return data, "User not found"
 	}
 
@@ -313,10 +328,12 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 
 	data.user = user
 
-	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), data.user)
+	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultKey(), data.user)
 
 	if err != nil {
-		config.Logger.Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
+		}
 		return data, "Tokens failed to be read"
 	}
 

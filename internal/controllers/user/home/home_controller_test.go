@@ -8,13 +8,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 )
 
 func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController().Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -29,7 +29,7 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)

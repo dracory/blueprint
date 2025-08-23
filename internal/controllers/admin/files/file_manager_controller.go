@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"project/internal/config"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 	"time"
 
@@ -19,9 +19,9 @@ import (
 
 	"github.com/mingrammer/cfmt"
 
+	"github.com/dracory/cdn"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/api"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/responses"
 
@@ -35,41 +35,17 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewFileManagerController() *FileManagerController {
-	// //        $this->user = \App\Helpers\AppHelper::getUser('admin');
-	// //        if ($this->user == null) {
-	// //            die('User authentication needed to use this service');
-	// //            exit;
-	// //        }
-
-	//         $this->disk = 'media_manager';
-	// //        $rootDir = trim(request('root_dir', ''));
-	// //        if ($rootDir == '') {
-	// //            die('Root directory is required');
-	// //        }
-	// //        $this->filesRootDir = public_path('media'); //public_path() . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR;
-	// //        $this->filesRootUrl = url('/') . '/media/';
-	// //        $rootDir = trim(request('root_dir', ''));
-	// //        if ($rootDir == '') {
-	// //            die('Root directory is required');
-	// //        }
-	// //        $rootDir = trim($rootDir, '/');
-	// //        $rootDir = trim($rootDir, '.');
-	// //        $this->fileManagerRootDir = $this->filesRootDir . $rootDir . DIRECTORY_SEPARATOR;
-	// //        $this->fileManagerRootUrl = $this->filesRootUrl . $rootDir . '/';
-	// //
-	// //        $dirExists = \Storage::disk($this->disk)->exists($this->fileManagerRootDir);
-	// //
-	// //        if($dirExists==false){
-	// //            $result = \Storage::disk($this->disk)->makeDirectory($this->fileManagerRootDir);
-	// //        }
-	rootDirPath := strings.TrimSpace(config.MediaRoot)
+func NewFileManagerController(app types.AppInterface) *FileManagerController {
+	cfg := app.GetConfig()
+	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
 	rootDirPath = "/" + rootDirPath
 
 	return &FileManagerController{
+		app:         app,
 		rootDirPath: rootDirPath,
+		storage:     app.GetSqlFileStorage(),
 	}
 }
 
@@ -86,12 +62,13 @@ type FileEntry struct {
 
 type FileManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
+	app         types.AppInterface
 	rootDirPath string
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }
 
-// init initializes the controller by setting the storage and the layout function
+// init initializes the controller by setting the layout function
 //
 // Parameters:
 //   - r *http.Request - the current request
@@ -99,10 +76,8 @@ type FileManagerController struct {
 // Return:
 //   - string - an empty string, used for chaining
 func (controller *FileManagerController) init(r *http.Request) string {
-	controller.storage = config.SqlFileStorage
-
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(r, layouts.Options{
+		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 			Title:   "File Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()

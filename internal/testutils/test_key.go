@@ -1,15 +1,22 @@
 package testutils
 
 import (
-	"project/internal/config"
+	"project/internal/types"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 )
 
 // TestKey is a pseudo secret test key used for testing specific unit cases
 //
 //	where a secret key is required but not available in the testing environment
-func TestKey() string {
+func TestKey(cfg types.ConfigInterface) string {
 	// Use the base testutils package's TestKey function
-	return test.TestKey(config.DbDriver, config.DbHost, config.DbPort, config.DbName, config.DbUser, config.DbPass)
+	return test.TestKey(
+		cfg.GetDatabaseDriver(),
+		cfg.GetDatabaseHost(),
+		cfg.GetDatabasePort(),
+		cfg.GetDatabaseName(),
+		cfg.GetDatabaseUsername(),
+		cfg.GetDatabasePassword(),
+	)
 }

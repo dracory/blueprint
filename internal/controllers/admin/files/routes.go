@@ -2,15 +2,16 @@ package admin
 
 import (
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes() []rtr.RouteInterface {
+func Routes(app types.AppInterface) []rtr.RouteInterface {
 	fileManager := rtr.NewRoute().
 		SetName("Admin > File Manager").
 		SetPath(links.ADMIN_FILE_MANAGER).
-		SetHTMLHandler(NewFileManagerController().Handler)
+		SetHTMLHandler(NewFileManagerController(app).Handler)
 
 	return []rtr.RouteInterface{
 		fileManager,

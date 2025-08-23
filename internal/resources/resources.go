@@ -18,13 +18,13 @@ func ToBytes(path string) ([]byte, error) {
 }
 
 func ToString(path string) (string, error) {
-	bytes, err := ToBytes(path)
+	b, err := ToBytes(path)
 
 	if err != nil {
 		return "", err
 	}
 
-	return string(bytes), nil
+	return string(b), nil
 }
 
 func ResourceExists(path string) bool {

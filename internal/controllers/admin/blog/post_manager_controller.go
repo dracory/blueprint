@@ -3,18 +3,18 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/cdn"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
@@ -23,22 +23,24 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type managerController struct{}
+type managerController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewManagerController() *managerController {
-	return &managerController{}
+func NewManagerController(app types.AppInterface) *managerController {
+	return &managerController{app: app}
 }
 
 func (controller *managerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Blog | Post Manager",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -109,23 +111,23 @@ func (controller *managerController) prepareData(r *http.Request) (data managerC
 		OrderBy:              data.sortBy,
 	}
 
-	data.blogList, err = config.BlogStore.
+	data.blogList, err = controller.app.GetBlogStore().
 		// EnableDebug(true).
 		PostList(query)
 
 	if err != nil {
-		config.Logger.Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving posts"
 	}
 
 	// DEBUG: cfmt.Successln("Invoice List: ", blogList)
 
-	data.blogCount, err = config.BlogStore.
+	data.blogCount, err = controller.app.GetBlogStore().
 		// EnableDebug().
 		PostCount(query)
 
 	if err != nil {
-		config.Logger.Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "Error retrieving posts count"
 	}
 

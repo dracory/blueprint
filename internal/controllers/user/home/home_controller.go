@@ -3,10 +3,10 @@ package user
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/gouniverse/userstore"
@@ -16,12 +16,14 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type homeController struct{}
+type homeController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewHomeController() *homeController {
-	return &homeController{}
+func NewHomeController(app types.AppInterface) *homeController {
+	return &homeController{app: app}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -30,10 +32,10 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.User().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.User().Home(map[string]string{}), 10)
 	}
 
-	return layouts.NewUserLayout(r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, layouts.Options{
 		Request:    r,
 		Title:      "Home | Client",
 		Content:    controller.view(data),
@@ -41,6 +43,8 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 		ScriptURLs: []string{},
 		Scripts:    []string{},
 		Styles:     []string{},
+		VaultStore: controller.app.GetVaultStore(),
+		VaultKey:   controller.app.GetConfig().GetVaultKey(),
 	}).ToHTML()
 }
 
@@ -66,11 +70,11 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 	userLastName := authUser.LastName()
 	userEmail := authUser.Email()
 
-	if config.VaultStoreUsed {
-		userFirstName, userLastName, userEmail, err = helpers.UserUntokenized(r.Context(), authUser)
+	if controller.app.GetConfig().GetVaultStoreUsed() {
+		userFirstName, userLastName, userEmail, err = helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultKey(), authUser)
 
 		if err != nil {
-			config.Logger.Error("Error: user > home > prepareData", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))
 			return data, "User data failed to be fetched"
 		}
 	}

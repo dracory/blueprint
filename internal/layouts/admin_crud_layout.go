@@ -3,26 +3,28 @@ package layouts
 import (
 	"net/http"
 	"project/internal/links"
+	"project/internal/types"
 
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/hb"
 )
 
-func NewAdminCrudLayout(w http.ResponseWriter, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
-	return adminCrudLayout(w, r, title, content, styleURLs, style, jsURLs, js)
+func NewAdminCrudLayout(app types.AppInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
+	return adminCrudLayout(app, r, title, content, styleURLs, style, jsURLs, js)
 }
 
-func adminCrudLayout(_ http.ResponseWriter, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
+func adminCrudLayout(app types.AppInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
 	jsURLs = append([]string{
-		"https://code.jquery.com/jquery-3.6.4.min.js",
-		"//code.jquery.com/ui/1.11.4/jquery-ui.js",
+		cdn.Jquery_3_7_1(),
+		cdn.JqueryUiJs_1_13_1(),
 		links.URL("/resources/blockarea_v0200.js", map[string]string{}),
 	}, jsURLs...)
 	styleURLs = append([]string{
 		// "https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css",
-		"//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css",
+		cdn.JqueryUiCss_1_13_1(),
 	}, styleURLs...)
 	// cfmt.Infoln(styleURLs)
-	dashboard := NewAdminLayout(r, Options{
+	dashboard := NewAdminLayout(app, r, Options{
 		Title:      title,
 		Content:    hb.Raw(content),
 		Scripts:    []string{js},

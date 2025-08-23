@@ -2,17 +2,17 @@ package layouts
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 
-	"github.com/gouniverse/cdn"
+	"github.com/dracory/cdn"
 	"github.com/gouniverse/dashboard"
 	"github.com/samber/lo"
 )
 
-func NewAdminLayout(r *http.Request, options Options) *dashboard.Dashboard {
-	return adminLayout(r, options)
+func NewAdminLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
+	return adminLayout(app, r, options)
 }
 
 // layout generates a dashboard based on the provided request and layout options.
@@ -23,12 +23,12 @@ func NewAdminLayout(r *http.Request, options Options) *dashboard.Dashboard {
 //
 // Returns:
 // - a pointer to a dashboard.Dashboard object representing the generated dashboard.
-func adminLayout(r *http.Request, options Options) *dashboard.Dashboard {
+func adminLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
 	authUser := helpers.GetAuthUser(r)
 
 	dashboardUser := dashboard.User{}
 	if authUser != nil {
-		firstName, lastName, err := getUserData(r, authUser)
+		firstName, lastName, err := getUserData(app, r, authUser, options.VaultKey)
 		if err == nil {
 			dashboardUser = dashboard.User{
 				FirstName: firstName,
@@ -64,7 +64,7 @@ func adminLayout(r *http.Request, options Options) *dashboard.Dashboard {
 	dashboard := dashboard.NewDashboard(dashboard.Config{
 		HTTPRequest:     r,
 		Content:         options.Content.ToHTML(),
-		Title:           options.Title + " | Admin | " + config.AppName,
+		Title:           options.Title + " | Admin | " + options.AppName,
 		LoginURL:        links.NewAuthLinks().Login(homeLink),
 		MenuItems:       adminLayoutMainMenu(authUser),
 		LogoImageURL:    "/media/user/dashboard-logo.jpg",

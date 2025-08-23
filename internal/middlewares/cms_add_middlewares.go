@@ -2,18 +2,18 @@ package middlewares
 
 import (
 	"net/http"
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/gouniverse/cmsstore"
 	"github.com/mingrammer/cfmt"
 )
 
-func CmsAddMiddlewares() {
-	if !config.CmsStoreUsed {
+func CmsAddMiddlewares(app types.AppInterface) {
+	if !app.GetConfig().GetCmsStoreUsed() {
 		return
 	}
 
-	if config.CmsStore == nil {
+	if app.GetCmsStore() == nil {
 		return
 	}
 
@@ -31,8 +31,8 @@ func CmsAddMiddlewares() {
 		SetIdentifier("CmsLayoutMiddleware").
 		SetName("Cms Layout Middleware").
 		SetType(cmsstore.MIDDLEWARE_TYPE_AFTER).
-		SetHandler(NewCmsLayoutMiddleware().GetHandler())
+		SetHandler(NewCmsLayoutMiddleware(app).GetHandler())
 
-	config.CmsStore.AddMiddleware(helloMiddleware)
-	config.CmsStore.AddMiddleware(afterMiddleware)
+	app.GetCmsStore().AddMiddleware(helloMiddleware)
+	app.GetCmsStore().AddMiddleware(afterMiddleware)
 }

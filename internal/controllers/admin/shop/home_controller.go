@@ -2,10 +2,10 @@ package admin
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/gouniverse/bs"
 	"github.com/gouniverse/hb"
@@ -13,20 +13,22 @@ import (
 	"github.com/samber/lo"
 )
 
-// == CONTROLLER ===============================================================
+// == CONTROLLER ==============================================================
 
-type homeController struct{}
+type homeController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController() *homeController {
-	return &homeController{}
+func NewHomeController(app types.AppInterface) *homeController {
+	return &homeController{app: app}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:      "Shop",
 		Content:    controller.view(r),
 		ScriptURLs: []string{},
@@ -62,13 +64,13 @@ func (controller *homeController) view(r *http.Request) *hb.Tag {
 	return hb.Wrap().
 		Child(breadcrumbs).
 		Child(hb.HR()).
-		Child(shared.Header(config.ShopStore, &config.Logger, r)).
+		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), r)).
 		Child(hb.HR()).
 		Child(header).
 		Child(sectionTiles)
 }
 
-func (*homeController) tiles() []hb.TagInterface {
+func (controller *homeController) tiles() []hb.TagInterface {
 	tiles := []map[string]string{
 		{
 			"title": "Order Manager",

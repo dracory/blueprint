@@ -3,9 +3,9 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
@@ -14,18 +14,20 @@ import (
 	"github.com/gouniverse/hb"
 )
 
-type postCreateController struct{}
+type postCreateController struct {
+	app types.AppInterface
+}
 
 type postCreateControllerData struct {
 	title          string
 	successMessage string
 }
 
-func NewPostCreateController() *postCreateController {
-	return &postCreateController{}
+func NewPostCreateController(app types.AppInterface) *postCreateController {
+	return &postCreateController{app: app}
 }
 
-func (controller postCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (controller *postCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
@@ -139,10 +141,10 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 	post := blogstore.NewPost()
 	post.SetTitle(data.title)
 
-	err := config.BlogStore.PostCreate(post)
+	err := controller.app.GetBlogStore().PostCreate(post)
 
 	if err != nil {
-		config.Logger.Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating post failed. Please contact an administrator."
 	}
 

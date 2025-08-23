@@ -3,19 +3,19 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"project/pkg/blogblocks"
 	"strings"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/cdn"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/blockeditor"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
@@ -27,17 +27,19 @@ const VIEW_CONTENT = "content"
 const VIEW_SEO = "seo"
 const ACTION_BLOCKEDITOR_HANDLE = "blockeditor_handle"
 
-type postUpdateController struct{}
-
-func NewPostUpdateController() *postUpdateController {
-	return &postUpdateController{}
+type postUpdateController struct {
+	app types.AppInterface
 }
 
-func (controller postUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
+func NewPostUpdateController(app types.AppInterface) *postUpdateController {
+	return &postUpdateController{app: app}
+}
+
+func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().BlogPostManager(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().BlogPostManager(map[string]string{}), 10)
 	}
 
 	if data.action == ACTION_BLOCKEDITOR_HANDLE {
@@ -48,7 +50,7 @@ func (controller postUpdateController) Handler(w http.ResponseWriter, r *http.Re
 		return controller.form(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Post | Blog",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -68,12 +70,12 @@ func (controller postUpdateController) Handler(w http.ResponseWriter, r *http.Re
 	}).ToHTML()
 }
 
-func (controller postUpdateController) script() string {
+func (controller *postUpdateController) script() string {
 	js := ``
 	return js
 }
 
-func (controller postUpdateController) page(data postUpdateControllerData) hb.TagInterface {
+func (controller *postUpdateController) page(data postUpdateControllerData) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
@@ -167,7 +169,7 @@ func (controller postUpdateController) page(data postUpdateControllerData) hb.Ta
 		Child(card)
 }
 
-func (controller postUpdateController) form(data postUpdateControllerData) hb.TagInterface {
+func (controller *postUpdateController) form(data postUpdateControllerData) hb.TagInterface {
 	fieldsDetails := []form.FieldInterface{
 		form.NewField(form.FieldOptions{
 			Label: "Status",
@@ -637,7 +639,7 @@ setTimeout(() => {
 	// return form
 }
 
-func (controller postUpdateController) savePost(r *http.Request, data postUpdateControllerData) (d postUpdateControllerData, errorMessage string) {
+func (controller *postUpdateController) savePost(r *http.Request, data postUpdateControllerData) (d postUpdateControllerData, errorMessage string) {
 	data.formCanonicalURL = req.Value(r, "post_canonical_url")
 	data.formContent = req.Value(r, "post_content")
 	data.formEditor = req.Value(r, "post_editor")
@@ -691,10 +693,10 @@ func (controller postUpdateController) savePost(r *http.Request, data postUpdate
 		data.post.SetMetaRobots(data.formMetaRobots)
 	}
 
-	err := config.BlogStore.PostUpdate(data.post)
+	err := controller.app.GetBlogStore().PostUpdate(data.post)
 
 	if err != nil {
-		config.Logger.Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		data.formErrorMessage = "System error. Saving post failed"
 		return data, ""
 	}
@@ -704,7 +706,7 @@ func (controller postUpdateController) savePost(r *http.Request, data postUpdate
 	return data, ""
 }
 
-func (controller postUpdateController) prepareDataAndValidate(r *http.Request) (data postUpdateControllerData, errorMessage string) {
+func (controller *postUpdateController) prepareDataAndValidate(r *http.Request) (data postUpdateControllerData, errorMessage string) {
 	data.action = req.Value(r, "action")
 	data.postID = req.Value(r, "post_id")
 	data.view = req.ValueOr(r, "view", VIEW_DETAILS)
@@ -718,10 +720,10 @@ func (controller postUpdateController) prepareDataAndValidate(r *http.Request) (
 	}
 
 	var err error
-	data.post, err = config.BlogStore.PostFindByID(data.postID)
+	data.post, err = controller.app.GetBlogStore().PostFindByID(data.postID)
 
 	if err != nil {
-		config.Logger.Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Post not found"
 	}
 

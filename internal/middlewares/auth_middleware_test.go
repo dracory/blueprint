@@ -13,14 +13,14 @@ import (
 )
 
 func TestAuthHandler_NoSessionKey(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Create a request without a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -38,7 +38,7 @@ func TestAuthHandler_NoSessionKey(t *testing.T) {
 }
 
 func TestAuthHandler_SessionNotFoundError(t *testing.T) {
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Create a request with a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
@@ -48,7 +48,7 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -66,13 +66,20 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 }
 
 func TestAuthHandler_SessionExpired(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
+	app := testutils.Setup()
+
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
+
+	if userStore == nil {
+		t.Fatal("userStore should not be nil")
 	}
 
-	testutils.Setup()
+	if sessionStore == nil {
+		t.Fatal("sessionStore should not be nil")
+	}
 
-	user, err := testutils.SeedUser(testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +89,7 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	session, err := testutils.SeedSession(httptest.NewRequest("GET", "/", nil), user, -100)
+	session, err := testutils.SeedSession(sessionStore, httptest.NewRequest("GET", "/", nil), user, -100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -97,7 +104,7 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -115,13 +122,20 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 }
 
 func TestAuthHandler_UserNotFound(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
+	app := testutils.Setup()
+
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
+
+	if userStore == nil {
+		t.Fatal("userStore should not be nil")
 	}
 
-	testutils.Setup()
+	if sessionStore == nil {
+		t.Fatal("sessionStore should not be nil")
+	}
 
-	user, err := testutils.SeedUser(testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -131,7 +145,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	session, err := testutils.SeedSession(httptest.NewRequest("GET", "/", nil), user, 1)
+	session, err := testutils.SeedSession(sessionStore, httptest.NewRequest("GET", "/", nil), user, 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -141,7 +155,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 		t.Fatal("session should not be nil")
 	}
 
-	err = config.UserStore.UserDelete(context.Background(), user)
+	err = userStore.UserDelete(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -152,7 +166,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -171,13 +185,20 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 }
 
 func TestAuthHandler_SessionSuccess(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
+	app := testutils.Setup()
+
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
+
+	if userStore == nil {
+		t.Fatal("userStore should not be nil")
 	}
 
-	testutils.Setup()
+	if sessionStore == nil {
+		t.Fatal("sessionStore should not be nil")
+	}
 
-	user, err := testutils.SeedUser(testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -187,7 +208,7 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	session, err := testutils.SeedSession(httptest.NewRequest("GET", "/", nil), user, 1)
+	session, err := testutils.SeedSession(sessionStore, httptest.NewRequest("GET", "/", nil), user, 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -202,7 +223,7 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) == nil {
 			t.Fatal("User should be set in context")
 		}

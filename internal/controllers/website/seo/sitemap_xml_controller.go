@@ -3,7 +3,6 @@ package seo
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/links"
 	"strings"
 
@@ -14,11 +13,13 @@ import (
 	"github.com/samber/lo"
 )
 
-type sitemapXmlController struct{}
+type sitemapXmlController struct {
+	blogStore blogstore.StoreInterface
+}
 
 // NewSitemapXmlController creates a new instance of the sitemapXmlController struct.
-func NewSitemapXmlController() *sitemapXmlController {
-	return &sitemapXmlController{}
+func NewSitemapXmlController(blogStore blogstore.StoreInterface) *sitemapXmlController {
+	return &sitemapXmlController{blogStore: blogStore}
 }
 
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -37,7 +38,7 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 		// "/privacy-policy",
 		// "/terms-of-use",
 	}
-	postList, err := config.BlogStore.PostList(blogstore.PostQueryOptions{
+	postList, err := c.blogStore.PostList(blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		OrderBy:   "title",
 		SortOrder: sb.DESC,
@@ -45,12 +46,12 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 	})
 
 	if err != nil {
-		config.Logger.Error("At sitemapXmlController > anySitemapXML", slog.String("error", err.Error()))
+		slog.Error("At sitemapXmlController > anySitemapXML", slog.String("error", err.Error()))
 		return ""
 	}
 
 	lo.ForEach(postList, func(post blogstore.Post, index int) {
-		locations = append(locations, links.NewWebsiteLinks().BlogPost(post.ID(), post.Title()))
+		locations = append(locations, links.Website().BlogPost(post.ID(), post.Title()))
 	})
 
 	timeNow := carbon.Now().ToIso8601String()

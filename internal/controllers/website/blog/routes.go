@@ -2,40 +2,43 @@ package blog
 
 import (
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes() []rtr.RouteInterface {
+func Routes(
+	app types.AppInterface,
+) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		rtr.NewRoute().
 			SetName("Guest > Articles").
 			SetPath("/articles").
-			SetHTMLHandler(NewBlogController().Handler),
+			SetHTMLHandler(NewBlogController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Articles > Post with ID > Index").
 			SetPath("/article/{id:[0-9]+}").
-			SetHTMLHandler(NewBlogPostController().Handler),
+			SetHTMLHandler(NewBlogPostController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Articles > Post with ID && Title > Index").
 			SetPath("/article/{id:[0-9]+}/{title}").
-			SetHTMLHandler(NewBlogPostController().Handler),
+			SetHTMLHandler(NewBlogPostController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Blog").
 			SetPath(links.BLOG).
-			SetHTMLHandler(NewBlogController().Handler),
+			SetHTMLHandler(NewBlogController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Blog > Post with ID > Index").
 			SetPath(links.BLOG_POST_WITH_REGEX).
-			SetHTMLHandler(NewBlogPostController().Handler),
+			SetHTMLHandler(NewBlogPostController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Blog > Post with ID && Title > Index").
 			SetPath(links.BLOG_POST_WITH_REGEX2).
-			SetHTMLHandler(NewBlogPostController().Handler),
+			SetHTMLHandler(NewBlogPostController(app).Handler),
 	}
 }

@@ -3,7 +3,6 @@ package admin
 import (
 	"errors"
 	"net/http"
-	"project/internal/config"
 
 	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
@@ -11,8 +10,8 @@ import (
 	"github.com/gouniverse/sessionstore"
 )
 
-func Impersonate(w http.ResponseWriter, r *http.Request, userID string) error {
-	if config.SessionStore == nil {
+func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.Request, userID string) error {
+	if ss == nil {
 		return errors.New("session store is nil")
 	}
 
@@ -22,14 +21,9 @@ func Impersonate(w http.ResponseWriter, r *http.Request, userID string) error {
 		SetIPAddress(req.IP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
-	if config.IsEnvDevelopment() {
-		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
-	}
-
-	err := config.SessionStore.SessionCreate(r.Context(), session)
+	err := ss.SessionCreate(r.Context(), session)
 
 	if err != nil {
-		config.Logger.Error("At Impersonate Error: ", "error", err.Error())
 		return err
 	}
 

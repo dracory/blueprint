@@ -3,7 +3,7 @@ package middlewares
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/dracory/base/req"
 	"github.com/dracory/rtr"
@@ -11,12 +11,11 @@ import (
 	"github.com/gouniverse/statsstore"
 )
 
-func NewStatsMiddleware() rtr.MiddlewareInterface {
+func NewStatsMiddleware(application types.AppInterface) rtr.MiddlewareInterface {
 	stats := new(statsMiddleware)
-
 	return rtr.NewMiddleware().
 		SetName(stats.Name()).
-		SetHandler(stats.Handler)
+		SetHandler(func(next http.Handler) http.Handler { return stats.Handler(application, next) })
 }
 
 type statsMiddleware struct{}
@@ -25,15 +24,15 @@ func (m statsMiddleware) Name() string {
 	return "Stats Middleware"
 }
 
-func (m statsMiddleware) Handler(next http.Handler) http.Handler {
+func (m statsMiddleware) Handler(application types.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !config.StatsStoreUsed {
+		if !application.GetConfig().GetStatsStoreUsed() {
 			next.ServeHTTP(w, r)
 			return
 		}
 
-		if config.StatsStore == nil {
-			config.Logger.Error("stats_middleware", "error", "stats store is marked as used but is nil")
+		if application.GetStatsStore() == nil {
+			application.GetLogger().Error("stats_middleware", "error", "stats store is marked as used but is nil")
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -47,7 +46,7 @@ func (m statsMiddleware) Handler(next http.Handler) http.Handler {
 		// userRequestedWith := r.Header.Get("X-Requested-With")
 		// userIsBot := r.Header.Get("X-Bot")
 
-		if config.AppEnvironment == config.APP_ENVIRONMENT_TESTING {
+		if application.GetConfig().IsEnvTesting() {
 			ip = "127.0.0.1"
 			userAcceptLanguage = "us"
 			userAgent = "testing"
@@ -66,10 +65,10 @@ func (m statsMiddleware) Handler(next http.Handler) http.Handler {
 		visitor.SetUserReferrer(userReferer)
 		visitor.SetPath("[" + r.Method + "] " + r.RequestURI)
 
-		err := config.StatsStore.VisitorCreate(r.Context(), visitor)
+		err := application.GetStatsStore().VisitorCreate(r.Context(), visitor)
 
 		if err != nil {
-			config.Logger.Error("Error at statsMiddleware", slog.String("error", err.Error()))
+			application.GetLogger().Error("Error at statsMiddleware", slog.String("error", err.Error()))
 		}
 
 		next.ServeHTTP(w, r)

@@ -2,11 +2,12 @@ package seo
 
 import (
 	"net/http"
+	"project/internal/types"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes() []rtr.RouteInterface {
+func Routes(app types.AppInterface) []rtr.RouteInterface {
 	adsRoute := rtr.NewRoute().
 		SetName("Website > ads.txt").
 		SetPath("/ads.txt").
@@ -28,7 +29,7 @@ func Routes() []rtr.RouteInterface {
 	sitemapRoute := rtr.NewRoute().
 		SetName("Website > Sitemap").
 		SetPath("/sitemap.xml").
-		SetHTMLHandler(NewSitemapXmlController().Handler)
+		SetHTMLHandler(NewSitemapXmlController(app.GetBlogStore()).Handler)
 
 	return []rtr.RouteInterface{
 		adsRoute,

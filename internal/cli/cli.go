@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"project/internal/cmds"
-	"project/internal/config"
 	"project/internal/routes"
+	"project/internal/types"
 
 	"github.com/mingrammer/cfmt"
 )
@@ -19,7 +19,7 @@ const (
 )
 
 // commandHandler defines the function signature for command handlers.
-type commandHandler func(args []string) error
+type commandHandler func(app types.AppInterface, args []string) error
 
 // commandHandlers maps command strings to their handler functions.
 var commandHandlers = map[string]commandHandler{
@@ -44,11 +44,12 @@ var commandHandlers = map[string]commandHandler{
 // 6. Returns specific errors for invalid commands, missing arguments, or nil TaskStore via the handlers.
 //
 // Parameters:
+// - db *database.Database : The database instance to be passed to command handlers.
 // - args []string : The command line arguments (excluding the program name).
 //
 // Returns:
 // - error: An error if the command execution fails or is invalid, otherwise nil.
-func ExecuteCliCommand(args []string) error {
+func ExecuteCliCommand(app types.AppInterface, args []string) error {
 	cfmt.Infoln("Executing command: ", args)
 
 	if len(args) == 0 {
@@ -69,16 +70,16 @@ func ExecuteCliCommand(args []string) error {
 		return err
 	}
 
-	// Execute the found handler
-	return handler(remainingArgs)
+	// Execute the found handler with db
+	return handler(app, remainingArgs)
 }
 
 // handleTaskCommand handles the 'task' command.
-func handleTaskCommand(args []string) error {
+func handleTaskCommand(app types.AppInterface, args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("missing task alias for command '%s'", CommandTask)
 	}
-	if config.TaskStore == nil {
+	if app.GetTaskStore() == nil {
 		err := errors.New("task store is nil")
 		cfmt.Errorln(err.Error())
 		return err
@@ -86,27 +87,27 @@ func handleTaskCommand(args []string) error {
 	taskAlias := args[0]
 	taskArgs := args[1:]
 	// Assuming TaskExecuteCli handles its own errors/logging internally
-	config.TaskStore.TaskExecuteCli(taskAlias, taskArgs)
+	app.GetTaskStore().TaskExecuteCli(taskAlias, taskArgs)
 	// Assuming success unless TaskExecuteCli panics or indicates failure differently
 	return nil
 }
 
 // handleJobCommand handles the 'job' command.
-func handleJobCommand(args []string) error {
+func handleJobCommand(app types.AppInterface, args []string) error {
 	// Assuming ExecuteJob handles its own errors/logging internally
-	cmds.ExecuteJob(args)
+	cmds.ExecuteJob(app, args)
 	// Assuming success unless ExecuteJob panics or indicates failure differently
 	return nil
 }
 
 // handleRoutesCommand handles the 'routes' command.
-func handleRoutesCommand(args []string) error {
+func handleRoutesCommand(app types.AppInterface, args []string) error {
 	if len(args) == 0 || args[0] != SubcommandList {
 		return fmt.Errorf("invalid or missing subcommand for '%s'. Use '%s %s'", CommandRoutes, CommandRoutes, SubcommandList)
 	}
 	// m, r := routes.RoutesList()
 	// router.List(m, r)
-	r := routes.Routes()
+	r := routes.Routes(app)
 	r.List()
 
 	return nil

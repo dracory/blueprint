@@ -3,7 +3,6 @@ package shared
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/links"
 
 	"github.com/dracory/shopstore"
@@ -13,11 +12,6 @@ import (
 
 func Header(store shopstore.StoreInterface, logger *slog.Logger, r *http.Request) hb.TagInterface {
 	if store == nil {
-		logger.Error("shop store is nil")
-		return nil
-	}
-
-	if config.ShopStore == nil {
 		logger.Error("shop store is nil")
 		return nil
 	}
@@ -53,21 +47,21 @@ func Header(store shopstore.StoreInterface, logger *slog.Logger, r *http.Request
 		})).
 		Class("nav-link")
 
-	productsCount, err := config.ShopStore.ProductCount(r.Context(), shopstore.NewProductQuery())
+	productsCount, err := store.ProductCount(r.Context(), shopstore.NewProductQuery())
 
 	if err != nil {
 		logger.Error(err.Error())
 		productsCount = -1
 	}
 
-	ordersCount, err := config.ShopStore.OrderCount(r.Context(), shopstore.NewOrderQuery())
+	ordersCount, err := store.OrderCount(r.Context(), shopstore.NewOrderQuery())
 
 	if err != nil {
 		logger.Error(err.Error())
 		ordersCount = -1
 	}
 
-	discountsCount, err := config.ShopStore.DiscountCount(r.Context(), shopstore.NewDiscountQuery())
+	discountsCount, err := store.DiscountCount(r.Context(), shopstore.NewDiscountQuery())
 
 	if err != nil {
 		logger.Error(err.Error())

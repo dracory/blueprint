@@ -11,16 +11,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 	"github.com/gouniverse/userstore"
 )
 
 func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	// Arrange
-	testutils.Setup()
+	app := testutils.Setup()
 
 	// Act
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{})
@@ -43,7 +43,7 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -69,8 +69,8 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 	// Arrange
 
-	testutils.Setup()
-	user, session, err := testutils.SeedUserAndSession(testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	app := testutils.Setup()
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -78,7 +78,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -103,7 +103,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -127,14 +127,10 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 }
 
 func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
-	}
-
 	// Arrange
-	testutils.Setup()
+	app := testutils.Setup()
 
-	user, session, err := testutils.SeedUserAndSession(testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -145,7 +141,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 	user.SetLastName("Last Name")
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
-	err = config.UserStore.UserUpdate(context.Background(), user)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -153,7 +149,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -178,7 +174,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -202,13 +198,9 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 }
 
 func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
-	}
-
 	// Arrange
-	testutils.Setup()
-	user, session, err := testutils.SeedUserAndSession(testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	application := testutils.Setup()
+	user, session, err := testutils.SeedUserAndSession(application.GetUserStore(), application.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -223,7 +215,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 	user.SetLastName("Last Name")
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
-	err = config.UserStore.UserUpdate(context.Background(), user)
+	err = application.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -231,7 +223,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(application).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -256,7 +248,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(body)
+	msg, err := testutils.FlashMessageFindFromBody(application.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -280,14 +272,10 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 }
 
 func TestAdminMiddleware_Success(t *testing.T) {
-	if config.UserStore == nil {
-		t.Fatal("UserStore should not be nil")
-	}
-
 	// Arrange
-	testutils.Setup()
+	application := testutils.Setup()
 
-	user, session, err := testutils.SeedUserAndSession(testutils.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(application.GetUserStore(), application.GetSessionStore(), testutils.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -302,7 +290,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
 
-	err = config.UserStore.UserUpdate(context.Background(), user)
+	err = application.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -310,7 +298,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware().GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(application).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Success"))
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{

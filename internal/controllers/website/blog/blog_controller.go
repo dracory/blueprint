@@ -3,10 +3,10 @@ package blog
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
@@ -18,7 +18,9 @@ import (
 	"github.com/samber/lo"
 )
 
-type blogController struct{}
+type blogController struct {
+	app types.AppInterface
+}
 
 type blogControllerData struct {
 	postList  []blogstore.Post
@@ -27,23 +29,27 @@ type blogControllerData struct {
 	perPage   int
 }
 
-func NewBlogController() *blogController {
-	return &blogController{}
+func NewBlogController(app types.AppInterface) *blogController {
+	return &blogController{
+		app: app,
+	}
 }
 
 func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.Website().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
 	}
 
-	return layouts.NewCmsLayout(layouts.Options{
-		Request:        r,
-		WebsiteSection: "Blog",
-		Title:          "Recent Posts",
-		Content:        hb.Wrap().HTML(controller.page(data)),
-	}).ToHTML()
+	return layouts.NewCmsLayout(
+		controller.app,
+		layouts.Options{
+			Request:        r,
+			WebsiteSection: "Blog",
+			Title:          "Recent Posts",
+			Content:        hb.Wrap().HTML(controller.page(data)),
+		}).ToHTML()
 }
 
 func (controller *blogController) page(data blogControllerData) string {
@@ -183,17 +189,17 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		Limit:     perPage,
 	}
 
-	postList, errList := config.BlogStore.PostList(options)
+	postList, errList := controller.app.GetBlogStore().PostList(options)
 
 	if errList != nil {
-		config.Logger.Error("Error. At blogController.page", slog.String("error", errList.Error()))
+		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := config.BlogStore.PostCount(options)
+	postCount, errCount := controller.app.GetBlogStore().PostCount(options)
 
 	if errCount != nil {
-		config.Logger.Error("Error. At blogController.page", slog.String("error", errCount.Error()))
+		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
 		return data, "Sorry, there was an error loading the posts count. Please try again later."
 	}
 

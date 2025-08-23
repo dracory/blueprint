@@ -3,15 +3,15 @@ package helpers
 import (
 	"errors"
 	"net/http"
-	"project/internal/config"
 
 	"github.com/dracory/base/req"
 	"github.com/dromara/carbon/v2"
+	"github.com/gouniverse/sessionstore"
 	"github.com/spf13/cast"
 )
 
-func ExtendSession(r *http.Request, seconds int64) error {
-	if config.SessionStore == nil {
+func ExtendSession(sessionStore sessionstore.StoreInterface, r *http.Request, seconds int64) error {
+	if sessionStore == nil {
 		return errors.New("session store is nil")
 	}
 
@@ -31,7 +31,7 @@ func ExtendSession(r *http.Request, seconds int64) error {
 
 	session.SetExpiresAt(carbon.Now(carbon.UTC).AddSeconds(cast.ToInt(seconds)).ToDateTimeString(carbon.UTC))
 
-	err := config.SessionStore.SessionUpdate(r.Context(), session)
+	err := sessionStore.SessionUpdate(r.Context(), session)
 
 	return err
 }

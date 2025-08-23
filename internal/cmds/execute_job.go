@@ -1,12 +1,7 @@
 package cmds
 
 import (
-
-	// "project/internal/jobs"
-
-	// "project/jobs"
-
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/gouniverse/taskstore"
 	"github.com/gouniverse/utils"
@@ -21,7 +16,7 @@ import (
 //
 // Args: an array of strings representing the arguments for the job.
 // Return type: None.
-func ExecuteJob(args []string) {
+func ExecuteJob(app types.AppInterface, args []string) {
 	name := "No name"
 	argumentsMap := utils.ArgsToMap(args)
 	cfmt.Infoln("Executing job: ", name, " with arguments: ", argumentsMap, " ...")
@@ -34,12 +29,12 @@ func ExecuteJob(args []string) {
 		return
 	}
 
-	if config.TaskStore == nil {
+	if app.GetTaskStore() == nil {
 		cfmt.Errorln("TaskStore is nil")
 		return
 	}
 
-	queuedTask, err := config.TaskStore.QueueFindByID(queuedTaskID)
+	queuedTask, err := app.GetTaskStore().QueueFindByID(queuedTaskID)
 
 	if err != nil {
 		cfmt.Errorln("Task not found: ", queuedTaskID)
@@ -61,7 +56,7 @@ func ExecuteJob(args []string) {
 		return
 	}
 
-	isOK, err := config.TaskStore.QueuedTaskProcess(queuedTask)
+	isOK, err := app.GetTaskStore().QueuedTaskProcess(queuedTask)
 
 	if err != nil {
 		cfmt.Errorln("Error processing task: ", queuedTaskID, " ", err.Error())

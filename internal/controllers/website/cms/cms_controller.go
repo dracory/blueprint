@@ -2,7 +2,7 @@ package cms
 
 import (
 	"net/http"
-	"project/internal/config"
+	"project/internal/types"
 	"project/internal/widgets"
 	"project/pkg/webtheme"
 	"sync"
@@ -18,18 +18,19 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
+	app      types.AppInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewCmsController() *cmsController {
-	return &cmsController{}
+func NewCmsController(app types.AppInterface) *cmsController {
+	return &cmsController{app: app}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) string {
-	instance := GetInstance()
+	instance := GetInstance(controller.app)
 	if instance == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return "cms is not configured"
@@ -40,9 +41,9 @@ func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) 
 var instance cmsFrontend.FrontendInterface
 var once sync.Once
 
-func GetInstance() cmsFrontend.FrontendInterface {
+func GetInstance(app types.AppInterface) cmsFrontend.FrontendInterface {
 	once.Do(func() {
-		list := widgets.WidgetRegistry()
+		list := widgets.WidgetRegistry(app.GetConfig())
 
 		shortcodes := []cmsstore.ShortcodeInterface{}
 		for _, widget := range list {
@@ -54,8 +55,8 @@ func GetInstance() cmsFrontend.FrontendInterface {
 			BlockEditorRenderer: func(blocks []ui.BlockInterface) string {
 				return webtheme.New(blocks).ToHtml()
 			},
-			Store:              config.CmsStore,
-			Logger:             &config.Logger,
+			Store:              app.GetCmsStore(),
+			Logger:             app.GetLogger(),
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
 		})

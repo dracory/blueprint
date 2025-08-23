@@ -3,7 +3,6 @@ package testutils
 import (
 	"errors"
 	"net/http"
-	"project/internal/config"
 
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/sessionstore"
@@ -11,8 +10,8 @@ import (
 	"github.com/gouniverse/utils"
 )
 
-func SeedSession(r *http.Request, user userstore.UserInterface, expiresSeconds int) (sessionstore.SessionInterface, error) {
-	if config.SessionStore == nil {
+func SeedSession(sessionStore sessionstore.StoreInterface, r *http.Request, user userstore.UserInterface, expiresSeconds int) (sessionstore.SessionInterface, error) {
+	if sessionStore == nil {
 		return nil, errors.New("session store is nil")
 	}
 
@@ -22,7 +21,7 @@ func SeedSession(r *http.Request, user userstore.UserInterface, expiresSeconds i
 		SetIPAddress(utils.IP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddSeconds(expiresSeconds).ToDateTimeString(carbon.UTC))
 
-	err := config.SessionStore.SessionCreate(r.Context(), session)
+	err := sessionStore.SessionCreate(r.Context(), session)
 
 	if err != nil {
 		return nil, err

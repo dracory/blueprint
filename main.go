@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"log/slog"
 	"os"
 
+	"project/internal/app"
 	"project/internal/cli"
 	"project/internal/config"
 	"project/internal/emails"
@@ -11,11 +13,12 @@ import (
 	"project/internal/routes"
 	"project/internal/schedules"
 	"project/internal/tasks"
+	"project/internal/types"
 	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
 
-	"github.com/dracory/base/server"
+	"github.com/dracory/websrv"
 )
 
 // main starts the application
@@ -39,32 +42,40 @@ import (
 // Returns:
 // - none
 func main() {
-	if err := config.Initialize(); err != nil {
-		// Initialize the environment
-		config.Console.Error("Failed to initialize environment:", slog.Any("error", err))
+	cfg, err := config.Load()
+	if err != nil {
+		cfmt.Error("Failed to load config:", slog.Any("error", err))
 		return
 	}
 
-	defer closeResources() // Defer Closing the database
+	// Initialize application (logger, caches, database)
+	application, err := app.New(cfg)
+	if err != nil {
+		cfmt.Error("Failed to initialize app:", slog.Any("error", err))
+		return
+	}
 
-	tasks.RegisterTasks() // Register the task handlers
+	defer closeResourcesDB(application.GetDB()) // Defer Closing the database
+
+	tasks.RegisterTasks(application) // Register the task handlers
 
 	if isCliMode() {
 		if len(os.Args) < 2 {
 			return
 		}
-		cli.ExecuteCliCommand(os.Args[1:]) // Execute the command
+		cli.ExecuteCliCommand(application, os.Args[1:]) // Execute the command
 		return
 	}
 
-	startBackgroundProcesses()
+	// Start background processes with explicit dependencies
+	startBackgroundProcesses(application)
 
 	// Start the web server
-	_, err := server.Start(server.Options{
-		Host:    config.WebServerHost,
-		Port:    config.WebServerPort,
-		URL:     config.AppUrl,
-		Handler: routes.Routes().ServeHTTP,
+	_, err = websrv.Start(websrv.Options{
+		Host:    application.GetConfig().GetAppHost(),
+		Port:    application.GetConfig().GetAppPort(),
+		URL:     application.GetConfig().GetAppUrl(),
+		Handler: routes.Routes(application).ServeHTTP,
 	})
 
 	if err != nil {
@@ -76,16 +87,15 @@ func main() {
 // closeResources closes the database connection if it exists.
 //
 // Parameters:
-// - none
+// - dbx: the database handle
 //
 // Returns:
 // - none
-func closeResources() {
-	if config.Database == nil {
+func closeResourcesDB(db *sql.DB) {
+	if db == nil {
 		return
 	}
-
-	if err := config.Database.DB().Close(); err != nil {
+	if err := db.Close(); err != nil {
 		cfmt.Errorf("Failed to close database connection: %v", err)
 	}
 }
@@ -104,28 +114,28 @@ func isCliMode() bool {
 // startBackgroundProcesses starts the background processes.
 //
 // Parameters:
-// - none
+// - db: the database handle
 //
 // Returns:
 // - none
-func startBackgroundProcesses() {
-	if config.TaskStore != nil {
-		go config.TaskStore.QueueRunGoroutine(10, 2) // Initialize the task queue
+func startBackgroundProcesses(app types.AppInterface) {
+	if app.GetDB() != nil {
+		if ts := app.GetTaskStore(); ts != nil {
+			go ts.QueueRunGoroutine(10, 2) // Initialize the task queue
+		}
+		if cs := app.GetCacheStore(); cs != nil {
+			go cs.ExpireCacheGoroutine() // Initialize the cache expiration goroutine
+		}
+		if ss := app.GetSessionStore(); ss != nil {
+			go ss.SessionExpiryGoroutine() // Initialize the session expiration goroutine
+		}
 	}
 
-	schedules.StartAsync() // Initialize the scheduler
-
-	if config.CacheStore != nil {
-		go config.CacheStore.ExpireCacheGoroutine() // Initialize the cache expiration goroutine
-	}
-
-	if config.SessionStore != nil {
-		go config.SessionStore.SessionExpiryGoroutine() // Initialize the session expiration goroutine
-	}
+	schedules.StartAsync(app) // Initialize the scheduler
 
 	// Initialize email sender
 	emails.InitEmailSender()
 
-	middlewares.CmsAddMiddlewares() // Add CMS middlewares
-	widgets.CmsAddShortcodes()      // Add CMS shortcodes
+	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
+	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
 }

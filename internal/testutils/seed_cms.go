@@ -3,13 +3,12 @@ package testutils
 import (
 	"context"
 	"errors"
-	"project/internal/config"
 
 	"github.com/gouniverse/cmsstore"
 )
 
-func SeedTemplate(siteID, templateID string) (err error) {
-	if config.CmsStore == nil {
+func SeedTemplate(cmsStore cmsstore.StoreInterface, siteID, templateID string) (err error) {
+	if cmsStore == nil {
 		return errors.New("cmsstore.seed template: cmsstore is nil")
 	}
 
@@ -31,5 +30,5 @@ func SeedTemplate(siteID, templateID string) (err error) {
 		SetName(templateID).
 		SetContent(templateContent)
 
-	return config.CmsStore.TemplateCreate(context.Background(), template)
+	return cmsStore.TemplateCreate(context.Background(), template)
 }

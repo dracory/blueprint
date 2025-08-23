@@ -3,19 +3,19 @@ package contact
 import (
 	"context"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/tasks"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
 	"github.com/gouniverse/csrf"
 
+	"github.com/dracory/cdn"
+	"github.com/dracory/customstore"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
-	"github.com/gouniverse/customstore"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
@@ -23,7 +23,9 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type contactController struct{}
+type contactController struct {
+	app types.AppInterface
+}
 
 type contactControllerData struct {
 	email          string
@@ -38,8 +40,8 @@ type contactControllerData struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewContactController() *contactController {
-	return &contactController{}
+func NewContactController(app types.AppInterface) *contactController {
+	return &contactController{app: app}
 }
 
 func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Request) string {
@@ -69,7 +71,7 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 				Child(formContact),
 		)
 
-	return layouts.NewUserLayout(r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, layouts.Options{
 		Title:      "Contact",
 		Content:    page,
 		ScriptURLs: []string{cdn.Sweetalert2_11()},
@@ -126,32 +128,34 @@ func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.R
 		"text":       data.text,
 	})
 
-	err := config.CustomStore.RecordCreate(record)
+	cs := controller.app.GetCustomStore()
+	err := cs.RecordCreate(record)
 
 	if err != nil {
-		config.Logger.Error("At contactController.PostSubmit", "error", err.Error())
+		controller.app.GetLogger().Error("At contactController.PostSubmit", "error", err.Error())
 		data.errorMessage = "System error occurred. Please try again later."
 		return controller.contactForm(r, data).ToHTML()
 	}
 
-	_, err = tasks.NewEmailToAdminOnNewContactFormSubmittedTaskHandler().Enqueue()
+	_, err = tasks.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(controller.app).Enqueue()
 
 	if err != nil {
-		config.Logger.Error("At contactController.PostSubmit. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
+		controller.app.GetLogger().Error("At contactController.PostSubmit. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
 		// No need to return error here
 	}
 
 	authUser := helpers.GetAuthUser(r)
 	canUpdateFirstName, canUpdateLastName, _ := controller.canUpdateFirstNameLastNameEmail(r)
 
-	if authUser != nil && (canUpdateFirstName || canUpdateLastName) && config.UserStore != nil {
+	us := controller.app.GetUserStore()
+	if authUser != nil && (canUpdateFirstName || canUpdateLastName) && us != nil {
 		authUser.SetFirstName(data.firstName)
 		authUser.SetLastName(data.lastName)
 
-		err = config.UserStore.UserUpdate(context.Background(), authUser)
+		err = us.UserUpdate(context.Background(), authUser)
 
 		if err != nil {
-			config.Logger.Error("At contactController.PostSubmit", "error", err.Error())
+			controller.app.GetLogger().Error("At contactController.PostSubmit", "error", err.Error())
 			// No need to return error here
 		}
 	}

@@ -8,8 +8,8 @@ import (
 	"github.com/gouniverse/userstore"
 )
 
-func SeedUserAndSession(userID string, r *http.Request, expiresSeconds int) (user userstore.UserInterface, session sessionstore.SessionInterface, err error) {
-	user, err = SeedUser(userID)
+func SeedUserAndSession(userStore userstore.StoreInterface, sessionStore sessionstore.StoreInterface, userID string, r *http.Request, expiresSeconds int) (user userstore.UserInterface, session sessionstore.SessionInterface, err error) {
+	user, err = SeedUser(userStore, userID)
 
 	if err != nil {
 		return nil, nil, err
@@ -19,7 +19,7 @@ func SeedUserAndSession(userID string, r *http.Request, expiresSeconds int) (use
 		return nil, nil, errors.New("user should not be nil")
 	}
 
-	session, err = SeedSession(r, user, expiresSeconds)
+	session, err = SeedSession(sessionStore, r, user, expiresSeconds)
 
 	if err != nil {
 		return nil, nil, err

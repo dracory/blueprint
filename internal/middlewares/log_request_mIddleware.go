@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"net/http"
-	"project/internal/config"
+	"project/internal/types"
 	"strings"
 
 	"log/slog"
@@ -18,7 +18,7 @@ import (
 // malicious spiders, DDOS, etc
 // ==================================================================
 // it is useful to detect spamming bots
-func LogRequestMiddleware() rtr.MiddlewareInterface {
+func LogRequestMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Log Request Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -29,7 +29,7 @@ func LogRequestMiddleware() rtr.MiddlewareInterface {
 
 				method := r.Method
 
-				config.Logger.Info("request",
+				app.GetLogger().Info("request",
 					slog.String("host", r.Host),
 					slog.String("path", strings.TrimLeft(r.URL.Path, "/")),
 					slog.String("ip", ip),

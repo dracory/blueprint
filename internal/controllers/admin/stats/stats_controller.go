@@ -3,10 +3,10 @@ package stats
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 
 	"github.com/gouniverse/hb"
 
@@ -14,30 +14,34 @@ import (
 	statsAdminShared "github.com/gouniverse/statsstore/admin/shared"
 )
 
-func StatsController() *statsController {
-	return &statsController{
-		logger: config.Logger,
-	}
+type statsController struct {
+	logger *slog.Logger
+	app    types.AppInterface
 }
 
-type statsController struct {
-	logger slog.Logger
+func NewStatsController(app types.AppInterface) *statsController {
+	return &statsController{
+		logger: app.GetLogger(),
+		app:    app,
+	}
 }
 
 func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
 		ResponseWriter: w,
 		Request:        r,
-		Logger:         &config.Logger,
-		Store:          config.StatsStore,
-		Layout:         &adminLayout{},
+		Logger:         c.app.GetLogger(),
+		Store:          c.app.GetStatsStore(),
+		Layout:         &adminLayout{app: c.app},
 		HomeURL:        links.Admin().Home(),
 		WebsiteUrl:     "https://lesichkov.co.uk",
 	})
 
 	if err != nil {
-		c.logger.Error("At admin > statsController > Handler", "error", err.Error())
-		helpers.ToFlashError(w, r, err.Error(), links.Admin().Home(), 30)
+		if c.logger != nil {
+			c.logger.Error("At admin > statsController > Handler", "error", err.Error())
+		}
+		helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
 		return
 	}
 
@@ -45,6 +49,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminLayout struct {
+	app   types.AppInterface
 	title string
 	body  string
 
@@ -80,7 +85,7 @@ func (a *adminLayout) SetStyles(styles []string) {
 }
 
 func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(a.app, r, layouts.Options{
 		Title:      a.title,
 		Content:    hb.Raw(a.body),
 		ScriptURLs: a.scriptURLs,

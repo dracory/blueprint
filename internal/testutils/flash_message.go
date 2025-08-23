@@ -2,15 +2,15 @@ package testutils
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/types"
 
-	"github.com/dracory/base/str"
+	"github.com/dracory/str"
+	"github.com/gouniverse/cachestore"
 	"github.com/spf13/cast"
 )
 
-func FlashMessageFind(messageID string) (msg *types.FlashMessage, err error) {
-	msgData, err := config.CacheStore.GetJSON(messageID+"_flash_message", "")
+func FlashMessageFind(cacheStore cachestore.StoreInterface, messageID string) (msg *types.FlashMessage, err error) {
+	msgData, err := cacheStore.GetJSON(messageID+"_flash_message", "")
 	if err != nil {
 		return msg, err
 	}
@@ -30,13 +30,13 @@ func FlashMessageFind(messageID string) (msg *types.FlashMessage, err error) {
 	return dataMap, nil
 }
 
-func FlashMessageFindFromBody(body string) (msg *types.FlashMessage, err error) {
+func FlashMessageFindFromBody(cacheStore cachestore.StoreInterface, body string) (msg *types.FlashMessage, err error) {
 	flashMessageID := str.LeftFrom(str.RightFrom(body, `/flash?message_id=`), `"`)
-	return FlashMessageFind(flashMessageID)
+	return FlashMessageFind(cacheStore, flashMessageID)
 }
 
-func FlashMessageFindFromResponse(r *http.Response) (msg *types.FlashMessage, err error) {
+func FlashMessageFindFromResponse(cacheStore cachestore.StoreInterface, r *http.Response) (msg *types.FlashMessage, err error) {
 	location := r.Header.Get("Location")
 	flashMessageID := str.RightFrom(location, `/flash?message_id=`)
-	return FlashMessageFind(flashMessageID)
+	return FlashMessageFind(cacheStore, flashMessageID)
 }

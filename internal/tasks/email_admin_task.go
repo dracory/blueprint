@@ -22,8 +22,8 @@ package tasks
 
 import (
 	"errors"
-	"project/internal/config"
 	"project/internal/emails"
+	"project/internal/types"
 
 	"github.com/gouniverse/taskstore"
 )
@@ -35,13 +35,16 @@ import (
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
-func NewEmailToAdminTask() taskstore.TaskHandlerInterface {
-	return &emailToAdminTask{}
+func NewEmailToAdminTask(app types.AppInterface) taskstore.TaskHandlerInterface {
+	return &emailToAdminTask{
+		app: app,
+	}
 }
 
 // emailToAdminTask send a notification email to admin
 type emailToAdminTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
+	app                       types.AppInterface
 }
 
 // Alias returns the unique identifier for this task handler
@@ -71,12 +74,16 @@ func (handler *emailToAdminTask) Description() string {
 //   - error: Any error that occurred during enqueueing
 func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.QueueInterface, err error) {
 	// Validate task store is initialized
-	if config.TaskStore == nil {
+	if handler.app == nil || handler.app.GetConfig() == nil {
+		return nil, errors.New("app/config is nil")
+	}
+
+	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
 	// Enqueue task with the provided HTML content
-	return config.TaskStore.TaskEnqueueByAlias(handler.Alias(), map[string]any{
+	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{
 		"html": html,
 	})
 }
@@ -94,6 +101,11 @@ func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.QueueInter
 // Returns:
 //   - bool: true if task was processed successfully, false otherwise
 func (handler *emailToAdminTask) Handle() bool {
+	if handler.app == nil || handler.app.GetConfig() == nil {
+		handler.LogError("App/Config is nil. Aborted.")
+		return false
+	}
+
 	// Get HTML content from task parameters
 	html := handler.GetParam("html")
 
@@ -119,7 +131,7 @@ func (handler *emailToAdminTask) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Send email using the email service
-	err := emails.NewEmailNotifyAdmin().Send(html)
+	err := emails.NewEmailNotifyAdmin(handler.app.GetConfig()).Send(html)
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

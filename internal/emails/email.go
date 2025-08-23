@@ -1,9 +1,11 @@
 package emails
 
 import (
-	"project/internal/config"
+	"fmt"
+	"project/internal/types"
 
 	baseEmail "github.com/dracory/base/email"
+	"github.com/spf13/cast"
 )
 
 // SendOptions defines the options for sending an email
@@ -20,16 +22,26 @@ type SendOptions struct {
 }
 
 var emailSender baseEmail.Sender
+var cfg types.ConfigInterface
 
 // InitEmailSender initializes the email sender
 func InitEmailSender() {
+	if cfg == nil {
+		// cannot initialize without config; leave sender nil so caller gets an error on send
+		return
+	}
 	emailSender = baseEmail.NewSMTPSender(baseEmail.Config{
-		Host:     config.MailHost,
-		Port:     config.MailPort,
-		Username: config.MailUsername,
-		Password: config.MailPassword,
+		Host:     cfg.GetMailHost(),
+		Port:     cast.ToString(cfg.GetMailPort()),
+		Username: cfg.GetMailUsername(),
+		Password: cfg.GetMailPassword(),
 		// Skip logger for now as it's causing type compatibility issues
 	})
+}
+
+// Init sets the package-level configuration for emails
+func Init(c types.ConfigInterface) {
+	cfg = c
 }
 
 // SendEmail sends an email using the base email package
@@ -38,6 +50,11 @@ func SendEmail(options SendOptions) error {
 	// Initialize the email sender if it hasn't been initialized yet
 	if emailSender == nil {
 		InitEmailSender()
+	}
+
+	// Guard against nil sender
+	if emailSender == nil {
+		return fmt.Errorf("email sender is not initialized")
 	}
 
 	// Convert SendOptions to base email.SendOptions
@@ -63,9 +80,14 @@ func CreateEmailTemplate(title string, htmlContent string) string {
 
 	// Use the base email template
 	return baseEmail.DefaultTemplate(baseEmail.TemplateOptions{
-		Title:       title,
-		Content:     htmlContent,
-		AppName:     config.AppName,
+		Title:   title,
+		Content: htmlContent,
+		AppName: func() string {
+			if cfg != nil {
+				return cfg.GetAppName()
+			}
+			return ""
+		}(),
 		HeaderLinks: headerLinks,
 	})
 }

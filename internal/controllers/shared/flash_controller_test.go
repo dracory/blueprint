@@ -3,27 +3,19 @@ package shared
 import (
 	"net/http"
 	"net/url"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/testutils"
 	"strings"
 	"testing"
 
-	"github.com/dracory/base/str"
-	"github.com/dracory/base/test"
+	"github.com/dracory/str"
+	"github.com/dracory/test"
 )
 
 func TestFlash(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"type":    {"success"},
 			"message": {"Authentication Provider Error. Once is required field"},
@@ -51,20 +43,13 @@ func TestFlash(t *testing.T) {
 }
 
 func TestFlashMessage_Info(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -92,20 +77,13 @@ func TestFlashMessage_Info(t *testing.T) {
 }
 
 func TestFlashMessage_Error(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	errorUrl := helpers.ToFlashErrorURL("This is an error message", "/testbackendpoint", 5)
+	errorUrl := helpers.ToFlashErrorURL(app.GetCacheStore(), "This is an error message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(errorUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -133,20 +111,13 @@ func TestFlashMessage_Error(t *testing.T) {
 }
 
 func TestFlashMessage_Success(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	successUrl := helpers.ToFlashSuccessURL("This is a success message", "/testbackendpoint", 5)
+	successUrl := helpers.ToFlashSuccessURL(app.GetCacheStore(), "This is a success message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(successUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -174,20 +145,13 @@ func TestFlashMessage_Success(t *testing.T) {
 }
 
 func TestFlashMessage_Warning(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	warningUrl := helpers.ToFlashWarningURL("This is a warning message", "/testbackendpoint", 5)
+	warningUrl := helpers.ToFlashWarningURL(app.GetCacheStore(), "This is a warning message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(warningUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -215,20 +179,13 @@ func TestFlashMessage_Warning(t *testing.T) {
 }
 
 func TestFlashMessage_Get(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodGet, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodGet, NewFlashController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -256,20 +213,13 @@ func TestFlashMessage_Get(t *testing.T) {
 }
 
 func TestFlashMessage_Delete(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodDelete, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodDelete, NewFlashController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -297,20 +247,13 @@ func TestFlashMessage_Delete(t *testing.T) {
 }
 
 func TestFlashMessage_Post(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -338,20 +281,13 @@ func TestFlashMessage_Post(t *testing.T) {
 }
 
 func TestFlashMessage_Put(t *testing.T) {
-	testutils.Setup()
-	if config.CmsStore != nil {
-		err := testutils.SeedTemplate(testutils.CMS_SITE_01, config.CmsUserTemplateID)
+	app := testutils.Setup()
 
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	infoUrl := helpers.ToFlashInfoURL("This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPut, NewFlashController().Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPut, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},

@@ -2,30 +2,32 @@ package auth
 
 import (
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
 )
 
-type loginController struct{}
+type loginController struct {
+	app types.AppInterface
+}
 
-func NewLoginController() *loginController {
-	return &loginController{}
+func NewLoginController(app types.AppInterface) *loginController {
+	return &loginController{app: app}
 }
 
 func (controller *loginController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
 	userURL := links.User().Home()
 
-	if !config.UserStoreUsed || config.UserStore == nil {
-		return helpers.ToFlashError(w, r, `user store is required`, homeURL, 5)
+	if controller.app.GetUserStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
-	if config.VaultStoreUsed && config.VaultStore == nil {
-		return helpers.ToFlashError(w, r, `vault store is required`, homeURL, 5)
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
 	}
 
 	backUrl := req.ValueOr(r, "back_url", userURL)

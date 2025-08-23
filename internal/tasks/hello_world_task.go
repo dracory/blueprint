@@ -2,17 +2,20 @@ package tasks
 
 import (
 	"errors"
-	"project/internal/config"
+	"project/internal/types"
 
 	"github.com/gouniverse/taskstore"
 )
 
-func NewHelloWorldTask() *helloWorldTask {
-	return &helloWorldTask{}
+func NewHelloWorldTask(app types.AppInterface) *helloWorldTask {
+	return &helloWorldTask{
+		app: app,
+	}
 }
 
 type helloWorldTask struct {
 	taskstore.TaskHandlerBase
+	app types.AppInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*helloWorldTask)(nil) // verify it extends the task interface
@@ -30,10 +33,13 @@ func (handler *helloWorldTask) Description() string {
 }
 
 func (handler *helloWorldTask) Enqueue() (task taskstore.QueueInterface, err error) {
-	if config.TaskStore == nil {
+	if handler.app == nil {
+		return nil, errors.New("app is nil")
+	}
+	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return config.TaskStore.TaskEnqueueByAlias(handler.Alias(), map[string]any{})
+	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{})
 }
 
 func (handler *helloWorldTask) Handle() bool {

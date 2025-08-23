@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"project/pkg/blogtheme"
 	"strings"
 
-	"github.com/dracory/base/str"
+	"github.com/dracory/str"
 	"github.com/go-chi/chi/v5"
 	"github.com/gouniverse/blogstore"
 	"github.com/gouniverse/bs"
@@ -22,10 +22,15 @@ import (
 )
 
 type blogPostController struct {
+	app types.AppInterface
 }
 
-func NewBlogPostController() *blogPostController {
-	return &blogPostController{}
+func NewBlogPostController(
+	app types.AppInterface,
+) *blogPostController {
+	return &blogPostController{
+		app: app,
+	}
 }
 
 func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -34,47 +39,49 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {
-		config.Logger.Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
-		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
 
-	post, errPost := config.BlogStore.PostFindByID(postID)
+	post, errPost := c.app.GetBlogStore().PostFindByID(postID)
 
 	if errPost != nil {
-		config.Logger.Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
-		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
 
 	if post == nil {
-		config.Logger.Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
-		helpers.ToFlash(w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if !c.accessAllowed(r, *post) {
-		config.Logger.Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
-		helpers.ToFlash(w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
 		url := links.Website().BlogPost(post.ID(), post.Title())
-		config.Logger.Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
-		helpers.ToFlash(w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
+		c.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
 	}
 
-	return layouts.NewCmsLayout(layouts.Options{
-		Request:        r,
-		WebsiteSection: "Blog.",
-		Title:          post.Title(),
-		StyleURLs: []string{
-			"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
-		},
-		Content: hb.Wrap().HTML(c.page(*post)),
-	}).ToHTML()
+	return layouts.NewCmsLayout(
+		c.app,
+		layouts.Options{
+			Request:        r,
+			WebsiteSection: "Blog",
+			Title:          post.Title(),
+			StyleURLs: []string{
+				"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+			},
+			Content: hb.Wrap().HTML(c.page(*post)),
+		}).ToHTML()
 }
 
 func (controller blogPostController) accessAllowed(r *http.Request, post blogstore.Post) bool {
@@ -98,7 +105,7 @@ func (controller blogPostController) accessAllowed(r *http.Request, post blogsto
 }
 
 func (c blogPostController) page(post blogstore.Post) string {
-	sectionBanner := NewBlogController().sectionBanner()
+	sectionBanner := blogController{}.sectionBanner()
 	return hb.Wrap().Children([]hb.TagInterface{
 		// hb.Style(c.cssSectionIntro()),
 		hb.Style(c.css()),

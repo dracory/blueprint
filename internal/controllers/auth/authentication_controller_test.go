@@ -5,16 +5,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"project/internal/config"
 	"project/internal/testutils"
 	"testing"
 
-	"github.com/dracory/base/test"
+	"github.com/dracory/test"
 	"github.com/gouniverse/responses"
 )
 
 func TestAuthControllerOnceIsRequired(t *testing.T) {
-	testutils.Setup()
+	application := testutils.Setup()
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{},
@@ -25,7 +24,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController().Handler))).ServeHTTP(recorder, req)
+	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
 
 	code := recorder.Code
 
@@ -33,7 +32,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +52,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 }
 
 func TestAuthControllerOnceMustBeValid(t *testing.T) {
-	testutils.Setup()
+	application := testutils.Setup()
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
@@ -66,7 +65,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController().Handler))).ServeHTTP(recorder, req)
+	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 
 	code := recorder.Code
@@ -75,7 +74,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -95,11 +94,11 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 }
 
 func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
-	testutils.Setup()
+	application := testutils.Setup()
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
-			"once": {testutils.TestKey()},
+			"once": {testutils.TestKey(application.GetConfig())},
 		},
 	})
 
@@ -108,7 +107,7 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController().Handler))).ServeHTTP(recorder, req)
+	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 	code := recorder.Code
 
@@ -116,7 +115,7 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -137,14 +136,13 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 }
 
 func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
-	testutils.Setup()
+	application := testutils.Setup()
 
-	if config.UserStore == nil {
+	if application.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	testutils.Setup()
-	user, err := testutils.SeedUser(testutils.USER_01)
+	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +154,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 
 	user.SetEmail("test@test.com")
 
-	err = config.UserStore.UserUpdate(context.Background(), user)
+	err = application.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -164,7 +162,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
-			"once": {testutils.TestKey()},
+			"once": {testutils.TestKey(application.GetConfig())},
 		},
 	})
 
@@ -173,7 +171,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController().Handler))).ServeHTTP(recorder, req)
+	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 	code := recorder.Code
 
@@ -181,7 +179,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)

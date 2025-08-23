@@ -5,18 +5,18 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"project/internal/config"
 	"project/internal/controllers/admin/shop/shared"
 
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/base/req"
+	"github.com/dracory/cdn"
 	"github.com/dracory/shopstore"
 	"github.com/gouniverse/bs"
-	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/form"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
@@ -28,26 +28,28 @@ const ActionModalProductFilterShow = "modal_product_filter_show"
 
 // == CONTROLLER ==============================================================
 
-type productManagerController struct{}
+type productManagerController struct {
+	app types.AppInterface
+}
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductManagerController() *productManagerController {
-	return &productManagerController{}
+func NewProductManagerController(app types.AppInterface) *productManagerController {
+	return &productManagerController{app: app}
 }
 
 func (controller *productManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
 	}
 
 	if data.action == ActionModalProductFilterShow {
 		return controller.onModalProductFilterShow(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Products | Shop",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -223,7 +225,7 @@ func (controller *productManagerController) page(data productManagerControllerDa
 		Class("container").
 		Child(breadcrumbs).
 		Child(hb.HR()).
-		Child(shared.Header(config.ShopStore, &config.Logger, data.request)).
+		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request)).
 		Child(hb.HR()).
 		Child(title).
 		Child(controller.tableProducts(data))
@@ -497,7 +499,7 @@ func (controller *productManagerController) prepareData(r *http.Request) (data p
 	productList, productCount, err := controller.fetchProductList(data)
 
 	if err != nil {
-		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
+		slog.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving products"
 	}
 
@@ -508,7 +510,7 @@ func (controller *productManagerController) prepareData(r *http.Request) (data p
 }
 
 func (controller *productManagerController) fetchProductList(data productManagerControllerData) ([]shopstore.ProductInterface, int64, error) {
-	if config.ShopStore == nil {
+	if controller.app.GetShopStore() == nil {
 		return nil, 0, errors.New("ShopStore is nil")
 	}
 
@@ -550,17 +552,17 @@ func (controller *productManagerController) fetchProductList(data productManager
 		query.SetCreatedAtLte(data.formCreatedTo + " 23:59:59")
 	}
 
-	productList, err := config.ShopStore.ProductList(context.Background(), query)
+	productList, err := controller.app.GetShopStore().ProductList(context.Background(), query)
 
 	if err != nil {
-		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
+		slog.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return []shopstore.ProductInterface{}, 0, err
 	}
 
-	productCount, err := config.ShopStore.ProductCount(context.Background(), query)
+	productCount, err := controller.app.GetShopStore().ProductCount(context.Background(), query)
 
 	if err != nil {
-		config.Logger.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
+		slog.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return []shopstore.ProductInterface{}, 0, err
 	}
 
