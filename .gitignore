@@ -30,6 +30,8 @@ tmp/
 
 # Database files
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 
 database.sqlite
@@ -45,5 +47,3 @@ google-cloud-sdk/
 
 # Cache
 .cache/
-database.db-shm
-database.db-wal
