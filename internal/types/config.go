@@ -110,7 +110,7 @@ type llmConfigInterface interface {
 	GetVertexAiModelID() string
 }
 
-type encryptionConfigInterface interface {
+type envEncryptionConfigInterface interface {
 	SetEnvEncryptionKey(string)
 	GetEnvEncryptionKey() string
 }
@@ -135,15 +135,6 @@ type i18nConfigInterface interface {
 	GetTranslationLanguageDefault() string
 	SetTranslationLanguageList(map[string]string)
 	GetTranslationLanguageList() map[string]string
-}
-
-type dailyAnalysisConfigInterface interface {
-	SetDailyAnalysisSymbols([]string)
-	GetDailyAnalysisSymbols() []string
-	SetDailyAnalysisTimeUTC(string)
-	GetDailyAnalysisTimeUTC() string
-	SetDailyAnalysisCadenceHours(int)
-	GetDailyAnalysisCadenceHours() int
 }
 
 type appSpecificConfigInterface interface {
@@ -199,7 +190,7 @@ type ConfigInterface interface {
 	emailConfigInterface
 	databaseConfigInterface
 	llmConfigInterface
-	encryptionConfigInterface
+	envEncryptionConfigInterface
 	cmsStoreConfigInterface
 	statsStoreConfigInterface
 	mediaConfigInterface
