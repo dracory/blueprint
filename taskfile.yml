@@ -63,7 +63,9 @@ tasks:
     desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
     cmds:
       - go run cmd/deploy/main.go
+      - echo "Open https://XXXX.com to view the app"
       - echo "Done!"
+    silent: true
 
   # ======================================================================== #
   # END: Deploy                                                              #

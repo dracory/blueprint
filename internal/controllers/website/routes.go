@@ -5,17 +5,15 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"project/internal/controllers/shared"
+	"github.com/dracory/rtr"
 
+	"project/internal/controllers/shared"
 	"project/internal/controllers/website/blog"
 	"project/internal/controllers/website/cms"
 	"project/internal/controllers/website/contact"
 	"project/internal/controllers/website/home"
 	"project/internal/controllers/website/seo"
 	"project/internal/controllers/website/swagger"
-
-	"github.com/dracory/rtr"
-	// paypalControllers "project/controllers/website/paypal"
 )
 
 func Routes(app types.AppInterface) []rtr.RouteInterface {
@@ -88,6 +86,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		// paymentCancel,
 	}
 
+	// Aggregated sub-routes (migrated ones only)
 	websiteRoutes = append(websiteRoutes, swaggerUiRoute)
 	websiteRoutes = append(websiteRoutes, swaggerYamlRoute)
 
