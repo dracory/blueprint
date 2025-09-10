@@ -16,7 +16,7 @@ func TestHomeController_Handler(t *testing.T) {
 	app.GetConfig().SetAppName("TEST APP NAME")
 
 	// Execute
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewHomeController(app).Handler, test.NewRequestOptions{})
+	body, response, err := test.CallStringEndpoint(http.MethodGet, NewHomeController(app).Handler, test.NewRequestOptions{})
 
 	// Assert
 	if err != nil {

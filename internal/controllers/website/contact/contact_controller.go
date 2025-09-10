@@ -8,15 +8,14 @@ import (
 	"project/internal/links"
 	"project/internal/tasks"
 	"project/internal/types"
-	"strings"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/gouniverse/csrf"
 
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/customstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
@@ -80,11 +79,11 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 
 func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.Request) string {
 	data := contactControllerData{
-		email:     strings.TrimSpace(req.Value(r, "email")),
-		firstName: strings.TrimSpace(req.Value(r, "first_name")),
-		lastName:  strings.TrimSpace(req.Value(r, "last_name")),
-		text:      strings.TrimSpace(req.Value(r, "text")),
-		csrfToken: strings.TrimSpace(req.Value(r, "csrf_token")),
+		email:     req.GetStringTrimmed(r, "email"),
+		firstName: req.GetStringTrimmed(r, "first_name"),
+		lastName:  req.GetStringTrimmed(r, "last_name"),
+		text:      req.GetStringTrimmed(r, "text"),
+		csrfToken: req.GetStringTrimmed(r, "csrf_token"),
 	}
 
 	if data.csrfToken == "" {

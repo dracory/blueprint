@@ -9,9 +9,9 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 // == CONTROLLER ==============================================================

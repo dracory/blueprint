@@ -5,7 +5,7 @@ import (
 	"project/internal/links"
 	"strings"
 
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 	"github.com/samber/lo"
 )
 

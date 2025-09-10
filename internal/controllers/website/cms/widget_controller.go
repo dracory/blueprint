@@ -5,7 +5,7 @@ import (
 	"project/internal/types"
 	"project/internal/widgets"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 )
 
 // == CONTROLLER ===============================================================
@@ -23,7 +23,7 @@ func NewWidgetController(app types.AppInterface) *widgetController {
 // == PUBLIC METHODS ==========================================================
 
 func (controller *widgetController) Handler(w http.ResponseWriter, r *http.Request) string {
-	alias := req.Value(r, "alias")
+	alias := req.GetStringTrimmed(r, "alias")
 
 	if alias == "" {
 		return "Widget type not specified"

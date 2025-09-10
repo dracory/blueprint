@@ -2,6 +2,11 @@ package shared
 
 import (
 	"net/http"
+	"project/internal/controllers/shared/file"
+	"project/internal/controllers/shared/flash"
+	"project/internal/controllers/shared/media"
+	"project/internal/controllers/shared/resource"
+	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
 	"project/internal/types"
 
@@ -21,23 +26,23 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetName("Shared > Files Controller").
 		SetPath(links.FILES).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(NewFileController(app.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(file.NewFileController(app.GetSqlFileStorage()).Handler)
 
 	flash := rtr.NewRoute().
 		SetName("Shared > Flash Controller").
 		SetPath(links.FLASH).
-		SetHTMLHandler(NewFlashController(app).Handler)
+		SetHTMLHandler(flash.NewFlashController(app).Handler)
 
 	media := rtr.NewRoute().
 		SetName("Shared > Media Controller").
 		SetPath(links.MEDIA).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(NewMediaController(app.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(media.NewMediaController(app.GetSqlFileStorage()).Handler)
 
 	resources := rtr.NewRoute().
 		SetName("Shared > Resources Controller").
 		SetPath(links.RESOURCES).
-		SetHTMLHandler(NewResourceController().Handler)
+		SetHTMLHandler(resource.NewResourceController().Handler)
 
 	theme := rtr.NewRoute().
 		SetName("Shared > Theme Controller").
@@ -47,7 +52,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	thumb := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath(links.THUMB).
-		SetHTMLHandler(NewThumbController(app).Handler)
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	return []rtr.RouteInterface{
 		adsTxt,

@@ -7,12 +7,11 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/types"
-	"strings"
 
-	"github.com/dracory/base/req"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/spf13/cast"
 
 	"github.com/samber/lo"
@@ -174,7 +173,7 @@ func (controller *blogController) page(data blogControllerData) string {
 
 func (controller blogController) prepareData(r *http.Request) (data blogControllerData, errorMessage string) {
 	perPage := 12 // 3 rows x 4 postss
-	pageStr := strings.TrimSpace(req.Value(r, "page"))
+	pageStr := req.GetStringTrimmed(r, "page")
 	page := cast.ToInt(pageStr)
 
 	if page < 0 {

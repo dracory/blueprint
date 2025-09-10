@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 // SeedUser find existing or generates a new user with the given ID

@@ -1,11 +1,12 @@
-package shared
+package thumb
 
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"project/internal/cache"
 	"project/internal/links"
 	"project/internal/resources"
@@ -219,7 +220,7 @@ func (controller *thumbnailController) urlToBytes(url string) ([]byte, error) {
 
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
 		log.Println("Url: " + url + " NOT FOUND")
@@ -230,7 +231,7 @@ func (controller *thumbnailController) urlToBytes(url string) ([]byte, error) {
 }
 
 func (controller *thumbnailController) toBytes(path string) ([]byte, error) {
-	bytes, err := ioutil.ReadFile(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
 		log.Println("Path: " + path + " NOT FOUND")
 		return nil, err

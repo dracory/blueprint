@@ -1,13 +1,13 @@
-package shared
+package file
 
 import (
 	"net/http"
 	"strings"
 
 	"github.com/dracory/str"
+	"github.com/gouniverse/filesystem"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
-	"github.com/gouniverse/filesystem"
 )
 
 // == CONTROLLER ==============================================================
@@ -51,37 +51,15 @@ func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string 
 	}
 
 	extension := c.findExtension(filePath)
+	mimeType := c.findMIMEType(extension)
 
 	if extension == "" {
 		return "File not found"
 	}
 
-	if extension == "html" {
-		w.Header().Set("Content-Type", "text/html")
-	} else if extension == "css" {
-		w.Header().Set("Content-Type", "text/css")
-	} else if extension == "js" {
-		w.Header().Set("Content-Type", "application/javascript")
-	} else if extension == "json" {
-		w.Header().Set("Content-Type", "application/json")
-	} else if extension == "png" {
-		w.Header().Set("Content-Type", "image/png")
-	} else if extension == "jpg" || extension == "jpeg" {
-		w.Header().Set("Content-Type", "image/jpeg")
-	} else if extension == "gif" {
-		w.Header().Set("Content-Type", "image/gif")
-	} else if extension == "svg" {
-		w.Header().Set("Content-Type", "image/svg+xml")
-	} else if extension == "ico" {
-		w.Header().Set("Content-Type", "image/x-icon")
-	} else if extension == "pdf" {
-		w.Header().Set("Content-Type", "application/pdf")
-	} else if extension == "zip" {
-		w.Header().Set("Content-Type", "application/zip")
-	} else if extension == "mp3" {
-		w.Header().Set("Content-Type", "audio/mpeg")
-	} else {
-		w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Type", mimeType)
+
+	if mimeType == "application/octet-stream" {
 		w.Header().Set("Content-Disposition", "attachment; filename="+r.URL.Path)
 		w.Header().Set("Content-Length", cast.ToString(len(content)))
 	}
@@ -89,16 +67,6 @@ func (c *fileController) Handler(w http.ResponseWriter, r *http.Request) string 
 	w.Write(content)
 
 	return ""
-}
-
-func (controller fileController) findFileName(path string) string {
-	uriParts := strings.Split(strings.Trim(path, "/"), "/")
-
-	if len(uriParts) < 1 {
-		return ""
-	}
-
-	return uriParts[len(uriParts)-1]
 }
 
 // findExtension finds the file extension from a path.
@@ -122,4 +90,54 @@ func (controller fileController) findExtension(path string) string {
 	}
 
 	return nameParts[1]
+}
+
+func (controller fileController) findMIMEType(extension string) string {
+	switch extension {
+	case "html":
+		return "text/html"
+	case "css":
+		return "text/css"
+	case "js":
+		return "application/javascript"
+	case "json":
+		return "application/json"
+	case "png":
+		return "image/png"
+	case "jpg", "jpeg":
+		return "image/jpeg"
+	case "gif":
+		return "image/gif"
+	case "svg":
+		return "image/svg+xml"
+	case "ico":
+		return "image/x-icon"
+	case "pdf":
+		return "application/pdf"
+	case "zip":
+		return "application/zip"
+	case "mp3":
+		return "audio/mpeg"
+	case "webm":
+		return "video/webm"
+	default:
+		return "application/octet-stream"
+	}
+}
+
+// findFileName finds the file name from a path.
+//
+// Parameter(s):
+//   - path string - the path
+//
+// Return type(s):
+//   - string - the file name
+func (controller fileController) findFileName(path string) string {
+	uriParts := strings.Split(strings.Trim(path, "/"), "/")
+
+	if len(uriParts) < 1 {
+		return ""
+	}
+
+	return uriParts[len(uriParts)-1]
 }

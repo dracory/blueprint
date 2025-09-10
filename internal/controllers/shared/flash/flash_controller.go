@@ -1,4 +1,4 @@
-package shared
+package flash
 
 import (
 	"net/http"
@@ -7,11 +7,10 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"strings"
-
-	"github.com/dracory/base/req"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/icons"
+	"github.com/dracory/cdn"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
 
@@ -32,12 +31,18 @@ func NewFlashController(app types.AppInterface) *flashController {
 func (controller flashController) Handler(w http.ResponseWriter, r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 
+	title := "System Message"
+	html := controller.pageHTML(r)
+
 	if authUser != nil && authUser.IsRegistrationCompleted() {
 		return layouts.NewUserLayout(controller.app, r, layouts.Options{
-			Title:      "System Message",
-			Content:    controller.pageHTML(r),
+			Title:      title,
+			Content:    html,
 			ScriptURLs: []string{},
 			Styles:     []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
+			StyleURLs: []string{
+				cdn.BootstrapIconsCss_1_13_1(),
+			},
 		}).ToHTML()
 	}
 
@@ -45,29 +50,33 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		return layouts.NewCmsLayout(
 			controller.app,
 			layouts.Options{
-				Request:    r,
-				Title:      "System Message",
-				Content:    controller.pageHTML(r),
-				ScriptURLs: []string{},
-				Styles:     []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
+				Request: r,
+				Title:   title,
+				Content: html,
+				Styles:  []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
+				StyleURLs: []string{
+					cdn.BootstrapIconsCss_1_13_1(),
+				},
 			},
 		).ToHTML()
 	} else {
 		return layouts.NewUserLayout(controller.app, r, layouts.Options{
-			Title:      "System Message",
-			Content:    controller.pageHTML(r),
-			ScriptURLs: []string{},
+			Title:   title,
+			Content: html,
+			StyleURLs: []string{
+				cdn.BootstrapIconsCss_1_13_1(),
+			},
 		}).ToHTML()
 	}
 }
 
 func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
-	messageID := req.Value(r, "message_id")
+	messageID := req.GetStringTrimmed(r, "message_id")
 	msgData, err := c.app.GetCacheStore().GetJSON(messageID+"_flash_message", "")
 
 	msgType := "error"
 	message := "The message is no longer available"
-	url := links.NewWebsiteLinks().Home()
+	url := links.Website().Home()
 	time := "5"
 
 	if err != nil {
@@ -86,58 +95,37 @@ func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
 		time = cast.ToString(msgDataAny["time"])
 	}
 
-	alert := hb.Div()
-	alertIcon := ""
-	if msgType == "error" {
-		alert.Class("alert alert-danger")
-		alertIcon = icons.BootstrapExclamationOctagon
-	} else if msgType == "success" {
-		alert.Class("alert alert-success")
-		alertIcon = icons.BootstrapCheckCircle
-	} else if msgType == "warning" {
-		alert.Class("alert alert-warning")
-		alertIcon = icons.BootstrapExclamationTriangle
-	} else {
-		alert.Class("alert alert-info")
-		alertIcon = icons.BootstrapInfoCircle
-	}
+	alertIcon := hb.I().
+		Class("me-2").
+		Class("bi").
+		Class(lo.If(msgType == "error", "bi-exclamation-octagon-fill").
+			ElseIf(msgType == "success", "bi-check-circle-fill").
+			ElseIf(msgType == "warning", "bi-exclamation-triangle-fill").
+			Else("bi-info-circle-fill"))
 
-	css := ""
-	css += "div.alert-success{color:green;}"
-	css += "div.alert-danger{color:red;}"
-	css += "div.alert-info{color:blue;}"
-	css += "div.alert-warning{color:warning;}"
+	alert := hb.Div().
+		Class("alert").
+		Class(lo.
+			If(msgType == "error", "alert-danger").
+			ElseIf(msgType == "success", "alert-success").
+			ElseIf(msgType == "warning", "alert-warning").
+			Else("alert-info")).
+		Child(alertIcon).
+		HTML(message)
 
-	icon := strings.ReplaceAll(alertIcon, "height=\"16\"", "height=\"24\"")
-	icon = strings.ReplaceAll(icon, "width=\"16\"", "width=\"24\"")
-	alert.Child(hb.Span().
-		Child(hb.Span().
-			HTML(icon).
-			Style("position:absolute;top:-16px;")).
-		Style("position:relative; margin:0px 20px 0px 0px; display:inline-table;width:24px;"))
-	alert.Child(hb.Span().HTML(message))
+	linkRedirect := hb.Hyperlink().Href(url).HTML("Click here to continue")
+	scriptRedirect := hb.Script("setTimeout(()=>{location.href=\"" + url + "\"}, " + time + "*1000)")
 
 	container := hb.Div().
 		Class("container").
 		Style("padding:0px 0px 20px 0px;text-align:left;").
-		Child(hb.Style(css)).
-		Child(alert)
-
-	if url != "" {
-		link := hb.Hyperlink().Href(url).HTML("Click here to continue")
-		divLink := hb.Div()
-		divLink.AddChild(link).Style("padding:20px 0px 20px 0px;")
-		container.AddChild(divLink)
-	}
-
-	if url != "" && time != "" {
-		script := hb.Script("setTimeout(()=>{location.href=\"" + url + "\"}, " + time + "*1000)")
-		container.AddChild(script)
-	}
+		Child(alert).
+		ChildIf(url != "", hb.Div().
+			Child(linkRedirect).
+			Style("padding:20px 0px 20px 0px;")).
+		ChildIf(url != "" && time != "", scriptRedirect)
 
 	return hb.Section().
-		Children([]hb.TagInterface{
-			container,
-		}).
+		Child(container).
 		Style("padding: 80px 0px 40px 0px;")
 }

@@ -7,7 +7,7 @@ import (
 
 	"github.com/dracory/rtr"
 
-	"project/internal/controllers/shared"
+	"project/internal/controllers/shared/page_not_found"
 	"project/internal/controllers/website/blog"
 	"project/internal/controllers/website/cms"
 	"project/internal/controllers/website/contact"
@@ -29,7 +29,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	pageNotFoundRoute := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
 		SetPath(links.CATCHALL).
-		SetHTMLHandler(shared.PageNotFoundController().Handler)
+		SetHTMLHandler(page_not_found.PageNotFoundController().Handler)
 
 	faviconRoute := rtr.NewRoute().
 		SetName("Website Favicon").

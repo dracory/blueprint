@@ -10,15 +10,14 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/types"
-	"strings"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/geostore"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/sb"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/geostore"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/sb"
+	"github.com/dracory/userstore"
 	"github.com/samber/lo"
 )
 
@@ -391,13 +390,13 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 	}
 
 	if r.Method == http.MethodPost {
-		data.email = strings.TrimSpace(req.Value(r, "email"))
-		data.firstName = strings.TrimSpace(req.Value(r, "first_name"))
-		data.lastName = strings.TrimSpace(req.Value(r, "last_name"))
-		data.buinessName = strings.TrimSpace(req.Value(r, "business_name"))
-		data.phone = strings.TrimSpace(req.Value(r, "phone"))
-		data.timezone = strings.TrimSpace(req.Value(r, "timezone"))
-		data.country = strings.TrimSpace(req.Value(r, "country"))
+		data.email = req.GetStringTrimmed(r, "email")
+		data.firstName = req.GetStringTrimmed(r, "first_name")
+		data.lastName = req.GetStringTrimmed(r, "last_name")
+		data.buinessName = req.GetStringTrimmed(r, "business_name")
+		data.phone = req.GetStringTrimmed(r, "phone")
+		data.timezone = req.GetStringTrimmed(r, "timezone")
+		data.country = req.GetStringTrimmed(r, "country")
 	}
 
 	return data, ""

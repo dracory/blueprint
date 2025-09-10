@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/config"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 // GetAuthUser returns the authenticated user

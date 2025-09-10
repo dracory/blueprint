@@ -1,4 +1,4 @@
-package shared
+package page_not_found
 
 import (
 	"net/http"

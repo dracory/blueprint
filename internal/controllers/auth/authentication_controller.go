@@ -14,13 +14,12 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/req"
 	"github.com/dracory/blindindexstore"
+	"github.com/dracory/req"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/auth"
-	"github.com/gouniverse/sessionstore"
-	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
 
@@ -104,7 +103,7 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 	session := sessionstore.NewSession().
 		SetUserID(user.ID()).
 		SetUserAgent(r.UserAgent()).
-		SetIPAddress(utils.IP(r)).
+		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
 	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
@@ -149,7 +148,7 @@ func (c *authenticationController) findUserIDInBlindIndex(email string) (userID 
 }
 
 func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.Request) (email, backUrl, errorMessage string) {
-	once := strings.TrimSpace(req.Value(r, "once"))
+	once := strings.TrimSpace(req.GetStringTrimmed(r, "once"))
 
 	if once == "" {
 		return "", "", "Once is required field"

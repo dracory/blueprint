@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/types"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 // == CONSTRUCTOR ==============================================================

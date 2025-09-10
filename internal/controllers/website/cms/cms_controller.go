@@ -7,9 +7,9 @@ import (
 	"project/pkg/webtheme"
 	"sync"
 
-	"github.com/gouniverse/cmsstore"
-	cmsFrontend "github.com/gouniverse/cmsstore/frontend"
-	"github.com/gouniverse/ui"
+	"github.com/dracory/cmsstore"
+	cmsFrontend "github.com/dracory/cmsstore/frontend"
+	"github.com/dracory/ui"
 )
 
 const CMS_ENABLE_CACHE = false

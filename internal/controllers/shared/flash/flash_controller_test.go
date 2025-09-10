@@ -1,4 +1,4 @@
-package shared
+package flash
 
 import (
 	"net/http"
