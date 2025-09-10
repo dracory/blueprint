@@ -37,6 +37,7 @@ require (
 	github.com/dracory/taskstore v1.7.0
 	github.com/dracory/test v0.2.0
 	github.com/dracory/tradingstore v0.10.0
+	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/userstore v1.5.0
 	github.com/dracory/websrv v0.1.0
@@ -46,25 +47,13 @@ require (
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gouniverse/auth v0.22.0
-	github.com/gouniverse/blockeditor v0.21.2
-	github.com/gouniverse/blogstore v1.0.0
-	github.com/gouniverse/bs v0.13.0
-	github.com/gouniverse/cachestore v0.19.1
-	github.com/gouniverse/cmsstore v0.29.0
 	github.com/gouniverse/csrf v0.1.0
 	github.com/gouniverse/dashboard v1.7.1
-	github.com/gouniverse/envenc v0.10.0
 	github.com/gouniverse/filesystem v0.3.1
-	github.com/gouniverse/form v0.17.0
-	github.com/gouniverse/hb v1.87.0
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
-	github.com/gouniverse/sessionstore v1.0.0
-	github.com/gouniverse/statsstore v0.5.0
 	github.com/gouniverse/taskstore v1.5.0
-	github.com/gouniverse/ui v0.14.0
-	github.com/gouniverse/userstore v1.1.0
 	github.com/gouniverse/utils v1.45.4
 	github.com/gouniverse/vaultstore v0.25.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
@@ -101,7 +90,6 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/api v1.7.0 // indirect
 	github.com/dracory/dataobject v1.6.0 // indirect
-	github.com/dracory/ui v0.17.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
@@ -111,17 +99,24 @@ require (
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/goravel/framework v1.16.0 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
+	github.com/gouniverse/blockeditor v0.21.2 // indirect
+	github.com/gouniverse/bs v0.13.0 // indirect
+	github.com/gouniverse/cachestore v0.19.1 // indirect
 	github.com/gouniverse/cdn v1.6.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
+	github.com/gouniverse/envenc v0.10.0 // indirect
+	github.com/gouniverse/form v0.17.0 // indirect
+	github.com/gouniverse/hb v1.87.0 // indirect
 	github.com/gouniverse/logstore v1.7.0 // indirect
 	github.com/gouniverse/router v1.4.2 // indirect
+	github.com/gouniverse/sessionstore v1.0.0 // indirect
 	github.com/gouniverse/settingstore v1.0.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/sqlfilestore v0.2.0 // indirect
 	github.com/gouniverse/strutils v0.7.0 // indirect
+	github.com/gouniverse/ui v0.14.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
-	github.com/gouniverse/versionstore v0.4.2 // indirect
 	github.com/gouniverse/webserver v0.1.0 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
 	github.com/jedib0t/go-pretty/v6 v6.6.7 // indirect
@@ -160,7 +155,6 @@ require (
 	github.com/gouniverse/cms v1.12.0
 	github.com/gouniverse/dataobject v1.3.0
 	github.com/gouniverse/entitystore v1.0.0
-	github.com/gouniverse/geostore v0.14.0
 	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.9.0
 	github.com/gouniverse/uid v1.5.0 // indirect
