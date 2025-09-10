@@ -3,8 +3,8 @@ package cmds
 import (
 	"project/internal/types"
 
-	"github.com/gouniverse/taskstore"
-	"github.com/gouniverse/utils"
+	"github.com/dracory/cmd"
+	"github.com/dracory/taskstore"
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 )
@@ -18,7 +18,7 @@ import (
 // Return type: None.
 func ExecuteJob(app types.AppInterface, args []string) {
 	name := "No name"
-	argumentsMap := utils.ArgsToMap(args)
+	argumentsMap := cmd.ArgsToMap(args)
 	cfmt.Infoln("Executing job: ", name, " with arguments: ", argumentsMap, " ...")
 
 	queuedTaskID := lo.ValueOr(argumentsMap, "task_id", "")

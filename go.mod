@@ -14,9 +14,10 @@ require (
 	github.com/dracory/bs v0.15.0
 	github.com/dracory/cachestore v0.20.0
 	github.com/dracory/cdn v1.8.0
+	github.com/dracory/cmd v0.2.0
 	github.com/dracory/cmsstore v0.33.0
 	github.com/dracory/crud/v2 v2.0.0-20250902001618-c4cd13b63280
-	github.com/dracory/customstore v1.5.0
+	github.com/dracory/customstore v1.6.0
 	github.com/dracory/database v0.3.0
 	github.com/dracory/env v0.6.0
 	github.com/dracory/envenc v0.12.0
@@ -27,10 +28,10 @@ require (
 	github.com/dracory/liveflux v0.4.0
 	github.com/dracory/logstore v1.8.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v0.10.0
+	github.com/dracory/rtr v0.11.0
 	github.com/dracory/sb v0.11.0
 	github.com/dracory/sessionstore v1.3.0
-	github.com/dracory/settingstore v1.1.0
+	github.com/dracory/settingstore v1.2.0
 	github.com/dracory/shopstore v1.1.2
 	github.com/dracory/statsstore v0.6.0
 	github.com/dracory/str v0.3.0
@@ -53,7 +54,6 @@ require (
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
-	github.com/gouniverse/taskstore v1.5.0
 	github.com/gouniverse/utils v1.45.4
 	github.com/gouniverse/vaultstore v0.25.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
@@ -63,11 +63,11 @@ require (
 	github.com/mocktools/go-smtp-mock v1.10.0
 	github.com/robertkrimen/otto v0.5.1
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
-	github.com/spf13/cast v1.9.2
+	github.com/spf13/cast v1.10.0
 	github.com/stretchr/testify v1.11.1
 	github.com/yuin/goldmark v1.7.13
 	gorm.io/driver/sqlite v1.6.0
-	gorm.io/gorm v1.30.0
+	gorm.io/gorm v1.30.5
 	modernc.org/sqlite v1.38.2
 )
 
@@ -114,12 +114,13 @@ require (
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/sqlfilestore v0.2.0 // indirect
 	github.com/gouniverse/strutils v0.7.0 // indirect
+	github.com/gouniverse/taskstore v1.5.0 // indirect
 	github.com/gouniverse/ui v0.14.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
 	github.com/gouniverse/webserver v0.1.0 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
-	github.com/jedib0t/go-pretty/v6 v6.6.7 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.6.8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
