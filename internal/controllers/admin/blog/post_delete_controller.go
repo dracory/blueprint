@@ -7,10 +7,10 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/dracory/base/req"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 )
 
 type postDeleteController struct {
@@ -124,7 +124,7 @@ func (controller *postDeleteController) modal(data postDeleteControllerData) hb.
 
 func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) (data postDeleteControllerData, errorMessage string) {
 	authUser := helpers.GetAuthUser(r)
-	data.postID = req.Value(r, "post_id")
+	data.postID = req.GetStringTrimmed(r, "post_id")
 
 	if authUser == nil {
 		return data, "You are not logged in. Please login to continue."

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
+	"github.com/dracory/sessionstore"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/auth"
-	"github.com/gouniverse/sessionstore"
 )
 
 func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.Request, userID string) error {
@@ -18,7 +18,7 @@ func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.
 	session := sessionstore.NewSession().
 		SetUserID(userID).
 		SetUserAgent(r.UserAgent()).
-		SetIPAddress(req.IP(r)).
+		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
 	err := ss.SessionCreate(r.Context(), session)

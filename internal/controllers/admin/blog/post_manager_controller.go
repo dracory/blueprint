@@ -10,13 +10,13 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/sb"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -89,16 +89,16 @@ func (controller *managerController) page(data managerControllerData) hb.TagInte
 func (controller *managerController) prepareData(r *http.Request) (data managerControllerData, errorMessage string) {
 	var err error
 
-	data.page = req.ValueOr(r, "page", "0")
+	data.page = req.GetStringTrimmed(r, "page")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
-	data.sortOrder = req.ValueOr(r, "sort_order", sb.DESC)
-	data.sortBy = req.ValueOr(r, "by", blogstore.COLUMN_CREATED_AT)
-	data.status = req.Value(r, "status")
-	data.search = req.Value(r, "search")
-	data.dateFrom = req.ValueOr(r, "date_from", carbon.Now().AddYears(-1).ToDateString())
-	data.dateTo = req.ValueOr(r, "date_to", carbon.Now().ToDateString())
-	data.customerID = req.Value(r, "customer_id")
+	data.perPage = cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
+	data.sortOrder = req.GetStringTrimmedOr(r, "sort_order", sb.DESC)
+	data.sortBy = req.GetStringTrimmedOr(r, "by", blogstore.COLUMN_CREATED_AT)
+	data.status = req.GetStringTrimmed(r, "status")
+	data.search = req.GetStringTrimmed(r, "search")
+	data.dateFrom = req.GetStringTrimmedOr(r, "date_from", carbon.Now().AddYears(-1).ToDateString())
+	data.dateTo = req.GetStringTrimmedOr(r, "date_to", carbon.Now().ToDateString())
+	data.customerID = req.GetStringTrimmed(r, "customer_id")
 
 	query := blogstore.PostQueryOptions{
 		Search:               data.search,

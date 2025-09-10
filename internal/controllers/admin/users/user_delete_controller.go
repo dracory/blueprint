@@ -7,10 +7,10 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/userstore"
 )
 
 type userDeleteController struct {
@@ -129,7 +129,7 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 	}
 
 	authUser := helpers.GetAuthUser(r)
-	data.userID = utils.Req(r, "user_id", "")
+	data.userID = req.GetString(r, "user_id")
 
 	if authUser == nil {
 		return data, "You are not logged in. Please login to continue."

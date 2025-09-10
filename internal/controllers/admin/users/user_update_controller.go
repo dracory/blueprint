@@ -9,11 +9,11 @@ import (
 	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/dracory/base/req"
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/userstore"
 )
 
 // == CONTROLLER ==============================================================
@@ -235,11 +235,11 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 		return data, "User store is not configured"
 	}
 
-	data.formFirstName = req.Value(r, "user_first_name")
-	data.formLastName = req.Value(r, "user_last_name")
-	data.formEmail = req.Value(r, "user_email")
-	data.formMemo = req.Value(r, "user_memo")
-	data.formStatus = req.Value(r, "user_status")
+	data.formFirstName = req.GetStringTrimmed(r, "user_first_name")
+	data.formLastName = req.GetStringTrimmed(r, "user_last_name")
+	data.formEmail = req.GetStringTrimmed(r, "user_email")
+	data.formMemo = req.GetStringTrimmed(r, "user_memo")
+	data.formStatus = req.GetStringTrimmed(r, "user_status")
 
 	if data.formStatus == "" {
 		data.formErrorMessage = "Status is required"
@@ -306,8 +306,8 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 		return data, "User store is not configured"
 	}
 
-	data.action = req.Value(r, "action")
-	data.userID = req.Value(r, "user_id")
+	data.action = req.GetStringTrimmed(r, "action")
+	data.userID = req.GetStringTrimmed(r, "user_id")
 
 	if data.userID == "" {
 		return data, "User ID is required"

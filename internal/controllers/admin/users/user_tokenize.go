@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 	"github.com/gouniverse/vaultstore"
 )
 

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/statsstore"
+	"github.com/dracory/statsstore"
 )
 
 // newStatsStore constructs the Stats store without running migrations

@@ -7,8 +7,8 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
 	"github.com/gouniverse/icons"
 	"github.com/samber/lo"
 )

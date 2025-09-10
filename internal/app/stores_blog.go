@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/blogstore"
+	"github.com/dracory/blogstore"
 )
 
 func newBlogStore(db *sql.DB) (blogstore.StoreInterface, error) {

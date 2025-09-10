@@ -10,15 +10,15 @@ import (
 	"project/pkg/blogblocks"
 	"strings"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/blockeditor"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/sb"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/blockeditor"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 )
 
@@ -640,19 +640,19 @@ setTimeout(() => {
 }
 
 func (controller *postUpdateController) savePost(r *http.Request, data postUpdateControllerData) (d postUpdateControllerData, errorMessage string) {
-	data.formCanonicalURL = req.Value(r, "post_canonical_url")
-	data.formContent = req.Value(r, "post_content")
-	data.formEditor = req.Value(r, "post_editor")
-	data.formFeatured = req.Value(r, "post_featured")
-	data.formImageUrl = req.Value(r, "post_image_url")
-	data.formMemo = req.Value(r, "post_memo")
-	data.formMetaDescription = req.Value(r, "post_meta_description")
-	data.formMetaKeywords = req.Value(r, "post_meta_keywords")
-	data.formMetaRobots = req.Value(r, "post_meta_robots")
-	data.formPublishedAt = req.Value(r, "post_published_at")
-	data.formSummary = req.Value(r, "post_summary")
-	data.formStatus = req.Value(r, "post_status")
-	data.formTitle = req.Value(r, "post_title")
+	data.formCanonicalURL = req.GetStringTrimmed(r, "post_canonical_url")
+	data.formContent = req.GetStringTrimmed(r, "post_content")
+	data.formEditor = req.GetStringTrimmed(r, "post_editor")
+	data.formFeatured = req.GetStringTrimmed(r, "post_featured")
+	data.formImageUrl = req.GetStringTrimmed(r, "post_image_url")
+	data.formMemo = req.GetStringTrimmed(r, "post_memo")
+	data.formMetaDescription = req.GetStringTrimmed(r, "post_meta_description")
+	data.formMetaKeywords = req.GetStringTrimmed(r, "post_meta_keywords")
+	data.formMetaRobots = req.GetStringTrimmed(r, "post_meta_robots")
+	data.formPublishedAt = req.GetStringTrimmed(r, "post_published_at")
+	data.formSummary = req.GetStringTrimmed(r, "post_summary")
+	data.formStatus = req.GetStringTrimmed(r, "post_status")
+	data.formTitle = req.GetStringTrimmed(r, "post_title")
 
 	if data.view == VIEW_DETAILS {
 		if data.formStatus == "" {
@@ -707,9 +707,9 @@ func (controller *postUpdateController) savePost(r *http.Request, data postUpdat
 }
 
 func (controller *postUpdateController) prepareDataAndValidate(r *http.Request) (data postUpdateControllerData, errorMessage string) {
-	data.action = req.Value(r, "action")
-	data.postID = req.Value(r, "post_id")
-	data.view = req.ValueOr(r, "view", VIEW_DETAILS)
+	data.action = req.GetStringTrimmed(r, "action")
+	data.postID = req.GetStringTrimmed(r, "post_id")
+	data.view = req.GetStringTrimmedOr(r, "view", VIEW_DETAILS)
 
 	if data.view == "" {
 		data.view = VIEW_DETAILS

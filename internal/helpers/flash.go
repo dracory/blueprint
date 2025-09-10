@@ -5,8 +5,8 @@ import (
 	"project/internal/links"
 	"strings"
 
-	"github.com/gouniverse/cachestore"
-	"github.com/gouniverse/uid"
+	"github.com/dracory/cachestore"
+	"github.com/dracory/uid"
 )
 
 const FLASH_ERROR = "error"

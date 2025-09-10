@@ -13,12 +13,12 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/dracory/shopstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
 	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -482,19 +482,19 @@ func (controller *productManagerController) tablePagination(data productManagerC
 func (controller *productManagerController) prepareData(r *http.Request) (data productManagerControllerData, errorMessage string) {
 	var err error
 	data.request = r
-	data.action = req.Value(r, "action")
-	data.page = req.ValueOr(r, "page", "0")
+	data.action = req.GetStringTrimmed(r, "action")
+	data.page = req.GetStringTrimmedOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
-	data.sortOrder = req.ValueOr(r, "sort", sb.DESC)
-	data.sortBy = req.ValueOr(r, "by", shopstore.COLUMN_CREATED_AT)
-	data.formProductID = req.Value(r, "filter_product_id")
-	data.formTitle = req.Value(r, "filter_title")
-	data.formStatus = req.Value(r, "filter_status")
-	data.formCreatedFrom = req.Value(r, "filter_created_from")
-	data.formCreatedTo = req.Value(r, "filter_created_to")
-	data.formUpdatedFrom = req.Value(r, "filter_updated_from")
-	data.formUpdatedTo = req.Value(r, "filter_updated_to")
+	data.perPage = cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
+	data.sortOrder = req.GetStringTrimmedOr(r, "sort", sb.DESC)
+	data.sortBy = req.GetStringTrimmedOr(r, "by", shopstore.COLUMN_CREATED_AT)
+	data.formProductID = req.GetStringTrimmed(r, "filter_product_id")
+	data.formTitle = req.GetStringTrimmed(r, "filter_title")
+	data.formStatus = req.GetStringTrimmed(r, "filter_status")
+	data.formCreatedFrom = req.GetStringTrimmed(r, "filter_created_from")
+	data.formCreatedTo = req.GetStringTrimmed(r, "filter_created_to")
+	data.formUpdatedFrom = req.GetStringTrimmed(r, "filter_updated_from")
+	data.formUpdatedTo = req.GetStringTrimmed(r, "filter_updated_to")
 
 	productList, productCount, err := controller.fetchProductList(data)
 

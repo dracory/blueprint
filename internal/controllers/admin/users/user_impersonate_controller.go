@@ -7,7 +7,7 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 )
 
 // == CONTROLLER ==============================================================
@@ -36,7 +36,7 @@ func (c *userImpersonateController) Handler(w http.ResponseWriter, r *http.Reque
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Not authorized", links.NewAdminLinks().Users(map[string]string{}), 15)
 	}
 
-	userID := req.Value(r, "user_id")
+	userID := req.GetStringTrimmed(r, "user_id")
 
 	if userID == "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User ID not found", links.NewAdminLinks().Users(map[string]string{}), 15)

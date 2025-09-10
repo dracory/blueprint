@@ -8,10 +8,10 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 
-	statsAdmin "github.com/gouniverse/statsstore/admin"
-	statsAdminShared "github.com/gouniverse/statsstore/admin/shared"
+	statsAdmin "github.com/dracory/statsstore/admin"
+	statsAdminShared "github.com/dracory/statsstore/admin/shared"
 )
 
 type statsController struct {

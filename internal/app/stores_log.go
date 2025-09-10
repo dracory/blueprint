@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/logstore"
+	"github.com/dracory/logstore"
 )
 
 func newLogStore(db *sql.DB) (logstore.StoreInterface, error) {

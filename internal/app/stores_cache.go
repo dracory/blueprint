@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/cachestore"
+	"github.com/dracory/cachestore"
 )
 
 func newCacheStore(db *sql.DB) (cachestore.StoreInterface, error) {

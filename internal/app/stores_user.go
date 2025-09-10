@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 func newUserStore(db *sql.DB) (userstore.StoreInterface, error) {
@@ -27,5 +27,3 @@ func newUserStore(db *sql.DB) (userstore.StoreInterface, error) {
 
 	return st, nil
 }
-
-

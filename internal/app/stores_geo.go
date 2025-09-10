@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/geostore"
+	"github.com/dracory/geostore"
 )
 
 func newGeoStore(db *sql.DB) (geostore.StoreInterface, error) {

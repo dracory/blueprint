@@ -10,11 +10,11 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/cdn"
+	crud "github.com/dracory/crud/v2"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
 	"github.com/dracory/shopstore"
 	"github.com/dromara/carbon/v2"
-	crud "github.com/gouniverse/crud/v2"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )

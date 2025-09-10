@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/sessionstore"
+	"github.com/dracory/sessionstore"
 )
 
 func newSessionStore(db *sql.DB) (sessionstore.StoreInterface, error) {

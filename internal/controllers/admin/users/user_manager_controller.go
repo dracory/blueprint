@@ -12,14 +12,14 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/req"
 	"github.com/dracory/blindindexstore"
+	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/userstore"
 	"github.com/gouniverse/sb"
-	"github.com/gouniverse/userstore"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -476,18 +476,18 @@ func (controller *userManagerController) tablePagination(data userManagerControl
 func (controller *userManagerController) prepareData(r *http.Request) (data userManagerControllerData, errorMessage string) {
 	var err error
 	data.request = r
-	data.action = req.Value(r, "action")
-	data.page = req.ValueOr(r, "page", "0")
+	data.action = req.GetStringTrimmed(r, "action")
+	data.page = req.GetStringTrimmedOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
-	data.perPage = cast.ToInt(req.ValueOr(r, "per_page", "10"))
-	data.sortOrder = req.ValueOr(r, "sort_order", sb.DESC)
-	data.sortBy = req.ValueOr(r, "by", userstore.COLUMN_CREATED_AT)
-	data.formEmail = req.Value(r, "email")
-	data.formFirstName = req.Value(r, "first_name")
-	data.formLastName = req.Value(r, "last_name")
-	data.formStatus = req.Value(r, "status")
-	data.formCreatedFrom = req.Value(r, "created_from")
-	data.formCreatedTo = req.Value(r, "created_to")
+	data.perPage = cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
+	data.sortOrder = req.GetStringTrimmedOr(r, "sort_order", sb.DESC)
+	data.sortBy = req.GetStringTrimmedOr(r, "by", userstore.COLUMN_CREATED_AT)
+	data.formEmail = req.GetStringTrimmed(r, "email")
+	data.formFirstName = req.GetStringTrimmed(r, "first_name")
+	data.formLastName = req.GetStringTrimmed(r, "last_name")
+	data.formStatus = req.GetStringTrimmed(r, "status")
+	data.formCreatedFrom = req.GetStringTrimmed(r, "created_from")
+	data.formCreatedTo = req.GetStringTrimmed(r, "created_to")
 
 	userList, userCount, err := controller.fetchUserList(data)
 

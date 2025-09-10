@@ -5,7 +5,7 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 
 	shopDiscounts "project/internal/controllers/admin/shop/discounts"
@@ -15,7 +15,7 @@ import (
 
 func ShopRoutes(app types.AppInterface) []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
-		controller := req.Value(r, "controller")
+		controller := req.GetStringTrimmed(r, "controller")
 
 		if controller == shared.CONTROLLER_DISCOUNTS {
 			return shopDiscounts.NewDiscountController(app).AnyIndex(w, r)

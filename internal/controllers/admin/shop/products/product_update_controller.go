@@ -15,11 +15,11 @@ import (
 	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
-	"github.com/dracory/base/req"
 	"github.com/dracory/cdn"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/dracory/shopstore"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
 	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -445,12 +445,12 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 		return data, "error retrieving shop store"
 	}
 
-	data.formDescription = req.Value(r, "product_description")
-	data.formMemo = req.Value(r, "product_memo")
-	data.formPrice = req.Value(r, "product_price")
-	data.formQuantity = req.Value(r, "product_quantity")
-	data.formStatus = req.Value(r, "product_status")
-	data.formTitle = req.Value(r, "product_title")
+	data.formDescription = req.GetStringTrimmed(r, "product_description")
+	data.formMemo = req.GetStringTrimmed(r, "product_memo")
+	data.formPrice = req.GetStringTrimmed(r, "product_price")
+	data.formQuantity = req.GetStringTrimmed(r, "product_quantity")
+	data.formStatus = req.GetStringTrimmed(r, "product_status")
+	data.formTitle = req.GetStringTrimmed(r, "product_title")
 
 	if data.formStatus == "" {
 		data.formErrorMessage = "Status is required"
@@ -517,7 +517,7 @@ func (controller *productUpdateController) saveProductDetails(r *http.Request, d
 }
 
 func ReqArrayOfMaps(r *http.Request, key string, defaultValue []map[string]string) []map[string]string {
-	all := req.All(r)
+	all := req.GetAll(r)
 
 	reqArrayOfMaps := []map[string]string{}
 
@@ -626,8 +626,8 @@ func (controller *productUpdateController) prepareDataAndValidate(r *http.Reques
 	}
 
 	data.request = r
-	data.action = req.Value(r, "action")
-	data.productID = req.Value(r, "product_id")
+	data.action = req.GetStringTrimmed(r, "action")
+	data.productID = req.GetStringTrimmed(r, "product_id")
 
 	if data.productID == "" {
 		return data, "Product ID is required"

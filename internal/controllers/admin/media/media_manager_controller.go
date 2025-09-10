@@ -14,15 +14,15 @@ import (
 	"time"
 
 	"github.com/dracory/base/files"
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/gouniverse/filesystem"
 
 	"github.com/mingrammer/cfmt"
 
 	"github.com/dracory/cdn"
+	"github.com/dracory/hb"
 	"github.com/dromara/carbon/v2"
 	"github.com/gouniverse/api"
-	"github.com/gouniverse/hb"
 	"github.com/gouniverse/responses"
 
 	"github.com/samber/lo"
@@ -105,7 +105,7 @@ func (c *mediaManagerController) AnyIndex(w http.ResponseWriter, r *http.Request
 		JSON_ACTION_FILE_RENAME,
 		JSON_ACTION_FILE_DELETE,
 		JSON_ACTION_FILE_UPLOAD,
-	}, strings.TrimSpace(req.Value(r, "action"))) {
+	}, strings.TrimSpace(req.GetStringTrimmed(r, "action"))) {
 		responses.JSONResponseF(w, r, c.anyIndex)
 		return ""
 	}
@@ -115,7 +115,7 @@ func (c *mediaManagerController) AnyIndex(w http.ResponseWriter, r *http.Request
 }
 
 func (c *mediaManagerController) anyIndex(w http.ResponseWriter, r *http.Request) string {
-	action := strings.TrimSpace(req.Value(r, "action"))
+	action := strings.TrimSpace(req.GetStringTrimmed(r, "action"))
 	if action == JSON_ACTION_FILE_RENAME {
 		return c.fileRenameAjax(r)
 	}
@@ -144,7 +144,7 @@ func (c *mediaManagerController) fileUploadAjax(r *http.Request) string {
 		return api.Error("The uploaded image is too big. Please use an file less than 50MB in size").ToString()
 	}
 
-	currentDir := req.Value(r, "current_dir")
+	currentDir := req.GetStringTrimmed(r, "current_dir")
 	if currentDir == "" {
 		return api.Error("current_dir is required").ToString()
 	}
@@ -185,13 +185,13 @@ func (c *mediaManagerController) fileUploadAjax(r *http.Request) string {
 }
 
 func (c *mediaManagerController) directoryCreateAjax(r *http.Request) string {
-	newDirName := strings.TrimSpace(req.Value(r, "create_dir"))
+	newDirName := strings.TrimSpace(req.GetStringTrimmed(r, "create_dir"))
 
 	if newDirName == "" {
 		return api.Error("create_dir is required").ToString()
 	}
 
-	currentDir := strings.TrimSpace(req.Value(r, "current_dir"))
+	currentDir := strings.TrimSpace(req.GetStringTrimmed(r, "current_dir"))
 
 	if currentDir == "" {
 		return api.Error("current_dir is required").ToString()
@@ -225,13 +225,13 @@ func (c *mediaManagerController) directoryCreateAjax(r *http.Request) string {
 }
 
 func (c *mediaManagerController) directoryDeleteAjax(r *http.Request) string {
-	selectedDirName := strings.TrimSpace(req.Value(r, "delete_dir"))
+	selectedDirName := strings.TrimSpace(req.GetStringTrimmed(r, "delete_dir"))
 
 	if selectedDirName == "" {
 		return api.Error("delete_dir is required").ToString()
 	}
 
-	currentDir := strings.TrimSpace(req.Value(r, "current_dir"))
+	currentDir := strings.TrimSpace(req.GetStringTrimmed(r, "current_dir"))
 
 	if currentDir == "." || currentDir == ".." {
 		return api.Error("current_dir is required").ToString()
@@ -266,11 +266,11 @@ func (c *mediaManagerController) directoryDeleteAjax(r *http.Request) string {
 }
 
 func (c *mediaManagerController) fileDeleteAjax(r *http.Request) string {
-	selectedFileName := req.Value(r, "delete_file")
+	selectedFileName := req.GetStringTrimmed(r, "delete_file")
 	if selectedFileName == "" {
 		return api.Error("delete_file is required").ToString()
 	}
-	currentDir := req.Value(r, "current_dir")
+	currentDir := req.GetStringTrimmed(r, "current_dir")
 	if currentDir == "" {
 		return api.Error("current_dir is required").ToString()
 	}
@@ -294,17 +294,17 @@ func (c *mediaManagerController) fileDeleteAjax(r *http.Request) string {
 }
 
 func (c *mediaManagerController) fileRenameAjax(r *http.Request) string {
-	currentFileName := req.Value(r, "rename_file")
+	currentFileName := req.GetStringTrimmed(r, "rename_file")
 	if currentFileName == "" {
 		return api.Error("rename_file is required").ToString()
 	}
 
-	newFileName := req.Value(r, "new_file")
+	newFileName := req.GetStringTrimmed(r, "new_file")
 
 	if newFileName == "" {
 		return api.Error("new_file is required").ToString()
 	}
-	currentDir := req.Value(r, "current_dir")
+	currentDir := req.GetStringTrimmed(r, "current_dir")
 
 	if currentDir == "" {
 		return api.Error("current_dir is required").ToString()
@@ -335,7 +335,7 @@ func (controller *mediaManagerController) getMediaManager(r *http.Request) strin
 		return api.Error("storage is required").ToString()
 	}
 
-	currentDirectory := req.Value(r, "current_dir")
+	currentDirectory := req.GetStringTrimmed(r, "current_dir")
 	currentDirectory = strings.Trim(currentDirectory, "/")
 	currentDirectory = strings.Trim(currentDirectory, ".")
 

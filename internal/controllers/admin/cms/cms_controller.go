@@ -7,8 +7,8 @@ import (
 	"project/internal/types"
 	"project/pkg/webtheme"
 
-	adminCmsStore "github.com/gouniverse/cmsstore/admin"
-	"github.com/gouniverse/hb"
+	adminCmsStore "github.com/dracory/cmsstore/admin"
+	"github.com/dracory/hb"
 )
 
 type cmsNewController struct {

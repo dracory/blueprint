@@ -9,10 +9,10 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/dracory/base/req"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/dracory/userstore"
 )
 
 type userCreateController struct {
@@ -148,9 +148,9 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	data.firstName = strings.TrimSpace(req.Value(r, "user_first_name"))
-	data.lastName = strings.TrimSpace(req.Value(r, "user_last_name"))
-	data.email = strings.TrimSpace(req.Value(r, "user_email"))
+	data.firstName = strings.TrimSpace(req.GetStringTrimmed(r, "user_first_name"))
+	data.lastName = strings.TrimSpace(req.GetStringTrimmed(r, "user_last_name"))
+	data.email = strings.TrimSpace(req.GetStringTrimmed(r, "user_email"))
 
 	if r.Method != http.MethodPost {
 		return data, ""

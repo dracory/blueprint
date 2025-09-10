@@ -8,10 +8,10 @@ import (
 	"project/internal/helpers"
 	"project/internal/types"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/dracory/shopstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
 )
 
 type productDeleteController struct {
@@ -130,7 +130,7 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 	}
 
 	authUser := helpers.GetAuthUser(r)
-	data.productID = req.Value(r, "product_id")
+	data.productID = req.GetStringTrimmed(r, "product_id")
 
 	if authUser == nil {
 		return data, "You are not logged in. Please login to continue."
