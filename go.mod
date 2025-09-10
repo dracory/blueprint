@@ -9,21 +9,26 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.4.0
+	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.1.0
 	github.com/dracory/bs v0.15.0
 	github.com/dracory/cachestore v0.20.0
 	github.com/dracory/cdn v1.8.0
 	github.com/dracory/cmsstore v0.33.0
+	github.com/dracory/crud/v2 v2.0.0-20250902001618-c4cd13b63280
 	github.com/dracory/customstore v1.5.0
 	github.com/dracory/database v0.3.0
 	github.com/dracory/env v0.6.0
 	github.com/dracory/envenc v0.12.0
 	github.com/dracory/feedstore v0.3.0
+	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
 	github.com/dracory/hb v1.88.0
+	github.com/dracory/liveflux v0.4.0
 	github.com/dracory/logstore v1.8.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v0.10.0
+	github.com/dracory/sb v0.11.0
 	github.com/dracory/sessionstore v1.3.0
 	github.com/dracory/settingstore v1.1.0
 	github.com/dracory/shopstore v1.1.2
@@ -32,6 +37,7 @@ require (
 	github.com/dracory/taskstore v1.7.0
 	github.com/dracory/test v0.2.0
 	github.com/dracory/tradingstore v0.10.0
+	github.com/dracory/uid v1.8.0
 	github.com/dracory/userstore v1.5.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dromara/carbon/v2 v2.6.11
@@ -45,7 +51,6 @@ require (
 	github.com/gouniverse/bs v0.13.0
 	github.com/gouniverse/cachestore v0.19.1
 	github.com/gouniverse/cmsstore v0.29.0
-	github.com/gouniverse/crud/v2 v2.0.0-20250124013508-aa498c4bb928
 	github.com/gouniverse/csrf v0.1.0
 	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/envenc v0.10.0
@@ -95,12 +100,8 @@ require (
 	github.com/davidmz/go-pageant v1.0.2 // indirect
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/api v1.7.0 // indirect
-	github.com/dracory/blockeditor v0.24.0 // indirect
 	github.com/dracory/dataobject v1.6.0 // indirect
-	github.com/dracory/form v0.19.0 // indirect
-	github.com/dracory/sb v0.11.0 // indirect
 	github.com/dracory/ui v0.17.0 // indirect
-	github.com/dracory/uid v1.8.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.9 // indirect
@@ -162,7 +163,7 @@ require (
 	github.com/gouniverse/geostore v0.14.0
 	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.9.0
-	github.com/gouniverse/uid v1.5.0
+	github.com/gouniverse/uid v1.5.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect

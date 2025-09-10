@@ -4,9 +4,9 @@ import (
 	"log"
 	"testing"
 
-	"github.com/gouniverse/cachestore"
-	"github.com/gouniverse/sessionstore"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/cachestore"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
 	smtpmock "github.com/mocktools/go-smtp-mock"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/sqlite"

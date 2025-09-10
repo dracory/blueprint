@@ -2,10 +2,10 @@ package blogblocks
 
 import (
 	"github.com/dracory/base/img"
-	"github.com/gouniverse/blockeditor"
-	"github.com/gouniverse/form"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/ui"
+	"github.com/dracory/blockeditor"
+	"github.com/dracory/form"
+	"github.com/dracory/hb"
+	"github.com/dracory/ui"
 )
 
 func BlockEditorDefinitions() []blockeditor.BlockDefinition {

@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"project/internal/types"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 func UserUntokenized(ctx context.Context, app types.AppInterface, vaultKey string, authUser userstore.UserInterface) (firstName string, lastName string, email string, err error) {
