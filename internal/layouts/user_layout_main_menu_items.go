@@ -3,9 +3,9 @@ package layouts
 import (
 	"project/internal/links"
 
+	"github.com/dracory/hb"
+	"github.com/dracory/userstore"
 	"github.com/gouniverse/dashboard"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
 )
 
 // userLayoutMainMenu generates the main menu items for the user dashboard.
@@ -16,10 +16,10 @@ import (
 // Returns:
 // - `[]dashboard.MenuItem`: The main menu items.
 func userLayoutMainMenuItems(user userstore.UserInterface) []dashboard.MenuItem {
-	websiteHomeLink := links.NewWebsiteLinks().Home()
-	dashboardLink := links.NewUserLinks().Home(map[string]string{})
-	loginLink := links.NewAuthLinks().Login(dashboardLink)
-	logoutLink := links.NewAuthLinks().Logout()
+	websiteHomeLink := links.Website().Home()
+	dashboardLink := links.User().Home(map[string]string{})
+	loginLink := links.Auth().Login(dashboardLink)
+	logoutLink := links.Auth().Logout()
 
 	homeMenuItem := dashboard.MenuItem{
 		Icon:  hb.I().Class("bi bi-house").Style("margin-right:10px;").ToHTML(),

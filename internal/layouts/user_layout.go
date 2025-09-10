@@ -7,7 +7,7 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/cmsstore"
+	"github.com/dracory/cmsstore"
 	"github.com/gouniverse/dashboard"
 	"github.com/samber/lo"
 )

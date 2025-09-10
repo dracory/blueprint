@@ -3,8 +3,8 @@ package layouts
 import (
 	"project/internal/links"
 
+	"github.com/dracory/userstore"
 	"github.com/gouniverse/dashboard"
-	"github.com/gouniverse/userstore"
 )
 
 // userDashboardUserMenu generates the user menu items for the dashboard.

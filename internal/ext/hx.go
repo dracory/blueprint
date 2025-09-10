@@ -3,7 +3,7 @@ package ext
 import (
 	"net/http"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 )
 
 // IsHtmx checks if the given HTTP request is an HTMX request.
@@ -30,7 +30,7 @@ func IsHtmx(r *http.Request) bool {
 // Returns:
 //   - bool: true if the request has been boosted, false otherwise
 func IsHxBoosted(r *http.Request) bool {
-	value := req.ValueOr(r, "HX-Boosted", "")
+	value := req.GetStringTrimmedOr(r, "HX-Boosted", "")
 	return value == "true"
 }
 
@@ -45,7 +45,7 @@ func IsHxBoosted(r *http.Request) bool {
 // Returns:
 //   - bool: true if the request is a history restore request, false otherwise
 func IsHxHistoryRestoreRequest(r *http.Request) bool {
-	value := req.ValueOr(r, "HX-History-Restore-Request", "")
+	value := req.GetStringTrimmedOr(r, "HX-History-Restore-Request", "")
 	return value == "true"
 }
 
@@ -75,7 +75,7 @@ func IsHxRequest(r *http.Request) bool {
 // Returns:
 //   - bool: true if the request was triggered, false otherwise
 func IsHxTrigger(r *http.Request) bool {
-	value := req.ValueOr(r, "HX-Trigger", "")
+	value := req.GetStringTrimmedOr(r, "HX-Trigger", "")
 	return value == "true"
 }
 
@@ -90,7 +90,7 @@ func IsHxTrigger(r *http.Request) bool {
 // Returns:
 //   - string: the prompt message
 func HxPrompt(r *http.Request) string {
-	return req.ValueOr(r, "HX-Prompt", "")
+	return req.GetStringTrimmedOr(r, "HX-Prompt", "")
 }
 
 // HxTarget gets the target element for the response.
@@ -104,7 +104,7 @@ func HxPrompt(r *http.Request) string {
 // Returns:
 //   - string: the target element
 func HxTarget(r *http.Request) string {
-	return req.ValueOr(r, "HX-Target", "")
+	return req.GetStringTrimmedOr(r, "HX-Target", "")
 }
 
 // HxTriggerName gets the name of the event or trigger that initiated the request.
@@ -118,7 +118,7 @@ func HxTarget(r *http.Request) string {
 // Returns:
 //   - string: the trigger name
 func HxTriggerName(r *http.Request) string {
-	return req.ValueOr(r, "HX-Trigger-Name", "")
+	return req.GetStringTrimmedOr(r, "HX-Trigger-Name", "")
 }
 
 // HxHideIndicatorCSS returns the CSS for hiding the HTMX indicator.

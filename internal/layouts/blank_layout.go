@@ -2,7 +2,7 @@ package layouts
 
 import (
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 // == TYPE ===================================================================

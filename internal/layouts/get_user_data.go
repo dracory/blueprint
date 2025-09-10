@@ -6,7 +6,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/types"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 func getUserData(app types.AppInterface, r *http.Request, authUser userstore.UserInterface, vaultKey string) (firstName string, lastName string, err error) {

@@ -1,7 +1,7 @@
 package layouts
 
 import (
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 // LogoHTML generates the HTML for the logo
@@ -12,12 +12,12 @@ func LogoHTML() string {
 	left := hb.Span().
 		Style("padding: 5px;").
 		Style("color: " + secondaryColor + "; font-size: 20px;").
-		Text("Market")
+		Text("Blue")
 
 	right := hb.Span().
 		Style("padding: 5px;").
 		Style("background: " + secondaryColor + "; color: " + primaryColor + ";").
-		Text("Pinpoint")
+		Text("Print")
 
 	frame := hb.Div().
 		Style("display: inline-block; justify-content: space-between; align-items: center; width: fit-content;").

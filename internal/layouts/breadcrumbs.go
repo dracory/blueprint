@@ -1,6 +1,6 @@
 package layouts
 
-import "github.com/gouniverse/hb"
+import "github.com/dracory/hb"
 
 func Breadcrumbs(breadcrumbs []Breadcrumb) hb.TagInterface {
 	nav := hb.Nav().Attr("aria-label", "breadcrumb")

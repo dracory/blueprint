@@ -3,9 +3,9 @@ package layouts
 import (
 	"project/internal/links"
 
+	"github.com/dracory/hb"
+	"github.com/dracory/userstore"
 	"github.com/gouniverse/dashboard"
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
 )
 
 func adminLayoutMainMenu(user userstore.UserInterface) []dashboard.MenuItem {

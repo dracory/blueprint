@@ -3,7 +3,7 @@ package ext
 import (
 	"strings"
 
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 	"github.com/samber/lo"
 )
 

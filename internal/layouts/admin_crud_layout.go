@@ -6,7 +6,7 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/cdn"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 func NewAdminCrudLayout(app types.AppInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {

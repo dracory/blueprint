@@ -5,9 +5,9 @@ import (
 	"project/internal/types"
 	"project/internal/widgets"
 
-	"github.com/gouniverse/cmsstore"
-	"github.com/gouniverse/cmsstore/frontend"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/cmsstore"
+	"github.com/dracory/cmsstore/frontend"
+	"github.com/dracory/hb"
 )
 
 func NewCmsLayout(
