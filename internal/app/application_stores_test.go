@@ -64,7 +64,6 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 		"snv_caches_cache",
 		"snv_blogs_post",
 		"snv_files_file",
-		"snv_idx_analysis_report",
 		"snv_logs_log",
 		"snv_metas_meta",
 		"snv_stats_visitor",
