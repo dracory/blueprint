@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/types"
 
-	"github.com/gouniverse/cmsstore"
+	"github.com/dracory/cmsstore"
 	"github.com/mingrammer/cfmt"
 )
 

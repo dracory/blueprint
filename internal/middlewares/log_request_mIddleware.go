@@ -7,7 +7,7 @@ import (
 
 	"log/slog"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 )
 
@@ -25,7 +25,7 @@ func LogRequestMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// uri := r.RequestURI
 
-				ip := req.IP(r)
+				ip := req.GetIP(r)
 
 				method := r.Method
 

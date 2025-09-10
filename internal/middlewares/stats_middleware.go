@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"project/internal/types"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/dracory/rtr"
+	"github.com/dracory/statsstore"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/statsstore"
 )
 
 func NewStatsMiddleware(application types.AppInterface) rtr.MiddlewareInterface {
@@ -37,7 +37,7 @@ func (m statsMiddleware) Handler(application types.AppInterface, next http.Handl
 			return
 		}
 
-		ip := req.IP(r)
+		ip := req.GetIP(r)
 		userAgent := r.UserAgent()
 		userAcceptLanguage := r.Header.Get("Accept-Language")
 		country := "" // empty by default (will be filled in later in the backend)

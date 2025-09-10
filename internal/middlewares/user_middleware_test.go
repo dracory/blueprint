@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/dracory/test"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {

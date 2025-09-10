@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 	"github.com/gouniverse/responses"
 	"github.com/jellydator/ttlcache/v3"
@@ -41,7 +41,7 @@ func (j *jailBotsMiddleware) Name() string {
 func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uri := r.RequestURI
-		ip := req.IP(r)
+		ip := req.GetIP(r)
 
 		if m.isJailed(ip) {
 			w.WriteHeader(http.StatusForbidden)
