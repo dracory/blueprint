@@ -3,7 +3,7 @@ package testimonials
 import (
 	"errors"
 
-	"github.com/gouniverse/dataobject"
+	"github.com/dracory/dataobject"
 	"github.com/gouniverse/entitystore"
 )
 

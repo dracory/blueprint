@@ -18,8 +18,8 @@ import (
 	"github.com/dracory/form"
 	"github.com/dracory/hb"
 	"github.com/dracory/req"
+	"github.com/dracory/sb"
 	"github.com/dracory/shopstore"
-	"github.com/gouniverse/sb"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )

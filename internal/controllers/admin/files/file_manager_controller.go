@@ -19,10 +19,10 @@ import (
 
 	"github.com/mingrammer/cfmt"
 
+	"github.com/dracory/api"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/api"
 	"github.com/gouniverse/responses"
 
 	"github.com/samber/lo"

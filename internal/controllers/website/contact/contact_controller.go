@@ -2,6 +2,7 @@ package contact
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/layouts"
@@ -16,7 +17,7 @@ import (
 	"github.com/dracory/cdn"
 	"github.com/dracory/customstore"
 	"github.com/dracory/hb"
-	"github.com/gouniverse/utils"
+
 	"github.com/samber/lo"
 )
 
@@ -296,8 +297,8 @@ func (controller *contactController) contactForm(r *http.Request, data contactCo
 					Child(buttonSubmit)),
 		}).Child(csrfToken)
 
-	errorMessageJSON, _ := utils.ToJSON(data.errorMessage)
-	successMessageJSON, _ := utils.ToJSON(data.successMessage)
+	errorMessageJSON, _ := json.Marshal(data.errorMessage)
+	successMessageJSON, _ := json.Marshal(data.successMessage)
 	return hb.Div().ID("CardContact").
 		Class("card bg-transparent border rounded-3").
 		Style("text-align:left;").
@@ -315,14 +316,14 @@ func (controller *contactController) contactForm(r *http.Request, data contactCo
 			Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
-				text: `+errorMessageJSON+`,
+				text: `+string(errorMessageJSON)+`,
 			})
 		`)).
 		ChildIf(data.successMessage != "", hb.Script(`
 			Swal.fire({
 				icon: 'success',
 				title: 'Saved',
-				text: `+successMessageJSON+`,
+				text: `+string(successMessageJSON)+`,
 			})
 		`)).
 		ChildIf(data.redirectURL != "", hb.Script(`setTimeout(() => {window.location.href="`+data.redirectURL+`";}, 5000);`))
