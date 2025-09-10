@@ -1,8 +1,9 @@
 package helpers
 
 import (
+	"encoding/json"
+
 	"github.com/gouniverse/maputils"
-	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -17,7 +18,8 @@ type Block struct {
 }
 
 func BlogPostBlocksToString(blocksString string) string {
-	blocksAny, err := utils.FromJSON(blocksString, []map[string]any{})
+	blocksAny := []map[string]any{}
+	err := json.Unmarshal([]byte(blocksString), &blocksAny)
 
 	if err != nil {
 		return "Error parsing content. Please try again later."

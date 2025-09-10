@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/config"
 
-	"github.com/gouniverse/sessionstore"
+	"github.com/dracory/sessionstore"
 )
 
 // GetAuthSession returns the authenticated session

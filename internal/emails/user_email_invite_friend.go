@@ -3,11 +3,11 @@ package emails
 import (
 	"context"
 	"errors"
-	"project/internal/types"
 	"project/internal/links"
+	"project/internal/types"
 
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/hb"
+	"github.com/dracory/userstore"
 )
 
 func NewInviteFriendEmail(cfg types.ConfigInterface, us userstore.StoreInterface) *inviteFriendEmail {
@@ -53,8 +53,18 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     func() string { if e.cfg != nil { return e.cfg.GetMailFromEmail() }; return "" }(),
-		FromName: func() string { if e.cfg != nil { return e.cfg.GetMailFromName() }; return appName }(),
+		From: func() string {
+			if e.cfg != nil {
+				return e.cfg.GetMailFromEmail()
+			}
+			return ""
+		}(),
+		FromName: func() string {
+			if e.cfg != nil {
+				return e.cfg.GetMailFromName()
+			}
+			return appName
+		}(),
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -79,7 +89,12 @@ func (e *inviteFriendEmail) template(userName string, userNote string, recipient
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().
-		HTML(`You have been invited by a friend who thinks you will like ` + func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }() + `.`).
+		HTML(`You have been invited by a friend who thinks you will like ` + func() string {
+			if e.cfg != nil {
+				return e.cfg.GetAppName()
+			}
+			return ""
+		}() + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p3 := hb.Paragraph().

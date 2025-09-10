@@ -3,11 +3,9 @@ package widgets
 import (
 	"net/http"
 	"project/internal/helpers"
-
-	"github.com/gouniverse/cms"
 )
 
-var _ cms.ShortcodeInterface = (*unauthenticatedWidget)(nil) // verify it extends the interface
+var _ Widget = (*unauthenticatedWidget)(nil) // verify it extends the interface
 
 // == CONSTUCTOR ==============================================================
 

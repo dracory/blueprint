@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/dracory/base/req"
+	"github.com/dracory/req"
+	"github.com/dracory/sessionstore"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/sessionstore"
 )
 
 func UserSettingGet(sessionStore sessionstore.StoreInterface, r *http.Request, key string, defaultValue string) string {
@@ -34,7 +34,7 @@ func UserSettingGet(sessionStore sessionstore.StoreInterface, r *http.Request, k
 		return defaultValue
 	}
 
-	if session.GetIPAddress() != req.IP(r) {
+	if session.GetIPAddress() != req.GetIP(r) {
 		return defaultValue
 	}
 
@@ -70,7 +70,7 @@ func UserSettingSet(sessionStore sessionstore.StoreInterface, r *http.Request, k
 		return errors.New("session user id does not match auth user id")
 	}
 
-	if session.GetIPAddress() != req.IP(r) {
+	if session.GetIPAddress() != req.GetIP(r) {
 		return errors.New("session ip address does not match request ip address")
 	}
 

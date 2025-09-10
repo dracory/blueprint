@@ -3,7 +3,7 @@ package widgets
 import (
 	"project/internal/types"
 
-	"github.com/gouniverse/cmsstore"
+	"github.com/dracory/cmsstore"
 )
 
 // CmsAddShortcodes adds the shortcodes to the CMS store

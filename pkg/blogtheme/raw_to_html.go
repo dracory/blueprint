@@ -1,8 +1,8 @@
 package blogtheme
 
 import (
-	"github.com/gouniverse/hb"
-	"github.com/gouniverse/ui"
+	"github.com/dracory/hb"
+	"github.com/dracory/ui"
 )
 
 func (t *theme) rawToHtml(block ui.BlockInterface) *hb.Tag {

@@ -9,7 +9,7 @@ package emails
 // 	"project/internal/config"
 
 // 	"github.com/dromara/carbon/v2"
-// 	"github.com/gouniverse/hb"
+// 	"github.com/dracory/hb"
 // )
 
 // // blankEmailTemplate blank HTML template

@@ -1,10 +1,10 @@
 package emails
 
 import (
-	"project/internal/types"
 	"project/internal/links"
+	"project/internal/types"
 
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 func NewEmailToAdminOnNewContactFormSubmitted(cfg types.ConfigInterface) *emailToAdminOnNewContactFormSubmitted {
@@ -31,8 +31,18 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     func() string { if e.cfg != nil { return e.cfg.GetMailFromEmail() }; return "" }(),
-		FromName: func() string { if e.cfg != nil { return e.cfg.GetMailFromName() }; return appName }(),
+		From: func() string {
+			if e.cfg != nil {
+				return e.cfg.GetMailFromEmail()
+			}
+			return ""
+		}(),
+		FromName: func() string {
+			if e.cfg != nil {
+				return e.cfg.GetMailFromName()
+			}
+			return appName
+		}(),
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -42,7 +52,12 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 
 func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 	urlHome := hb.Hyperlink().
-		HTML(func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }()).
+		HTML(func() string {
+			if e.cfg != nil {
+				return e.cfg.GetAppName()
+			}
+			return ""
+		}()).
 		Href(links.NewWebsiteLinks().Home()).
 		ToHTML()
 
@@ -51,7 +66,12 @@ func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 		Style(STYLE_HEADING)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new contact form request submitted into ` + func() string { if e.cfg != nil { return e.cfg.GetAppName() }; return "" }() + `.`).
+		HTML(`There is a new contact form request submitted into ` + func() string {
+			if e.cfg != nil {
+				return e.cfg.GetAppName()
+			}
+			return ""
+		}() + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().

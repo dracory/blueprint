@@ -8,10 +8,10 @@ import (
 	"project/internal/types"
 	"strings"
 
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
 	"github.com/dracory/str"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
 	"github.com/mingrammer/cfmt"
 )
 

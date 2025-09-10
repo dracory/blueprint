@@ -3,8 +3,7 @@ package widgets
 import (
 	"net/http"
 
-	"github.com/gouniverse/cms"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 )
 
 // NewContactForm creates a new instance of the contactForm widget.
@@ -18,7 +17,7 @@ func NewContactFormWidget() *contactFormWidget {
 	return &contactFormWidget{}
 }
 
-var _ cms.ShortcodeInterface = (*contactFormWidget)(nil) // verify it extends the interface
+var _ Widget = (*contactFormWidget)(nil) // verify it extends the interface
 
 // contactForm is the struct that will be used to render the contactForm shortcode.
 //

@@ -5,7 +5,7 @@ import (
 	"project/internal/types"
 	"project/pkg/testimonials"
 
-	"github.com/gouniverse/hb"
+	"github.com/dracory/hb"
 	"github.com/samber/lo"
 )
 
@@ -63,7 +63,6 @@ func (t *testimonialsWidget) Render(r *http.Request, content string, params map[
 	row := hb.Div().
 		Class("row").
 		Children(lo.Map(testimonialList, func(testimonial testimonials.Testimonial, index int) hb.TagInterface {
-
 
 			stars := hb.Wrap().
 				Child(hb.I().Class("bi bi-star-fill")).

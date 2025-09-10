@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"project/internal/links"
 	"project/internal/types"
-	"strings"
 
-	"github.com/dracory/base/req"
-	"github.com/gouniverse/blogstore"
-	"github.com/gouniverse/bs"
-	"github.com/gouniverse/hb"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/bs"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -170,7 +169,7 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 }
 
 func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostListWidgetData, errorMessage string) {
-	pageStr := strings.TrimSpace(req.Value(r, "page"))
+	pageStr := req.GetStringTrimmed(r, "page")
 	page := cast.ToInt(pageStr)
 
 	if page < 0 {
