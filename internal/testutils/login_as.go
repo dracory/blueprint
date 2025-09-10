@@ -8,7 +8,7 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/test"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/userstore"
 )
 
 func LoginAs(app types.AppInterface, r *http.Request, user userstore.UserInterface) (*http.Request, error) {

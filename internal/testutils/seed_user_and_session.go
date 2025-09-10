@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gouniverse/sessionstore"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
 )
 
 func SeedUserAndSession(userStore userstore.StoreInterface, sessionStore sessionstore.StoreInterface, userID string, r *http.Request, expiresSeconds int) (user userstore.UserInterface, session sessionstore.SessionInterface, err error) {

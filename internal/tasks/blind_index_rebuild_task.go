@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/dracory/blindindexstore"
-	"github.com/gouniverse/taskstore"
-	"github.com/gouniverse/userstore"
+	"github.com/dracory/taskstore"
+	"github.com/dracory/userstore"
 )
 
 // ============================================================================

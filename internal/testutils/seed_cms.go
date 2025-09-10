@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/gouniverse/cmsstore"
+	"github.com/dracory/cmsstore"
 )
 
 func SeedTemplate(cmsStore cmsstore.StoreInterface, siteID, templateID string) (err error) {

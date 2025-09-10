@@ -6,7 +6,7 @@ import (
 	"project/internal/emails"
 	"project/internal/types"
 
-	"github.com/gouniverse/taskstore"
+	"github.com/dracory/taskstore"
 )
 
 // NewEmailToAdminOnNewUserRegisteredRegisterTask sends an email to admin email when new user is registered

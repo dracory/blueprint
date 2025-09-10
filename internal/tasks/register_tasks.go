@@ -4,7 +4,7 @@ import (
 	taskStats "project/internal/tasks/stats"
 	"project/internal/types"
 
-	"github.com/gouniverse/taskstore"
+	"github.com/dracory/taskstore"
 )
 
 // RegisterTasks registers the task handlers to the task store

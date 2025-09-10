@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/dracory/req"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/sessionstore"
-	"github.com/gouniverse/userstore"
-	"github.com/gouniverse/utils"
 )
 
 func SeedSession(sessionStore sessionstore.StoreInterface, r *http.Request, user userstore.UserInterface, expiresSeconds int) (sessionstore.SessionInterface, error) {
@@ -18,7 +18,7 @@ func SeedSession(sessionStore sessionstore.StoreInterface, r *http.Request, user
 	session := sessionstore.NewSession().
 		SetUserID(user.ID()).
 		SetUserAgent(r.UserAgent()).
-		SetIPAddress(utils.IP(r)).
+		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddSeconds(expiresSeconds).ToDateTimeString(carbon.UTC))
 
 	err := sessionStore.SessionCreate(r.Context(), session)

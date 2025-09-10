@@ -9,8 +9,8 @@ import (
 	"project/internal/types"
 	"strings"
 
-	"github.com/gouniverse/statsstore"
-	"github.com/gouniverse/taskstore"
+	"github.com/dracory/statsstore"
+	"github.com/dracory/taskstore"
 	"github.com/spf13/cast"
 
 	"github.com/mingrammer/cfmt"
