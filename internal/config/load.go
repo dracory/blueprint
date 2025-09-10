@@ -2,12 +2,13 @@ package config
 
 import (
 	"errors"
+	"os"
 	"project/internal/resources"
 	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/env"
-	"github.com/gouniverse/utils"
+	"github.com/dracory/envenc"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -360,19 +361,30 @@ func intializeEnvEncVariables(appEnvironment string) error {
 		return err
 	}
 
-	err = utils.EnvEncInitialize(struct {
-		Password      string
-		VaultFilePath string
-		VaultContent  string
-	}{
-		Password:      derivedEnvEncKey,
-		VaultFilePath: lo.Ternary(vaultContent == "", vaultFilePath, ""),
-		VaultContent:  lo.Ternary(vaultContent != "", vaultContent, ""),
-	})
+	if fileExists(vaultFilePath) {
+		err := envenc.HydrateEnvFromFile(vaultFilePath, derivedEnvEncKey)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
+	}
+
+	if vaultContent != "" {
+		err = envenc.HydrateEnvFromString(vaultContent, derivedEnvEncKey)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
+}
+
+// fileExists checks if a file exists at the given path.
+func fileExists(path string) bool {
+	if _, err := os.Stat(path); err == nil {
+		return true
+	} else {
+		return !os.IsNotExist(err)
+	}
 }

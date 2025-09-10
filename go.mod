@@ -9,7 +9,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
 	github.com/dracory/base v0.26.0
-	github.com/dracory/blindindexstore v1.4.0
+	github.com/dracory/blindindexstore v1.5.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.1.0
 	github.com/dracory/bs v0.15.0
@@ -22,7 +22,7 @@ require (
 	github.com/dracory/database v0.3.0
 	github.com/dracory/dataobject v1.6.0
 	github.com/dracory/env v0.6.0
-	github.com/dracory/envenc v0.12.0
+	github.com/dracory/envenc v1.0.0
 	github.com/dracory/feedstore v0.3.0
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
@@ -56,7 +56,6 @@ require (
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
-	github.com/gouniverse/utils v1.45.4
 	github.com/gouniverse/vaultstore v0.25.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
@@ -117,6 +116,7 @@ require (
 	github.com/gouniverse/taskstore v1.5.0 // indirect
 	github.com/gouniverse/ui v0.14.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
+	github.com/gouniverse/utils v1.45.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
 	github.com/gouniverse/webserver v0.1.0 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
