@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/dracory/hb"
-	"github.com/gouniverse/vaultstore"
+	"github.com/dracory/vaultstore"
 )
 
 // Options defines the options for the layout

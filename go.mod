@@ -43,6 +43,7 @@ require (
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/userstore v1.5.0
+	github.com/dracory/vaultstore v0.26.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dromara/carbon/v2 v2.6.11
 	github.com/faabiosr/cachego v0.26.0
@@ -56,7 +57,6 @@ require (
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
-	github.com/gouniverse/vaultstore v0.25.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
 	github.com/mileusna/useragent v1.3.5

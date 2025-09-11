@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/gouniverse/vaultstore"
+	"github.com/dracory/vaultstore"
 	"github.com/samber/lo"
 )
 

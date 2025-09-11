@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/dracory/userstore"
-	"github.com/gouniverse/vaultstore"
+	"github.com/dracory/vaultstore"
 )
 
 func userTokenize(ctx context.Context, vaultStore vaultstore.StoreInterface, logger *slog.Logger, vaultKey string, user userstore.UserInterface, firstName string, lastName string, email string) (err error) {

@@ -18,10 +18,10 @@ import (
 	"github.com/dracory/taskstore"
 	"github.com/dracory/tradingstore"
 	"github.com/dracory/userstore"
+	"github.com/dracory/vaultstore"
 	"github.com/faabiosr/cachego"
 	"github.com/gouniverse/entitystore"
 	"github.com/gouniverse/filesystem"
-	"github.com/gouniverse/vaultstore"
 	"github.com/jellydator/ttlcache/v3"
 )
 

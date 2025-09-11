@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/vaultstore"
+	"github.com/dracory/vaultstore"
 )
 
 func newVaultStore(db *sql.DB) (vaultstore.StoreInterface, error) {
@@ -23,5 +23,3 @@ func newVaultStore(db *sql.DB) (vaultstore.StoreInterface, error) {
 	}
 	return st, nil
 }
-
-
