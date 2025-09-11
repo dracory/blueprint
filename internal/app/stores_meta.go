@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/metastore"
+	"github.com/dracory/metastore"
 )
 
 func newMetaStore(db *sql.DB) (metastore.StoreInterface, error) {

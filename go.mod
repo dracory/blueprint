@@ -29,6 +29,7 @@ require (
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.4.0
 	github.com/dracory/logstore v1.8.0
+	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v0.11.0
 	github.com/dracory/sb v0.11.0
@@ -55,7 +56,6 @@ require (
 	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/filesystem v0.3.1
 	github.com/gouniverse/icons v1.3.1
-	github.com/gouniverse/metastore v1.2.0
 	github.com/gouniverse/responses v0.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2

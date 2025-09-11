@@ -17,6 +17,7 @@ import (
 	"github.com/dracory/feedstore"
 	"github.com/dracory/geostore"
 	"github.com/dracory/logstore"
+	"github.com/dracory/metastore"
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
@@ -29,7 +30,6 @@ import (
 	"github.com/faabiosr/cachego/file"
 	"github.com/gouniverse/entitystore"
 	"github.com/gouniverse/filesystem"
-	"github.com/gouniverse/metastore"
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/lmittmann/tint"
 )
