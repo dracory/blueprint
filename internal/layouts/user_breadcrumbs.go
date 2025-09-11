@@ -5,7 +5,6 @@ import (
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
-	"github.com/gouniverse/icons"
 )
 
 // userBreadcrumbs generates the user breadcrumbs
@@ -14,8 +13,8 @@ func userBreadcrumbs(path []bs.Breadcrumb) hb.TagInterface {
 	breadcrumbsPath := []bs.Breadcrumb{
 		{
 			Name: "Dashboard",
-			URL:  links.NewUserLinks().Home(map[string]string{}),
-			Icon: icons.Icon("bi-speedometer", 16, 16, "gray").ToHTML(),
+			URL:  links.User().Home(map[string]string{}),
+			Icon: hb.I().Class("bi bi-speedometer").Style("font-size: 16px; color: gray").ToHTML(),
 		},
 	}
 

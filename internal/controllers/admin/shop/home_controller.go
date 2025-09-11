@@ -9,7 +9,6 @@ import (
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
-	"github.com/gouniverse/icons"
 	"github.com/samber/lo"
 )
 
@@ -109,7 +108,7 @@ func (controller *homeController) tiles() []hb.TagInterface {
 					Class("d-flex flex-column justify-content-evenly").
 					Children([]hb.TagInterface{
 						hb.Div().
-							Child(icons.Icon(tile["icon"], 36, 36, "red")).
+							Child(hb.I().Class("bi " + tile["icon"]).Style("font-size: 36px; color: red")).
 							Style("text-align:center;padding:10px;"),
 						hb.Heading5().
 							HTML(tile["title"]).

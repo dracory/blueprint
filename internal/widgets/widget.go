@@ -1,7 +1,7 @@
 package widgets
 
-import "github.com/gouniverse/cms"
+import "github.com/dracory/cmsstore"
 
 type Widget interface {
-	cms.ShortcodeInterface
+	cmsstore.ShortcodeInterface
 }

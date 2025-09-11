@@ -5,15 +5,14 @@ import (
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
-	"github.com/gouniverse/icons"
 )
 
 func websiteBreadcrumbs(path []bs.Breadcrumb) hb.TagInterface {
 	breadcrumbsPath := []bs.Breadcrumb{
 		{
 			Name: "",
-			URL:  links.NewWebsiteLinks().Home(),
-			Icon: icons.Icon("bi-house", 16, 16, "gray").ToHTML(),
+			URL:  links.Website().Home(),
+			Icon: hb.I().Class("bi bi-house").Style("font-size: 16px; color: gray").ToHTML(),
 		},
 	}
 

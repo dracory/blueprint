@@ -55,7 +55,6 @@ require (
 	github.com/gouniverse/csrf v0.1.0
 	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/filesystem v0.3.1
-	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/responses v0.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
@@ -98,23 +97,16 @@ require (
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/goravel/framework v1.16.3 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
-	github.com/gouniverse/blockeditor v0.21.2 // indirect
 	github.com/gouniverse/bs v0.13.0 // indirect
-	github.com/gouniverse/cachestore v0.19.1 // indirect
 	github.com/gouniverse/cdn v1.6.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/envenc v0.10.0 // indirect
-	github.com/gouniverse/form v0.17.0 // indirect
 	github.com/gouniverse/hb v1.87.0 // indirect
-	github.com/gouniverse/logstore v1.7.0 // indirect
+	github.com/gouniverse/icons v1.3.1 // indirect
 	github.com/gouniverse/router v1.4.2 // indirect
-	github.com/gouniverse/sessionstore v1.0.0 // indirect
-	github.com/gouniverse/settingstore v1.0.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/sqlfilestore v0.2.0 // indirect
 	github.com/gouniverse/strutils v0.7.0 // indirect
-	github.com/gouniverse/taskstore v1.5.0 // indirect
-	github.com/gouniverse/ui v0.14.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
 	github.com/gouniverse/utils v1.45.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
@@ -153,7 +145,6 @@ require (
 	github.com/georgysavva/scany v1.2.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gouniverse/api v1.6.0 // indirect
-	github.com/gouniverse/cms v1.12.0
 	github.com/gouniverse/dataobject v1.3.0 // indirect
 	github.com/gouniverse/entitystore v1.0.0
 	github.com/gouniverse/maputils v0.7.0
