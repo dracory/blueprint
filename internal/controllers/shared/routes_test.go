@@ -12,8 +12,8 @@ import (
 func TestSharedRoutesCount(t *testing.T) {
 	app := testutils.Setup()
 	routes := shared.Routes(app)
-	if len(routes) != 7 {
-		t.Fatalf("expected 7 shared routes, got %d", len(routes))
+	if len(routes) != 8 {
+		t.Fatalf("expected 8 shared routes, got %d", len(routes))
 	}
 }
 
