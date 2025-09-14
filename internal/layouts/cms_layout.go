@@ -56,23 +56,26 @@ func (layout *cmsLayout) ToHTML() string {
 		Logger: layout.app.GetLogger(),
 	})
 
-	html, err := fe.TemplateRenderHtmlByID(layout.request, layout.app.GetConfig().GetCMSTemplateID(), struct {
-		PageContent         string
-		PageCanonicalURL    string
-		PageMetaDescription string
-		PageMetaKeywords    string
-		PageMetaRobots      string
-		PageTitle           string
-		Language            string
-	}{
-		PageContent:         layout.content.ToHTML(),
-		PageCanonicalURL:    "",
-		PageMetaDescription: "",
-		PageMetaKeywords:    "",
-		PageMetaRobots:      "",
-		PageTitle:           layout.title,
-		Language:            "en",
-	})
+	html, err := fe.TemplateRenderHtmlByID(
+		layout.request,
+		layout.app.GetConfig().GetCmsStoreTemplateID(),
+		struct {
+			PageContent         string
+			PageCanonicalURL    string
+			PageMetaDescription string
+			PageMetaKeywords    string
+			PageMetaRobots      string
+			PageTitle           string
+			Language            string
+		}{
+			PageContent:         layout.content.ToHTML(),
+			PageCanonicalURL:    "",
+			PageMetaDescription: "",
+			PageMetaKeywords:    "",
+			PageMetaRobots:      "",
+			PageTitle:           layout.title,
+			Language:            "en",
+		})
 
 	if err != nil {
 		layout.app.GetLogger().Error("At WebsiteLayout", "error", err.Error())

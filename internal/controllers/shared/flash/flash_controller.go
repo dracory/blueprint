@@ -46,7 +46,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		}).ToHTML()
 	}
 
-	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCMSTemplateID() != "" {
+	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreTemplateID() != "" {
 		return layouts.NewCmsLayout(
 			controller.app,
 			layouts.Options{

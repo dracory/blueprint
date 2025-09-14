@@ -262,7 +262,7 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 				}),
 			}),
 			hb.Tbody().Children(lo.Map(data.userList, func(user userstore.UserInterface, _ int) hb.TagInterface {
-				firstName, lastName, email, err := helpers.UserUntokenized(context.Background(), controller.app, controller.app.GetConfig().GetVaultKey(), user)
+				firstName, lastName, email, err := helpers.UserUntokenized(context.Background(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 
 				if err != nil {
 					controller.app.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))

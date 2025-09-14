@@ -64,8 +64,6 @@ func Load() (types.ConfigInterface, error) {
 	}
 	appDebug := env.GetBool(KEY_APP_DEBUG)
 
-	// cmsUserTemplateID := env.Value("CMS_TEMPLATE_ID")
-
 	dbDriver, err := env.GetStringOrError(KEY_DB_DRIVER)
 	if err != nil {
 		return nil, errors.New(KEY_DB_DRIVER + " is required")
@@ -104,6 +102,11 @@ func Load() (types.ConfigInterface, error) {
 	mailPort := env.GetString(KEY_MAIL_PORT)
 	mailUsername := env.GetString(KEY_MAIL_USERNAME)
 
+	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
+	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
+	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
+	vaultStoreUsed := env.GetBool(KEY_VAULT_STORE_USED)
+
 	// mediaBucket := env.Value("MEDIA_BUCKET")
 	// mediaDriver := env.Value("MEDIA_DRIVER")
 	// mediaEndpoint := env.Value("MEDIA_ENDPOINT")
@@ -126,9 +129,6 @@ func Load() (types.ConfigInterface, error) {
 	stripeKeyPrivate := env.GetString(KEY_STRIPE_KEY_PRIVATE)
 	stripeKeyPublic := env.GetString(KEY_STRIPE_KEY_PUBLIC)
 
-	vaultKey := env.GetString(KEY_VAULT_KEY)
-	vaultStoreUsed := env.GetBool(KEY_VAULT_STORE_USED)
-
 	// LLM: Vertex AI
 	vertexAiUsed := env.GetBool(KEY_VERTEX_AI_USED)
 	vertexAiModelID := env.GetString(KEY_VERTEX_MODEL_ID)
@@ -149,9 +149,9 @@ func Load() (types.ConfigInterface, error) {
 	// Check required variables
 
 	// Enable if you use CMS template
-	// if cmsUserTemplateID == "" {
-	// 	return nil, errors.New("CMS_TEMPLATE_ID is required")
-	// }
+	if cmsStoreUsed && cmsStoreTemplateID == "" {
+		return nil, errors.New("CMS_TEMPLATE_ID is required")
+	}
 
 	if googleGeminiApiUsed && googleGeminiApiKey == "" {
 		return nil, errors.New(KEY_GEMINI_API_KEY + " is required")
@@ -177,8 +177,8 @@ func Load() (types.ConfigInterface, error) {
 		return nil, errors.New(KEY_STRIPE_KEY_PUBLIC + " is required")
 	}
 
-	if vaultStoreUsed && vaultKey == "" {
-		return nil, errors.New(KEY_VAULT_KEY + " is required")
+	if vaultStoreUsed && vaultStoreKey == "" {
+		return nil, errors.New(KEY_VAULT_STORE_KEY + " is required")
 	}
 
 	if vertexAiUsed && vertexAiModelID == "" {
@@ -200,6 +200,11 @@ func Load() (types.ConfigInterface, error) {
 	// }
 
 	config := types.Config{}
+
+	config.SetCmsStoreUsed(cmsStoreUsed)
+	config.SetCmsStoreTemplateID(cmsStoreTemplateID)
+	config.SetVaultStoreUsed(vaultStoreUsed)
+	config.SetVaultStoreKey(vaultStoreKey)
 
 	config.SetAppDebug(appDebug)
 	config.SetAppName(appName)

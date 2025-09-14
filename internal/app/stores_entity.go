@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/gouniverse/entitystore"
+	"github.com/dracory/entitystore"
 )
 
 func newEntityStore(db *sql.DB) (entitystore.StoreInterface, error) {

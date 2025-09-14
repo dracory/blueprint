@@ -36,15 +36,9 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 	}
 
 	return layouts.NewUserLayout(controller.app, r, layouts.Options{
-		Request:    r,
-		Title:      "Home | Client",
-		Content:    controller.view(data),
-		StyleURLs:  []string{},
-		ScriptURLs: []string{},
-		Scripts:    []string{},
-		Styles:     []string{},
-		VaultStore: controller.app.GetVaultStore(),
-		VaultKey:   controller.app.GetConfig().GetVaultKey(),
+		Request: r,
+		Title:   "Home",
+		Content: controller.view(data),
 	}).ToHTML()
 }
 
@@ -71,7 +65,7 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 	userEmail := authUser.Email()
 
 	if controller.app.GetConfig().GetVaultStoreUsed() {
-		userFirstName, userLastName, userEmail, err = helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultKey(), authUser)
+		userFirstName, userLastName, userEmail, err = helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), authUser)
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))

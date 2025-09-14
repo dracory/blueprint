@@ -264,7 +264,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		return true // empty email, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"email": emailToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultStoreKey(), map[string]string{"email": emailToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + emailToken + " - " + err.Error())
@@ -331,7 +331,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return true // empty first name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"first_name": firstNameToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultStoreKey(), map[string]string{"first_name": firstNameToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + firstNameToken + " - " + err.Error())
@@ -399,7 +399,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		return true // empty last name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultKey(), map[string]string{"last_name": lastNameToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultStoreKey(), map[string]string{"last_name": lastNameToken})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + lastNameToken + " - " + err.Error())

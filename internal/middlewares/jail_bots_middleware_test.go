@@ -1,13 +1,15 @@
 package middlewares
 
 import (
+	"io"
 	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gouniverse/auth/tests"
+	"github.com/dracory/auth/tests"
 	"github.com/gouniverse/responses"
+	"github.com/jellydator/ttlcache/v3"
 	"github.com/spf13/cast"
 )
 
@@ -165,5 +167,117 @@ func TestJailBotsMiddlewareIsJailable(t *testing.T) {
 		if jailable != data[i].jailable {
 			t.Fatal("JailBotsMiddleware.isJailable(", data[i].uri, ") must be ", data[i].jailable)
 		}
+	}
+}
+
+// helper to create a simple next handler that writes a body for assertion
+func nextOK() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("next"))
+	})
+}
+
+func TestExcludedWildcard_Blog(t *testing.T) {
+	jb := &jailBotsMiddleware{
+		cache:        ttlcache.New[string, struct{}](),
+		excludePaths: []string{"/blog*"},
+	}
+
+	handler := jb.Handler(nextOK())
+
+	req := httptest.NewRequest(http.MethodGet, "/blog/post", nil)
+	req.RemoteAddr = "1.2.3.4:12345"
+	rr := httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for excluded wildcard path, got %d", rr.Code)
+	}
+	body, _ := io.ReadAll(rr.Body)
+	if string(body) != "next" {
+		t.Fatalf("expected body 'next', got %q", string(body))
+	}
+}
+
+func TestExcludedSegment_NoWildcard_AllowsBlogAndDoesNotOvermatch(t *testing.T) {
+	jb := &jailBotsMiddleware{
+		cache:        ttlcache.New[string, struct{}](),
+		excludePaths: []string{"/blog"},
+	}
+
+	handler := jb.Handler(nextOK())
+
+	// Exact or segment '/blog/...'
+	req1 := httptest.NewRequest(http.MethodGet, "/blog/.env", nil)
+	req1.RemoteAddr = "2.2.2.2:12345"
+	rr1 := httptest.NewRecorder()
+	handler.ServeHTTP(rr1, req1)
+	if rr1.Code != http.StatusOK {
+		t.Fatalf("expected 200 for excluded segment path '/blog/.env', got %d", rr1.Code)
+	}
+
+	// Ensure no overmatch like '/blogger'
+	req2 := httptest.NewRequest(http.MethodGet, "/blogger", nil)
+	req2.RemoteAddr = "2.2.2.3:12345"
+	rr2 := httptest.NewRecorder()
+	handler.ServeHTTP(rr2, req2)
+	if rr2.Code != http.StatusOK {
+		t.Fatalf("expected 200 pass-through for '/blogger', got %d", rr2.Code)
+	}
+}
+
+func TestJailableBlocksAndJailsIP(t *testing.T) {
+	jb := &jailBotsMiddleware{
+		cache:        ttlcache.New[string, struct{}](),
+		excludePaths: []string{},
+	}
+
+	handler := jb.Handler(nextOK())
+
+	// First: trigger jailing via a known blacklisted prefix '/wp'
+	req1 := httptest.NewRequest(http.MethodGet, "/wp-admin", nil)
+	req1.RemoteAddr = "9.9.9.9:1111"
+	rr1 := httptest.NewRecorder()
+	handler.ServeHTTP(rr1, req1)
+	if rr1.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for jailable path, got %d", rr1.Code)
+	}
+
+	// Second: same IP to a normal path should still be forbidden due to jail
+	req2 := httptest.NewRequest(http.MethodGet, "/", nil)
+	req2.RemoteAddr = "9.9.9.9:9999"
+	rr2 := httptest.NewRecorder()
+	handler.ServeHTTP(rr2, req2)
+	if rr2.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 for jailed IP on normal path, got %d", rr2.Code)
+	}
+}
+
+func TestExcludedOverridesJail(t *testing.T) {
+	jb := &jailBotsMiddleware{
+		cache:        ttlcache.New[string, struct{}](),
+		excludePaths: []string{"/blog*"},
+	}
+
+	handler := jb.Handler(nextOK())
+
+	// Jail the IP first
+	req1 := httptest.NewRequest(http.MethodGet, "/wp-admin", nil)
+	req1.RemoteAddr = "3.3.3.3:2222"
+	rr1 := httptest.NewRecorder()
+	handler.ServeHTTP(rr1, req1)
+	if rr1.Code != http.StatusForbidden {
+		t.Fatalf("expected 403 on jailable path, got %d", rr1.Code)
+	}
+
+	// Now access excluded path with same IP should bypass jail and pass
+	req2 := httptest.NewRequest(http.MethodGet, "/blog/post", nil)
+	req2.RemoteAddr = "3.3.3.3:3333"
+	rr2 := httptest.NewRecorder()
+	handler.ServeHTTP(rr2, req2)
+	if rr2.Code != http.StatusOK {
+		t.Fatalf("expected 200 on excluded path even when jailed, got %d", rr2.Code)
 	}
 }

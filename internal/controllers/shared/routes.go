@@ -49,9 +49,15 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath(links.THEME).
 		SetHandler(dashboard.ThemeHandler)
 
-	thumb := rtr.NewRoute().
+
+	thumbRoute := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
-		SetPath(links.THUMB).
+		SetPath("/th/:extension/:size/:quality/:path").
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
+
+	thumbCatchAll := rtr.NewRoute().
+		SetName("Shared > Thumb Controller").
+		SetPath("/th/:extension/:size/:quality/:path...").
 		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	return []rtr.RouteInterface{
@@ -61,6 +67,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		media,
 		resources,
 		theme,
-		thumb,
+		thumbRoute,
+		thumbCatchAll,
 	}
 }

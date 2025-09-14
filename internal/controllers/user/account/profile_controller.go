@@ -59,8 +59,8 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
-		{Name: "Home", URL: links.User().Home(map[string]string{})},
-		{Name: "My Profile", URL: ""},
+		{Name: "Home", URL: links.User().Home()},
+		{Name: "My Account", URL: links.User().Profile()},
 	})
 
 	title := hb.Heading1().
@@ -90,7 +90,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 		)
 
 	return layouts.NewUserLayout(controller.app, r, layouts.Options{
-		Title:      "My Profile",
+		Title:      "My Account",
 		Content:    page,
 		ScriptURLs: []string{cdn.Sweetalert2_10()},
 	}).ToHTML()
@@ -136,28 +136,28 @@ func (controller *profileController) postUpdate(data profileControllerData) stri
 		data.authUser.SetPhone(data.phone)
 	} else {
 		// First name
-		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.FirstName(), data.firstName, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.FirstName(), data.firstName, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error saving first name", slog.String("error", err.Error()))
 			data.formErrorMessage = "Saving profile failed. Please try again later."
 			return controller.formProfile(data).ToHTML()
 		}
 
 		// Last name
-		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.LastName(), data.lastName, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.LastName(), data.lastName, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error saving last name", slog.String("error", err.Error()))
 			data.formErrorMessage = "Saving profile failed. Please try again later."
 			return controller.formProfile(data).ToHTML()
 		}
 
 		// Business name
-		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.BusinessName(), data.buinessName, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.BusinessName(), data.buinessName, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error saving business name", slog.String("error", err.Error()))
 			data.formErrorMessage = "Saving profile failed. Please try again later."
 			return controller.formProfile(data).ToHTML()
 		}
 
 		// Phone
-		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.Phone(), data.phone, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if err := controller.app.GetVaultStore().TokenUpdate(data.request.Context(), data.authUser.Phone(), data.phone, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error saving phone", slog.String("error", err.Error()))
 			data.formErrorMessage = "Saving profile failed. Please try again later."
 			return controller.formProfile(data).ToHTML()
@@ -431,35 +431,35 @@ func (controller *profileController) untokenizeProfileData(ctx context.Context, 
 	phoneToken := phone
 
 	if emailToken != "" {
-		if email, err = controller.app.GetVaultStore().TokenRead(ctx, emailToken, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if email, err = controller.app.GetVaultStore().TokenRead(ctx, emailToken, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if firstNameToken != "" {
-		if firstName, err = controller.app.GetVaultStore().TokenRead(ctx, firstNameToken, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if firstName, err = controller.app.GetVaultStore().TokenRead(ctx, firstNameToken, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error reading first name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if lastNameToken != "" {
-		if lastName, err = controller.app.GetVaultStore().TokenRead(ctx, lastNameToken, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if lastName, err = controller.app.GetVaultStore().TokenRead(ctx, lastNameToken, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error reading last name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if businessNameToken != "" {
-		if businessName, err = controller.app.GetVaultStore().TokenRead(ctx, businessNameToken, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if businessName, err = controller.app.GetVaultStore().TokenRead(ctx, businessNameToken, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error reading business name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if phoneToken != "" {
-		if phone, err = controller.app.GetVaultStore().TokenRead(ctx, phoneToken, controller.app.GetConfig().GetVaultKey()); err != nil {
+		if phone, err = controller.app.GetVaultStore().TokenRead(ctx, phoneToken, controller.app.GetConfig().GetVaultStoreKey()); err != nil {
 			controller.app.GetLogger().Error("Error reading phone", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}

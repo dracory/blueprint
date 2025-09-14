@@ -18,6 +18,7 @@ func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 	jb := new(jailBotsMiddleware)
 	jb.exclude = config.Exclude
 	jb.cache = ttlcache.New[string, struct{}]()
+	jb.excludePaths = append([]string{}, config.ExcludePaths...)
 	m := rtr.NewMiddleware().
 		SetName(jb.Name()).
 		SetHandler(jb.Handler)
@@ -26,12 +27,26 @@ func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 }
 
 type JailBotsConfig struct {
-	Exclude []string
+    // Exclude filters items out of the internal URI blacklist lists used by
+    // isJailable (e.g., if "wp" is in the blacklist but you want to allow it,
+    // add "wp" here). Matches are compared literally against the blacklist
+    // entries, not against request paths.
+    Exclude      []string
+
+    // ExcludePaths defines request path patterns that must bypass the jail logic.
+    // Supported patterns:
+    //  - With a trailing '*': treated as a simple prefix match, e.g. "/blog*" matches
+    //    "/blog", "/blog/", and any subpaths like "/blog/post".
+    //  - Without '*': segment-aware; matches exactly the path (e.g. "/blog") or any
+    //    subpath starting with that segment (e.g. "/blog/..."), but NOT lookalikes
+    //    like "/blogger".
+    ExcludePaths []string
 }
 
 type jailBotsMiddleware struct {
-	exclude []string
-	cache   *ttlcache.Cache[string, struct{}]
+	exclude      []string
+	cache        *ttlcache.Cache[string, struct{}]
+	excludePaths []string
 }
 
 func (j *jailBotsMiddleware) Name() string {
@@ -40,8 +55,14 @@ func (j *jailBotsMiddleware) Name() string {
 
 func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		uri := r.RequestURI
+		path := r.URL.Path
 		ip := req.GetIP(r)
+
+		// Exclude specific routes from jail logic
+		if m.isExcludedPath(path) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		if m.isJailed(ip) {
 			w.WriteHeader(http.StatusForbidden)
@@ -49,14 +70,14 @@ func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 			return
 		}
 
-		jailable, reason := m.isJailable(uri)
+		jailable, reason := m.isJailable(path)
 
 		if jailable {
 			m.jail(ip)
 
 			slog.Default().Info("Jailed bot from "+ip+" for 5 minutes",
 				slog.String("reason", reason),
-				slog.String("uri", uri),
+				slog.String("path", path),
 				slog.String("ip", ip),
 				slog.String("useragent", r.UserAgent()),
 			)
@@ -84,11 +105,11 @@ func (j *jailBotsMiddleware) jail(ip string) {
 	j.cache.Set("jail:"+ip, struct{}{}, 5*time.Minute)
 }
 
-func (m *jailBotsMiddleware) isJailable(uri string) (jailable bool, reason string) {
+func (m *jailBotsMiddleware) isJailable(path string) (jailable bool, reason string) {
 	startsWithList := m.startsWithBlacklistedUriList()
 
 	for i := 0; i < len(startsWithList); i++ {
-		if strings.HasPrefix(uri, startsWithList[i]) {
+		if strings.HasPrefix(path, startsWithList[i]) {
 			return true, "starts with " + startsWithList[i]
 		}
 	}
@@ -96,12 +117,34 @@ func (m *jailBotsMiddleware) isJailable(uri string) (jailable bool, reason strin
 	containsList := m.containsBlacklistedUriList()
 
 	for i := 0; i < len(containsList); i++ {
-		if strings.Contains(uri, containsList[i]) {
+		if strings.Contains(path, containsList[i]) {
 			return true, "contains " + containsList[i]
 		}
 	}
 
 	return false, ""
+}
+
+// isExcludedPath returns true for routes that should bypass jail logic entirely.
+// Supports simple wildcard '*' suffix in patterns (prefix match), e.g., '/blog*'.
+// Without '*', it matches exact segment (exact path or path starting with pattern + '/').
+func (m *jailBotsMiddleware) isExcludedPath(path string) bool {
+	for _, pattern := range m.excludePaths {
+		if pattern == "" {
+			continue
+		}
+		if strings.HasSuffix(pattern, "*") {
+			prefix := strings.TrimSuffix(pattern, "*")
+			if strings.HasPrefix(path, prefix) {
+				return true
+			}
+			continue
+		}
+		if path == pattern || strings.HasPrefix(path, pattern+"/") {
+			return true
+		}
+	}
+	return false
 }
 
 // containsBlacklistedUriList returns a list of strings

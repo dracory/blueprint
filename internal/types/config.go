@@ -118,6 +118,8 @@ type envEncryptionConfigInterface interface {
 type cmsStoreConfigInterface interface {
 	SetCmsStoreUsed(bool)
 	GetCmsStoreUsed() bool
+	SetCmsStoreTemplateID(string)
+	GetCmsStoreTemplateID() string
 }
 
 type statsStoreConfigInterface interface {
@@ -128,6 +130,8 @@ type statsStoreConfigInterface interface {
 type vaultStoreConfigInterface interface {
 	SetVaultStoreUsed(bool)
 	GetVaultStoreUsed() bool
+	SetVaultStoreKey(string)
+	GetVaultStoreKey() string
 }
 
 type i18nConfigInterface interface {
@@ -138,11 +142,11 @@ type i18nConfigInterface interface {
 }
 
 type appSpecificConfigInterface interface {
-	SetCMSTemplateID(string)
-	GetCMSTemplateID() string
+	// SetCMSTemplateID(string)
+	// GetCMSTemplateID() string
 
-	SetVaultKey(string)
-	GetVaultKey() string
+	// SetVaultKey(string)
+	// GetVaultKey() string
 
 	SetOpenAIKey(string)
 	GetOpenAIKey() string
@@ -252,7 +256,8 @@ type Config struct {
 	envEncryptionKey string
 
 	// CMS configuration
-	cmsStoreUsed bool
+	cmsStoreUsed       bool
+	cmsStoreTemplateID string
 
 	// i18n / Translation
 	translationLanguageDefault string
@@ -260,7 +265,6 @@ type Config struct {
 
 	// App-specific settings
 	cmsTemplateID        string
-	vaultKey             string
 	openAIKey            string
 	stripeKeyPrivate     string
 	stripeKeyPublic      string
@@ -276,6 +280,7 @@ type Config struct {
 
 	// Vault configuration
 	vaultStoreUsed bool
+	vaultStoreKey  string
 
 	// Media configuration
 	mediaBucket   string
@@ -617,13 +622,20 @@ func (c *Config) GetEnvEncryptionKey() string {
 	return c.envEncryptionKey
 }
 
-// == CMS Getters/Setters ==
+// == CMS Store Getters/Setters ==
 func (c *Config) SetCmsStoreUsed(v bool) {
 	c.cmsStoreUsed = v
 }
 
 func (c *Config) GetCmsStoreUsed() bool {
 	return c.cmsStoreUsed
+}
+
+func (c *Config) SetCmsStoreTemplateID(v string) {
+	c.cmsStoreTemplateID = v
+}
+func (c *Config) GetCmsStoreTemplateID() string {
+	return c.cmsStoreTemplateID
 }
 
 // == Stats Getters/Setters ==
@@ -653,12 +665,6 @@ func (c *Config) GetTranslationLanguageList() map[string]string {
 }
 
 // == App-specific Getters/Setters ==
-func (c *Config) SetCMSTemplateID(v string) { c.cmsTemplateID = v }
-func (c *Config) GetCMSTemplateID() string  { return c.cmsTemplateID }
-
-func (c *Config) SetVaultKey(v string) { c.vaultKey = v }
-func (c *Config) GetVaultKey() string  { return c.vaultKey }
-
 func (c *Config) SetOpenAIKey(v string) { c.openAIKey = v }
 func (c *Config) GetOpenAIKey() string  { return c.openAIKey }
 
@@ -680,13 +686,20 @@ func (c *Config) GetVertexRegionID() string  { return c.vertexRegionID }
 func (c *Config) SetVertexModelID(v string) { c.vertexModelID = v }
 func (c *Config) GetVertexModelID() string  { return c.vertexModelID }
 
-// == Vault Getters/Setters ==
+// == Vault Store Getters/Setters ==
 func (c *Config) SetVaultStoreUsed(v bool) {
 	c.vaultStoreUsed = v
 }
 
 func (c *Config) GetVaultStoreUsed() bool {
 	return c.vaultStoreUsed
+}
+
+func (c *Config) SetVaultStoreKey(v string) {
+	c.vaultStoreKey = v
+}
+func (c *Config) GetVaultStoreKey() string {
+	return c.vaultStoreKey
 }
 
 // == Media Getters/Setters ==

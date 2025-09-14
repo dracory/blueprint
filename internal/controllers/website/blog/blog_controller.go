@@ -66,18 +66,19 @@ func (controller *blogController) page(data blogControllerData) string {
 
 	columnCards := lo.Map(data.postList, func(post blogstore.Post, index int) hb.TagInterface {
 		postImageURL := post.ImageUrlOrDefault()
+		thumbnailURL := links.Website().Thumbnail("png", "300", "200", "80", postImageURL)
 
-		publishedAt := lo.Ternary(post.PublishedAt() == "", "", post.PublishedAtCarbon().Format("d M, Y"))
-
-		postURL := links.NewWebsiteLinks().BlogPost(post.ID(), post.Slug())
-
-		postImage := hb.Image(postImageURL).
+		postImage := hb.Image(thumbnailURL).
 			Class("card-img-top rounded-3").
 			Style("object-fit: cover;").
 			Style("max-height: 180px;").
 			Style("aspect-ratio: 9/6;").
 			Style("border-radius: 0.5rem").
 			Alt("")
+
+		publishedAt := lo.Ternary(post.PublishedAt() == "", "", post.PublishedAtCarbon().Format("d M, Y"))
+
+		postURL := links.Website().BlogPost(post.ID(), post.Slug())
 
 		postTitle := hb.Heading5().
 			Class("card-title").

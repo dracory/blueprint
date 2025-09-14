@@ -14,8 +14,8 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
+	"github.com/dracory/rtr"
 	"github.com/dracory/str"
-	"github.com/go-chi/chi/v5"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -34,8 +34,8 @@ func NewBlogPostController(
 }
 
 func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
-	postID := chi.URLParam(r, "id")
-	postSlug := chi.URLParam(r, "title")
+	postID, _ := rtr.GetParam(r, "id")
+	postSlug, _ := rtr.GetParam(r, "title")
 	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {

@@ -89,13 +89,13 @@ func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.R
 
 	if data.csrfToken == "" {
 		data.errorMessage = "CSRF token is required"
-		data.redirectURL = links.NewWebsiteLinks().Contact()
+		data.redirectURL = links.Website().Contact()
 		return controller.contactForm(r, data).ToHTML()
 	}
 
 	if !csrf.TokenValidate(data.csrfToken, "holymoly") {
 		data.errorMessage = "CSRF token is invalid"
-		data.redirectURL = links.NewWebsiteLinks().Contact()
+		data.redirectURL = links.Website().Contact()
 		return controller.contactForm(r, data).ToHTML()
 	}
 

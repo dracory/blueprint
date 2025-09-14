@@ -1,6 +1,7 @@
 package thumb
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -15,11 +16,11 @@ import (
 
 	"strings"
 
+	"github.com/dracory/rtr"
 	"github.com/dracory/str"
 
 	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
-	"github.com/go-chi/chi/v5"
 	"github.com/spf13/cast"
 
 	"github.com/mingrammer/cfmt"
@@ -97,11 +98,12 @@ func (controller *thumbnailController) setHeaders(w http.ResponseWriter, fileExt
 }
 
 func (controller *thumbnailController) prepareData(r *http.Request) (data thumbnailControllerData, errorMessage string) {
-	data.extension = chi.URLParam(r, "extension")
-	size := chi.URLParam(r, "size")
-	quality := chi.URLParam(r, "quality")
-	data.path = chi.URLParam(r, "*")
+	data.extension, _ = rtr.GetParam(r, "extension")
+	size, _ := rtr.GetParam(r, "size")
+	quality, _ := rtr.GetParam(r, "quality")
+	data.path, _ = rtr.GetParam(r, "path")
 	data.isURL = false
+	data.isCache = false
 
 	///cfmt.Infoln("====================================")
 	//cfmt.Infoln("EXTENSION: ", extension)
@@ -130,6 +132,11 @@ func (controller *thumbnailController) prepareData(r *http.Request) (data thumbn
 		data.isURL = true
 		data.path = strings.ReplaceAll(data.path, "https/", "https://")
 		data.path = strings.ReplaceAll(data.path, "http/", "http://")
+	}
+
+	if strings.HasPrefix(data.path, "cache-") {
+		data.isCache = true
+		data.path = data.path[6:]
 	}
 
 	if strings.HasPrefix(data.path, "files/") {
@@ -184,6 +191,33 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
+			return "", err.Error()
+		}
+	} else if data.isCache {
+		dataBase64ImageStr, err := cache.File.Fetch(data.path)
+
+		if err != nil {
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			return "", err.Error()
+		}
+
+		// convert data:image base64 URL or plain base64 string to bytes
+		payload := strings.TrimSpace(dataBase64ImageStr)
+		if strings.HasPrefix(payload, "data:image") {
+			// expected format: data:image/<ext>;base64,<base64-data>
+			parts := strings.SplitN(payload, ",", 2)
+			if len(parts) == 2 {
+				payload = parts[1]
+			} else {
+				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "invalid data URL format")
+				return "", "invalid data URL format"
+			}
+		}
+
+		imgBytes, err = base64.StdEncoding.DecodeString(payload)
+
+		if err != nil {
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			return "", err.Error()
 		}
 	} else {
@@ -246,4 +280,5 @@ type thumbnailControllerData struct {
 	quality   int64
 	path      string
 	isURL     bool
+	isCache   bool
 }

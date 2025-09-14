@@ -1,8 +1,11 @@
 package links
 
 import (
+	"project/internal/cache"
 	"strings"
+	"time"
 
+	"github.com/dracory/str"
 	"github.com/samber/lo"
 )
 
@@ -92,9 +95,29 @@ func (l *websiteLinks) Theme(params map[string]string) string {
 }
 
 func (l *websiteLinks) Thumbnail(extension, width, height, quality, path string) string {
+	if quality == "" {
+		quality = "80"
+	}
+	if width == "" {
+		width = "100"
+	}
+	if height == "" {
+		height = "100"
+	}
+	if extension == "" {
+		extension = "png"
+	}
 	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
 		url := strings.ReplaceAll(path, "https://", "https/")
 		path = strings.ReplaceAll(url, "http://", "http/")
+	}
+	if strings.HasPrefix(path, "data") {
+		hash := str.MD5(path)
+		err := cache.File.Save(hash, path, 5*time.Minute)
+		if err != nil {
+			return RootURL() + "/th/cache-error"
+		}
+		path = "cache-" + hash
 	}
 	return RootURL() + "/th/" + extension + "/" + width + "x" + height + "/" + quality + "/" + path
 }

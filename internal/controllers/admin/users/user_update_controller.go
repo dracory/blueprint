@@ -283,7 +283,7 @@ func (controller userUpdateController) saveUser(r *http.Request, data userUpdate
 		r.Context(),
 		controller.app.GetVaultStore(),
 		controller.app.GetLogger(),
-		controller.app.GetConfig().GetVaultKey(),
+		controller.app.GetConfig().GetVaultStoreKey(),
 		data.user,
 		data.formFirstName,
 		data.formLastName,
@@ -328,7 +328,7 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 
 	data.user = user
 
-	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultKey(), data.user)
+	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), data.user)
 
 	if err != nil {
 		if controller.app.GetLogger() != nil {

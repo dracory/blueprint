@@ -29,7 +29,7 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 
 	dashboardUser := dashboard.User{}
 	if authUser != nil {
-		firstName, lastName, err := getUserData(app, r, authUser, options.VaultKey)
+		firstName, lastName, err := getUserData(app, r, authUser, app.GetConfig().GetVaultStoreKey())
 		if err == nil {
 			dashboardUser = dashboard.User{
 				FirstName: firstName,

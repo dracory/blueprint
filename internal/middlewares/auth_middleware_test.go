@@ -8,7 +8,7 @@ import (
 	"project/internal/testutils"
 	"testing"
 
-	"github.com/gouniverse/auth"
+	"github.com/dracory/auth"
 	"github.com/stretchr/testify/assert"
 )
 

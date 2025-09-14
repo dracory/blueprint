@@ -40,5 +40,15 @@ func Routes(
 			SetName("Guest > Blog > Post with ID && Title > Index").
 			SetPath(links.BLOG_POST_WITH_REGEX2).
 			SetHTMLHandler(NewBlogPostController(app).Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Blog > Post with ID > Index").
+			SetPath("/blog/post/:id").
+			SetHTMLHandler(NewBlogPostController(app).Handler),
+
+		rtr.NewRoute().
+			SetName("Guest > Blog > Post with ID && Title > Index").
+			SetPath("/blog/post/:id/:title").
+			SetHTMLHandler(NewBlogPostController(app).Handler),
 	}
 }

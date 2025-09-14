@@ -91,8 +91,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	websiteRoutes = append(websiteRoutes, swaggerYamlRoute)
 
 	// Comment if you do not use the blog routes
-	websiteRoutes = append(websiteRoutes,
-		blog.Routes(app)...)
+	websiteRoutes = append(websiteRoutes, blog.Routes(app)...)
 
 	// Comment if you do not use the payment routes
 	// websiteRoutes = append(websiteRoutes, paymentRoutes...)

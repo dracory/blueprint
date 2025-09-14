@@ -7,8 +7,8 @@ import (
 	"project/internal/config"
 	"project/internal/types"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/rtr"
-	"github.com/gouniverse/auth"
 )
 
 func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {

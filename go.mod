@@ -8,6 +8,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
+	github.com/dracory/auth v0.24.0
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.5.0
 	github.com/dracory/blockeditor v0.24.0
@@ -21,8 +22,9 @@ require (
 	github.com/dracory/customstore v1.6.0
 	github.com/dracory/database v0.3.0
 	github.com/dracory/dataobject v1.6.0
-	github.com/dracory/env v0.6.0
-	github.com/dracory/envenc v1.0.0
+	github.com/dracory/entitystore v1.1.0
+	github.com/dracory/env v1.0.0
+	github.com/dracory/envenc v1.1.0
 	github.com/dracory/feedstore v0.3.0
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
@@ -48,7 +50,6 @@ require (
 	github.com/dracory/websrv v0.1.0
 	github.com/dromara/carbon/v2 v2.6.11
 	github.com/faabiosr/cachego v0.26.0
-	github.com/go-chi/chi/v5 v5.2.3
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gouniverse/auth v0.22.0
@@ -88,9 +89,12 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/davidmz/go-pageant v1.0.2 // indirect
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
+	github.com/dracory/crypto v0.3.0 // indirect
+	github.com/dracory/uncdn v0.9.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
+	github.com/go-chi/chi/v5 v5.2.3 // indirect
 	github.com/go-chi/cors v1.2.2 // indirect
 	github.com/go-chi/httprate v0.15.0 // indirect
 	github.com/go-openapi/errors v0.22.2 // indirect
@@ -146,7 +150,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gouniverse/api v1.6.0 // indirect
 	github.com/gouniverse/dataobject v1.3.0 // indirect
-	github.com/gouniverse/entitystore v1.0.0
 	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.9.0 // indirect
 	github.com/gouniverse/uid v1.5.0 // indirect

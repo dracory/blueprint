@@ -142,14 +142,14 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 			return controller.formRegister(data).ToHTML()
 		}
 
-		firstNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.firstName, controller.app.GetConfig().GetVaultKey(), 20)
+		firstNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.firstName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(data).ToHTML()
 		}
 
-		lastNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.lastName, controller.app.GetConfig().GetVaultKey(), 20)
+		lastNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.lastName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating last name token", slog.String("error", err.Error()))
@@ -157,7 +157,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 			return controller.formRegister(data).ToHTML()
 		}
 
-		businessNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.app.GetConfig().GetVaultKey(), 20)
+		businessNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating business name token", slog.String("error", err.Error()))
@@ -165,7 +165,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 			return controller.formRegister(data).ToHTML()
 		}
 
-		phoneToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.phone, controller.app.GetConfig().GetVaultKey(), 20)
+		phoneToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.phone, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating phone token", slog.String("error", err.Error()))
@@ -403,7 +403,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	phoneToken := phone
 
 	if emailToken != "" {
-		email, err = controller.app.GetVaultStore().TokenRead(ctx, emailToken, controller.app.GetConfig().GetVaultKey())
+		email, err = controller.app.GetVaultStore().TokenRead(ctx, emailToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
@@ -412,7 +412,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	}
 
 	if firstNameToken != "" {
-		firstName, err = controller.app.GetVaultStore().TokenRead(ctx, firstNameToken, controller.app.GetConfig().GetVaultKey())
+		firstName, err = controller.app.GetVaultStore().TokenRead(ctx, firstNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error reading first name", slog.String("error", err.Error()))
@@ -421,7 +421,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	}
 
 	if lastNameToken != "" {
-		lastName, err = controller.app.GetVaultStore().TokenRead(ctx, lastNameToken, controller.app.GetConfig().GetVaultKey())
+		lastName, err = controller.app.GetVaultStore().TokenRead(ctx, lastNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error reading last name", slog.String("error", err.Error()))
@@ -430,7 +430,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	}
 
 	if businessNameToken != "" {
-		businessName, err = controller.app.GetVaultStore().TokenRead(ctx, businessNameToken, controller.app.GetConfig().GetVaultKey())
+		businessName, err = controller.app.GetVaultStore().TokenRead(ctx, businessNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error reading business name", slog.String("error", err.Error()))
@@ -439,7 +439,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	}
 
 	if phoneToken != "" {
-		phone, err = controller.app.GetVaultStore().TokenRead(ctx, phoneToken, controller.app.GetConfig().GetVaultKey())
+		phone, err = controller.app.GetVaultStore().TokenRead(ctx, phoneToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error reading phone", slog.String("error", err.Error()))

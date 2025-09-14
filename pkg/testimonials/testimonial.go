@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/dracory/dataobject"
-	"github.com/gouniverse/entitystore"
+	"github.com/dracory/entitystore"
 )
 
 const ENTITY_TYPE = "testimonial"

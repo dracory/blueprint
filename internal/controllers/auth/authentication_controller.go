@@ -317,7 +317,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		return nil, errors.New(`vault store is nil`)
 	}
 
-	emailToken, err := c.app.GetVaultStore().TokenCreate(ctx, email, c.app.GetConfig().GetVaultKey(), 20)
+	emailToken, err := c.app.GetVaultStore().TokenCreate(ctx, email, c.app.GetConfig().GetVaultStoreKey(), 20)
 
 	if err != nil {
 		return nil, err

@@ -37,7 +37,9 @@ func TestSharedRoutesAreAdded(t *testing.T) {
 		"/flash",
 		"/media/*",
 		"/resources",
-		"/th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*",
+		// "/th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*",
+		"/th/:extension/:size/:quality/:path",
+		"/th/:extension/:size/:quality/:path...",
 	}
 	for _, expectedPath := range expectedPaths {
 		found := false

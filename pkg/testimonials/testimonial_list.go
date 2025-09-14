@@ -1,7 +1,7 @@
 package testimonials
 
 import (
-	"github.com/gouniverse/entitystore"
+	"github.com/dracory/entitystore"
 )
 
 func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
