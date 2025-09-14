@@ -104,8 +104,21 @@ func Load() (types.ConfigInterface, error) {
 
 	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
 	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
-	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
+	customStoreUsed := env.GetBool(KEY_CUSTOM_STORE_USED)
+	entityStoreUsed := env.GetBool(KEY_ENTITY_STORE_USED)
+	feedStoreUsed := env.GetBool(KEY_FEED_STORE_USED)
+	geoStoreUsed := env.GetBool(KEY_GEO_STORE_USED)
+	logStoreUsed := env.GetBool(KEY_LOG_STORE_USED)
+	metaStoreUsed := env.GetBool(KEY_META_STORE_USED)
+	sessionStoreUsed := env.GetBool(KEY_SESSION_STORE_USED)
+	settingStoreUsed := env.GetBool(KEY_SETTING_STORE_USED)
+	shopStoreUsed := env.GetBool(KEY_SHOP_STORE_USED)
+	statsStoreUsed := env.GetBool(KEY_STATS_STORE_USED)
+	taskStoreUsed := env.GetBool(KEY_TASK_STORE_USED)
+	tradingStoreUsed := env.GetBool(KEY_TRADING_STORE_USED)
+	userStoreUsed := env.GetBool(KEY_USER_STORE_USED)
 	vaultStoreUsed := env.GetBool(KEY_VAULT_STORE_USED)
+	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
 
 	// mediaBucket := env.Value("MEDIA_BUCKET")
 	// mediaDriver := env.Value("MEDIA_DRIVER")
@@ -201,14 +214,28 @@ func Load() (types.ConfigInterface, error) {
 
 	config := types.Config{}
 
+	// Store configurations
 	config.SetCmsStoreUsed(cmsStoreUsed)
 	config.SetCmsStoreTemplateID(cmsStoreTemplateID)
+	config.SetCustomStoreUsed(customStoreUsed)
+	config.SetEntityStoreUsed(entityStoreUsed)
+	config.SetFeedStoreUsed(feedStoreUsed)
+	config.SetGeoStoreUsed(geoStoreUsed)
+	config.SetLogStoreUsed(logStoreUsed)
+	config.SetMetaStoreUsed(metaStoreUsed)
+	config.SetSessionStoreUsed(sessionStoreUsed)
+	config.SetSettingStoreUsed(settingStoreUsed)
+	config.SetShopStoreUsed(shopStoreUsed)
+	config.SetStatsStoreUsed(statsStoreUsed)
+	config.SetTaskStoreUsed(taskStoreUsed)
+	config.SetTradingStoreUsed(tradingStoreUsed)
+	config.SetUserStoreUsed(userStoreUsed)
 	config.SetVaultStoreUsed(vaultStoreUsed)
 	config.SetVaultStoreKey(vaultStoreKey)
 
+	// App configurations
 	config.SetAppDebug(appDebug)
 	config.SetAppName(appName)
-	// config.SetAppType(AppType)
 	config.SetAppEnv(appEnvironment)
 	config.SetAppHost(appHost)
 	config.SetAppPort(appPort)
@@ -219,6 +246,7 @@ func Load() (types.ConfigInterface, error) {
 		config.SetEnvEncryptionKey(envencRealKey)
 	}
 
+	// Mail configurations
 	config.SetMailDriver(mailDriver)
 	config.SetMailHost(mailHost)
 	config.SetMailPort(cast.ToInt(mailPort))
@@ -227,6 +255,7 @@ func Load() (types.ConfigInterface, error) {
 	config.SetMailFromEmail(mailFromEmailAddress)
 	config.SetMailFromName(mailFromName)
 
+	// Database configurations
 	config.SetDatabaseDriver(dbDriver)
 	config.SetDatabaseHost(dbHost)
 	config.SetDatabasePort(dbPort)
