@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/req"
 	"github.com/dracory/sessionstore"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/auth"
 )
 
 func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.Request, userID string) error {

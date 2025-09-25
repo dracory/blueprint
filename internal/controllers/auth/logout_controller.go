@@ -6,7 +6,7 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/gouniverse/auth"
+	"github.com/dracory/auth"
 )
 
 type logoutController struct {

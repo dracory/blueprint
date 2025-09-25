@@ -4,8 +4,44 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/shopstore"
 )
+
+func shopStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetShopStoreUsed() {
+		return nil
+	}
+
+	if store, err := newShopStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetShopStore(store)
+	}
+
+	return nil
+}
+
+func shopStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetShopStoreUsed() {
+		return nil
+	}
+
+	if app.GetShopStore() == nil {
+		return errors.New("shop store is not initialized")
+	}
+
+	if err := app.GetShopStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newShopStore(db *sql.DB) (shopstore.StoreInterface, error) {
 	if db == nil {

@@ -12,7 +12,11 @@ import (
 )
 
 func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},

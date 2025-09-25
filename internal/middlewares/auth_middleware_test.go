@@ -13,7 +13,12 @@ import (
 )
 
 func TestAuthHandler_NoSessionKey(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	// cfg.SetCacheStoreUsed(true)
+	// cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a request without a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
@@ -38,7 +43,12 @@ func TestAuthHandler_NoSessionKey(t *testing.T) {
 }
 
 func TestAuthHandler_SessionNotFoundError(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	// cfg.SetCacheStoreUsed(true)
+	// cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a request with a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
@@ -66,7 +76,12 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 }
 
 func TestAuthHandler_SessionExpired(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	// cfg.SetCacheStoreUsed(true)
+	// cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	userStore := app.GetUserStore()
 	sessionStore := app.GetSessionStore()
@@ -122,7 +137,12 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 }
 
 func TestAuthHandler_UserNotFound(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	// cfg.SetCacheStoreUsed(true)
+	// cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	userStore := app.GetUserStore()
 	sessionStore := app.GetSessionStore()
@@ -185,7 +205,12 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 }
 
 func TestAuthHandler_SessionSuccess(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	// cfg.SetCacheStoreUsed(true)
+	// cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	userStore := app.GetUserStore()
 	sessionStore := app.GetSessionStore()
@@ -238,4 +263,99 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 	if responseRecorder.Code != http.StatusOK {
 		t.Errorf("Expected status code %d, got %d", http.StatusOK, responseRecorder.Code)
 	}
+}
+
+func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
+	// Configure app with session store disabled
+	cfg := testutils.DefaultConf()
+	cfg.SetSessionStoreUsed(false)
+
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+
+	handler := authHandler(app, next)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, "session store not enabled", rr.Body.String())
+}
+
+func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
+	// Configure app with session store enabled, then nil the store
+	cfg := testutils.DefaultConf()
+	cfg.SetSessionStoreUsed(true)
+
+	app := testutils.Setup(testutils.WithCfg(cfg))
+	// Simulate uninitialized session store
+	app.SetSessionStore(nil)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+
+	handler := authHandler(app, next)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, "session store not initialized", rr.Body.String())
+}
+
+func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T) {
+	// According to current implementation, if user store is marked as used,
+	// the middleware returns an error message "user store not enabled".
+	// Set both session and user stores to used so we pass earlier guards.
+	cfg := testutils.DefaultConf()
+	cfg.SetUserStoreUsed(false)
+	cfg.SetSessionStoreUsed(true)
+
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+
+	handler := authHandler(app, next)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, "user store not enabled", rr.Body.String())
+}
+
+func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
+	// Set session store used and initialized, but user store marked as not used
+	// and remains nil, which should trigger the "user store not initialized" error
+	// per the current guard sequence.
+	cfg := testutils.DefaultConf()
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
+	// Ensure user store is nil
+	app.SetUserStore(nil)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rr := httptest.NewRecorder()
+
+	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusTeapot)
+	})
+
+	handler := authHandler(app, next)
+	handler.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, "user store not initialized", rr.Body.String())
 }

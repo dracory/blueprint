@@ -17,7 +17,11 @@ import (
 
 func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Act
 	body, response, err := test.CallMiddleware("GET", NewUserMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +72,11 @@ func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 
 func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	if app.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")
@@ -142,7 +150,11 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	if app.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")
@@ -230,7 +242,11 @@ func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 
 func TestUserMiddleware_Success(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	if app.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")

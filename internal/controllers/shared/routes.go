@@ -49,7 +49,6 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath(links.THEME).
 		SetHandler(dashboard.ThemeHandler)
 
-
 	thumbRoute := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path").

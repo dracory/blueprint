@@ -10,7 +10,11 @@ import (
 
 // TestSharedRoutesCount verifies the number of shared routes registered.
 func TestSharedRoutesCount(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 	routes := shared.Routes(app)
 	if len(routes) != 8 {
 		t.Fatalf("expected 8 shared routes, got %d", len(routes))
@@ -19,7 +23,11 @@ func TestSharedRoutesCount(t *testing.T) {
 
 // TestSharedRoutesNotNil ensures no route entries are nil.
 func TestSharedRoutesNotNil(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 	routes := shared.Routes(app)
 	for i, rt := range routes {
 		if rt == nil {
@@ -29,7 +37,11 @@ func TestSharedRoutesNotNil(t *testing.T) {
 }
 
 func TestSharedRoutesAreAdded(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 	routes := shared.Routes(app)
 	expectedPaths := []string{
 		"/ads.txt",
@@ -58,7 +70,11 @@ func TestSharedRoutesAreAdded(t *testing.T) {
 
 // TestSharedRoutesAreInGlobalRouter verifies that all shared routes are added to the application router.
 func TestSharedRoutesAreInGlobalRouter(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	sharedRoutes := shared.Routes(app)
 	_, allRoutes := approutes.RoutesList(app)

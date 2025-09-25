@@ -9,12 +9,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/test"
-	"github.com/gouniverse/auth"
 )
 
 func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
@@ -65,7 +69,11 @@ func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T)
 }
 
 func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
@@ -116,7 +124,12 @@ func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -165,7 +178,13 @@ func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -214,7 +233,12 @@ func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -266,7 +290,13 @@ func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -318,7 +348,12 @@ func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -371,7 +406,13 @@ func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -424,7 +465,12 @@ func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -478,7 +524,13 @@ func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -532,7 +584,12 @@ func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -587,7 +644,13 @@ func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -642,9 +705,12 @@ func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_Success_WithoutVault(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(false))
-	application.GetConfig().SetVaultStoreUsed(false)
-	application.SetVaultStore(nil)
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 
@@ -701,7 +767,13 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_Success_WithVaultStore(t *testing.T) {
-	application := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
 

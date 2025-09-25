@@ -28,7 +28,9 @@ func TestExecuteCliCommand_NilTaskStore(t *testing.T) {
 }
 
 func TestExecuteCliCommand_TaskExecution(t *testing.T) {
-	app := testutils.Setup() // Sets up necessary config, including potentially a mock TaskStore
+	cfg := testutils.DefaultConf()
+	cfg.SetTaskStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg)) // Sets up necessary config, including potentially a mock TaskStore
 
 	// Test task execution with TaskStore not nil
 	os.Args = []string{"main", "task", "testTask"}

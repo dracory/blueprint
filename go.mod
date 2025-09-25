@@ -52,7 +52,6 @@ require (
 	github.com/faabiosr/cachego v0.26.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gouniverse/auth v0.22.0
 	github.com/gouniverse/csrf v0.1.0
 	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/filesystem v0.3.1

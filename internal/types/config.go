@@ -115,6 +115,16 @@ type envEncryptionConfigInterface interface {
 	GetEnvEncryptionKey() string
 }
 
+type blogStoreConfigInterface interface {
+	SetBlogStoreUsed(bool)
+	GetBlogStoreUsed() bool
+}
+
+type cacheStoreConfigInterface interface {
+	SetCacheStoreUsed(bool)
+	GetCacheStoreUsed() bool
+}
+
 type cmsStoreConfigInterface interface {
 	SetCmsStoreUsed(bool)
 	GetCmsStoreUsed() bool
@@ -167,6 +177,11 @@ type shopStoreConfigInterface interface {
 	GetShopStoreUsed() bool
 }
 
+type sqlFileStoreConfigInterface interface {
+	SetSqlFileStoreUsed(bool)
+	GetSqlFileStoreUsed() bool
+}
+
 type statsStoreConfigInterface interface {
 	SetStatsStoreUsed(bool)
 	GetStatsStoreUsed() bool
@@ -194,7 +209,6 @@ type vaultStoreConfigInterface interface {
 	GetVaultStoreKey() string
 }
 
-
 type i18nConfigInterface interface {
 	SetTranslationLanguageDefault(string)
 	GetTranslationLanguageDefault() string
@@ -202,33 +216,13 @@ type i18nConfigInterface interface {
 	GetTranslationLanguageList() map[string]string
 }
 
-type appSpecificConfigInterface interface {
-	// SetCMSTemplateID(string)
-	// GetCMSTemplateID() string
-
-	// SetVaultKey(string)
-	// GetVaultKey() string
-
-	SetOpenAIKey(string)
-	GetOpenAIKey() string
-
+type paymentConfigInterface interface {
 	SetStripeKeyPrivate(string)
 	GetStripeKeyPrivate() string
-
 	SetStripeKeyPublic(string)
 	GetStripeKeyPublic() string
-
 	SetStripeUsed(bool)
 	GetStripeUsed() bool
-
-	SetVertexProjectID(string)
-	GetVertexProjectID() string
-
-	SetVertexRegionID(string)
-	GetVertexRegionID() string
-
-	SetVertexModelID(string)
-	GetVertexModelID() string
 }
 
 type mediaConfigInterface interface {
@@ -254,8 +248,14 @@ type ConfigInterface interface {
 	appConfigInterface
 	emailConfigInterface
 	databaseConfigInterface
-	llmConfigInterface
 	envEncryptionConfigInterface
+	llmConfigInterface
+	mediaConfigInterface
+	paymentConfigInterface
+
+	// Stores
+	blogStoreConfigInterface
+	cacheStoreConfigInterface
 	cmsStoreConfigInterface
 	customStoreConfigInterface
 	entityStoreConfigInterface
@@ -266,14 +266,13 @@ type ConfigInterface interface {
 	sessionStoreConfigInterface
 	settingStoreConfigInterface
 	shopStoreConfigInterface
+	sqlFileStoreConfigInterface
 	statsStoreConfigInterface
 	taskStoreConfigInterface
 	tradingStoreConfigInterface
 	userStoreConfigInterface
 	vaultStoreConfigInterface
 	i18nConfigInterface
-	appSpecificConfigInterface
-	mediaConfigInterface
 }
 
 var _ ConfigInterface = (*Config)(nil)
@@ -311,70 +310,61 @@ type Config struct {
 	openRouterApiUsed      bool
 	openRouterDefaultModel string
 
+	// OpenAI
+	openAiApiKey       string
 	openAiApiUsed      bool
 	openAiDefaultModel string
 
+	// Anthropic
 	anthropicApiUsed      bool
 	anthropicApiKey       string
 	anthropicDefaultModel string
 
+	// Google Gemini
 	googleGeminiApiUsed      bool
 	googleGeminiApiKey       string
 	googleGeminiDefaultModel string
 
+	// Vertex AI
 	vertexAiUsed         bool
 	vertexAiDefaultModel string
 	vertexAiProjectID    string
 	vertexAiRegionID     string
 	vertexAiModelID      string
 
+	// Encryption
 	envEncryptionKey string
 
 	// Store configurations
+	blogStoreUsed      bool
+	cacheStoreUsed     bool
 	cmsStoreUsed       bool
 	cmsStoreTemplateID string
+	customStoreUsed    bool
+	entityStoreUsed    bool
+	feedStoreUsed      bool
+	geoStoreUsed       bool
+	logStoreUsed       bool
+	metaStoreUsed      bool
+	sessionStoreUsed   bool
+	settingStoreUsed   bool
+	shopStoreUsed      bool
+	sqlFileStoreUsed   bool
+	statsStoreUsed     bool
+	taskStoreUsed      bool
+	tradingStoreUsed   bool
+	userStoreUsed      bool
+	vaultStoreUsed     bool
+	vaultStoreKey      string
 
-	customStoreUsed bool
-
-	entityStoreUsed bool
-
-	feedStoreUsed bool
-
-	geoStoreUsed bool
-
-	logStoreUsed bool
-
-	metaStoreUsed bool
-
-	sessionStoreUsed bool
-
-	settingStoreUsed bool
-
-	shopStoreUsed bool
-
-	statsStoreUsed bool
-
-	taskStoreUsed bool
-
-	tradingStoreUsed bool
-
-	userStoreUsed bool
-
-	vaultStoreUsed bool
-	vaultStoreKey  string
-
+	// i18n / Translation
 	translationLanguageDefault string
 	translationLanguageList    map[string]string
 
-	// App-specific configuration
-	cmsTemplateID   string
-	openAIKey       string
+	// App-specific settings
 	stripeKeyPrivate string
 	stripeKeyPublic  string
 	stripeUsed       bool
-	vertexProjectID  string
-	vertexRegionID   string
-	vertexModelID    string
 
 	// Media configuration
 	mediaBucket   string
@@ -620,10 +610,10 @@ func (c *Config) GetOpenAiApiUsed() bool {
 }
 
 func (c *Config) SetOpenAiApiKey(v string) {
-	c.openAIKey = v
+	c.openAiApiKey = v
 }
 func (c *Config) GetOpenAiApiKey() string {
-	return c.openAIKey
+	return c.openAiApiKey
 }
 
 func (c *Config) SetOpenAiDefaultModel(v string) {
@@ -716,6 +706,24 @@ func (c *Config) GetEnvEncryptionKey() string {
 	return c.envEncryptionKey
 }
 
+// == Cache Store Getters/Setters ==
+func (c *Config) SetCacheStoreUsed(v bool) {
+	c.cacheStoreUsed = v
+}
+
+func (c *Config) GetCacheStoreUsed() bool {
+	return c.cacheStoreUsed
+}
+
+// == Blog Store Getters/Setters ==
+func (c *Config) SetBlogStoreUsed(v bool) {
+	c.blogStoreUsed = v
+}
+
+func (c *Config) GetBlogStoreUsed() bool {
+	return c.blogStoreUsed
+}
+
 // == CMS Store Getters/Setters ==
 func (c *Config) SetCmsStoreUsed(v bool) {
 	c.cmsStoreUsed = v
@@ -796,6 +804,15 @@ func (c *Config) GetSessionStoreUsed() bool {
 	return c.sessionStoreUsed
 }
 
+// == Sql File Store Getters/Setters ==
+func (c *Config) SetSqlFileStoreUsed(v bool) {
+	c.sqlFileStoreUsed = v
+}
+
+func (c *Config) GetSqlFileStoreUsed() bool {
+	return c.sqlFileStoreUsed
+}
+
 // == Setting Store Getters/Setters ==
 func (c *Config) SetSettingStoreUsed(v bool) {
 	c.settingStoreUsed = v
@@ -868,26 +885,25 @@ func (c *Config) GetTranslationLanguageList() map[string]string {
 }
 
 // == App-specific Getters/Setters ==
-func (c *Config) SetOpenAIKey(v string) { c.openAIKey = v }
-func (c *Config) GetOpenAIKey() string  { return c.openAIKey }
+func (c *Config) SetStripeKeyPrivate(v string) {
+	c.stripeKeyPrivate = v
+}
 
-func (c *Config) SetStripeKeyPrivate(v string) { c.stripeKeyPrivate = v }
-func (c *Config) GetStripeKeyPrivate() string  { return c.stripeKeyPrivate }
+func (c *Config) GetStripeKeyPrivate() string {
+	return c.stripeKeyPrivate
+}
 
-func (c *Config) SetStripeKeyPublic(v string) { c.stripeKeyPublic = v }
-func (c *Config) GetStripeKeyPublic() string  { return c.stripeKeyPublic }
+func (c *Config) SetStripeKeyPublic(v string) {
+	c.stripeKeyPublic = v
+}
+func (c *Config) GetStripeKeyPublic() string {
+	return c.stripeKeyPublic
+}
 
-func (c *Config) SetStripeUsed(v bool) { c.stripeUsed = v }
-func (c *Config) GetStripeUsed() bool  { return c.stripeUsed }
-
-func (c *Config) SetVertexProjectID(v string) { c.vertexProjectID = v }
-func (c *Config) GetVertexProjectID() string  { return c.vertexProjectID }
-
-func (c *Config) SetVertexRegionID(v string) { c.vertexRegionID = v }
-func (c *Config) GetVertexRegionID() string  { return c.vertexRegionID }
-
-func (c *Config) SetVertexModelID(v string) { c.vertexModelID = v }
-func (c *Config) GetVertexModelID() string  { return c.vertexModelID }
+func (c *Config) SetStripeUsed(v bool) {
+	c.stripeUsed = v
+}
+func (c *Config) GetStripeUsed() bool { return c.stripeUsed }
 
 // == Vault Store Getters/Setters ==
 func (c *Config) SetVaultStoreUsed(v bool) {

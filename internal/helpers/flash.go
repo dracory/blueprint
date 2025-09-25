@@ -21,6 +21,7 @@ func IsFlashRoute(r *http.Request) bool {
 // ToFlashURL return a flash message URL
 func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, message string, url string, seconds int) string {
 	id := uid.HumanUid()
+
 	cacheStore.SetJSON(id+"_flash_message", map[string]any{
 		"type":    messageType,
 		"message": message,
@@ -28,7 +29,7 @@ func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, messag
 		"time":    seconds,
 	}, int64(seconds)+10)
 
-	return links.NewWebsiteLinks().Flash(map[string]string{
+	return links.Website().Flash(map[string]string{
 		"message_id": id,
 	})
 }

@@ -16,11 +16,8 @@ func NewCmsLayout(
 ) *cmsLayout {
 	layout := &cmsLayout{}
 	layout.app = app
-	// layout.cfg = cfg
-	// layout.cmsStore = cmsStore
-	// layout.cmsTemplateID = cmsTemplateID
 	layout.request = options.Request
-	layout.title = options.Title // + " | " + config.AppName
+	layout.title = options.Title
 	layout.content = options.Content
 	layout.scriptURLs = options.ScriptURLs
 	layout.scripts = options.Scripts
@@ -30,11 +27,8 @@ func NewCmsLayout(
 }
 
 type cmsLayout struct {
-	app types.AppInterface
-	// cfg           types.ConfigInterface
-	request *http.Request
-	// cmsStore      cmsstore.StoreInterface
-	// cmsTemplateID string
+	app        types.AppInterface
+	request    *http.Request
 	title      string
 	content    hb.TagInterface
 	scriptURLs []string
@@ -44,6 +38,22 @@ type cmsLayout struct {
 }
 
 func (layout *cmsLayout) ToHTML() string {
+	if layout.app == nil {
+		return "App is not initialized"
+	}
+	if layout.app.GetConfig() == nil {
+		return "Config is not initialized"
+	}
+	// if !layout.app.GetConfig().GetCmsStoreUsed() {
+	// 	return "Cms store is not used"
+	// }
+	// if layout.app.GetConfig().GetCmsStoreTemplateID() == "" {
+	// 	return "Cms store template is not set"
+	// }
+	if layout.app.GetCmsStore() == nil {
+		return "Cms store is not initialized"
+	}
+
 	list := widgets.WidgetRegistry(layout.app.GetConfig())
 
 	shortcodes := []cmsstore.ShortcodeInterface{}

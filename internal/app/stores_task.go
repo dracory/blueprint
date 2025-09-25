@@ -4,8 +4,49 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/taskstore"
 )
+
+// taskStoreInitialize initializes the task store if enabled in the configuration.
+func taskStoreInitialize(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetTaskStoreUsed() {
+		return nil
+	}
+
+	if store, err := newTaskStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetTaskStore(store)
+	}
+
+	return nil
+}
+
+func taskStoreMigrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetTaskStoreUsed() {
+		return nil
+	}
+
+	if app.GetTaskStore() == nil {
+		return errors.New("task store is not initialized")
+	}
+
+	if err := app.GetTaskStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 // newTaskStore constructs the Task store without running migrations
 func newTaskStore(db *sql.DB) (taskstore.StoreInterface, error) {

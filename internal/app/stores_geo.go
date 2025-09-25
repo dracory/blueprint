@@ -4,8 +4,44 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/geostore"
 )
+
+func geoStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetGeoStoreUsed() {
+		return nil
+	}
+
+	if store, err := newGeoStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetGeoStore(store)
+	}
+
+	return nil
+}
+
+func geoStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetGeoStoreUsed() {
+		return nil
+	}
+
+	if app.GetGeoStore() == nil {
+		return errors.New("geo store is not initialized")
+	}
+
+	if err := app.GetGeoStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newGeoStore(db *sql.DB) (geostore.StoreInterface, error) {
 	if db == nil {

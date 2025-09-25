@@ -4,8 +4,44 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/entitystore"
 )
+
+func entityStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetEntityStoreUsed() {
+		return nil
+	}
+
+	if store, err := newEntityStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetEntityStore(store)
+	}
+
+	return nil
+}
+
+func entityStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetEntityStoreUsed() {
+		return nil
+	}
+
+	if app.GetEntityStore() == nil {
+		return errors.New("entity store is not initialized")
+	}
+
+	if err := app.GetEntityStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newEntityStore(db *sql.DB) (entitystore.StoreInterface, error) {
 	if db == nil {

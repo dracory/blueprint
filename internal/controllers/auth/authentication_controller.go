@@ -14,12 +14,12 @@ import (
 	"project/internal/types"
 	"strings"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/req"
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/userstore"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/auth"
 	"github.com/samber/lo"
 )
 

@@ -13,7 +13,11 @@ import (
 )
 
 func TestAuthControllerOnceIsRequired(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{},
@@ -52,7 +56,11 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 }
 
 func TestAuthControllerOnceMustBeValid(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
@@ -94,7 +102,11 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 }
 
 func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
@@ -136,7 +148,11 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 }
 
 func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	if application.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")

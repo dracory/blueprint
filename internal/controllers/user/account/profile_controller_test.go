@@ -8,12 +8,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/test"
-	"github.com/gouniverse/auth"
 )
 
 func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
@@ -59,7 +64,12 @@ func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
 }
 
 func TestProfileController_ShowsProfileForm(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
@@ -104,7 +114,13 @@ func TestProfileController_ShowsProfileForm(t *testing.T) {
 }
 
 func TestProfileController_RequiresFirstName(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
@@ -140,7 +156,13 @@ func TestProfileController_RequiresFirstName(t *testing.T) {
 }
 
 func TestProfileController_RequiresLastName(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
@@ -176,7 +198,13 @@ func TestProfileController_RequiresLastName(t *testing.T) {
 }
 
 func TestProfileController_RequiresEmail(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
@@ -212,7 +240,13 @@ func TestProfileController_RequiresEmail(t *testing.T) {
 }
 
 func TestProfileController_RequiresCountry(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
@@ -248,7 +282,13 @@ func TestProfileController_RequiresCountry(t *testing.T) {
 }
 
 func TestProfileController_RequiresTimezone(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
@@ -284,7 +324,12 @@ func TestProfileController_RequiresTimezone(t *testing.T) {
 }
 
 func TestProfileController_Success_NoVault(t *testing.T) {
-	app := testutils.Setup(testutils.WithVault(false))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
@@ -332,7 +377,13 @@ func TestProfileController_Success_NoVault(t *testing.T) {
 }
 
 func TestProfileController_Success_WithVault(t *testing.T) {
-	app := testutils.Setup(testutils.WithVault(true))
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetVaultStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {

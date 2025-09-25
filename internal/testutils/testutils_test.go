@@ -29,9 +29,14 @@ func TestTestKeyIntegration(t *testing.T) {
 func TestTestConfigIntegration(t *testing.T) {
 	// Create a test configuration
 	testConfig := types.Config{}
+	// App
+	testConfig.SetAppHost("localhost")
+	testConfig.SetAppPort("8080")
 	testConfig.SetAppName("Test App")
 	testConfig.SetAppUrl("http://localhost:8080")
 	testConfig.SetAppEnv(config.APP_ENVIRONMENT_TESTING)
+
+	// Database
 	testConfig.SetDatabaseDriver("sqlite")
 	testConfig.SetDatabaseHost("")
 	testConfig.SetDatabasePort("")
@@ -39,9 +44,11 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetDatabaseUsername("")
 	testConfig.SetDatabasePassword("")
 	testConfig.SetAppDebug(true)
+
+	// Encryption
 	testConfig.SetEnvEncryptionKey("123456")
-	testConfig.SetAppHost("localhost")
-	testConfig.SetAppPort("8080")
+
+	// Mail
 	testConfig.SetMailDriver("smtp")
 	testConfig.SetMailHost("127.0.0.1")
 	testConfig.SetMailPort(32435)
@@ -49,18 +56,24 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetMailPassword("")
 	testConfig.SetMailFromEmail("admintest@test.com")
 	testConfig.SetMailFromName("Admin Test")
+
+	// Stores
 	testConfig.SetCmsStoreUsed(false)
 	testConfig.SetCmsStoreTemplateID("default")
 	testConfig.SetVaultStoreUsed(false)
 	testConfig.SetVaultStoreKey("abcdefghijklmnopqrstuvwxyz1234567890")
-	testConfig.SetOpenAIKey("openai_api_key")
+
+	// Artificial Intelligence
+	testConfig.SetOpenAiApiKey("openai_api_key")
+	testConfig.SetVertexAiUsed(false)
+	testConfig.SetVertexAiDefaultModel("vertex_default_model")
+	testConfig.SetVertexAiProjectID("vertex_project_id")
+	testConfig.SetVertexAiRegionID("vertex_region_id")
+	testConfig.SetVertexAiModelID("vertex_model_id")
+	
+	// Payments
 	testConfig.SetStripeKeyPrivate("sk_test_yoursecretkey")
 	testConfig.SetStripeKeyPublic("pk_test_yourpublickey")
-	testConfig.SetVertexProjectID("vertex_project_id")
-	testConfig.SetVertexRegionID("vertex_region_id")
-	testConfig.SetVertexModelID("vertex_model_id")
-
-	// os.Setenv("VERTEX_REGION_ID", "TEST_VERTEX_REGION_ID")
 
 	// Verify that the configuration was applied
 	if "Test App" != testConfig.GetAppName() {

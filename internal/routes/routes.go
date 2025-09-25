@@ -18,7 +18,7 @@ func routes(app types.AppInterface) []rtr.RouteInterface {
 
 	routes = append(routes, admin.Routes(app)...)
 	routes = append(routes, auth.Routes(app)...)
-	routes = append(routes, liveflux.Routes()...)
+	routes = append(routes, liveflux.Routes(app)...)
 	routes = append(routes, shared.Routes(app)...)
 	routes = append(routes, user.Routes(app)...)
 	routes = append(routes, widgets.Routes()...)

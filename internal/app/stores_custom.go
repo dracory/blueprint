@@ -4,8 +4,44 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/customstore"
 )
+
+func customStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetCustomStoreUsed() {
+		return nil
+	}
+
+	if store, err := newCustomStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetCustomStore(store)
+	}
+
+	return nil
+}
+
+func customStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetCustomStoreUsed() {
+		return nil
+	}
+
+	if app.GetCustomStore() == nil {
+		return errors.New("custom store is not initialized")
+	}
+
+	if err := app.GetCustomStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newCustomStore(db *sql.DB) (customstore.StoreInterface, error) {
 	if db == nil {

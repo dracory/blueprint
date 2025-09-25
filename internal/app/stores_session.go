@@ -1,11 +1,48 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/sessionstore"
 )
+
+func sessionStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetSessionStoreUsed() {
+		return nil
+	}
+
+	if store, err := newSessionStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetSessionStore(store)
+	}
+
+	return nil
+}
+
+func sessionStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetSessionStoreUsed() {
+		return nil
+	}
+
+	if app.GetSessionStore() == nil {
+		return errors.New("session store is not initialized")
+	}
+
+	if err := app.GetSessionStore().AutoMigrate(context.Background()); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newSessionStore(db *sql.DB) (sessionstore.StoreInterface, error) {
 	if db == nil {

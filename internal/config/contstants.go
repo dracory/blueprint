@@ -173,6 +173,7 @@ const KEY_ENVENC_KEY_PRIVATE = "ENVENC_KEY_PRIVATE"
 //
 // ============================================================================
 
+const KEY_CACHE_STORE_USED = "CACHE_STORE_USED"
 const KEY_CMS_STORE_USED = "CMS_STORE_USED"
 const KEY_CMS_STORE_TEMPLATE_ID = "CMS_STORE_TEMPLATE_ID"
 const KEY_CUSTOM_STORE_USED = "CUSTOM_STORE_USED"

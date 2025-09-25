@@ -12,6 +12,8 @@ import (
 	"github.com/dracory/entitystore"
 	"github.com/dracory/feedstore"
 	"github.com/dracory/geostore"
+	"github.com/dracory/logstore"
+	"github.com/dracory/metastore"
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
@@ -93,6 +95,14 @@ type AppInterface interface {
 	// Geo store
 	GetGeoStore() geostore.StoreInterface
 	SetGeoStore(s geostore.StoreInterface)
+
+	// Log store
+	GetLogStore() logstore.StoreInterface
+	SetLogStore(s logstore.StoreInterface)
+
+	// Meta store
+	GetMetaStore() metastore.StoreInterface
+	SetMetaStore(s metastore.StoreInterface)
 
 	// Session store
 	GetSessionStore() sessionstore.StoreInterface

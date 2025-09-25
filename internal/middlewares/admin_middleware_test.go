@@ -17,7 +17,12 @@ import (
 
 func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Act
 	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +74,13 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 	// Arrange
 
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
 	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
@@ -128,7 +139,12 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
@@ -199,7 +215,12 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 
 func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 	// Arrange
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 	user, session, err := testutils.SeedUserAndSession(application.GetUserStore(), application.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
@@ -273,7 +294,12 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 
 func TestAdminMiddleware_Success(t *testing.T) {
 	// Arrange
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(application.GetUserStore(), application.GetSessionStore(), testutils.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
 

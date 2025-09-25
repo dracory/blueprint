@@ -243,6 +243,7 @@ func (a *Application) SetGeoStore(s geostore.StoreInterface) {
 func (a *Application) GetMetaStore() metastore.StoreInterface {
 	return a.metaStore
 }
+
 func (a *Application) SetMetaStore(s metastore.StoreInterface) {
 	a.metaStore = s
 }

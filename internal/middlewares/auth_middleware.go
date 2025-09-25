@@ -34,6 +34,30 @@ func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 // - an http.Handler which represents the modified handler with the user.
 func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !app.GetConfig().GetSessionStoreUsed() {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("session store not enabled"))
+			return
+		}
+
+		if app.GetSessionStore() == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("session store not initialized"))
+			return
+		}
+
+		if !app.GetConfig().GetUserStoreUsed() {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("user store not enabled"))
+			return
+		}
+
+		if app.GetUserStore() == nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("user store not initialized"))
+			return
+		}
+
 		sessionKey := authHandlerSessionKey(r)
 
 		if sessionKey == "" {

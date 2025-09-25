@@ -1,11 +1,48 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/cmsstore"
 )
+
+func cmsStoreInitialize(app types.AppInterface) error {
+	if !app.GetConfig().GetCmsStoreUsed() {
+		return nil
+	}
+
+	if store, err := newCmsStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetCmsStore(store)
+	}
+
+	return nil
+}
+
+func cmsStoreMgrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetCmsStoreUsed() {
+		return nil
+	}
+
+	if app.GetCmsStore() == nil {
+		return errors.New("cms store is not initialized")
+	}
+
+	if err := app.GetCmsStore().AutoMigrate(context.Background()); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newCmsStore(db *sql.DB) (cmsstore.StoreInterface, error) {
 	if db == nil {

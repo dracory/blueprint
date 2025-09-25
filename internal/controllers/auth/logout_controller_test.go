@@ -8,13 +8,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/dracory/auth"
 	"github.com/dracory/test"
-	"github.com/gouniverse/auth"
 	"github.com/gouniverse/responses"
 )
 
 func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {
@@ -76,7 +80,11 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 }
 
 func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
-	application := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	application := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {

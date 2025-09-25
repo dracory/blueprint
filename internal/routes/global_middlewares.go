@@ -14,8 +14,8 @@ func globalMiddlewares(app types.AppInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
 		middlewares.JailBotsMiddleware(middlewares.JailBotsConfig{
-			Exclude:      []string{"/new"},
-			ExcludePaths: []string{"/blog*", "/th*"},
+			Exclude:      []string{"/new",},
+			ExcludePaths: []string{"/blog*", "/th*", "/liveflux*"},
 		}),
 		rtrMiddleware.CompressMiddleware(5, "text/html", "text/css"),
 		rtrMiddleware.GetHead(),

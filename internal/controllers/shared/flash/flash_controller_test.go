@@ -13,7 +13,11 @@ import (
 )
 
 func TestFlash(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
@@ -43,7 +47,11 @@ func TestFlash(t *testing.T) {
 }
 
 func TestFlashMessage_Info(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
@@ -77,7 +85,11 @@ func TestFlashMessage_Info(t *testing.T) {
 }
 
 func TestFlashMessage_Error(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	errorUrl := helpers.ToFlashErrorURL(app.GetCacheStore(), "This is an error message", "/testbackendpoint", 5)
 
@@ -111,7 +123,11 @@ func TestFlashMessage_Error(t *testing.T) {
 }
 
 func TestFlashMessage_Success(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	successUrl := helpers.ToFlashSuccessURL(app.GetCacheStore(), "This is a success message", "/testbackendpoint", 5)
 
@@ -145,7 +161,11 @@ func TestFlashMessage_Success(t *testing.T) {
 }
 
 func TestFlashMessage_Warning(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	warningUrl := helpers.ToFlashWarningURL(app.GetCacheStore(), "This is a warning message", "/testbackendpoint", 5)
 
@@ -179,7 +199,11 @@ func TestFlashMessage_Warning(t *testing.T) {
 }
 
 func TestFlashMessage_Get(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
@@ -213,7 +237,11 @@ func TestFlashMessage_Get(t *testing.T) {
 }
 
 func TestFlashMessage_Delete(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
@@ -247,7 +275,11 @@ func TestFlashMessage_Delete(t *testing.T) {
 }
 
 func TestFlashMessage_Post(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
@@ -281,7 +313,11 @@ func TestFlashMessage_Post(t *testing.T) {
 }
 
 func TestFlashMessage_Put(t *testing.T) {
-	app := testutils.Setup()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 

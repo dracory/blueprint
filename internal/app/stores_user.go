@@ -4,8 +4,49 @@ import (
 	"database/sql"
 	"errors"
 
+	"project/internal/types"
+
 	"github.com/dracory/userstore"
 )
+
+// userStoreInitialize initializes the user store if enabled in the configuration.
+func userStoreInitialize(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetUserStoreUsed() {
+		return nil
+	}
+
+	if store, err := newUserStore(app.GetDB()); err != nil {
+		return err
+	} else {
+		app.SetUserStore(store)
+	}
+
+	return nil
+}
+
+func userStoreMigrate(app types.AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetUserStoreUsed() {
+		return nil
+	}
+
+	if app.GetUserStore() == nil {
+		return errors.New("user store is not initialized")
+	}
+
+	if err := app.GetUserStore().AutoMigrate(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func newUserStore(db *sql.DB) (userstore.StoreInterface, error) {
 	if db == nil {
