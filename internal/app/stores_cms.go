@@ -24,7 +24,7 @@ func cmsStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func cmsStoreMgrate(app types.AppInterface) error {
+func cmsStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

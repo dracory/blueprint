@@ -24,7 +24,7 @@ func sessionStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func sessionStoreMgrate(app types.AppInterface) error {
+func sessionStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

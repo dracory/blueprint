@@ -23,7 +23,7 @@ func feedStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func feedStoreMgrate(app types.AppInterface) error {
+func feedStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

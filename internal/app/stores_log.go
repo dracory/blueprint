@@ -22,7 +22,7 @@ func logStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func logStoreMgrate(app types.AppInterface) error {
+func logStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

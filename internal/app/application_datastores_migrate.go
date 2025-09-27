@@ -7,30 +7,30 @@ import (
 // dataStoresMigrate performs phase 2 of store setup. Placeholder for upcoming
 // two-phase migration once stores are split into create/migrate.
 func (a *Application) dataStoresMigrate() error {
-	migartors := []func(app types.AppInterface) error{
-		blogStoreMgrate,
+	migrators := []func(app types.AppInterface) error{
+		blogStoreMigrate,
 		blindIndexEmailStoreMigrate,
 		blindIndexFirstNameStoreMigrate,
 		blindIndexLastNameStoreMigrate,
-		cacheStoreMgrate,
-		cmsStoreMgrate,
-		customStoreMgrate,
-		entityStoreMgrate,
-		feedStoreMgrate,
-		geoStoreMgrate,
-		logStoreMgrate,
-		metaStoreMgrate,
-		sessionStoreMgrate,
-		settingStoreMgrate,
-		shopStoreMgrate,
-		statsStoreMgrate,
+		cacheStoreMigrate,
+		cmsStoreMigrate,
+		customStoreMigrate,
+		entityStoreMigrate,
+		feedStoreMigrate,
+		geoStoreMigrate,
+		logStoreMigrate,
+		metaStoreMigrate,
+		sessionStoreMigrate,
+		settingStoreMigrate,
+		shopStoreMigrate,
+		statsStoreMigrate,
 		taskStoreMigrate,
 		tradingStoreMigrate,
 		userStoreMigrate,
 		vaultStoreMigrate,
 	}
 
-	for _, m := range migartors {
+	for _, m := range migrators {
 		if err := m(a); err != nil {
 			return err
 		}

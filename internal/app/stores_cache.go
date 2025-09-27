@@ -23,7 +23,7 @@ func cacheStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func cacheStoreMgrate(app types.AppInterface) error {
+func cacheStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

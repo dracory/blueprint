@@ -23,7 +23,7 @@ func entityStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func entityStoreMgrate(app types.AppInterface) error {
+func entityStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

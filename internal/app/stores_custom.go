@@ -23,7 +23,7 @@ func customStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func customStoreMgrate(app types.AppInterface) error {
+func customStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

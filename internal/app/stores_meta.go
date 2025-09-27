@@ -23,7 +23,7 @@ func metaStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func metaStoreMgrate(app types.AppInterface) error {
+func metaStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

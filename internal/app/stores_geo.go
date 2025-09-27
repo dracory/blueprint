@@ -23,7 +23,7 @@ func geoStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func geoStoreMgrate(app types.AppInterface) error {
+func geoStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

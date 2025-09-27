@@ -27,7 +27,7 @@ func sqlFileStorageInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func sqlFileStorageMgrate(app types.AppInterface) error {
+func sqlFileStorageMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

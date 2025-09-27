@@ -28,7 +28,7 @@ func statsStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func statsStoreMgrate(app types.AppInterface) error {
+func statsStoreMigrate(app types.AppInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

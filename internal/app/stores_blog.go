@@ -22,7 +22,7 @@ func blogStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func blogStoreMgrate(app types.AppInterface) error {
+func blogStoreMigrate(app types.AppInterface) error {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		return nil
 	}
