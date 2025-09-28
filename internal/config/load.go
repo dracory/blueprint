@@ -153,11 +153,6 @@ func Load() (types.ConfigInterface, error) {
 	anthropicApiKey := env.GetString(KEY_ANTHROPIC_API_KEY)
 	anthropicDefaultModel := env.GetString(KEY_ANTHROPIC_DEFAULT_MODEL)
 
-	// Daily Analysis
-	dailySymbolsCSV := env.GetString(KEY_DAILY_ANALYSIS_SYMBOLS)
-	dailyTimeUTC := env.GetString(KEY_DAILY_ANALYSIS_TIME_UTC)
-	dailyCadenceHours := env.GetString(KEY_DAILY_ANALYSIS_CADENCE_HOURS)
-
 	// Check required variables
 
 	// Enable if you use CMS template
@@ -269,13 +264,9 @@ func Load() (types.ConfigInterface, error) {
 	// i18n defaults (can be overridden via env in future if needed)
 	translationDefault := env.GetString(KEY_TRANSLATION_LANGUAGE_DEFAULT)
 	if translationDefault == "" {
-		translationDefault = "en"
+		translationDefault = translationLanguageDefault()
 	}
-	translationList := map[string]string{
-		"en": "English",
-		"bg": "Bulgarian",
-		"de": "German",
-	}
+	translationList := translationLanguageListDefault()
 	config.SetTranslationLanguageDefault(translationDefault)
 	config.SetTranslationLanguageList(translationList)
 
@@ -322,29 +313,6 @@ func Load() (types.ConfigInterface, error) {
 	if vertexAiModelID != "" {
 		config.SetVertexAiModelID(vertexAiModelID)
 	}
-
-	// == Daily Analysis defaults and config ==
-	if strings.TrimSpace(dailySymbolsCSV) == "" {
-		dailySymbolsCSV = "US30,US2000,US500,SP500,NASDAQ,NL25,UK100,DAX,FR40,SMI,NIKKEI225,XAGUSD,XAUUSD,XPTUSD,XPDUSD"
-	}
-	if strings.TrimSpace(dailyTimeUTC) == "" {
-		dailyTimeUTC = "06:30"
-	}
-	cadence := cast.ToInt(dailyCadenceHours)
-	if cadence == 0 {
-		cadence = 24
-	}
-	// parse symbols
-	var symList []string
-	for _, s := range strings.Split(dailySymbolsCSV, ",") {
-		s = strings.TrimSpace(s)
-		if s != "" {
-			symList = append(symList, s)
-		}
-	}
-	config.SetDailyAnalysisSymbols(symList)
-	config.SetDailyAnalysisTimeUTC(dailyTimeUTC)
-	config.SetDailyAnalysisCadenceHours(cadence)
 
 	return &config, nil
 }

@@ -938,11 +938,3 @@ func (c *Config) SetMediaSecret(v string)   { c.mediaSecret = v }
 func (c *Config) GetMediaSecret() string    { return c.mediaSecret }
 func (c *Config) SetMediaUrl(v string)      { c.mediaUrl = v }
 func (c *Config) GetMediaUrl() string       { return c.mediaUrl }
-
-// == Daily Analysis Getters/Setters ==
-func (c *Config) SetDailyAnalysisSymbols(v []string) { c.dailyAnalysisSymbols = v }
-func (c *Config) GetDailyAnalysisSymbols() []string  { return c.dailyAnalysisSymbols }
-func (c *Config) SetDailyAnalysisTimeUTC(v string)   { c.dailyAnalysisTimeUTC = v }
-func (c *Config) GetDailyAnalysisTimeUTC() string    { return c.dailyAnalysisTimeUTC }
-func (c *Config) SetDailyAnalysisCadenceHours(v int) { c.dailyAnalysisCadenceHours = v }
-func (c *Config) GetDailyAnalysisCadenceHours() int  { return c.dailyAnalysisCadenceHours }
