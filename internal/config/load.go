@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"os"
 	"project/internal/resources"
 	"project/internal/types"
@@ -30,9 +29,9 @@ import (
 func Load() (types.ConfigInterface, error) {
 	env.Load(".env")
 
-	appEnvironment, err := env.GetStringOrError(KEY_APP_ENVIRONMENT)
+	appEnvironment, err := requireString(KEY_APP_ENVIRONMENT, "set the application environment")
 	if err != nil {
-		return nil, errors.New(KEY_APP_ENVIRONMENT + " is required")
+		return nil, err
 	}
 
 	// Enable if you use envenc
@@ -54,39 +53,38 @@ func Load() (types.ConfigInterface, error) {
 
 	appName := env.GetString(KEY_APP_NAME)
 	appUrl := env.GetString(KEY_APP_URL)
-	appHost, err := env.GetStringOrError(KEY_APP_HOST)
+	appHost, err := requireString(KEY_APP_HOST, "set the application host address")
 	if err != nil {
-		return nil, errors.New(KEY_APP_HOST + " is required")
+		return nil, err
 	}
-	appPort, err := env.GetStringOrError(KEY_APP_PORT)
+	appPort, err := requireString(KEY_APP_PORT, "set the application port")
 	if err != nil {
-		return nil, errors.New(KEY_APP_PORT + " is required")
+		return nil, err
 	}
 	appDebug := env.GetBool(KEY_APP_DEBUG)
-
-	dbDriver, err := env.GetStringOrError(KEY_DB_DRIVER)
+	dbDriver, err := requireString(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
 	if err != nil {
-		return nil, errors.New(KEY_DB_DRIVER + " is required")
+		return nil, err
 	}
-	dbHost, err := env.GetStringOrError(KEY_DB_HOST)
-	if dbDriver != "sqlite" && err != nil {
-		return nil, errors.New(KEY_DB_HOST + " is required")
+	dbHost := strings.TrimSpace(env.GetString(KEY_DB_HOST))
+	if err := requireWhen(dbDriver != driverSQLite, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", dbHost); err != nil {
+		return nil, err
 	}
-	dbPort, err := env.GetStringOrError(KEY_DB_PORT)
-	if dbDriver != "sqlite" && err != nil {
-		return nil, errors.New(KEY_DB_PORT + " is required")
+	dbPort := strings.TrimSpace(env.GetString(KEY_DB_PORT))
+	if err := requireWhen(dbDriver != driverSQLite, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", dbPort); err != nil {
+		return nil, err
 	}
-	dbName, err := env.GetStringOrError(KEY_DB_DATABASE)
+	dbName, err := requireString(KEY_DB_DATABASE, "set the database name")
 	if err != nil {
-		return nil, errors.New(KEY_DB_DATABASE + " is required")
+		return nil, err
 	}
-	dbUser, err := env.GetStringOrError(KEY_DB_USERNAME)
-	if dbDriver != "sqlite" && err != nil {
-		return nil, errors.New(KEY_DB_USERNAME + " is required")
+	dbUser := strings.TrimSpace(env.GetString(KEY_DB_USERNAME))
+	if err := requireWhen(dbDriver != driverSQLite, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", dbUser); err != nil {
+		return nil, err
 	}
-	dbPass, err := env.GetStringOrError(KEY_DB_PASSWORD)
-	if dbDriver != "sqlite" && err != nil {
-		return nil, errors.New(KEY_DB_PASSWORD + " is required")
+	dbPass := strings.TrimSpace(env.GetString(KEY_DB_PASSWORD))
+	if err := requireWhen(dbDriver != driverSQLite, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", dbPass); err != nil {
+		return nil, err
 	}
 
 	// LLM: Google Gemini
@@ -163,46 +161,46 @@ func Load() (types.ConfigInterface, error) {
 	// Check required variables
 
 	// Enable if you use CMS template
-	if cmsStoreUsed && cmsStoreTemplateID == "" {
-		return nil, errors.New("CMS_TEMPLATE_ID is required")
+	if err := requireWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID, "required when `CMS_STORE_USED` is true", cmsStoreTemplateID); err != nil {
+		return nil, err
 	}
 
-	if googleGeminiApiUsed && googleGeminiApiKey == "" {
-		return nil, errors.New(KEY_GEMINI_API_KEY + " is required")
+	if err := requireWhen(googleGeminiApiUsed, KEY_GEMINI_API_KEY, "required when `GEMINI_API_USED` is true", googleGeminiApiKey); err != nil {
+		return nil, err
 	}
 
-	if openAiApiUsed && openAiApiKey == "" {
-		return nil, errors.New(KEY_OPENAI_API_KEY + " is required")
+	if err := requireWhen(openAiApiUsed, KEY_OPENAI_API_KEY, "required when `OPENAI_API_USED` is true", openAiApiKey); err != nil {
+		return nil, err
 	}
 
-	if openRouterApiUsed && openRouterApiKey == "" {
-		return nil, errors.New(KEY_OPENROUTER_API_KEY + " is required")
+	if err := requireWhen(openRouterApiUsed, KEY_OPENROUTER_API_KEY, "required when `OPENROUTER_API_USED` is true", openRouterApiKey); err != nil {
+		return nil, err
 	}
 
-	if anthropicApiUsed && anthropicApiKey == "" {
-		return nil, errors.New(KEY_ANTHROPIC_API_KEY + " is required")
+	if err := requireWhen(anthropicApiUsed, KEY_ANTHROPIC_API_KEY, "required when `ANTHROPIC_API_USED` is true", anthropicApiKey); err != nil {
+		return nil, err
 	}
 
-	if stripeUsed && stripeKeyPrivate == "" {
-		return nil, errors.New(KEY_STRIPE_KEY_PRIVATE + " is required")
+	if err := requireWhen(stripeUsed, KEY_STRIPE_KEY_PRIVATE, "required when Stripe integration is enabled", stripeKeyPrivate); err != nil {
+		return nil, err
 	}
 
-	if stripeUsed && stripeKeyPublic == "" {
-		return nil, errors.New(KEY_STRIPE_KEY_PUBLIC + " is required")
+	if err := requireWhen(stripeUsed, KEY_STRIPE_KEY_PUBLIC, "required when Stripe integration is enabled", stripeKeyPublic); err != nil {
+		return nil, err
 	}
 
-	if vaultStoreUsed && vaultStoreKey == "" {
-		return nil, errors.New(KEY_VAULT_STORE_KEY + " is required")
+	if err := requireWhen(vaultStoreUsed, KEY_VAULT_STORE_KEY, "required when `VAULT_STORE_USED` is true", vaultStoreKey); err != nil {
+		return nil, err
 	}
 
-	if vertexAiUsed && vertexAiModelID == "" {
-		return nil, errors.New(KEY_VERTEX_MODEL_ID + " is required")
+	if err := requireWhen(vertexAiUsed, KEY_VERTEX_MODEL_ID, "required when `VERTEX_AI_USED` is true", vertexAiModelID); err != nil {
+		return nil, err
 	}
-	if vertexAiUsed && vertexAiProjectID == "" {
-		return nil, errors.New(KEY_VERTEX_PROJECT_ID + " is required")
+	if err := requireWhen(vertexAiUsed, KEY_VERTEX_PROJECT_ID, "required when `VERTEX_AI_USED` is true", vertexAiProjectID); err != nil {
+		return nil, err
 	}
-	if vertexAiUsed && vertexAiRegionID == "" {
-		return nil, errors.New(KEY_VERTEX_REGION_ID + " is required")
+	if err := requireWhen(vertexAiUsed, KEY_VERTEX_REGION_ID, "required when `VERTEX_AI_USED` is true", vertexAiRegionID); err != nil {
+		return nil, err
 	}
 
 	// os.Setenv("TZ", "UTC")
@@ -372,15 +370,15 @@ func intializeEnvEncVariables(appEnvironment string) error {
 		return nil
 	}
 
-	if appEnvironment == "" {
-		return errors.New(KEY_APP_ENVIRONMENT + " is required")
+	if strings.TrimSpace(appEnvironment) == "" {
+		return MissingEnvError{Key: KEY_APP_ENVIRONMENT, Context: "required to initialize EnvEnc variables"}
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)
 	envEncryptionKey := env.GetString(KEY_ENV_ENCRYPTION_KEY)
 
-	if envEncryptionKey == "" {
-		return errors.New(KEY_ENV_ENCRYPTION_KEY + " is required")
+	if err := ensureRequired(envEncryptionKey, KEY_ENV_ENCRYPTION_KEY, "required to hydrate EnvEnc variables"); err != nil {
+		return err
 	}
 
 	vaultFilePath := ".env." + appEnvironment + ".vault"
