@@ -29,6 +29,10 @@ import (
  */
 const ENVENC_KEY_PUBLIC = "YOUR_PUBLIC_KEY"
 
+var envencKeyPublic = ENVENC_KEY_PUBLIC
+
+var deobfuscate = envenc.Deobfuscate
+
 // deriveEnvEncKey: Derives the final envenc encryption key.
 //
 // This function generates the final encryption key used for securing the envenc vault file.
@@ -88,7 +92,7 @@ const ENVENC_KEY_PUBLIC = "YOUR_PUBLIC_KEY"
 // }
 // // Use finalKey for encryption
 func deriveEnvEncKey(envencPrivateKey string) (string, error) {
-	envencPublicKey := ENVENC_KEY_PUBLIC
+	envencPublicKey := envencKeyPublic
 
 	if envencPublicKey == "" {
 		return "", fmt.Errorf("envenc public key is empty")
@@ -106,7 +110,7 @@ func deriveEnvEncKey(envencPrivateKey string) (string, error) {
 		return "", fmt.Errorf("envenc private key is too short (should be at least 32 characters)")
 	}
 
-	envencPublicKey, err := envenc.Deobfuscate(envencPublicKey)
+	envencPublicKey, err := deobfuscate(envencPublicKey)
 
 	if err != nil {
 		return "", fmt.Errorf("failed to deobfuscate public key: %w", err)
