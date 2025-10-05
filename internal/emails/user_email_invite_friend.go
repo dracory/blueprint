@@ -55,7 +55,7 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 	errSend := SendEmail(SendOptions{
 		From: func() string {
 			if e.cfg != nil {
-				return e.cfg.GetMailFromEmail()
+				return e.cfg.GetMailFromAddress()
 			}
 			return ""
 		}(),

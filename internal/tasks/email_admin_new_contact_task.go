@@ -68,7 +68,7 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Initialize emails package with config and send using DI
-	emails.Init(handler.app.GetConfig())
+	emails.InitEmailSender(handler.app)
 	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.app.GetConfig()).Send()
 
 	if err != nil {

@@ -33,7 +33,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 	errSend := SendEmail(SendOptions{
 		From: func() string {
 			if e.cfg != nil {
-				return e.cfg.GetMailFromEmail()
+				return e.cfg.GetMailFromAddress()
 			}
 			return ""
 		}(),

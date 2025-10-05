@@ -93,8 +93,8 @@ func Load() (types.ConfigInterface, error) {
 	googleGeminiDefaultModel := env.GetString(KEY_GEMINI_DEFAULT_MODEL)
 
 	mailDriver := env.GetString(KEY_MAIL_DRIVER)
-	mailFromEmailAddress := env.GetString(KEY_EMAIL_FROM_ADDRESS)
-	mailFromName := env.GetString(KEY_EMAIL_FROM_NAME)
+	mailFromAddress := env.GetString(KEY_MAIL_FROM_ADDRESS)
+	mailFromName := env.GetString(KEY_MAIL_FROM_NAME)
 	mailHost := env.GetString(KEY_MAIL_HOST)
 	mailPassword := env.GetString(KEY_MAIL_PASSWORD)
 	mailPort := env.GetString(KEY_MAIL_PORT)
@@ -247,7 +247,7 @@ func Load() (types.ConfigInterface, error) {
 	config.SetMailPort(cast.ToInt(mailPort))
 	config.SetMailUsername(mailUsername)
 	config.SetMailPassword(mailPassword)
-	config.SetMailFromEmail(mailFromEmailAddress)
+	config.SetMailFromAddress(mailFromAddress)
 	config.SetMailFromName(mailFromName)
 
 	// Database configurations

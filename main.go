@@ -134,8 +134,7 @@ func startBackgroundProcesses(app types.AppInterface) {
 	schedules.StartAsync(app) // Initialize the scheduler
 
 	// Initialize email sender
-	emails.InitEmailSender()
-
+	emails.InitEmailSender(app)
 	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
 	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
 }

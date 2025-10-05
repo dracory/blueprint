@@ -65,12 +65,12 @@ const KEY_DB_PASSWORD = "DB_PASSWORD"
 // ============================================================================
 
 const KEY_MAIL_DRIVER = "MAIL_DRIVER"
-const KEY_EMAIL_FROM_ADDRESS = "EMAIL_FROM_ADDRESS"
-const KEY_EMAIL_FROM_NAME = "EMAIL_FROM_NAME"
 const KEY_MAIL_HOST = "MAIL_HOST"
 const KEY_MAIL_PASSWORD = "MAIL_PASSWORD"
 const KEY_MAIL_PORT = "MAIL_PORT"
 const KEY_MAIL_USERNAME = "MAIL_USERNAME"
+const KEY_MAIL_FROM_ADDRESS = "MAIL_FROM_ADDRESS"
+const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 
 // ============================================================================
 // == END: Mail Configurations

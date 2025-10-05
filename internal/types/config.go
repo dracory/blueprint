@@ -58,10 +58,10 @@ type emailConfigInterface interface {
 	GetMailUsername() string
 	SetMailPassword(string)
 	GetMailPassword() string
+	SetMailFromAddress(string)
+	GetMailFromAddress() string
 	SetMailFromName(string)
 	GetMailFromName() string
-	SetMailFromEmail(string)
-	GetMailFromEmail() string
 }
 
 type llmConfigInterface interface {
@@ -288,13 +288,13 @@ type Config struct {
 	appDebug bool
 
 	// Email configuration
-	emailDriver    string
-	emailHost      string
-	emailPort      int
-	emailUsername  string
-	emailPassword  string
-	emailFromName  string
-	emailFromEmail string
+	emailDriver      string
+	emailHost        string
+	emailPort        int
+	emailUsername    string
+	emailPassword    string
+	emailFromName    string
+	emailFromAddress string
 
 	// Database configuration
 	databaseDriver   string
@@ -510,12 +510,13 @@ func (c *Config) GetMailFromName() string {
 	return c.emailFromName
 }
 
-func (c *Config) SetMailFromEmail(v string) {
-	c.emailFromEmail = v
+// == Email From Address Getters/Setters ==
+func (c *Config) SetMailFromAddress(v string) {
+	c.emailFromAddress = v
 }
 
-func (c *Config) GetMailFromEmail() string {
-	return c.emailFromEmail
+func (c *Config) GetMailFromAddress() string {
+	return c.emailFromAddress
 }
 
 // == Database Getters/Setters ==

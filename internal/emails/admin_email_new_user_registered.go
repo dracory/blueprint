@@ -26,7 +26,7 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     e.cfg.GetMailFromEmail(),
+		From:     e.cfg.GetMailFromAddress(),
 		FromName: appName,
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,

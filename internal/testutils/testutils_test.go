@@ -54,7 +54,7 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetMailPort(32435)
 	testConfig.SetMailUsername("")
 	testConfig.SetMailPassword("")
-	testConfig.SetMailFromEmail("admintest@test.com")
+	testConfig.SetMailFromAddress("admintest@test.com")
 	testConfig.SetMailFromName("Admin Test")
 
 	// Stores
@@ -70,7 +70,7 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetVertexAiProjectID("vertex_project_id")
 	testConfig.SetVertexAiRegionID("vertex_region_id")
 	testConfig.SetVertexAiModelID("vertex_model_id")
-	
+
 	// Payments
 	testConfig.SetStripeKeyPrivate("sk_test_yoursecretkey")
 	testConfig.SetStripeKeyPublic("pk_test_yourpublickey")
