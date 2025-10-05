@@ -124,8 +124,6 @@ github.com/dracory/taskstore v1.7.0 h1:asFIm9cKMLPs6Fdsm5g5insdzjmILX2tffQtCw2RB
 github.com/dracory/taskstore v1.7.0/go.mod h1:gQ9xFsDxJMTYPVtf3fem43FC62BfTszCbNzL2uyGow8=
 github.com/dracory/test v0.2.0 h1:3NmFXnznkqHqU5TIz1zJaTHvF/bFVH79QAi/YhpRmMs=
 github.com/dracory/test v0.2.0/go.mod h1:9PJ6MrI1LGrLBLgaC1cSqJ32df1NqlNpFh7BsBQ6Lfo=
-github.com/dracory/tradingstore v0.10.0 h1:Fkth45mmpsdqu30wGcBRuU4H+CNNhztDGIa6LJt8P+o=
-github.com/dracory/tradingstore v0.10.0/go.mod h1:1yC4ui/oGxfb5FMgyRHIYFcparQwRP3ClX3MVsheC7c=
 github.com/dracory/ui v0.17.0 h1:h8MQk0H41LuMAWlCQDG02DymAf0OBgJi/BuxrKPf1Bs=
 github.com/dracory/ui v0.17.0/go.mod h1:ItkhffHGUvwu0O+mwzXYy2nxGUYedFcm5KtmC8PHVak=
 github.com/dracory/uid v1.8.0 h1:L2D8fNH0CcmJLD3TM8f9RZ9UCpHB1Bbi82n7PG4I+5M=

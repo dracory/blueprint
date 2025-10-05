@@ -42,7 +42,6 @@ require (
 	github.com/dracory/str v0.3.0
 	github.com/dracory/taskstore v1.7.0
 	github.com/dracory/test v0.2.0
-	github.com/dracory/tradingstore v0.10.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/userstore v1.5.0

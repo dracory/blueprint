@@ -42,7 +42,6 @@ func newTestApp(t *testing.T) types.AppInterface {
 	cfg.SetSqlFileStoreUsed(true)
 	cfg.SetStatsStoreUsed(true)
 	cfg.SetTaskStoreUsed(true)
-	cfg.SetTradingStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
 
@@ -69,7 +68,6 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	require.NotNil(t, a.GetSqlFileStorage())
 	require.NotNil(t, a.GetStatsStore())
 	require.NotNil(t, a.GetTaskStore())
-	require.NotNil(t, a.GetTradingStore())
 	require.NotNil(t, a.GetUserStore())
 	require.NotNil(t, a.GetVaultStore())
 	require.NotNil(t, a.GetBlindIndexStoreEmail())
@@ -87,7 +85,6 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 		"snv_metas_meta",
 		"snv_stats_visitor",
 		"snv_tasks_task",
-		"snv_trading_instruments",
 		"snv_vault_vault",
 		"snv_bindx_email",
 		"snv_bindx_first_name",

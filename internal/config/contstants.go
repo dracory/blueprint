@@ -229,10 +229,6 @@ const KEY_STATS_STORE_USED = "STATS_STORE_USED"
 // queues to be reachable.
 const KEY_TASK_STORE_USED = "TASK_STORE_USED"
 
-// KEY_TRADING_STORE_USED enables trading data persistence and associated
-// market integrations.
-const KEY_TRADING_STORE_USED = "TRADING_STORE_USED"
-
 // KEY_USER_STORE_USED activates the user store. User authentication and profile
 // management will fail if the necessary tables are missing.
 const KEY_USER_STORE_USED = "USER_STORE_USED"

@@ -33,7 +33,6 @@ func (a *Application) dataStoresInitialize() error {
 		vaultStoreInitialize,
 		taskStoreInitialize,
 		statsStoreInitialize,
-		tradingStoreInitialize,
 	}
 
 	for _, initializer := range initializers {

@@ -19,7 +19,6 @@ import (
 	"github.com/dracory/shopstore"
 	"github.com/dracory/statsstore"
 	"github.com/dracory/taskstore"
-	"github.com/dracory/tradingstore"
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"
 	"github.com/faabiosr/cachego"
@@ -127,10 +126,6 @@ type AppInterface interface {
 	// Task store
 	GetTaskStore() taskstore.StoreInterface
 	SetTaskStore(s taskstore.StoreInterface)
-
-	// Trading store
-	GetTradingStore() tradingstore.StoreInterface
-	SetTradingStore(s tradingstore.StoreInterface)
 
 	// User store
 	GetUserStore() userstore.StoreInterface

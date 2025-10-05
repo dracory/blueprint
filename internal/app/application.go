@@ -24,7 +24,6 @@ import (
 	"github.com/dracory/shopstore"
 	"github.com/dracory/statsstore"
 	"github.com/dracory/taskstore"
-	"github.com/dracory/tradingstore"
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"
 	"github.com/faabiosr/cachego"
@@ -63,7 +62,6 @@ type Application struct {
 	sqlFileStorage      filesystem.StorageInterface
 	statsStore          statsstore.StoreInterface
 	taskStore           taskstore.StoreInterface
-	tradingStore        tradingstore.StoreInterface
 	userStore           userstore.StoreInterface
 	vaultStore          vaultstore.StoreInterface
 }
@@ -286,14 +284,6 @@ func (a *Application) GetTaskStore() taskstore.StoreInterface {
 }
 func (a *Application) SetTaskStore(s taskstore.StoreInterface) {
 	a.taskStore = s
-}
-
-// TradingStore
-func (a *Application) GetTradingStore() tradingstore.StoreInterface {
-	return a.tradingStore
-}
-func (a *Application) SetTradingStore(s tradingstore.StoreInterface) {
-	a.tradingStore = s
 }
 
 // UserStore

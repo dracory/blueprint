@@ -25,7 +25,6 @@ func (a *Application) dataStoresMigrate() error {
 		shopStoreMigrate,
 		statsStoreMigrate,
 		taskStoreMigrate,
-		tradingStoreMigrate,
 		userStoreMigrate,
 		vaultStoreMigrate,
 	}

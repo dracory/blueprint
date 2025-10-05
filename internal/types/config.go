@@ -192,11 +192,6 @@ type taskStoreConfigInterface interface {
 	GetTaskStoreUsed() bool
 }
 
-type tradingStoreConfigInterface interface {
-	SetTradingStoreUsed(bool)
-	GetTradingStoreUsed() bool
-}
-
 type userStoreConfigInterface interface {
 	SetUserStoreUsed(bool)
 	GetUserStoreUsed() bool
@@ -269,7 +264,6 @@ type ConfigInterface interface {
 	sqlFileStoreConfigInterface
 	statsStoreConfigInterface
 	taskStoreConfigInterface
-	tradingStoreConfigInterface
 	userStoreConfigInterface
 	vaultStoreConfigInterface
 	i18nConfigInterface
@@ -352,7 +346,6 @@ type Config struct {
 	sqlFileStoreUsed   bool
 	statsStoreUsed     bool
 	taskStoreUsed      bool
-	tradingStoreUsed   bool
 	userStoreUsed      bool
 	vaultStoreUsed     bool
 	vaultStoreKey      string
@@ -375,11 +368,6 @@ type Config struct {
 	mediaRoot     string
 	mediaSecret   string
 	mediaUrl      string
-
-	// Trading configuration
-	dailyAnalysisSymbols      []string
-	dailyAnalysisTimeUTC      string
-	dailyAnalysisCadenceHours int
 }
 
 func (c *Config) SetAppName(appName string) {
@@ -839,15 +827,6 @@ func (c *Config) SetTaskStoreUsed(v bool) {
 
 func (c *Config) GetTaskStoreUsed() bool {
 	return c.taskStoreUsed
-}
-
-// == Trading Store Getters/Setters ==
-func (c *Config) SetTradingStoreUsed(v bool) {
-	c.tradingStoreUsed = v
-}
-
-func (c *Config) GetTradingStoreUsed() bool {
-	return c.tradingStoreUsed
 }
 
 // == User Store Getters/Setters ==
