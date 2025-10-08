@@ -38,21 +38,7 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 		// "/privacy-policy",
 		// "/terms-of-use",
 	}
-	postList, err := c.blogStore.PostList(blogstore.PostQueryOptions{
-		Status:    blogstore.POST_STATUS_PUBLISHED,
-		OrderBy:   "title",
-		SortOrder: sb.DESC,
-		Limit:     1000,
-	})
-
-	if err != nil {
-		slog.Error("At sitemapXmlController > anySitemapXML", slog.String("error", err.Error()))
-		return ""
-	}
-
-	lo.ForEach(postList, func(post blogstore.Post, index int) {
-		locations = append(locations, links.Website().BlogPost(post.ID(), post.Title()))
-	})
+	locations = append(locations, c.blogPostLocations()...)
 
 	timeNow := carbon.Now().ToIso8601String()
 
@@ -75,4 +61,30 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 	xml += "</urlset>"
 
 	return xml
+}
+
+func (c sitemapXmlController) blogPostLocations() []string {
+	if c.blogStore == nil {
+		slog.Warn("At sitemapXmlController > blogPostLocations", slog.String("reason", "blog store is not configured"))
+		return nil
+	}
+
+	postList, err := c.blogStore.PostList(blogstore.PostQueryOptions{
+		Status:    blogstore.POST_STATUS_PUBLISHED,
+		OrderBy:   "title",
+		SortOrder: sb.DESC,
+		Limit:     1000,
+	})
+
+	if err != nil {
+		slog.Error("At sitemapXmlController > blogPostLocations", slog.String("error", err.Error()))
+		return nil
+	}
+
+	postLocations := make([]string, 0, len(postList))
+	lo.ForEach(postList, func(post blogstore.Post, index int) {
+		postLocations = append(postLocations, links.Website().BlogPost(post.ID(), post.Title()))
+	})
+
+	return postLocations
 }
