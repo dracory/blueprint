@@ -240,8 +240,6 @@ func (c *FileManagerController) directoryDeleteAjax(r *http.Request) string {
 		return api.Error("root directory can not be deleted").ToString()
 	}
 
-	cfmt.Infoln("Deleting directory:", dirPath)
-
 	if c.storage == nil {
 		return api.Error("Storage not initialized").ToString()
 	}
@@ -321,6 +319,19 @@ func (c *FileManagerController) fileRenameAjax(r *http.Request) string {
 }
 
 func (controller *FileManagerController) getMediaManager(r *http.Request) string {
+	if controller.app == nil {
+		return api.Error("app is required").ToString()
+	}
+
+	cfg := controller.app.GetConfig()
+	if cfg == nil {
+		return api.Error("config is required").ToString()
+	}
+
+	if !cfg.GetSqlFileStoreUsed() {
+		return api.Error("SQL file store is not enabled").ToString()
+	}
+
 	if controller.storage == nil {
 		return api.Error("storage is required").ToString()
 	}

@@ -225,6 +225,10 @@ const KEY_SETTING_STORE_USED = "SETTING_STORE_USED"
 // Ensure shop migrations run before enabling it in production.
 const KEY_SHOP_STORE_USED = "SHOP_STORE_USED"
 
+// KEY_SQL_FILE_STORE_USED toggles the SQL-backed file storage. Enable it when
+// uploads should be persisted via `filesystem.DRIVER_SQL` tables.
+const KEY_SQL_FILE_STORE_USED = "SQL_FILE_STORE_USED"
+
 // KEY_STATS_STORE_USED controls analytics/statistics aggregation stores. When
 // enabled, reporting jobs will read/write supporting tables.
 const KEY_STATS_STORE_USED = "STATS_STORE_USED"
