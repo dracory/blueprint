@@ -15,6 +15,7 @@ import (
 // setupOptions holds configuration flags for Setup
 type setupOptions struct {
 	withVault bool
+	withBlog  bool
 	cfg       types.ConfigInterface
 }
 
@@ -25,6 +26,13 @@ type SetupOption func(*setupOptions)
 func WithVault(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.withVault = enable
+	}
+}
+
+// WithBlogStore enables the blog store during test setup
+func WithBlogStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.withBlog = enable
 	}
 }
 
@@ -70,6 +78,20 @@ func Setup(options ...SetupOption) types.AppInterface {
 		// Only set Vault store if withVault was explicitly set when using default config
 		if opts.withVault {
 			opts.cfg.SetVaultStoreUsed(true)
+		}
+
+		if opts.withBlog {
+			opts.cfg.SetBlogStoreUsed(true)
+		}
+	}
+
+	// Apply optional toggles to provided configs
+	if opts.cfg != nil {
+		if opts.withVault {
+			opts.cfg.SetVaultStoreUsed(true)
+		}
+		if opts.withBlog {
+			opts.cfg.SetBlogStoreUsed(true)
 		}
 	}
 
