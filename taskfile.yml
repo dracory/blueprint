@@ -11,6 +11,7 @@ version: '3'
 vars:
   APPNAME: The Dracory Blueprint Project
   DATETIME: '{{now | date "20060102_150405"}}'
+  LIVEURL: https://example.com
 
 tasks:
   # ======================================================================== #
@@ -62,8 +63,14 @@ tasks:
   deploy-live:
     desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
     cmds:
-      - go run cmd/deploy/main.go
-      - echo "Open https://XXXX.com to view the app"
+      - go run ./cmd/deploy
+      - cmd: powershell -Command "Start-Process '{{.LIVEURL}}'"
+        platforms: [windows]
+      - cmd: open {{.LIVEURL}}
+        platforms: [darwin]
+      - cmd: xdg-open {{.LIVEURL}}
+        platforms: [linux]
+      - echo "Open {{.LIVEURL}} to view the app"
       - echo "Done!"
     silent: true
 

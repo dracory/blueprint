@@ -100,6 +100,7 @@ func Load() (types.ConfigInterface, error) {
 	mailPort := env.GetString(KEY_MAIL_PORT)
 	mailUsername := env.GetString(KEY_MAIL_USERNAME)
 
+	blogStoreUsed := env.GetBool(KEY_BLOG_STORE_USED)
 	cacheStoreUsed := env.GetBool(KEY_CACHE_STORE_USED)
 	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
 	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
@@ -208,6 +209,7 @@ func Load() (types.ConfigInterface, error) {
 	config := types.Config{}
 
 	// Store configurations
+	config.SetBlogStoreUsed(blogStoreUsed)
 	config.SetCacheStoreUsed(cacheStoreUsed)
 	config.SetCmsStoreUsed(cmsStoreUsed)
 	config.SetCmsStoreTemplateID(cmsStoreTemplateID)

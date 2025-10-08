@@ -173,6 +173,10 @@ const KEY_ENVENC_KEY_PRIVATE = "ENVENC_KEY_PRIVATE"
 // This is where you can configure the stores used by the application.
 //
 
+// KEY_BLOG_STORE_USED toggles initialization of the public blog store. Enable it
+// when the application should expose blog content backed by blogstore tables.
+const KEY_BLOG_STORE_USED = "BLOG_STORE_USED"
+
 // KEY_CACHE_STORE_USED toggles cache store bootstrapping. When true, the
 // application expects backing cache infrastructure to be reachable.
 const KEY_CACHE_STORE_USED = "CACHE_STORE_USED"
