@@ -231,7 +231,7 @@ func (controller *registerController) formRegister(data registerControllerData) 
 		HxTarget("#CardRegister").
 		HxTrigger("click").
 		HxSwap("outerHTML").
-		HxPost(links.NewAuthLinks().Register(map[string]string{}))
+		HxPost(links.Auth().Register())
 
 	firstNameGroup := hb.Div().
 		Class("form-group").
@@ -287,7 +287,7 @@ func (controller *registerController) formRegister(data registerControllerData) 
 			return bs.FormSelectOption(country.IsoCode2(), country.Name()).
 				AttrIf(data.country == country.IsoCode2(), "selected", "selected")
 		})).
-		Hx("post", links.NewAuthLinks().Register(map[string]string{
+		Hx("post", links.Auth().Register(map[string]string{
 			"action": "on-country-selected-timezone-options",
 		})).
 		Hx("target", "#SelectTimezones").

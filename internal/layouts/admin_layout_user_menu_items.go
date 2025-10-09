@@ -17,12 +17,12 @@ import (
 func adminLayoutUserMenu(authUser userstore.UserInterface) []dashboard.MenuItem {
 	userDashboardMenuItem := dashboard.MenuItem{
 		Title: "To User Panel",
-		URL:   links.NewUserLinks().Home(map[string]string{}),
+		URL:   links.User().Home(),
 	}
 
 	logoutMenuItem := dashboard.MenuItem{
 		Title: "Logout",
-		URL:   links.NewAuthLinks().Logout(),
+		URL:   links.Auth().Logout(),
 	}
 
 	items := []dashboard.MenuItem{}

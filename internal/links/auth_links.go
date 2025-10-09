@@ -7,11 +7,6 @@ type authLinks struct {
 
 // Auth is a shortcut for NewAuthLinks
 func Auth() *authLinks {
-	return NewAuthLinks()
-}
-
-// Deprecated: Use Auth() instead. NewAuthLinks will be removed in the next major version.
-func NewAuthLinks() *authLinks {
 	return &authLinks{}
 }
 

@@ -233,7 +233,7 @@ func (controller *profileController) formProfile(data profileControllerData) *hb
 			return bs.FormSelectOption(country.IsoCode2(), country.Name()).
 				AttrIf(data.country == country.IsoCode2(), "selected", "selected")
 		})).
-		HxPost(links.NewAuthLinks().Register(map[string]string{
+		HxPost(links.Auth().Register(map[string]string{
 			"action": controller.actionOnCountrySelectedTimezoneOptions,
 		})).
 		HxTarget("#SelectTimezones").
