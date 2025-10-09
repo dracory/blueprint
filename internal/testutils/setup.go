@@ -14,32 +14,65 @@ import (
 
 // setupOptions holds configuration flags for Setup
 type setupOptions struct {
-	withVault bool
-	withBlog  bool
-	cfg       types.ConfigInterface
+	WithBlogStore    bool
+	WithCacheStore   bool
+	WithLogStore     bool
+	WithSessionStore bool
+	WithUserStore    bool
+	WithVaultStore   bool
+
+	cfg types.ConfigInterface
 }
 
 // SetupOption is a functional option for Setup
 type SetupOption func(*setupOptions)
 
-// WithVault enables in-memory VaultStore during test setup
-func WithVault(enable bool) SetupOption {
+// WithCfg allows providing a custom config for Setup
+func WithCfg(cfg types.ConfigInterface) SetupOption {
 	return func(opts *setupOptions) {
-		opts.withVault = enable
+		opts.cfg = cfg
 	}
 }
 
 // WithBlogStore enables the blog store during test setup
 func WithBlogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
-		opts.withBlog = enable
+		opts.WithBlogStore = enable
 	}
 }
 
-// WithCfg allows providing a custom config for Setup
-func WithCfg(cfg types.ConfigInterface) SetupOption {
+// WithCacheStore enables the cache store during test setup
+func WithCacheStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
-		opts.cfg = cfg
+		opts.WithCacheStore = enable
+	}
+}
+
+// WithLogStore enables the log store during test setup
+func WithLogStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithLogStore = enable
+	}
+}
+
+// WithSessionStore enables the session store during test setup
+func WithSessionStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithSessionStore = enable
+	}
+}
+
+// WithUserStore enables the user store during test setup
+func WithUserStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithUserStore = enable
+	}
+}
+
+// WithVaultStore enables the vault store during test setup
+func WithVaultStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithVaultStore = enable
 	}
 }
 
@@ -56,6 +89,7 @@ func DefaultConf() *types.Config {
 	cfg.SetDatabaseName(uniqueDSN)
 	cfg.SetDatabaseUsername("")
 	cfg.SetDatabasePassword("")
+	cfg.SetRegistrationEnabled(true)
 
 	// cfg.SetCacheStoreUsed(true)
 	// cfg.SetUserStoreUsed(true)
@@ -75,23 +109,48 @@ func Setup(options ...SetupOption) types.AppInterface {
 	if opts.cfg == nil {
 		opts.cfg = DefaultConf()
 
-		// Only set Vault store if withVault was explicitly set when using default config
-		if opts.withVault {
+		// Only set stores if explicitly set when using default config
+		if opts.WithVaultStore {
 			opts.cfg.SetVaultStoreUsed(true)
 		}
 
-		if opts.withBlog {
+		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
+		}
+
+		if opts.WithCacheStore {
+			opts.cfg.SetCacheStoreUsed(true)
+		}
+
+		if opts.WithLogStore {
+			opts.cfg.SetLogStoreUsed(true)
+		}
+
+		if opts.WithSessionStore {
+			opts.cfg.SetSessionStoreUsed(true)
+		}
+
+		if opts.WithUserStore {
+			opts.cfg.SetUserStoreUsed(true)
 		}
 	}
 
 	// Apply optional toggles to provided configs
 	if opts.cfg != nil {
-		if opts.withVault {
+		if opts.WithVaultStore {
 			opts.cfg.SetVaultStoreUsed(true)
 		}
-		if opts.withBlog {
+		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
+		}
+		if opts.WithCacheStore {
+			opts.cfg.SetCacheStoreUsed(true)
+		}
+		if opts.WithSessionStore {
+			opts.cfg.SetSessionStoreUsed(true)
+		}
+		if opts.WithUserStore {
+			opts.cfg.SetUserStoreUsed(true)
 		}
 	}
 
