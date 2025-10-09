@@ -43,8 +43,8 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 
 	return layouts.NewCmsLayout(
 		controller.app,
+		r,
 		layouts.Options{
-			Request:        r,
 			WebsiteSection: "Blog",
 			Title:          "Recent Posts",
 			Content:        hb.Wrap().HTML(controller.page(data)),

@@ -49,8 +49,8 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreTemplateID() != "" {
 		return layouts.NewCmsLayout(
 			controller.app,
+			r,
 			layouts.Options{
-				Request: r,
 				Title:   title,
 				Content: html,
 				Styles:  []string{`.Center > div{padding:0px !important;margin:0px !important;}`},

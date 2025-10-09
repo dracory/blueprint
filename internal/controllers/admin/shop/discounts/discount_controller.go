@@ -225,7 +225,6 @@ func (discountController *discountController) FuncLayout(w http.ResponseWriter, 
 	}, scriptURLs...)
 
 	return layouts.NewAdminLayout(discountController.app, r, layouts.Options{
-		Request:    r,
 		Title:      title + " | Admin",
 		Content:    hb.Wrap().HTML(content),
 		StyleURLs:  styleURLs,

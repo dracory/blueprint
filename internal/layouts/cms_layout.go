@@ -12,11 +12,12 @@ import (
 
 func NewCmsLayout(
 	app types.AppInterface,
+	r *http.Request,
 	options Options,
 ) *cmsLayout {
 	layout := &cmsLayout{}
 	layout.app = app
-	layout.request = options.Request
+	layout.request = r
 	layout.title = options.Title
 	layout.content = options.Content
 	layout.scriptURLs = options.ScriptURLs
