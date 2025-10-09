@@ -59,7 +59,7 @@ func (w *blogPostWidget) Description() string {
 
 // Render implements the shortcode interface.
 func (w *blogPostWidget) Render(r *http.Request, content string, params map[string]string) string {
-	blogsUrl := links.NewWebsiteLinks().Blog(map[string]string{})
+	blogsUrl := links.Website().Blog(map[string]string{})
 
 	uriParts := strings.Split(r.RequestURI, "/")
 	if len(uriParts) < 5 {
@@ -218,7 +218,7 @@ func (w *blogPostWidget) sectionPost(post blogstore.Post) *hb.Tag {
 							hb.Hyperlink().Class("btn text-white text-center").Style(`background:#1ba1b6;color:#fff;width:600px;max-width:100%;`).Children([]hb.TagInterface{
 								// icons.Icon("bi-arrow-left", 16, 16, "#333").Style("margin-right:5px;"),
 								hb.Span().HTML("View All Posts"),
-							}).Attr("href", links.NewWebsiteLinks().Blog(map[string]string{})),
+							}).Attr("href", links.Website().Blog()),
 						}),
 					}),
 				}),

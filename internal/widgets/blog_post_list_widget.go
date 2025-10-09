@@ -76,7 +76,7 @@ func (widget *blogPostListWidget) Render(r *http.Request, content string, params
 // == PRIVATE METHODS ========================================================
 func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag {
 
-	url := links.NewWebsiteLinks().Blog(map[string]string{
+	url := links.Website().Blog(map[string]string{
 		"page": "",
 	})
 
@@ -93,7 +93,7 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 
 		publishedAt := lo.Ternary(post.PublishedAt() == "", "", post.PublishedAtCarbon().Format("d M, Y"))
 
-		postURL := links.NewWebsiteLinks().BlogPost(post.ID(), post.Slug())
+		postURL := links.Website().BlogPost(post.ID(), post.Slug())
 
 		postImage := hb.Image(postImageURL).
 			Class("card-img-top rounded-3").

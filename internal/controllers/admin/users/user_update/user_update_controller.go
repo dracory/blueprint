@@ -47,7 +47,7 @@ func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Re
 			cdn.TrumbowygJs_2_27_3(),
 			cdn.Sweetalert2_10(),
 			cdn.JqueryUiJs_1_13_1(), // needed for BlockArea
-			links.NewWebsiteLinks().Resource(`/blockarea_v0200.js`, map[string]string{}),
+			links.Website().Resource(`/blockarea_v0200.js`, map[string]string{}),
 		},
 		Scripts: []string{
 			controller.script(),

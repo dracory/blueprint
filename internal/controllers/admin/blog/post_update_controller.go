@@ -58,7 +58,7 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 			cdn.TrumbowygJs_2_27_3(),
 			cdn.Sweetalert2_10(),
 			cdn.JqueryUiJs_1_13_1(), // needed for BlockArea
-			links.NewWebsiteLinks().Resource(`/js/blockarea_v0200.js`, map[string]string{}), // needed for BlockArea
+			links.Website().Resource(`/js/blockarea_v0200.js`, map[string]string{}), // needed for BlockArea
 		},
 		Scripts: []string{
 			controller.script(),

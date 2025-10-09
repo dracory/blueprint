@@ -161,7 +161,7 @@ func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.R
 	}
 
 	data.successMessage = "Your message has been sent."
-	data.redirectURL = links.NewWebsiteLinks().Contact()
+	data.redirectURL = links.Website().Contact()
 	return controller.contactForm(r, data).ToHTML()
 }
 
@@ -264,7 +264,7 @@ func (controller *contactController) contactForm(r *http.Request, data contactCo
 		HxTarget("#CardContact").
 		HxTrigger("click").
 		HxSwap("outerHTML").
-		HxPost(links.NewWebsiteLinks().Contact())
+		HxPost(links.Website().Contact())
 
 	formContact := hb.Div().
 		ID("FormContact").

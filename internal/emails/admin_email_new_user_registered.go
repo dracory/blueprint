@@ -38,7 +38,7 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 func (e *emailToAdminOnNewUserRegistered) template(userID string) string {
 	urlHome := hb.Hyperlink().
 		HTML(e.cfg.GetAppName()).
-		Href(links.NewWebsiteLinks().Home()).
+		Href(links.Website().Home()).
 		ToHTML()
 
 	h1 := hb.Heading1().

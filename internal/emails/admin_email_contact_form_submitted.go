@@ -58,7 +58,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 			}
 			return ""
 		}()).
-		Href(links.NewWebsiteLinks().Home()).
+		Href(links.Website().Home()).
 		ToHTML()
 
 	h1 := hb.Heading1().

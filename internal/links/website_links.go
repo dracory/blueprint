@@ -13,11 +13,6 @@ type websiteLinks struct{}
 
 // Website is a shortcut for NewWebsiteLinks
 func Website() *websiteLinks {
-	return NewWebsiteLinks()
-}
-
-// Deprecated: Use Website() instead. NewWebsiteLinks will be removed in the next major version.
-func NewWebsiteLinks() *websiteLinks {
 	return &websiteLinks{}
 }
 
@@ -25,8 +20,9 @@ func (l *websiteLinks) Home() string {
 	return URL(HOME, map[string]string{})
 }
 
-func (l *websiteLinks) Blog(params map[string]string) string {
-	return URL(BLOG, params)
+func (l *websiteLinks) Blog(params ...map[string]string) string {
+	p := lo.FirstOrEmpty(params)
+	return URL(BLOG, p)
 }
 
 func (l *websiteLinks) BlogPost(postID string, postSlug string) string {
@@ -37,7 +33,7 @@ func (l *websiteLinks) BlogPost(postID string, postSlug string) string {
 }
 
 func (l *websiteLinks) Chat(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
+	p := lo.FirstOrEmpty(params)
 	return URL(CHAT_HOME, p)
 }
 
@@ -50,12 +46,14 @@ func (l *websiteLinks) File(filePath string) string {
 	return URL(path, map[string]string{})
 }
 
-func (l *websiteLinks) Flash(params map[string]string) string {
-	return URL(FLASH, params)
+func (l *websiteLinks) Flash(params ...map[string]string) string {
+	p := lo.FirstOrEmpty(params)
+	return URL(FLASH, p)
 }
 
-func (l *websiteLinks) Shop(params map[string]string) string {
-	return URL(SHOP, params)
+func (l *websiteLinks) Shop(params ...map[string]string) string {
+	p := lo.FirstOrEmpty(params)
+	return URL(SHOP, p)
 }
 
 func (l *websiteLinks) ShopProduct(productID string, productSlug string, params map[string]string) string {

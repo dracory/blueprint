@@ -168,7 +168,7 @@ func (controller *managerController) tablePosts(data managerControllerData) hb.T
 			hb.Tbody().Children(lo.Map(data.blogList, func(blog blogstore.Post, _ int) hb.TagInterface {
 				blogLink := hb.Hyperlink().
 					HTML(blog.Title()).
-					Href(links.NewWebsiteLinks().BlogPost(blog.ID(), blog.Slug())).
+					Href(links.Website().BlogPost(blog.ID(), blog.Slug())).
 					Target("_blank")
 
 				status := hb.Span().

@@ -232,14 +232,14 @@ func (controller blogController) sectionBanner() *hb.Tag {
 			Child(hb.LI().
 				Class("breadcrumb-item").
 				Child(hb.A().
-					Href(links.NewWebsiteLinks().Home()).
+					Href(links.Website().Home()).
 					HTML("Home"),
 				)).
 			Child(hb.LI().
 				Class("breadcrumb-item active").
 				Attr("aria-current", "page").
 				Child(hb.A().
-					Href(links.NewWebsiteLinks().Blog(map[string]string{})).
+					Href(links.Website().Blog()).
 					HTML("Blog"),
 				),
 			))

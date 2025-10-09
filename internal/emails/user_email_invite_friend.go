@@ -75,10 +75,10 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 func (e *inviteFriendEmail) template(userName string, userNote string, recipientName string) string {
 
 	urlHome := hb.Hyperlink().Text("ProvedExpert").
-		Href(links.NewWebsiteLinks().Home()).ToHTML()
+		Href(links.Website().Home()).ToHTML()
 
 	urlJoin := hb.Hyperlink().Text("Click to Join Me at ProvedExpert").
-		Href(links.NewWebsiteLinks().Home()).ToHTML()
+		Href(links.Website().Home()).ToHTML()
 
 	h1 := hb.Heading1().
 		HTML(`You have an awesome friend`).

@@ -242,7 +242,7 @@ func (c *blogPostController) sectionPost(post blogstore.Post) *hb.Tag {
 								hb.Hyperlink().Class("btn text-white text-center").Style(`background:#1ba1b6;color:#fff;width:600px;max-width:100%;`).Children([]hb.TagInterface{
 									// icons.Icon("bi-arrow-left", 16, 16, "#333").Style("margin-right:5px;"),
 									hb.Span().HTML("View All Posts"),
-								}).Attr("href", links.NewWebsiteLinks().Blog(map[string]string{})),
+								}).Attr("href", links.Website().Blog()),
 							}),
 						}),
 					}),
