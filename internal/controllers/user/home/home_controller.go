@@ -36,7 +36,6 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 	}
 
 	return layouts.NewUserLayout(controller.app, r, layouts.Options{
-		Request: r,
 		Title:   "Home",
 		Content: controller.view(data),
 	}).ToHTML()

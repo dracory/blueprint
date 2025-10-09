@@ -1,8 +1,6 @@
 package layouts
 
 import (
-	"net/http"
-
 	"github.com/dracory/hb"
 )
 
