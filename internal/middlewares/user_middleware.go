@@ -31,6 +31,7 @@ func userMiddlewareHandler(app types.AppInterface) func(next http.Handler) http.
 			returnURL := links.URL(r.URL.Path, map[string]string{})
 			loginURL := links.Auth().Login(returnURL)
 			homeURL := links.Website().Home()
+			registrationEnabled := app.GetConfig().GetRegistrationEnabled()
 			registerURL := links.Auth().Register()
 
 			// User validation logic here. Change with your own
@@ -54,8 +55,10 @@ func userMiddlewareHandler(app types.AppInterface) func(next http.Handler) http.
 				strings.Trim(r.URL.Path, "/") != strings.Trim(links.AUTH_REGISTER, "/")
 
 			if !authUser.IsRegistrationCompleted() && notOnProfilePage {
-				helpers.ToFlashInfo(app.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
-				return
+				if registrationEnabled {
+					helpers.ToFlashInfo(app.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
+					return
+				}
 			}
 
 			next.ServeHTTP(w, r)

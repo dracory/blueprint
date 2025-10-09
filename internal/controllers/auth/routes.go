@@ -8,7 +8,7 @@ import (
 )
 
 func Routes(application types.AppInterface) []rtr.RouteInterface {
-    return []rtr.RouteInterface{
+    routes := []rtr.RouteInterface{
         rtr.NewRoute().
             SetName("Auth > Auth Controller").
             SetPath(links.AUTH_AUTH).
@@ -21,9 +21,16 @@ func Routes(application types.AppInterface) []rtr.RouteInterface {
             SetName("Auth > Logout Controller").
             SetPath(links.AUTH_LOGOUT).
             SetHTMLHandler(NewLogoutController(application).AnyIndex),
-        rtr.NewRoute().
-            SetName("Auth > Register Controller").
-            SetPath(links.AUTH_REGISTER).
-            SetHTMLHandler(NewRegisterController(application).Handler),
     }
+
+    if application.GetConfig().GetRegistrationEnabled() {
+        routes = append(routes,
+            rtr.NewRoute().
+                SetName("Auth > Register Controller").
+                SetPath(links.AUTH_REGISTER).
+                SetHTMLHandler(NewRegisterController(application).Handler),
+        )
+    }
+
+    return routes
 }

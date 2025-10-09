@@ -81,7 +81,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 		Child(hb.HR()).
 		Child(
 			hb.Div().
-				Class("container").
+				// Class("container").
 				Child(title).
 				Child(paragraph1).
 				Child(formProfile).

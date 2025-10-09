@@ -70,6 +70,10 @@ func NewRegisterController(app types.AppInterface) *registerController {
 // == PUBLIC METHODS ==========================================================
 
 func (controller *registerController) Handler(w http.ResponseWriter, r *http.Request) string {
+	if !controller.app.GetConfig().GetRegistrationEnabled() {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `Registrations are currently disabled`, links.Website().Home(), 10)
+	}
+
 	if controller.app.GetUserStore() == nil {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
 	}

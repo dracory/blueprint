@@ -9,7 +9,12 @@ import (
 	"github.com/samber/lo"
 )
 
-func UserQuickLinks(req *http.Request) *hb.Tag {
+type UserQuickLinksOptions struct {
+	WrapInContainer bool
+}
+
+func UserQuickLinks(req *http.Request, opts ...UserQuickLinksOptions) *hb.Tag {
+	opt := lo.FirstOrEmpty(opts)
 	errorMessage := ""
 
 	if errorMessage != "" {
@@ -91,12 +96,15 @@ func UserQuickLinks(req *http.Request) *hb.Tag {
 			Child(link)
 	})
 
+	content := hb.Div().
+		Class("row").
+		Children(columns)
+
 	return hb.Section().
 		ID("SectionQuickLinks").
-		Child(hb.Div().
-			Class("container").
-			Child(
-				hb.Div().
-					Class("row").
-					Children(columns)))
+		ChildIfElse(opt.WrapInContainer,
+			hb.Div().
+				Class("container").
+				Child(content),
+			content)
 }

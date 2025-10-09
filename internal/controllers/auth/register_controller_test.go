@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/url"
 	"project/internal/config"
+	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/testutils"
 	"strings"
@@ -12,7 +13,6 @@ import (
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
 )
-
 func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
@@ -65,6 +65,58 @@ func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T)
 	expected := "You must be logged in to access this page"
 	if flashMessage.Message != expected {
 		t.Fatal(`Response MUST contain '`, expected, `', but got: `, flashMessage.Message)
+	}
+}
+
+func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetRegistrationEnabled(false)
+	application := testutils.Setup(testutils.WithCfg(cfg))
+
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+		GetValues: url.Values{},
+		Context:   map[any]any{},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if response == nil {
+		t.Fatal(`Response MUST not be nil`)
+	}
+
+	if response.StatusCode != http.StatusSeeOther {
+		t.Fatalf("Response MUST be %d but was: %d", http.StatusSeeOther, response.StatusCode)
+	}
+
+	if !strings.Contains(responseHTML, `/flash?message_id=`) {
+		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
+	}
+
+	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), response)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if flashMessage == nil {
+		t.Fatal(`Response MUST contain 'flash message'`)
+	}
+
+	if flashMessage.Type != helpers.FLASH_ERROR {
+		t.Fatalf("Expected flash type %s but got %s", helpers.FLASH_ERROR, flashMessage.Type)
+	}
+
+	if flashMessage.Message != "Registrations are currently disabled" {
+		t.Fatalf("Expected message 'Registrations are currently disabled' but got: %s", flashMessage.Message)
+	}
+
+	if flashMessage.Url != links.Website().Home() {
+		t.Fatalf("Expected redirect URL %s but got %s", links.Website().Home(), flashMessage.Url)
 	}
 }
 

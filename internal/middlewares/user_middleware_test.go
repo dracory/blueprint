@@ -28,7 +28,6 @@ func TestUserMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{})
-
 	// Assert
 
 	if err != nil {
@@ -145,6 +144,61 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	if msg.Message != "Please complete your registration to continue" {
 		t.Fatalf("Expected message %s, got %s", "Please complete your registration to continue", msg.Message)
+	}
+}
+
+func TestUserMiddleware_RegistrationDisabledAllowsAccess(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetRegistrationEnabled(false)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
+	if app.GetUserStore() == nil {
+		t.Fatal("UserStore should not be nil")
+	}
+
+	if app.GetSessionStore() == nil {
+		t.Fatal("SessionStore should not be nil")
+	}
+
+	user, session, err := testutils.SeedUserAndSession(
+		app.GetUserStore(),
+		app.GetSessionStore(),
+		testutils.USER_01,
+		httptest.NewRequest("GET", "/", nil),
+		1,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	body, response, err := test.CallMiddleware("GET", NewUserMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("ok"))
+	}, test.NewRequestOptions{
+		Context: map[any]any{
+			config.AuthenticatedUserContextKey{}:    user,
+			config.AuthenticatedSessionContextKey{}: session,
+		},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if response == nil {
+		t.Fatal("response should not be nil")
+	}
+
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, response.StatusCode)
+	}
+
+	if body != "ok" {
+		t.Fatalf("expected body 'ok', got %s", body)
 	}
 }
 
