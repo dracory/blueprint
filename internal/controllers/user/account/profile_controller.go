@@ -47,7 +47,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewUserLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.User().Home(), 10)
 	}
 
 	if data.action == controller.actionOnCountrySelectedTimezoneOptions {
@@ -263,7 +263,7 @@ func (controller *profileController) formProfile(data profileControllerData) *hb
 		HxTarget("#CardUserProfile").
 		HxTrigger("click").
 		HxSwap("outerHTML").
-		HxPost(links.NewUserLinks().Profile(map[string]string{}))
+		HxPost(links.User().Profile())
 
 	formProfile := hb.Div().ID("FormProfile").Children([]hb.TagInterface{
 		bs.Row().

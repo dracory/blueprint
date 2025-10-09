@@ -30,7 +30,7 @@ func userLayoutMainMenuItems(user userstore.UserInterface) []dashboard.MenuItem 
 	profileMenuItem := dashboard.MenuItem{
 		Icon:  hb.I().Class("bi bi-person").Style("margin-right:10px;").ToHTML(),
 		Title: "My Account",
-		URL:   links.NewUserLinks().Profile(map[string]string{}),
+		URL:   links.User().Profile(),
 	}
 
 	loginMenuItem := dashboard.MenuItem{

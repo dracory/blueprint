@@ -27,7 +27,7 @@ func userLayoutUserMenuItems(authUser userstore.UserInterface) []dashboard.MenuI
 
 	profileMenuItem := dashboard.MenuItem{
 		Title: "My Account",
-		URL:   links.NewUserLinks().Profile(map[string]string{}),
+		URL:   links.User().Profile(),
 	}
 
 	items := []dashboard.MenuItem{profileMenuItem}
