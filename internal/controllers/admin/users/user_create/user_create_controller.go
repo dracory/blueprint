@@ -57,7 +57,7 @@ func (controller userCreateController) Handler(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *userCreateController) modal(data userCreateControllerData) hb.TagInterface {
-	submitUrl := links.NewAdminLinks().UsersUserCreate(map[string]string{})
+	submitUrl := links.Admin().UsersUserCreate()
 
 	formGroupFirstName := bs.FormGroup().
 		Class("mb-3").

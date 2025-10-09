@@ -32,7 +32,7 @@ func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Re
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().UsersUserManager(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().UsersUserManager(), 10)
 	}
 
 	if r.Method == http.MethodPost {
@@ -68,15 +68,15 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(),
 		},
 		{
 			Name: "User Manager",
-			URL:  links.NewAdminLinks().UsersUserManager(map[string]string{}),
+			URL:  links.Admin().UsersUserManager(),
 		},
 		{
 			Name: "Edit User",
-			URL:  links.NewAdminLinks().UsersUserUpdate(map[string]string{"user_id": data.userID}),
+			URL:  links.Admin().UsersUserUpdate(map[string]string{"user_id": data.userID}),
 		},
 	})
 
@@ -85,14 +85,14 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 		Child(hb.I().Class("bi bi-save").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("Save").
 		HxInclude("#FormUserUpdate").
-		HxPost(links.NewAdminLinks().UsersUserUpdate(map[string]string{"userID": data.userID})).
+		HxPost(links.Admin().UsersUserUpdate(map[string]string{"userID": data.userID})).
 		HxTarget("#FormUserUpdate")
 
 	buttonCancel := hb.Hyperlink().
 		Class("btn btn-secondary ms-2 float-end").
 		Child(hb.I().Class("bi bi-chevron-left").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("Back").
-		Href(links.NewAdminLinks().UsersUserManager(map[string]string{}))
+		Href(links.Admin().UsersUserManager())
 
 	heading := hb.Heading1().
 		HTML("Edit User").

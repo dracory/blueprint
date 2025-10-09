@@ -42,7 +42,7 @@ func (controller *productManagerController) Handler(w http.ResponseWriter, r *ht
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	if data.action == ActionModalProductFilterShow {
@@ -197,7 +197,7 @@ func (controller *productManagerController) page(data productManagerControllerDa
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(),
 		},
 		{
 			Name: "Shop",
@@ -300,7 +300,7 @@ func (controller *productManagerController) tableProducts(data productManagerCon
 			hb.Tbody().Children(lo.Map(data.productList, func(product shopstore.ProductInterface, _ int) hb.TagInterface {
 				productLink := hb.Hyperlink().
 					Text(product.Title()).
-					Href(links.NewAdminLinks().Tasks(map[string]string{"product_id": product.ID()}))
+					Href(links.Admin().Tasks(map[string]string{"product_id": product.ID()}))
 
 				status := hb.Span().
 					Style(`font-weight: bold;`).

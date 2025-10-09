@@ -127,7 +127,7 @@ func (c *homeController) cardDailyVisitors() hb.TagInterface {
 				Text("Daily Visitors Report").
 				Child(hb.Hyperlink().
 					Class("card-link").
-					Href(links.NewAdminLinks().Stats(map[string]string{})).
+					Href(links.Admin().Stats(map[string]string{})).
 					Text("View all").
 					Style("float: right;")))).
 		Child(hb.Div().

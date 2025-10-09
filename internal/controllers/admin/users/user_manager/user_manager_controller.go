@@ -40,7 +40,7 @@ func (controller *userManagerController) Handler(w http.ResponseWriter, r *http.
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	if data.action == ActionModalUserFilterShow {
@@ -199,15 +199,15 @@ func (controller *userManagerController) page(data userManagerControllerData) hb
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(map[string]string{}),
 		},
 		{
 			Name: "Users",
-			URL:  links.NewAdminLinks().UsersUserManager(map[string]string{}),
+			URL:  links.Admin().UsersUserManager(map[string]string{}),
 		},
 		{
 			Name: "User Manager",
-			URL:  links.NewAdminLinks().UsersUserManager(map[string]string{}),
+			URL:  links.Admin().UsersUserManager(map[string]string{}),
 		},
 	})
 
@@ -215,7 +215,7 @@ func (controller *userManagerController) page(data userManagerControllerData) hb
 		Class("btn btn-primary float-end").
 		Child(hb.I().Class("bi bi-plus-circle").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("New User").
-		HxGet(links.NewAdminLinks().UsersUserCreate(map[string]string{})).
+		HxGet(links.Admin().UsersUserCreate(map[string]string{})).
 		HxTarget("body").
 		HxSwap("beforeend")
 
@@ -275,7 +275,7 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 					Text(firstName).
 					Text(` `).
 					Text(lastName).
-					Href(links.NewAdminLinks().UsersUserUpdate(map[string]string{"user_id": user.ID()}))
+					Href(links.Admin().UsersUserUpdate(map[string]string{"user_id": user.ID()}))
 
 				status := hb.Span().
 					Style(`font-weight: bold;`).
@@ -289,14 +289,14 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 					Class("btn btn-primary me-2").
 					Child(hb.I().Class("bi bi-pencil-square")).
 					Title("Edit").
-					Href(links.NewAdminLinks().UsersUserUpdate(map[string]string{"user_id": user.ID()})).
+					Href(links.Admin().UsersUserUpdate(map[string]string{"user_id": user.ID()})).
 					Target("_blank")
 
 				buttonDelete := hb.Hyperlink().
 					Class("btn btn-danger").
 					Child(hb.I().Class("bi bi-trash")).
 					Title("Delete").
-					HxGet(links.NewAdminLinks().UsersUserDelete(map[string]string{"user_id": user.ID()})).
+					HxGet(links.Admin().UsersUserDelete(map[string]string{"user_id": user.ID()})).
 					HxTarget("body").
 					HxSwap("beforeend")
 
@@ -304,7 +304,7 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 					Class("btn btn-warning me-2").
 					Child(hb.I().Class("bi bi-shuffle")).
 					Title("Impersonate").
-					Href(links.NewAdminLinks().UsersUserImpersonate(map[string]string{"user_id": user.ID()}))
+					Href(links.Admin().UsersUserImpersonate(map[string]string{"user_id": user.ID()}))
 
 				return hb.TR().Children([]hb.TagInterface{
 					hb.TD().
@@ -351,7 +351,7 @@ func (controller *userManagerController) sortableColumnLabel(data userManagerCon
 		direction = "asc"
 	}
 
-	link := links.NewAdminLinks().UsersUserManager(map[string]string{
+	link := links.Admin().UsersUserManager(map[string]string{
 		"page":      "0",
 		"by":        columnName,
 		"sort":      direction,
@@ -388,7 +388,7 @@ func (controller *userManagerController) tableFilter(data userManagerControllerD
 		Style("margin-bottom: 2px; margin-left:2px; margin-right:2px;").
 		Child(hb.I().Class("bi bi-filter me-2")).
 		Text("Filters").
-		HxPost(links.NewAdminLinks().UsersUserManager(map[string]string{
+		HxPost(links.Admin().UsersUserManager(map[string]string{
 			"action":       ActionModalUserFilterShow,
 			"first_name":   data.formFirstName,
 			"last_name":    data.formLastName,
@@ -447,7 +447,7 @@ func (controller *userManagerController) tableFilter(data userManagerControllerD
 }
 
 func (controller *userManagerController) tablePagination(data userManagerControllerData, count int, page int, perPage int) hb.TagInterface {
-	url := links.NewAdminLinks().UsersUserManager(map[string]string{
+	url := links.Admin().UsersUserManager(map[string]string{
 		"status":       data.formStatus,
 		"first_name":   data.formFirstName,
 		"last_name":    data.formLastName,

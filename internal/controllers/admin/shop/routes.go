@@ -51,7 +51,7 @@ func ShopRoutes(app types.AppInterface) []rtr.RouteInterface {
 
 	shopCatchAll := rtr.NewRoute().
 		SetName("Admin > Shop > Catchall").
-		SetPath(links.ADMIN_USERS + links.CATCHALL).
+		SetPath(links.ADMIN_SHOP + links.CATCHALL).
 		SetHTMLHandler(handler)
 
 	return []rtr.RouteInterface{

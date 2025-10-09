@@ -41,7 +41,7 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	if r.Method == http.MethodPost && data.action == "update-details" {
@@ -67,7 +67,7 @@ func (controller *productUpdateController) page(data productUpdateControllerData
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(),
 		},
 		{
 			Name: "Shop",

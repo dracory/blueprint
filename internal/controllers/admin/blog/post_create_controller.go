@@ -52,7 +52,7 @@ func (controller *postCreateController) Handler(w http.ResponseWriter, r *http.R
 }
 
 func (controller *postCreateController) modal(data postCreateControllerData) hb.TagInterface {
-	submitUrl := links.NewAdminLinks().BlogPostCreate(map[string]string{})
+	submitUrl := links.Admin().BlogPostCreate()
 
 	formGroupTitle := bs.FormGroup().
 		Class("mb-3").

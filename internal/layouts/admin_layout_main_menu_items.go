@@ -9,10 +9,10 @@ import (
 )
 
 func adminLayoutMainMenu(user userstore.UserInterface) []dashboard.MenuItem {
-	websiteHomeLink := links.NewWebsiteLinks().Home()
-	dashboardLink := links.NewAdminLinks().Home(map[string]string{})
-	loginLink := links.NewAuthLinks().Login(dashboardLink)
-	logoutLink := links.NewAuthLinks().Logout()
+	websiteHomeLink := links.Website().Home()
+	dashboardLink := links.Admin().Home()
+	loginLink := links.Auth().Login(dashboardLink)
+	logoutLink := links.Auth().Logout()
 
 	homeMenuItem := dashboard.MenuItem{
 		Icon:  hb.I().Class("bi bi-house").Style("margin-right:10px;").ToHTML(),

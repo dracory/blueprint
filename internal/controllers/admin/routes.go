@@ -6,7 +6,7 @@ import (
 	adminFiles "project/internal/controllers/admin/files"
 	adminMedia "project/internal/controllers/admin/media"
 	adminShop "project/internal/controllers/admin/shop"
-	"project/internal/controllers/admin/stats"
+	adminStats "project/internal/controllers/admin/stats"
 	adminTasks "project/internal/controllers/admin/tasks"
 	adminUsers "project/internal/controllers/admin/users"
 	"project/internal/links"
@@ -34,7 +34,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	adminRoutes = append(adminRoutes, adminFiles.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminMedia.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(app)...)
-	adminRoutes = append(adminRoutes, stats.Routes(app)...)
+	adminRoutes = append(adminRoutes, adminStats.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminTasks.TaskRoutes(app)...)
 	adminRoutes = append(adminRoutes, adminUsers.UserRoutes(app)...)
 	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)

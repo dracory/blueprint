@@ -37,7 +37,7 @@ func (controller *managerController) Handler(w http.ResponseWriter, r *http.Requ
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
@@ -55,15 +55,15 @@ func (controller *managerController) page(data managerControllerData) hb.TagInte
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(map[string]string{}),
 		},
 		{
 			Name: "Blog",
-			URL:  links.NewAdminLinks().BlogPostManager(map[string]string{}),
+			URL:  links.Admin().BlogPostManager(map[string]string{}),
 		},
 		{
 			Name: "Post Manager",
-			URL:  links.NewAdminLinks().BlogPostManager(map[string]string{}),
+			URL:  links.Admin().BlogPostManager(map[string]string{}),
 		},
 	})
 
@@ -71,7 +71,7 @@ func (controller *managerController) page(data managerControllerData) hb.TagInte
 		Class("btn btn-primary float-end").
 		Child(hb.I().Class("bi bi-plus-circle").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("New Post").
-		HxGet(links.NewAdminLinks().BlogPostCreate(map[string]string{})).
+		HxGet(links.Admin().BlogPostCreate(map[string]string{})).
 		HxTarget("body").
 		HxSwap("beforeend")
 
@@ -183,14 +183,14 @@ func (controller *managerController) tablePosts(data managerControllerData) hb.T
 					Class("btn btn-primary me-2").
 					Child(hb.I().Class("bi bi-pencil-square")).
 					Title("Edit").
-					Href(links.NewAdminLinks().BlogPostUpdate(map[string]string{"post_id": blog.ID()})).
+					Href(links.Admin().BlogPostUpdate(map[string]string{"post_id": blog.ID()})).
 					Target("_blank")
 
 				buttonDelete := hb.Hyperlink().
 					Class("btn btn-danger").
 					Child(hb.I().Class("bi bi-trash")).
 					Title("Delete").
-					HxGet(links.NewAdminLinks().BlogPostDelete(map[string]string{"post_id": blog.ID()})).
+					HxGet(links.Admin().BlogPostDelete(map[string]string{"post_id": blog.ID()})).
 					HxTarget("body").
 					HxSwap("beforeend")
 
@@ -242,7 +242,7 @@ func (controller *managerController) sortableColumnLabel(data managerControllerD
 		direction = "asc"
 	}
 
-	link := links.NewAdminLinks().BlogPostManager(map[string]string{
+	link := links.Admin().BlogPostManager(map[string]string{
 		"page":        "0",
 		"by":          columnName,
 		"sort":        direction,
@@ -371,7 +371,7 @@ func (controller *managerController) tableFilter(data managerControllerData) hb.
 }
 
 func (controller *managerController) tablePagination(data managerControllerData, count int, page int, perPage int) hb.TagInterface {
-	url := links.NewAdminLinks().BlogPostManager(map[string]string{
+	url := links.Admin().BlogPostManager(map[string]string{
 		"search":    data.search,
 		"status":    data.status,
 		"date_from": data.dateFrom,

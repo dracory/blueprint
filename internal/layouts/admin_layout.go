@@ -52,14 +52,14 @@ func adminLayout(app types.AppInterface, r *http.Request, options Options) *dash
 	}
 	styles = append(styles, options.Styles...)
 
-	homeLink := links.NewAdminLinks().Home(map[string]string{})
+	homeLink := links.Admin().Home()
 
 	path := lo.IfF(r != nil, func() string {
 		return r.URL.Path
 	}).ElseF(func() string {
 		return ""
 	})
-	themeLink := links.NewWebsiteLinks().Theme(map[string]string{"redirect": path})
+	themeLink := links.Website().Theme(map[string]string{"redirect": path})
 
 	dashboard := dashboard.NewDashboard(dashboard.Config{
 		HTTPRequest:     r,

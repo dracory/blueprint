@@ -29,24 +29,24 @@ func (c *userImpersonateController) Handler(w http.ResponseWriter, r *http.Reque
 	authUser := helpers.GetAuthUser(r)
 
 	if authUser == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User not found", links.NewAdminLinks().Users(map[string]string{}), 15)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User not found", links.Admin().Users(), 15)
 	}
 
 	if !authUser.IsAdministrator() {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Not authorized", links.NewAdminLinks().Users(map[string]string{}), 15)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Not authorized", links.Admin().Users(), 15)
 	}
 
 	userID := req.GetStringTrimmed(r, "user_id")
 
 	if userID == "" {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User ID not found", links.NewAdminLinks().Users(map[string]string{}), 15)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User ID not found", links.Admin().Users(), 15)
 	}
 
 	err := Impersonate(c.app.GetSessionStore(), w, r, userID)
 
 	if err != nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.NewAdminLinks().Users(map[string]string{}), 15)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Users(), 15)
 	}
 
-	return helpers.ToFlashSuccess(c.app.GetCacheStore(), w, r, "Impersonation is successful", links.NewUserLinks().Home(map[string]string{}), 15)
+	return helpers.ToFlashSuccess(c.app.GetCacheStore(), w, r, "Impersonation is successful", links.User().Home(), 15)
 }

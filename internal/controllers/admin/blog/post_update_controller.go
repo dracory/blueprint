@@ -39,7 +39,7 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 	data, errorMessage := controller.prepareDataAndValidate(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.NewAdminLinks().BlogPostManager(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().BlogPostManager(), 10)
 	}
 
 	if data.action == ACTION_BLOCKEDITOR_HANDLE {
@@ -79,15 +79,15 @@ func (controller *postUpdateController) page(data postUpdateControllerData) hb.T
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.NewAdminLinks().Home(map[string]string{}),
+			URL:  links.Admin().Home(),
 		},
 		{
 			Name: "Post Manager",
-			URL:  links.NewAdminLinks().BlogPostManager(map[string]string{}),
+			URL:  links.Admin().BlogPostManager(),
 		},
 		{
 			Name: "Edit Post",
-			URL:  links.NewAdminLinks().BlogPostUpdate(map[string]string{"post_id": data.postID}),
+			URL:  links.Admin().BlogPostUpdate(map[string]string{"post_id": data.postID}),
 		},
 	})
 
@@ -96,14 +96,14 @@ func (controller *postUpdateController) page(data postUpdateControllerData) hb.T
 		Child(hb.I().Class("bi bi-save").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("Save").
 		HxInclude("#FormPostUpdate").
-		HxPost(links.NewAdminLinks().BlogPostUpdate(map[string]string{"postID": data.postID})).
+		HxPost(links.Admin().BlogPostUpdate(map[string]string{"postID": data.postID})).
 		HxTarget("#FormPostUpdate")
 
 	buttonCancel := hb.Hyperlink().
 		Class("btn btn-secondary ms-2 float-end").
 		Child(hb.I().Class("bi bi-chevron-left").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
 		HTML("Back").
-		Href(links.NewAdminLinks().BlogPostManager(map[string]string{}))
+		Href(links.Admin().BlogPostManager())
 
 	heading := hb.Heading1().
 		HTML("Edit Post").
@@ -133,7 +133,7 @@ func (controller *postUpdateController) page(data postUpdateControllerData) hb.T
 		Child(bs.NavItem().
 			Child(bs.NavLink().
 				ClassIf(data.view == VIEW_DETAILS, "active").
-				Href(links.NewAdminLinks().BlogPostUpdate(map[string]string{
+				Href(links.Admin().BlogPostUpdate(map[string]string{
 					"post_id": data.postID,
 					"view":    VIEW_DETAILS,
 				})).
@@ -141,7 +141,7 @@ func (controller *postUpdateController) page(data postUpdateControllerData) hb.T
 		Child(bs.NavItem().
 			Child(bs.NavLink().
 				ClassIf(data.view == VIEW_CONTENT, "active").
-				Href(links.NewAdminLinks().BlogPostUpdate(map[string]string{
+				Href(links.Admin().BlogPostUpdate(map[string]string{
 					"post_id": data.postID,
 					"view":    VIEW_CONTENT,
 				})).
@@ -149,7 +149,7 @@ func (controller *postUpdateController) page(data postUpdateControllerData) hb.T
 		Child(bs.NavItem().
 			Child(bs.NavLink().
 				ClassIf(data.view == VIEW_SEO, "active").
-				Href(links.NewAdminLinks().BlogPostUpdate(map[string]string{
+				Href(links.Admin().BlogPostUpdate(map[string]string{
 					"post_id": data.postID,
 					"view":    VIEW_SEO,
 				})).
@@ -345,7 +345,7 @@ func (controller *postUpdateController) form(data postUpdateControllerData) hb.T
 			// ID:    "blockeditor" + uid.HumanUid(),
 			Name:  fieldContent.Name,
 			Value: value,
-			HandleEndpoint: links.NewAdminLinks().BlogPostUpdate(map[string]string{
+			HandleEndpoint: links.Admin().BlogPostUpdate(map[string]string{
 				"post_id": data.postID,
 				"action":  ACTION_BLOCKEDITOR_HANDLE,
 			}),

@@ -208,7 +208,7 @@ func (discountController *discountController) AnyIndex(w http.ResponseWriter, r 
 		FuncTrash:           discountController.FuncTrash,
 		FuncUpdate:          discountController.FuncUpdate,
 		FuncLayout:          discountController.FuncLayout,
-		HomeURL:             links.NewAdminLinks().Home(map[string]string{}),
+		HomeURL:             links.Admin().Home(),
 	})
 
 	if err != nil {

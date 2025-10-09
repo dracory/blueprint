@@ -414,7 +414,7 @@ func (controller *FileManagerController) getMediaManager(r *http.Request) string
 }
 
 func (c *FileManagerController) modalFileUpload(currentDirectory string) string {
-	url := links.NewAdminLinks().FileManager(map[string]string{})
+	url := links.Admin().FileManager()
 	return `
 <!-- START: Modal Upload File -->
 <div class="modal fade" id="ModalUploadFile" role="dialog">
@@ -492,7 +492,7 @@ function fileUpload() {
 }
 
 func (c *FileManagerController) modalDirectoryCreate(currentDirectory string) string {
-	url := links.NewAdminLinks().FileManager(map[string]string{})
+	url := links.Admin().FileManager()
 	if currentDirectory == "" {
 		currentDirectory = "/"
 	}
@@ -549,7 +549,7 @@ func (c *FileManagerController) modalDirectoryCreate(currentDirectory string) st
 }
 
 func (c *FileManagerController) modalDirectoryDelete(currentDirectory string) string {
-	url := links.NewAdminLinks().FileManager(map[string]string{})
+	url := links.Admin().FileManager()
 	return `
 	<!-- START: Modal Directory Delete -->
 	<div class="modal fade" id="ModalDirectoryDelete" role="dialog">
@@ -614,7 +614,7 @@ func (c *FileManagerController) modalDirectoryDelete(currentDirectory string) st
 }
 
 func (c *FileManagerController) modalFileDelete(currentDirectory string) string {
-	url := links.NewAdminLinks().FileManager(map[string]string{})
+	url := links.Admin().FileManager()
 	return `
 	<!-- START: Modal File Delete -->
 	<div class="modal fade" id="ModalFileDelete" role="dialog">
@@ -678,7 +678,7 @@ func (c *FileManagerController) modalFileDelete(currentDirectory string) string 
 }
 
 func (c *FileManagerController) modalFileRename(currentDirectory string) string {
-	url := links.NewAdminLinks().FileManager(map[string]string{})
+	url := links.Admin().FileManager()
 	return `
 <!-- START: Modal File Rename -->
 <div class="modal fade" id="ModalFileRename" role="dialog">
@@ -787,7 +787,7 @@ func (c *FileManagerController) tableFileList(currentDirectory, parentDirectory 
 		hb.Tbody().
 			// Parent DIrectory
 			ChildIfF(currentDirectory != "", func() hb.TagInterface {
-				parentDirectoryURL := links.NewAdminLinks().FileManager(map[string]string{"current_dir": parentDirectory})
+				parentDirectoryURL := links.Admin().FileManager(map[string]string{"current_dir": parentDirectory})
 
 				return hb.TR().Children([]hb.TagInterface{
 					hb.TD().Children([]hb.TagInterface{
@@ -812,7 +812,7 @@ func (c *FileManagerController) tableFileList(currentDirectory, parentDirectory 
 						return nil
 					}
 					path := strings.TrimRight(dir.Path, "/")
-					pathURL := links.NewAdminLinks().FileManager(map[string]string{"current_dir": path})
+					pathURL := links.Admin().FileManager(map[string]string{"current_dir": path})
 					size := dir.SizeHuman
 
 					buttonDelete := hb.Button().Class("btn btn-danger btn-sm").OnClick(`modalDirectoryDeleteShow('` + name + `')`).Children([]hb.TagInterface{

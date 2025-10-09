@@ -53,7 +53,7 @@ func (controller *postDeleteController) Handler(w http.ResponseWriter, r *http.R
 }
 
 func (controller *postDeleteController) modal(data postDeleteControllerData) hb.TagInterface {
-	submitUrl := links.NewAdminLinks().BlogPostDelete(map[string]string{
+	submitUrl := links.Admin().BlogPostDelete(map[string]string{
 		"post_id": data.postID,
 	})
 

@@ -6,11 +6,6 @@ type adminLinks struct{}
 
 // Admin is a shortcut for NewAdminLinks
 func Admin() *adminLinks {
-	return NewAdminLinks()
-}
-
-// Deprecated: Use Admin() instead. NewAdminLinks will be removed in the next major version.
-func NewAdminLinks() *adminLinks {
 	return &adminLinks{}
 }
 

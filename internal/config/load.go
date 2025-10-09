@@ -100,6 +100,8 @@ func Load() (types.ConfigInterface, error) {
 	mailPort := env.GetString(KEY_MAIL_PORT)
 	mailUsername := env.GetString(KEY_MAIL_USERNAME)
 
+	registrationEnabled := env.GetBool(KEY_AUTH_REGISTRATION_ENABLED)
+
 	blogStoreUsed := env.GetBool(KEY_BLOG_STORE_USED)
 	cacheStoreUsed := env.GetBool(KEY_CACHE_STORE_USED)
 	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
@@ -251,6 +253,7 @@ func Load() (types.ConfigInterface, error) {
 	config.SetMailPassword(mailPassword)
 	config.SetMailFromAddress(mailFromAddress)
 	config.SetMailFromName(mailFromName)
+	config.SetRegistrationEnabled(registrationEnabled)
 
 	// Database configurations
 	config.SetDatabaseDriver(dbDriver)

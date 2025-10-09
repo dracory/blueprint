@@ -64,6 +64,11 @@ type emailConfigInterface interface {
 	GetMailFromName() string
 }
 
+type authConfigInterface interface {
+	SetRegistrationEnabled(bool)
+	GetRegistrationEnabled() bool
+}
+
 type llmConfigInterface interface {
 	// Anthropic
 	SetAnthropicApiUsed(bool)
@@ -241,9 +246,11 @@ type mediaConfigInterface interface {
 
 type ConfigInterface interface {
 	appConfigInterface
+	authConfigInterface
 	emailConfigInterface
 	databaseConfigInterface
 	envEncryptionConfigInterface
+	i18nConfigInterface
 	llmConfigInterface
 	mediaConfigInterface
 	paymentConfigInterface
@@ -266,7 +273,6 @@ type ConfigInterface interface {
 	taskStoreConfigInterface
 	userStoreConfigInterface
 	vaultStoreConfigInterface
-	i18nConfigInterface
 }
 
 var _ ConfigInterface = (*Config)(nil)
@@ -358,6 +364,9 @@ type Config struct {
 	stripeKeyPrivate string
 	stripeKeyPublic  string
 	stripeUsed       bool
+
+	// Authentication
+	registrationEnabled bool
 
 	// Media configuration
 	mediaBucket   string
@@ -884,6 +893,14 @@ func (c *Config) SetStripeUsed(v bool) {
 	c.stripeUsed = v
 }
 func (c *Config) GetStripeUsed() bool { return c.stripeUsed }
+
+func (c *Config) SetRegistrationEnabled(v bool) {
+	c.registrationEnabled = v
+}
+
+func (c *Config) GetRegistrationEnabled() bool {
+	return c.registrationEnabled
+}
 
 // == Vault Store Getters/Setters ==
 func (c *Config) SetVaultStoreUsed(v bool) {
