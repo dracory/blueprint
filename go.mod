@@ -99,16 +99,17 @@ require (
 	github.com/go-openapi/strfmt v0.23.0 // indirect
 	github.com/goravel/framework v1.16.3 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
-	github.com/dracory/bs v0.13.0 // indirect
-	github.com/dracory/cdn v1.6.0 // indirect
+	github.com/gouniverse/bs v0.13.0 // indirect
+	github.com/gouniverse/cdn v1.6.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/envenc v0.10.0 // indirect
-	github.com/dracory/hb v1.87.0 // indirect
+	github.com/gouniverse/hb v1.87.0 // indirect
 	github.com/gouniverse/icons v1.3.1 // indirect
 	github.com/gouniverse/router v1.4.2 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/sqlfilestore v0.2.0 // indirect
 	github.com/gouniverse/strutils v0.7.0 // indirect
+	github.com/gouniverse/uid v1.5.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
 	github.com/gouniverse/utils v1.45.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
@@ -150,7 +151,6 @@ require (
 	github.com/gouniverse/dataobject v1.3.0 // indirect
 	github.com/gouniverse/maputils v0.7.0
 	github.com/gouniverse/sb v0.9.0 // indirect
-	github.com/dracory/uid v1.5.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
