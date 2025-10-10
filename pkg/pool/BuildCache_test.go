@@ -6,7 +6,7 @@ package pool
 // 	"testing"
 
 // 	"github.com/gouniverse/cms"
-// 	"github.com/gouniverse/entitystore"
+// 	"github.com/dracory/entitystore"
 // )
 
 // func TestBuildCacheBlocks(t *testing.T) {

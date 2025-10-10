@@ -9,7 +9,7 @@ package admin
 // 	"project/models"
 
 // 	"github.com/gouniverse/api"
-// 	"github.com/gouniverse/crud"
+// 	"github.com/dracory/crud"
 // )
 
 // func NewFaqController() *faqController {

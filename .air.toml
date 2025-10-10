@@ -15,7 +15,7 @@ full_bin = "./tmp/main.exe"
 # Watch these filename extensions.
 include_ext = ["go", "html", "css", "js"]
 # Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "vendor", "bin"]
+exclude_dir = ["assets", "tmp", "vendor", "bin", ".git"]
 # Watch these directories if you specified.
 include_dir = []
 # Exclude files.
