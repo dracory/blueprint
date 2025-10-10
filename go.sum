@@ -192,8 +192,8 @@ github.com/gouniverse/base v0.9.0 h1:GQkHSLlkqzYUuFPbiUCw45Jz1XYHe+LmyO0kNYoMnWE
 github.com/gouniverse/base v0.9.0/go.mod h1:LWHTmmyaOdnNg5FGKBM7tdrEqUIhLMfQU3N1prBhdSQ=
 github.com/gouniverse/bs v0.13.0 h1:+YEybVDZo4tPs6L+9cabuwAdVblL4+1Y14CNEarYSNA=
 github.com/gouniverse/bs v0.13.0/go.mod h1:pwmAi5bTLhl9zxxQw41C51Q1/LeMnEewFBoJ2qkq9V8=
-github.com/gouniverse/cdn v1.6.0 h1:vRNVTydAgjln8QpdMdJqgLu+XdybtkDPGbx+K1Barjs=
-github.com/gouniverse/cdn v1.6.0/go.mod h1:sVnmFvpaG04winyiB2zgpfsXU0FUtIu5e2nDoO6kqVM=
+github.com/dracory/cdn v1.6.0 h1:vRNVTydAgjln8QpdMdJqgLu+XdybtkDPGbx+K1Barjs=
+github.com/dracory/cdn v1.6.0/go.mod h1:sVnmFvpaG04winyiB2zgpfsXU0FUtIu5e2nDoO6kqVM=
 github.com/gouniverse/crypto v0.2.0 h1:7ppqn9FrwrlC6nTfgVBnEop5cKBFNEZyP5yXoUH7MZ0=
 github.com/gouniverse/crypto v0.2.0/go.mod h1:uWfzSf1dsYyij6yrVTdxuLFfLZIvSJu24+x3sj+DLXU=
 github.com/gouniverse/csrf v0.1.0 h1:Snlx5iuuSzJnMXRBmTZEFxX88ocQ3de2a2+zsLiDiuM=
@@ -206,8 +206,8 @@ github.com/gouniverse/envenc v0.10.0 h1:vgVuERUPRgX9wVMU5vLrEuu9uoREjEwv0CijjZB/
 github.com/gouniverse/envenc v0.10.0/go.mod h1:AlSuOmGyjJBrHoDUggHO2Cxv1iJWuBLXaq4lb0xdu1Q=
 github.com/gouniverse/filesystem v0.3.1 h1:RfWzaTIMDyM7xVQdKUhzj1sKTAUP8I6H7ogExYrLWyI=
 github.com/gouniverse/filesystem v0.3.1/go.mod h1:YDny3M0T1BcUAeoROzFfrNs85qyKooKRFzDX/zvU8BM=
-github.com/gouniverse/hb v1.87.0 h1:x6Hd66mrVnbxZHCgWYfi8+FtUblKP4oee2YINAusaKw=
-github.com/gouniverse/hb v1.87.0/go.mod h1:VkHqNfFBFHWyd0vSxKqfGrMXmSoPpGyN4OBLHWi/ymw=
+github.com/dracory/hb v1.87.0 h1:x6Hd66mrVnbxZHCgWYfi8+FtUblKP4oee2YINAusaKw=
+github.com/dracory/hb v1.87.0/go.mod h1:VkHqNfFBFHWyd0vSxKqfGrMXmSoPpGyN4OBLHWi/ymw=
 github.com/gouniverse/icons v1.3.1 h1:CCiBmWRkUcREX1nSvW9lJD6IjII3m6LZJkKd3y/PhdI=
 github.com/gouniverse/icons v1.3.1/go.mod h1:VR4mbFpJyWeFmoNAicVAyBJ2LsxOyB04e+DxnqY4cCU=
 github.com/gouniverse/maputils v0.7.0 h1:qoJnY8tY5gkdyuIkwGHJYwH7It7LnCevxU+P+c4nU/Y=

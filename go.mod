@@ -100,10 +100,10 @@ require (
 	github.com/goravel/framework v1.16.3 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
 	github.com/gouniverse/bs v0.13.0 // indirect
-	github.com/gouniverse/cdn v1.6.0 // indirect
+	github.com/dracory/cdn v1.6.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/envenc v0.10.0 // indirect
-	github.com/gouniverse/hb v1.87.0 // indirect
+	github.com/dracory/hb v1.87.0 // indirect
 	github.com/gouniverse/icons v1.3.1 // indirect
 	github.com/gouniverse/router v1.4.2 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
