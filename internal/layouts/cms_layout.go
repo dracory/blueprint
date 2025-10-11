@@ -55,7 +55,7 @@ func (layout *cmsLayout) ToHTML() string {
 		return "Cms store is not initialized"
 	}
 
-	list := widgets.WidgetRegistry(layout.app.GetConfig())
+	list := widgets.WidgetRegistry(layout.app)
 
 	shortcodes := []cmsstore.ShortcodeInterface{}
 	for _, widget := range list {
