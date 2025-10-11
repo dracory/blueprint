@@ -16,8 +16,10 @@ import (
 type setupOptions struct {
 	WithBlogStore    bool
 	WithCacheStore   bool
+	WithGeoStore     bool
 	WithLogStore     bool
 	WithSessionStore bool
+	WithShopStore    bool
 	WithUserStore    bool
 	WithVaultStore   bool
 
@@ -48,6 +50,13 @@ func WithCacheStore(enable bool) SetupOption {
 	}
 }
 
+// WithGeoStore enables the geo store during test setup
+func WithGeoStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithGeoStore = enable
+	}
+}
+
 // WithLogStore enables the log store during test setup
 func WithLogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
@@ -59,6 +68,13 @@ func WithLogStore(enable bool) SetupOption {
 func WithSessionStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithSessionStore = enable
+	}
+}
+
+// WithShopStore enables the shop store during test setup
+func WithShopStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithShopStore = enable
 	}
 }
 
@@ -122,12 +138,20 @@ func Setup(options ...SetupOption) types.AppInterface {
 			opts.cfg.SetCacheStoreUsed(true)
 		}
 
+		if opts.WithGeoStore {
+			opts.cfg.SetGeoStoreUsed(true)
+		}
+
 		if opts.WithLogStore {
 			opts.cfg.SetLogStoreUsed(true)
 		}
 
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)
+		}
+
+		if opts.WithShopStore {
+			opts.cfg.SetShopStoreUsed(true)
 		}
 
 		if opts.WithUserStore {
@@ -146,8 +170,14 @@ func Setup(options ...SetupOption) types.AppInterface {
 		if opts.WithCacheStore {
 			opts.cfg.SetCacheStoreUsed(true)
 		}
+		if opts.WithGeoStore {
+			opts.cfg.SetGeoStoreUsed(true)
+		}
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)
+		}
+		if opts.WithShopStore {
+			opts.cfg.SetShopStoreUsed(true)
 		}
 		if opts.WithUserStore {
 			opts.cfg.SetUserStoreUsed(true)
