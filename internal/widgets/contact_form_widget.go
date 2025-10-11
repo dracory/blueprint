@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"net/http"
+	"project/internal/types"
 
 	"github.com/dracory/hb"
 )
@@ -13,7 +14,7 @@ import (
 //
 // Returns:
 //   - *contactForm - A pointer to the contactForm shrtcode
-func NewContactFormWidget() *contactFormWidget {
+func NewContactFormWidget(app types.AppInterface) *contactFormWidget {
 	return &contactFormWidget{}
 }
 
@@ -22,7 +23,9 @@ var _ Widget = (*contactFormWidget)(nil) // verify it extends the interface
 // contactForm is the struct that will be used to render the contactForm shortcode.
 //
 // This shortcode is used to send a contact message from the website.
-type contactFormWidget struct{}
+type contactFormWidget struct {
+	app types.AppInterface
+}
 
 // Alias the shortcode alias to be used in the template.
 func (widget *contactFormWidget) Alias() string {

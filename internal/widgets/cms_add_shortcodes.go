@@ -30,7 +30,7 @@ func CmsAddShortcodes(app types.AppInterface) {
 
 	shortcodes := []cmsstore.ShortcodeInterface{}
 
-	list := WidgetRegistry(app.GetConfig())
+	list := WidgetRegistry(app)
 
 	for _, widget := range list {
 		shortcodes = append(shortcodes, widget)

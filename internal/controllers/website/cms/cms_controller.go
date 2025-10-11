@@ -43,7 +43,7 @@ var once sync.Once
 
 func GetInstance(app types.AppInterface) cmsFrontend.FrontendInterface {
 	once.Do(func() {
-		list := widgets.WidgetRegistry(app.GetConfig())
+		list := widgets.WidgetRegistry(app)
 
 		shortcodes := []cmsstore.ShortcodeInterface{}
 		for _, widget := range list {

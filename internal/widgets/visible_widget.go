@@ -21,9 +21,9 @@ var _ Widget = (*visibleWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget
-func NewVisibleWidget(cfg types.ConfigInterface) *visibleWidget {
+func NewVisibleWidget(app types.AppInterface) *visibleWidget {
 	return &visibleWidget{
-		cfg: cfg,
+		app: app,
 	}
 }
 
@@ -40,7 +40,7 @@ func NewVisibleWidget(cfg types.ConfigInterface) *visibleWidget {
 // <x-visible environment="staging" auth="no">content</x-visible>
 // <x-visible environment="local" auth="yes">content</x-visible>
 type visibleWidget struct {
-	cfg types.ConfigInterface
+	app types.AppInterface
 }
 
 // == PUBLIC METHODS =========================================================
@@ -158,23 +158,23 @@ func (t *visibleWidget) isEnvironmentMatch(environment string) bool {
 		return false
 	}
 
-	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && t.cfg.IsEnvDevelopment() {
+	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && t.app.GetConfig().IsEnvDevelopment() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_LOCAL && t.cfg.IsEnvLocal() {
+	if environment == config.APP_ENVIRONMENT_LOCAL && t.app.GetConfig().IsEnvLocal() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_PRODUCTION && t.cfg.IsEnvProduction() {
+	if environment == config.APP_ENVIRONMENT_PRODUCTION && t.app.GetConfig().IsEnvProduction() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_STAGING && t.cfg.IsEnvStaging() {
+	if environment == config.APP_ENVIRONMENT_STAGING && t.app.GetConfig().IsEnvStaging() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_TESTING && t.cfg.IsEnvTesting() {
+	if environment == config.APP_ENVIRONMENT_TESTING && t.app.GetConfig().IsEnvTesting() {
 		return true
 	}
 

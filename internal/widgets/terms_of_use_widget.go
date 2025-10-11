@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"net/http"
+	"project/internal/types"
 
 	"github.com/dracory/base/bbcode"
 )
@@ -224,12 +225,16 @@ var termsOfUse = `
 [/paragraph]
 `
 
-type termsOfUseWidget struct{}
+type termsOfUseWidget struct {
+	app types.AppInterface
+}
 
 var _ Widget = (*termsOfUseWidget)(nil)
 
-func NewTermsOfUseWidget() *termsOfUseWidget {
-	return &termsOfUseWidget{}
+func NewTermsOfUseWidget(app types.AppInterface) *termsOfUseWidget {
+	return &termsOfUseWidget{
+		app: app,
+	}
 }
 
 func (w *termsOfUseWidget) Alias() string {

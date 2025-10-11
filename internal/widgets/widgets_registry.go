@@ -11,12 +11,12 @@ import "project/internal/types"
 //
 // Returns:
 //   - []Widget - A list of all widgets
-func WidgetRegistry(cfg types.ConfigInterface) []Widget {
+func WidgetRegistry(app types.AppInterface) []Widget {
 	return []Widget{
-		NewAuthenticatedWidget(),
-		NewContactFormWidget(),
-		NewTermsOfUseWidget(),
-		NewUnauthenticatedWidget(),
-		NewVisibleWidget(cfg),
+		NewAuthenticatedWidget(app),
+		NewContactFormWidget(app),
+		NewTermsOfUseWidget(app),
+		NewUnauthenticatedWidget(app),
+		NewVisibleWidget(app),
 	}
 }

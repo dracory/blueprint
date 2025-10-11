@@ -29,7 +29,7 @@ func (controller *widgetController) Handler(w http.ResponseWriter, r *http.Reque
 		return "Widget type not specified"
 	}
 
-	widgetList := widgets.WidgetRegistry(controller.app.GetConfig())
+	widgetList := widgets.WidgetRegistry(controller.app)
 
 	for _, widget := range widgetList {
 		if widget.Alias() == alias {
