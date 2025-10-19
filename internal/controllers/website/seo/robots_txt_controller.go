@@ -28,6 +28,9 @@ Allow: /about
 Allow: /blog
 Allow: /blog/post/*
 Allow: /blog/post/*/*
+Allow: /contact
+Allow: /faq
+Allow: /marketplace
 Allow: /privacy-policy
 Allow: /terms-of-use
 
@@ -35,6 +38,7 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
 Disallow: /f/
+Disallow: /form-makeawish-ajax
 Disallow: /c/
 Disallow: /certificate/
 Disallow: /files/
