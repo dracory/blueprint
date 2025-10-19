@@ -302,6 +302,9 @@ func TestFormUserUpdate_HandleApplySuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
+	if updatedUser == nil {
+		t.Fatal("UserFindByID returned nil user")
+	}
 
 	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
@@ -382,6 +385,9 @@ func TestFormUserUpdate_HandleSaveRedirect(t *testing.T) {
 	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
+	}
+	if updatedUser == nil {
+		t.Fatal("UserFindByID returned nil user")
 	}
 
 	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
