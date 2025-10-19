@@ -17,7 +17,7 @@ import (
 	"github.com/dracory/req"
 	"github.com/gouniverse/filesystem"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 
 	"github.com/dracory/api"
 	"github.com/dracory/cdn"
@@ -145,14 +145,22 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 	if err != nil {
 		return api.Error(err.Error()).ToString()
 	}
-	defer file.Close() // Cleanup
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Warning: failed to close uploaded file: %v", err)
+		}
+	}()
 
 	filePath, errSave := files.SaveToTempDir(fileHeader.Filename, file)
 	if errSave != nil {
 		log.Println(errSave.Error())
 		return api.Error(errSave.Error()).ToString()
 	}
-	defer os.Remove(filePath) // Cleanup
+	defer func() {
+		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+			log.Printf("Warning: failed to remove temp file %s: %v", filePath, err)
+		}
+	}()
 
 	remoteFilePath := currentDir + "/" + fileHeader.Filename
 

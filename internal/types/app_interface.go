@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"log/slog"
 
+	"github.com/dracory/subscriptionstore"
+
+	"github.com/dracory/auditstore"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cachestore"
@@ -54,6 +57,10 @@ type AppInterface interface {
 	// ========================================================================
 	// == Stores (all specific data stores)
 	// ========================================================================
+
+	// Audit store
+	GetAuditStore() auditstore.StoreInterface
+	SetAuditStore(s auditstore.StoreInterface)
 
 	// Blog store
 	GetBlogStore() blogstore.StoreInterface
@@ -122,6 +129,10 @@ type AppInterface interface {
 	// Stats store
 	GetStatsStore() statsstore.StoreInterface
 	SetStatsStore(s statsstore.StoreInterface)
+
+	// Subscription store
+	GetSubscriptionStore() subscriptionstore.StoreInterface
+	SetSubscriptionStore(s subscriptionstore.StoreInterface)
 
 	// Task store
 	GetTaskStore() taskstore.StoreInterface

@@ -45,9 +45,9 @@ func (layout *cmsLayout) ToHTML() string {
 	if layout.app.GetConfig() == nil {
 		return "Config is not initialized"
 	}
-	// if !layout.app.GetConfig().GetCmsStoreUsed() {
-	// 	return "Cms store is not used"
-	// }
+	if !layout.app.GetConfig().GetCmsStoreUsed() {
+		return "Cms store is not used"
+	}
 	// if layout.app.GetConfig().GetCmsStoreTemplateID() == "" {
 	// 	return "Cms store template is not set"
 	// }

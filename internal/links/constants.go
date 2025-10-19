@@ -60,14 +60,14 @@ const CHAT_HOME = "/chat"
 // ===========================================================================
 
 const HOME = "/"
-const BLOG = "/blog"
-const BLOG_POST = "/blog/post"
+const BLOG = HOME + "blog"
+const BLOG_POST = BLOG + "/post"
 const BLOG_POST_WITH_REGEX = BLOG_POST + "/{id:[0-9]+}"
 const BLOG_POST_WITH_REGEX2 = BLOG_POST + "/{id:[0-9]+}/{title}"
-const CONTACT = "/contact"
-const FILES = "/files" + CATCHALL
-const FLASH = "/flash"
-const MEDIA = "/media" + CATCHALL
+const CONTACT = HOME + "contact"
+const FILES = HOME + "files" + CATCHALL
+const FLASH = HOME + "flash"
+const MEDIA = HOME + "media" + CATCHALL
 const PAYPAL_CANCEL = "/paypal/cancel"
 const PAYPAL_NOTIFY = "/paypal/notify"
 const PAYPAL_SUCCESS = "/paypal/success"
@@ -80,6 +80,6 @@ const SHOP_PRODUCT = SHOP + "/product"
 const SHOP_PRODUCT_WITH_REGEX = SHOP_PRODUCT + "/{id:[0-9]+}"
 const SHOP_PRODUCT_WITH_REGEX2 = SHOP_PRODUCT + "/{id:[0-9]+}/{title}"
 
-const THEME = "/theme"
-const THUMB = "/th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*"
-const WIDGET = "/widget"
+const THEME = HOME + "theme"
+const THUMB = HOME + "th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*"
+const WIDGET = HOME + "widget"

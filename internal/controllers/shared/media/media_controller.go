@@ -64,7 +64,9 @@ func (c *mediaController) Handler(w http.ResponseWriter, r *http.Request) string
 		w.Header().Set("Content-Length", cast.ToString(len(content)))
 	}
 
-	w.Write(content)
+	if _, err := w.Write(content); err != nil {
+		return "Failed to write media content: " + err.Error()
+	}
 
 	return ""
 }

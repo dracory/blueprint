@@ -63,7 +63,10 @@ func main() {
 		if len(os.Args) < 2 {
 			return
 		}
-		cli.ExecuteCliCommand(application, os.Args[1:]) // Execute the command
+		if err := cli.ExecuteCliCommand(application, os.Args[1:]); err != nil {
+			slog.Error("Failed to execute CLI command", "error", err)
+			os.Exit(1)
+		}
 		return
 	}
 
@@ -124,10 +127,18 @@ func startBackgroundProcesses(app types.AppInterface) {
 			go ts.QueueRunGoroutine(10, 2) // Initialize the task queue
 		}
 		if cs := app.GetCacheStore(); cs != nil {
-			go cs.ExpireCacheGoroutine() // Initialize the cache expiration goroutine
+			go func() {
+				if err := cs.ExpireCacheGoroutine(); err != nil {
+					slog.Error("Cache expiration goroutine failed", "error", err)
+				}
+			}()
 		}
 		if ss := app.GetSessionStore(); ss != nil {
-			go ss.SessionExpiryGoroutine() // Initialize the session expiration goroutine
+			go func() {
+				if err := ss.SessionExpiryGoroutine(); err != nil {
+					slog.Error("Session expiry goroutine failed", "error", err)
+				}
+			}()
 		}
 	}
 

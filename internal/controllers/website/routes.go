@@ -65,25 +65,11 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetHandler(swagger.SwaggerYAMLController).
 		SetMethod(http.MethodGet)
 
-	// paymentSuccess := &router.Route{
-	// 	Name:        "Website > Payment Success Controller",
-	// 	Path:        links.PAYMENT_SUCCESS,
-	// 	HTMLHandler: payment.NewPaymentSuccessController().Handler,
-	// }
-
-	// paymentCancel := &router.Route{
-	// 	Name:        "Website > Payment Cancel Controller",
-	// 	Path:        links.PAYMENT_CANCELED,
-	// 	HTMLHandler: payment.NewPaymentCanceledController().Handler,
-	// }
-
 	// These are custom routes for the website, that cannot be served by the CMS
 	websiteRoutes := []rtr.RouteInterface{
 		faviconRoute,
 		contactRoute,
 		contactSubmitRoute,
-		// paymentSuccess,
-		// paymentCancel,
 	}
 
 	// Aggregated sub-routes (migrated ones only)
@@ -108,35 +94,3 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 
 	return websiteRoutes
 }
-
-// func paymentRoutes() []router.RouteInterface {
-// 	paymentRoutes := []router.RouteInterface{
-// 		&router.Route{
-// 			Name:        "Website > Payment Canceled Controller > Handle",
-// 			Path:        links.PAYMENT_CANCELED,
-// 			HTMLHandler: website.NewPaymentCanceledController().Handle,
-// 		},
-// 		&router.Route{
-// 			Name:        "Website > Payment Success Controller > Handle",
-// 			Path:        links.PAYMENT_SUCCESS,
-// 			HTMLHandler: website.NewPaymentSuccessController().Handle,
-// 		},
-// 		&router.Route{
-// 			Name:        "Guest > Paypal Success Controller > Index",
-// 			Path:        links.PAYPAL_SUCCESS,
-// 			HTMLHandler: paypalControllers.NewPaypalSuccessController().AnyIndex,
-// 		},
-// 		&router.Route{
-// 			Name:        "Guest > Paypal Cancel Controller > Index",
-// 			Path:        links.PAYPAL_CANCEL,
-// 			HTMLHandler: paypalControllers.NewPaypalCancelController().AnyIndex,
-// 		},
-// 		&router.Route{
-// 			Name:        "Guest > Paypal Notify Controller > Index",
-// 			Path:        links.PAYPAL_NOTIFY,
-// 			HTMLHandler: paypalControllers.NewPaypalNotifyController().AnyIndex,
-// 		},
-// 	}
-
-// 	return paymentRoutes
-// }

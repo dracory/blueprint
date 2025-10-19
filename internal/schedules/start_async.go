@@ -2,7 +2,7 @@ package schedules
 
 import (
 	taskStats "project/internal/tasks/stats"
-	
+
 	"project/internal/tasks"
 	"project/internal/types"
 	"time"
@@ -57,7 +57,13 @@ func StartAsync(app types.AppInterface) {
 
 	// Schedule Building the Stats Every 2 Minutes
 	scheduler.Every(2).Minutes().Do(func() { scheduleStatsVisitorEnhanceTask(app) })
-	scheduler.Every(20).Minutes().Do(func() { scheduleCleanUpTask(app) })
+
+	// Clean up every 20 minutes
+	if _, err := scheduler.Every(20).Minutes().Do(func() {
+		scheduleCleanUpTask(app)
+	}); err != nil {
+		cfmt.Errorln("Error scheduling clean up task:", err.Error())
+	}
 
 	scheduler.StartAsync()
 }

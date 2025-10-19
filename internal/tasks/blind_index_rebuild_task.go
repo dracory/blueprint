@@ -3,15 +3,22 @@ package tasks
 import (
 	"context"
 	"errors"
+	"log"
 	"project/internal/helpers"
 	"project/internal/types"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/taskstore"
 	"github.com/dracory/userstore"
 )
+
+const BlindIndexAll = "all"
+const BlindIndexEmail = "email"
+const BlindIndexFirstName = "first_name"
+const BlindIndexLastName = "last_name"
 
 // ============================================================================
 // blindIndexRebuildTask
@@ -48,7 +55,7 @@ var _ taskstore.TaskHandlerInterface = (*blindIndexRebuildTask)(nil) // verify i
 func NewBlindIndexRebuildTask(app types.AppInterface) *blindIndexRebuildTask {
 	return &blindIndexRebuildTask{
 		app:            app,
-		allowedIndexes: []string{"all", "email", "first_name", "last_name"},
+		allowedIndexes: []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName},
 	}
 }
 
@@ -85,9 +92,9 @@ func (task *blindIndexRebuildTask) Handle() bool {
 		return false
 	}
 
-	rebuilEmailIndex := task.index == "all" || task.index == "email"
-	rebuildFirstNameIndex := task.index == "all" || task.index == "first_name"
-	rebuildLastNameIndex := task.index == "all" || task.index == "last_name"
+	rebuilEmailIndex := task.index == BlindIndexAll || task.index == BlindIndexEmail
+	rebuildFirstNameIndex := task.index == BlindIndexAll || task.index == BlindIndexFirstName
+	rebuildLastNameIndex := task.index == BlindIndexAll || task.index == BlindIndexLastName
 
 	if task.checkAndEnqueueTask() {
 		return true
@@ -148,8 +155,7 @@ func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 	task.LogInfo(" - Rebuilding index...")
 	for _, user := range users {
 		if !task.insertEmailForUser(ctx, user) {
-			task.LogError("- Failed to insert email for user: " + user.ID() + ". Aborted.")
-			return false
+			task.LogError("- Failed to insert email for user: " + user.ID() + ". Skipped.")
 		}
 	}
 
@@ -180,7 +186,11 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 	}
 
 	task.LogInfo(" - Fetching users list")
+	// task.app.GetUserStore().EnableDebug(true)
 	users, err := task.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
+
+	task.LogInfo(" - Found " + strconv.Itoa(len(users)) + " users")
+	log.Println(users)
 
 	if err != nil {
 		task.LogError("Error retrieving users: " + err.Error())
@@ -190,8 +200,7 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 	task.LogInfo(" - Rebuilding index")
 	for _, user := range users {
 		if !task.insertFirstNameForUser(ctx, user) {
-			task.LogError("- Failed to insert first name for user: " + user.ID() + ". Aborted.")
-			return false
+			task.LogError("- Failed to insert first name for user: " + user.ID() + ". Skipped.")
 		}
 	}
 
@@ -232,8 +241,7 @@ func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) boo
 	task.LogInfo(" - Rebuilding index")
 	for _, user := range users {
 		if !task.insertLastNameForUser(ctx, user) {
-			task.LogError("- Failed to insert last name for user: " + user.ID() + ". Aborted.")
-			return false
+			task.LogError("- Failed to insert last name for user: " + user.ID() + ". Skipped.")
 		}
 	}
 

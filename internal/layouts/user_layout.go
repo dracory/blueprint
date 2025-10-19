@@ -6,7 +6,6 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/dracory/cdn"
 	"github.com/dracory/cmsstore"
 	"github.com/gouniverse/dashboard"
 	"github.com/samber/lo"
@@ -29,11 +28,16 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 
 	dashboardUser := dashboard.User{}
 	if authUser != nil {
-		firstName, lastName, err := getUserData(app, r, authUser, app.GetConfig().GetVaultStoreKey())
+		firstName, lastName, err := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
 		if err == nil {
 			dashboardUser = dashboard.User{
 				FirstName: firstName,
 				LastName:  lastName,
+			}
+		} else {
+			dashboardUser = dashboard.User{
+				FirstName: "n/a",
+				LastName:  "",
 			}
 		}
 	}
@@ -46,7 +50,7 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 	// Prepare script URLs
 	scriptURLs := []string{} // prepend any if required
 	scriptURLs = append(scriptURLs, options.ScriptURLs...)
-	scriptURLs = append(scriptURLs, cdn.Htmx_2_0_0())
+	scriptURLs = lo.Uniq(scriptURLs)
 
 	// Prepare scripts
 	scripts := []string{} // prepend any if required
@@ -60,7 +64,11 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 
 	homeLink := links.User().Home()
 
-	titlePostfix := ` | ` + lo.Ternary(authUser == nil, `Guest`, `User`) + ` | ` + app.GetConfig().GetAppName()
+	titlePostfix := ` | ` + lo.Ternary(authUser == nil, `Guest`, `User`)
+
+	if app.GetConfig().GetAppName() != "" {
+		titlePostfix += ` | ` + app.GetConfig().GetAppName()
+	}
 
 	_, isPage := r.Context().Value("page").(cmsstore.PageInterface)
 

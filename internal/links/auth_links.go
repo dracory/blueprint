@@ -11,7 +11,7 @@ func Auth() *authLinks {
 }
 
 func (l *authLinks) Auth(params ...map[string]string) string {
-	p := lo.IfF(len(params) > 0, func() map[string]string { return params[0] }).Else(map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(AUTH_AUTH, p)
 }
 
@@ -24,7 +24,7 @@ func (l *authLinks) AuthKnightLogin(backUrl string) string {
 }
 
 func (l *authLinks) Login(backUrl string, params ...map[string]string) string {
-	p := lo.IfF(len(params) > 0, func() map[string]string { return params[0] }).Else(map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 
 	if backUrl != "" {
 		p["back_url"] = backUrl
@@ -34,11 +34,11 @@ func (l *authLinks) Login(backUrl string, params ...map[string]string) string {
 }
 
 func (l *authLinks) Logout(params ...map[string]string) string {
-	p := lo.IfF(len(params) > 0, func() map[string]string { return params[0] }).Else(map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(AUTH_LOGOUT, p)
 }
 
 func (l *authLinks) Register(params ...map[string]string) string {
-	p := lo.IfF(len(params) > 0, func() map[string]string { return params[0] }).Else(map[string]string{})
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(AUTH_REGISTER, p)
 }

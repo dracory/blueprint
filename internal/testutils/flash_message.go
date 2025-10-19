@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"errors"
 	"net/http"
 	"project/internal/types"
 
@@ -10,6 +11,10 @@ import (
 )
 
 func FlashMessageFind(cacheStore cachestore.StoreInterface, messageID string) (msg *types.FlashMessage, err error) {
+	if cacheStore == nil {
+		return msg, errors.New("flash message find: cache store is nil")
+	}
+
 	msgData, err := cacheStore.GetJSON(messageID+"_flash_message", "")
 	if err != nil {
 		return msg, err

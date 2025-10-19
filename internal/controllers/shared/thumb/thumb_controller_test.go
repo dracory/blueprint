@@ -40,9 +40,15 @@ func servePrepareData(method, target string) (data thumbnailControllerData, errM
 		// parse ints and bools
 		var w, h, q int
 		var isURLStr, isCacheStr string
-		fmt.Sscanf(parts[2], "%d", &w)
-		fmt.Sscanf(parts[3], "%d", &h)
-		fmt.Sscanf(parts[4], "%d", &q)
+		if _, err := fmt.Sscanf(parts[2], "%d", &w); err != nil {
+			errMsg = fmt.Sprintf("failed to parse width: %v", err)
+		}
+		if _, err := fmt.Sscanf(parts[3], "%d", &h); err != nil {
+			errMsg = fmt.Sprintf("failed to parse height: %v", err)
+		}
+		if _, err := fmt.Sscanf(parts[4], "%d", &q); err != nil {
+			errMsg = fmt.Sprintf("failed to parse quality: %v", err)
+		}
 		data.width = int64(w)
 		data.height = int64(h)
 		data.quality = int64(q)
@@ -125,7 +131,12 @@ func TestPrepareDataFilesLink(t *testing.T) {
     t.Skip("requires catch-all path; skipped while route uses :path")
     // Ensure APP_ENV=testing so links.RootURL() returns empty string (see links.RootURL)
     oldEnv := os.Getenv("APP_ENV")
-    _ = os.Setenv("APP_ENV", "testing")
-    defer os.Setenv("APP_ENV", oldEnv)
-    _ = oldEnv
+    if err := os.Setenv("APP_ENV", "testing"); err != nil {
+        t.Fatalf("failed to set APP_ENV: %v", err)
+    }
+    t.Cleanup(func() {
+        if err := os.Setenv("APP_ENV", oldEnv); err != nil {
+            t.Logf("warning: failed to restore APP_ENV: %v", err)
+        }
+    })
 }

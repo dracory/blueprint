@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"project/internal/types"
 
+	"github.com/dracory/base/cfmt"
 	"github.com/dracory/cmsstore"
-	"github.com/mingrammer/cfmt"
 )
 
 func CmsAddMiddlewares(app types.AppInterface) {

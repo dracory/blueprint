@@ -1,21 +1,39 @@
 package layouts
 
-import "github.com/dracory/hb"
+import (
+	"strings"
 
-func Breadcrumbs(breadcrumbs []Breadcrumb) hb.TagInterface {
-	nav := hb.Nav().Attr("aria-label", "breadcrumb")
-	ol := hb.OL().Attr("class", "breadcrumb")
+	"github.com/dracory/hb"
+	"github.com/samber/lo"
+)
+
+func Breadcrumbs(breadcrumbs []Breadcrumb) *hb.Tag {
+	nav := hb.Nav().Aria("label", "breadcrumb")
+	ol := hb.OL().Class("breadcrumb")
 
 	for _, breadcrumb := range breadcrumbs {
-		li := hb.LI().Attr("class", "breadcrumb-item")
-		link := hb.Hyperlink().HTML(breadcrumb.Name).Attr("href", breadcrumb.URL)
+		icon := lo.IfF(breadcrumb.Icon != "", func() hb.TagInterface {
+			if strings.HasSuffix(breadcrumb.Icon, "bi") {
+				return hb.I().Class("bi " + breadcrumb.Icon)
+			}
+			return hb.NewHTML(breadcrumb.Icon)
+		}).ElseF(func() hb.TagInterface {
+			return nil
+		})
 
-		li.AddChild(link)
+		link := hb.Hyperlink().
+			HTML(breadcrumb.Name).
+			Href(breadcrumb.URL)
 
-		ol.AddChild(li)
+		li := hb.LI().
+			Class("breadcrumb-item").
+			Child(icon).
+			Child(link)
+
+		ol.Child(li)
 	}
 
-	nav.AddChild(ol)
+	nav.Child(ol)
 
 	return nav
 }

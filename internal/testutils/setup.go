@@ -9,19 +9,25 @@ import (
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 
+	"github.com/samber/lo"
 	_ "modernc.org/sqlite"
 )
 
 // setupOptions holds configuration flags for Setup
 type setupOptions struct {
-	WithBlogStore    bool
-	WithCacheStore   bool
-	WithGeoStore     bool
-	WithLogStore     bool
-	WithSessionStore bool
-	WithShopStore    bool
-	WithUserStore    bool
-	WithVaultStore   bool
+	WithAuditStore        bool
+	WithBlogStore         bool
+	WithCacheStore        bool
+	WithGeoStore          bool
+	WithLogStore          bool
+	WithSessionStore      bool
+	WithShopStore         bool
+	WithSubscriptionStore bool
+	WithTaskStore         bool
+	WithUserStore         bool
+	WithVaultStore        bool
+	WithUserStoreVault    bool
+	VaultStoreKey         string
 
 	cfg types.ConfigInterface
 }
@@ -78,17 +84,44 @@ func WithShopStore(enable bool) SetupOption {
 	}
 }
 
+// WithTaskStore enables the task store during test setup
+func WithTaskStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithTaskStore = enable
+	}
+}
+
 // WithUserStore enables the user store during test setup
-func WithUserStore(enable bool) SetupOption {
+// Optional bool flag enables user-store vault integration
+func WithUserStore(enable bool, enableVault ...bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithUserStore = enable
+		if len(enableVault) > 0 && enableVault[0] {
+			opts.WithUserStoreVault = true
+		}
 	}
 }
 
 // WithVaultStore enables the vault store during test setup
-func WithVaultStore(enable bool) SetupOption {
+// Optional string parameter sets the vault store key
+func WithVaultStore(enable bool, vaultKeys ...string) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithVaultStore = enable
+		opts.VaultStoreKey = lo.FirstOr(vaultKeys, "test-key")
+	}
+}
+
+// WithSubscriptionStore enables the subscription store during test setup
+func WithSubscriptionStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithSubscriptionStore = enable
+	}
+}
+
+// WithAuditStore enables the audit store during test setup
+func WithAuditStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithAuditStore = enable
 	}
 }
 
@@ -106,9 +139,12 @@ func DefaultConf() *types.Config {
 	cfg.SetDatabaseUsername("")
 	cfg.SetDatabasePassword("")
 	cfg.SetRegistrationEnabled(true)
+	cfg.SetMailFromAddress("test@test.com")
+	cfg.SetMailFromName("TestName")
 
-	// cfg.SetCacheStoreUsed(true)
-	// cfg.SetUserStoreUsed(true)
+	// All stores are disabled by default in tests to ensure explicit configuration
+	// Enable only the stores you need in your test using the appropriate With* methods
+	// or by directly setting the flags on the config
 	return cfg
 }
 
@@ -126,43 +162,51 @@ func Setup(options ...SetupOption) types.AppInterface {
 		opts.cfg = DefaultConf()
 
 		// Only set stores if explicitly set when using default config
-		if opts.WithVaultStore {
-			opts.cfg.SetVaultStoreUsed(true)
+		if opts.WithAuditStore {
+			opts.cfg.SetAuditStoreUsed(true)
 		}
-
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
 		}
-
 		if opts.WithCacheStore {
 			opts.cfg.SetCacheStoreUsed(true)
 		}
-
 		if opts.WithGeoStore {
 			opts.cfg.SetGeoStoreUsed(true)
 		}
-
 		if opts.WithLogStore {
 			opts.cfg.SetLogStoreUsed(true)
 		}
-
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)
 		}
-
 		if opts.WithShopStore {
 			opts.cfg.SetShopStoreUsed(true)
 		}
-
+		if opts.WithSubscriptionStore {
+			opts.cfg.SetSubscriptionStoreUsed(true)
+		}
+		if opts.WithTaskStore {
+			opts.cfg.SetTaskStoreUsed(true)
+		}
 		if opts.WithUserStore {
 			opts.cfg.SetUserStoreUsed(true)
+		}
+		if opts.WithUserStoreVault {
+			opts.cfg.SetUserStoreVaultEnabled(true)
+		}
+		if opts.WithVaultStore {
+			opts.cfg.SetVaultStoreUsed(true)
+		}
+		if opts.VaultStoreKey != "" {
+			opts.cfg.SetVaultStoreKey(opts.VaultStoreKey)
 		}
 	}
 
 	// Apply optional toggles to provided configs
 	if opts.cfg != nil {
-		if opts.WithVaultStore {
-			opts.cfg.SetVaultStoreUsed(true)
+		if opts.WithAuditStore {
+			opts.cfg.SetAuditStoreUsed(true)
 		}
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
@@ -179,8 +223,17 @@ func Setup(options ...SetupOption) types.AppInterface {
 		if opts.WithShopStore {
 			opts.cfg.SetShopStoreUsed(true)
 		}
+		if opts.WithSubscriptionStore {
+			opts.cfg.SetSubscriptionStoreUsed(true)
+		}
+		if opts.WithTaskStore {
+			opts.cfg.SetTaskStoreUsed(true)
+		}
 		if opts.WithUserStore {
 			opts.cfg.SetUserStoreUsed(true)
+		}
+		if opts.WithVaultStore {
+			opts.cfg.SetVaultStoreUsed(true)
 		}
 	}
 

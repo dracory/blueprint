@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"project/internal/resources"
 	"project/internal/types"
@@ -90,7 +91,7 @@ func Load() (types.ConfigInterface, error) {
 	// LLM: Google Gemini
 	googleGeminiApiUsed := env.GetBool(KEY_GEMINI_API_USED)
 	googleGeminiApiKey := env.GetString(KEY_GEMINI_API_KEY)
-	googleGeminiDefaultModel := env.GetString(KEY_GEMINI_DEFAULT_MODEL)
+	googleGeminiApiDefaultModel := env.GetString(KEY_GEMINI_API_DEFAULT_MODEL)
 
 	mailDriver := env.GetString(KEY_MAIL_DRIVER)
 	mailFromAddress := env.GetString(KEY_MAIL_FROM_ADDRESS)
@@ -102,6 +103,7 @@ func Load() (types.ConfigInterface, error) {
 
 	registrationEnabled := env.GetBool(KEY_AUTH_REGISTRATION_ENABLED)
 
+	auditStoreUsed := env.GetBool(KEY_AUDIT_STORE_USED)
 	blogStoreUsed := env.GetBool(KEY_BLOG_STORE_USED)
 	cacheStoreUsed := env.GetBool(KEY_CACHE_STORE_USED)
 	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
@@ -117,10 +119,16 @@ func Load() (types.ConfigInterface, error) {
 	shopStoreUsed := env.GetBool(KEY_SHOP_STORE_USED)
 	sqlFileStoreUsed := env.GetBool(KEY_SQL_FILE_STORE_USED)
 	statsStoreUsed := env.GetBool(KEY_STATS_STORE_USED)
+	subscriptionStoreUsed := env.GetBool(KEY_SUBSCRIPTION_STORE_USED)
 	taskStoreUsed := env.GetBool(KEY_TASK_STORE_USED)
 	userStoreUsed := env.GetBool(KEY_USER_STORE_USED)
+	userStoreVaultEnabled := env.GetBool(KEY_USER_STORE_USE_VAULT)
 	vaultStoreUsed := env.GetBool(KEY_VAULT_STORE_USED)
 	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
+
+	if userStoreVaultEnabled && !vaultStoreUsed {
+		return nil, fmt.Errorf("%s requires %s to be true", KEY_USER_STORE_USE_VAULT, KEY_VAULT_STORE_USED)
+	}
 
 	// mediaBucket := env.Value("MEDIA_BUCKET")
 	// mediaDriver := env.Value("MEDIA_DRIVER")
@@ -130,31 +138,33 @@ func Load() (types.ConfigInterface, error) {
 	// mediaSecret := env.Value("MEDIA_SECRET")
 	// mediaRegion := env.Value("MEDIA_REGION")
 	// mediaUrl := env.Value("MEDIA_URL")
-	// LLM: OpenAI
-	openAiApiUsed := env.GetBool(KEY_OPENAI_API_USED)
-	openAiApiKey := env.GetString(KEY_OPENAI_API_KEY)
-	openAiDefaultModel := env.GetString(KEY_OPENAI_DEFAULT_MODEL)
 
-	// LLM: OpenRouter
-	openRouterApiUsed := env.GetBool(KEY_OPENROUTER_API_USED)
-	openRouterApiKey := env.GetString(KEY_OPENROUTER_API_KEY)
-	openRouterDefaultModel := env.GetString(KEY_OPENROUTER_DEFAULT_MODEL)
-
-	stripeUsed := false
+	// Payments
 	stripeKeyPrivate := env.GetString(KEY_STRIPE_KEY_PRIVATE)
 	stripeKeyPublic := env.GetString(KEY_STRIPE_KEY_PUBLIC)
-
-	// LLM: Vertex AI
-	vertexAiUsed := env.GetBool(KEY_VERTEX_AI_USED)
-	vertexAiModelID := env.GetString(KEY_VERTEX_MODEL_ID)
-	vertexAiProjectID := env.GetString(KEY_VERTEX_PROJECT_ID)
-	vertexAiRegionID := env.GetString(KEY_VERTEX_REGION_ID)
-	vertexAiDefaultModel := env.GetString(KEY_VERTEX_DEFAULT_MODEL)
+	stripeUsed := stripeKeyPrivate != "" && stripeKeyPublic != ""
 
 	// LLM: Anthropic
 	anthropicApiUsed := env.GetBool(KEY_ANTHROPIC_API_USED)
 	anthropicApiKey := env.GetString(KEY_ANTHROPIC_API_KEY)
-	anthropicDefaultModel := env.GetString(KEY_ANTHROPIC_DEFAULT_MODEL)
+	anthropicApiDefaultModel := env.GetString(KEY_ANTHROPIC_API_DEFAULT_MODEL)
+
+	// LLM: OpenAI
+	openAiApiUsed := env.GetBool(KEY_OPENAI_API_USED)
+	openAiApiKey := env.GetString(KEY_OPENAI_API_KEY)
+	openAiApiDefaultModel := env.GetString(KEY_OPENAI_API_DEFAULT_MODEL)
+
+	// LLM: OpenRouter
+	openRouterApiUsed := env.GetBool(KEY_OPENROUTER_API_USED)
+	openRouterApiKey := env.GetString(KEY_OPENROUTER_API_KEY)
+	openRouterApiDefaultModel := env.GetString(KEY_OPENROUTER_API_DEFAULT_MODEL)
+
+	// LLM: Vertex AI
+	vertexAiApiUsed := env.GetBool(KEY_VERTEX_AI_API_USED)
+	vertexAiApiModelID := env.GetString(KEY_VERTEX_AI_API_MODEL_ID)
+	vertexAiApiProjectID := env.GetString(KEY_VERTEX_AI_API_PROJECT_ID)
+	vertexAiApiRegionID := env.GetString(KEY_VERTEX_AI_API_REGION_ID)
+	vertexAiApiDefaultModel := env.GetString(KEY_VERTEX_AI_API_DEFAULT_MODEL)
 
 	// Check required variables
 
@@ -163,41 +173,50 @@ func Load() (types.ConfigInterface, error) {
 		return nil, err
 	}
 
+	// LLM: Anthropic
+	if err := requireWhen(anthropicApiUsed, KEY_ANTHROPIC_API_KEY, "required when `ANTHROPIC_API_USED` is true", anthropicApiKey); err != nil {
+		return nil, err
+	}
+	if err := requireWhen(anthropicApiUsed, KEY_ANTHROPIC_API_DEFAULT_MODEL, "required when `ANTHROPIC_API_USED` is true", anthropicApiDefaultModel); err != nil {
+		return nil, err
+	}
+
+	// LLM: Google Gemini
 	if err := requireWhen(googleGeminiApiUsed, KEY_GEMINI_API_KEY, "required when `GEMINI_API_USED` is true", googleGeminiApiKey); err != nil {
 		return nil, err
 	}
-
-	if err := requireWhen(openAiApiUsed, KEY_OPENAI_API_KEY, "required when `OPENAI_API_USED` is true", openAiApiKey); err != nil {
+	if err := requireWhen(googleGeminiApiUsed, KEY_GEMINI_API_DEFAULT_MODEL, "required when `GEMINI_API_USED` is true", googleGeminiApiDefaultModel); err != nil {
 		return nil, err
 	}
 
+	// LLM: OpenAI
+	if err := requireWhen(openAiApiUsed, KEY_OPENAI_API_KEY, "required when `OPENAI_API_USED` is true", openAiApiKey); err != nil {
+		return nil, err
+	}
+	if err := requireWhen(openAiApiUsed, KEY_OPENAI_API_DEFAULT_MODEL, "required when `OPENAI_API_USED` is true", openAiApiDefaultModel); err != nil {
+		return nil, err
+	}
+
+	// LLM: OpenRouter
 	if err := requireWhen(openRouterApiUsed, KEY_OPENROUTER_API_KEY, "required when `OPENROUTER_API_USED` is true", openRouterApiKey); err != nil {
 		return nil, err
 	}
 
-	if err := requireWhen(anthropicApiUsed, KEY_ANTHROPIC_API_KEY, "required when `ANTHROPIC_API_USED` is true", anthropicApiKey); err != nil {
+	if err := requireWhen(openRouterApiUsed, KEY_OPENROUTER_API_DEFAULT_MODEL, "required when `OPENROUTER_API_USED` is true", openRouterApiDefaultModel); err != nil {
 		return nil, err
 	}
 
-	if err := requireWhen(stripeUsed, KEY_STRIPE_KEY_PRIVATE, "required when Stripe integration is enabled", stripeKeyPrivate); err != nil {
+	// LLM: Vertex AI
+	if err := requireWhen(vertexAiApiUsed, KEY_VERTEX_AI_API_MODEL_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiApiModelID); err != nil {
 		return nil, err
 	}
-
-	if err := requireWhen(stripeUsed, KEY_STRIPE_KEY_PUBLIC, "required when Stripe integration is enabled", stripeKeyPublic); err != nil {
+	if err := requireWhen(vertexAiApiUsed, KEY_VERTEX_AI_API_PROJECT_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiApiProjectID); err != nil {
 		return nil, err
 	}
-
-	if err := requireWhen(vaultStoreUsed, KEY_VAULT_STORE_KEY, "required when `VAULT_STORE_USED` is true", vaultStoreKey); err != nil {
+	if err := requireWhen(vertexAiApiUsed, KEY_VERTEX_AI_API_REGION_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiApiRegionID); err != nil {
 		return nil, err
 	}
-
-	if err := requireWhen(vertexAiUsed, KEY_VERTEX_MODEL_ID, "required when `VERTEX_AI_USED` is true", vertexAiModelID); err != nil {
-		return nil, err
-	}
-	if err := requireWhen(vertexAiUsed, KEY_VERTEX_PROJECT_ID, "required when `VERTEX_AI_USED` is true", vertexAiProjectID); err != nil {
-		return nil, err
-	}
-	if err := requireWhen(vertexAiUsed, KEY_VERTEX_REGION_ID, "required when `VERTEX_AI_USED` is true", vertexAiRegionID); err != nil {
+	if err := requireWhen(vertexAiApiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL, "required when `VERTEX_AI_API_USED` is true", vertexAiApiDefaultModel); err != nil {
 		return nil, err
 	}
 
@@ -212,6 +231,7 @@ func Load() (types.ConfigInterface, error) {
 	config := types.Config{}
 
 	// Store configurations
+	config.SetAuditStoreUsed(auditStoreUsed)
 	config.SetBlogStoreUsed(blogStoreUsed)
 	config.SetCacheStoreUsed(cacheStoreUsed)
 	config.SetCmsStoreUsed(cmsStoreUsed)
@@ -227,8 +247,10 @@ func Load() (types.ConfigInterface, error) {
 	config.SetShopStoreUsed(shopStoreUsed)
 	config.SetSqlFileStoreUsed(sqlFileStoreUsed)
 	config.SetStatsStoreUsed(statsStoreUsed)
+	config.SetSubscriptionStoreUsed(subscriptionStoreUsed)
 	config.SetTaskStoreUsed(taskStoreUsed)
 	config.SetUserStoreUsed(userStoreUsed)
+	config.SetUserStoreVaultEnabled(userStoreVaultEnabled)
 	config.SetVaultStoreUsed(vaultStoreUsed)
 	config.SetVaultStoreKey(vaultStoreKey)
 
@@ -279,45 +301,50 @@ func Load() (types.ConfigInterface, error) {
 	// OpenRouter
 	config.SetOpenRouterApiUsed(openRouterApiUsed)
 	config.SetOpenRouterApiKey(openRouterApiKey)
-	if openRouterDefaultModel != "" {
-		config.SetOpenRouterDefaultModel(openRouterDefaultModel)
+	if openRouterApiDefaultModel != "" {
+		config.SetOpenRouterApiDefaultModel(openRouterApiDefaultModel)
 	}
 
 	// OpenAI
 	config.SetOpenAiApiUsed(openAiApiUsed)
 	config.SetOpenAiApiKey(openAiApiKey)
-	if openAiDefaultModel != "" {
-		config.SetOpenAiDefaultModel(openAiDefaultModel)
+	if openAiApiDefaultModel != "" {
+		config.SetOpenAiApiDefaultModel(openAiApiDefaultModel)
 	}
 
 	// Anthropic
 	config.SetAnthropicApiUsed(anthropicApiUsed)
 	config.SetAnthropicApiKey(anthropicApiKey)
-	if anthropicDefaultModel != "" {
-		config.SetAnthropicDefaultModel(anthropicDefaultModel)
+	if anthropicApiDefaultModel != "" {
+		config.SetAnthropicApiDefaultModel(anthropicApiDefaultModel)
 	}
 
 	// Google Gemini
 	config.SetGoogleGeminiApiUsed(googleGeminiApiUsed)
 	config.SetGoogleGeminiApiKey(googleGeminiApiKey)
-	if googleGeminiDefaultModel != "" {
-		config.SetGoogleGeminiDefaultModel(googleGeminiDefaultModel)
+	if googleGeminiApiDefaultModel != "" {
+		config.SetGoogleGeminiApiDefaultModel(googleGeminiApiDefaultModel)
 	}
 
 	// Vertex AI
-	config.SetVertexAiUsed(vertexAiUsed)
-	if vertexAiDefaultModel != "" {
-		config.SetVertexAiDefaultModel(vertexAiDefaultModel)
+	config.SetVertexAiApiUsed(vertexAiApiUsed)
+	if vertexAiApiDefaultModel != "" {
+		config.SetVertexAiApiDefaultModel(vertexAiApiDefaultModel)
 	}
-	if vertexAiProjectID != "" {
-		config.SetVertexAiProjectID(vertexAiProjectID)
+	if vertexAiApiProjectID != "" {
+		config.SetVertexAiApiProjectID(vertexAiApiProjectID)
 	}
-	if vertexAiRegionID != "" {
-		config.SetVertexAiRegionID(vertexAiRegionID)
+	if vertexAiApiRegionID != "" {
+		config.SetVertexAiApiRegionID(vertexAiApiRegionID)
 	}
-	if vertexAiModelID != "" {
-		config.SetVertexAiModelID(vertexAiModelID)
+	if vertexAiApiModelID != "" {
+		config.SetVertexAiApiModelID(vertexAiApiModelID)
 	}
+
+	// Stripe
+	config.SetStripeUsed(stripeUsed)
+	config.SetStripeKeyPrivate(stripeKeyPrivate)
+	config.SetStripeKeyPublic(stripeKeyPublic)
 
 	return &config, nil
 }

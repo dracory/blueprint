@@ -3,68 +3,58 @@ package admin
 import (
 	"log/slog"
 	"net/http"
+	"strings"
+
+	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/types"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/dracory/cdn"
-	"github.com/dracory/form"
 	"github.com/dracory/hb"
+	"github.com/dracory/liveflux"
 	"github.com/dracory/req"
 	"github.com/dracory/userstore"
 )
 
-// == CONTROLLER ==============================================================
-
 type userUpdateController struct {
 	app types.AppInterface
 }
-
-// == CONSTRUCTOR =============================================================
 
 func NewUserUpdateController(app types.AppInterface) *userUpdateController {
 	return &userUpdateController{app: app}
 }
 
 func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
-	data, errorMessage := controller.prepareDataAndValidate(r)
+	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().UsersUserManager(), 10)
 	}
 
-	if r.Method == http.MethodPost {
-		return controller.form(data).ToHTML()
+	rendered := liveflux.SSR(NewFormUserUpdate(controller.app), map[string]string{
+		"user_id":    data.userID,
+		"return_url": data.returnURL,
+	})
+
+	if rendered == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error rendering user form", links.Admin().UsersUserManager(), 10)
 	}
 
 	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
-		Title:   "Edit User | Blog",
-		Content: controller.page(data),
+		Title:   "Edit User | Users",
+		Content: controller.page(data, rendered),
 		ScriptURLs: []string{
-			cdn.Jquery_3_7_1(),
-			cdn.TrumbowygJs_2_27_3(),
 			cdn.Sweetalert2_10(),
-			cdn.JqueryUiJs_1_13_1(), // needed for BlockArea
-			links.Website().Resource(`/blockarea_v0200.js`, map[string]string{}),
 		},
 		Scripts: []string{
-			controller.script(),
-		},
-		StyleURLs: []string{
-			cdn.TrumbowygCss_2_27_3(),
-			cdn.JqueryUiCss_1_13_1(), // needed for BlockArea
+			liveflux.Script().ToHTML(),
 		},
 	}).ToHTML()
 }
 
-func (controller userUpdateController) script() string {
-	js := ``
-	return js
-}
-
-func (controller userUpdateController) page(data userUpdateControllerData) hb.TagInterface {
+func (controller userUpdateController) page(data userUpdateControllerData, component hb.TagInterface) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
@@ -80,14 +70,6 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 		},
 	})
 
-	buttonSave := hb.Button().
-		Class("btn btn-primary ms-2 float-end").
-		Child(hb.I().Class("bi bi-save").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
-		HTML("Save").
-		HxInclude("#FormUserUpdate").
-		HxPost(links.Admin().UsersUserUpdate(map[string]string{"userID": data.userID})).
-		HxTarget("#FormUserUpdate")
-
 	buttonCancel := hb.Hyperlink().
 		Class("btn btn-secondary ms-2 float-end").
 		Child(hb.I().Class("bi bi-chevron-left").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
@@ -96,7 +78,6 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 
 	heading := hb.Heading1().
 		HTML("Edit User").
-		Child(buttonSave).
 		Child(buttonCancel)
 
 	card := hb.Div().
@@ -107,20 +88,18 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 				Style(`display:flex;justify-content:space-between;align-items:center;`).
 				Child(hb.Heading4().
 					HTML("User Details").
-					Style("margin-bottom:0;display:inline-block;")).
-				Child(buttonSave),
+					Style("margin-bottom:0;display:inline-block;")),
 		).
 		Child(
 			hb.Div().
 				Class("card-body").
-				Child(controller.form(data)))
+				Child(component),
+		)
 
 	userTitle := hb.Heading2().
 		Class("mb-3").
 		Text("User: ").
-		Text(data.user.FirstName()).
-		Text(" ").
-		Text(data.user.LastName())
+		Text(data.userDisplayName)
 
 	return hb.Div().
 		Class("container").
@@ -131,182 +110,11 @@ func (controller userUpdateController) page(data userUpdateControllerData) hb.Ta
 		Child(card)
 }
 
-func (controller userUpdateController) form(data userUpdateControllerData) hb.TagInterface {
-	fieldsDetails := []form.FieldInterface{
-		form.NewField(form.FieldOptions{
-			Label: "Status",
-			Name:  "user_status",
-			Type:  form.FORM_FIELD_TYPE_SELECT,
-			Value: data.formStatus,
-			Help:  `The status of the user.`,
-			Options: []form.FieldOption{
-				{
-					Value: "- not selected -",
-					Key:   "",
-				},
-				{
-					Value: "Active",
-					Key:   userstore.USER_STATUS_ACTIVE,
-				},
-				{
-					Value: "Unverified",
-					Key:   userstore.USER_STATUS_UNVERIFIED,
-				},
-				{
-					Value: "Inactive",
-					Key:   userstore.USER_STATUS_INACTIVE,
-				},
-				{
-					Value: "In Trash Bin",
-					Key:   userstore.USER_STATUS_DELETED,
-				},
-			},
-		}),
-		form.NewField(form.FieldOptions{
-			Label: "First Name",
-			Name:  "user_first_name",
-			Type:  form.FORM_FIELD_TYPE_STRING,
-			Value: data.formFirstName,
-			Help:  `The first name of the user.`,
-		}),
-		form.NewField(form.FieldOptions{
-			Label: "Last Name",
-			Name:  "user_last_name",
-			Type:  form.FORM_FIELD_TYPE_STRING,
-			Value: data.formLastName,
-			Help:  `The last name of the user.`,
-		}),
-		form.NewField(form.FieldOptions{
-			Label: "Email",
-			Name:  "user_email",
-			Type:  form.FORM_FIELD_TYPE_STRING,
-			Value: data.formEmail,
-			Help:  `The email address of the user.`,
-		}),
-		form.NewField(form.FieldOptions{
-			Label: "Admin Notes",
-			Name:  "user_memo",
-			Type:  form.FORM_FIELD_TYPE_TEXTAREA,
-			Value: data.formMemo,
-			Help:  "Admin notes for this bloguser. These notes will not be visible to the public.",
-		}),
-		form.NewField(form.FieldOptions{
-			Label:    "User ID",
-			Name:     "user_id",
-			Type:     form.FORM_FIELD_TYPE_STRING,
-			Value:    data.userID,
-			Readonly: true,
-			Help:     "The reference number (ID) of the user.",
-		}),
-		form.NewField(form.FieldOptions{
-			Label:    "User ID",
-			Name:     "user_id",
-			Type:     form.FORM_FIELD_TYPE_HIDDEN,
-			Value:    data.userID,
-			Readonly: true,
-		}),
-	}
-
-	formUserUpdate := form.NewForm(form.FormOptions{
-		ID: "FormUserUpdate",
-	})
-
-	formUserUpdate.SetFields(fieldsDetails)
-
-	if data.formErrorMessage != "" {
-		formUserUpdate.AddField(form.NewField(form.FieldOptions{
-			Type:  form.FORM_FIELD_TYPE_RAW,
-			Value: hb.Swal(hb.SwalOptions{Icon: "error", Text: data.formErrorMessage}).ToHTML(),
-		}))
-	}
-
-	if data.formSuccessMessage != "" {
-		formUserUpdate.AddField(form.NewField(form.FieldOptions{
-			Type:  form.FORM_FIELD_TYPE_RAW,
-			Value: hb.Swal(hb.SwalOptions{Icon: "success", Text: data.formSuccessMessage}).ToHTML(),
-		}))
-	}
-
-	return formUserUpdate.Build()
-}
-
-func (controller userUpdateController) saveUser(r *http.Request, data userUpdateControllerData) (d userUpdateControllerData, errorMessage string) {
+func (controller userUpdateController) prepareData(r *http.Request) (data userUpdateControllerData, errorMessage string) {
 	if controller.app.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
-	data.formFirstName = req.GetStringTrimmed(r, "user_first_name")
-	data.formLastName = req.GetStringTrimmed(r, "user_last_name")
-	data.formEmail = req.GetStringTrimmed(r, "user_email")
-	data.formMemo = req.GetStringTrimmed(r, "user_memo")
-	data.formStatus = req.GetStringTrimmed(r, "user_status")
-
-	if data.formStatus == "" {
-		data.formErrorMessage = "Status is required"
-		return data, ""
-	}
-
-	if data.formFirstName == "" {
-		data.formErrorMessage = "First name is required"
-		return data, ""
-	}
-
-	if data.formLastName == "" {
-		data.formErrorMessage = "Last name is required"
-		return data, ""
-	}
-
-	if data.formEmail == "" {
-		data.formErrorMessage = "Email is required"
-		return data, ""
-	}
-
-	if !govalidator.IsEmail(data.formEmail) {
-		data.formErrorMessage = "Invalid email address"
-		return data, ""
-	}
-
-	data.user.SetMemo(data.formMemo)
-	data.user.SetStatus(data.formStatus)
-
-	err := controller.app.GetUserStore().UserUpdate(r.Context(), data.user)
-
-	if err != nil {
-		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
-		}
-		data.formErrorMessage = "System error. Saving user failed"
-		return data, ""
-	}
-
-	err = userTokenize(
-		r.Context(),
-		controller.app.GetVaultStore(),
-		controller.app.GetLogger(),
-		controller.app.GetConfig().GetVaultStoreKey(),
-		data.user,
-		data.formFirstName,
-		data.formLastName,
-		data.formEmail,
-	)
-
-	if err != nil {
-		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
-		}
-		data.formErrorMessage = "System error. Saving user failed"
-		return data, ""
-	}
-
-	return data, ""
-}
-
-func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (data userUpdateControllerData, errorMessage string) {
-	if controller.app.GetUserStore() == nil {
-		return data, "User store is not configured"
-	}
-
-	data.action = req.GetStringTrimmed(r, "action")
 	data.userID = req.GetStringTrimmed(r, "user_id")
 
 	if data.userID == "" {
@@ -317,7 +125,7 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 
 	if err != nil {
 		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("At userUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
 		}
 		return data, "User not found"
 	}
@@ -326,40 +134,36 @@ func (controller userUpdateController) prepareDataAndValidate(r *http.Request) (
 		return data, "User not found"
 	}
 
-	data.user = user
+	firstName := user.FirstName()
+	lastName := user.LastName()
+	email := user.Email()
 
-	firstName, lastName, email, err := helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), data.user)
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
+		firstName, lastName, email, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 
-	if err != nil {
-		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
+		if err != nil {
+			if controller.app.GetLogger() != nil {
+				controller.app.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
+			}
+			return data, "Tokens failed to be read"
 		}
-		return data, "Tokens failed to be read"
 	}
 
-	data.formFirstName = firstName
-	data.formLastName = lastName
-	data.formEmail = email
-	data.formMemo = data.user.Memo()
-	data.formStatus = data.user.Status()
-
-	if r.Method != http.MethodPost {
-		return data, ""
+	data.user = user
+	data.userDisplayName = strings.TrimSpace(firstName + " " + lastName)
+	if data.userDisplayName == "" {
+		data.userDisplayName = user.ID()
 	}
+	data.returnURL = links.Admin().UsersUserManager()
 
-	return controller.saveUser(r, data)
+	_ = email
+
+	return data, ""
 }
 
 type userUpdateControllerData struct {
-	action string
-	userID string
-	user   userstore.UserInterface
-
-	formErrorMessage   string
-	formSuccessMessage string
-	formEmail          string
-	formFirstName      string
-	formLastName       string
-	formMemo           string
-	formStatus         string
+	userID          string
+	user            userstore.UserInterface
+	userDisplayName string
+	returnURL       string
 }

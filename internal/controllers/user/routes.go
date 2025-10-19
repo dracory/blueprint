@@ -27,17 +27,22 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath(links.USER_PROFILE).
 		SetHTMLHandler(userAccount.NewProfileController(app).Handler)
 
-	userRoutes := []rtr.RouteInterface{
-		profile,
-		home,
-		homeCatchAll,
-	}
+	userRoutes := []rtr.RouteInterface{}
+	userRoutes = append(userRoutes, profile)
+	userRoutes = append(userRoutes, home)
+	userRoutes = append(userRoutes, homeCatchAll) // Must be last!
 
-	for _, route := range userRoutes {
-		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
-			middlewares.NewUserMiddleware(app),
-		})
-	}
+	applyUserMiddleware(app, userRoutes)
 
 	return userRoutes
+}
+
+func applyUserMiddleware(app types.AppInterface, routes []rtr.RouteInterface) {
+	for _, route := range routes {
+		middlewaresToAdd := []rtr.MiddlewareInterface{
+			middlewares.NewUserMiddleware(app),
+		}
+
+		route.AddBeforeMiddlewares(middlewaresToAdd)
+	}
 }

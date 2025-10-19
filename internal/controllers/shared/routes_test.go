@@ -16,7 +16,7 @@ func TestSharedRoutesCount(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 	routes := shared.Routes(app)
-	if len(routes) != 8 {
+	if len(routes) != 10 {
 		t.Fatalf("expected 8 shared routes, got %d", len(routes))
 	}
 }
@@ -48,7 +48,7 @@ func TestSharedRoutesAreAdded(t *testing.T) {
 		"/files/*",
 		"/flash",
 		"/media/*",
-		"/resources",
+		"/resources/*",
 		// "/th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*",
 		"/th/:extension/:size/:quality/:path",
 		"/th/:extension/:size/:quality/:path...",

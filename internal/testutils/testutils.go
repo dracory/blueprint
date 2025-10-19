@@ -22,7 +22,7 @@ func SetupTestDatabase(t *testing.T) (*gorm.DB, func()) {
 	require.NoError(t, err, "Failed to get sql.DB")
 
 	return db, func() {
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}
 }
 

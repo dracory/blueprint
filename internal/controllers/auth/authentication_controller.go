@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -67,11 +68,13 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
-	if c.app.GetConfig().GetVaultStoreUsed() && c.app.GetVaultStore() == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
+	if c.app.GetConfig().GetUserStoreVaultEnabled() {
+		if c.app.GetVaultStore() == nil {
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
+		}
 	}
 
-	if c.app.GetConfig().GetVaultStoreUsed() && c.app.GetBlindIndexStoreEmail() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetBlindIndexStoreEmail() == nil {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `blind index store is required`, homeURL, 5)
 	}
 
@@ -131,10 +134,9 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 // == PRIVATE METHODS =========================================================
 
 func (c *authenticationController) findUserIDInBlindIndex(email string) (userID string, err error) {
-	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(blindindexstore.SearchValueQueryOptions{
-		SearchValue: email,
-		SearchType:  blindindexstore.SEARCH_TYPE_EQUALS,
-	})
+	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(blindindexstore.NewSearchValueQuery().
+		SetSearchValue(email).
+		SetSearchType(blindindexstore.SEARCH_TYPE_EQUALS))
 
 	if err != nil {
 		return "", err
@@ -219,7 +221,10 @@ func (c *authenticationController) callAuthKnight(once string) (map[string]inter
 		} else {
 			testResponseJSONString = `{"status":"error","message":"once data is invalid:test","data":{}}`
 		}
-		json.NewDecoder(bytes.NewReader([]byte(testResponseJSONString))).Decode(&response)
+		err := json.NewDecoder(bytes.NewReader([]byte(testResponseJSONString))).Decode(&response)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode test response: %v", err)
+		}
 		return response, nil
 	}
 
@@ -235,9 +240,15 @@ func (c *authenticationController) callAuthKnight(once string) (map[string]inter
 		return nil, errors.New("no response")
 	}
 
-	defer req.Body.Close()
+	defer func() {
+		if err := req.Body.Close(); err != nil {
+			slog.Error("failed to close response body", "error", err)
+		}
+	}()
 
-	json.NewDecoder(req.Body).Decode(&response)
+	if err := json.NewDecoder(req.Body).Decode(&response); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
 
 	return response, nil
 }
@@ -299,7 +310,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		return nil, errors.New("user store is nil")
 	}
 
-	if c.app.GetConfig().GetVaultStoreUsed() && c.app.GetVaultStore() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetVaultStore() == nil {
 		return nil, errors.New(`vault store is nil`)
 	}
 
@@ -309,7 +320,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		return nil, err
 	}
 
-	if !c.app.GetConfig().GetVaultStoreUsed() {
+	if !c.app.GetConfig().GetUserStoreVaultEnabled() {
 		return user, nil
 	}
 
@@ -368,7 +379,7 @@ func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, 
 		return nil, errors.New("user store is nil")
 	}
 
-	if c.app.GetConfig().GetVaultStoreUsed() {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() {
 		if c.app.GetVaultStore() == nil {
 			return nil, errors.New(`vault store is nil`)
 		}

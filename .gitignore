@@ -32,6 +32,7 @@ tmp/
 *.db
 *.db-shm
 *.db-wal
+*.db-journal
 *.sqlite
 
 database.sqlite
@@ -49,3 +50,4 @@ google-cloud-sdk/
 .cache/
 
 old/
+/vendor/

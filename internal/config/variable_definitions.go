@@ -220,6 +220,14 @@ func variableDefinitions() []variable {
 
 		// == Store configuration ==
 		{
+			key:          KEY_AUDIT_STORE_USED,
+			variableType: variableTypeBool,
+			assignBool: func(cfg types.ConfigInterface, value bool) error {
+				cfg.SetAuditStoreUsed(value)
+				return nil
+			},
+		},
+		{
 			key:          KEY_CACHE_STORE_USED,
 			variableType: variableTypeBool,
 			assignBool: func(cfg types.ConfigInterface, value bool) error {
@@ -327,6 +335,14 @@ func variableDefinitions() []variable {
 			},
 		},
 		{
+			key:          KEY_SUBSCRIPTION_STORE_USED,
+			variableType: variableTypeBool,
+			assignBool: func(cfg types.ConfigInterface, value bool) error {
+				cfg.SetSubscriptionStoreUsed(value)
+				return nil
+			},
+		},
+		{
 			key:          KEY_TASK_STORE_USED,
 			variableType: variableTypeBool,
 			assignBool: func(cfg types.ConfigInterface, value bool) error {
@@ -339,6 +355,14 @@ func variableDefinitions() []variable {
 			variableType: variableTypeBool,
 			assignBool: func(cfg types.ConfigInterface, value bool) error {
 				cfg.SetUserStoreUsed(value)
+				return nil
+			},
+		},
+		{
+			key:          KEY_USER_STORE_USE_VAULT,
+			variableType: variableTypeBool,
+			assignBool: func(cfg types.ConfigInterface, value bool) error {
+				cfg.SetUserStoreVaultEnabled(value)
 				return nil
 			},
 		},
@@ -383,9 +407,9 @@ func variableDefinitions() []variable {
 			},
 		},
 		{
-			key: KEY_GEMINI_DEFAULT_MODEL,
+			key: KEY_GEMINI_API_DEFAULT_MODEL,
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetGoogleGeminiDefaultModel(value)
+				cfg.SetGoogleGeminiApiDefaultModel(value)
 				return nil
 			},
 		},
@@ -409,9 +433,9 @@ func variableDefinitions() []variable {
 			},
 		},
 		{
-			key: KEY_OPENAI_DEFAULT_MODEL,
+			key: KEY_OPENAI_API_DEFAULT_MODEL,
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetOpenAiDefaultModel(value)
+				cfg.SetOpenAiApiDefaultModel(value)
 				return nil
 			},
 		},
@@ -435,9 +459,9 @@ func variableDefinitions() []variable {
 			},
 		},
 		{
-			key: KEY_OPENROUTER_DEFAULT_MODEL,
+			key: KEY_OPENROUTER_API_DEFAULT_MODEL,
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetOpenRouterDefaultModel(value)
+				cfg.SetOpenRouterApiDefaultModel(value)
 				return nil
 			},
 		},
@@ -461,57 +485,57 @@ func variableDefinitions() []variable {
 			},
 		},
 		{
-			key: KEY_ANTHROPIC_DEFAULT_MODEL,
+			key: KEY_ANTHROPIC_API_DEFAULT_MODEL,
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetAnthropicDefaultModel(value)
+				cfg.SetAnthropicApiDefaultModel(value)
 				return nil
 			},
 		},
 		{
-			key:          KEY_VERTEX_AI_USED,
+			key:          KEY_VERTEX_AI_API_USED,
 			variableType: variableTypeBool,
 			assignBool: func(cfg types.ConfigInterface, value bool) error {
-				cfg.SetVertexAiUsed(value)
+				cfg.SetVertexAiApiUsed(value)
 				return nil
 			},
 		},
 		{
-			key: KEY_VERTEX_MODEL_ID,
+			key: KEY_VERTEX_AI_API_MODEL_ID,
 			requiredWhen: func() bool {
-				return env.GetBool(KEY_VERTEX_AI_USED)
+				return env.GetBool(KEY_VERTEX_AI_API_USED)
 			},
-			requiredMessage: "required when `VERTEX_AI_USED` is true",
+			requiredMessage: "required when `VERTEX_AI_API_USED` is true",
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetVertexAiModelID(value)
+				cfg.SetVertexAiApiModelID(value)
 				return nil
 			},
 		},
 		{
-			key: KEY_VERTEX_PROJECT_ID,
+			key: KEY_VERTEX_AI_API_PROJECT_ID,
 			requiredWhen: func() bool {
-				return env.GetBool(KEY_VERTEX_AI_USED)
+				return env.GetBool(KEY_VERTEX_AI_API_USED)
 			},
-			requiredMessage: "required when `VERTEX_AI_USED` is true",
+			requiredMessage: "required when `VERTEX_AI_API_USED` is true",
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetVertexAiProjectID(value)
+				cfg.SetVertexAiApiProjectID(value)
 				return nil
 			},
 		},
 		{
-			key: KEY_VERTEX_REGION_ID,
+			key: KEY_VERTEX_AI_API_REGION_ID,
 			requiredWhen: func() bool {
-				return env.GetBool(KEY_VERTEX_AI_USED)
+				return env.GetBool(KEY_VERTEX_AI_API_USED)
 			},
-			requiredMessage: "required when `VERTEX_AI_USED` is true",
+			requiredMessage: "required when `VERTEX_AI_API_USED` is true",
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetVertexAiRegionID(value)
+				cfg.SetVertexAiApiRegionID(value)
 				return nil
 			},
 		},
 		{
-			key: KEY_VERTEX_DEFAULT_MODEL,
+			key: KEY_VERTEX_AI_API_DEFAULT_MODEL,
 			assignString: func(cfg types.ConfigInterface, value string) error {
-				cfg.SetVertexAiDefaultModel(value)
+				cfg.SetVertexAiApiDefaultModel(value)
 				return nil
 			},
 		},

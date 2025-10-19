@@ -8,6 +8,7 @@ import (
 // two-phase migration once stores are split into create/migrate.
 func (a *Application) dataStoresMigrate() error {
 	migrators := []func(app types.AppInterface) error{
+		auditStoreMigrate,
 		blogStoreMigrate,
 		blindIndexEmailStoreMigrate,
 		blindIndexFirstNameStoreMigrate,
@@ -23,7 +24,9 @@ func (a *Application) dataStoresMigrate() error {
 		sessionStoreMigrate,
 		settingStoreMigrate,
 		shopStoreMigrate,
+		sqlFileStorageMigrate,
 		statsStoreMigrate,
+		subscriptionStoreMigrate,
 		taskStoreMigrate,
 		userStoreMigrate,
 		vaultStoreMigrate,

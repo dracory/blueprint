@@ -1,280 +1,5 @@
 package types
 
-type appConfigInterface interface {
-	SetAppName(string)
-	GetAppName() string
-
-	SetAppType(string)
-	GetAppType() string
-
-	SetAppEnv(string)
-	GetAppEnv() string
-
-	SetAppHost(string)
-	GetAppHost() string
-
-	SetAppPort(string)
-	GetAppPort() string
-
-	SetAppUrl(string)
-	GetAppUrl() string
-
-	SetAppDebug(bool)
-	GetAppDebug() bool
-
-	// Environment helpers
-	IsEnvDevelopment() bool
-	IsEnvLocal() bool
-	IsEnvProduction() bool
-	IsEnvStaging() bool
-	IsEnvTesting() bool
-}
-
-type databaseConfigInterface interface {
-	SetDatabaseDriver(string)
-	GetDatabaseDriver() string
-	SetDatabaseHost(string)
-	GetDatabaseHost() string
-	SetDatabasePort(string)
-	GetDatabasePort() string
-	SetDatabaseName(string)
-	GetDatabaseName() string
-	SetDatabaseUsername(string)
-	GetDatabaseUsername() string
-	SetDatabasePassword(string)
-	GetDatabasePassword() string
-	SetDatabaseSSLMode(string)
-	GetDatabaseSSLMode() string
-}
-
-type emailConfigInterface interface {
-	SetMailDriver(string)
-	GetMailDriver() string
-	SetMailHost(string)
-	GetMailHost() string
-	SetMailPort(int)
-	GetMailPort() int
-	SetMailUsername(string)
-	GetMailUsername() string
-	SetMailPassword(string)
-	GetMailPassword() string
-	SetMailFromAddress(string)
-	GetMailFromAddress() string
-	SetMailFromName(string)
-	GetMailFromName() string
-}
-
-type authConfigInterface interface {
-	SetRegistrationEnabled(bool)
-	GetRegistrationEnabled() bool
-}
-
-type llmConfigInterface interface {
-	// Anthropic
-	SetAnthropicApiUsed(bool)
-	GetAnthropicApiUsed() bool
-	SetAnthropicApiKey(string)
-	GetAnthropicApiKey() string
-	SetAnthropicDefaultModel(string)
-	GetAnthropicDefaultModel() string
-
-	// Google Gemini
-	SetGoogleGeminiApiUsed(bool)
-	GetGoogleGeminiApiUsed() bool
-	SetGoogleGeminiApiKey(string)
-	GetGoogleGeminiApiKey() string
-	SetGoogleGeminiDefaultModel(string)
-	GetGoogleGeminiDefaultModel() string
-
-	// OpenRouter
-	SetOpenRouterApiUsed(bool)
-	GetOpenRouterApiUsed() bool
-	SetOpenRouterApiKey(string)
-	GetOpenRouterApiKey() string
-	SetOpenRouterDefaultModel(string)
-	GetOpenRouterDefaultModel() string
-
-	// OpenAI
-	SetOpenAiApiUsed(bool)
-	GetOpenAiApiUsed() bool
-	SetOpenAiApiKey(string)
-	GetOpenAiApiKey() string
-	SetOpenAiDefaultModel(string)
-	GetOpenAiDefaultModel() string
-
-	// Vertex AI
-	SetVertexAiUsed(bool)
-	GetVertexAiUsed() bool
-	SetVertexAiDefaultModel(string)
-	GetVertexAiDefaultModel() string
-	SetVertexAiProjectID(string)
-	GetVertexAiProjectID() string
-	SetVertexAiRegionID(string)
-	GetVertexAiRegionID() string
-	SetVertexAiModelID(string)
-	GetVertexAiModelID() string
-}
-
-type envEncryptionConfigInterface interface {
-	SetEnvEncryptionKey(string)
-	GetEnvEncryptionKey() string
-}
-
-type blogStoreConfigInterface interface {
-	SetBlogStoreUsed(bool)
-	GetBlogStoreUsed() bool
-}
-
-type cacheStoreConfigInterface interface {
-	SetCacheStoreUsed(bool)
-	GetCacheStoreUsed() bool
-}
-
-type cmsStoreConfigInterface interface {
-	SetCmsStoreUsed(bool)
-	GetCmsStoreUsed() bool
-	SetCmsStoreTemplateID(string)
-	GetCmsStoreTemplateID() string
-}
-
-type customStoreConfigInterface interface {
-	SetCustomStoreUsed(bool)
-	GetCustomStoreUsed() bool
-}
-
-type entityStoreConfigInterface interface {
-	SetEntityStoreUsed(bool)
-	GetEntityStoreUsed() bool
-}
-
-type feedStoreConfigInterface interface {
-	SetFeedStoreUsed(bool)
-	GetFeedStoreUsed() bool
-}
-
-type geoStoreConfigInterface interface {
-	SetGeoStoreUsed(bool)
-	GetGeoStoreUsed() bool
-}
-
-type logStoreConfigInterface interface {
-	SetLogStoreUsed(bool)
-	GetLogStoreUsed() bool
-}
-
-type metaStoreConfigInterface interface {
-	SetMetaStoreUsed(bool)
-	GetMetaStoreUsed() bool
-}
-
-type sessionStoreConfigInterface interface {
-	SetSessionStoreUsed(bool)
-	GetSessionStoreUsed() bool
-}
-
-type settingStoreConfigInterface interface {
-	SetSettingStoreUsed(bool)
-	GetSettingStoreUsed() bool
-}
-
-type shopStoreConfigInterface interface {
-	SetShopStoreUsed(bool)
-	GetShopStoreUsed() bool
-}
-
-type sqlFileStoreConfigInterface interface {
-	SetSqlFileStoreUsed(bool)
-	GetSqlFileStoreUsed() bool
-}
-
-type statsStoreConfigInterface interface {
-	SetStatsStoreUsed(bool)
-	GetStatsStoreUsed() bool
-}
-
-type taskStoreConfigInterface interface {
-	SetTaskStoreUsed(bool)
-	GetTaskStoreUsed() bool
-}
-
-type userStoreConfigInterface interface {
-	SetUserStoreUsed(bool)
-	GetUserStoreUsed() bool
-}
-
-type vaultStoreConfigInterface interface {
-	SetVaultStoreUsed(bool)
-	GetVaultStoreUsed() bool
-	SetVaultStoreKey(string)
-	GetVaultStoreKey() string
-}
-
-type i18nConfigInterface interface {
-	SetTranslationLanguageDefault(string)
-	GetTranslationLanguageDefault() string
-	SetTranslationLanguageList(map[string]string)
-	GetTranslationLanguageList() map[string]string
-}
-
-type paymentConfigInterface interface {
-	SetStripeKeyPrivate(string)
-	GetStripeKeyPrivate() string
-	SetStripeKeyPublic(string)
-	GetStripeKeyPublic() string
-	SetStripeUsed(bool)
-	GetStripeUsed() bool
-}
-
-type mediaConfigInterface interface {
-	SetMediaBucket(string)
-	GetMediaBucket() string
-	SetMediaDriver(string)
-	GetMediaDriver() string
-	SetMediaKey(string)
-	GetMediaKey() string
-	SetMediaEndpoint(string)
-	GetMediaEndpoint() string
-	SetMediaRegion(string)
-	GetMediaRegion() string
-	SetMediaRoot(string)
-	GetMediaRoot() string
-	SetMediaSecret(string)
-	GetMediaSecret() string
-	SetMediaUrl(string)
-	GetMediaUrl() string
-}
-
-type ConfigInterface interface {
-	appConfigInterface
-	authConfigInterface
-	emailConfigInterface
-	databaseConfigInterface
-	envEncryptionConfigInterface
-	i18nConfigInterface
-	llmConfigInterface
-	mediaConfigInterface
-	paymentConfigInterface
-
-	// Stores
-	blogStoreConfigInterface
-	cacheStoreConfigInterface
-	cmsStoreConfigInterface
-	customStoreConfigInterface
-	entityStoreConfigInterface
-	feedStoreConfigInterface
-	geoStoreConfigInterface
-	logStoreConfigInterface
-	metaStoreConfigInterface
-	sessionStoreConfigInterface
-	settingStoreConfigInterface
-	shopStoreConfigInterface
-	sqlFileStoreConfigInterface
-	statsStoreConfigInterface
-	taskStoreConfigInterface
-	userStoreConfigInterface
-	vaultStoreConfigInterface
-}
-
 var _ ConfigInterface = (*Config)(nil)
 
 type Config struct {
@@ -306,36 +31,37 @@ type Config struct {
 	databaseSSLMode  string
 
 	// LLM configuration
-	openRouterApiKey       string
-	openRouterApiUsed      bool
-	openRouterDefaultModel string
+	openRouterApiKey          string
+	openRouterApiUsed         bool
+	openRouterApiDefaultModel string
 
 	// OpenAI
-	openAiApiKey       string
-	openAiApiUsed      bool
-	openAiDefaultModel string
+	openAiApiKey          string
+	openAiApiUsed         bool
+	openAiApiDefaultModel string
 
 	// Anthropic
-	anthropicApiUsed      bool
-	anthropicApiKey       string
-	anthropicDefaultModel string
+	anthropicApiUsed         bool
+	anthropicApiKey          string
+	anthropicApiDefaultModel string
 
 	// Google Gemini
-	googleGeminiApiUsed      bool
-	googleGeminiApiKey       string
-	googleGeminiDefaultModel string
+	googleGeminiApiUsed         bool
+	googleGeminiApiKey          string
+	googleGeminiApiDefaultModel string
 
 	// Vertex AI
-	vertexAiUsed         bool
-	vertexAiDefaultModel string
-	vertexAiProjectID    string
-	vertexAiRegionID     string
-	vertexAiModelID      string
+	vertexAiApiUsed         bool
+	vertexAiApiDefaultModel string
+	vertexAiApiProjectID    string
+	vertexAiApiRegionID     string
+	vertexAiApiModelID      string
 
 	// Encryption
 	envEncryptionKey string
 
-	// Store configurations
+	// Store flags
+	auditStoreUsed        bool
 	blogStoreUsed      bool
 	cacheStoreUsed     bool
 	cmsStoreUsed       bool
@@ -351,8 +77,10 @@ type Config struct {
 	shopStoreUsed      bool
 	sqlFileStoreUsed   bool
 	statsStoreUsed     bool
+	subscriptionStoreUsed bool
 	taskStoreUsed      bool
 	userStoreUsed      bool
+	userStoreVaultEnabled bool
 	vaultStoreUsed     bool
 	vaultStoreKey      string
 
@@ -574,6 +302,74 @@ func (c *Config) GetDatabaseSSLMode() string {
 }
 
 // == LLM Getters/Setters ==
+
+// LLM: Anthropic
+func (c *Config) SetAnthropicApiUsed(v bool) {
+	c.anthropicApiUsed = v
+}
+func (c *Config) GetAnthropicApiUsed() bool {
+	return c.anthropicApiUsed
+}
+
+func (c *Config) SetAnthropicApiKey(v string) {
+	c.anthropicApiKey = v
+}
+func (c *Config) GetAnthropicApiKey() string {
+	return c.anthropicApiKey
+}
+
+func (c *Config) SetAnthropicApiDefaultModel(v string) {
+	c.anthropicApiDefaultModel = v
+}
+func (c *Config) GetAnthropicApiDefaultModel() string {
+	return c.anthropicApiDefaultModel
+}
+
+// LLM: Google Gemini
+func (c *Config) SetGoogleGeminiApiUsed(v bool) {
+	c.googleGeminiApiUsed = v
+}
+func (c *Config) GetGoogleGeminiApiUsed() bool {
+	return c.googleGeminiApiUsed
+}
+
+func (c *Config) SetGoogleGeminiApiKey(v string) {
+	c.googleGeminiApiKey = v
+}
+func (c *Config) GetGoogleGeminiApiKey() string {
+	return c.googleGeminiApiKey
+}
+
+func (c *Config) SetGoogleGeminiApiDefaultModel(v string) {
+	c.googleGeminiApiDefaultModel = v
+}
+func (c *Config) GetGoogleGeminiApiDefaultModel() string {
+	return c.googleGeminiApiDefaultModel
+}
+
+// LLM: OpenAI (mapped to existing openAIKey field for key storage)
+func (c *Config) SetOpenAiApiUsed(v bool) {
+	c.openAiApiUsed = v
+}
+
+func (c *Config) GetOpenAiApiUsed() bool {
+	return c.openAiApiUsed
+}
+
+func (c *Config) SetOpenAiApiKey(v string) {
+	c.openAiApiKey = v
+}
+func (c *Config) GetOpenAiApiKey() string {
+	return c.openAiApiKey
+}
+
+func (c *Config) SetOpenAiApiDefaultModel(v string) {
+	c.openAiApiDefaultModel = v
+}
+func (c *Config) GetOpenAiApiDefaultModel() string {
+	return c.openAiApiDefaultModel
+}
+
 func (c *Config) SetOpenRouterApiKey(v string) {
 	c.openRouterApiKey = v
 }
@@ -590,110 +386,43 @@ func (c *Config) GetOpenRouterApiUsed() bool {
 	return c.openRouterApiUsed
 }
 
-func (c *Config) SetOpenRouterDefaultModel(v string) {
-	c.openRouterDefaultModel = v
+func (c *Config) SetOpenRouterApiDefaultModel(v string) {
+	c.openRouterApiDefaultModel = v
 }
 
-func (c *Config) GetOpenRouterDefaultModel() string {
-	return c.openRouterDefaultModel
+func (c *Config) GetOpenRouterApiDefaultModel() string {
+	return c.openRouterApiDefaultModel
 }
 
-// OpenAI (mapped to existing openAIKey field for key storage)
-func (c *Config) SetOpenAiApiUsed(v bool) {
-	c.openAiApiUsed = v
+// LLM: Vertex AI
+func (c *Config) SetVertexAiApiUsed(v bool) {
+	c.vertexAiApiUsed = v
+}
+func (c *Config) GetVertexAiApiUsed() bool {
+	return c.vertexAiApiUsed
 }
 
-func (c *Config) GetOpenAiApiUsed() bool {
-	return c.openAiApiUsed
+func (c *Config) SetVertexAiApiDefaultModel(v string) {
+	c.vertexAiApiDefaultModel = v
+}
+func (c *Config) GetVertexAiApiDefaultModel() string {
+	return c.vertexAiApiDefaultModel
 }
 
-func (c *Config) SetOpenAiApiKey(v string) {
-	c.openAiApiKey = v
+func (c *Config) SetVertexAiApiProjectID(v string) {
+	c.vertexAiApiProjectID = v
 }
-func (c *Config) GetOpenAiApiKey() string {
-	return c.openAiApiKey
-}
-
-func (c *Config) SetOpenAiDefaultModel(v string) {
-	c.openAiDefaultModel = v
-}
-func (c *Config) GetOpenAiDefaultModel() string {
-	return c.openAiDefaultModel
+func (c *Config) GetVertexAiApiProjectID() string {
+	return c.vertexAiApiProjectID
 }
 
-// Anthropic
-func (c *Config) SetAnthropicApiUsed(v bool) {
-	c.anthropicApiUsed = v
+func (c *Config) SetVertexAiApiRegionID(v string) {
+	c.vertexAiApiRegionID = v
 }
-func (c *Config) GetAnthropicApiUsed() bool {
-	return c.anthropicApiUsed
-}
+func (c *Config) GetVertexAiApiRegionID() string { return c.vertexAiApiRegionID }
 
-func (c *Config) SetAnthropicApiKey(v string) {
-	c.anthropicApiKey = v
-}
-func (c *Config) GetAnthropicApiKey() string {
-	return c.anthropicApiKey
-}
-
-func (c *Config) SetAnthropicDefaultModel(v string) {
-	c.anthropicDefaultModel = v
-}
-func (c *Config) GetAnthropicDefaultModel() string {
-	return c.anthropicDefaultModel
-}
-
-// Google Gemini
-func (c *Config) SetGoogleGeminiApiUsed(v bool) {
-	c.googleGeminiApiUsed = v
-}
-func (c *Config) GetGoogleGeminiApiUsed() bool {
-	return c.googleGeminiApiUsed
-}
-
-func (c *Config) SetGoogleGeminiApiKey(v string) {
-	c.googleGeminiApiKey = v
-}
-func (c *Config) GetGoogleGeminiApiKey() string {
-	return c.googleGeminiApiKey
-}
-
-func (c *Config) SetGoogleGeminiDefaultModel(v string) {
-	c.googleGeminiDefaultModel = v
-}
-func (c *Config) GetGoogleGeminiDefaultModel() string {
-	return c.googleGeminiDefaultModel
-}
-
-// Vertex AI
-func (c *Config) SetVertexAiUsed(v bool) {
-	c.vertexAiUsed = v
-}
-func (c *Config) GetVertexAiUsed() bool {
-	return c.vertexAiUsed
-}
-
-func (c *Config) SetVertexAiDefaultModel(v string) {
-	c.vertexAiDefaultModel = v
-}
-func (c *Config) GetVertexAiDefaultModel() string {
-	return c.vertexAiDefaultModel
-}
-
-func (c *Config) SetVertexAiProjectID(v string) {
-	c.vertexAiProjectID = v
-}
-func (c *Config) GetVertexAiProjectID() string {
-	return c.vertexAiProjectID
-}
-
-func (c *Config) SetVertexAiRegionID(v string) {
-	c.vertexAiRegionID = v
-}
-func (c *Config) GetVertexAiRegionID() string { return c.vertexAiRegionID }
-
-func (c *Config) SetVertexAiModelID(v string) { c.vertexAiModelID = v }
-func (c *Config) GetVertexAiModelID() string  { return c.vertexAiModelID }
+func (c *Config) SetVertexAiApiModelID(v string) { c.vertexAiApiModelID = v }
+func (c *Config) GetVertexAiApiModelID() string  { return c.vertexAiApiModelID }
 
 // == Encryption Getters/Setters ==
 func (c *Config) SetEnvEncryptionKey(v string) {
@@ -711,6 +440,15 @@ func (c *Config) SetCacheStoreUsed(v bool) {
 
 func (c *Config) GetCacheStoreUsed() bool {
 	return c.cacheStoreUsed
+}
+
+// == Subscription Store Getters/Setters ==
+func (c *Config) SetSubscriptionStoreUsed(v bool) {
+	c.subscriptionStoreUsed = v
+}
+
+func (c *Config) GetSubscriptionStoreUsed() bool {
+	return c.subscriptionStoreUsed
 }
 
 // == Blog Store Getters/Setters ==
@@ -847,6 +585,14 @@ func (c *Config) GetUserStoreUsed() bool {
 	return c.userStoreUsed
 }
 
+func (c *Config) SetUserStoreVaultEnabled(v bool) {
+	c.userStoreVaultEnabled = v
+}
+
+func (c *Config) GetUserStoreVaultEnabled() bool {
+	return c.userStoreVaultEnabled
+}
+
 // == Stats Getters/Setters ==
 func (c *Config) SetStatsStoreUsed(v bool) {
 	c.statsStoreUsed = v
@@ -900,6 +646,15 @@ func (c *Config) SetRegistrationEnabled(v bool) {
 
 func (c *Config) GetRegistrationEnabled() bool {
 	return c.registrationEnabled
+}
+
+// == Audit Store Getters/Setters ==
+func (c *Config) SetAuditStoreUsed(v bool) {
+	c.auditStoreUsed = v
+}
+
+func (c *Config) GetAuditStoreUsed() bool {
+	return c.auditStoreUsed
 }
 
 // == Vault Store Getters/Setters ==

@@ -3,6 +3,7 @@ package page_not_found
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -15,18 +16,16 @@ func TestHandlerReturnsNotFound(t *testing.T) {
 
 	res := c.Handler(rec, req)
 
-	// Verify returned message
-	if res != "Sorry, page not found." {
-		t.Fatalf("expected 'Sorry, page not found.', got: %q", res)
-	}
-
 	// Verify status code written to ResponseWriter
 	if rec.Code != http.StatusNotFound {
 		t.Fatalf("expected status %d, got %d", http.StatusNotFound, rec.Code)
 	}
 
-	// Handler does not write body, only status; ensure body is empty
-	if rec.Body.Len() != 0 {
-		t.Fatalf("expected empty response body, got: %q", rec.Body.String())
+	// Verify HTML content contains key elements
+	if !strings.Contains(res, "<title>404 - Page Not Found</title>") {
+		t.Fatal("expected HTML response with title")
+	}
+	if !strings.Contains(res, "Oops! Page Not Found") {
+		t.Fatal("expected HTML response with error title")
 	}
 }

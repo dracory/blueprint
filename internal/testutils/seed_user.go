@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/userstore"
 )
 
-// SeedUser find existing or generates a new user with the given ID
+// SeedUser find existing or generates a new user with the given ID (no email, no names)
 func SeedUser(userStore userstore.StoreInterface, userID string) (userstore.UserInterface, error) {
 	if userStore == nil {
 		return nil, errors.New("userstore is not configured")

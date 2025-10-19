@@ -13,6 +13,7 @@ func (a *Application) dataStoresInitialize() error {
 	}
 
 	initializers := []func(app types.AppInterface) error{
+		auditStoreInitialize,
 		blindIndexEmailStoreInitialize,
 		blindIndexFirstNameStoreInitialize,
 		blindIndexLastNameStoreInitialize,
@@ -29,10 +30,11 @@ func (a *Application) dataStoresInitialize() error {
 		settingStoreInitialize,
 		shopStoreInitialize,
 		sqlFileStorageInitialize,
+		statsStoreInitialize,
+		subscriptionStoreInitialize,
+		taskStoreInitialize,
 		userStoreInitialize,
 		vaultStoreInitialize,
-		taskStoreInitialize,
-		statsStoreInitialize,
 	}
 
 	for _, initializer := range initializers {

@@ -325,7 +325,10 @@ func TestAdminMiddleware_Success(t *testing.T) {
 	// Act
 
 	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(application).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Success"))
+		if _, err := w.Write([]byte("Success")); err != nil {
+			t.Errorf("failed to write response: %v", err)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
 		Context: map[any]any{

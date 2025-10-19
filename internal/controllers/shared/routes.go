@@ -2,9 +2,11 @@ package shared
 
 import (
 	"net/http"
+	"project/internal/controllers/shared/cdn"
 	"project/internal/controllers/shared/file"
 	"project/internal/controllers/shared/flash"
 	"project/internal/controllers/shared/media"
+	"project/internal/controllers/shared/page_not_found"
 	"project/internal/controllers/shared/resource"
 	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
@@ -21,6 +23,12 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
 			return "google.com, pub-8821108004642146, DIRECT, f08c47fec0942fa0"
 		})
+
+	cdnRoute := rtr.NewRoute().
+		SetName("Shared > CDN Controller").
+		SetPath("/cdn/:name").
+		SetMethod(http.MethodGet).
+		SetHandler(cdn.NewCdnController().Handler)
 
 	files := rtr.NewRoute().
 		SetName("Shared > Files Controller").
@@ -59,8 +67,14 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath("/th/:extension/:size/:quality/:path...").
 		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
+	pageNotFound := rtr.NewRoute().
+		SetName("Shared > Page Not Found Controller").
+		SetPath("/404").
+		SetHTMLHandler(page_not_found.PageNotFoundController().Handler)
+
 	return []rtr.RouteInterface{
 		adsTxt,
+		cdnRoute,
 		files,
 		flash,
 		media,
@@ -68,5 +82,6 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		theme,
 		thumbRoute,
 		thumbCatchAll,
+		pageNotFound,
 	}
 }

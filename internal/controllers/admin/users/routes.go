@@ -1,4 +1,4 @@
-package admin
+package users
 
 import (
 	"project/internal/links"

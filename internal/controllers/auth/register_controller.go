@@ -78,7 +78,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
 	}
 
-	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() == nil {
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.GetVaultStore() == nil {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, links.Website().Home(), 5)
 	}
 
@@ -107,8 +107,18 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		},
 		StyleURLs: []string{cdn.BootstrapIconsCss_1_11_3()},
 		Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
-		@media (min-width: 576px) {.container.container-xs {max-width: 350px;}}
-		body{background:rgba(128,0,128,0.05);}`},
+		@media (min-width: 576px) {.container.container-xs {max-width: 520px;}}
+		body{background:rgba(128,0,128,0.05);}`,
+		`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
+		#CardRegister .card-header{padding:24px;border-bottom:1px solid rgba(0,0,0,0.05);background:#f8f9ff;}
+		#CardRegister .card-header h3{font-size:14px;font-weight:600;letter-spacing:0.08em;color:#4b4b63;text-transform:uppercase;}
+		#CardRegister .card-body{padding:32px;}
+		#CardRegister .form-group{margin-bottom:18px;}
+		#CardRegister .form-group label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600!important;color:#2b2b3f;text-transform:none;letter-spacing:0.02em;margin-bottom:6px;}
+		#CardRegister .form-group label sup{font-size:12px;font-weight:500;color:#e26d78;margin-left:8px;}
+		#CardRegister .form-control,#CardRegister .form-select{border-radius:14px;border-color:rgba(111,108,212,0.4);padding:12px 15px;transition:box-shadow 0.2s ease,border-color 0.2s ease;}
+		#CardRegister .form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%234e73df' d='M4.646 6.146a.5.5 0 0 1 .708 0L8 8.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:14px;}
+		#CardRegister .form-control:focus{box-shadow:0 0 0 0.25rem rgba(78,115,223,0.2);border-color:#4e73df;}`},
 	}).ToHTML()
 }
 
@@ -140,7 +150,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		return controller.formRegister(data).ToHTML()
 	}
 
-	if controller.app.GetConfig().GetVaultStoreUsed() {
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
 		if controller.app.GetVaultStore() == nil {
 			data.formErrorMessage = "We are very sorry vault store is not configured. Saving the details not possible."
 			return controller.formRegister(data).ToHTML()
@@ -227,7 +237,7 @@ func (controller *registerController) formRegister(data registerControllerData) 
 		Style("margin-left:5px;color:lightcoral;")
 
 	buttonSave := bs.Button().
-		Class("btn-primary mb-0 w-100").
+		Class("btn-primary mb-0 w-100 py-3 fs-5").
 		Attr("type", "button").
 		Child(hb.I().Class("bi bi-check-circle me-2")).
 		Text("Save changes").
@@ -257,19 +267,23 @@ func (controller *registerController) formRegister(data registerControllerData) 
 				Value(data.lastName),
 		})
 
-	businessNameGroup := bs.FormGroup().Children([]hb.TagInterface{
-		bs.FormLabel("Company / buiness name"),
-		bs.FormInput().
-			Name("business_name").
-			Value(data.buinessName),
-	})
+	businessNameGroup := hb.Div().
+		Class("form-group").
+		Children([]hb.TagInterface{
+			bs.FormLabel("Company / buiness name"),
+			bs.FormInput().
+				Name("business_name").
+				Value(data.buinessName),
+		})
 
-	phoneGroup := bs.FormGroup().Children([]hb.TagInterface{
-		bs.FormLabel("Phone"),
-		bs.FormInput().
-			Name("phone").
-			Value(data.phone),
-	})
+	phoneGroup := hb.Div().
+		Class("form-group").
+		Children([]hb.TagInterface{
+			bs.FormLabel("Phone"),
+			bs.FormInput().
+				Name("phone").
+				Value(data.phone),
+		})
 
 	emailGroup := hb.Div().
 		Class("form-group").
@@ -317,31 +331,26 @@ func (controller *registerController) formRegister(data registerControllerData) 
 		ID("FormRegister").
 		Child(
 			bs.Row().
-				Class("g-4").
+				Class("g-3").
 				Children([]hb.TagInterface{
 					bs.Column(12).
-						Class("mt-3").
 						Child(emailGroup),
 					bs.Column(6).
-						Class("mt-3").
 						Child(firstNameGroup),
 					bs.Column(6).
-						Class("mt-3").
 						Child(lastNameGroup),
 					bs.Column(6).
 						Child(businessNameGroup),
 					bs.Column(6).
 						Child(phoneGroup),
 					bs.Column(6).
-						Class("mt-3").
 						Child(countryGroup),
 					bs.Column(6).
-						Class("mt-3").
 						Child(timezoneGroup),
 				}),
 		).
 		Child(
-			bs.Row().Class("mt-3").Children([]hb.TagInterface{
+			bs.Row().Class("mt-4").Children([]hb.TagInterface{
 				bs.Column(12).Class("d-sm-flex justify-content-end").
 					Children([]hb.TagInterface{
 						buttonSave,
@@ -363,19 +372,25 @@ func (controller *registerController) formRegister(data registerControllerData) 
 			}),
 		}).
 		ChildIf(data.formErrorMessage != "", hb.Swal(hb.SwalOptions{
-			Icon:              "error",
-			Title:             "Oops...",
+			Icon: "error",
+			// Title:             "Oops...",
 			Text:              data.formErrorMessage,
 			ShowCancelButton:  false,
-			ConfirmButtonText: "OK",
+			ShowConfirmButton: false,
+			Timer:             5000,
+			TimerProgressBar:  true,
+			Position:          "top-end",
 		})).
 		ChildIf(data.formSuccessMessage != "", hb.Swal(hb.SwalOptions{
 			Icon:              "success",
 			Title:             "Saved",
 			Text:              data.formSuccessMessage,
 			ShowCancelButton:  false,
-			ConfirmButtonText: "OK",
+			ShowConfirmButton: false,
 			ConfirmCallback:   "window.location.href = window.location.href",
+			Timer:             5000,
+			TimerProgressBar:  true,
+			Position:          "top-end",
 		})).
 		ChildIf(data.formRedirectURL != "", hb.Script(`window.location.href = '`+data.formRedirectURL+`'`))
 }
@@ -391,7 +406,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	businessName = user.BusinessName()
 	phone = user.Phone()
 
-	if !controller.app.GetConfig().GetVaultStoreUsed() {
+	if !controller.app.GetConfig().GetUserStoreVaultEnabled() {
 		return email, firstName, lastName, businessName, phone, nil
 	}
 
@@ -464,6 +479,10 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 
 	if authUser == nil {
 		return registerControllerData{}, "You must be logged in to access this page"
+	}
+
+	if controller.app.GetGeoStore() == nil {
+		return registerControllerData{}, "Geo store is nil"
 	}
 
 	countries, errCountries := controller.app.GetGeoStore().CountryList(geostore.CountryQueryOptions{

@@ -63,13 +63,23 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetVaultStoreUsed(false)
 	testConfig.SetVaultStoreKey("abcdefghijklmnopqrstuvwxyz1234567890")
 
-	// Artificial Intelligence
+	// Artificial Intelligence LLMs
+	testConfig.SetAnthropicApiUsed(false)
+	testConfig.SetAnthropicApiKey("anthropic_api_key")
+	testConfig.SetAnthropicApiDefaultModel("anthropic_api_default_model")
+	testConfig.SetGoogleGeminiApiUsed(false)
+	testConfig.SetGoogleGeminiApiKey("google_gemini_api_key")
+	testConfig.SetGoogleGeminiApiDefaultModel("google_gemini_api_default_model")
+	testConfig.SetOpenAiApiUsed(false)
 	testConfig.SetOpenAiApiKey("openai_api_key")
-	testConfig.SetVertexAiUsed(false)
-	testConfig.SetVertexAiDefaultModel("vertex_default_model")
-	testConfig.SetVertexAiProjectID("vertex_project_id")
-	testConfig.SetVertexAiRegionID("vertex_region_id")
-	testConfig.SetVertexAiModelID("vertex_model_id")
+	testConfig.SetOpenRouterApiUsed(false)
+	testConfig.SetOpenRouterApiKey("openrouter_api_key")
+	testConfig.SetOpenRouterApiDefaultModel("openrouter_api_default_model")
+	testConfig.SetVertexAiApiUsed(false)
+	testConfig.SetVertexAiApiDefaultModel("vertex_ai_api_default_model")
+	testConfig.SetVertexAiApiProjectID("vertex_ai_api_project_id")
+	testConfig.SetVertexAiApiRegionID("vertex_ai_api_region_id")
+	testConfig.SetVertexAiApiModelID("vertex_ai_api_model_id")
 
 	// Payments
 	testConfig.SetStripeKeyPrivate("sk_test_yoursecretkey")
@@ -87,7 +97,9 @@ func TestTestDBIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create test database: %v", err)
 	}
-	defer test.CloseTestDB(db)
+	defer func() {
+		_ = test.CloseTestDB(db)
+	}()
 
 	// Create a test table
 	err = test.CreateTestTable(db, "test_users", "id INTEGER PRIMARY KEY, name TEXT")

@@ -23,7 +23,7 @@ import (
 	"github.com/dracory/base/img"
 	"github.com/spf13/cast"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 	"github.com/samber/lo"
 )
 
@@ -194,6 +194,10 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 			return "", err.Error()
 		}
 	} else if data.isCache {
+		if cache.File == nil {
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
+			return "", "cache not initialized"
+		}
 		dataBase64ImageStr, err := cache.File.Fetch(data.path)
 
 		if err != nil {
@@ -252,7 +256,11 @@ func (controller *thumbnailController) urlToBytes(url string) ([]byte, error) {
 		return nil, errors.New("no response")
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("warning: failed to close response body: %v", err)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 

@@ -22,12 +22,20 @@ func IsFlashRoute(r *http.Request) bool {
 func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, message string, url string, seconds int) string {
 	id := uid.HumanUid()
 
-	cacheStore.SetJSON(id+"_flash_message", map[string]any{
+	if cacheStore == nil {
+		return "to_flash_url: cache store is nil"
+	}
+
+	err := cacheStore.SetJSON(id+"_flash_message", map[string]any{
 		"type":    messageType,
 		"message": message,
 		"url":     url,
 		"time":    seconds,
 	}, int64(seconds)+10)
+	if err != nil {
+		// Log error but continue since this is not critical
+		return "to_flash_url: failed to set flash message: " + err.Error()
+	}
 
 	return links.Website().Flash(map[string]string{
 		"message_id": id,

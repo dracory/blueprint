@@ -36,25 +36,33 @@ func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !app.GetConfig().GetSessionStoreUsed() {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("session store not enabled"))
+			if _, err := w.Write([]byte("session store not enabled")); err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+			}
 			return
 		}
 
 		if app.GetSessionStore() == nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("session store not initialized"))
+			if _, err := w.Write([]byte("session store not initialized")); err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+			}
 			return
 		}
 
 		if !app.GetConfig().GetUserStoreUsed() {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("user store not enabled"))
+			if _, err := w.Write([]byte("user store not enabled")); err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+			}
 			return
 		}
 
 		if app.GetUserStore() == nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("user store not initialized"))
+			if _, err := w.Write([]byte("user store not initialized")); err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+			}
 			return
 		}
 

@@ -27,6 +27,7 @@ func newTestApp(t *testing.T) types.AppInterface {
 	cfg.SetDatabasePassword("")
 	cfg.SetDatabaseName(fmt.Sprintf("file:mp_test_%d?mode=memory&cache=shared", time.Now().UnixNano()))
 
+	cfg.SetAuditStoreUsed(true)
 	cfg.SetBlogStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetCmsStoreUsed(true)
@@ -41,6 +42,7 @@ func newTestApp(t *testing.T) types.AppInterface {
 	cfg.SetShopStoreUsed(true)
 	cfg.SetSqlFileStoreUsed(true)
 	cfg.SetStatsStoreUsed(true)
+	cfg.SetSubscriptionStoreUsed(true)
 	cfg.SetTaskStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
@@ -55,6 +57,7 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	ctx := context.Background()
 
 	// Verify all stores are wired (non-nil)
+	require.NotNil(t, a.GetAuditStore())
 	require.NotNil(t, a.GetBlogStore())
 	require.NotNil(t, a.GetCacheStore())
 	require.NotNil(t, a.GetCmsStore())
@@ -70,6 +73,7 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	require.NotNil(t, a.GetTaskStore())
 	require.NotNil(t, a.GetUserStore())
 	require.NotNil(t, a.GetVaultStore())
+	require.NotNil(t, a.GetSubscriptionStore())
 	require.NotNil(t, a.GetBlindIndexStoreEmail())
 	require.NotNil(t, a.GetBlindIndexStoreFirstName())
 	require.NotNil(t, a.GetBlindIndexStoreLastName())
@@ -85,6 +89,8 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 		"snv_metas_meta",
 		"snv_stats_visitor",
 		"snv_tasks_task",
+		"snv_subscriptions_plan",
+		"snv_subscriptions_subscription",
 		"snv_vault_vault",
 		"snv_bindx_email",
 		"snv_bindx_first_name",

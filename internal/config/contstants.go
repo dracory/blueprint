@@ -97,29 +97,29 @@ const KEY_AUTH_REGISTRATION_ENABLED = "AUTH_REGISTRATION_ENABLED"
 // LLM: Anthropic
 const KEY_ANTHROPIC_API_USED = "ANTHROPIC_API_USED"
 const KEY_ANTHROPIC_API_KEY = "ANTHROPIC_API_KEY"
-const KEY_ANTHROPIC_DEFAULT_MODEL = "ANTHROPIC_DEFAULT_MODEL"
+const KEY_ANTHROPIC_API_DEFAULT_MODEL = "ANTHROPIC_DEFAULT_MODEL"
 
 // LLM: Google Gemini
 const KEY_GEMINI_API_USED = "GEMINI_API_USED"
 const KEY_GEMINI_API_KEY = "GEMINI_API_KEY"
-const KEY_GEMINI_DEFAULT_MODEL = "GEMINI_DEFAULT_MODEL"
+const KEY_GEMINI_API_DEFAULT_MODEL = "GEMINI_DEFAULT_MODEL"
 
 // LLM: OpenAI
 const KEY_OPENAI_API_USED = "OPENAI_API_USED"
 const KEY_OPENAI_API_KEY = "OPENAI_API_KEY"
-const KEY_OPENAI_DEFAULT_MODEL = "OPENAI_DEFAULT_MODEL"
+const KEY_OPENAI_API_DEFAULT_MODEL = "OPENAI_DEFAULT_MODEL"
 
 // LLM: OpenRouter
 const KEY_OPENROUTER_API_USED = "OPENROUTER_API_USED"
 const KEY_OPENROUTER_API_KEY = "OPENROUTER_API_KEY"
-const KEY_OPENROUTER_DEFAULT_MODEL = "OPENROUTER_DEFAULT_MODEL"
+const KEY_OPENROUTER_API_DEFAULT_MODEL = "OPENROUTER_DEFAULT_MODEL"
 
 // LLM: Vertex AI
-const KEY_VERTEX_AI_USED = "VERTEX_AI_USED"
-const KEY_VERTEX_MODEL_ID = "VERTEX_MODEL_ID"
-const KEY_VERTEX_PROJECT_ID = "VERTEX_PROJECT_ID"
-const KEY_VERTEX_REGION_ID = "VERTEX_REGION_ID"
-const KEY_VERTEX_DEFAULT_MODEL = "VERTEX_DEFAULT_MODEL"
+const KEY_VERTEX_AI_API_USED = "VERTEX_AI_API_USED"
+const KEY_VERTEX_AI_API_MODEL_ID = "VERTEX_AI_API_MODEL_ID"
+const KEY_VERTEX_AI_API_PROJECT_ID = "VERTEX_AI_API_PROJECT_ID"
+const KEY_VERTEX_AI_API_REGION_ID = "VERTEX_AI_API_REGION_ID"
+const KEY_VERTEX_AI_API_DEFAULT_MODEL = "VERTEX_AI_API_DEFAULT_MODEL"
 
 // ============================================================================
 // == END: Artifical Intelligence Configurations (LLM)
@@ -170,6 +170,10 @@ const KEY_ENVENC_KEY_PRIVATE = "ENVENC_KEY_PRIVATE"
 //
 // This is where you can configure the stores used by the application.
 //
+
+// KEY_AUDIT_STORE_USED toggles initialization of the audit store responsible for
+// recording change history. Enable it when audit logging should be persisted.
+const KEY_AUDIT_STORE_USED = "AUDIT_STORE_USED"
 
 // KEY_BLOG_STORE_USED toggles initialization of the public blog store. Enable it
 // when the application should expose blog content backed by blogstore tables.
@@ -231,6 +235,10 @@ const KEY_SQL_FILE_STORE_USED = "SQL_FILE_STORE_USED"
 // enabled, reporting jobs will read/write supporting tables.
 const KEY_STATS_STORE_USED = "STATS_STORE_USED"
 
+// KEY_SUBSCRIPTION_STORE_USED toggles subscription store bootstrapping. Enable
+// it when subscription plans and billing data should be managed.
+const KEY_SUBSCRIPTION_STORE_USED = "SUBSCRIPTION_STORE_USED"
+
 // KEY_TASK_STORE_USED toggles the task orchestration store and requires task
 // queues to be reachable.
 const KEY_TASK_STORE_USED = "TASK_STORE_USED"
@@ -238,6 +246,7 @@ const KEY_TASK_STORE_USED = "TASK_STORE_USED"
 // KEY_USER_STORE_USED activates the user store. User authentication and profile
 // management will fail if the necessary tables are missing.
 const KEY_USER_STORE_USED = "USER_STORE_USED"
+const KEY_USER_STORE_USE_VAULT = "USER_STORE_USE_VAULT"
 
 // KEY_VAULT_STORE_USED toggles secret vault storage. When true, vault keys and
 // encrypted records must be provisioned.

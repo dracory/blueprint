@@ -13,14 +13,15 @@ import (
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
 )
-func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T) {
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -48,7 +49,7 @@ func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T)
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -69,14 +70,14 @@ func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T)
 }
 
 func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetRegistrationEnabled(false)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+	app.GetConfig().SetRegistrationEnabled(false)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -97,7 +98,7 @@ func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
 		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -121,13 +122,13 @@ func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
 }
 
 func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -155,7 +156,7 @@ func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -176,14 +177,14 @@ func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -193,7 +194,7 @@ func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
 			auth.AuthenticatedUserID{}:           user.ID(),
@@ -230,15 +231,15 @@ func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithVaultStore(true),
+	)
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -248,7 +249,7 @@ func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
 			auth.AuthenticatedUserID{}:           user.ID(),
@@ -285,14 +286,14 @@ func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -302,7 +303,7 @@ func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email": {user.Email()},
 		},
@@ -342,15 +343,15 @@ func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
 }
 
 func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithVaultStore(true),
+	)
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -360,7 +361,7 @@ func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email": {user.Email()},
 		},

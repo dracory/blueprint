@@ -28,7 +28,7 @@ func adminLayout(app types.AppInterface, r *http.Request, options Options) *dash
 
 	dashboardUser := dashboard.User{}
 	if authUser != nil {
-		firstName, lastName, err := getUserData(app, r, authUser, app.GetConfig().GetVaultStoreKey())
+		firstName, lastName, err := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
 		if err == nil {
 			dashboardUser = dashboard.User{
 				FirstName: firstName,

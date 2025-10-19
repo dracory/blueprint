@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/layouts"
@@ -52,7 +53,16 @@ func NewCmsLayoutMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 					Styles:     []string{},
 				}).ToHTML()
 
-				w.Write([]byte(fullPage))
+				if _, err := w.Write([]byte(fullPage)); err != nil {
+					app.GetLogger().Error("Failed to write response", 
+						slog.String("error", err.Error()),
+						slog.String("path", r.URL.Path),
+					)
+					// At this point, we've already started writing the response, 
+					// so we can't send a different status code
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
 			})
 		})
 }

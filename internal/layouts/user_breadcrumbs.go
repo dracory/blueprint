@@ -3,36 +3,35 @@ package layouts
 import (
 	"project/internal/links"
 
-	"github.com/dracory/bs"
 	"github.com/dracory/hb"
 )
 
 // userBreadcrumbs generates the user breadcrumbs
 // the first breadcrumb is always the dashboard
-func userBreadcrumbs(path []bs.Breadcrumb) hb.TagInterface {
-	breadcrumbsPath := []bs.Breadcrumb{
+func userBreadcrumbs(path []Breadcrumb) hb.TagInterface {
+	breadcrumbsPath := []Breadcrumb{
 		{
 			Name: "Dashboard",
-			URL:  links.User().Home(map[string]string{}),
+			URL:  links.User().Home(),
 			Icon: hb.I().Class("bi bi-speedometer").Style("font-size: 16px; color: gray").ToHTML(),
 		},
 	}
 
 	breadcrumbsPath = append(breadcrumbsPath, path...)
 
-	breadcrumbs := bs.Breadcrumbs(breadcrumbsPath)
+	breadcrumbs := Breadcrumbs(breadcrumbsPath)
 
 	return breadcrumbs
 }
 
-func NewUserBreadcrumbsSection(path []bs.Breadcrumb) hb.TagInterface {
+func NewUserBreadcrumbsSection(path []Breadcrumb) hb.TagInterface {
 	return hb.Section().
 		ID("SectionBreadcrumbs").
 		Child(userBreadcrumbs(path)).
 		Style("margin-bottom:10px;")
 }
 
-func NewUserBreadcrumbsSectionWithContainer(path []bs.Breadcrumb) hb.TagInterface {
+func NewUserBreadcrumbsSectionWithContainer(path []Breadcrumb) hb.TagInterface {
 	return hb.Section().
 		ID("SectionBreadcrumbs").
 		Child(

@@ -14,8 +14,7 @@ import "project/internal/types"
 func WidgetRegistry(app types.AppInterface) []Widget {
 	return []Widget{
 		NewAuthenticatedWidget(app),
-		NewContactFormWidget(app),
-		NewTermsOfUseWidget(app),
+		// NewContactFormWidget(app),
 		NewUnauthenticatedWidget(app),
 		NewVisibleWidget(app),
 	}

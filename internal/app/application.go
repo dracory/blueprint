@@ -9,6 +9,10 @@ import (
 	"project/internal/cache"
 	"project/internal/types"
 
+	"github.com/dracory/subscriptionstore"
+
+	"github.com/dracory/auditstore"
+
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cachestore"
@@ -44,6 +48,7 @@ type Application struct {
 	consoleLogger  *slog.Logger
 
 	// Database stores
+	auditStore          auditstore.StoreInterface
 	blogStore           blogstore.StoreInterface
 	blindIndexEmail     blindindexstore.StoreInterface
 	blindIndexFirstName blindindexstore.StoreInterface
@@ -56,6 +61,7 @@ type Application struct {
 	geoStore            geostore.StoreInterface
 	logStore            logstore.StoreInterface
 	metaStore           metastore.StoreInterface
+	subscriptionStore   subscriptionstore.StoreInterface
 	sessionStore        sessionstore.StoreInterface
 	settingStore        settingstore.StoreInterface
 	shopStore           shopstore.StoreInterface
@@ -172,6 +178,13 @@ func (a *Application) SetFileCache(c cachego.Cache) {
 // ============================================================================
 // == Store accessors
 // ============================================================================
+
+func (a *Application) GetAuditStore() auditstore.StoreInterface {
+	return a.auditStore
+}
+func (a *Application) SetAuditStore(s auditstore.StoreInterface) {
+	a.auditStore = s
+}
 
 // LogStore
 func (a *Application) GetLogStore() logstore.StoreInterface {
@@ -308,6 +321,13 @@ func (a *Application) GetSettingStore() settingstore.StoreInterface {
 }
 func (a *Application) SetSettingStore(s settingstore.StoreInterface) {
 	a.settingStore = s
+}
+
+func (a *Application) GetSubscriptionStore() subscriptionstore.StoreInterface {
+	return a.subscriptionStore
+}
+func (a *Application) SetSubscriptionStore(s subscriptionstore.StoreInterface) {
+	a.subscriptionStore = s
 }
 
 // Blind index stores

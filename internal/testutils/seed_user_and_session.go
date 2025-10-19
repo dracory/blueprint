@@ -9,6 +9,10 @@ import (
 )
 
 func SeedUserAndSession(userStore userstore.StoreInterface, sessionStore sessionstore.StoreInterface, userID string, r *http.Request, expiresSeconds int) (user userstore.UserInterface, session sessionstore.SessionInterface, err error) {
+	if r == nil {
+		return nil, nil, errors.New("request should not be nil")
+	}
+
 	user, err = SeedUser(userStore, userID)
 
 	if err != nil {
