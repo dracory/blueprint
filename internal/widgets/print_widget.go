@@ -3,7 +3,7 @@ package widgets
 import (
 	"net/http"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 	"github.com/robertkrimen/otto"
 )
 

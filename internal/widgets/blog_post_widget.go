@@ -8,11 +8,11 @@ import (
 	"project/internal/types"
 	"strings"
 
+	"github.com/dracory/base/cfmt"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
 	"github.com/dracory/str"
-	"github.com/mingrammer/cfmt"
 )
 
 var _ Widget = (*blogPostWidget)(nil) // verify it extends the interface

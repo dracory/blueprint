@@ -2,6 +2,7 @@ package swagger
 
 import (
 	"embed"
+	"log"
 	"net/http"
 )
 
@@ -16,7 +17,9 @@ func SwaggerUIController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(data)
+	if _, err := w.Write(data); err != nil {
+		log.Printf("swagger: failed to write swagger-ui response: %v", err)
+	}
 }
 
 // SwaggerYAMLController serves the embedded Swagger YAML file
@@ -27,5 +30,7 @@ func SwaggerYAMLController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/x-yaml; charset=utf-8")
-	w.Write(data)
+	if _, err := w.Write(data); err != nil {
+		log.Printf("swagger: failed to write swagger.yaml response: %v", err)
+	}
 }

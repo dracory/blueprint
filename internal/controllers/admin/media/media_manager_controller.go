@@ -155,14 +155,22 @@ func (c *mediaManagerController) fileUploadAjax(r *http.Request) string {
 	if err != nil {
 		return api.Error(err.Error()).ToString()
 	}
-	defer file.Close() // Cleanup
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			log.Println(closeErr.Error())
+		}
+	}() // Cleanup
 
 	filePath, errSave := files.SaveToTempDir(fileHeader.Filename, file)
 	if errSave != nil {
 		log.Println(errSave.Error())
 		return api.Error(errSave.Error()).ToString()
 	}
-	defer os.Remove(filePath) // Cleanup
+	defer func() {
+		if removeErr := os.Remove(filePath); removeErr != nil {
+			log.Println(removeErr.Error())
+		}
+	}() // Cleanup
 
 	remoteFilePath := currentDir + "/" + fileHeader.Filename
 
