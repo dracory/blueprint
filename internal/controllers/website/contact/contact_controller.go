@@ -11,8 +11,8 @@ import (
 	"project/internal/tasks"
 	"project/internal/types"
 
+	"github.com/dracory/csrf"
 	"github.com/dracory/req"
-	"github.com/gouniverse/csrf"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"

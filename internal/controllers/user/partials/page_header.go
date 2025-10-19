@@ -5,8 +5,8 @@ import (
 	"project/internal/links"
 
 	"github.com/dracory/hb"
-	"github.com/gouniverse/icons"
-	"github.com/gouniverse/uid"
+	"github.com/dracory/uid"
+
 	"github.com/samber/lo"
 )
 
@@ -32,7 +32,7 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 		Class("d-flex align-items-center justify-content-center rounded-circle bg-white text-primary me-3").
 		Style("width:56px;height:56px;").
 		Children([]hb.TagInterface{
-			icons.Icon(iconName, 28, 28, "currentColor"),
+			hb.I().Class("bi " + iconName).Style("font-size:28px;"),
 		})
 
 	heading := hb.NewHeading1().
