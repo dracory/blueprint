@@ -162,7 +162,11 @@ func (t *statsVisitorEnhanceTask) findCountryByIp(ip string) string {
 		return "UN"
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("Closing response body failed: %s", err)
+		}
+	}()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {

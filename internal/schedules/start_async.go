@@ -56,7 +56,9 @@ func StartAsync(app types.AppInterface) {
 	// }
 
 	// Schedule Building the Stats Every 2 Minutes
-	scheduler.Every(2).Minutes().Do(func() { scheduleStatsVisitorEnhanceTask(app) })
+	if _, err := scheduler.Every(2).Minutes().Do(func() { scheduleStatsVisitorEnhanceTask(app) }); err != nil {
+		cfmt.Errorln("Error scheduling stats visitor enhance task:", err.Error())
+	}
 
 	// Clean up every 20 minutes
 	if _, err := scheduler.Every(20).Minutes().Do(func() {

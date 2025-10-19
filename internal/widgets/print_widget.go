@@ -50,7 +50,9 @@ func (t *printWidget) Render(r *http.Request, content string, params map[string]
 
 	vm := otto.New()
 
-	vm.Set("path", path)
+	if err := vm.Set("path", path); err != nil {
+		cfmt.Errorln(err)
+	}
 
 	result, err := vm.Run("result = " + content)
 
