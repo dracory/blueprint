@@ -13,7 +13,7 @@ import (
 
 func TestSitemapXmlController_NoBlogStore(t *testing.T) {
 	app := testutils.Setup()
-	controller := NewSitemapXmlController(app.GetBlogStore())
+	controller := NewSitemapXmlController(app)
 
 	body, response, err := test.CallStringEndpoint(http.MethodGet, controller.Handler, test.NewRequestOptions{})
 
@@ -36,8 +36,16 @@ func TestSitemapXmlController_NoBlogStore(t *testing.T) {
 
 func TestSitemapXmlController_WithBlogStore(t *testing.T) {
 	app := testutils.Setup(testutils.WithBlogStore(true))
-	store := app.GetBlogStore()
-	if store == nil {
+	if app == nil {
+		t.Fatal("expected app to be initialized")
+	}
+	if app.GetConfig() == nil {
+		t.Fatal("expected app config to be initialized")
+	}
+	if !app.GetConfig().GetBlogStoreUsed() {
+		t.Fatal("expected blog store to be enabled")
+	}
+	if app.GetBlogStore() == nil {
 		t.Fatal("expected blog store to be initialized")
 	}
 
@@ -46,11 +54,11 @@ func TestSitemapXmlController_WithBlogStore(t *testing.T) {
 		SetTitle("first-post").
 		SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := store.PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 
-	controller := NewSitemapXmlController(store)
+	controller := NewSitemapXmlController(app)
 	body, response, err := test.CallStringEndpoint(http.MethodGet, controller.Handler, test.NewRequestOptions{})
 
 	if err != nil {

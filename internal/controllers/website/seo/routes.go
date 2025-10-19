@@ -29,7 +29,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	sitemapRoute := rtr.NewRoute().
 		SetName("Website > Sitemap").
 		SetPath("/sitemap.xml").
-		SetHTMLHandler(NewSitemapXmlController(app.GetBlogStore()).Handler)
+		SetHTMLHandler(NewSitemapXmlController(app).Handler)
 
 	return []rtr.RouteInterface{
 		adsRoute,
