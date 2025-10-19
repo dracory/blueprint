@@ -111,11 +111,12 @@ func (l *websiteLinks) Thumbnail(extension, width, height, quality, path string)
 	}
 	if strings.HasPrefix(path, "data") {
 		hash := str.MD5(path)
-		err := cache.File.Save(hash, path, 5*time.Minute)
-		if err != nil {
-			return RootURL() + "/th/cache-error"
+		if cache.File != nil {
+			if err := cache.File.Save(hash, path, 5*time.Minute); err != nil {
+				return RootURL() + "/th/cache-error"
+			}
+			path = "cache-" + hash
 		}
-		path = "cache-" + hash
 	}
 	return RootURL() + "/th/" + extension + "/" + width + "x" + height + "/" + quality + "/" + path
 }

@@ -5,29 +5,49 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/hb"
+	"github.com/samber/lo"
 )
 
-func NewEmailToAdminOnNewUserRegistered(cfg types.ConfigInterface) *emailToAdminOnNewUserRegistered {
-	return &emailToAdminOnNewUserRegistered{cfg: cfg}
+func NewEmailToAdminOnNewUserRegistered(app types.AppInterface) *emailToAdminOnNewUserRegistered {
+	return &emailToAdminOnNewUserRegistered{app: app}
 }
 
-type emailToAdminOnNewUserRegistered struct{ cfg types.ConfigInterface }
+type emailToAdminOnNewUserRegistered struct{ app types.AppInterface }
 
 // Send sends an email notification to the admin when a new user registers
 func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
-	appName := e.cfg.GetAppName()
+	appName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetAppName()
+	}).Else("")
 	emailSubject := appName + ". New User Registered"
-	emailContent := e.template(userID)
+	emailContent := e.template(e.app, userID)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 
+	fromEmail := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromAddress()
+	}).Else("")
+
+	fromName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromName()
+	}).Else("")
+
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From:     e.cfg.GetMailFromAddress(),
-		FromName: appName,
+		From:     fromEmail,
+		FromName: fromName,
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -35,9 +55,16 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 	return errSend
 }
 
-func (e *emailToAdminOnNewUserRegistered) template(userID string) string {
+func (e *emailToAdminOnNewUserRegistered) template(app types.AppInterface, userID string) string {
+	appName := lo.IfF(app != nil, func() string {
+		if app.GetConfig() == nil {
+			return ""
+		}
+		return app.GetConfig().GetAppName()
+	}).Else("")
+
 	urlHome := hb.Hyperlink().
-		HTML(e.cfg.GetAppName()).
+		HTML(appName).
 		Href(links.Website().Home()).
 		ToHTML()
 
@@ -46,7 +73,7 @@ func (e *emailToAdminOnNewUserRegistered) template(userID string) string {
 		Style(STYLE_HEADING)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new user ID ` + userID + `	that registsred into ` + e.cfg.GetAppName() + `.`).
+		HTML(`There is a new user ID ` + userID + `	that registsred into ` + appName + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().

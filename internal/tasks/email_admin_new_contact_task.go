@@ -69,7 +69,7 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {
 
 	// Initialize emails package with config and send using DI
 	emails.InitEmailSender(handler.app)
-	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.app.GetConfig()).Send()
+	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.app).Send()
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

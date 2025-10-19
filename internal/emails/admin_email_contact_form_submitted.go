@@ -5,44 +5,51 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/hb"
+	"github.com/samber/lo"
 )
 
-func NewEmailToAdminOnNewContactFormSubmitted(cfg types.ConfigInterface) *emailToAdminOnNewContactFormSubmitted {
-	return &emailToAdminOnNewContactFormSubmitted{cfg: cfg}
+func NewEmailToAdminOnNewContactFormSubmitted(app types.AppInterface) *emailToAdminOnNewContactFormSubmitted {
+	return &emailToAdminOnNewContactFormSubmitted{app: app}
 }
 
 type emailToAdminOnNewContactFormSubmitted struct {
-	cfg types.ConfigInterface
+	app types.AppInterface
 }
 
 // Send sends an email notification to the admin when a new contact form is submitted
 func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
-	appName := ""
-	if e.cfg != nil {
-		appName = e.cfg.GetAppName()
-	}
+	appName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetAppName()
+	}).Else("")
 	emailSubject := appName + ". New Contact Form Submitted"
-	emailContent := e.template()
+	emailContent := e.template(e.app)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 
+	fromEmail := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromAddress()
+	}).Else("")
+
+	fromName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromName()
+	}).Else("")
+
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From: func() string {
-			if e.cfg != nil {
-				return e.cfg.GetMailFromAddress()
-			}
-			return ""
-		}(),
-		FromName: func() string {
-			if e.cfg != nil {
-				return e.cfg.GetMailFromName()
-			}
-			return appName
-		}(),
+		From:     fromEmail,
+		FromName: fromName,
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -50,14 +57,16 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 	return errSend
 }
 
-func (e *emailToAdminOnNewContactFormSubmitted) template() string {
-	urlHome := hb.Hyperlink().
-		HTML(func() string {
-			if e.cfg != nil {
-				return e.cfg.GetAppName()
-			}
+func (e *emailToAdminOnNewContactFormSubmitted) template(app types.AppInterface) string {
+	appName := lo.IfF(app != nil, func() string {
+		if app.GetConfig() == nil {
 			return ""
-		}()).
+		}
+		return app.GetConfig().GetAppName()
+	}).Else("")
+
+	urlHome := hb.Hyperlink().
+		HTML(appName).
 		Href(links.Website().Home()).
 		ToHTML()
 
@@ -66,12 +75,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) template() string {
 		Style(STYLE_HEADING)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new contact form request submitted into ` + func() string {
-			if e.cfg != nil {
-				return e.cfg.GetAppName()
-			}
-			return ""
-		}() + `.`).
+		HTML(`There is a new contact form request submitted into ` + appName + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().

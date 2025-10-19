@@ -131,7 +131,7 @@ func (handler *emailToAdminTask) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Send email using the email service
-	err := emails.NewEmailNotifyAdmin(handler.app.GetConfig()).Send(html)
+	err := emails.NewEmailNotifyAdmin(handler.app).Send(html)
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

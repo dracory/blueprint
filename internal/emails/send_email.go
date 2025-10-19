@@ -29,7 +29,6 @@ type SendOptions struct {
 }
 
 var emailSender baseEmail.Sender
-var cfg types.ConfigInterface
 
 // InitEmailSender initializes the email sender
 func InitEmailSender(app types.AppInterface) {

@@ -3,6 +3,7 @@ package user
 import (
 	"log/slog"
 	"net/http"
+	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -64,7 +65,7 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 	userEmail := authUser.Email()
 
 	if controller.app.GetConfig().GetVaultStoreUsed() {
-		userFirstName, userLastName, userEmail, _, _, err = helpers.UserUntokenized(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), authUser)
+		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), authUser)
 
 		if err != nil {
 			controller.app.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))

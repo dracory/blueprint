@@ -73,7 +73,7 @@ const PAYPAL_NOTIFY = "/paypal/notify"
 const PAYPAL_SUCCESS = "/paypal/success"
 const PAYMENT_CANCELED = "/payment/canceled"
 const PAYMENT_SUCCESS = "/payment/success"
-const RESOURCES = "/resources" + CATCHALL
+const RESOURCES = HOME + "resources" + CATCHALL
 
 const SHOP = "/shop"
 const SHOP_PRODUCT = SHOP + "/product"

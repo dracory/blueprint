@@ -8,14 +8,15 @@ import (
 
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
+	"github.com/samber/lo"
 )
 
-func NewInviteFriendEmail(cfg types.ConfigInterface, us userstore.StoreInterface) *inviteFriendEmail {
-	return &inviteFriendEmail{cfg: cfg, userStore: us}
+func NewInviteFriendEmail(app types.AppInterface, us userstore.StoreInterface) *inviteFriendEmail {
+	return &inviteFriendEmail{app: app, userStore: us}
 }
 
 type inviteFriendEmail struct {
-	cfg       types.ConfigInterface
+	app       types.AppInterface
 	userStore userstore.StoreInterface
 }
 
@@ -41,30 +42,37 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 		userName = user.Email()
 	}
 
-	appName := ""
-	if e.cfg != nil {
-		appName = e.cfg.GetAppName()
-	}
+	appName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetAppName()
+	}).Else("")
+
+	fromEmail := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromAddress()
+	}).Else("")
+
+	fromName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
+			return ""
+		}
+		return e.app.GetConfig().GetMailFromName()
+	}).Else("")
+
 	emailSubject := appName + ". Invitation by a Friend"
-	emailContent := e.template(userName, userNote, recipientName)
+	emailContent := e.template(e.app, userName, userNote, recipientName)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
-		From: func() string {
-			if e.cfg != nil {
-				return e.cfg.GetMailFromAddress()
-			}
-			return ""
-		}(),
-		FromName: func() string {
-			if e.cfg != nil {
-				return e.cfg.GetMailFromName()
-			}
-			return appName
-		}(),
+		From:     fromEmail,
+		FromName: fromName,
 		To:       []string{recipientEmail},
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
@@ -72,12 +80,18 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 	return errSend
 }
 
-func (e *inviteFriendEmail) template(userName string, userNote string, recipientName string) string {
+func (e *inviteFriendEmail) template(app types.AppInterface, userName string, userNote string, recipientName string) string {
+	appName := lo.IfF(app != nil, func() string {
+		if app.GetConfig() == nil {
+			return ""
+		}
+		return app.GetConfig().GetAppName()
+	}).Else("")
 
-	urlHome := hb.Hyperlink().Text("ProvedExpert").
+	urlHome := hb.Hyperlink().Text(appName).
 		Href(links.Website().Home()).ToHTML()
 
-	urlJoin := hb.Hyperlink().Text("Click to Join Me at ProvedExpert").
+	urlJoin := hb.Hyperlink().Text("Click to Join Me at " + appName).
 		Href(links.Website().Home()).ToHTML()
 
 	h1 := hb.Heading1().
@@ -90,8 +104,8 @@ func (e *inviteFriendEmail) template(userName string, userNote string, recipient
 
 	p2 := hb.Paragraph().
 		HTML(`You have been invited by a friend who thinks you will like ` + func() string {
-			if e.cfg != nil {
-				return e.cfg.GetAppName()
+			if e.app != nil {
+				return e.app.GetConfig().GetAppName()
 			}
 			return ""
 		}() + `.`).
