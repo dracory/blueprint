@@ -17,7 +17,7 @@ import (
 	"github.com/dracory/req"
 	"github.com/gouniverse/filesystem"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 
 	"github.com/dracory/api"
 	"github.com/dracory/cdn"

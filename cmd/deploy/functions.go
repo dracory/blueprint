@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"os/user"
 
-	"github.com/mingrammer/cfmt"
+	"github.com/dracory/base/cfmt"
 	"github.com/sfreiberg/simplessh"
 )
 
@@ -69,7 +69,11 @@ func SSH(sshHost, sshUser, sshKey, cmd string) (output string, err error) {
 	if err != nil {
 		panic(err)
 	}
-	defer client.Close()
+	defer func() {
+		if closeErr := client.Close(); closeErr != nil {
+			log.Println(closeErr)
+		}
+	}()
 
 	outputBytes, err := client.Exec(cmd)
 

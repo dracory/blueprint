@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 
+	"github.com/dracory/base/cfmt"
 	cli "github.com/dracory/base/cmd"
-	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 )
 

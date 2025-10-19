@@ -7,8 +7,8 @@ import (
 	"project/internal/types"
 	"time"
 
+	"github.com/dracory/base/cfmt"
 	"github.com/go-co-op/gocron"
-	"github.com/mingrammer/cfmt"
 )
 
 // scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task

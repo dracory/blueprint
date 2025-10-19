@@ -50,7 +50,11 @@ func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Reque
 			logger.Error("At admin > cmsNewController > Handler", "error", err.Error())
 		}
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		if _, writeErr := w.Write([]byte(err.Error())); writeErr != nil {
+			if logger := controller.app.GetLogger(); logger != nil {
+				logger.Error("At admin > cmsNewController > Handler", "write_error", writeErr.Error())
+			}
+		}
 
 		return
 	}
