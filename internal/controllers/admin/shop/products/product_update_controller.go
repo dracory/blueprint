@@ -605,7 +605,11 @@ func (controller *productUpdateController) saveProductMetadata(r *http.Request, 
 		return data, ""
 	}
 
-	data.product.SetMetas(data.formMetas)
+	if err := data.product.SetMetas(data.formMetas); err != nil {
+		slog.Error("At productUpdateController > saveProductMetadata", slog.String("error", err.Error()))
+		data.formErrorMessage = "System error. Saving metas failed"
+		return data, ""
+	}
 
 	err := controller.app.GetShopStore().ProductUpdate(context.Background(), data.product)
 

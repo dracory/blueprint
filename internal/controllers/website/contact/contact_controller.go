@@ -3,6 +3,7 @@ package contact
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/layouts"
@@ -121,12 +122,16 @@ func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.R
 
 	record := customstore.NewRecord("contact")
 
-	record.SetPayloadMap(map[string]interface{}{
+	if err := record.SetPayloadMap(map[string]interface{}{
 		"first_name": data.firstName,
 		"last_name":  data.lastName,
 		"email":      data.email,
 		"text":       data.text,
-	})
+	}); err != nil {
+		slog.Error("At contactController.PostSubmit", slog.String("error", err.Error()))
+		data.errorMessage = "System error occurred. Please try again later."
+		return controller.contactForm(r, data).ToHTML()
+	}
 
 	cs := controller.app.GetCustomStore()
 	err := cs.RecordCreate(record)
