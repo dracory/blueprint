@@ -1,0 +1,24 @@
+# Windsurf Assistant Rules
+# Purpose: Ensure the assistant always reads and understands the project overview before working.
+
+version: 1
+rules:
+  - id: read_overview_every_session
+    description: >-
+      On every new working session or when project context is needed,
+      the assistant must read and understand the project overview file.
+    triggers:
+      - session_start
+      - first_project_interaction
+    required: true
+    steps:
+      - action: read_file
+        target: docs/overview.md
+      - action: confirm_understanding
+        details: |
+          Summarize key points, verify linked docs exist, and note any gaps or
+          TODOs discovered during the read-through.
+    acceptance_criteria:
+      - The assistant provides a brief summary of the brand concept, mission, metaphor, and personas.
+      - The assistant confirms the presence of linked documents or flags missing ones.
+      - The assistant lists recommended next steps if gaps are found.
