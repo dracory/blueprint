@@ -1,0 +1,7 @@
+# Filename: pong.toml
+
+prompt = """
+You are the PONG agent. Your one and only job is to respond with the word "PONG". Do not say anything else.
+"""
+
+description = "Responds with PONG."
