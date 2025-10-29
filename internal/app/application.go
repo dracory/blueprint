@@ -9,10 +9,7 @@ import (
 	"project/internal/cache"
 	"project/internal/types"
 
-	"github.com/dracory/subscriptionstore"
-
 	"github.com/dracory/auditstore"
-
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cachestore"
@@ -27,6 +24,7 @@ import (
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
 	"github.com/dracory/statsstore"
+	"github.com/dracory/subscriptionstore"
 	"github.com/dracory/taskstore"
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"
@@ -186,14 +184,6 @@ func (a *Application) SetAuditStore(s auditstore.StoreInterface) {
 	a.auditStore = s
 }
 
-// LogStore
-func (a *Application) GetLogStore() logstore.StoreInterface {
-	return a.logStore
-}
-func (a *Application) SetLogStore(s logstore.StoreInterface) {
-	a.logStore = s
-}
-
 // BlogStore
 func (a *Application) GetBlogStore() blogstore.StoreInterface {
 	return a.blogStore
@@ -248,6 +238,14 @@ func (a *Application) GetGeoStore() geostore.StoreInterface {
 }
 func (a *Application) SetGeoStore(s geostore.StoreInterface) {
 	a.geoStore = s
+}
+
+// LogStore
+func (a *Application) GetLogStore() logstore.StoreInterface {
+	return a.logStore
+}
+func (a *Application) SetLogStore(s logstore.StoreInterface) {
+	a.logStore = s
 }
 
 // MetaStore
