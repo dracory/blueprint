@@ -136,9 +136,6 @@ func TestUserSpecificRoutesBeforeCatchAll(t *testing.T) {
 
 	// Verify that specific routes come before the catch-all
 	specificPaths := []string{
-		// links.USER_ORDER_CREATE_CONTRACT_DETAILS,
-		// links.USER_ORDER_CREATE_CONTRACT_UPLOAD,
-		// links.USER_ORDER_CREATE_SERVICE_SELECT,
 		links.USER_PROFILE,
 	}
 

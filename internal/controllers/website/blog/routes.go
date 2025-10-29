@@ -12,21 +12,6 @@ func Routes(
 ) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		rtr.NewRoute().
-			SetName("Guest > Articles").
-			SetPath("/articles").
-			SetHTMLHandler(NewBlogController(app).Handler),
-
-		rtr.NewRoute().
-			SetName("Guest > Articles > Post with ID > Index").
-			SetPath("/article/{id:[0-9]+}").
-			SetHTMLHandler(NewBlogPostController(app).Handler),
-
-		rtr.NewRoute().
-			SetName("Guest > Articles > Post with ID && Title > Index").
-			SetPath("/article/{id:[0-9]+}/{title}").
-			SetHTMLHandler(NewBlogPostController(app).Handler),
-
-		rtr.NewRoute().
 			SetName("Guest > Blog").
 			SetPath(links.BLOG).
 			SetHTMLHandler(NewBlogController(app).Handler),
@@ -43,12 +28,12 @@ func Routes(
 
 		rtr.NewRoute().
 			SetName("Guest > Blog > Post with ID > Index").
-			SetPath("/blog/post/:id").
+			SetPath(links.BLOG_POST_01).
 			SetHTMLHandler(NewBlogPostController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Guest > Blog > Post with ID && Title > Index").
-			SetPath("/blog/post/:id/:title").
+			SetPath(links.BLOG_POST_02).
 			SetHTMLHandler(NewBlogPostController(app).Handler),
 	}
 }

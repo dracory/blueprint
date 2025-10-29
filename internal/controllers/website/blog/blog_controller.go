@@ -7,6 +7,7 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/types"
+	"strings"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -66,7 +67,16 @@ func (controller *blogController) page(data blogControllerData) string {
 
 	columnCards := lo.Map(data.postList, func(post blogstore.Post, index int) hb.TagInterface {
 		postImageURL := post.ImageUrlOrDefault()
-		thumbnailURL := links.Website().Thumbnail("png", "300", "200", "80", postImageURL)
+		extension := "png"
+		if strings.HasSuffix(postImageURL, ".jpg") {
+			extension = "jpg"
+		} else if strings.HasSuffix(postImageURL, ".jpeg") {
+			extension = "jpg"
+		} else if strings.HasSuffix(postImageURL, ".webp") {
+			extension = "webp"
+		}
+
+		thumbnailURL := links.Website().Thumbnail(extension, "300", "200", "80", postImageURL)
 
 		postImage := hb.Image(thumbnailURL).
 			Class("card-img-top rounded-3").
@@ -181,6 +191,13 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		page = 0
 	}
 
+	blogStore := controller.app.GetBlogStore()
+
+	if blogStore == nil {
+		controller.app.GetLogger().Error("Error. At blogController.prepareData", slog.String("error", "blog store is not initialized"))
+		return data, "Sorry, the blog is currently unavailable. Please try again later."
+	}
+
 	options := blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		SortOrder: "DESC",
@@ -189,14 +206,14 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		Limit:     perPage,
 	}
 
-	postList, errList := controller.app.GetBlogStore().PostList(options)
+	postList, errList := blogStore.PostList(options)
 
 	if errList != nil {
 		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := controller.app.GetBlogStore().PostCount(options)
+	postCount, errCount := blogStore.PostCount(options)
 
 	if errCount != nil {
 		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
