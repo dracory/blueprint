@@ -22,26 +22,6 @@ type inviteFriendEmail struct {
 
 // Send sends an invitation email to a friend
 func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipientEmail string, recipientName string) error {
-	if e.userStore == nil {
-		return errors.New("user store not configured")
-	}
-
-	user, err := e.userStore.UserFindByID(context.Background(), sendingUserID)
-
-	if err != nil {
-		return err
-	}
-
-	if user == nil {
-		return errors.New("user not found")
-	}
-
-	userName := user.FirstName()
-
-	if userName == "" {
-		userName = user.Email()
-	}
-
 	appName := lo.IfF(e.app != nil, func() string {
 		if e.app.GetConfig() == nil {
 			return ""
@@ -63,8 +43,28 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
+	if e.userStore == nil {
+		return errors.New("user store not configured")
+	}
+
+	user, err := e.userStore.UserFindByID(context.Background(), sendingUserID)
+
+	if err != nil {
+		return err
+	}
+
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	userName := user.FirstName()
+
+	if userName == "" {
+		userName = user.Email()
+	}
+
 	emailSubject := appName + ". Invitation by a Friend"
-	emailContent := e.template(e.app, userName, userNote, recipientName)
+	emailContent := e.template(appName, userName, userNote, recipientName)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
 	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
@@ -80,14 +80,7 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 	return errSend
 }
 
-func (e *inviteFriendEmail) template(app types.AppInterface, userName string, userNote string, recipientName string) string {
-	appName := lo.IfF(app != nil, func() string {
-		if app.GetConfig() == nil {
-			return ""
-		}
-		return app.GetConfig().GetAppName()
-	}).Else("")
-
+func (e *inviteFriendEmail) template(appName string, userName string, userNote string, recipientName string) string {
 	urlHome := hb.Hyperlink().Text(appName).
 		Href(links.Website().Home()).ToHTML()
 
@@ -103,12 +96,7 @@ func (e *inviteFriendEmail) template(app types.AppInterface, userName string, us
 		Style(STYLE_PARAGRAPH)
 
 	p2 := hb.Paragraph().
-		HTML(`You have been invited by a friend who thinks you will like ` + func() string {
-			if e.app != nil {
-				return e.app.GetConfig().GetAppName()
-			}
-			return ""
-		}() + `.`).
+		HTML(`You have been invited by a friend who thinks you will like ` + appName + `.`).
 		Style(STYLE_PARAGRAPH)
 
 	p3 := hb.Paragraph().

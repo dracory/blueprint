@@ -433,24 +433,6 @@ func (c *Config) GetEnvEncryptionKey() string {
 	return c.envEncryptionKey
 }
 
-// == Cache Store Getters/Setters ==
-func (c *Config) SetCacheStoreUsed(v bool) {
-	c.cacheStoreUsed = v
-}
-
-func (c *Config) GetCacheStoreUsed() bool {
-	return c.cacheStoreUsed
-}
-
-// == Subscription Store Getters/Setters ==
-func (c *Config) SetSubscriptionStoreUsed(v bool) {
-	c.subscriptionStoreUsed = v
-}
-
-func (c *Config) GetSubscriptionStoreUsed() bool {
-	return c.subscriptionStoreUsed
-}
-
 // == Blog Store Getters/Setters ==
 func (c *Config) SetBlogStoreUsed(v bool) {
 	c.blogStoreUsed = v
@@ -458,6 +440,15 @@ func (c *Config) SetBlogStoreUsed(v bool) {
 
 func (c *Config) GetBlogStoreUsed() bool {
 	return c.blogStoreUsed
+}
+
+// == Cache Store Getters/Setters ==
+func (c *Config) SetCacheStoreUsed(v bool) {
+	c.cacheStoreUsed = v
+}
+
+func (c *Config) GetCacheStoreUsed() bool {
+	return c.cacheStoreUsed
 }
 
 // == CMS Store Getters/Setters ==
@@ -565,6 +556,15 @@ func (c *Config) SetShopStoreUsed(v bool) {
 
 func (c *Config) GetShopStoreUsed() bool {
 	return c.shopStoreUsed
+}
+
+// == Subscription Store Getters/Setters ==
+func (c *Config) SetSubscriptionStoreUsed(v bool) {
+	c.subscriptionStoreUsed = v
+}
+
+func (c *Config) GetSubscriptionStoreUsed() bool {
+	return c.subscriptionStoreUsed
 }
 
 // == Task Store Getters/Setters ==

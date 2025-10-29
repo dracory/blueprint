@@ -28,17 +28,6 @@ func scheduleCleanUpTask(app types.AppInterface) {
 func StartAsync(app types.AppInterface) {
 	scheduler := gocron.NewScheduler(time.UTC)
 
-	// Example of task scheduled every 2 minutes
-	// only on production and staging, not on dev and local
-	// if config.IsEnvStaging() || config.IsEnvProduction() {
-	// 	scheduler.Every(2).Minutes().Do(func() {
-	// 		_, err := taskhandlers.NewHelloWorldTaskHandler().Enqueue()
-	// 		if err != nil {
-	// 			cfmt.Errorln(err.Error())
-	// 		}
-	// 	})
-	// }
-
 	// Example of daily scheduled task
 	// scheduler.Every(1).Day().At("01:00").Do(func() {
 	// 	_, err := taskhandlers.NewHelloWorldTaskHandler().Enqueue()
@@ -47,16 +36,10 @@ func StartAsync(app types.AppInterface) {
 	// 	}
 	// })
 
-	// Schedule Building the Cache Every 2 Minutes
-	// only on production, no need on dev and local
-	// if config.IsEnvStaging() || config.IsEnvProduction() {
-	// 	scheduler.Every(2).Minutes().Do(func() {
-	// 		pool.BuildCache()
-	// 	})
-	// }
-
 	// Schedule Building the Stats Every 2 Minutes
-	if _, err := scheduler.Every(2).Minutes().Do(func() { scheduleStatsVisitorEnhanceTask(app) }); err != nil {
+	if _, err := scheduler.Every(2).Minutes().Do(func() {
+		scheduleStatsVisitorEnhanceTask(app)
+	}); err != nil {
 		cfmt.Errorln("Error scheduling stats visitor enhance task:", err.Error())
 	}
 
@@ -65,6 +48,13 @@ func StartAsync(app types.AppInterface) {
 		scheduleCleanUpTask(app)
 	}); err != nil {
 		cfmt.Errorln("Error scheduling clean up task:", err.Error())
+	}
+
+	// Schedule queue clear job every 2 minutes
+	if _, err := scheduler.Every(2).Minutes().Do(func() {
+		queueClearJob(app)
+	}); err != nil {
+		cfmt.Errorln("Error scheduling queue clear job:", err.Error())
 	}
 
 	scheduler.StartAsync()

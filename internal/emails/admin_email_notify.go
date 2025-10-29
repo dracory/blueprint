@@ -20,13 +20,6 @@ func (e *emailNotifyAdmin) Send(html string) error {
 		}
 		return e.app.GetConfig().GetAppName()
 	}).Else("")
-	emailSubject := appName + ". Admin Notification"
-	emailContent := html
-
-	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
-
-	recipientEmail := "info@sinevia.com"
 
 	fromEmail := lo.IfF(e.app != nil, func() string {
 		if e.app.GetConfig() == nil {
@@ -41,6 +34,14 @@ func (e *emailNotifyAdmin) Send(html string) error {
 		}
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
+
+	emailSubject := appName + ". Admin Notification"
+	emailContent := html
+
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+
+	recipientEmail := "info@sinevia.com"
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{

@@ -30,7 +30,9 @@ func userLayoutUserMenuItems(authUser userstore.UserInterface) []dashboard.MenuI
 		URL:   links.User().Profile(),
 	}
 
-	items := []dashboard.MenuItem{profileMenuItem}
+	items := []dashboard.MenuItem{
+		profileMenuItem,
+	}
 
 	if authUser != nil {
 		if authUser.IsAdministrator() || authUser.IsSuperuser() {

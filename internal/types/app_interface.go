@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"log/slog"
 
-	"github.com/dracory/subscriptionstore"
-
 	"github.com/dracory/auditstore"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
@@ -21,6 +19,7 @@ import (
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
 	"github.com/dracory/statsstore"
+	"github.com/dracory/subscriptionstore"
 	"github.com/dracory/taskstore"
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"

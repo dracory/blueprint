@@ -24,13 +24,6 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 		}
 		return e.app.GetConfig().GetAppName()
 	}).Else("")
-	emailSubject := appName + ". New Contact Form Submitted"
-	emailContent := e.template(e.app)
-
-	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
-
-	recipientEmail := "info@sinevia.com"
 
 	fromEmail := lo.IfF(e.app != nil, func() string {
 		if e.app.GetConfig() == nil {
@@ -46,6 +39,14 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
+	emailSubject := appName + ". New Contact Form Submitted"
+	emailContent := e.template(appName)
+
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+
+	recipientEmail := "info@sinevia.com"
+
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
 		From:     fromEmail,
@@ -57,14 +58,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) Send() error {
 	return errSend
 }
 
-func (e *emailToAdminOnNewContactFormSubmitted) template(app types.AppInterface) string {
-	appName := lo.IfF(app != nil, func() string {
-		if app.GetConfig() == nil {
-			return ""
-		}
-		return app.GetConfig().GetAppName()
-	}).Else("")
-
+func (e *emailToAdminOnNewContactFormSubmitted) template(appName string) string {
 	urlHome := hb.Hyperlink().
 		HTML(appName).
 		Href(links.Website().Home()).

@@ -22,13 +22,6 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 		}
 		return e.app.GetConfig().GetAppName()
 	}).Else("")
-	emailSubject := appName + ". New User Registered"
-	emailContent := e.template(e.app, userID)
-
-	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
-
-	recipientEmail := "info@sinevia.com"
 
 	fromEmail := lo.IfF(e.app != nil, func() string {
 		if e.app.GetConfig() == nil {
@@ -44,6 +37,14 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
+	emailSubject := appName + ". New User Registered"
+	emailContent := e.template(appName, userID)
+
+	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+
+	recipientEmail := "info@sinevia.com"
+
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
 		From:     fromEmail,
@@ -55,14 +56,7 @@ func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
 	return errSend
 }
 
-func (e *emailToAdminOnNewUserRegistered) template(app types.AppInterface, userID string) string {
-	appName := lo.IfF(app != nil, func() string {
-		if app.GetConfig() == nil {
-			return ""
-		}
-		return app.GetConfig().GetAppName()
-	}).Else("")
-
+func (e *emailToAdminOnNewUserRegistered) template(appName string, userID string) string {
 	urlHome := hb.Hyperlink().
 		HTML(appName).
 		Href(links.Website().Home()).

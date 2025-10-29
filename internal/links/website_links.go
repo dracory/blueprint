@@ -11,7 +11,6 @@ import (
 
 type websiteLinks struct{}
 
-// Website is a shortcut for NewWebsiteLinks
 func Website() *websiteLinks {
 	return &websiteLinks{}
 }

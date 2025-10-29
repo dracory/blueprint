@@ -6,7 +6,6 @@ import (
 
 // Options defines the options for the layout
 type Options struct {
-	// Request        *http.Request
 	AppName        string
 	WebsiteSection string
 	Title          string
