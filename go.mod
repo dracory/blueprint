@@ -33,21 +33,21 @@ require (
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
 	github.com/dracory/hb v1.88.0
-	github.com/dracory/liveflux v0.8.0
+	github.com/dracory/liveflux v0.11.0
 	github.com/dracory/llm v0.9.0
 	github.com/dracory/logstore v1.9.0
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.1.0
 	github.com/dracory/sb v0.11.0
-	github.com/dracory/sessionstore v1.3.0
+	github.com/dracory/sessionstore v1.4.0
 	github.com/dracory/settingstore v1.2.0
-	github.com/dracory/shopstore v1.1.2
-	github.com/dracory/statsstore v0.6.0
+	github.com/dracory/shopstore v1.5.1
+	github.com/dracory/statsstore v0.7.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.5.0
 	github.com/dracory/taskstore v1.7.0
-	github.com/dracory/test v0.2.0
+	github.com/dracory/test v0.4.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/uncdn v0.9.0
@@ -62,7 +62,6 @@ require (
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gouniverse/dashboard v1.7.1
-	github.com/gouniverse/filesystem v0.3.1
 	github.com/gouniverse/responses v0.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
@@ -132,8 +131,6 @@ require (
 	github.com/gouniverse/hb v1.87.0 // indirect
 	github.com/gouniverse/icons v1.3.1 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
-	github.com/gouniverse/sqlfilestore v0.2.0 // indirect
-	github.com/gouniverse/strutils v0.7.0 // indirect
 	github.com/gouniverse/uid v1.5.0 // indirect
 	github.com/gouniverse/uncdn v0.7.4 // indirect
 	github.com/gouniverse/utils v1.45.4 // indirect
@@ -187,7 +184,6 @@ require (
 	github.com/gouniverse/api v1.6.0 // indirect
 	github.com/gouniverse/dataobject v1.3.0 // indirect
 	github.com/gouniverse/maputils v0.7.0
-	github.com/gouniverse/sb v0.9.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect

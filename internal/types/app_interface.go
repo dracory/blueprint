@@ -12,6 +12,7 @@ import (
 	"github.com/dracory/customstore"
 	"github.com/dracory/entitystore"
 	"github.com/dracory/feedstore"
+	"github.com/dracory/filesystem"
 	"github.com/dracory/geostore"
 	"github.com/dracory/logstore"
 	"github.com/dracory/metastore"
@@ -24,7 +25,6 @@ import (
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"
 	"github.com/faabiosr/cachego"
-	"github.com/gouniverse/filesystem"
 	"github.com/jellydator/ttlcache/v3"
 )
 
