@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/glebarez/sqlite"
 
 	apppkg "project/internal/app"
 	"project/internal/types"
