@@ -1,8 +1,8 @@
 package middlewares
 
 import (
+	"github.com/dracory/dashboard"
 	"github.com/dracory/rtr"
-	"github.com/gouniverse/dashboard"
 )
 
 func ThemeMiddleware() rtr.MiddlewareInterface {

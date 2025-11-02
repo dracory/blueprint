@@ -61,7 +61,6 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gouniverse/dashboard v1.7.1
 	github.com/gouniverse/responses v0.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
@@ -100,13 +99,14 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.12 // indirect
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.89.1 // indirect
 	github.com/aws/smithy-go v1.23.1 // indirect
-	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
+	github.com/clipperhouse/stringish v0.1.1 // indirect
+	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/davidmz/go-pageant v1.0.2 // indirect
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
-	github.com/dracory/sqlfilestore v0.3.0 // indirect
+	github.com/dracory/sqlfilestore v1.0.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -124,18 +124,8 @@ require (
 	github.com/goravel/framework v1.16.5 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
-	github.com/gouniverse/bs v0.13.0 // indirect
-	github.com/gouniverse/cdn v1.6.0 // indirect
-	github.com/gouniverse/crypto v0.2.0 // indirect
-	github.com/gouniverse/envenc v0.10.0 // indirect
-	github.com/gouniverse/hb v1.87.0 // indirect
-	github.com/gouniverse/icons v1.3.1 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
-	github.com/gouniverse/uid v1.5.0 // indirect
-	github.com/gouniverse/uncdn v0.7.4 // indirect
-	github.com/gouniverse/utils v1.45.4 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
-	github.com/gouniverse/webserver v0.1.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.6.8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -181,8 +171,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/georgysavva/scany v1.2.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gouniverse/api v1.6.0 // indirect
-	github.com/gouniverse/dataobject v1.3.0 // indirect
 	github.com/gouniverse/maputils v0.7.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
