@@ -1,14 +1,17 @@
 package blog
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"project/internal/links"
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
+	"github.com/dracory/userstore"
 )
 
 func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
@@ -86,14 +89,26 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 
 func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithUserStore(true))
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
+
+	// Ensure CMS template exists for layout rendering
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	if err != nil {
+		t.Fatalf("Failed to create test template: %v", err)
+	}
 
 	// Create a draft post
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err := app.GetBlogStore().PostCreate(post)
+	err = app.GetBlogStore().PostCreate(post)
 	if err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
@@ -103,39 +118,49 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
+	user.SetRole(userstore.USER_ROLE_ADMINISTRATOR)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
+	if err != nil {
+		t.Fatalf("Failed to elevate test user role: %v", err)
+	}
 
 	controller := NewBlogPostController(app)
 
 	// --- Execute ---
+	postPath := strings.ReplaceAll(links.BLOG_POST_02, ":id", post.ID())
+	postPath = strings.ReplaceAll(postPath, ":title", post.Slug())
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), nil)
+	r := httptest.NewRequest(http.MethodGet, postPath, nil)
 	r, err = testutils.LoginAs(app, r, user)
 	if err != nil {
 		t.Fatalf("Failed to authenticate test user: %v", err)
 	}
 	html := controller.Handler(w, r)
+	response := w.Result()
+	t.Cleanup(func() {
+		_ = response.Body.Close()
+	})
 
 	// --- Assert ---
 	if html == "" {
-		t.Fatal("Expected HTML to not be empty")
+		t.Fatalf("Expected HTML to not be empty. Status: %d", response.StatusCode)
 	}
 
 	if strings.Contains(html, "post is missing") {
-		t.Errorf("Expected authenticated user to access unpublished post")
+		t.Fatalf("Expected authenticated user to access unpublished post. Status: %d Body:\n%s", response.StatusCode, html)
 	}
 
 	if !strings.Contains(html, "Draft Post") {
-		t.Errorf("Expected HTML to contain the post title")
+		t.Fatalf("Expected HTML to contain the post title. Status: %d Body:\n%s", response.StatusCode, html)
 	}
 }
 
 func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	// --- Setup ---
-	cfg := testutils.DefaultConf()
-	cfg.SetBlogStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
 
 	// Create a test template
 	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
@@ -180,7 +205,11 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 
 func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
 
 	// Create a published post
 	post := blogstore.NewPost()
@@ -235,14 +264,24 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 
 func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithUserStore(true))
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+		testutils.WithSessionStore(true),
+	)
+
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	if err != nil {
+		t.Fatalf("Failed to create test template: %v", err)
+	}
 
 	// Create a draft post
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err := app.GetBlogStore().PostCreate(post)
+	err = app.GetBlogStore().PostCreate(post)
 	if err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
@@ -280,11 +319,19 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup()
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
+
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	if err != nil {
+		t.Fatalf("Failed to create test template: %v", err)
+	}
 	controller := NewBlogPostController(app)
 
 	markdown := "# Hello World\n\nThis is **bold** text."
-	expectedHTML := "<h1>Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>\n"
+	expectedHTML := "<h1 id=\"hello-world\">Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>\n"
 
 	// --- Execute ---
 	html, css := controller.processContent(markdown, blogstore.POST_EDITOR_MARKDOWN)
@@ -301,7 +348,14 @@ func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup()
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	if err != nil {
+		t.Fatalf("Failed to create test template: %v", err)
+	}
 	controller := NewBlogPostController(app)
 
 	blockContent := `[{"Id":"block-1","Type":"text","Sequence":1,"ParentId":"","Attributes":{"Text":"Test content"}}]`
@@ -322,7 +376,14 @@ func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockEditor(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup()
+	app := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCmsStore(true, "test-template"),
+	)
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	if err != nil {
+		t.Fatalf("Failed to create test template: %v", err)
+	}
 	controller := NewBlogPostController(app)
 
 	blockEditorContent := `{"blocks": [{"type": "paragraph", "data": {"text": "Test content"}}]}`

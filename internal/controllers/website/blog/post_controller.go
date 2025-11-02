@@ -35,6 +35,19 @@ func NewBlogPostController(
 func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
 	postID, _ := rtr.GetParam(r, "id")
 	postSlug, _ := rtr.GetParam(r, "title")
+
+	if postID == "" || postSlug == "" {
+		segments := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+		if len(segments) >= 3 && segments[0] == "blog" && segments[1] == "post" {
+			if postID == "" {
+				postID = segments[2]
+			}
+			if postSlug == "" && len(segments) >= 4 {
+				postSlug = segments[3]
+			}
+		}
+	}
+
 	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {
@@ -54,20 +67,19 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 	if post == nil {
 		c.app.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
 		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
-		return ""
+		return "post is missing"
 	}
 
 	if !c.accessAllowed(r, *post) {
 		c.app.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
 		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
-		return ""
+		return "post is missing"
 	}
 
 	if postSlug == "" || postSlug != post.Slug() {
 		url := links.Website().BlogPost(post.ID(), post.Slug())
 		c.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
-		helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
-		return ""
+		return helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 	}
 
 	return layouts.NewCmsLayout(

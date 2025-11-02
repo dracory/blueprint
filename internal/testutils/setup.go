@@ -17,6 +17,7 @@ import (
 type setupOptions struct {
 	WithAuditStore        bool
 	WithBlogStore         bool
+	WithCmsStore          bool
 	WithCacheStore        bool
 	WithGeoStore          bool
 	WithLogStore          bool
@@ -29,6 +30,7 @@ type setupOptions struct {
 	WithVaultStore        bool
 	WithUserStoreVault    bool
 	VaultStoreKey         string
+	CmsStoreTemplateID    string
 
 	cfg types.ConfigInterface
 }
@@ -47,6 +49,17 @@ func WithCfg(cfg types.ConfigInterface) SetupOption {
 func WithBlogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithBlogStore = enable
+	}
+}
+
+// WithCmsStore enables the CMS store during test setup
+// Optional templateID sets the CMS template ID used by the layout renderer
+func WithCmsStore(enable bool, templateID ...string) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithCmsStore = enable
+		if enable {
+			opts.CmsStoreTemplateID = lo.FirstOr(templateID, opts.CmsStoreTemplateID)
+		}
 	}
 }
 
@@ -176,6 +189,12 @@ func Setup(options ...SetupOption) types.AppInterface {
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
 		}
+		if opts.WithCmsStore {
+			opts.cfg.SetCmsStoreUsed(true)
+			if opts.CmsStoreTemplateID != "" {
+				opts.cfg.SetCmsStoreTemplateID(opts.CmsStoreTemplateID)
+			}
+		}
 		if opts.WithCacheStore {
 			opts.cfg.SetCacheStoreUsed(true)
 		}
@@ -221,6 +240,12 @@ func Setup(options ...SetupOption) types.AppInterface {
 		}
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
+		}
+		if opts.WithCmsStore {
+			opts.cfg.SetCmsStoreUsed(true)
+			if opts.CmsStoreTemplateID != "" {
+				opts.cfg.SetCmsStoreTemplateID(opts.CmsStoreTemplateID)
+			}
 		}
 		if opts.WithCacheStore {
 			opts.cfg.SetCacheStoreUsed(true)
