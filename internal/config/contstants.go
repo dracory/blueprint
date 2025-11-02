@@ -10,6 +10,12 @@ type AuthenticatedUserContextKey struct{}
 // AuthenticatedSessionContextKey is a context key for the authenticated session.
 type AuthenticatedSessionContextKey struct{}
 
+// APIAuthenticatedUserContextKey is a context key for API authenticated user.
+type APIAuthenticatedUserContextKey struct{}
+
+// APIAuthenticatedSessionContextKey is a context key for API authenticated session.
+type APIAuthenticatedSessionContextKey struct{}
+
 // ============================================================================
 // == END: Types
 // ============================================================================

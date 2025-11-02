@@ -1,6 +1,6 @@
 module project
 
-go 1.25
+go 1.25.0
 
 // replace github.com/dracory/base => ../base
 
@@ -9,17 +9,17 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v0.2.0
-	github.com/dracory/auth v0.24.0
+	github.com/dracory/auth v0.25.0
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.6.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.1.0
 	github.com/dracory/bs v0.15.0
-	github.com/dracory/cachestore v0.20.0
+	github.com/dracory/cachestore v0.21.0
 	github.com/dracory/cdn v1.8.0
 	github.com/dracory/cmd v0.2.0
 	github.com/dracory/cmsstore v0.34.0
-	github.com/dracory/crud/v2 v2.0.0-20250902001618-c4cd13b63280
+	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
 	github.com/dracory/dashboard v1.10.0
@@ -112,7 +112,7 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
-	github.com/glebarez/go-sqlite v1.21.2 // indirect
+	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.3 // indirect
 	github.com/go-chi/cors v1.2.2 // indirect
 	github.com/go-chi/httprate v0.15.0 // indirect
