@@ -35,11 +35,11 @@ func (controller *userManagerController) page(data userManagerControllerData) hb
 		HTML("Users. User Manager").
 		Child(buttonUserNew)
 
-	return hb.Div().
-		Class("container").
-		Child(hb.BR()).
-		Child(breadcrumbs).
-		Child(hb.HR()).
-		Child(title).
-		Child(controller.tableUsers(data))
+	return layouts.AdminPage(
+		hb.BR(),
+		breadcrumbs,
+		hb.HR(),
+		title,
+		controller.tableUsers(data),
+	)
 }

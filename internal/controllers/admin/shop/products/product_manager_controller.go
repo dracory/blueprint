@@ -221,14 +221,14 @@ func (controller *productManagerController) page(data productManagerControllerDa
 		HTML("Shop. Product Manager").
 		Child(buttonProductNew)
 
-	return hb.Div().
-		Class("container").
-		Child(breadcrumbs).
-		Child(hb.HR()).
-		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request)).
-		Child(hb.HR()).
-		Child(title).
-		Child(controller.tableProducts(data))
+	return layouts.AdminPage(
+		breadcrumbs,
+		hb.HR(),
+		shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request),
+		hb.HR(),
+		title,
+		controller.tableProducts(data),
+	)
 }
 
 func (controller *productManagerController) tableProducts(data productManagerControllerData) hb.TagInterface {

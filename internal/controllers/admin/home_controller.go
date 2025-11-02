@@ -63,10 +63,11 @@ func (c *homeController) view() *hb.Tag {
 			Child(bs.Column(12).
 				Child(c.cardDailyVisitors())))
 
-	return hb.Wrap().
-		Child(header).
-		Child(sectionTiles).
-		Child(sectionDailyVisitors)
+	return layouts.AdminPage(
+		header,
+		sectionTiles,
+		sectionDailyVisitors,
+	)
 }
 
 func (c *homeController) cardDailyVisitors() hb.TagInterface {
@@ -146,8 +147,8 @@ func (c *homeController) tiles() []hb.TagInterface {
 	// 	"link":  links.Admin().Cms(map[string]string{}),
 	// }
 
-	cmsTileNew := map[string]string{
-		"title": "Website Manager (New)",
+	cmsTile := map[string]string{
+		"title": "Website Manager",
 		"icon":  "bi-globe",
 		"link":  links.Admin().CmsNew(),
 	}
@@ -213,18 +214,36 @@ func (c *homeController) tiles() []hb.TagInterface {
 	// }
 
 	if c.app.GetConfig().GetCmsStoreUsed() {
-		tiles = append(tiles, cmsTileNew)
+		tiles = append(tiles, cmsTile)
 	}
 
-	tiles = append(tiles,
-		blogTile,
-		userTile,
-		shopTile,
-		fileManagerTile,
-		mediaManagerTile,
-		queueTile,
-		visitStatsTile,
-	)
+	if c.app.GetConfig().GetBlogStoreUsed() {
+		tiles = append(tiles, blogTile)
+	}
+
+	if c.app.GetConfig().GetUserStoreUsed() {
+		tiles = append(tiles, userTile)
+	}
+
+	if c.app.GetConfig().GetShopStoreUsed() {
+		tiles = append(tiles, shopTile)
+	}
+
+	if c.app.GetConfig().GetSqlFileStoreUsed() {
+		tiles = append(tiles, fileManagerTile)
+	}
+
+	if c.app.GetConfig().GetMediaDriver() != "" {
+		tiles = append(tiles, mediaManagerTile)
+	}
+
+	if c.app.GetConfig().GetTaskStoreUsed() {
+		tiles = append(tiles, queueTile)
+	}
+
+	if c.app.GetConfig().GetStatsStoreUsed() {
+		tiles = append(tiles, visitStatsTile)
+	}
 
 	cards := lo.Map(tiles, func(tile map[string]string, index int) hb.TagInterface {
 		target := lo.ValueOr(tile, "target", "")

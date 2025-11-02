@@ -101,13 +101,13 @@ func (controller userUpdateController) page(data userUpdateControllerData, compo
 		Text("User: ").
 		Text(data.userDisplayName)
 
-	return hb.Div().
-		Class("container").
-		Child(breadcrumbs).
-		Child(hb.HR()).
-		Child(heading).
-		Child(userTitle).
-		Child(card)
+	return layouts.AdminPage(
+		breadcrumbs,
+		hb.HR(),
+		heading,
+		userTitle,
+		card,
+	)
 }
 
 func (controller userUpdateController) prepareData(r *http.Request) (data userUpdateControllerData, errorMessage string) {

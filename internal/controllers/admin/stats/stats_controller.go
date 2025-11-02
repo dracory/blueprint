@@ -34,7 +34,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		Store:          c.app.GetStatsStore(),
 		Layout:         &adminLayout{app: c.app},
 		HomeURL:        links.Admin().Home(),
-		WebsiteUrl:     "https://lesichkov.co.uk",
+		WebsiteUrl:     links.Website().Home(),
 	})
 
 	if err != nil {

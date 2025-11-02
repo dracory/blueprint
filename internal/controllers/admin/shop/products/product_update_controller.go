@@ -153,17 +153,17 @@ func (controller *productUpdateController) page(data productUpdateControllerData
 		Text("Product: ").
 		Text(data.product.Title())
 
-	return hb.Div().
-		Class("container").
-		Child(breadcrumbs).
-		Child(hb.HR()).
-		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request)).
-		Child(hb.HR()).
-		Child(heading).
-		Child(productTitle).
-		Child(cardProductDetails).
-		Child(hb.BR()).
-		Child(cardProductMetadata)
+	return layouts.AdminPage(
+		breadcrumbs,
+		hb.HR(),
+		shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request),
+		hb.HR(),
+		heading,
+		productTitle,
+		cardProductDetails,
+		hb.BR(),
+		cardProductMetadata,
+	)
 }
 
 func (controller *productUpdateController) formDetails(data productUpdateControllerData) hb.TagInterface {
