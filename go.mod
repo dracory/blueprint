@@ -74,7 +74,6 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.7.13
 	gorm.io/gorm v1.31.0
-	modernc.org/sqlite v1.39.1
 )
 
 require (
@@ -164,6 +163,7 @@ require (
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.66.10 // indirect
+	modernc.org/sqlite v1.39.1 // indirect
 )
 
 require (
