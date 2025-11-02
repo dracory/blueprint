@@ -12,8 +12,8 @@ import (
 	"project/internal/links"
 	"project/internal/types"
 
+	"github.com/dracory/dashboard"
 	"github.com/dracory/rtr"
-	"github.com/gouniverse/dashboard"
 )
 
 func Routes(app types.AppInterface) []rtr.RouteInterface {
@@ -62,9 +62,15 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath("/th/:extension/:size/:quality/:path").
 		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
-	thumbCatchAll := rtr.NewRoute().
+	// /th/png/300x200/80/https/dogpace.com/img/pets/20190827152208397552.jpg
+	thumbRoutePathCarchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path...").
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
+
+	thumbCatchAll := rtr.NewRoute().
+		SetName("Shared > Thumb Controller").
+		SetPath("/th/*").
 		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	pageNotFound := rtr.NewRoute().
@@ -81,6 +87,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		resources,
 		theme,
 		thumbRoute,
+		thumbRoutePathCarchAll,
 		thumbCatchAll,
 		pageNotFound,
 	}
