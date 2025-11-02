@@ -3,8 +3,6 @@ package home
 import (
 	"net/http"
 	"project/internal/types"
-
-	"github.com/dracory/userstore"
 )
 
 // == CONSTRUCTOR ==============================================================
@@ -21,9 +19,9 @@ type homeController struct {
 	app types.AppInterface
 }
 
-type homeControllerData struct {
-	AuthUser userstore.UserInterface
-}
+// type homeControllerData struct {
+// 	AuthUser userstore.UserInterface
+// }
 
 // == PUBLIC METHODS ===========================================================
 

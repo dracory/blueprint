@@ -42,8 +42,3 @@ func (*Links) ProductUpdate(params map[string]string) string {
 	params["controller"] = CONTROLLER_PRODUCT_UPDATE
 	return links.Admin().Shop(params)
 }
-
-func (*Links) TestLlm(params map[string]string) string {
-	params["controller"] = CONTROLLER_TEST_LLM
-	return links.Admin().Shop(params)
-}

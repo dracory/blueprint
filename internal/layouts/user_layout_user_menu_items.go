@@ -3,8 +3,8 @@ package layouts
 import (
 	"project/internal/links"
 
+	dashboardTypes "github.com/dracory/dashboard/types"
 	"github.com/dracory/userstore"
-	"github.com/gouniverse/dashboard"
 )
 
 // userLayoutUserMenu generates the user menu items for the dashboard.
@@ -14,23 +14,23 @@ import (
 //
 // Returns:
 // - `[]dashboard.MenuItem`: The user menu items.
-func userLayoutUserMenuItems(authUser userstore.UserInterface) []dashboard.MenuItem {
-	adminDashboardMenuItem := dashboard.MenuItem{
+func userLayoutUserMenuItems(authUser userstore.UserInterface) []dashboardTypes.MenuItem {
+	adminDashboardMenuItem := dashboardTypes.MenuItem{
 		Title: "To Admin Dashboard",
 		URL:   links.Admin().Home(),
 	}
 
-	logoutMenuItem := dashboard.MenuItem{
+	logoutMenuItem := dashboardTypes.MenuItem{
 		Title: "Logout",
 		URL:   links.Auth().Logout(),
 	}
 
-	profileMenuItem := dashboard.MenuItem{
+	profileMenuItem := dashboardTypes.MenuItem{
 		Title: "My Account",
 		URL:   links.User().Profile(),
 	}
 
-	items := []dashboard.MenuItem{
+	items := []dashboardTypes.MenuItem{
 		profileMenuItem,
 	}
 

@@ -28,14 +28,6 @@ func scheduleCleanUpTask(app types.AppInterface) {
 func StartAsync(app types.AppInterface) {
 	scheduler := gocron.NewScheduler(time.UTC)
 
-	// Example of daily scheduled task
-	// scheduler.Every(1).Day().At("01:00").Do(func() {
-	// 	_, err := taskhandlers.NewHelloWorldTaskHandler().Enqueue()
-	// 	if err != nil {
-	// 		cfmt.Errorln(err.Error())
-	// 	}
-	// })
-
 	// Schedule Building the Stats Every 2 Minutes
 	if _, err := scheduler.Every(2).Minutes().Do(func() {
 		scheduleStatsVisitorEnhanceTask(app)

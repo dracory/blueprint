@@ -9,8 +9,8 @@ import (
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 
+	_ "github.com/glebarez/sqlite"
 	"github.com/samber/lo"
-	_ "modernc.org/sqlite"
 )
 
 // setupOptions holds configuration flags for Setup
@@ -20,6 +20,7 @@ type setupOptions struct {
 	WithCacheStore        bool
 	WithGeoStore          bool
 	WithLogStore          bool
+	WithSettingStore      bool
 	WithSessionStore      bool
 	WithShopStore         bool
 	WithSubscriptionStore bool
@@ -53,6 +54,13 @@ func WithBlogStore(enable bool) SetupOption {
 func WithCacheStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithCacheStore = enable
+	}
+}
+
+// WithSettingStore enables the setting store during test setup
+func WithSettingStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithSettingStore = enable
 	}
 }
 
@@ -179,6 +187,9 @@ func Setup(options ...SetupOption) types.AppInterface {
 		}
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)
+		}
+		if opts.WithSettingStore {
+			opts.cfg.SetSettingStoreUsed(true)
 		}
 		if opts.WithShopStore {
 			opts.cfg.SetShopStoreUsed(true)

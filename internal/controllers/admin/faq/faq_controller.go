@@ -8,7 +8,7 @@ package admin
 // 	"project/internal/links"
 // 	"project/models"
 
-// 	"github.com/gouniverse/api"
+// 	"github.com/dracory/api"
 // 	"github.com/dracory/crud"
 // )
 

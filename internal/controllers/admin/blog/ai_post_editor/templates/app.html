@@ -1,0 +1,160 @@
+<div id="post-editor-app" v-cloak :class="{ 'is-loading': loading }">
+  <div v-if="!post" class="text-center my-5">
+    Loading...
+  </div>
+  <div v-else>
+    <form class="vue-form" v-if="!loading" @submit.prevent="savePost">
+      <!-- START: Title -->
+      <div class="mb-3 border p-3 bg-light">
+        <label class="form-label" for="title">Title</label>
+        <input type="text" class="form-control" id="title" v-model="post.title">
+      </div>
+      <!-- END: Title -->
+      
+      <!-- START: Summary -->
+      <div class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0" for="summary">Summary</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="onRegenerateSummary" :disabled="loading">
+            Regenerate
+            <i class="spinner-border spinner-border-sm ms-1" v-if="loadingSections.summary"></i>
+          </button>
+        </div>
+        <textarea class="form-control" id="summary" v-model="post.summary" rows="3"></textarea>
+      </div>
+      <!-- END: Summary -->
+      
+      <!-- START: Introduction Section -->
+      <div class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0">Introduction</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="regenerateSection('introduction')" :disabled="loading">
+            Regenerate
+            <i class="spinner-border spinner-border-sm ms-1" v-if="loadingSections.introduction"></i>
+          </button>
+        </div>
+        <input type="text" class="form-control mb-2" v-model="post.introduction.title" placeholder="Section Title">
+        <div v-for="(paragraph, pIndex) in post.introduction.paragraphs" :key="'intro-' + pIndex" class="card mb-2 paragraph-row">
+          <div class="card-header d-flex justify-content-end gap-1" style="padding:2px 6px; background:none; border-bottom:none; min-height:auto;">
+            <button type="button" class="btn btn-sm btn-outline-primary p-1" @click="regenerateParagraph('introduction', null, pIndex)" title="Regenerate">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger p-1" @click="removeParagraph('introduction', null, pIndex)" title="Remove">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <div class="card-body p-2">
+            <textarea class="form-control" v-model="post.introduction.paragraphs[pIndex]" rows="3"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" @click="addParagraph('introduction')">+ Add Paragraph</button>
+      </div>
+      <!-- END: Introduction Section -->
+      
+      <!-- START: Dynamic Sections -->
+      <div v-for="(section, index) in post.sections" :key="index" class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0">{{ section.title }}</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="regenerateSection('section_' + index)" :disabled="loading">
+            Regenerate
+            <i class="spinner-border spinner-border-sm ms-1" v-if="loadingSections['section_' + index]"></i>
+          </button>
+        </div>
+        <input type="text" class="form-control mb-2" v-model="section.title" placeholder="Section Title">
+        <div v-for="(paragraph, pIndex) in section.paragraphs" :key="'section-' + index + '-' + pIndex" class="card mb-2 paragraph-row">
+          <div class="card-header d-flex justify-content-end gap-1" style="padding:2px 6px; background:none; border-bottom:none; min-height:auto;">
+            <button type="button" class="btn btn-sm btn-outline-primary p-1" @click="regenerateParagraph('section', index, pIndex)" title="Regenerate">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger p-1" @click="removeParagraph('section', index, pIndex)" title="Remove">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <div class="card-body p-2">
+            <textarea class="form-control" v-model="section.paragraphs[pIndex]" rows="3"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" @click="addParagraph('section', index)">+ Add Paragraph</button>
+      </div>
+      <!-- END: Dynamic Sections -->
+
+      <!-- START: Conclusion Section -->
+      <div class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0">Conclusion</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="regenerateSection('conclusion')" :disabled="loading">
+            Regenerate
+            <span class="spinner-border spinner-border-sm ms-1" v-if="loadingSections.conclusion"></span>
+          </button>
+        </div>
+        <input type="text" class="form-control mb-2" v-model="post.conclusion.title" placeholder="Section Title">
+        <div v-for="(paragraph, pIndex) in post.conclusion.paragraphs" :key="'conclusion-' + pIndex" class="card mb-2 paragraph-row">
+          <div class="card-header d-flex justify-content-end gap-1" style="padding:2px 6px; background:none; border-bottom:none; min-height:auto;">
+            <button type="button" class="btn btn-sm btn-outline-primary p-1" @click="regenerateParagraph('conclusion', null, pIndex)" title="Regenerate">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger p-1" @click="removeParagraph('conclusion', null, pIndex)" title="Remove">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <div class="card-body p-2">
+            <textarea class="form-control" v-model="post.conclusion.paragraphs[pIndex]" rows="3"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" @click="addParagraph('conclusion')">+ Add Paragraph</button>
+      </div>
+      <!-- END: Conclusion Section -->
+      
+      <!-- START: Meta Information -->
+      <div class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Meta Information</h5>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="onRegenerateMetas" :disabled="loading">
+            Regenerate
+            <i class="spinner-border spinner-border-sm ms-1" v-if="loadingSections.metas"></i>
+          </button>
+        </div>
+        <div class="mb-2">
+          <label class="form-label" for="meta_title">Meta Title</label>
+          <input type="text" class="form-control" id="meta_title" v-model="post.metaTitle">
+        </div>
+        <div class="mb-2">
+          <label class="form-label" for="meta_description">Meta Description</label>
+          <textarea class="form-control" id="meta_description" v-model="post.metaDescription" rows="2"></textarea>
+        </div>
+        <div>
+          <label class="form-label" for="meta_keywords">Meta Keywords</label>
+          <input type="text" class="form-control" id="meta_keywords" v-model="post.metaKeywords">
+        </div>
+      </div>
+      <!-- END: Meta Information -->
+      
+      <!-- START: Image URL -->
+      <div class="mb-3 border p-3 bg-light">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0" for="image">Featured Image URL</label>
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="regenerateImage" :disabled="loading">
+            Generate Image
+            <span class="spinner-border spinner-border-sm ms-1" v-if="loadingImage"></span>
+          </button>
+        </div>
+        <textarea class="form-control" id="image" v-model="post.image" rows="3" placeholder="Paste or generate a data URL or image URL here"></textarea>
+        <div class="mt-2" v-if="post.image">
+          <div class="mb-2"><strong>Preview:</strong></div>
+          <img :src="post.image" alt="Featured Image" class="img-fluid img-thumbnail" style="max-height: 300px; max-width: 100%; object-fit: contain;">
+        </div>
+      </div>
+      <!-- END: Image URL -->
+
+      <!-- START: Save Buttons -->
+      <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-secondary btn-lg me-3" @click="saveDraft">Save Draft</button>
+        <button type="submit" class="btn btn-primary btn-lg" :disabled="loading">
+          Finalize and Save as Blog Post
+          <span class="spinner-border spinner-border-sm ms-2" v-if="saving"></span>
+        </button>
+      </div>
+      <!-- END: Save Buttons -->
+    </form>
+  </div>
+</div>

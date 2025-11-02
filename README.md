@@ -121,3 +121,9 @@ Run job:
 ```bash
 go run . job run ...
 ```
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). You can find a copy of the license at [https://www.gnu.org/licenses/agpl-3.0.en.html](https://www.gnu.org/licenses/agpl-3.0.txt).
+
+For commercial use, please use the [contact page](https://lesichkov.co.uk/contact) to obtain a commercial license.

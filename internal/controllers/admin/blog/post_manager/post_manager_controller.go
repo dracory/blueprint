@@ -1,39 +1,37 @@
-package admin
+package post_manager
 
 import (
 	"log/slog"
 	"net/http"
 
+	"project/internal/controllers/admin/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/types"
-	"strings"
 
 	"github.com/dracory/blogstore"
-	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dracory/req"
 	"github.com/dracory/sb"
 	"github.com/dromara/carbon/v2"
-	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
 
 // == CONTROLLER ==============================================================
 
-type managerController struct {
+type postManagerController struct {
 	app types.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewManagerController(app types.AppInterface) *managerController {
-	return &managerController{app: app}
+func NewPostManagerController(app types.AppInterface) *postManagerController {
+	return &postManagerController{app: app}
 }
 
-func (controller *managerController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (controller *postManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
@@ -44,50 +42,76 @@ func (controller *managerController) Handler(w http.ResponseWriter, r *http.Requ
 		Title:   "Blog | Post Manager",
 		Content: controller.page(data),
 		ScriptURLs: []string{
-			cdn.Htmx_1_9_4(),
+			cdn.Htmx_2_0_0(),
 			cdn.Sweetalert2_10(),
 		},
 		Styles: []string{},
 	}).ToHTML()
 }
 
-func (controller *managerController) page(data managerControllerData) hb.TagInterface {
+func (controller *postManagerController) page(data postManagerControllerData) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
-			URL:  links.Admin().Home(map[string]string{}),
+			URL:  links.Admin().Home(),
 		},
 		{
 			Name: "Blog",
-			URL:  links.Admin().BlogPostManager(map[string]string{}),
+			URL:  links.Admin().Blog(),
 		},
 		{
 			Name: "Post Manager",
-			URL:  links.Admin().BlogPostManager(map[string]string{}),
+			URL:  shared.NewLinks().Home(),
 		},
 	})
 
+	actionButtons := hb.Div().
+		Class("d-flex gap-2 float-end")
+
+	buttonAiHome := hb.Hyperlink().
+		Class("btn btn-light text-dark d-inline-flex align-items-center").
+		Child(hb.I().Class("bi bi-stars me-2")).
+		HTML("AI Tools").
+		Href(shared.NewLinks().AiTools())
+
+	buttonSettings := hb.Hyperlink().
+		Class("btn btn-outline-secondary d-inline-flex align-items-center").
+		Child(hb.I().Class("bi bi-gear me-2")).
+		HTML("Settings").
+		Href(shared.NewLinks().BlogSettings())
+
 	buttonPostNew := hb.Button().
-		Class("btn btn-primary float-end").
-		Child(hb.I().Class("bi bi-plus-circle").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
+		Class("btn btn-primary d-inline-flex align-items-center").
+		Child(hb.I().Class("bi bi-plus-circle me-2")).
 		HTML("New Post").
-		HxGet(links.Admin().BlogPostCreate(map[string]string{})).
+		HxGet(shared.NewLinks().PostCreate()).
 		HxTarget("body").
 		HxSwap("beforeend")
 
-	title := hb.Heading1().
-		HTML("Blog. Post Manager").
+	actionButtons = actionButtons.
+		Child(buttonAiHome).
+		Child(buttonSettings).
 		Child(buttonPostNew)
 
-	return hb.Div().
-		Class("container").
-		Child(title).
-		Child(breadcrumbs).
-		Child(controller.tablePosts(data))
+	title := hb.Heading1().
+		HTML("Blog. Post Manager").
+		Child(actionButtons)
+
+	return layouts.AdminPage(
+		title,
+		breadcrumbs,
+		tablePostList(data),
+	)
 }
 
-func (controller *managerController) prepareData(r *http.Request) (data managerControllerData, errorMessage string) {
+func (controller *postManagerController) prepareData(r *http.Request) (data postManagerControllerData, errorMessage string) {
 	var err error
+
+	authUser := helpers.GetAuthUser(r)
+
+	if authUser == nil {
+		return data, "You are not logged in. Please login to continue."
+	}
 
 	data.page = req.GetStringTrimmed(r, "page")
 	data.pageInt = cast.ToInt(data.page)
@@ -132,270 +156,9 @@ func (controller *managerController) prepareData(r *http.Request) (data managerC
 	}
 
 	return data, ""
-
 }
 
-func (controller *managerController) tablePosts(data managerControllerData) hb.TagInterface {
-	table := hb.Table().
-		Class("table table-striped table-hover table-bordered").
-		Children([]hb.TagInterface{
-			hb.Thead().Children([]hb.TagInterface{
-				hb.TR().Children([]hb.TagInterface{
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Post", "title")).
-						Text(", ").
-						Child(controller.sortableColumnLabel(data, "Reference", "title")).
-						Style(`cursor: pointer;`),
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Status", "status")).
-						Style("width: 200px;cursor: pointer;"),
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Featured", "featured")).
-						Style("width: 1px;cursor: pointer;"),
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Published", "published_at")).
-						Style("width: 1px;cursor: pointer;"),
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Created", "created_at")).
-						Style("width: 1px;cursor: pointer;"),
-					hb.TH().
-						Child(controller.sortableColumnLabel(data, "Modified", "updated_at")).
-						Style("width: 1px;cursor: pointer;"),
-					hb.TH().
-						HTML("Actions"),
-				}),
-			}),
-			hb.Tbody().Children(lo.Map(data.blogList, func(blog blogstore.Post, _ int) hb.TagInterface {
-				blogLink := hb.Hyperlink().
-					HTML(blog.Title()).
-					Href(links.Website().BlogPost(blog.ID(), blog.Slug())).
-					Target("_blank")
-
-				status := hb.Span().
-					Style(`font-weight: bold;`).
-					StyleIf(blog.IsPublished(), `color:green;`).
-					StyleIf(blog.IsTrashed(), `color:silver;`).
-					StyleIf(blog.IsDraft(), `color:blue;`).
-					StyleIf(blog.IsUnpublished(), `color:red;`).
-					HTML(blog.Status())
-
-				buttonEdit := hb.Hyperlink().
-					Class("btn btn-primary me-2").
-					Child(hb.I().Class("bi bi-pencil-square")).
-					Title("Edit").
-					Href(links.Admin().BlogPostUpdate(map[string]string{"post_id": blog.ID()})).
-					Target("_blank")
-
-				buttonDelete := hb.Hyperlink().
-					Class("btn btn-danger").
-					Child(hb.I().Class("bi bi-trash")).
-					Title("Delete").
-					HxGet(links.Admin().BlogPostDelete(map[string]string{"post_id": blog.ID()})).
-					HxTarget("body").
-					HxSwap("beforeend")
-
-				return hb.TR().Children([]hb.TagInterface{
-					hb.TD().
-						Child(hb.Div().Child(blogLink)).
-						Child(hb.Div().
-							Style("font-size: 11px;").
-							HTML("Ref: ").
-							HTML(blog.ID())),
-					hb.TD().
-						Child(status),
-					hb.TD().
-						HTML(blog.Featured()),
-					hb.TD().
-						Child(hb.Div().
-							Style("font-size: 13px;white-space: nowrap;").
-							HTML(blog.PublishedAtCarbon().Format("d M Y"))),
-					hb.TD().
-						Child(hb.Div().
-							Style("font-size: 13px;white-space: nowrap;").
-							HTML(blog.CreatedAtCarbon().Format("d M Y"))),
-					hb.TD().
-						Child(hb.Div().
-							Style("font-size: 13px;white-space: nowrap;").
-							HTML(blog.UpdatedAtCarbon().Format("d M Y"))),
-					hb.TD().
-						Child(buttonEdit).
-						Child(buttonDelete),
-				})
-			})),
-		})
-
-	// cfmt.Successln("Table: ", table)
-
-	return hb.Wrap().Children([]hb.TagInterface{
-		controller.tableFilter(data),
-		table,
-		controller.tablePagination(data, int(data.blogCount), data.pageInt, data.perPage),
-	})
-}
-
-func (controller *managerController) sortableColumnLabel(data managerControllerData, tableLabel string, columnName string) hb.TagInterface {
-	isSelected := strings.EqualFold(data.sortBy, columnName)
-
-	direction := lo.If(data.sortOrder == "asc", "desc").Else("asc")
-
-	if !isSelected {
-		direction = "asc"
-	}
-
-	link := links.Admin().BlogPostManager(map[string]string{
-		"page":        "0",
-		"by":          columnName,
-		"sort":        direction,
-		"date_from":   data.dateFrom,
-		"date_to":     data.dateTo,
-		"status":      data.status,
-		"search":      data.search,
-		"customer_id": data.customerID,
-	})
-	return hb.Hyperlink().
-		HTML(tableLabel).
-		Child(controller.sortingIndicator(columnName, data.sortBy, direction)).
-		Href(link)
-}
-
-func (controller *managerController) sortingIndicator(columnName string, sortByColumnName string, sortOrder string) hb.TagInterface {
-	isSelected := strings.EqualFold(sortByColumnName, columnName)
-
-	direction := lo.If(isSelected && sortOrder == "asc", "up").
-		ElseIf(isSelected && sortOrder == "desc", "down").
-		Else("none")
-
-	sortingIndicator := hb.Span().
-		Class("sorting").
-		HTMLIf(direction == "up", "&#8595;").
-		HTMLIf(direction == "down", "&#8593;").
-		HTMLIf(direction != "down" && direction != "up", "")
-
-	return sortingIndicator
-}
-
-func (controller *managerController) tableFilter(data managerControllerData) hb.TagInterface {
-	statusList := []map[string]string{
-		{"id": "", "name": "All Statuses"},
-		{"id": blogstore.POST_STATUS_DRAFT, "name": "Draft"},
-		{"id": blogstore.POST_STATUS_UNPUBLISHED, "name": "Unpublished"},
-		{"id": blogstore.POST_STATUS_PUBLISHED, "name": "Published"},
-		{"id": blogstore.POST_STATUS_TRASH, "name": "Deleted"},
-	}
-
-	searchButton := hb.Button().
-		Type("submit").
-		Child(hb.I().Class("bi bi-search")).
-		Class("btn btn-primary w-100 h-100")
-
-	period := hb.Div().Class("form-group").Children([]hb.TagInterface{
-		hb.Label().
-			HTML("Period").
-			Style("margin-bottom: 0px;"),
-		hb.Div().Class("input-group").Children([]hb.TagInterface{
-			hb.Input().
-				Type(hb.TYPE_DATE).
-				Name("date_from").
-				Value(data.dateFrom).
-				OnChange("FORM_TRANSACTIONS.submit()").
-				Class("form-control"),
-			hb.Span().
-				HTML(" : ").
-				Class("input-group-text"),
-			hb.Input().
-				Type(hb.TYPE_DATE).
-				Name("date_to").
-				Value(data.dateTo).
-				OnChange("FORM_TRANSACTIONS.submit()").
-				Class("form-control"),
-		}),
-	})
-
-	search := hb.Div().Class("form-group").Children([]hb.TagInterface{
-		hb.Label().
-			HTML("Search").
-			Style("margin-bottom: 0px;"),
-		hb.Input().
-			Type("search").
-			Name("search").
-			Value(data.search).
-			Class("form-control").
-			Placeholder("reference, title, content ..."),
-	})
-
-	status := hb.Div().Class("form-group").Children([]hb.TagInterface{
-		hb.Label().
-			HTML("Status").
-			Style("margin-bottom: 0px;"),
-		hb.Select().
-			Name("status").
-			Class("form-select").
-			OnChange("FORM_TRANSACTIONS.submit()").
-			Children(lo.Map(statusList, func(status map[string]string, index int) hb.TagInterface {
-				return hb.Option().
-					Value(status["id"]).
-					HTML(status["name"]).
-					AttrIf(data.status == status["id"], "selected", "selected")
-			})),
-	})
-
-	form := hb.Form().
-		ID("FORM_TRANSACTIONS").
-		Style("display: block").
-		Method(http.MethodGet).
-		Children([]hb.TagInterface{
-			hb.Div().Class("row").Children([]hb.TagInterface{
-				hb.Div().Class("col-md-2").Children([]hb.TagInterface{
-					search,
-				}),
-				hb.Div().Class("col-md-4").Children([]hb.TagInterface{
-					period,
-				}),
-				hb.Div().Class("col-md-2").Children([]hb.TagInterface{
-					status,
-				}),
-				hb.Div().Class("col-md-1").Children([]hb.TagInterface{
-					searchButton,
-				}),
-			}),
-		})
-
-	return hb.Div().
-		Class("card bg-light mb-3").
-		Style("").
-		Children([]hb.TagInterface{
-			hb.Div().Class("card-body").Children([]hb.TagInterface{
-				form,
-			}),
-		})
-}
-
-func (controller *managerController) tablePagination(data managerControllerData, count int, page int, perPage int) hb.TagInterface {
-	url := links.Admin().BlogPostManager(map[string]string{
-		"search":    data.search,
-		"status":    data.status,
-		"date_from": data.dateFrom,
-		"date_to":   data.dateTo,
-		"by":        data.sortBy,
-		"order":     data.sortOrder,
-	})
-
-	url = lo.Ternary(strings.Contains(url, "?"), url+"&page=", url+"?page=") // page must be last
-
-	pagination := bs.Pagination(bs.PaginationOptions{
-		NumberItems:       count,
-		CurrentPageNumber: page,
-		PagesToShow:       5,
-		PerPage:           perPage,
-		URL:               url,
-	})
-
-	return hb.Div().
-		Class(`d-flex justify-content-left mt-5 pagination-primary-soft rounded mb-0`).
-		HTML(pagination)
-}
-
-type managerControllerData struct {
+type postManagerControllerData struct {
 	// r            *http.Request
 	page       string
 	pageInt    int

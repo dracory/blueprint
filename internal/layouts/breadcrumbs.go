@@ -13,8 +13,10 @@ func Breadcrumbs(breadcrumbs []Breadcrumb) *hb.Tag {
 
 	for _, breadcrumb := range breadcrumbs {
 		icon := lo.IfF(breadcrumb.Icon != "", func() hb.TagInterface {
-			if strings.HasSuffix(breadcrumb.Icon, "bi") {
-				return hb.I().Class("bi " + breadcrumb.Icon)
+			if strings.HasPrefix(breadcrumb.Icon, "bi") {
+				return hb.I().
+					Class("bi " + breadcrumb.Icon).
+					Style("margin-right: 8px;")
 			}
 			return hb.NewHTML(breadcrumb.Icon)
 		}).ElseF(func() hb.TagInterface {

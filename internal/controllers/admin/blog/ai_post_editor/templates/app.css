@@ -1,0 +1,6 @@
+[v-cloak] {
+    display: none;
+}
+.vue-form label {
+    font-weight: 500;
+}

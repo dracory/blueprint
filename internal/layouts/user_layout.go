@@ -7,11 +7,12 @@ import (
 	"project/internal/types"
 
 	"github.com/dracory/cmsstore"
-	"github.com/gouniverse/dashboard"
+	"github.com/dracory/dashboard"
+	dashboardTypes "github.com/dracory/dashboard/types"
 	"github.com/samber/lo"
 )
 
-func NewUserLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
+func NewUserLayout(app types.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
 	return userLayout(app, r, options)
 }
 
@@ -23,19 +24,19 @@ func NewUserLayout(app types.AppInterface, r *http.Request, options Options) *da
 //
 // Returns:
 // - a pointer to a dashboard.Dashboard object representing the generated dashboard.
-func userLayout(app types.AppInterface, r *http.Request, options Options) *dashboard.Dashboard {
+func userLayout(app types.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
 	authUser := helpers.GetAuthUser(r)
 
-	dashboardUser := dashboard.User{}
+	dashboardUser := dashboardTypes.User{}
 	if authUser != nil {
 		firstName, lastName, err := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
 		if err == nil {
-			dashboardUser = dashboard.User{
+			dashboardUser = dashboardTypes.User{
 				FirstName: firstName,
 				LastName:  lastName,
 			}
 		} else {
-			dashboardUser = dashboard.User{
+			dashboardUser = dashboardTypes.User{
 				FirstName: "n/a",
 				LastName:  "",
 			}
@@ -58,6 +59,7 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 
 	// Prepare styles
 	styles := []string{ // prepend any if required
+		`a.navbar-brand{font-size:18px;}`,
 		`nav#Toolbar {border-bottom: 8px solid blue;}`,
 	}
 	styles = append(styles, options.Styles...)
@@ -76,26 +78,32 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) *dashb
 		titlePostfix = "" // no postfix for CMS pages
 	}
 
-	dashboard := dashboard.NewDashboard(dashboard.Config{
-		HTTPRequest: r,
-		Content:     options.Content.ToHTML(),
-		Title:       options.Title + titlePostfix,
-		LoginURL:    links.Auth().Login(homeLink),
-		MenuItems:   userLayoutMainMenuItems(authUser),
-		// LogoImageURL:              "/media/user/dashboard-logo.jpg",
-		NavbarBackgroundColorMode: "primary",
-		LogoRawHtml:               userLogoHtml(),
-		LogoRedirectURL:           homeLink,
-		User:                      dashboardUser,
-		UserMenu:                  userLayoutUserMenuItems(authUser),
-		ThemeHandlerUrl:           links.Website().Theme(map[string]string{"redirect": r.URL.Path}),
-		Scripts:                   scripts,
-		ScriptURLs:                scriptURLs,
-		Styles:                    styles,
-		StyleURLs:                 options.StyleURLs,
-		FaviconURL:                FaviconURL(),
-		// Theme: dashboard.THEME_MINTY,
+	path := lo.IfF(r != nil, func() string {
+		return r.URL.Path
+	}).ElseF(func() string {
+		return ""
 	})
+
+	themeLink := links.Website().Theme(map[string]string{"redirect": path})
+
+	dashboard := dashboard.New()
+	dashboard.SetHTTPRequest(r)
+	dashboard.SetContent(options.Content.ToHTML())
+	dashboard.SetTitle(options.Title + titlePostfix)
+	dashboard.SetFaviconURL(FaviconURL())
+	dashboard.SetLoginURL(links.Auth().Login(homeLink))
+	dashboard.SetMenuMainItems(userLayoutMainMenuItems(authUser))
+	dashboard.SetMenuUserItems(userLayoutUserMenuItems(authUser))
+	// dashboard.SetMenuQuickAccessItems(userLayoutQuickAccessMenuItems(authUser))
+	dashboard.SetNavbarBackgroundColorMode("primary")
+	dashboard.SetLogoRawHtml(userLogoHtml())
+	dashboard.SetLogoRedirectURL(homeLink)
+	dashboard.SetUser(dashboardUser)
+	dashboard.SetThemeHandlerUrl(themeLink)
+	dashboard.SetScripts(scripts)
+	dashboard.SetScriptURLs(scriptURLs)
+	dashboard.SetStyles(styles)
+	dashboard.SetStyleURLs(options.StyleURLs)
 
 	return dashboard
 }

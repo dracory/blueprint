@@ -20,7 +20,7 @@ func (l *websiteLinks) Home() string {
 }
 
 func (l *websiteLinks) Blog(params ...map[string]string) string {
-	p := lo.FirstOrEmpty(params)
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(BLOG, p)
 }
 
@@ -32,7 +32,7 @@ func (l *websiteLinks) BlogPost(postID string, postSlug string) string {
 }
 
 func (l *websiteLinks) Chat(params ...map[string]string) string {
-	p := lo.FirstOrEmpty(params)
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(CHAT_HOME, p)
 }
 
@@ -46,12 +46,12 @@ func (l *websiteLinks) File(filePath string) string {
 }
 
 func (l *websiteLinks) Flash(params ...map[string]string) string {
-	p := lo.FirstOrEmpty(params)
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(FLASH, p)
 }
 
 func (l *websiteLinks) Shop(params ...map[string]string) string {
-	p := lo.FirstOrEmpty(params)
+	p := lo.FirstOr(params, map[string]string{})
 	return URL(SHOP, p)
 }
 

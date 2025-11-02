@@ -3,9 +3,9 @@ package layouts
 import (
 	"project/internal/links"
 
+	dashboardTypes "github.com/dracory/dashboard/types"
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
-	"github.com/gouniverse/dashboard"
 )
 
 // userLayoutMainMenu generates the main menu items for the user dashboard.
@@ -15,25 +15,25 @@ import (
 //
 // Returns:
 // - `[]dashboard.MenuItem`: The main menu items.
-func userLayoutMainMenuItems(user userstore.UserInterface) []dashboard.MenuItem {
+func userLayoutMainMenuItems(user userstore.UserInterface) []dashboardTypes.MenuItem {
 	websiteHomeLink := links.Website().Home()
 	dashboardLink := links.User().Home(map[string]string{})
 	loginLink := links.Auth().Login(dashboardLink)
 	logoutLink := links.Auth().Logout()
 
-	homeMenuItem := dashboard.MenuItem{
+	homeMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-house").Style("margin-right:10px;").ToHTML(),
 		Title: "Home",
 		URL:   websiteHomeLink,
 	}
 
-	profileMenuItem := dashboard.MenuItem{
+	profileMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-person").Style("margin-right:10px;").ToHTML(),
 		Title: "My Account",
 		URL:   links.User().Profile(),
 	}
 
-	loginMenuItem := dashboard.MenuItem{
+	loginMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-door-open").Style("margin-right:10px;").ToHTML(),
 		Title: "Login",
 		URL:   loginLink,
@@ -51,26 +51,26 @@ func userLayoutMainMenuItems(user userstore.UserInterface) []dashboard.MenuItem 
 	// 	URL:   links.NewUserLinks().InviteFriend(),
 	// }
 
-	websiteMenuItem := dashboard.MenuItem{
+	websiteMenuItem := dashboardTypes.MenuItem{
 		Icon:   hb.I().Class("bi bi-globe").Style("margin-right:10px;").ToHTML(),
 		Title:  "To Website",
 		URL:    websiteHomeLink,
 		Target: "_blank",
 	}
 
-	logoutMenuItem := dashboard.MenuItem{
+	logoutMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-arrow-right").Style("margin-right:10px;").ToHTML(),
 		Title: "Logout",
 		URL:   logoutLink,
 	}
 
-	dashboardMenuItem := dashboard.MenuItem{
+	dashboardMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-speedometer").Style("margin-right:10px;").ToHTML(),
 		Title: "Dashboard",
 		URL:   dashboardLink,
 	}
 
-	menuItems := []dashboard.MenuItem{}
+	menuItems := []dashboardTypes.MenuItem{}
 
 	if user != nil {
 		menuItems = append(menuItems, dashboardMenuItem)
