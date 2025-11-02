@@ -13,15 +13,15 @@ import (
 func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcrumb) *hb.Tag {
 	b := lo.FirstOr(breadcrumbs, []layouts.Breadcrumb{
 		{
-			Name: "Home",
+			Name: "Dashboard",
 			URL:  links.User().Home(),
 		},
 	})
 	// if first is not home, add home
-	if len(b) > 0 && b[0].Name != "Home" {
+	if len(b) > 0 && b[0].Name != "Dashboard" {
 		b = append([]layouts.Breadcrumb{
 			{
-				Name: "Home",
+				Name: "Dashboard",
 				URL:  links.User().Home(),
 			},
 		}, b...)

@@ -15,7 +15,6 @@ import (
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
 	"github.com/dracory/rtr"
-	"github.com/dracory/str"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -64,8 +63,8 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 		return ""
 	}
 
-	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
-		url := links.Website().BlogPost(post.ID(), post.Title())
+	if postSlug == "" || postSlug != post.Slug() {
+		url := links.Website().BlogPost(post.ID(), post.Slug())
 		c.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
 		helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
