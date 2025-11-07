@@ -6,8 +6,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"project/internal/types"
 	"strings"
+	"time"
+
+	"project/internal/types"
 
 	"github.com/dracory/statsstore"
 	"github.com/dracory/taskstore"
@@ -17,6 +19,15 @@ import (
 
 	"github.com/mileusna/useragent"
 )
+
+const (
+	ipLookupEndpoint = "https://ip2c.org/"
+	ipLookupTimeout  = 5 * time.Second
+)
+
+var ipLookupHTTPClient = &http.Client{
+	Timeout: ipLookupTimeout,
+}
 
 // statsVisitorEnhanceTask enhances the visitor stats with the country
 //
@@ -127,7 +138,7 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 		userDeviceType = "bot"
 	}
 
-	country := t.findCountryByIp(visitor.IpAddress())
+	country := t.findCountryByIp(ctx, visitor.IpAddress())
 
 	visitor.SetCountry(country)
 	visitor.SetUserBrowser(userBrowser)
@@ -146,12 +157,21 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 	return false
 }
 
-func (t *statsVisitorEnhanceTask) findCountryByIp(ip string) string {
+func (t *statsVisitorEnhanceTask) findCountryByIp(ctx context.Context, ip string) string {
 	if ip == "" || ip == "127.0.0.1" {
 		return "UN"
 	}
 
-	resp, err := http.Get("https://ip2c.org/" + ip)
+	timeoutCtx, cancel := context.WithTimeout(ctx, ipLookupTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(timeoutCtx, http.MethodGet, ipLookupEndpoint+ip, nil)
+	if err != nil {
+		log.Printf("Creating geo lookup request failed: %s", err)
+		return "ER"
+	}
+
+	resp, err := ipLookupHTTPClient.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)
@@ -162,6 +182,11 @@ func (t *statsVisitorEnhanceTask) findCountryByIp(ip string) string {
 		return "UN"
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Geo lookup returned status code %d", resp.StatusCode)
+		return "ER"
+	}
+
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("Closing response body failed: %s", err)
@@ -170,18 +195,17 @@ func (t *statsVisitorEnhanceTask) findCountryByIp(ip string) string {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Reading body failed: %s", err)
+		log.Printf("Reading geo lookup response failed: %s", err)
 		return "ER"
 	}
-	// Log the request body
-	bodyString := string(body)
-	cfmt.Infoln(bodyString)
-	parts := strings.Split(bodyString, ";")
+
+	parts := strings.Split(string(body), ";")
 	if len(parts) > 2 {
-		if parts[1] == "" {
+		code := strings.TrimSpace(parts[1])
+		if code == "" {
 			return "UN"
 		}
-		return parts[1]
+		return code
 	}
 
 	return "UN"

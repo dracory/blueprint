@@ -14,7 +14,7 @@ func globalMiddlewares(app types.AppInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
 		middlewares.JailBotsMiddleware(middlewares.JailBotsConfig{
-			Exclude:      []string{"/new",},
+			Exclude:      []string{"/new"},
 			ExcludePaths: []string{"/blog*", "/th*", "/liveflux*"},
 		}),
 		rtrMiddleware.CompressMiddleware(5, "text/html", "text/css"),
@@ -30,7 +30,8 @@ func globalMiddlewares(app types.AppInterface) []rtr.MiddlewareInterface {
 
 	// Conditionally add logger and recovery when not running tests
 	if app.GetConfig() != nil {
-		if app.GetConfig().IsEnvTesting() {
+		isNotTesting := !app.GetConfig().IsEnvTesting()
+		if isNotTesting {
 			globalMiddlewares = append(globalMiddlewares,
 				rtrMiddleware.LoggerMiddleware(),
 				rtrMiddleware.RecoveryMiddleware(),
