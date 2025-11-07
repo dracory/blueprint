@@ -18,26 +18,6 @@ func (l *adminLinks) Blog(params ...map[string]string) string {
 	return URL(ADMIN_BLOG, p)
 }
 
-func (l *adminLinks) BlogPostCreate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_BLOG_POST_CREATE, p)
-}
-
-func (l *adminLinks) BlogPostDelete(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_BLOG_POST_DELETE, p)
-}
-
-func (l *adminLinks) BlogPostManager(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_BLOG_POST_MANAGER, p)
-}
-
-func (l *adminLinks) BlogPostUpdate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_BLOG_POST_UPDATE, p)
-}
-
 // Cms is the cms old manager
 func (l *adminLinks) Cms(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})

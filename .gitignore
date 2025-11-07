@@ -51,3 +51,4 @@ google-cloud-sdk/
 
 old/
 /vendor/
+__debug_bin*
