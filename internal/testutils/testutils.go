@@ -4,66 +4,60 @@ import (
 	"log"
 	"testing"
 
-	"github.com/dracory/cachestore"
-	"github.com/dracory/sessionstore"
-	"github.com/dracory/userstore"
 	smtpmock "github.com/mocktools/go-smtp-mock"
-	"github.com/stretchr/testify/require"
-	"github.com/glebarez/sqlite"
-	"gorm.io/gorm"
 )
 
 // SetupTestDatabase creates an in-memory SQLite database for testing
-func SetupTestDatabase(t *testing.T) (*gorm.DB, func()) {
-	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-	require.NoError(t, err, "Failed to connect to database")
+// func SetupTestDatabase(t *testing.T) (*gorm.DB, func()) {
+// 	db, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+// 	require.NoError(t, err, "Failed to connect to database")
 
-	sqlDB, err := db.DB()
-	require.NoError(t, err, "Failed to get sql.DB")
+// 	sqlDB, err := db.DB()
+// 	require.NoError(t, err, "Failed to get sql.DB")
 
-	return db, func() {
-		_ = sqlDB.Close()
-	}
-}
+// 	return db, func() {
+// 		_ = sqlDB.Close()
+// 	}
+// }
 
 // SetupTestAuth creates an auth.Auth instance with in-memory stores for testing
-func SetupTestAuth(t *testing.T) (
-	userstore.StoreInterface,
-	sessionstore.StoreInterface,
-	cachestore.StoreInterface,
-	func(),
-) {
-	db, cleanupDB := SetupTestDatabase(t)
-	sqlDB, err := db.DB()
-	require.NoError(t, err, "Failed to get SQL DB")
+// func SetupTestAuth(t *testing.T) (
+// 	userstore.StoreInterface,
+// 	sessionstore.StoreInterface,
+// 	cachestore.StoreInterface,
+// 	func(),
+// ) {
+// 	db, cleanupDB := SetupTestDatabase(t)
+// 	sqlDB, err := db.DB()
+// 	require.NoError(t, err, "Failed to get SQL DB")
 
-	// Initialize stores with in-memory SQLite
-	userStore, err := userstore.NewStore(userstore.NewStoreOptions{
-		DB:                 sqlDB,
-		UserTableName:      "users",
-		AutomigrateEnabled: true,
-		DebugEnabled:       false,
-	})
-	require.NoError(t, err, "Failed to create user store")
+// 	// Initialize stores with in-memory SQLite
+// 	userStore, err := userstore.NewStore(userstore.NewStoreOptions{
+// 		DB:                 sqlDB,
+// 		UserTableName:      "users",
+// 		AutomigrateEnabled: true,
+// 		DebugEnabled:       false,
+// 	})
+// 	require.NoError(t, err, "Failed to create user store")
 
-	sessionStore, err := sessionstore.NewStore(sessionstore.NewStoreOptions{
-		DB:                 sqlDB,
-		SessionTableName:   "sessions",
-		AutomigrateEnabled: true,
-		DebugEnabled:       false,
-	})
-	require.NoError(t, err, "Failed to create session store")
+// 	sessionStore, err := sessionstore.NewStore(sessionstore.NewStoreOptions{
+// 		DB:                 sqlDB,
+// 		SessionTableName:   "sessions",
+// 		AutomigrateEnabled: true,
+// 		DebugEnabled:       false,
+// 	})
+// 	require.NoError(t, err, "Failed to create session store")
 
-	cacheStore, err := cachestore.NewStore(cachestore.NewStoreOptions{
-		DB:                 sqlDB,
-		CacheTableName:     "caches",
-		AutomigrateEnabled: true,
-		DebugEnabled:       false,
-	})
-	require.NoError(t, err, "Failed to create cache store")
+// 	cacheStore, err := cachestore.NewStore(cachestore.NewStoreOptions{
+// 		DB:                 sqlDB,
+// 		CacheTableName:     "caches",
+// 		AutomigrateEnabled: true,
+// 		DebugEnabled:       false,
+// 	})
+// 	require.NoError(t, err, "Failed to create cache store")
 
-	return userStore, sessionStore, cacheStore, cleanupDB
-}
+// 	return userStore, sessionStore, cacheStore, cleanupDB
+// }
 
 // SetupMailServer creates a mock SMTP server for testing email functionality.
 // Returns the server instance and a cleanup function to stop the server.

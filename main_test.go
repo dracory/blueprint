@@ -27,16 +27,11 @@ func TestIsCliMode(t *testing.T) {
 
 func TestStartBackgroundProcesses(t *testing.T) {
 	// Initialize minimal stores for background processes
-	userStore, sessionStore, cacheStore, cleanup := testutils.SetupTestAuth(t)
-	defer cleanup()
-
-	// Build application via testutils to ensure cfg, DB, and stores are initialized
-	application := testutils.Setup()
-
-	// Inject required stores
-	application.SetUserStore(userStore)
-	application.SetSessionStore(sessionStore)
-	application.SetCacheStore(cacheStore)
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -45,12 +40,12 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	defer group.stop()
 
 	// Should not panic
-	startBackgroundProcesses(ctx, group, application)
+	startBackgroundProcesses(ctx, group, app)
 
-	if application.GetCacheStore() == nil {
+	if app.GetCacheStore() == nil {
 		t.Errorf("Cache store should not be nil after starting background processes")
 	}
-	if application.GetSessionStore() == nil {
+	if app.GetSessionStore() == nil {
 		t.Errorf("Session store should not be nil after starting background processes")
 	}
 }

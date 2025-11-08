@@ -9,14 +9,18 @@ import (
 
 func TestImpersonate(t *testing.T) {
 	// Setup
-	_, sessionStore, _, cleanup := testutils.SetupTestAuth(t)
-	defer cleanup()
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
 	userID := "test_user"
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	// Act
-	err := Impersonate(sessionStore, w, req, userID)
+	err := Impersonate(app.GetSessionStore(), w, req, userID)
 
 	// Assert
 	if err != nil {

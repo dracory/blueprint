@@ -4,9 +4,7 @@ go 1.25.0
 
 // replace github.com/dracory/base => ../base
 // replace github.com/dracory/taskstore => ../../_modules_dracory/taskstore
-
 // replace github.com/dracory/cachestore => ../../_modules_dracory/cachestore
-
 // replace github.com/dracory/sessionstore => ../../_modules_dracory/sessionstore
 
 require (
@@ -78,7 +76,6 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.7.13
-	gorm.io/gorm v1.31.0
 )
 
 require (
@@ -167,6 +164,7 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/gorm v1.31.0 // indirect
 	modernc.org/libc v1.66.10 // indirect
 	modernc.org/sqlite v1.40.0 // indirect
 )
