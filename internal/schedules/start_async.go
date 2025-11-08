@@ -32,7 +32,23 @@ func scheduleStatsVisitorEnhanceTask(app types.AppInterface) {
 
 // scheduleCleanUpTask schedules the clean up task
 func scheduleCleanUpTask(app types.AppInterface) {
-	tasks.NewCleanUpTask(app).Handle()
+	if app == nil {
+		cfmt.Errorln("CleanUp scheduling skipped; app is nil")
+		return
+	}
+
+	if app.GetTaskStore() == nil {
+		cfmt.Warningln("CleanUp scheduling skipped; task store not configured.")
+		return
+	}
+
+	task := tasks.NewCleanUpTask(app)
+
+	go func() {
+		if handled := task.Handle(); !handled {
+			cfmt.Warningln("CleanUp task handler reported failure")
+		}
+	}()
 }
 
 func newScheduler(app types.AppInterface) *gocron.Scheduler {
