@@ -1,4 +1,4 @@
-package blog
+package home
 
 import (
 	"errors"
@@ -18,13 +18,13 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
-	
+
 	// Create a test template
 	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
-	
+
 	controller := NewBlogController(app)
 
 	// Create test posts in the database
@@ -62,7 +62,7 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	if html == "" {
 		t.Fatal("Expected HTML to not be empty")
 	}
-	
+
 	if !strings.Contains(html, "Blog") {
 		t.Errorf("Expected HTML to contain 'Blog'")
 	}
@@ -114,7 +114,7 @@ func TestBlogController_Handler_PostListError(t *testing.T) {
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
-	
+
 	// Create a test template
 	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
@@ -175,7 +175,7 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
-	
+
 	// Create a test template
 	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
@@ -247,7 +247,7 @@ func TestBlogController_PageRendering(t *testing.T) {
 	if html == "" {
 		t.Fatal("Expected HTML to not be empty")
 	}
-	
+
 	if !strings.Contains(html, "My First Post") {
 		t.Errorf("Expected post title to be in the HTML")
 	}

@@ -1,25 +1,195 @@
 package blog_settings
 
 import (
+	"context"
+	"log"
+	"net/url"
+	"os"
+	"strings"
+
 	"project/internal/controllers/admin/blog/shared"
+	"project/internal/types"
 
 	"github.com/dracory/hb"
+	"github.com/dracory/liveflux"
 )
 
-type blogSettingsFormOptions struct {
-	Data blogSettingsData
+type formBlogSettings struct {
+	liveflux.Base
+	App                      types.AppInterface
+	BlogTopic                string
+	FormErrorMessage         string
+	FormSuccessMessage       string
+	FormInfoMessage          string
+	FormRedirect             string
+	FormRedirectDelaySeconds int
+	IsEnvOverride            bool
+	ReturnURL                string
 }
 
-func blogSettingsForm(options blogSettingsFormOptions) hb.TagInterface {
-	textarea := hb.TextArea().
+func NewFormBlogSettings(app types.AppInterface) liveflux.ComponentInterface {
+	inst, err := liveflux.New(&formBlogSettings{})
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	if c, ok := inst.(*formBlogSettings); ok {
+		c.App = app
+	}
+	return inst
+}
+
+func (c *formBlogSettings) GetAlias() string {
+	return "admin_blog_settings_form_component"
+}
+
+func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) error {
+	if c.App == nil {
+		c.FormErrorMessage = "Application not initialized"
+		return nil
+	}
+
+	c.ReturnURL = strings.TrimSpace(params["return_url"])
+	if c.ReturnURL == "" {
+		c.ReturnURL = shared.NewLinks().PostManager()
+	}
+
+	store := c.App.GetSettingStore()
+	if store == nil {
+		c.FormErrorMessage = "Setting store is not configured"
+		return nil
+	}
+
+	value, err := store.Get(ctx, SettingKeyBlogTopic, "")
+	if err != nil {
+		if c.App.GetLogger() != nil {
+			c.App.GetLogger().Error("Blog settings form: failed to load blog topic", "error", err.Error())
+		}
+		c.FormErrorMessage = "Failed to load blog settings"
+		return nil
+	}
+
+	c.BlogTopic = value
+
+	envTopic := strings.TrimSpace(os.Getenv("BLOG_TOPIC"))
+	if envTopic != "" {
+		c.BlogTopic = envTopic
+		c.IsEnvOverride = true
+		c.FormInfoMessage = "The BLOG_TOPIC environment variable is set, so updates are disabled here."
+	}
+
+	return nil
+}
+
+func (c *formBlogSettings) Handle(ctx context.Context, action string, data url.Values) error {
+	switch action {
+	case "apply", "save_close":
+		return c.handleUpdate(ctx, action, data)
+	default:
+		return nil
+	}
+}
+
+func (c *formBlogSettings) handleUpdate(ctx context.Context, action string, data url.Values) error {
+	if data == nil {
+		data = url.Values{}
+	}
+
+	topic := strings.TrimSpace(data.Get("blog_topic"))
+	if topic == "" {
+		c.FormErrorMessage = "Blog topic is required"
+		c.FormSuccessMessage = ""
+		return nil
+	}
+
+	if c.IsEnvOverride {
+		c.FormErrorMessage = "Blog topic is managed via environment and cannot be changed here."
+		c.FormSuccessMessage = ""
+		return nil
+	}
+
+	store := c.App.GetSettingStore()
+	if store == nil {
+		c.FormErrorMessage = "Setting store is not configured"
+		c.FormSuccessMessage = ""
+		return nil
+	}
+
+	if err := store.Set(ctx, SettingKeyBlogTopic, topic); err != nil {
+		if c.App.GetLogger() != nil {
+			c.App.GetLogger().Error("Blog settings form: failed to save blog topic", "error", err.Error())
+		}
+		c.FormErrorMessage = "Failed to save blog topic. Please try again later."
+		c.FormSuccessMessage = ""
+		return nil
+	}
+
+	c.BlogTopic = topic
+	c.FormErrorMessage = ""
+	c.FormSuccessMessage = "Blog settings saved successfully"
+
+	switch action {
+	case "apply":
+		c.FormRedirect = ""
+		c.FormRedirectDelaySeconds = 0
+	case "save_close":
+		c.FormRedirect = c.ReturnURL
+		c.FormRedirectDelaySeconds = 2
+	default:
+		c.FormRedirect = shared.NewLinks().BlogSettings()
+		c.FormRedirectDelaySeconds = 2
+	}
+
+	return nil
+}
+
+func (c *formBlogSettings) Render(ctx context.Context) hb.TagInterface {
+	alerts := hb.Div()
+	if c.FormErrorMessage != "" {
+		alerts = alerts.Child(hb.SwalError(hb.SwalOptions{
+			Text:             c.FormErrorMessage,
+			Timer:            5000,
+			TimerProgressBar: true,
+			Position:         "top-end",
+		}))
+	}
+	if c.FormSuccessMessage != "" {
+		if c.FormRedirect != "" {
+			alerts = alerts.Child(hb.SwalSuccess(hb.SwalOptions{
+				Text:             c.FormSuccessMessage,
+				RedirectURL:      c.FormRedirect,
+				RedirectSeconds:  c.FormRedirectDelaySeconds,
+				Timer:            5000,
+				TimerProgressBar: true,
+				Position:         "top-end",
+			}))
+		} else {
+			alerts = alerts.Child(hb.SwalSuccess(hb.SwalOptions{
+				Text:             c.FormSuccessMessage,
+				Timer:            5000,
+				TimerProgressBar: true,
+				Position:         "top-end",
+			}))
+		}
+	}
+	if c.FormInfoMessage != "" {
+		alerts = alerts.Child(hb.Div().
+			Class("alert alert-info d-flex align-items-center gap-2 mb-3").
+			Attr("role", "alert").
+			Child(hb.I().Class("bi bi-info-circle-fill")).
+			Child(hb.Span().Text(c.FormInfoMessage)))
+	}
+
+	textareaBlogTopic := hb.TextArea().
 		Class("form-control").
 		ID("blog_topic").
 		Name("blog_topic").
-		Text(options.Data.blogTopic).
-		Attr("placeholder", "e.g. Contract review insights")
+		Text(c.BlogTopic).
+		Placeholder("e.g. Contract review insights").
+		Attr("rows", "5")
 
-	if options.Data.isEnvOverride {
-		textarea = textarea.
+	if c.IsEnvOverride {
+		textareaBlogTopic = textareaBlogTopic.
 			Attr("readonly", "true").
 			Attr("disabled", "true")
 	}
@@ -28,108 +198,69 @@ func blogSettingsForm(options blogSettingsFormOptions) hb.TagInterface {
 		Class("mb-3").
 		Child(hb.Label().
 			Class("form-label fw-semibold").
-			Attr("for", "blog_topic").
+			For("blog_topic").
 			HTML("Blog Topic")).
-		Child(textarea)
+		Child(textareaBlogTopic).
+		Child(hb.Small().
+			Class("form-text text-muted").
+			Text("This is the topic of your blog. It will be used by the AI to generate titles and content for your blog."))
 
 	applyIndicator := hb.Span().
 		ID("BlogSettingsApplyIndicator").
 		Class("htmx-indicator spinner-border spinner-border-sm ms-2").
-		Attr("role", "status").
-		Attr("aria-hidden", "true")
+		Role("status").
+		Aria("hidden", "true")
 
 	saveIndicator := hb.Span().
 		ID("BlogSettingsSaveIndicator").
 		Class("htmx-indicator spinner-border spinner-border-sm ms-2").
-		Attr("role", "status").
-		Attr("aria-hidden", "true")
+		Role("status").
+		Aria("hidden", "true")
 
 	buttonApply := hb.Button().
-		Type("button").
-		Class("btn btn-primary d-inline-flex align-items-center")
-
-	buttonSaveClose := hb.Button().
-		Type("button").
-		Class("btn btn-success d-inline-flex align-items-center")
-
-	if options.Data.isEnvOverride {
-		buttonApply = buttonApply.
-			Attr("disabled", "true")
-		buttonSaveClose = buttonSaveClose.
-			Attr("disabled", "true")
-	} else {
-		buttonApply = buttonApply.
-			Attr("hx-post", shared.NewLinks().BlogSettings()).
-			Attr("hx-target", "#BlogSettingsFormWrapper").
-			Attr("hx-swap", "outerHTML").
-			Attr("hx-include", "#BlogSettingsFormWrapper").
-			Attr("hx-vals", "{\"action\":\"apply\"}").
-			Attr("hx-indicator", "#BlogSettingsApplyIndicator")
-
-		buttonSaveClose = buttonSaveClose.
-			Attr("hx-post", shared.NewLinks().BlogSettings()).
-			Attr("hx-target", "#BlogSettingsFormWrapper").
-			Attr("hx-swap", "outerHTML").
-			Attr("hx-include", "#BlogSettingsFormWrapper").
-			Attr("hx-vals", "{\"action\":\"save_close\"}").
-			Attr("hx-indicator", "#BlogSettingsSaveIndicator")
-	}
-
-	buttonApply = buttonApply.
+		Type("submit").
+		Class("btn btn-primary").
+		Attr("data-flux-action", "apply").
 		Child(hb.I().Class("bi bi-check2 me-2")).
 		Child(hb.Span().Text("Apply")).
 		Child(applyIndicator)
 
-	buttonSaveClose = buttonSaveClose.
+	buttonSaveClose := hb.Button().
+		Type("submit").
+		Class("btn btn-success").
+		Attr("data-flux-action", "save_close").
 		Child(hb.I().Class("bi bi-check2-all me-2")).
 		Child(hb.Span().Text("Save & Close")).
 		Child(saveIndicator)
 
+	if c.IsEnvOverride {
+		buttonApply = buttonApply.Attr("disabled", "true")
+		buttonSaveClose = buttonSaveClose.Attr("disabled", "true")
+	}
+
 	submitRow := hb.Div().
 		Class("d-flex justify-content-between align-items-center flex-wrap gap-2").
-		Child(hb.Hyperlink().
-			Class("btn btn-secondary d-inline-flex align-items-center").
-			Href(shared.NewLinks().PostManager()).
+		Child(hb.A().
+			Href(c.ReturnURL).
+			Class("btn btn-secondary").
 			Child(hb.I().Class("bi bi-chevron-left me-2")).
-			Child(hb.Span().Text("Cancel"))).
+			Text("Cancel")).
 		Child(hb.Div().
 			Class("d-flex gap-2").
 			Child(buttonApply).
 			Child(buttonSaveClose))
 
-	flashMessages := hb.Div()
-
-	errorMessage := hb.SwalError(hb.SwalOptions{
-		Title:            "Error",
-		Text:             options.Data.formErrorMessage,
-		TimerProgressBar: true,
-		Timer:            5000,
-		Position:         "top-end",
-	})
-
-	successMessage := hb.SwalSuccess(hb.SwalOptions{
-		Title:            "Success",
-		Text:             options.Data.formSuccessMessage,
-		TimerProgressBar: true,
-		Timer:            5000,
-		Position:         "top-end",
-		RedirectURL:      options.Data.formRedirect,
-		RedirectSeconds:  options.Data.formRedirectDelaySeconds,
-	})
-
-	infoMessage := hb.Div().
-		Class("alert alert-info d-flex align-items-center gap-2 mb-3").
-		Attr("role", "alert").
-		Child(hb.I().Class("bi bi-info-circle-fill")).
-		Child(hb.Span().Text(options.Data.formInfoMessage))
-
-	flashMessages = flashMessages.ChildIf(options.Data.formErrorMessage != "", errorMessage)
-	flashMessages = flashMessages.ChildIf(options.Data.formSuccessMessage != "", successMessage)
-	flashMessages = flashMessages.ChildIf(options.Data.formInfoMessage != "", infoMessage)
-
-	return hb.Div().
+	form := hb.Div().
 		ID("BlogSettingsFormWrapper").
-		Child(flashMessages).
+		Child(alerts).
 		Child(formGroup).
 		Child(submitRow)
+
+	return c.Root(form)
+}
+
+func init() {
+	if err := liveflux.Register(&formBlogSettings{}); err != nil {
+		log.Printf("Failed to register formBlogSettings component: %v", err)
+	}
 }

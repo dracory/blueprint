@@ -1,21 +1,36 @@
 package blog_settings
 
 import (
+	"context"
 	"html"
-	"strings"
 	"testing"
 
 	"project/internal/controllers/admin/blog/shared"
+	"project/internal/testutils"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBlogSettingsForm_RenderStructure(t *testing.T) {
-	options := blogSettingsFormOptions{Data: blogSettingsData{
-		blogTopic: "AI insights",
-	}}
+	// Create a mock app for testing
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSettingStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	html := blogSettingsForm(options).ToHTML()
+	component := NewFormBlogSettings(app)
+	if component == nil {
+		t.Fatal("Failed to create component")
+	}
+
+	// Set test data on the component
+	if comp, ok := component.(*formBlogSettings); ok {
+		comp.BlogTopic = "AI insights"
+		comp.ReturnURL = shared.NewLinks().PostManager()
+	}
+
+	html := component.Render(context.TODO()).ToHTML()
 	decoded := htmlDecode(html)
 	t.Log(decoded)
 
@@ -25,61 +40,77 @@ func TestBlogSettingsForm_RenderStructure(t *testing.T) {
 	cancelURL := shared.NewLinks().PostManager()
 	assert.Contains(t, html, cancelURL)
 
-	blogSettingsURL := shared.NewLinks().BlogSettings()
-	assert.Contains(t, html, `hx-post="`+blogSettingsURL+`"`)
-	assert.Contains(t, html, `hx-target="#BlogSettingsFormWrapper"`)
-	assert.Contains(t, html, `hx-indicator="#BlogSettingsApplyIndicator"`)
-	assert.Contains(t, html, `hx-indicator="#BlogSettingsSaveIndicator"`)
-	assert.Contains(t, html, `id="BlogSettingsApplyIndicator"`)
-	assert.Contains(t, html, `id="BlogSettingsSaveIndicator"`)
+	assert.Contains(t, html, `data-flux-action="apply"`)
+	assert.Contains(t, html, `data-flux-action="save_close"`)
 
-	assert.Contains(t, decoded, "\"action\":\"apply\"")
-	assert.Contains(t, decoded, "\"action\":\"save_close\"")
+	// Verify the action attributes are present in the HTML
+	assert.Contains(t, decoded, "data-flux-action=\"apply\"")
+	assert.Contains(t, decoded, "data-flux-action=\"save_close\"")
 }
 
 func TestBlogSettingsForm_RenderStructure_WithEnvOverride(t *testing.T) {
 	infoMessage := "The BLOG_TOPIC environment variable is set, so updates are disabled here."
-	options := blogSettingsFormOptions{Data: blogSettingsData{
-		blogTopic:       "Env controlled topic",
-		formInfoMessage: infoMessage,
-		isEnvOverride:   true,
-	}}
 
-	html := blogSettingsForm(options).ToHTML()
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSettingStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	component := NewFormBlogSettings(app)
+	if component == nil {
+		t.Fatal("Failed to create component")
+	}
+
+	// Set test data on the component
+	if comp, ok := component.(*formBlogSettings); ok {
+		comp.BlogTopic = "Env controlled topic"
+		comp.FormInfoMessage = infoMessage
+		comp.IsEnvOverride = true
+		comp.ReturnURL = shared.NewLinks().PostManager()
+	}
+
+	html := component.Render(context.TODO()).ToHTML()
 
 	assert.Contains(t, html, "Env controlled topic")
 	assert.Contains(t, html, infoMessage)
 	assert.Contains(t, html, `readonly="true"`)
 	assert.Contains(t, html, `disabled="true"`)
 
-	assert.NotContains(t, html, `hx-vals="{\"action\":\"apply\"}"`)
-	assert.NotContains(t, html, `hx-vals="{\"action\":\"save_close\"}"`)
+	// Buttons should still have data-flux-action attributes but be disabled
+	assert.Contains(t, html, `data-flux-action="apply"`)
+	assert.Contains(t, html, `data-flux-action="save_close"`)
+	// Verify buttons are disabled
 	assert.Contains(t, html, `disabled="true"`)
 }
 
 func TestBlogSettingsForm_FlashMessages(t *testing.T) {
-	options := blogSettingsFormOptions{Data: blogSettingsData{
-		blogTopic:                "Contracts",
-		formErrorMessage:         "Blog topic is required",
-		formSuccessMessage:       "Blog settings saved successfully",
-		formRedirect:             "/admin/blog?controller=post-manager",
-		formRedirectDelaySeconds: 5,
-	}}
+	app := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSettingStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	html := blogSettingsForm(options).ToHTML()
+	component := NewFormBlogSettings(app)
+	if component == nil {
+		t.Fatal("Failed to create component")
+	}
+
+	// Set test data on the component
+	if comp, ok := component.(*formBlogSettings); ok {
+		comp.BlogTopic = "Contracts"
+		comp.FormErrorMessage = "Blog topic is required"
+		comp.FormSuccessMessage = "Blog settings saved successfully"
+		comp.FormRedirect = "/admin/blog?controller=post-manager"
+		comp.FormRedirectDelaySeconds = 5
+		comp.ReturnURL = shared.NewLinks().PostManager()
+	}
+
+	html := component.Render(context.TODO()).ToHTML()
 
 	assert.Contains(t, html, "Blog topic is required")
 	assert.Contains(t, html, "Blog settings saved successfully")
-	assert.Contains(t, html, options.Data.formRedirect)
-}
-
-func containsAny(haystack string, needles []string) bool {
-	for _, needle := range needles {
-		if strings.Contains(haystack, needle) {
-			return true
-		}
-	}
-	return false
+	assert.Contains(t, html, "/admin/blog?controller=post-manager")
 }
 
 func htmlDecode(s string) string {

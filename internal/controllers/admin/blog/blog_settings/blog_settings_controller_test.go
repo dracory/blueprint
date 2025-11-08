@@ -83,6 +83,6 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, postResp.StatusCode)
-	assert.Contains(t, postHTML, "managed via environment")
+	assert.Contains(t, postHTML, "Blog topic is managed via environment and cannot be changed here.")
 	assert.Contains(t, postHTML, envValue)
 }

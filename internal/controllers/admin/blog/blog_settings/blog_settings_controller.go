@@ -15,6 +15,7 @@ import (
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/liveflux"
 	"github.com/dracory/req"
 )
 
@@ -42,27 +43,76 @@ func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request)
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errMessage, shared.NewLinks().Home(), 10)
 	}
 
+	var formComponent liveflux.ComponentInterface
+
 	if r.Method == http.MethodPost {
-		if data.isEnvOverride {
-			data.formErrorMessage = "BLOG_TOPIC is managed via environment and cannot be changed here."
-		} else {
-			var postError string
-			data, postError = c.processForm(r, data)
-			if postError != "" {
-				return helpers.ToFlashError(c.app.GetCacheStore(), w, r, postError, shared.NewLinks().Home(), 10)
+		// Create the component for handling POST
+		formComponent = NewFormBlogSettings(c.app)
+		if formComponent != nil {
+			// Parse form data
+			if err := r.ParseForm(); err != nil {
+				data.formErrorMessage = "Failed to parse form data"
+			} else {
+				// Handle the action using the component
+				action := req.GetStringTrimmed(r, "action")
+				if action == "" {
+					action = "apply" // default action
+				}
+
+				params := map[string]string{
+					"return_url": shared.NewLinks().PostManager(),
+				}
+
+				// Mount the component first
+				ctx := r.Context()
+				if err := formComponent.Mount(ctx, params); err != nil {
+					data.formErrorMessage = "Failed to initialize form"
+				} else {
+					// Handle the action
+					if err := formComponent.Handle(ctx, action, r.Form); err != nil {
+						data.formErrorMessage = "Failed to process form"
+					} else {
+						// Update data from component state
+						if comp, ok := formComponent.(*formBlogSettings); ok {
+							data.blogTopic = comp.BlogTopic
+							data.formErrorMessage = comp.FormErrorMessage
+							data.formSuccessMessage = comp.FormSuccessMessage
+							data.formInfoMessage = comp.FormInfoMessage
+							data.formRedirect = comp.FormRedirect
+							data.formRedirectDelaySeconds = comp.FormRedirectDelaySeconds
+							data.isEnvOverride = comp.IsEnvOverride
+						}
+					}
+				}
 			}
+		} else {
+			data.formErrorMessage = "Failed to initialize form component"
 		}
+	}
+
+	// Use the existing component if available, otherwise create a new one
+	if formComponent == nil {
+		formComponent = NewFormBlogSettings(c.app)
+	}
+
+	rendered := liveflux.SSR(formComponent, map[string]string{
+		"return_url": shared.NewLinks().PostManager(),
+	})
+
+	if rendered == nil {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error rendering blog settings form", shared.NewLinks().Home(), 10)
 	}
 
 	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:   "Settings | Blog",
-		Content: c.page(data),
+		Content: c.page(data, rendered),
 		ScriptURLs: []string{
 			cdn.Htmx_2_0_0(),
 			cdn.Sweetalert2_11(),
 		},
 		Scripts: []string{
 			ext.HxHideIndicatorCSS(),
+			liveflux.Script().ToHTML(),
 		},
 	}).ToHTML()
 }
@@ -98,45 +148,7 @@ func (c *blogSettingsController) prepareData(r *http.Request) (blogSettingsData,
 	return data, ""
 }
 
-func (c *blogSettingsController) processForm(r *http.Request, data blogSettingsData) (blogSettingsData, string) {
-	action := req.GetStringTrimmed(r, "action")
-	topic := req.GetStringTrimmed(r, "blog_topic")
-
-	if topic == "" {
-		data.formErrorMessage = "Blog topic is required"
-		return data, ""
-	}
-
-	store := c.app.GetSettingStore()
-	if store == nil {
-		c.app.GetLogger().Error("Blog settings controller: setting store is not configured for POST")
-		return data, "Blog settings are unavailable. Please contact an administrator."
-	}
-
-	if err := store.Set(r.Context(), SettingKeyBlogTopic, topic); err != nil {
-		c.app.GetLogger().Error("Blog settings controller: failed to save blog topic", slog.String("error", err.Error()))
-		data.formErrorMessage = "Failed to save blog topic. Please try again later."
-		return data, ""
-	}
-
-	data.blogTopic = topic
-	data.formSuccessMessage = "Blog settings saved successfully"
-
-	switch action {
-	case "apply":
-		data.formRedirect = ""
-		data.formRedirectDelaySeconds = 0
-	case "save_close":
-		data.formRedirect = shared.NewLinks().PostManager()
-		data.formRedirectDelaySeconds = 2
-	default:
-		data.formRedirect = shared.NewLinks().BlogSettings()
-		data.formRedirectDelaySeconds = 2
-	}
-	return data, ""
-}
-
-func (c *blogSettingsController) page(data blogSettingsData) hb.TagInterface {
+func (c *blogSettingsController) page(data blogSettingsData, component hb.TagInterface) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Dashboard",
@@ -162,7 +174,7 @@ func (c *blogSettingsController) page(data blogSettingsData) hb.TagInterface {
 
 	cardBody := hb.Div().
 		Class("card-body").
-		Child(blogSettingsForm(blogSettingsFormOptions{Data: data}))
+		Child(component)
 
 	card := hb.Div().
 		Class("card shadow-sm").

@@ -1,9 +1,10 @@
-package blog
+package post
 
 import (
 	"bytes"
 	"log/slog"
 	"net/http"
+	"project/internal/controllers/website/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -12,42 +13,29 @@ import (
 	"strings"
 
 	"github.com/dracory/blogstore"
-	"github.com/dracory/bs"
 	"github.com/dracory/hb"
+	"github.com/dracory/liveflux"
 	"github.com/dracory/rtr"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-type blogPostController struct {
+type postController struct {
 	app types.AppInterface
 }
 
-func NewBlogPostController(
+func NewPostController(
 	app types.AppInterface,
-) *blogPostController {
-	return &blogPostController{
+) *postController {
+	return &postController{
 		app: app,
 	}
 }
 
-func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string {
 	postID, _ := rtr.GetParam(r, "id")
 	postSlug, _ := rtr.GetParam(r, "title")
-
-	if postID == "" || postSlug == "" {
-		segments := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-		if len(segments) >= 3 && segments[0] == "blog" && segments[1] == "post" {
-			if postID == "" {
-				postID = segments[2]
-			}
-			if postSlug == "" && len(segments) >= 4 {
-				postSlug = segments[3]
-			}
-		}
-	}
-
 	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {
@@ -67,19 +55,20 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 	if post == nil {
 		c.app.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
 		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
-		return "post is missing"
+		return ""
 	}
 
 	if !c.accessAllowed(r, *post) {
 		c.app.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
 		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
-		return "post is missing"
+		return ""
 	}
 
 	if postSlug == "" || postSlug != post.Slug() {
 		url := links.Website().BlogPost(post.ID(), post.Slug())
 		c.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
-		return helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
+		return ""
 	}
 
 	return layouts.NewCmsLayout(
@@ -91,11 +80,15 @@ func (c blogPostController) Handler(w http.ResponseWriter, r *http.Request) stri
 			StyleURLs: []string{
 				"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
 			},
+			ScriptURLs: []string{
+				"/liveflux",
+				"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
+			},
 			Content: hb.Wrap().HTML(c.page(*post)),
 		}).ToHTML()
 }
 
-func (controller blogPostController) accessAllowed(r *http.Request, post blogstore.Post) bool {
+func (controller *postController) accessAllowed(r *http.Request, post blogstore.Post) bool {
 	if post.IsPublished() {
 		return true // everyone can access published posts
 	}
@@ -115,14 +108,15 @@ func (controller blogPostController) accessAllowed(r *http.Request, post blogsto
 	return false // default to false
 }
 
-func (c blogPostController) page(post blogstore.Post) string {
-	sectionBanner := blogController{}.sectionBanner()
+func (c *postController) page(post blogstore.Post) string {
+	sectionBanner := shared.SectionBanner()
 	return hb.Wrap().Children([]hb.TagInterface{
 		// hb.Style(c.cssSectionIntro()),
 		hb.Style(c.css()),
 		sectionBanner,
 		// c.sectionIntro(),
 		c.sectionPost(post),
+		c.recommendationsSection(post),
 	}).ToHTML()
 }
 
@@ -130,7 +124,7 @@ func (c blogPostController) page(post blogstore.Post) string {
 //
 // No parameters.
 // Returns a string containing the CSS code.
-func (c blogPostController) css() string {
+func (c *postController) css() string {
 	return `
 #SectionNewsItem {
 	padding:50px 0px 80px 0px;
@@ -153,7 +147,7 @@ func (c blogPostController) css() string {
 	`
 }
 
-func (controller *blogPostController) processContent(content string, editor string) (html string, css string) {
+func (controller *postController) processContent(content string, editor string) (html string, css string) {
 	if editor == blogstore.POST_EDITOR_BLOCKAREA {
 		return helpers.BlogPostBlocksToString(content), ""
 	}
@@ -173,93 +167,60 @@ func (controller *blogPostController) processContent(content string, editor stri
 	return content, ""
 }
 
-func (c *blogPostController) sectionPost(post blogstore.Post) *hb.Tag {
+func (c *postController) sectionPost(post blogstore.Post) *hb.Tag {
 	postHtml, themeStyle := c.processContent(post.Content(), post.Editor())
 
-	// nextPost, _ := models.NewBlogRepository().PostFindNext(post)
-	// prevPost, _ := models.NewBlogRepository().PostFindPrevious(post)
+	rowTitle := hb.Div().
+		Class("BlogTitle").
+		Child(hb.Heading1().
+			HTML(post.Title()))
+
+	rowContent := hb.Div().
+		Child(hb.Div().
+			Class("BlogImage float-end").
+			Style("padding-top:10px; padding-left:30px; padding-bottom:30px; width:600px; max-width:100%;").
+			Child(c.postImage(post))).
+		Child(hb.Div().
+			Class("BlogContent").
+			HTML(postHtml))
+
 	sectionPost := hb.Section().
 		ID("SectionNewsItem").
 		Style(`background:#fff;`).
 		Child(hb.Style(themeStyle)).
-		Children([]hb.TagInterface{
-			bs.Container().
-				Children([]hb.TagInterface{
-					bs.Row().
-						Child(bs.Column(12).
-							Child(hb.Div().
-								Class("BlogTitle").
-								Child(hb.Heading1().
-									HTML(post.Title())))),
-					bs.Row().
-						Children([]hb.TagInterface{
-							bs.Column(12).Children([]hb.TagInterface{
-								hb.Div().Class("BlogImage float-end").Style("padding-top:30px; padding-left:30px; padding-bottom:30px; width:600px; max-width:100%;").Children([]hb.TagInterface{
-									hb.Image(post.ImageUrlOrDefault()).
-										Class("img img-responsive img-thumbnail"),
-								}),
-								hb.Div().
-									Class("BlogContent").
-									HTML(postHtml),
-							}),
-							// bs.Column(8).Children([]hb.TagInterface{
-							// 	hb.Div().Class("BlogContent").Children([]hb.TagInterface{
-							// 		hb.HTML(post.Content()),
-							// 	}),
-							// }),
-							// bs.Column(4).Children([]hb.TagInterface{
-							// 	hb.Div().Class("BlogImage").Children([]hb.TagInterface{
-							// 		hb.Image().Class("img img-responsive img-thumbnail").Attrs(map[string]string{
-							// 			"src": post.ImageUrlOrDefault(),
-							// 		}),
-							// 	}),
-							// }),
-						}),
-					// bs.Row().Children([]hb.TagInterface{
-					// 	bs.Column(6).Children([]hb.TagInterface{
-					// 		lo.IfF(prevPost != nil, func() *hb.Tag {
-					// 			link := links.NewWebsiteLinks().BlogPost(prevPost.ID(), prevPost.Title(), map[string]string{})
-					// 			return hb.Div().Children([]hb.TagInterface{
-					// 				hb.Hyperlink().Children([]hb.TagInterface{
-					// 					icons.Icon("bi-chevron-left", 20, 20, "#333").Style("margin-right:5px;"),
-					// 					hb.Span().HTML("Previous"),
-					// 				}).Attr("href", link).
-					// 					Style("font-weight:bold; font-size:20px;"),
-					// 				hb.Div().HTML(prevPost.Title()),
-					// 			})
-					// 		}).ElseF(func() *hb.Tag {
-					// 			return hb.Span().HTML("")
-					// 		}),
-					// 	}),
-					// 	bs.Column(6).Children([]hb.TagInterface{
-					// 		lo.IfF(nextPost != nil, func() *hb.Tag {
-					// 			link := links.NewWebsiteLinks().BlogPost(nextPost.ID(), nextPost.Title(), map[string]string{})
-					// 			return hb.Div().Children([]hb.TagInterface{
-					// 				hb.Hyperlink().Children([]hb.TagInterface{
-					// 					hb.Span().HTML("Next"),
-					// 					icons.Icon("bi-chevron-right", 20, 20, "#333").Style("margin-right:5px;"),
-					// 				}).Attr("href", link).
-					// 					Style("font-weight:bold; font-size:20px;"),
-					// 				hb.Div().HTML(nextPost.Title()),
-					// 			}).Style("text-align:right;")
-					// 		}).ElseF(func() *hb.Tag {
-					// 			return hb.Span().HTML("")
-					// 		}),
-					// 	}),
-					// }),
-					bs.Row().Style("margin-top:40px;").Children([]hb.TagInterface{
-						bs.Column(12).Children([]hb.TagInterface{
-							hb.Div().Children([]hb.TagInterface{
-								hb.Hyperlink().Class("btn text-white text-center").Style(`background:#1ba1b6;color:#fff;width:600px;max-width:100%;`).Children([]hb.TagInterface{
-									// icons.Icon("bi-arrow-left", 16, 16, "#333").Style("margin-right:5px;"),
-									hb.Span().HTML("View All Posts"),
-								}).Attr("href", links.Website().Blog()),
-							}),
-						}),
-					}),
-				}),
-		})
+		Child(hb.Div().
+			Class("container").
+			Child(rowTitle).
+			Child(rowContent))
+
 	return sectionPost
+}
+
+func (c *postController) recommendationsSection(post blogstore.Post) hb.TagInterface {
+	component := NewPostRecommendationsComponent(c.app)
+	rendered := liveflux.Placeholder(component, map[string]string{
+		"post_id": post.ID(),
+	})
+
+	// if rendered == nil {
+	// 	if c.app != nil && c.app.GetLogger() != nil {
+	// 		c.app.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
+	// 	}
+	// 	return hb.Div()
+	// }
+
+	return rendered
+}
+
+func (c *postController) postImage(post blogstore.Post) *hb.Tag {
+	thumbnailURL := shared.SizedThumbnailURL(post, "300", "200", "80")
+
+	return hb.Image(``).
+		Class("img img-responsive img-thumbnail w-100").
+		Class(`slazy-placeholder`).
+		Class(`slazy-resize-zero`).
+		// Style("object-fit: cover; height: 180px; border-radius: 0.75rem 0.75rem 0 0;").
+		Data("slazy-src", thumbnailURL)
 }
 
 // markdownToHtml converts a markdown text to html
@@ -267,7 +228,7 @@ func (c *blogPostController) sectionPost(post blogstore.Post) *hb.Tag {
 // 1. the text is trimmed of any white spaces
 // 2. if the text is empty, it returns an empty string
 // 3. the text is converted to html using the goldmark library
-func (controller *blogPostController) markdownToHtml(text string) string {
+func (controller *postController) markdownToHtml(text string) string {
 	text = strings.TrimSpace(text)
 
 	if text == "" {

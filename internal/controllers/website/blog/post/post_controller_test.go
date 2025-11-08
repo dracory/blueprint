@@ -1,4 +1,4 @@
-package blog
+package post
 
 import (
 	"context"
@@ -7,185 +7,204 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/links"
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
-	"github.com/dracory/userstore"
+	"github.com/dracory/rtr"
 )
 
 func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
-	// --- Setup ---
-	app := testutils.Setup()
+	app := testutils.Setup(testutils.WithCacheStore(true))
+	controller := NewPostController(app)
 
-	controller := NewBlogPostController(app)
-
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/", nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/", map[string]string{})
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
 	if html == "" {
 		t.Fatal("Expected HTML to not be empty")
 	}
 
 	if !strings.Contains(html, "post is missing") {
 		t.Errorf("Expected HTML to contain 'post is missing'")
+	}
+
+	resp := w.Result()
+	if resp.StatusCode != http.StatusSeeOther {
+		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
+	}
+
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	if err != nil {
+		t.Fatalf("Failed to read flash message: %v", err)
+	}
+
+	if flashMessage == nil || !strings.Contains(flashMessage.Message, "no longer exists") {
+		t.Fatalf("Expected flash message about missing post, got: %+v", flashMessage)
 	}
 }
 
 func TestBlogPostController_Handler_PostNotFound(t *testing.T) {
-	// --- Setup ---
-	app := testutils.Setup(testutils.WithBlogStore(true))
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
+	controller := NewPostController(app)
 
-	controller := NewBlogPostController(app)
-
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/nonexistent/Nonexistent-Post", nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/nonexistent/Nonexistent-Post", map[string]string{
+		"id":    "nonexistent",
+		"title": "nonexistent-post",
+	})
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
-	if html == "" {
-		t.Fatal("Expected HTML to not be empty")
+	if html != "" {
+		t.Errorf("Expected empty HTML when post is missing, got: %s", html)
 	}
 
-	if !strings.Contains(html, "post is missing") {
-		t.Errorf("Expected HTML to contain 'post is missing'")
+	resp := w.Result()
+	if resp.StatusCode != http.StatusSeeOther {
+		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
+	}
+
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	if err != nil {
+		t.Fatalf("Failed to read flash message: %v", err)
+	}
+
+	if flashMessage == nil || !strings.Contains(flashMessage.Message, "no longer exists") {
+		t.Fatalf("Expected flash message about missing post, got: %+v", flashMessage)
 	}
 }
 
 func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
-	// --- Setup ---
-	app := testutils.Setup(testutils.WithBlogStore(true))
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
 
-	// Create a draft post
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err := app.GetBlogStore().PostCreate(post)
-	if err != nil {
+
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewBlogPostController(app)
+	controller := NewPostController(app)
 
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
+		"id":    post.ID(),
+		"title": post.Slug(),
+	})
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
-	if html == "" {
-		t.Fatal("Expected HTML to not be empty")
+	if html != "" {
+		t.Errorf("Expected empty HTML for unauthorised draft access, got: %s", html)
 	}
 
-	if !strings.Contains(html, "post is missing") {
-		t.Errorf("Expected HTML to contain 'post is missing' for unpublished post without auth")
+	resp := w.Result()
+	if resp.StatusCode != http.StatusSeeOther {
+		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
+	}
+
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	if err != nil {
+		t.Fatalf("Failed to read flash message: %v", err)
+	}
+
+	if flashMessage == nil || flashMessage.Type != "warning" || !strings.Contains(flashMessage.Message, "no longer active") {
+		t.Fatalf("Expected warning flash about inactive post, got: %+v", flashMessage)
 	}
 }
 
 func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
-	// --- Setup ---
 	app := testutils.Setup(
 		testutils.WithBlogStore(true),
-		testutils.WithCacheStore(true),
-		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
-		testutils.WithCmsStore(true, "test-template"),
+		testutils.WithSessionStore(true),
+		testutils.WithCacheStore(true),
 	)
 
-	// Ensure CMS template exists for layout rendering
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
-
-	// Create a draft post
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err = app.GetBlogStore().PostCreate(post)
-	if err != nil {
+
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	// Create and authenticate a regular user
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
-	user.SetRole(userstore.USER_ROLE_ADMINISTRATOR)
-	err = app.GetUserStore().UserUpdate(context.Background(), user)
-	if err != nil {
-		t.Fatalf("Failed to elevate test user role: %v", err)
-	}
 
-	controller := NewBlogPostController(app)
+	controller := NewPostController(app)
 
-	// --- Execute ---
-	postPath := strings.ReplaceAll(links.BLOG_POST_02, ":id", post.ID())
-	postPath = strings.ReplaceAll(postPath, ":title", post.Slug())
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, postPath, nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
+		"id":    post.ID(),
+		"title": post.Slug(),
+	})
+
 	r, err = testutils.LoginAs(app, r, user)
 	if err != nil {
 		t.Fatalf("Failed to authenticate test user: %v", err)
 	}
+
 	html := controller.Handler(w, r)
-	response := w.Result()
-	t.Cleanup(func() {
-		_ = response.Body.Close()
-	})
 
-	// --- Assert ---
-	if html == "" {
-		t.Fatalf("Expected HTML to not be empty. Status: %d", response.StatusCode)
+	if html != "" {
+		t.Errorf("Expected empty HTML for non-admin draft access, got: %s", html)
 	}
 
-	if strings.Contains(html, "post is missing") {
-		t.Fatalf("Expected authenticated user to access unpublished post. Status: %d Body:\n%s", response.StatusCode, html)
+	resp := w.Result()
+	if resp.StatusCode != http.StatusSeeOther {
+		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
 	}
 
-	if !strings.Contains(html, "Draft Post") {
-		t.Fatalf("Expected HTML to contain the post title. Status: %d Body:\n%s", response.StatusCode, html)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	if err != nil {
+		t.Fatalf("Failed to read flash message: %v", err)
+	}
+
+	if flashMessage == nil || flashMessage.Type != "warning" || !strings.Contains(flashMessage.Message, "no longer active") {
+		t.Fatalf("Expected warning flash about inactive post, got: %+v", flashMessage)
 	}
 }
 
 func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
-	// --- Setup ---
-	app := testutils.Setup(
-		testutils.WithBlogStore(true),
-		testutils.WithCmsStore(true, "test-template"),
-	)
+	cfg := testutils.DefaultConf()
+	cfg.SetBlogStoreUsed(true)
+	cfg.SetCmsStoreUsed(true)
+	cfg.SetCmsStoreTemplateID("test-template")
+	cfg.SetCacheStoreUsed(true)
 
-	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
+	app := testutils.Setup(testutils.WithCfg(cfg))
+
+	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
-	// Create a published post
 	post := blogstore.NewPost()
 	post.SetTitle("Published Post")
 	post.SetContent("Published content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	err = app.GetBlogStore().PostCreate(post)
-	if err != nil {
+
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewBlogPostController(app)
+	controller := NewPostController(app)
 
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
+		"id":    post.ID(),
+		"title": post.Slug(),
+	})
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
 	if html == "" {
 		t.Fatal("Expected HTML to not be empty")
 	}
@@ -204,53 +223,43 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
-	// --- Setup ---
-	app := testutils.Setup(
-		testutils.WithBlogStore(true),
-		testutils.WithCacheStore(true),
-		testutils.WithCmsStore(true, "test-template"),
-	)
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
 
-	// Create a published post
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetContent("Test content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	err := app.GetBlogStore().PostCreate(post)
-	if err != nil {
+
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewBlogPostController(app)
+	controller := NewPostController(app)
 
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/"+post.ID()+"/wrong-slug", nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/wrong-slug", map[string]string{
+		"id":    post.ID(),
+		"title": "wrong-slug",
+	})
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
-	if html == "" {
-		t.Fatal("Expected HTML to not be empty")
+	if html != "" {
+		t.Fatalf("Expected empty HTML when redirecting, got: %s", html)
 	}
 
-	if !strings.Contains(html, "See Other") {
-		t.Errorf("Expected HTML to contain redirect link 'See Other'")
-	}
-
-	// Check that a redirect status code was set
 	response := w.Result()
 	if response.StatusCode != http.StatusSeeOther {
-		t.Errorf("Expected status code %d, got %d", http.StatusSeeOther, response.StatusCode)
+		t.Fatalf("Expected status code %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	// Check that the flash message was set correctly
 	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if flashMessage == nil {
-		t.Fatal("Response MUST contain 'flash message'")
+		t.Fatal("Response MUST contain flash message")
 	}
 
 	if flashMessage.Type != "success" {
@@ -263,72 +272,81 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
-	// --- Setup ---
+	cfg := testutils.DefaultConf()
+	cfg.SetBlogStoreUsed(true)
+	cfg.SetCmsStoreUsed(true)
+	cfg.SetCmsStoreTemplateID("test-template")
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+
 	app := testutils.Setup(
-		testutils.WithBlogStore(true),
+		testutils.WithCfg(cfg),
 		testutils.WithUserStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 		testutils.WithSessionStore(true),
 	)
 
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
+	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
-	// Create a draft post
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err = app.GetBlogStore().PostCreate(post)
-	if err != nil {
+
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	// Create and authenticate an admin user
 	adminUser, err := testutils.SeedUser(app.GetUserStore(), testutils.ADMIN_01)
 	if err != nil {
 		t.Fatalf("Failed to create admin user: %v", err)
 	}
 
-	controller := NewBlogPostController(app)
+	controller := NewPostController(app)
 
-	// --- Execute ---
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), nil)
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
+		"id":    post.ID(),
+		"title": post.Slug(),
+	})
+
 	r, err = testutils.LoginAs(app, r, adminUser)
 	if err != nil {
 		t.Fatalf("Failed to authenticate admin user: %v", err)
 	}
+
 	html := controller.Handler(w, r)
 
-	// --- Assert ---
 	if html == "" {
 		t.Fatal("Expected HTML to not be empty")
-	}
-
-	if strings.Contains(html, "post is missing") {
-		t.Errorf("Expected admin user to access unpublished post")
 	}
 
 	if !strings.Contains(html, "Draft Post") {
 		t.Errorf("Expected HTML to contain the post title")
 	}
+
+	resp := w.Result()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("Expected OK status, got %d", resp.StatusCode)
+	}
+}
+
+func newRequestWithParams(method, path string, params map[string]string) *http.Request {
+	if params == nil {
+		params = map[string]string{}
+	}
+
+	req := httptest.NewRequest(method, path, nil)
+	ctx := context.WithValue(req.Context(), rtr.ParamsKey, params)
+	return req.WithContext(ctx)
 }
 
 func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(
-		testutils.WithBlogStore(true),
-		testutils.WithCmsStore(true, "test-template"),
-	)
-
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
-	controller := NewBlogPostController(app)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	markdown := "# Hello World\n\nThis is **bold** text."
 	expectedHTML := "<h1 id=\"hello-world\">Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>\n"
@@ -348,15 +366,8 @@ func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(
-		testutils.WithBlogStore(true),
-		testutils.WithCmsStore(true, "test-template"),
-	)
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
-	controller := NewBlogPostController(app)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	blockContent := `[{"Id":"block-1","Type":"text","Sequence":1,"ParentId":"","Attributes":{"Text":"Test content"}}]`
 
@@ -376,15 +387,8 @@ func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockEditor(t *testing.T) {
 	// --- Setup ---
-	app := testutils.Setup(
-		testutils.WithBlogStore(true),
-		testutils.WithCmsStore(true, "test-template"),
-	)
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
-	controller := NewBlogPostController(app)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	blockEditorContent := `{"blocks": [{"type": "paragraph", "data": {"text": "Test content"}}]}`
 
