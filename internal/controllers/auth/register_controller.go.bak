@@ -96,24 +96,15 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		return controller.postUpdate(r.Context(), data)
 	}
 
-	scripts := []string{}
-	scriptURLs := []string{
-		cdn.BootstrapJs_5_3_3(),
-		cdn.Htmx_2_0_0(),
-		cdn.Sweetalert2_11(),
-	}
-
-	if controller.app.GetConfig().IsEnvProduction() {
-		//scriptURLs = append([]string{helpers.GoogleTagScriptURL()}, scriptURLs...)
-		//scripts = append(scripts, helpers.GoogleTagInitScript(), helpers.GoogleConversionScript())
-	}
-
 	return layouts.NewBlankLayout(layouts.Options{
 		Title: "Register",
 		// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
 		Content: controller.pageHTML(data),
-		ScriptURLs: scriptURLs,
-		Scripts:   scripts,
+		ScriptURLs: []string{
+			cdn.BootstrapJs_5_3_3(),
+			cdn.Htmx_2_0_0(),
+			cdn.Sweetalert2_11(),
+		},
 		StyleURLs: []string{cdn.BootstrapIconsCss_1_11_3()},
 		Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
 		@media (min-width: 576px) {.container.container-xs {max-width: 520px;}}

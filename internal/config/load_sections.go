@@ -38,7 +38,6 @@ type envEncryptionConfig struct {
 
 func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
 	used := env.GetBool(KEY_ENVENC_USED)
-
 	privateKey := strings.TrimSpace(env.GetString(KEY_ENVENC_KEY_PRIVATE))
 
 	if used {
@@ -52,13 +51,18 @@ func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
 		return envEncryptionConfig{privateKey: privateKey, derivedKey: "", used: used}
 	}
 
-	derivedKey, err := deriveEnvEncKey(privateKey)
-	acc.add(err)
-	if err != nil {
-		return envEncryptionConfig{used: used}
+	if privateKey == "" {
+		acc.add(fmt.Errorf("private key is required when env encryption is enabled"))
+		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}
 	}
 
-	return envEncryptionConfig{privateKey: privateKey, derivedKey: derivedKey, used: used}
+	derived, err := deriveEnvEncKey(privateKey)
+	acc.add(err)
+	if err != nil {
+		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}
+	}
+
+	return envEncryptionConfig{privateKey: privateKey, derivedKey: derived, used: used}
 }
 
 // databaseConfig captures database connection settings.

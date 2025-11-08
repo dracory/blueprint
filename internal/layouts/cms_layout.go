@@ -3,9 +3,7 @@ package layouts
 import (
 	"net/http"
 	"project/internal/types"
-	"project/internal/widgets"
 
-	"github.com/dracory/cmsstore"
 	"github.com/dracory/cmsstore/frontend"
 	"github.com/dracory/hb"
 )
@@ -55,17 +53,37 @@ func (layout *cmsLayout) ToHTML() string {
 		return "Cms store is not initialized"
 	}
 
-	list := widgets.WidgetRegistry(layout.app)
+	// list := widgets.WidgetRegistry(layout.app)
 
-	shortcodes := []cmsstore.ShortcodeInterface{}
-	for _, widget := range list {
-		shortcodes = append(shortcodes, widget)
-	}
+	// shortcodes := []cmsstore.ShortcodeInterface{}
+	// for _, widget := range list {
+	// 	shortcodes = append(shortcodes, widget)
+	// }
 
 	fe := frontend.New(frontend.Config{
 		Store:  layout.app.GetCmsStore(),
 		Logger: layout.app.GetLogger(),
 	})
+
+	pageContent := ""
+
+	for _, styleURL := range layout.styleURLs {
+		pageContent += "<link rel='stylesheet' href='" + styleURL + "'>"
+	}
+
+	for _, style := range layout.styles {
+		pageContent += "<style>" + style + "</style>"
+	}
+
+	pageContent += layout.content.ToHTML()
+
+	for _, script := range layout.scripts {
+		pageContent += "<script>" + script + "</script>"
+	}
+
+	for _, scriptURL := range layout.scriptURLs {
+		pageContent += "<script src='" + scriptURL + "'></script>"
+	}
 
 	html, err := fe.TemplateRenderHtmlByID(
 		layout.request,
@@ -79,7 +97,7 @@ func (layout *cmsLayout) ToHTML() string {
 			PageTitle           string
 			Language            string
 		}{
-			PageContent:         layout.content.ToHTML(),
+			PageContent:         pageContent,
 			PageCanonicalURL:    "",
 			PageMetaDescription: "",
 			PageMetaKeywords:    "",
@@ -89,7 +107,7 @@ func (layout *cmsLayout) ToHTML() string {
 		})
 
 	if err != nil {
-		layout.app.GetLogger().Error("At WebsiteLayout", "error", err.Error())
+		layout.app.GetLogger().Error("At CmsLayout", "error", err.Error())
 		return "Template error. Please try again later"
 	}
 

@@ -2,6 +2,7 @@ package liveflux
 
 import (
 	"net/http"
+	"project/internal/links"
 	"project/internal/types"
 
 	"github.com/dracory/rtr"
@@ -11,11 +12,17 @@ import (
 func Routes(app types.AppInterface) []rtr.RouteInterface {
 	ctrl := NewController(app)
 
-	r := rtr.NewRoute().
+	livefluxPost := rtr.NewRoute().
 		SetName("Liveflux > Handler").
-		SetPath("/liveflux").
+		SetPath(links.LIVEFLUX).
 		SetMethod(http.MethodPost).
 		SetHTMLHandler(ctrl.Handler)
 
-	return []rtr.RouteInterface{r}
+	livefluxGet := rtr.NewRoute().
+		SetName("Liveflux > Handler").
+		SetPath(links.LIVEFLUX).
+		SetMethod(http.MethodGet).
+		SetHTMLHandler(ctrl.Handler)
+
+	return []rtr.RouteInterface{livefluxPost, livefluxGet}
 }

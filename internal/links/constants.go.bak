@@ -65,7 +65,6 @@ const BLOG_POST_02 = "/blog/post/:id/:title"
 const CONTACT = HOME + "contact"
 const FILES = HOME + "files" + CATCHALL
 const FLASH = HOME + "flash"
-const LIVEFLUX = HOME + "liveflux"
 const MEDIA = HOME + "media" + CATCHALL
 const PAYPAL_CANCEL = "/paypal/cancel"
 const PAYPAL_NOTIFY = "/paypal/notify"

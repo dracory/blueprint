@@ -30,6 +30,7 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
+		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
