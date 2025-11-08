@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+	"time"
 
 	"project/internal/types"
 
@@ -59,12 +60,12 @@ func databaseOpen(cfg types.ConfigInterface) (*sql.DB, error) {
 		// Increase carefully if needed; 1 is the safest to avoid SQLITE_BUSY.
 		db.SetMaxOpenConns(1)
 		db.SetMaxIdleConns(1)
+	} else {
+		// Provide sensible defaults for production databases; adjust after load testing.
+		db.SetMaxOpenConns(25)
+		db.SetMaxIdleConns(5)
+		db.SetConnMaxLifetime(5 * time.Minute)
 	}
-
-	// Add connection pool settings
-	// db.SetMaxOpenConns(25)                 // Maximum number of open connections
-	// db.SetMaxIdleConns(5)                  // Maximum number of idle connections
-	// db.SetConnMaxLifetime(5 * time.Minute) // Maximum connection lifetime
 
 	return db, nil
 }
