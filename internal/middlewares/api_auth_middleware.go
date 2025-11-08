@@ -3,15 +3,25 @@ package middlewares
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"project/internal/config"
 	"project/internal/types"
 
 	"github.com/dracory/api"
 	"github.com/dracory/rtr"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
 )
 
+type apiAuthCacheItem struct {
+	session sessionstore.SessionInterface
+	user    userstore.UserInterface
+}
+
 func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+	memoryCache := app.GetMemoryCache()
+
 	return rtr.NewMiddleware().
 		SetName("API Auth Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -21,6 +31,18 @@ func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 				if token == "" {
 					w.Write([]byte(api.Error("Authorization token required").ToString()))
 					return
+				}
+
+				cacheKey := "api-auth:" + token
+				if item := memoryCache.Get(cacheKey); item != nil {
+					if cacheData, ok := item.Value().(apiAuthCacheItem); ok {
+						if !cacheData.session.IsExpired() {
+							ctx := context.WithValue(r.Context(), config.APIAuthenticatedSessionContextKey{}, cacheData.session)
+							ctx = context.WithValue(ctx, config.APIAuthenticatedUserContextKey{}, cacheData.user)
+							next.ServeHTTP(w, r.WithContext(ctx))
+							return
+						}
+					}
 				}
 
 				// 2. Validate session token
@@ -52,6 +74,10 @@ func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 					w.Write([]byte(api.Error("User not found").ToString()))
 					return
 				}
+
+				// Cache the data for 1 minute
+				cacheData := apiAuthCacheItem{session: session, user: user}
+				memoryCache.Set(cacheKey, cacheData, 1*time.Minute)
 
 				ctx := context.WithValue(r.Context(), config.APIAuthenticatedSessionContextKey{}, session)
 				ctx = context.WithValue(ctx, config.APIAuthenticatedUserContextKey{}, user)

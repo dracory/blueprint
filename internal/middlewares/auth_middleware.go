@@ -6,15 +6,86 @@ import (
 	"net/http"
 	"project/internal/config"
 	"project/internal/types"
+	"time"
 
 	"github.com/dracory/auth"
 	"github.com/dracory/rtr"
+	"github.com/dracory/sessionstore"
+	"github.com/dracory/userstore"
+	"github.com/jellydator/ttlcache/v3"
+)
+
+const (
+	sessionCacheTTL    = 5 * time.Minute
+	userCacheTTL       = 5 * time.Minute
+	sessionCachePrefix = "auth:session:"
+	userCachePrefix    = "auth:user:"
 )
 
 func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Auth Middleware").
 		SetHandler(func(next http.Handler) http.Handler { return authHandler(app, next) })
+}
+
+func cacheStoreSession(cache *ttlcache.Cache[string, any], sessionKey string, session sessionstore.SessionInterface) {
+	if cache == nil || session == nil {
+		return
+	}
+
+	cache.Set(sessionCachePrefix+sessionKey, session, sessionCacheTTL)
+}
+
+func cacheGetSession(cache *ttlcache.Cache[string, any], sessionKey string) sessionstore.SessionInterface {
+	if cache == nil {
+		return nil
+	}
+
+	item := cache.Get(sessionCachePrefix + sessionKey)
+
+	if item == nil {
+		return nil
+	}
+
+	session, ok := item.Value().(sessionstore.SessionInterface)
+
+	if !ok || session == nil {
+		return nil
+	}
+
+	if session.IsExpired() {
+		return nil
+	}
+
+	return session
+}
+
+func cacheStoreUser(cache *ttlcache.Cache[string, any], userID string, user userstore.UserInterface) {
+	if cache == nil || user == nil {
+		return
+	}
+
+	cache.Set(userCachePrefix+userID, user, userCacheTTL)
+}
+
+func cacheGetUser(cache *ttlcache.Cache[string, any], userID string) userstore.UserInterface {
+	if cache == nil {
+		return nil
+	}
+
+	item := cache.Get(userCachePrefix + userID)
+
+	if item == nil {
+		return nil
+	}
+
+	user, ok := item.Value().(userstore.UserInterface)
+
+	if !ok || user == nil {
+		return nil
+	}
+
+	return user
 }
 
 // authHandler adds the user and session to the context.
@@ -73,17 +144,27 @@ func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 			return
 		}
 
-		session, err := app.GetSessionStore().SessionFindByKey(r.Context(), sessionKey)
+		sessionStore := app.GetSessionStore()
+		memoryCache := app.GetMemoryCache()
 
-		if err != nil {
-			app.GetLogger().Error("auth_middleware", "error", err.Error())
-			next.ServeHTTP(w, r)
-			return
-		}
+		session := cacheGetSession(memoryCache, sessionKey)
 
 		if session == nil {
-			next.ServeHTTP(w, r)
-			return
+			var err error
+			session, err = sessionStore.SessionFindByKey(r.Context(), sessionKey)
+
+			if err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			if session == nil {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			cacheStoreSession(memoryCache, sessionKey, session)
 		}
 
 		if session.IsExpired() {
@@ -98,17 +179,24 @@ func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := app.GetUserStore().UserFindByID(r.Context(), userID)
-
-		if err != nil {
-			app.GetLogger().Error("auth_middleware", "error", err.Error())
-			next.ServeHTTP(w, r)
-			return
-		}
+		user := cacheGetUser(memoryCache, userID)
 
 		if user == nil {
-			next.ServeHTTP(w, r)
-			return
+			fetchedUser, err := app.GetUserStore().UserFindByID(r.Context(), userID)
+
+			if err != nil {
+				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			if fetchedUser == nil {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			cacheStoreUser(memoryCache, userID, fetchedUser)
+			user = fetchedUser
 		}
 
 		ctx := context.WithValue(r.Context(), config.AuthenticatedUserContextKey{}, user)
