@@ -29,24 +29,35 @@ func loadAppConfig(acc *loadAccumulator) appConfig {
 	}
 }
 
-// envEncryptionConfig captures optional environment encryption key.
+// envEncryptionConfig captures optional environment encryption key usage state and derived key.
 type envEncryptionConfig struct {
-	key string
+	key  string
+	used bool
 }
 
 func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
+	used := env.GetBool(KEY_ENVENC_USED)
+
 	privateKey := strings.TrimSpace(env.GetString(KEY_ENVENC_KEY_PRIVATE))
+
+	if used {
+		if err := ensureRequired(privateKey, KEY_ENVENC_KEY_PRIVATE, "required when ENVENC_USED is yes"); err != nil {
+			acc.add(err)
+			return envEncryptionConfig{used: used}
+		}
+	}
+
 	if privateKey == "" {
-		return envEncryptionConfig{}
+		return envEncryptionConfig{used: used}
 	}
 
 	derived, err := deriveEnvEncKey(privateKey)
 	acc.add(err)
 	if err != nil {
-		return envEncryptionConfig{}
+		return envEncryptionConfig{used: used}
 	}
 
-	return envEncryptionConfig{key: derived}
+	return envEncryptionConfig{key: derived, used: used}
 }
 
 // databaseConfig captures database connection settings.

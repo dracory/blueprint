@@ -72,8 +72,6 @@ type adminLayout struct {
 
 	styleURLs []string
 	styles    []string
-
-	countryNameByIso2 func(iso2Code string) (string, error)
 }
 
 func (a *adminLayout) SetTitle(title string) {
@@ -98,10 +96,6 @@ func (a *adminLayout) SetStyleURLs(urls []string) {
 
 func (a *adminLayout) SetStyles(styles []string) {
 	a.styles = styles
-}
-
-func (a *adminLayout) SetCountryNameByIso2(f func(iso2Code string) (string, error)) {
-	a.countryNameByIso2 = f
 }
 
 func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {

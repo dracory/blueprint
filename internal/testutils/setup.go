@@ -9,8 +9,8 @@ import (
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 
-	_ "github.com/glebarez/sqlite"
 	"github.com/samber/lo"
+	_ "modernc.org/sqlite"
 )
 
 // setupOptions holds configuration flags for Setup

@@ -39,6 +39,12 @@ func Load() (types.ConfigInterface, error) {
 	llms := loadLLMConfig(acc)
 	trans := loadTranslationConfig()
 
+	if envEnc.used {
+		if err := intializeEnvEncVariables(app.env); err != nil {
+			acc.add(err)
+		}
+	}
+
 	if err := acc.err(); err != nil {
 		return nil, err
 	}
@@ -155,9 +161,9 @@ func intializeEnvEncVariables(appEnvironment string) error {
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)
-	envEncryptionKey := env.GetString(KEY_ENV_ENCRYPTION_KEY)
+	envEncryptionKey := env.GetString(KEY_ENVENC_KEY_PRIVATE)
 
-	if err := ensureRequired(envEncryptionKey, KEY_ENV_ENCRYPTION_KEY, "required to hydrate EnvEnc variables"); err != nil {
+	if err := ensureRequired(envEncryptionKey, KEY_ENVENC_KEY_PRIVATE, "required to hydrate EnvEnc variables"); err != nil {
 		return err
 	}
 
@@ -166,7 +172,7 @@ func intializeEnvEncVariables(appEnvironment string) error {
 	vaultContent, err := resources.Resource(".env." + appEnvironment + ".vault")
 
 	if err != nil {
-		panic(err.Error())
+		return err
 	}
 
 	derivedEnvEncKey, err := deriveEnvEncKey(envEncryptionKey)

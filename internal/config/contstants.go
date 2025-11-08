@@ -163,8 +163,8 @@ const KEY_TRANSLATION_LANGUAGE_DEFAULT = "TRANSLATION_LANGUAGE_DEFAULT"
 // This is where you can configure the EnvEnc encryption key.
 //
 // ============================================================================
-const KEY_ENV_ENCRYPTION_KEY = "ENV_ENCRYPTION_KEY"
 const KEY_ENVENC_KEY_PRIVATE = "ENVENC_KEY_PRIVATE"
+const KEY_ENVENC_USED = "ENVENC_USED"
 
 // ============================================================================
 // == END: EnvEnc Configurations

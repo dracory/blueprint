@@ -25,7 +25,7 @@ require (
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
-	github.com/dracory/dashboard v1.10.0
+	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/database v0.5.0
 	github.com/dracory/dataobject v1.6.0
 	github.com/dracory/entitystore v1.1.0
@@ -36,7 +36,7 @@ require (
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
 	github.com/dracory/hb v1.88.0
-	github.com/dracory/liveflux v0.11.0
+	github.com/dracory/liveflux v0.16.0
 	github.com/dracory/llm v0.9.0
 	github.com/dracory/logstore v1.9.0
 	github.com/dracory/metastore v1.3.0
@@ -44,13 +44,13 @@ require (
 	github.com/dracory/rtr v1.1.0
 	github.com/dracory/sb v0.12.0
 	github.com/dracory/sessionstore v1.5.2
-	github.com/dracory/settingstore v1.2.0
+	github.com/dracory/settingstore v1.3.0
 	github.com/dracory/shopstore v1.5.1
-	github.com/dracory/statsstore v0.7.0
+	github.com/dracory/statsstore v0.9.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.5.0
 	github.com/dracory/taskstore v1.8.1
-	github.com/dracory/test v0.4.0
+	github.com/dracory/test v0.6.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/uncdn v0.9.0
@@ -61,7 +61,6 @@ require (
 	github.com/dromara/carbon/v2 v2.6.14
 	github.com/faabiosr/cachego v0.26.0
 	github.com/flosch/pongo2/v6 v6.0.0
-	github.com/glebarez/sqlite v1.11.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gouniverse/responses v0.6.0
@@ -76,6 +75,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.7.13
+	modernc.org/sqlite v1.40.0
 )
 
 require (
@@ -88,18 +88,18 @@ require (
 	cloud.google.com/go/longrunning v0.7.0 // indirect
 	cloud.google.com/go/vertexai v0.15.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.39.5 // indirect
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.2 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.20 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.12 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.12 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.12 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.89.1 // indirect
-	github.com/aws/smithy-go v1.23.1 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.39.6 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.3 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.21 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.13 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.13 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.13 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.13 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.13 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.90.0 // indirect
+	github.com/aws/smithy-go v1.23.2 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -112,7 +112,6 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.11 // indirect
-	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-chi/chi/v5 v5.2.3 // indirect
 	github.com/go-chi/cors v1.2.2 // indirect
 	github.com/go-chi/httprate v0.15.0 // indirect
@@ -120,16 +119,14 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.7 // indirect
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/goravel/framework v1.16.5 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/gouniverse/base v0.9.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.6.9 // indirect
-	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.7.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
@@ -155,18 +152,16 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/term v0.36.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
-	google.golang.org/api v0.254.0 // indirect
-	google.golang.org/genai v1.33.0 // indirect
-	google.golang.org/genproto v0.0.0-20251029180050-ab9386a59fda // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
+	google.golang.org/api v0.255.0 // indirect
+	google.golang.org/genai v1.34.0 // indirect
+	google.golang.org/genproto v0.0.0-20251103181224-f26f9409b101 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251103181224-f26f9409b101 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/gorm v1.31.0 // indirect
 	modernc.org/libc v1.66.10 // indirect
-	modernc.org/sqlite v1.40.0 // indirect
 )
 
 require (
