@@ -3,6 +3,11 @@ module project
 go 1.25.0
 
 // replace github.com/dracory/base => ../base
+// replace github.com/dracory/taskstore => ../../_modules_dracory/taskstore
+
+// replace github.com/dracory/cachestore => ../../_modules_dracory/cachestore
+
+// replace github.com/dracory/sessionstore => ../../_modules_dracory/sessionstore
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -15,7 +20,7 @@ require (
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.1.0
 	github.com/dracory/bs v0.15.0
-	github.com/dracory/cachestore v0.21.0
+	github.com/dracory/cachestore v0.23.0
 	github.com/dracory/cdn v1.8.0
 	github.com/dracory/cmd v0.2.0
 	github.com/dracory/cmsstore v0.34.0
@@ -23,7 +28,7 @@ require (
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
 	github.com/dracory/dashboard v1.10.0
-	github.com/dracory/database v0.4.0
+	github.com/dracory/database v0.5.0
 	github.com/dracory/dataobject v1.6.0
 	github.com/dracory/entitystore v1.1.0
 	github.com/dracory/env v1.0.0
@@ -39,14 +44,14 @@ require (
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.1.0
-	github.com/dracory/sb v0.11.0
-	github.com/dracory/sessionstore v1.4.0
+	github.com/dracory/sb v0.12.0
+	github.com/dracory/sessionstore v1.5.2
 	github.com/dracory/settingstore v1.2.0
 	github.com/dracory/shopstore v1.5.1
 	github.com/dracory/statsstore v0.7.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.5.0
-	github.com/dracory/taskstore v1.7.0
+	github.com/dracory/taskstore v1.8.1
 	github.com/dracory/test v0.4.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
@@ -163,7 +168,7 @@ require (
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.66.10 // indirect
-	modernc.org/sqlite v1.39.1 // indirect
+	modernc.org/sqlite v1.40.0 // indirect
 )
 
 require (

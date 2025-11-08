@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"os"
 	"testing"
 
@@ -37,8 +38,14 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	application.SetSessionStore(sessionStore)
 	application.SetCacheStore(cacheStore)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	group := newBackgroundGroup(ctx)
+	defer group.stop()
+
 	// Should not panic
-	startBackgroundProcesses(application)
+	startBackgroundProcesses(ctx, group, application)
 
 	if application.GetCacheStore() == nil {
 		t.Errorf("Cache store should not be nil after starting background processes")

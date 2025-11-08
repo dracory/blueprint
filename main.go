@@ -1,9 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log/slog"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"project/internal/app"
 	"project/internal/cli"
@@ -71,10 +76,14 @@ func main() {
 	}
 
 	// Start background processes with explicit dependencies
-	startBackgroundProcesses(application)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	background := newBackgroundGroup(ctx)
+	startBackgroundProcesses(ctx, background, application)
 
 	// Start the web server
-	_, err = websrv.Start(websrv.Options{
+	server, err := websrv.Start(websrv.Options{
 		Host:    application.GetConfig().GetAppHost(),
 		Port:    application.GetConfig().GetAppPort(),
 		URL:     application.GetConfig().GetAppUrl(),
@@ -83,14 +92,36 @@ func main() {
 
 	if err != nil {
 		cfmt.Errorf("Failed to start server: %v", err)
+		background.stop()
 		return
+	}
+
+	// Listen for OS signals to gracefully drain background work
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case <-sigs:
+		slog.Info("Shutdown signal received, draining background workers")
+		cancel()
+	case <-background.Done():
+		cancel()
+	}
+
+	background.stop()
+	if server != nil {
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer shutdownCancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			slog.Error("Server shutdown failed", "error", err)
+		}
 	}
 }
 
 // closeResources closes the database connection if it exists.
 //
 // Parameters:
-// - dbx: the database handle
+// - db: the database handle
 //
 // Returns:
 // - none
@@ -117,35 +148,79 @@ func isCliMode() bool {
 // startBackgroundProcesses starts the background processes.
 //
 // Parameters:
-// - db: the database handle
+// - ctx: the context
+// - group: the background group
+// - app: the application
 //
 // Returns:
 // - none
-func startBackgroundProcesses(app types.AppInterface) {
+func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.AppInterface) {
 	if app.GetDB() != nil {
 		if ts := app.GetTaskStore(); ts != nil {
-			go ts.QueueRunGoroutine(10, 2) // Initialize the task queue
+			group.Go(func(ctx context.Context) {
+				ts.QueueRunGoroutine(ctx, 10, 2)
+			})
 		}
 		if cs := app.GetCacheStore(); cs != nil {
-			go func() {
-				if err := cs.ExpireCacheGoroutine(); err != nil {
+			group.Go(func(ctx context.Context) {
+				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
 					slog.Error("Cache expiration goroutine failed", "error", err)
 				}
-			}()
+			})
 		}
 		if ss := app.GetSessionStore(); ss != nil {
-			go func() {
-				if err := ss.SessionExpiryGoroutine(); err != nil {
+			group.Go(func(ctx context.Context) {
+				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
 					slog.Error("Session expiry goroutine failed", "error", err)
 				}
-			}()
+			})
 		}
 	}
 
-	schedules.StartAsync(app) // Initialize the scheduler
+	group.Go(func(ctx context.Context) {
+		schedules.StartAsyncWithContext(ctx, app)
+	})
 
 	// Initialize email sender
 	emails.InitEmailSender(app)
 	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
 	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
+}
+
+type backgroundGroup struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup
+	doneCh chan struct{}
+	once   sync.Once
+}
+
+func newBackgroundGroup(parent context.Context) *backgroundGroup {
+	if parent == nil {
+		parent = context.Background()
+	}
+	ctx, cancel := context.WithCancel(parent)
+	return &backgroundGroup{ctx: ctx, cancel: cancel, doneCh: make(chan struct{})}
+}
+
+func (g *backgroundGroup) Go(fn func(ctx context.Context)) {
+	g.wg.Add(1)
+	go func() {
+		defer g.wg.Done()
+		ctx, cancel := context.WithCancel(g.ctx)
+		defer cancel()
+		fn(ctx)
+	}()
+}
+
+func (g *backgroundGroup) stop() {
+	g.once.Do(func() {
+		g.cancel()
+		g.wg.Wait()
+		close(g.doneCh)
+	})
+}
+
+func (g *backgroundGroup) Done() <-chan struct{} {
+	return g.doneCh
 }

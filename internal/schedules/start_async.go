@@ -1,11 +1,12 @@
 package schedules
 
 import (
-	taskStats "project/internal/tasks/stats"
+	"context"
+	"time"
 
 	"project/internal/tasks"
+	taskStats "project/internal/tasks/stats"
 	"project/internal/types"
-	"time"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/go-co-op/gocron"
@@ -24,8 +25,7 @@ func scheduleCleanUpTask(app types.AppInterface) {
 	tasks.NewCleanUpTask(app).Handle()
 }
 
-// StartAsync starts the scheduler in the background without blocking the main thread
-func StartAsync(app types.AppInterface) {
+func newScheduler(app types.AppInterface) *gocron.Scheduler {
 	scheduler := gocron.NewScheduler(time.UTC)
 
 	// Schedule Building the Stats Every 2 Minutes
@@ -49,5 +49,21 @@ func StartAsync(app types.AppInterface) {
 		cfmt.Errorln("Error scheduling queue clear job:", err.Error())
 	}
 
+	return scheduler
+}
+
+// StartAsync starts the scheduler in the background without blocking the main thread
+func StartAsync(app types.AppInterface) {
+	scheduler := newScheduler(app)
 	scheduler.StartAsync()
+}
+
+// StartAsyncWithContext starts the scheduler and stops it when the context is cancelled.
+func StartAsyncWithContext(ctx context.Context, app types.AppInterface) {
+	scheduler := newScheduler(app)
+	scheduler.StartAsync()
+
+	<-ctx.Done()
+	scheduler.Stop()
+	scheduler.Clear()
 }
