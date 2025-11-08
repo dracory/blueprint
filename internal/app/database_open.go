@@ -3,6 +3,7 @@ package app
 import (
 	"database/sql"
 	"errors"
+	"strings"
 
 	"project/internal/types"
 
@@ -15,7 +16,9 @@ func databaseOpen(cfg types.ConfigInterface) (*sql.DB, error) {
 		return nil, errors.New("databaseOpen: cfg is nil")
 	}
 
-	db, err := database.Open(database.Options().
+	isSQLite := strings.Contains(strings.ToLower(cfg.GetDatabaseDriver()), "sqlite")
+
+	options := database.Options().
 		SetDatabaseType(cfg.GetDatabaseDriver()).
 		SetDatabaseHost(cfg.GetDatabaseHost()).
 		SetDatabasePort(cfg.GetDatabasePort()).
@@ -23,8 +26,17 @@ func databaseOpen(cfg types.ConfigInterface) (*sql.DB, error) {
 		SetCharset(`utf8mb4`).
 		SetTimeZone("UTC").
 		SetUserName(cfg.GetDatabaseUsername()).
-		SetPassword(cfg.GetDatabasePassword()).
-		SetSSLMode("require"))
+		SetPassword(cfg.GetDatabasePassword())
+
+	if !isSQLite {
+		sslMode := cfg.GetDatabaseSSLMode()
+		if sslMode == "" {
+			sslMode = "require"
+		}
+		options = options.SetSSLMode(sslMode)
+	}
+
+	db, err := database.Open(options)
 
 	if err != nil {
 		return nil, err
@@ -33,7 +45,7 @@ func databaseOpen(cfg types.ConfigInterface) (*sql.DB, error) {
 	// Add connection pool and driver-specific settings
 	// For SQLite, reduce lock contention by enabling WAL and busy timeout,
 	// and by constraining pool concurrency.
-	if cfg.GetDatabaseDriver() == "sqlite" {
+	if isSQLite {
 		// Enable WAL mode for better concurrency; ignore errors if already set.
 		_, _ = db.Exec("PRAGMA journal_mode=WAL;")
 		// Use NORMAL synchronous for WAL (durable enough, faster writes).
