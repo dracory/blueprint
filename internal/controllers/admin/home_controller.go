@@ -209,10 +209,6 @@ func (c *homeController) tiles() []hb.TagInterface {
 
 	tiles := []map[string]string{}
 
-	// if c.app.GetConfig().GetCmsUsed() {
-	// 	tiles = append(tiles, cmsTileOld)
-	// }
-
 	if c.app.GetConfig().GetCmsStoreUsed() {
 		tiles = append(tiles, cmsTile)
 	}

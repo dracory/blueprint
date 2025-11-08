@@ -62,7 +62,6 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath("/th/:extension/:size/:quality/:path").
 		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
-	// /th/png/300x200/80/https/dogpace.com/img/pets/20190827152208397552.jpg
 	thumbRoutePathCarchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path...").
