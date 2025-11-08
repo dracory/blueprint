@@ -17,10 +17,12 @@ import (
 type setupOptions struct {
 	WithAuditStore        bool
 	WithBlogStore         bool
+	WithChatStore         bool
 	WithCmsStore          bool
 	WithCacheStore        bool
 	WithGeoStore          bool
 	WithLogStore          bool
+	WithMetaStore         bool
 	WithSettingStore      bool
 	WithSessionStore      bool
 	WithShopStore         bool
@@ -49,6 +51,13 @@ func WithCfg(cfg types.ConfigInterface) SetupOption {
 func WithBlogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithBlogStore = enable
+	}
+}
+
+// WithChatStore enables the chat store during test setup
+func WithChatStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithChatStore = enable
 	}
 }
 
@@ -88,6 +97,13 @@ func WithGeoStore(enable bool) SetupOption {
 func WithLogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithLogStore = enable
+	}
+}
+
+// WithMetaStore enables the meta store during test setup
+func WithMetaStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithMetaStore = enable
 	}
 }
 
@@ -189,6 +205,9 @@ func Setup(options ...SetupOption) types.AppInterface {
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
 		}
+		if opts.WithChatStore {
+			opts.cfg.SetChatStoreUsed(true)
+		}
 		if opts.WithCmsStore {
 			opts.cfg.SetCmsStoreUsed(true)
 			if opts.CmsStoreTemplateID != "" {
@@ -203,6 +222,9 @@ func Setup(options ...SetupOption) types.AppInterface {
 		}
 		if opts.WithLogStore {
 			opts.cfg.SetLogStoreUsed(true)
+		}
+		if opts.WithMetaStore {
+			opts.cfg.SetMetaStoreUsed(true)
 		}
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)
@@ -241,6 +263,9 @@ func Setup(options ...SetupOption) types.AppInterface {
 		if opts.WithBlogStore {
 			opts.cfg.SetBlogStoreUsed(true)
 		}
+		if opts.WithChatStore {
+			opts.cfg.SetChatStoreUsed(true)
+		}
 		if opts.WithCmsStore {
 			opts.cfg.SetCmsStoreUsed(true)
 			if opts.CmsStoreTemplateID != "" {
@@ -252,6 +277,9 @@ func Setup(options ...SetupOption) types.AppInterface {
 		}
 		if opts.WithGeoStore {
 			opts.cfg.SetGeoStoreUsed(true)
+		}
+		if opts.WithMetaStore {
+			opts.cfg.SetMetaStoreUsed(true)
 		}
 		if opts.WithSessionStore {
 			opts.cfg.SetSessionStoreUsed(true)

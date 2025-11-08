@@ -8,7 +8,6 @@ import (
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cachestore"
-	"github.com/dracory/chatstore"
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/customstore"
 	"github.com/dracory/entitystore"
@@ -65,10 +64,6 @@ type AppInterface interface {
 	// Blog store
 	GetBlogStore() blogstore.StoreInterface
 	SetBlogStore(s blogstore.StoreInterface)
-
-	// Chat store
-	GetChatStore() chatstore.StoreInterface
-	SetChatStore(s chatstore.StoreInterface)
 
 	// Blind index store
 	GetBlindIndexStoreEmail() blindindexstore.StoreInterface

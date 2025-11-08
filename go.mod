@@ -20,6 +20,7 @@ require (
 	github.com/dracory/bs v0.15.0
 	github.com/dracory/cachestore v0.23.0
 	github.com/dracory/cdn v1.8.0
+	github.com/dracory/chatstore v0.6.0
 	github.com/dracory/cmd v0.2.0
 	github.com/dracory/cmsstore v0.34.0
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710

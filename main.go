@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -49,14 +50,14 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		cfmt.Error("Failed to load config:", slog.Any("error", err))
+		fmt.Printf("Failed to load config: %v\n", err)
 		return
 	}
 
 	// Initialize application (logger, caches, database)
 	application, err := app.New(cfg)
 	if err != nil {
-		cfmt.Error("Failed to initialize app:", slog.Any("error", err))
+		fmt.Printf("Failed to initialize app: %v\n", err)
 		return
 	}
 
@@ -69,7 +70,7 @@ func main() {
 			return
 		}
 		if err := cli.ExecuteCliCommand(application, os.Args[1:]); err != nil {
-			slog.Error("Failed to execute CLI command", "error", err)
+			fmt.Printf("Failed to execute CLI command: %v\n", err)
 			os.Exit(1)
 		}
 		return
@@ -91,7 +92,7 @@ func main() {
 	})
 
 	if err != nil {
-		cfmt.Errorf("Failed to start server: %v", err)
+		fmt.Printf("Failed to start server: %v\n", err)
 		background.stop()
 		return
 	}
@@ -102,7 +103,7 @@ func main() {
 
 	select {
 	case <-sigs:
-		slog.Info("Shutdown signal received, draining background workers")
+		fmt.Println("Shutdown signal received, draining background workers")
 		cancel()
 	case <-background.Done():
 		cancel()
@@ -178,7 +179,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 	}
 
 	group.Go(func(ctx context.Context) {
-		schedules.StartAsyncWithContext(ctx, app)
+		schedules.StartAsync(ctx, app)
 	})
 
 	// Initialize email sender

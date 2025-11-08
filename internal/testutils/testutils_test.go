@@ -86,7 +86,7 @@ func TestTestConfigIntegration(t *testing.T) {
 	testConfig.SetStripeKeyPublic("pk_test_yourpublickey")
 
 	// Verify that the configuration was applied
-	if "Test App" != testConfig.GetAppName() {
+	if testConfig.GetAppName() != "Test App" {
 		t.Errorf("Expected AppName to be %s, got %s", "Test App", testConfig.GetAppName())
 	}
 }

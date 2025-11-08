@@ -189,6 +189,10 @@ const KEY_BLOG_STORE_USED = "BLOG_STORE_USED"
 // application expects backing cache infrastructure to be reachable.
 const KEY_CACHE_STORE_USED = "CACHE_STORE_USED"
 
+// KEY_CHAT_STORE_USED toggles chat store bootstrapping. When true, the
+// application expects backing chat infrastructure to be reachable.
+const KEY_CHAT_STORE_USED = "CHAT_STORE_USED"
+
 // KEY_CMS_STORE_USED enables the CMS store and requires related templates and
 // backing tables so the CMS module can respond to requests.
 const KEY_CMS_STORE_USED = "CMS_STORE_USED"

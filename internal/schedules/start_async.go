@@ -14,6 +14,16 @@ import (
 
 // scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task
 func scheduleStatsVisitorEnhanceTask(app types.AppInterface) {
+	if app == nil {
+		cfmt.Errorln("StatsVisitorEnhance scheduling skipped; app is nil")
+		return
+	}
+
+	if app.GetTaskStore() == nil {
+		cfmt.Warningln("StatsVisitorEnhance scheduling skipped; task store not configured.")
+		return
+	}
+
 	_, err := taskStats.NewStatsVisitorEnhanceTask(app).Enqueue()
 	if err != nil {
 		cfmt.Errorln(err.Error())
@@ -52,14 +62,13 @@ func newScheduler(app types.AppInterface) *gocron.Scheduler {
 	return scheduler
 }
 
-// StartAsync starts the scheduler in the background without blocking the main thread
-func StartAsync(app types.AppInterface) {
-	scheduler := newScheduler(app)
-	scheduler.StartAsync()
-}
+// StartAsync starts the scheduler and stops it when the context is cancelled.
+func StartAsync(ctx context.Context, app types.AppInterface) {
+	if app == nil {
+		cfmt.Errorln("Scheduler StartAsync called with nil app; skipping job registration")
+		return
+	}
 
-// StartAsyncWithContext starts the scheduler and stops it when the context is cancelled.
-func StartAsyncWithContext(ctx context.Context, app types.AppInterface) {
 	scheduler := newScheduler(app)
 	scheduler.StartAsync()
 

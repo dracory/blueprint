@@ -94,6 +94,8 @@ github.com/dracory/cachestore v0.23.0 h1:UqbwmeP+OzUGIFiAkXCUxg4bWVO2xQ+Tk6rgVpY
 github.com/dracory/cachestore v0.23.0/go.mod h1:uhYWOxNJsmYTx/K/UOicyhrKOpISBS6IsNAfgAKF6Vc=
 github.com/dracory/cdn v1.8.0 h1:3GC1qtqCMnamw/6OmeXkh5F8pn6Ab2CduRTVKEPP4Vg=
 github.com/dracory/cdn v1.8.0/go.mod h1:A5Dhmy44OsG5+hhdcXqpYtoBLYjbDP3I5XXa7ta54a8=
+github.com/dracory/chatstore v0.6.0 h1:3Fow4kDWWDlKQZMYyz/fE7Ijun1legP7/OfBu5jRlLU=
+github.com/dracory/chatstore v0.6.0/go.mod h1:nTw0nL454PykjY10GJKIIyOc0vxedUmNH6K7ZUph0Kg=
 github.com/dracory/cmd v0.2.0 h1:q+oCRqphKbF+enIS58AogL6lk8kkoIQgk9uPidSzKA8=
 github.com/dracory/cmd v0.2.0/go.mod h1:ok8R+FAskM5zLvx6g7wdsd1TsPdXfzJo7qpIYGHpork=
 github.com/dracory/cmsstore v0.34.0 h1:y0aBzYOUfRKMZpVIRARaL7rLl9vZcEmvgNWdo+QZTbU=

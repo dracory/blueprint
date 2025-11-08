@@ -125,6 +125,11 @@ type blogStoreConfigInterface interface {
 	GetBlogStoreUsed() bool
 }
 
+type chatStoreConfigInterface interface {
+	SetChatStoreUsed(bool)
+	GetChatStoreUsed() bool
+}
+
 type cacheStoreConfigInterface interface {
 	SetCacheStoreUsed(bool)
 	GetCacheStoreUsed() bool
@@ -271,6 +276,7 @@ type ConfigInterface interface {
 	// Datastores
 	auditStoreConfigInterface
 	blogStoreConfigInterface
+	chatStoreConfigInterface
 	cacheStoreConfigInterface
 	cmsStoreConfigInterface
 	customStoreConfigInterface

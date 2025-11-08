@@ -18,6 +18,7 @@ func (a *Application) dataStoresInitialize() error {
 		blindIndexFirstNameStoreInitialize,
 		blindIndexLastNameStoreInitialize,
 		blogStoreInitialize,
+		chatStoreInitialize,
 		cacheStoreInitialize,
 		cmsStoreInitialize,
 		customStoreInitialize,

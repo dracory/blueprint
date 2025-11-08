@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"project/internal/resources"
 	"project/internal/types"
@@ -40,6 +41,7 @@ func Load() (types.ConfigInterface, error) {
 	trans := loadTranslationConfig()
 
 	if envEnc.used {
+		log.Println("Initializing EnvEnc variables")
 		if err := intializeEnvEncVariables(app.env); err != nil {
 			acc.add(err)
 		}
@@ -58,8 +60,8 @@ func Load() (types.ConfigInterface, error) {
 	cfg.SetAppEnv(app.env)
 	cfg.SetAppDebug(app.debug)
 
-	if envEnc.key != "" {
-		cfg.SetEnvEncryptionKey(envEnc.key)
+	if envEnc.derivedKey != "" {
+		cfg.SetEnvEncryptionKey(envEnc.derivedKey)
 	}
 
 	cfg.SetDatabaseDriver(db.driver)

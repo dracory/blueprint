@@ -5,11 +5,22 @@ import (
 	tasksStats "project/internal/tasks/stats"
 	"project/internal/types"
 
+	"github.com/dracory/base/cfmt"
 	"github.com/dracory/taskstore"
 )
 
 // queueClearJob clears the queue for a specific task
 func queueClearJob(app types.AppInterface) {
+	if app == nil {
+		cfmt.Errorln("QueueClearJob called with nil app; skipping")
+		return
+	}
+
+	if app.GetTaskStore() == nil {
+		cfmt.Warningln("QueueClearJob skipped; task store not configured.")
+		return
+	}
+
 	alias := tasksStats.NewStatsVisitorEnhanceTask(app).Alias()
 
 	task, err := app.GetTaskStore().TaskFindByAlias(alias)

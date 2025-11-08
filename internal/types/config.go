@@ -61,8 +61,9 @@ type Config struct {
 	envEncryptionKey string
 
 	// Store flags
-	auditStoreUsed        bool
+	auditStoreUsed     bool
 	blogStoreUsed      bool
+	chatStoreUsed      bool
 	cacheStoreUsed     bool
 	cmsStoreUsed       bool
 	cmsStoreTemplateID string
@@ -440,6 +441,15 @@ func (c *Config) SetBlogStoreUsed(v bool) {
 
 func (c *Config) GetBlogStoreUsed() bool {
 	return c.blogStoreUsed
+}
+
+// == Chat Store Getters/Setters ==
+func (c *Config) SetChatStoreUsed(v bool) {
+	c.chatStoreUsed = v
+}
+
+func (c *Config) GetChatStoreUsed() bool {
+	return c.chatStoreUsed
 }
 
 // == Cache Store Getters/Setters ==

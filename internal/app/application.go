@@ -13,6 +13,7 @@ import (
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cachestore"
+	"github.com/dracory/chatstore"
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/customstore"
 	"github.com/dracory/entitystore"
@@ -48,6 +49,7 @@ type Application struct {
 	// Database stores
 	auditStore          auditstore.StoreInterface
 	blogStore           blogstore.StoreInterface
+	chatStore           chatstore.StoreInterface
 	blindIndexEmail     blindindexstore.StoreInterface
 	blindIndexFirstName blindindexstore.StoreInterface
 	blindIndexLastName  blindindexstore.StoreInterface
@@ -190,6 +192,14 @@ func (a *Application) GetBlogStore() blogstore.StoreInterface {
 }
 func (a *Application) SetBlogStore(s blogstore.StoreInterface) {
 	a.blogStore = s
+}
+
+// ChatStore
+func (a *Application) GetChatStore() chatstore.StoreInterface {
+	return a.chatStore
+}
+func (a *Application) SetChatStore(s chatstore.StoreInterface) {
+	a.chatStore = s
 }
 
 // CacheStore

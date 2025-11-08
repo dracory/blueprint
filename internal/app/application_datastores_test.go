@@ -29,6 +29,7 @@ func newTestApp(t *testing.T) types.AppInterface {
 
 	cfg.SetAuditStoreUsed(true)
 	cfg.SetBlogStoreUsed(true)
+	cfg.SetChatStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCustomStoreUsed(true)
@@ -59,6 +60,7 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	// Verify all stores are wired (non-nil)
 	require.NotNil(t, a.GetAuditStore())
 	require.NotNil(t, a.GetBlogStore())
+	require.NotNil(t, a.GetChatStore())
 	require.NotNil(t, a.GetCacheStore())
 	require.NotNil(t, a.GetCmsStore())
 	require.NotNil(t, a.GetCustomStore())
@@ -80,6 +82,8 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 
 	// Verify some key tables exist
 	mustHaveTables := []string{
+		"snv_chat_chats",
+		"snv_chat_messages",
 		"snv_users_user",
 		"snv_sessions_session",
 		"snv_caches_cache",
