@@ -10,12 +10,12 @@ import (
 func Routes(app types.AppInterface) []rtr.RouteInterface {
 	cmsManager := rtr.NewRoute().
 		SetName("Admin > Cms Manager").
-		SetPath(links.ADMIN_CMS_NEW).
+		SetPath(links.ADMIN_CMS).
 		SetHandler(NewCmsNewController(app).Handler)
 
 	cmsOldManager := rtr.NewRoute().
 		SetName("Admin > CMS Old Manager").
-		SetPath(links.ADMIN_CMS_NEW).
+		SetPath(links.ADMIN_CMS_OLD).
 		SetHTMLHandler(NewCmsOldController(app).Handler)
 
 	return []rtr.RouteInterface{
