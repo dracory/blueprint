@@ -68,13 +68,17 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	}
 
 	pageHeader := partials.PageHeader("bi-person", "My Account", []layouts.Breadcrumb{
+		{Name: "Dashboard", Icon: "bi-speedometer2", URL: links.User().Home()},
 		{Name: "My Account", URL: links.User().Profile()},
 	})
 
 	page := hb.Section().
-		Child(pageHeader).
+		Child(hb.Div().
+			Class("container").
+			Child(pageHeader)).
 		Child(
 			hb.Div().
+				Class("container").
 				Child(hb.Paragraph().Text("Please keep your details updated so that we can contact you if you need our help.").Style("margin-bottom:20px;")).
 				Child(rendered).
 				Child(hb.BR()).

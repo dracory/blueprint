@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -154,28 +155,46 @@ func isCliMode() bool {
 // - app: the application
 //
 // Returns:
-// - none
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.AppInterface) {
-	if app.GetDB() != nil {
-		if ts := app.GetTaskStore(); ts != nil {
-			group.Go(func(ctx context.Context) {
-				ts.QueueRunGoroutine(ctx, 10, 2)
-			})
-		}
-		if cs := app.GetCacheStore(); cs != nil {
-			group.Go(func(ctx context.Context) {
-				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
-					slog.Error("Cache expiration goroutine failed", "error", err)
-				}
-			})
-		}
-		if ss := app.GetSessionStore(); ss != nil {
-			group.Go(func(ctx context.Context) {
-				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
-					slog.Error("Session expiry goroutine failed", "error", err)
-				}
-			})
-		}
+// - error: the error if any
+func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.AppInterface) error {
+	if app == nil {
+		return errors.New("startBackgroundProcesses called with nil app")
+	}
+
+	if app.GetDB() == nil {
+		return errors.New("startBackgroundProcesses called with nil db")
+	}
+
+	if app.GetTaskStore() == nil {
+		return errors.New("startBackgroundProcesses called with nil task store")
+	}
+
+	if app.GetCacheStore() == nil {
+		return errors.New("startBackgroundProcesses called with nil cache store")
+	}
+
+	if app.GetSessionStore() == nil {
+		return errors.New("startBackgroundProcesses called with nil session store")
+	}
+
+	if ts := app.GetTaskStore(); ts != nil {
+		group.Go(func(ctx context.Context) {
+			ts.QueueRunGoroutine(ctx, 10, 2)
+		})
+	}
+	if cs := app.GetCacheStore(); cs != nil {
+		group.Go(func(ctx context.Context) {
+			if err := cs.ExpireCacheGoroutine(ctx); err != nil {
+				slog.Error("Cache expiration goroutine failed", "error", err)
+			}
+		})
+	}
+	if ss := app.GetSessionStore(); ss != nil {
+		group.Go(func(ctx context.Context) {
+			if err := ss.SessionExpiryGoroutine(ctx); err != nil {
+				slog.Error("Session expiry goroutine failed", "error", err)
+			}
+		})
 	}
 
 	group.Go(func(ctx context.Context) {
@@ -186,6 +205,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 	emails.InitEmailSender(app)
 	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
 	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
+
+	return nil
 }
 
 type backgroundGroup struct {
@@ -208,9 +229,7 @@ func (g *backgroundGroup) Go(fn func(ctx context.Context)) {
 	g.wg.Add(1)
 	go func() {
 		defer g.wg.Done()
-		ctx, cancel := context.WithCancel(g.ctx)
-		defer cancel()
-		fn(ctx)
+		fn(g.ctx)
 	}()
 }
 

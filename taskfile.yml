@@ -11,7 +11,7 @@ version: '3'
 vars:
   APPNAME: The Dracory Blueprint Project
   DATETIME: '{{now | date "20060102_150405"}}'
-  LIVEURL: https://example.com
+  LIVEURL: https://dracory.com
 
 tasks:
   # ======================================================================== #

@@ -11,13 +11,15 @@ import (
 )
 
 func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcrumb) *hb.Tag {
+	// Breadcrumb first or (default to Dashboard)
 	b := lo.FirstOr(breadcrumbs, []layouts.Breadcrumb{
 		{
 			Name: "Dashboard",
 			URL:  links.User().Home(),
 		},
 	})
-	// if first is not home, add home
+
+	// If first is not Dashboard, add Dashboard
 	if len(b) > 0 && b[0].Name != "Dashboard" {
 		b = append([]layouts.Breadcrumb{
 			{
@@ -28,6 +30,7 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 	}
 	breadcrumbsTag := layouts.Breadcrumbs(b)
 
+	// Icon
 	icon := hb.NewDiv().
 		Class("d-flex align-items-center justify-content-center rounded-circle bg-white text-primary me-3").
 		Style("width:56px;height:56px;").
@@ -35,15 +38,19 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 			hb.I().Class("bi " + iconName).Style("font-size:28px;"),
 		})
 
+	// Heading
 	heading := hb.NewHeading1().
-		Class("h3 mb-0 text-white").
+		Class("h3 mb-0").
 		HTML(title)
 
+	// Layout
 	layout := hb.NewBorderLayout().
 		AddLeft(icon, hb.BORDER_LAYOUT_ALIGN_CENTER, hb.BORDER_LAYOUT_ALIGN_MIDDLE).
 		AddCenter(hb.NewDiv().
 			Children([]hb.TagInterface{
-				hb.NewDiv().Class("small mb-1 breadcrumbs-wrapper text-white-50").Child(breadcrumbsTag),
+				hb.NewDiv().
+					Class("small mb-1 breadcrumbs-wrapper").
+					Child(breadcrumbsTag),
 				heading,
 			}),
 			hb.BORDER_LAYOUT_ALIGN_LEFT,
@@ -58,14 +65,14 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 			padding:0;
 		}
 		#` + id + ` .breadcrumb-item + .breadcrumb-item::before{
-			color: rgba(255,255,255,0.6);
+			// color: rgba(255,255,255,0.6);
 		}
 		#` + id + ` .breadcrumb a{
-			color: rgba(255,255,255,0.75);
+			// color: rgba(255,255,255,0.75);
 			text-decoration:none;
 		}
 		#` + id + ` .breadcrumb a:hover{
-			color: #ffffff;
+			// color: #ffffff;
 			text-decoration:underline;
 		}
 	`)
@@ -73,7 +80,8 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 	pageHeader := hb.NewSection().
 		ID(id).
 		Child(layout).
-		Class("py-3 px-4 mb-4 rounded-4 shadow-sm bg-secondary text-white")
+		Class("py-3 px-4 mb-4 rounded-4 shadow-sm").
+		Class("bg-secondary")
 
 	return hb.Wrap(style, pageHeader)
 }

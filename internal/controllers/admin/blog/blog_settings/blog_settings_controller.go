@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"project/internal/controllers/admin/blog/shared"
-	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -24,13 +23,9 @@ type blogSettingsController struct {
 }
 
 type blogSettingsData struct {
-	blogTopic                string
-	formErrorMessage         string
-	formSuccessMessage       string
-	formInfoMessage          string
-	formRedirect             string
-	formRedirectDelaySeconds int
-	isEnvOverride            bool
+	blogTopic       string
+	formInfoMessage string
+	isEnvOverride   bool
 }
 
 func NewBlogSettingsController(app types.AppInterface) *blogSettingsController {
@@ -48,51 +43,56 @@ func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request)
 	if r.Method == http.MethodPost {
 		// Create the component for handling POST
 		formComponent = NewFormBlogSettings(c.app)
-		if formComponent != nil {
-			// Parse form data
-			if err := r.ParseForm(); err != nil {
-				data.formErrorMessage = "Failed to parse form data"
+		if formComponent == nil {
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize form component", shared.NewLinks().Home(), 10)
+		}
+
+		comp, ok := formComponent.(*formBlogSettings)
+		if !ok {
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid form component", shared.NewLinks().Home(), 10)
+		}
+
+		// Parse form data
+		if err := r.ParseForm(); err != nil {
+			comp.FormErrorMessage = "Failed to parse form data"
+		} else {
+			// Handle the action using the component
+			action := req.GetStringTrimmed(r, "action")
+			if action == "" {
+				action = "apply" // default action
+			}
+
+			params := map[string]string{
+				"return_url": shared.NewLinks().PostManager(),
+			}
+
+			// Mount the component first
+			ctx := r.Context()
+			if err := formComponent.Mount(ctx, params); err != nil {
+				comp.FormErrorMessage = "Failed to initialize form"
 			} else {
-				// Handle the action using the component
-				action := req.GetStringTrimmed(r, "action")
-				if action == "" {
-					action = "apply" // default action
-				}
-
-				params := map[string]string{
-					"return_url": shared.NewLinks().PostManager(),
-				}
-
-				// Mount the component first
-				ctx := r.Context()
-				if err := formComponent.Mount(ctx, params); err != nil {
-					data.formErrorMessage = "Failed to initialize form"
-				} else {
-					// Handle the action
-					if err := formComponent.Handle(ctx, action, r.Form); err != nil {
-						data.formErrorMessage = "Failed to process form"
-					} else {
-						// Update data from component state
-						if comp, ok := formComponent.(*formBlogSettings); ok {
-							data.blogTopic = comp.BlogTopic
-							data.formErrorMessage = comp.FormErrorMessage
-							data.formSuccessMessage = comp.FormSuccessMessage
-							data.formInfoMessage = comp.FormInfoMessage
-							data.formRedirect = comp.FormRedirect
-							data.formRedirectDelaySeconds = comp.FormRedirectDelaySeconds
-							data.isEnvOverride = comp.IsEnvOverride
-						}
-					}
+				// Handle the action
+				if err := formComponent.Handle(ctx, action, r.Form); err != nil {
+					comp.FormErrorMessage = "Failed to process form"
 				}
 			}
-		} else {
-			data.formErrorMessage = "Failed to initialize form component"
 		}
 	}
 
 	// Use the existing component if available, otherwise create a new one
 	if formComponent == nil {
 		formComponent = NewFormBlogSettings(c.app)
+	}
+	if formComponent == nil {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize blog settings form", shared.NewLinks().Home(), 10)
+	}
+
+	if comp, ok := formComponent.(*formBlogSettings); ok {
+		if r.Method != http.MethodPost {
+			comp.BlogTopic = data.blogTopic
+			comp.FormInfoMessage = data.formInfoMessage
+			comp.IsEnvOverride = data.isEnvOverride
+		}
 	}
 
 	rendered := liveflux.SSR(formComponent, map[string]string{
@@ -105,13 +105,11 @@ func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request)
 
 	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:   "Settings | Blog",
-		Content: c.page(data, rendered),
+		Content: c.page(rendered),
 		ScriptURLs: []string{
-			cdn.Htmx_2_0_0(),
 			cdn.Sweetalert2_11(),
 		},
 		Scripts: []string{
-			ext.HxHideIndicatorCSS(),
 			liveflux.Script().ToHTML(),
 		},
 	}).ToHTML()
@@ -148,7 +146,7 @@ func (c *blogSettingsController) prepareData(r *http.Request) (blogSettingsData,
 	return data, ""
 }
 
-func (c *blogSettingsController) page(data blogSettingsData, component hb.TagInterface) hb.TagInterface {
+func (c *blogSettingsController) page(component hb.TagInterface) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Dashboard",

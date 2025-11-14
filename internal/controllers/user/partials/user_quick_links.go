@@ -14,7 +14,7 @@ type UserQuickLinksOptions struct {
 }
 
 func UserQuickLinks(req *http.Request, opts ...UserQuickLinksOptions) *hb.Tag {
-	opt := lo.FirstOrEmpty(opts)
+	opt := lo.FirstOr(opts, UserQuickLinksOptions{})
 	errorMessage := ""
 
 	if errorMessage != "" {

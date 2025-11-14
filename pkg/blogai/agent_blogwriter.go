@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/dracory/llm"
 )
@@ -79,12 +80,14 @@ Do not include any text outside of this JSON structure. The response must be par
 
 	fmt.Printf("Raw LLM response:\n%s\n", content)
 
+	cleanContent := sanitizeJSONContent(content)
+
 	// Parse the response into a RecordPost
 	var post RecordPost
-	err = json.Unmarshal([]byte(content), &post)
+	err = json.Unmarshal([]byte(cleanContent), &post)
 	if err != nil {
 		fmt.Printf("JSON parsing error: %v\n", err)
-		fmt.Printf("Attempted to parse:\n%s\n", content)
+		fmt.Printf("Attempted to parse (sanitized):\n%s\n", cleanContent)
 		return RecordPost{}, fmt.Errorf("failed to parse blog post JSON: %w", err)
 	}
 
@@ -217,16 +220,18 @@ func (b *BlogWriterAgent) RegenerateSection(ai llm.LlmInterface, post RecordPost
 	b.logger.Info("BlogAi. BlogWriterAgent. Regenerate Section. Raw Response:",
 		slog.String("content", content))
 
+	cleanContent := sanitizeJSONContent(content)
+
 	// Parse the response
 	var response struct {
 		Title      string   `json:"title"`
 		Paragraphs []string `json:"paragraphs"`
 	}
-	err = json.Unmarshal([]byte(content), &response)
+	err = json.Unmarshal([]byte(cleanContent), &response)
 	if err != nil {
 		b.logger.Error("BlogAi. BlogWriterAgent. Regenerate Section. Failed to parse section content JSON",
 			slog.String("error", err.Error()),
-			slog.String("content", content))
+			slog.String("content", cleanContent))
 		return post, fmt.Errorf("failed to parse section content JSON: %w raw content: %s", err, content)
 	}
 
@@ -432,15 +437,42 @@ You are an experienced SEO specialist. Generate the following for the given blog
 		return "", "", "", fmt.Errorf("failed to generate metas: %w", err)
 	}
 
+	cleanResponse := sanitizeJSONContent(response)
+
 	var resp struct {
 		MetaTitle       string `json:"meta_title"`
 		MetaDescription string `json:"meta_description"`
 		MetaKeywords    string `json:"meta_keywords"`
 	}
-	err = json.Unmarshal([]byte(response), &resp)
+	err = json.Unmarshal([]byte(cleanResponse), &resp)
 	if err != nil {
 		return "", "", "", fmt.Errorf("failed to parse metas response: %w", err)
 	}
 
 	return resp.MetaTitle, resp.MetaDescription, resp.MetaKeywords, nil
+}
+
+func sanitizeJSONContent(content string) string {
+	trimmed := strings.TrimSpace(content)
+	if !strings.HasPrefix(trimmed, "```") {
+		return trimmed
+	}
+
+	trimmed = strings.TrimPrefix(trimmed, "```json")
+	trimmed = strings.TrimPrefix(trimmed, "```")
+	trimmed = strings.TrimSpace(trimmed)
+	trimmed = strings.TrimSuffix(trimmed, "```")
+	trimmed = strings.TrimSpace(trimmed)
+
+	if trimmed == "" {
+		return trimmed
+	}
+
+	const jsonStartChars = "{"
+
+	if idx := strings.IndexAny(trimmed, jsonStartChars); idx > 0 {
+		trimmed = trimmed[idx:]
+	}
+
+	return strings.TrimSpace(trimmed)
 }

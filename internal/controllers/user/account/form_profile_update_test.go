@@ -862,15 +862,15 @@ func TestFormProfileUpdate_Render(t *testing.T) {
 	}
 }
 
-func TestFormProfileUpdate_GetAlias(t *testing.T) {
+func TestFormProfileUpdate_GetKind(t *testing.T) {
 	app := testutils.Setup()
 	component := NewFormProfileUpdate(app)
 	form := component.(*formProfileUpdate)
 
-	alias := form.GetAlias()
+	kind := form.GetKind()
 
-	if alias != "profile_update_form" {
-		t.Fatalf("Expected alias 'profile_update_form', got: %s", alias)
+	if kind != "profile_update_form" {
+		t.Fatalf("Expected kind 'profile_update_form', got: %s", kind)
 	}
 }
 

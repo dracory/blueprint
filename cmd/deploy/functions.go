@@ -71,7 +71,7 @@ func SSH(sshHost, sshUser, sshKey, cmd string) (output string, err error) {
 	}
 	defer func() {
 		if closeErr := client.Close(); closeErr != nil {
-			log.Println(closeErr)
+			log.Printf("Warning: failed to close SSH client: %v", closeErr)
 		}
 	}()
 

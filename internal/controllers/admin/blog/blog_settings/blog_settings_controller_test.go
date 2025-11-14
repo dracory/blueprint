@@ -9,6 +9,7 @@ import (
 
 	"project/internal/config"
 	"project/internal/controllers/admin/blog/shared"
+	"project/internal/links"
 	"project/internal/testutils"
 
 	"github.com/dracory/cdn"
@@ -39,7 +40,7 @@ func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, html, "Blog Settings")
 	assert.Contains(t, html, shared.NewLinks().BlogSettings())
-	assert.Contains(t, html, cdn.Htmx_2_0_0())
+	assert.Contains(t, html, links.LIVEFLUX)
 	assert.Contains(t, html, cdn.Sweetalert2_11())
 }
 

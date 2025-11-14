@@ -69,7 +69,7 @@ func NewFormUserUpdate(app types.AppInterface) liveflux.ComponentInterface {
 	return inst
 }
 
-func (c *formUserUpdate) GetAlias() string {
+func (c *formUserUpdate) GetKind() string {
 	return "admin_user_update_form"
 }
 

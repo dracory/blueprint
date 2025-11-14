@@ -18,16 +18,16 @@ func (l *adminLinks) Blog(params ...map[string]string) string {
 	return URL(ADMIN_BLOG, p)
 }
 
-// Cms is the cms old manager
+// Cms is the cms manager
 func (l *adminLinks) Cms(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	return URL(ADMIN_CMS, p)
 }
 
-// CmsNew is the new cms manager
-func (l *adminLinks) CmsNew(params ...map[string]string) string {
+// CmsNew is the old cms manager
+func (l *adminLinks) CmsOld(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_CMS_NEW, p)
+	return URL(ADMIN_CMS_OLD, p)
 }
 
 // FileManager is the file manager

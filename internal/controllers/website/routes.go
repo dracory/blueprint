@@ -39,49 +39,19 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 			return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"><circle cx="20" cy="8" r="1" fill="currentColor"></circle><circle cx="23" cy="8" r="1" fill="currentColor"></circle><circle cx="26" cy="8" r="1" fill="currentColor"></circle><path d="M28 4H4a2.002 2.002 0 0 0-2 2v20a2.002 2.002 0 0 0 2 2h24a2.002 2.002 0 0 0 2-2V6a2.002 2.002 0 0 0-2-2zm0 2v4H4V6zM4 12h6v14H4zm8 14V12h16v14z" fill="currentColor"></path></svg>`
 		})
 
-	contactRoute := rtr.NewRoute().
-		SetName("Website > Contact Controller").
-		SetPath(links.CONTACT).
-		SetMethod(http.MethodGet).
-		SetHTMLHandler(contact.NewContactController(app).AnyIndex)
-
-	contactSubmitRoute := rtr.NewRoute().
-		SetName("Website > Contact Submit Controller").
-		SetPath(links.CONTACT).
-		SetMethod(http.MethodPost).
-		SetHTMLHandler(contact.NewContactController(app).PostSubmit)
-
-	// Serve Swagger UI using a controller
-	swaggerUiRoute := rtr.NewRoute().
-		SetName("Swagger UI").
-		SetPath("/swagger").
-		SetHandler(swagger.SwaggerUIController).
-		SetMethod(http.MethodGet)
-
-	// Serve embedded YAML
-	swaggerYamlRoute := rtr.NewRoute().
-		SetName("Swagger YAML").
-		SetPath("/docs/swagger.yaml").
-		SetHandler(swagger.SwaggerYAMLController).
-		SetMethod(http.MethodGet)
-
 	// These are custom routes for the website, that cannot be served by the CMS
 	websiteRoutes := []rtr.RouteInterface{
 		faviconRoute,
-		contactRoute,
-		contactSubmitRoute,
 	}
-
-	// Aggregated sub-routes (migrated ones only)
-	websiteRoutes = append(websiteRoutes, swaggerUiRoute)
-	websiteRoutes = append(websiteRoutes, swaggerYamlRoute)
 
 	// Comment if you do not use the blog routes
 	websiteRoutes = append(websiteRoutes, blog.Routes(app)...)
+	websiteRoutes = append(websiteRoutes, contact.Routes(app)...)
 
 	// Comment if you do not use the payment routes
 	// websiteRoutes = append(websiteRoutes, paymentRoutes...)
 	websiteRoutes = append(websiteRoutes, seo.Routes(app)...)
+	websiteRoutes = append(websiteRoutes, swagger.Routes()...)
 
 	isCmsUsed := app.GetConfig().GetCmsStoreUsed() && app.GetCmsStore() != nil
 

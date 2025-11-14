@@ -55,7 +55,7 @@ func NewFormProfileUpdate(app types.AppInterface) liveflux.ComponentInterface {
 
 // == PUBLIC METHODS ==========================================================
 
-func (c *formProfileUpdate) GetAlias() string {
+func (c *formProfileUpdate) GetKind() string {
 	return "profile_update_form"
 }
 

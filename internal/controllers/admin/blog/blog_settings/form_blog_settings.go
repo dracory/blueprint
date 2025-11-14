@@ -39,7 +39,7 @@ func NewFormBlogSettings(app types.AppInterface) liveflux.ComponentInterface {
 	return inst
 }
 
-func (c *formBlogSettings) GetAlias() string {
+func (c *formBlogSettings) GetKind() string {
 	return "admin_blog_settings_form_component"
 }
 
@@ -207,20 +207,23 @@ func (c *formBlogSettings) Render(ctx context.Context) hb.TagInterface {
 
 	applyIndicator := hb.Span().
 		ID("BlogSettingsApplyIndicator").
-		Class("htmx-indicator spinner-border spinner-border-sm ms-2").
+		Class("spinner-border spinner-border-sm ms-2").
+		Style(`display: none;`).
 		Role("status").
 		Aria("hidden", "true")
 
 	saveIndicator := hb.Span().
 		ID("BlogSettingsSaveIndicator").
-		Class("htmx-indicator spinner-border spinner-border-sm ms-2").
+		Class("spinner-border spinner-border-sm ms-2").
+		Style(`display: none;`).
 		Role("status").
 		Aria("hidden", "true")
 
 	buttonApply := hb.Button().
 		Type("submit").
 		Class("btn btn-primary").
-		Attr("data-flux-action", "apply").
+		Attr(liveflux.DataFluxAction, "apply").
+		Attr(liveflux.DataFluxIndicator, "#BlogSettingsApplyIndicator").
 		Child(hb.I().Class("bi bi-check2 me-2")).
 		Child(hb.Span().Text("Apply")).
 		Child(applyIndicator)
@@ -228,7 +231,8 @@ func (c *formBlogSettings) Render(ctx context.Context) hb.TagInterface {
 	buttonSaveClose := hb.Button().
 		Type("submit").
 		Class("btn btn-success").
-		Attr("data-flux-action", "save_close").
+		Attr(liveflux.DataFluxAction, "save_close").
+		Attr(liveflux.DataFluxIndicator, "#BlogSettingsSaveIndicator").
 		Child(hb.I().Class("bi bi-check2-all me-2")).
 		Child(hb.Span().Text("Save & Close")).
 		Child(saveIndicator)

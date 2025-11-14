@@ -10,11 +10,11 @@ func (a *Application) dataStoresMigrate() error {
 	migrators := []func(app types.AppInterface) error{
 		auditStoreMigrate,
 		blogStoreMigrate,
-		chatStoreMigrate,
 		blindIndexEmailStoreMigrate,
 		blindIndexFirstNameStoreMigrate,
 		blindIndexLastNameStoreMigrate,
 		cacheStoreMigrate,
+		chatStoreMigrate,
 		cmsStoreMigrate,
 		customStoreMigrate,
 		entityStoreMigrate,

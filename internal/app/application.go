@@ -49,11 +49,11 @@ type Application struct {
 	// Database stores
 	auditStore          auditstore.StoreInterface
 	blogStore           blogstore.StoreInterface
-	chatStore           chatstore.StoreInterface
 	blindIndexEmail     blindindexstore.StoreInterface
 	blindIndexFirstName blindindexstore.StoreInterface
 	blindIndexLastName  blindindexstore.StoreInterface
 	cacheStore          cachestore.StoreInterface
+	chatStore           chatstore.StoreInterface
 	cmsStore            cmsstore.StoreInterface
 	customStore         customstore.StoreInterface
 	entityStore         entitystore.StoreInterface
