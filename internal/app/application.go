@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"project/internal/cache"
 	"project/internal/types"
@@ -86,9 +87,10 @@ func New(cfg types.ConfigInterface) (types.AppInterface, error) {
 		cache.Memory = ttlcache.New[string, any]()
 	}
 	// Ensure cache directory exists for file cache
-	_ = os.MkdirAll(".cache", os.ModePerm)
+	cacheDir := cacheDirectory()
+	_ = os.MkdirAll(cacheDir, os.ModePerm)
 	if cache.File == nil {
-		cache.File = file.New(".cache")
+		cache.File = file.New(cacheDir)
 	}
 
 	consoleLogger := slog.New(tint.NewHandler(os.Stdout, nil))
@@ -173,6 +175,33 @@ func (a *Application) GetFileCache() cachego.Cache {
 
 func (a *Application) SetFileCache(c cachego.Cache) {
 	cache.File = c
+}
+
+// cacheDirectory returns the path to the shared filesystem cache directory.
+// It walks up from the current working directory until it finds go.mod and
+// then returns the .cache directory at that project root. If no go.mod is
+// found, it falls back to a relative .cache in the current working directory.
+func cacheDirectory() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		return ".cache"
+	}
+
+	dir := wd
+	for {
+		goModPath := filepath.Join(dir, "go.mod")
+		if _, err := os.Stat(goModPath); err == nil {
+			return filepath.Join(dir, ".cache")
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
+	}
+
+	return ".cache"
 }
 
 // ============================================================================
