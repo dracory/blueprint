@@ -28,66 +28,6 @@ func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 		SetHandler(func(next http.Handler) http.Handler { return authHandler(app, next) })
 }
 
-func cacheStoreSession(cache *ttlcache.Cache[string, any], sessionKey string, session sessionstore.SessionInterface) {
-	if cache == nil || session == nil {
-		return
-	}
-
-	cache.Set(sessionCachePrefix+sessionKey, session, sessionCacheTTL)
-}
-
-func cacheGetSession(cache *ttlcache.Cache[string, any], sessionKey string) sessionstore.SessionInterface {
-	if cache == nil {
-		return nil
-	}
-
-	item := cache.Get(sessionCachePrefix + sessionKey)
-
-	if item == nil {
-		return nil
-	}
-
-	session, ok := item.Value().(sessionstore.SessionInterface)
-
-	if !ok || session == nil {
-		return nil
-	}
-
-	if session.IsExpired() {
-		return nil
-	}
-
-	return session
-}
-
-func cacheStoreUser(cache *ttlcache.Cache[string, any], userID string, user userstore.UserInterface) {
-	if cache == nil || user == nil {
-		return
-	}
-
-	cache.Set(userCachePrefix+userID, user, userCacheTTL)
-}
-
-func cacheGetUser(cache *ttlcache.Cache[string, any], userID string) userstore.UserInterface {
-	if cache == nil {
-		return nil
-	}
-
-	item := cache.Get(userCachePrefix + userID)
-
-	if item == nil {
-		return nil
-	}
-
-	user, ok := item.Value().(userstore.UserInterface)
-
-	if !ok || user == nil {
-		return nil
-	}
-
-	return user
-}
-
 // authHandler adds the user and session to the context.
 //
 //  1. Checks if the user session key exists in the incoming request.
@@ -164,7 +104,7 @@ func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 				return
 			}
 
-			cacheStoreSession(memoryCache, sessionKey, session)
+			cacheSetSession(memoryCache, sessionKey, session)
 		}
 
 		if session.IsExpired() {
@@ -195,7 +135,7 @@ func authHandler(app types.AppInterface, next http.Handler) http.Handler {
 				return
 			}
 
-			cacheStoreUser(memoryCache, userID, fetchedUser)
+			cacheSetUser(memoryCache, userID, fetchedUser)
 			user = fetchedUser
 		}
 
@@ -223,4 +163,64 @@ func authHandlerSessionKey(r *http.Request) string {
 	sessionKey := authTokenFromCookie.Value
 
 	return sessionKey
+}
+
+func cacheGetSession(cache *ttlcache.Cache[string, any], sessionKey string) sessionstore.SessionInterface {
+	if cache == nil {
+		return nil
+	}
+
+	item := cache.Get(sessionCachePrefix + sessionKey)
+
+	if item == nil {
+		return nil
+	}
+
+	session, ok := item.Value().(sessionstore.SessionInterface)
+
+	if !ok || session == nil {
+		return nil
+	}
+
+	if session.IsExpired() {
+		return nil
+	}
+
+	return session
+}
+
+func cacheSetSession(cache *ttlcache.Cache[string, any], sessionKey string, session sessionstore.SessionInterface) {
+	if cache == nil || session == nil {
+		return
+	}
+
+	cache.Set(sessionCachePrefix+sessionKey, session, sessionCacheTTL)
+}
+
+func cacheGetUser(cache *ttlcache.Cache[string, any], userID string) userstore.UserInterface {
+	if cache == nil {
+		return nil
+	}
+
+	item := cache.Get(userCachePrefix + userID)
+
+	if item == nil {
+		return nil
+	}
+
+	user, ok := item.Value().(userstore.UserInterface)
+
+	if !ok || user == nil {
+		return nil
+	}
+
+	return user
+}
+
+func cacheSetUser(cache *ttlcache.Cache[string, any], userID string, user userstore.UserInterface) {
+	if cache == nil || user == nil {
+		return
+	}
+
+	cache.Set(userCachePrefix+userID, user, userCacheTTL)
 }
