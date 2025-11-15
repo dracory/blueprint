@@ -21,7 +21,6 @@
 
 ## Common Tasks
 - To add a new package: Create a new directory under `/pkg` with appropriate `go.mod`
-- To run database migrations: `go run cmd/migrate/main.go`
 - To run linters: `golangci-lint run`
 
 ## Testing
