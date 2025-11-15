@@ -27,6 +27,10 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		SetPath(links.USER_PROFILE).
 		SetHTMLHandler(userAccount.NewProfileController(app).Handler)
 
+	// IMPORTANT: Specific routes must come BEFORE catch-all routes
+	// The catch-all route /user/* will match any path starting with /user/
+	// so it must be registered last to avoid intercepting specific routes
+	
 	userRoutes := []rtr.RouteInterface{}
 	userRoutes = append(userRoutes, profile)
 	userRoutes = append(userRoutes, home)

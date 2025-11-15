@@ -4,52 +4,11 @@ import (
 	"context"
 	"time"
 
-	"project/internal/tasks"
-	taskStats "project/internal/tasks/stats"
 	"project/internal/types"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/go-co-op/gocron"
 )
-
-// scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task
-func scheduleStatsVisitorEnhanceTask(app types.AppInterface) {
-	if app == nil {
-		cfmt.Errorln("StatsVisitorEnhance scheduling skipped; app is nil")
-		return
-	}
-
-	if app.GetTaskStore() == nil {
-		cfmt.Warningln("StatsVisitorEnhance scheduling skipped; task store not configured.")
-		return
-	}
-
-	_, err := taskStats.NewStatsVisitorEnhanceTask(app).Enqueue()
-	if err != nil {
-		cfmt.Errorln(err.Error())
-	}
-}
-
-// scheduleCleanUpTask schedules the clean up task
-func scheduleCleanUpTask(app types.AppInterface) {
-	if app == nil {
-		cfmt.Errorln("CleanUp scheduling skipped; app is nil")
-		return
-	}
-
-	if app.GetTaskStore() == nil {
-		cfmt.Warningln("CleanUp scheduling skipped; task store not configured.")
-		return
-	}
-
-	task := tasks.NewCleanUpTask(app)
-
-	go func() {
-		if handled := task.Handle(); !handled {
-			cfmt.Warningln("CleanUp task handler reported failure")
-		}
-	}()
-}
 
 func newScheduler(app types.AppInterface) *gocron.Scheduler {
 	scheduler := gocron.NewScheduler(time.UTC)

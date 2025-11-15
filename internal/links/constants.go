@@ -60,8 +60,9 @@ const BLOG = HOME + "blog"
 const BLOG_POST = BLOG + "/post"
 const BLOG_POST_WITH_REGEX = BLOG_POST + "/{id:[0-9]+}"
 const BLOG_POST_WITH_REGEX2 = BLOG_POST + "/{id:[0-9]+}/{title}"
-const BLOG_POST_01 = "/blog/post/:id"
-const BLOG_POST_02 = "/blog/post/:id/:title"
+const BLOG_POST_01 = BLOG_POST + "/:id"
+const BLOG_POST_02 = BLOG_POST + "/:id/:title"
+
 const CONTACT = HOME + "contact"
 const FILES = HOME + "files" + CATCHALL
 const FLASH = HOME + "flash"

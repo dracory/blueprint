@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	// "project/internal/controllers/user/usershared"
 	"project/internal/controllers/user/partials"
 	"project/internal/helpers"
 	"project/internal/layouts"
