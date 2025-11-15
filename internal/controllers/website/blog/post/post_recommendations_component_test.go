@@ -20,14 +20,14 @@ func TestNewPostRecommendationsComponent(t *testing.T) {
 	}
 }
 
-func TestPostRecommendationsComponent_GetAlias(t *testing.T) {
+func TestPostRecommendationsComponent_GetKind(t *testing.T) {
 	app := testutils.Setup()
 	component := NewPostRecommendationsComponent(app)
 
-	alias := component.GetAlias()
+	kind := component.GetKind()
 	expected := "blog_post_recommendations"
-	if alias != expected {
-		t.Errorf("Expected alias '%s', got '%s'", expected, alias)
+	if kind != expected {
+		t.Errorf("Expected kind '%s', got '%s'", expected, kind)
 	}
 }
 

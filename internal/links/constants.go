@@ -38,12 +38,23 @@ const ADMIN_USERS_USER_UPDATE = ADMIN_USERS + "/user-update"
 // ===========================================================================
 
 const USER_HOME = "/user"
+
+// User Orders
 const USER_ORDERS = USER_HOME + "/orders"
 const USER_ORDER_CREATE = USER_ORDERS + "/create"
 const USER_ORDER_CREATE_PAYMENT_BEGIN = USER_ORDER_CREATE + "/payment-begin"
 const USER_ORDER_DELETE = USER_ORDERS + "/delete"
 const USER_ORDER_LIST = USER_ORDERS + "/list"
+
 const USER_PROFILE = USER_HOME + "/profile"
+
+// User Subscription
+const USER_SUBSCRIPTION = USER_HOME + "/subscription"
+const USER_SUBSCRIPTION_PLAN_SELECT = USER_SUBSCRIPTION + "/plan-select"
+const USER_SUBSCRIPTION_PLAN_SELECT_AJAX = USER_SUBSCRIPTION + "/plan-select-ajax"
+const USER_SUBSCRIPTION_PAYMENT_CANCELED = USER_SUBSCRIPTION + "/payment-canceled"
+const USER_SUBSCRIPTION_PAYMENT_SUCCESS = USER_SUBSCRIPTION + "/payment-success"
+
 
 // ===========================================================================
 // == CHAT LINKS

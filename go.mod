@@ -19,10 +19,10 @@ require (
 	github.com/dracory/blogstore v1.1.0
 	github.com/dracory/bs v0.15.0
 	github.com/dracory/cachestore v0.23.0
-	github.com/dracory/cdn v1.8.0
-	github.com/dracory/chatstore v0.6.0
+	github.com/dracory/cdn v1.9.0
+	github.com/dracory/chatstore v0.7.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v0.34.0
+	github.com/dracory/cmsstore v1.0.1
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
@@ -37,8 +37,8 @@ require (
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
 	github.com/dracory/hb v1.88.0
-	github.com/dracory/liveflux v0.16.0
-	github.com/dracory/llm v0.9.0
+	github.com/dracory/liveflux v0.21.0
+	github.com/dracory/llm v1.0.0
 	github.com/dracory/logstore v1.9.0
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
@@ -81,7 +81,7 @@ require (
 
 require (
 	cloud.google.com/go v0.123.0 // indirect
-	cloud.google.com/go/aiplatform v1.108.0 // indirect
+	cloud.google.com/go/aiplatform v1.109.0 // indirect
 	cloud.google.com/go/auth v0.17.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
@@ -91,7 +91,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.39.6 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.21 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.24 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.13 // indirect
@@ -147,15 +147,15 @@ require (
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
+	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 // indirect
 	golang.org/x/image v0.32.0 // indirect
 	golang.org/x/oauth2 v0.32.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/term v0.36.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.255.0 // indirect
 	google.golang.org/genai v1.34.0 // indirect
-	google.golang.org/genproto v0.0.0-20251103181224-f26f9409b101 // indirect
+	google.golang.org/genproto v0.0.0-20251111163417-95abcf5c77ba // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251103181224-f26f9409b101 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251103181224-f26f9409b101 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
@@ -178,10 +178,10 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/samber/lo v1.52.0
-	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )

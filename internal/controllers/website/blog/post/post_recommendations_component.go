@@ -45,7 +45,7 @@ func NewPostRecommendationsComponent(app types.AppInterface) liveflux.ComponentI
 	return inst
 }
 
-func (c *postRecommendationsComponent) GetAlias() string {
+func (c *postRecommendationsComponent) GetKind() string {
 	return "blog_post_recommendations"
 }
 

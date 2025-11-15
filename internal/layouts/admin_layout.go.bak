@@ -54,6 +54,7 @@ func adminLayout(app types.AppInterface, r *http.Request, options Options) dashb
 
 	styleURLs := []string{} // prepend any if required
 	styleURLs = append(styleURLs, options.StyleURLs...)
+	//styleURLs = append(styleURLs, cdn.BootstrapIconsCss_1_13_1())
 	styleURLs = lo.Uniq(styleURLs)
 
 	// Prepare styles
