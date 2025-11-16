@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"project/internal/controllers/user/partials"
+	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -137,9 +138,9 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 		return profileControllerData{}, "Error listing countries"
 	}
 
-	email, firstName, lastName, buinessName, phone, err := UntokenizeUserTranparently(
-		controller.app,
+	email, firstName, lastName, buinessName, phone, err := ext.UserUntokenizeTransparently(
 		r.Context(),
+		controller.app,
 		authUser,
 	)
 

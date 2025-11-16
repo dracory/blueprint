@@ -1,4 +1,4 @@
-package tasks
+package blind_index_rebuild
 
 import (
 	"context"
@@ -322,7 +322,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		task.LogError("BlindIndexStoreFirstName is nil. Aborted.")
 		return false
 	}
-	
+
 	searchValue, err := task.app.GetBlindIndexStoreFirstName().SearchValueFindBySourceReferenceID(user.ID())
 
 	if err != nil {

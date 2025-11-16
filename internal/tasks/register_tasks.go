@@ -1,7 +1,8 @@
 package tasks
 
 import (
-	taskStats "project/internal/tasks/stats"
+	"project/internal/tasks/blind_index_rebuild"
+	"project/internal/tasks/stats"
 	"project/internal/types"
 
 	"github.com/dracory/taskstore"
@@ -20,14 +21,14 @@ func RegisterTasks(app types.AppInterface) {
 	}
 
 	tasks := []taskstore.TaskHandlerInterface{
-		NewBlindIndexRebuildTask(app),
+		blind_index_rebuild.NewBlindIndexRebuildTask(app),
 		NewCleanUpTask(app),
 		NewEmailTestTask(app),
 		NewEmailToAdminTask(app),
 		NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
 		NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
 		NewHelloWorldTask(app),
-		taskStats.NewStatsVisitorEnhanceTask(app),
+		stats.NewStatsVisitorEnhanceTask(app),
 	}
 
 	for _, task := range tasks {
