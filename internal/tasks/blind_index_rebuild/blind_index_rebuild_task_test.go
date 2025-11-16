@@ -2,6 +2,7 @@ package blind_index_rebuild
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 
 	"project/internal/testutils"
@@ -58,5 +59,53 @@ func TestBlindIndexRebuildTask_Enqueue_InvalidIndex(t *testing.T) {
 	if _, err := task.Enqueue("invalid"); err == nil {
 		t.Fatalf("expected error when invalid index is provided, got nil")
 	}
+}
 
+func TestBlindIndexRebuildTask_Handle(t *testing.T) {
+	app := testutils.Setup(
+		testutils.WithTaskStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	// Register task
+	err := app.GetTaskStore().TaskHandlerAdd(NewBlindIndexRebuildTask(app), true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
+	}
+
+	// Enqueue task with valid funnel and lead
+	queuedTask, err := NewBlindIndexRebuildTask(app).Enqueue(BlindIndexAll)
+	if err != nil {
+		t.Fatalf("Enqueue() expected nil error, got %q", err)
+	}
+
+	// Set queued task
+	task := NewBlindIndexRebuildTask(app)
+	task.SetQueuedTask(queuedTask)
+
+	// ACT
+	if ok := task.Handle(); !ok {
+		t.Fatalf("Handle() expected true, got false")
+	}
+
+	details := task.QueuedTask().Details()
+	if details == "" {
+		t.Fatalf("Details() should not be empty")
+	}
+
+	if !strings.Contains(details, "Rebuilding email index:") {
+		t.Fatalf("Details() should contain 'Rebuilding email index:' but got %q", details)
+	}
+
+	if !strings.Contains(details, "Rebuilding first name index:") {
+		t.Fatalf("Details() should contain 'Rebuilding first name index:' but got %q", details)
+	}
+
+	if !strings.Contains(details, "Rebuilding last name index:") {
+		t.Fatalf("Details() should contain 'Rebuilding last name index:' but got %q", details)
+	}
+
+	if !strings.Contains(details, "Index rebuilt successfully") {
+		t.Fatalf("Details() should contain 'Index rebuilt successfully' but got %q", details)
+	}
 }
