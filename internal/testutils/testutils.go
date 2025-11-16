@@ -13,8 +13,9 @@ func SetupMailServer(t *testing.T) (*smtpmock.Server, func()) {
 	server := smtpmock.New(smtpmock.ConfigurationAttr{
 		LogToStdout:       false, // Set to true for debugging
 		LogServerActivity: true,
-		PortNumber:        2525, // Standard test SMTP port
-		HostAddress:       "127.0.0.1",
+		// Use port 0 so the OS assigns a free ephemeral port, avoiding collisions
+		PortNumber:  0,
+		HostAddress: "127.0.0.1",
 	})
 
 	if err := server.Start(); err != nil {
