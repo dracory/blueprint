@@ -1,4 +1,4 @@
-package tasks
+package email_admin_new_contact
 
 import (
 	"errors"

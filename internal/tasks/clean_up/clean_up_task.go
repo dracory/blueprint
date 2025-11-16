@@ -1,4 +1,4 @@
-package tasks
+package clean_up
 
 import (
 	"errors"

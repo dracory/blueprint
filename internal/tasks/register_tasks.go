@@ -2,6 +2,12 @@ package tasks
 
 import (
 	"project/internal/tasks/blind_index_rebuild"
+	"project/internal/tasks/clean_up"
+	"project/internal/tasks/email_admin"
+	"project/internal/tasks/email_admin_new_contact"
+	"project/internal/tasks/email_admin_new_user_registered"
+	"project/internal/tasks/email_test"
+	"project/internal/tasks/hello_world"
 	"project/internal/tasks/stats"
 	"project/internal/types"
 
@@ -22,12 +28,12 @@ func RegisterTasks(app types.AppInterface) {
 
 	tasks := []taskstore.TaskHandlerInterface{
 		blind_index_rebuild.NewBlindIndexRebuildTask(app),
-		NewCleanUpTask(app),
-		NewEmailTestTask(app),
-		NewEmailToAdminTask(app),
-		NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
-		NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
-		NewHelloWorldTask(app),
+		clean_up.NewCleanUpTask(app),
+		email_test.NewEmailTestTask(app),
+		email_admin.NewEmailToAdminTask(app),
+		email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
+		email_admin_new_user_registered.NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
+		hello_world.NewHelloWorldTask(app),
 		stats.NewStatsVisitorEnhanceTask(app),
 	}
 

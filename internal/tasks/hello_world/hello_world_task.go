@@ -1,4 +1,4 @@
-package tasks
+package hello_world
 
 import (
 	"errors"

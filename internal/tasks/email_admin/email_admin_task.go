@@ -1,21 +1,19 @@
-// Package tasks implements various background tasks for the application.
-// This file specifically handles sending test emails.
-package tasks
+// This file specifically handles sending notification emails to administrators.
+package email_admin
 
-// EmailTestTask sends test email.
+// EmailToAdminTask handles sending notification emails to system administrators.
 //
 // =================================================================
 // Example Usage:
 //
 // 1. Direct execution:
-//    go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
+//    go run . task EmailToAdminTask --html="<p>Notification content</p>"
 //
 // 2. Enqueue for background processing:
-//    go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com" --enqueue=yes
+//    go run . task EmailToAdminTask --html="<p>Notification content</p>" --enqueue=yes
 //
 // Required Parameters:
 // - html: HTML content of the email to be sent
-// - to: Email address to send the test email to
 //
 // Optional Parameters:
 // - enqueue: Set to "yes" to enqueue task instead of executing immediately
@@ -32,37 +30,37 @@ import (
 // NewEmailToAdminTaskHandler constructs a new task handler for sending emails to admin
 // Example usage:
 //
-//	go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
+//	go run . task EmailToAdminTask --html=HTML
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
-func NewEmailTestTask(app types.AppInterface) taskstore.TaskHandlerInterface {
-	return &emailTestTask{
+func NewEmailToAdminTask(app types.AppInterface) taskstore.TaskHandlerInterface {
+	return &emailToAdminTask{
 		app: app,
 	}
 }
 
-// emailTestTask send a notification email to admin
-type emailTestTask struct {
+// emailToAdminTask send a notification email to admin
+type emailToAdminTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
 	app                       types.AppInterface
 }
 
 // Alias returns the unique identifier for this task handler
 // Used when enqueuing and processing tasks
-func (handler *emailTestTask) Alias() string {
-	return "EmailTestTask"
+func (handler *emailToAdminTask) Alias() string {
+	return "EmailToAdminTask"
 }
 
 // Title returns a human-readable title for this task
 // Used in task management interfaces
-func (handler *emailTestTask) Title() string {
-	return "Email Test"
+func (handler *emailToAdminTask) Title() string {
+	return "Email to Admin"
 }
 
 // Description returns a detailed description of the task's purpose
 // Used in task management interfaces
-func (handler *emailTestTask) Description() string {
+func (handler *emailToAdminTask) Description() string {
 	return "Sends a notification email to the system administrator"
 }
 
@@ -73,7 +71,7 @@ func (handler *emailTestTask) Description() string {
 // Returns:
 //   - taskstore.QueueInterface: The enqueued task
 //   - error: Any error that occurred during enqueueing
-func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.QueueInterface, err error) {
+func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.QueueInterface, err error) {
 	// Validate task store is initialized
 	if handler.app == nil || handler.app.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")
@@ -83,17 +81,8 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Queu
 		return nil, errors.New("task store is nil")
 	}
 
-	if toEmail == "" {
-		return nil, errors.New("to is required parameter")
-	}
-
-	if html == "" {
-		return nil, errors.New("html is required parameter")
-	}
-
 	// Enqueue task with the provided HTML content
 	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{
-		"to":   toEmail,
 		"html": html,
 	})
 }
@@ -110,22 +99,16 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Queu
 //
 // Returns:
 //   - bool: true if task was processed successfully, false otherwise
-func (handler *emailTestTask) Handle() bool {
+func (handler *emailToAdminTask) Handle() bool {
 	if handler.app == nil || handler.app.GetConfig() == nil {
 		handler.LogError("App/Config is nil. Aborted.")
 		return false
 	}
 
 	// Get HTML content from task parameters
-	toEmail := handler.GetParam("to")
 	html := handler.GetParam("html")
 
-	// Validate required parameters
-	if toEmail == "" {
-		handler.LogError("to is required parameter")
-		return false
-	}
-
+	// Validate required parameter
 	if html == "" {
 		handler.LogError("html is required parameter")
 		return false
@@ -133,7 +116,7 @@ func (handler *emailTestTask) Handle() bool {
 
 	// Check if task should be enqueued instead of executed directly
 	if !handler.HasQueuedTask() && handler.GetParam("enqueue") == "yes" {
-		_, err := handler.Enqueue(toEmail, html)
+		_, err := handler.Enqueue(html)
 
 		if err != nil {
 			handler.LogError("Error enqueuing task: " + err.Error())
@@ -147,13 +130,7 @@ func (handler *emailTestTask) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Send email using the email service
-	err := emails.SendEmail(emails.SendOptions{
-		From:     handler.app.GetConfig().GetMailFromAddress(),
-		FromName: handler.app.GetConfig().GetMailFromName(),
-		To:       []string{toEmail},
-		HtmlBody: html,
-		Subject:  "Test email",
-	})
+	err := emails.NewEmailNotifyAdmin(handler.app).Send(html)
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

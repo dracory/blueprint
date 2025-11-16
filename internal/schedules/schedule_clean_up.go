@@ -1,7 +1,7 @@
 package schedules
 
 import (
-	"project/internal/tasks"
+	"project/internal/tasks/clean_up"
 	"project/internal/types"
 
 	"github.com/dracory/base/cfmt"
@@ -19,7 +19,7 @@ func scheduleCleanUpTask(app types.AppInterface) {
 		return
 	}
 
-	task := tasks.NewCleanUpTask(app)
+	task := clean_up.NewCleanUpTask(app)
 
 	go func() {
 		if handled := task.Handle(); !handled {

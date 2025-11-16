@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/tasks"
+	"project/internal/tasks/email_admin_new_contact"
 	"project/internal/types"
 
 	"github.com/dracory/csrf"
@@ -142,7 +142,7 @@ func (controller *contactController) PostSubmit(w http.ResponseWriter, r *http.R
 		return controller.contactForm(r, data).ToHTML()
 	}
 
-	_, err = tasks.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(controller.app).Enqueue()
+	_, err = email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(controller.app).Enqueue()
 
 	if err != nil {
 		controller.app.GetLogger().Error("At contactController.PostSubmit. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
