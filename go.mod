@@ -56,10 +56,10 @@ require (
 	github.com/dracory/uid v1.8.0
 	github.com/dracory/uncdn v0.9.0
 	github.com/dracory/userstore v1.5.0
-	github.com/dracory/vaultstore v0.26.0
+	github.com/dracory/vaultstore v0.27.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dracory/wf v0.6.0
-	github.com/dromara/carbon/v2 v2.6.14
+	github.com/dromara/carbon/v2 v2.6.15
 	github.com/faabiosr/cachego v0.26.0
 	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/go-co-op/gocron v1.37.0
