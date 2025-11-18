@@ -41,7 +41,9 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	defer group.stop()
 
 	// Should not panic
-	startBackgroundProcesses(ctx, group, app)
+	if err := startBackgroundProcesses(ctx, group, app); err != nil {
+		t.Fatalf("startBackgroundProcesses returned error: %v", err)
+	}
 
 	if app.GetCacheStore() == nil {
 		t.Errorf("Cache store should not be nil after starting background processes")

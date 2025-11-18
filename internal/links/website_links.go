@@ -76,7 +76,7 @@ func (l *websiteLinks) PaymentSuccess(paymentKey string) string {
 	return URL(PAYMENT_SUCCESS, params)
 }
 
-func (l *websiteLinks) Resource(resourcePath string, params map[string]string) string {
+func (l *websiteLinks) Resource(resourcePath string, params ...map[string]string) string {
 	if resourcePath == "" {
 		return ""
 	}
@@ -84,7 +84,9 @@ func (l *websiteLinks) Resource(resourcePath string, params map[string]string) s
 		resourcePath = "/" + resourcePath
 	}
 
-	return URL(RESOURCES+resourcePath, params)
+	resourcePath = strings.TrimSuffix(RESOURCES, CATCHALL) + resourcePath
+
+	return URL(resourcePath, lo.FirstOr(params, map[string]string{}))
 }
 
 func (l *websiteLinks) Theme(params map[string]string) string {

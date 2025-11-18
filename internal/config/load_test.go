@@ -7,11 +7,11 @@ import (
 
 func TestLoad_Success(t *testing.T) {
 	// Setup minimal required env vars
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -55,11 +55,11 @@ func TestLoad_MissingRequiredFields(t *testing.T) {
 }
 
 func TestLoad_DatabasePostgresRequirements(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "postgres")
-	os.Setenv(KEY_DB_DATABASE, "testdb")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "postgres")
+	mustSetenv(t, KEY_DB_DATABASE, "testdb")
 	// Missing host, port, username, password
 	defer cleanupEnv()
 
@@ -80,11 +80,11 @@ func TestLoad_DatabasePostgresRequirements(t *testing.T) {
 }
 
 func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	// No ENVENC_KEY_PRIVATE set
 	defer cleanupEnv()
 
@@ -99,13 +99,13 @@ func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
 }
 
 func TestLoad_StoreToggles(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_CACHE_STORE_USED, "true")
-	os.Setenv(KEY_SESSION_STORE_USED, "true")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_CACHE_STORE_USED, "true")
+	mustSetenv(t, KEY_SESSION_STORE_USED, "true")
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -127,12 +127,12 @@ func TestLoad_StoreToggles(t *testing.T) {
 }
 
 func TestLoad_CMSStoreRequiresTemplateID(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_CMS_STORE_USED, "true")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_CMS_STORE_USED, "true")
 	// Missing CMS_STORE_TEMPLATE_ID
 	defer cleanupEnv()
 
@@ -160,12 +160,12 @@ func TestLoad_CMSStoreRequiresTemplateID(t *testing.T) {
 }
 
 func TestLoad_LLMProviderRequirements(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_OPENAI_API_USED, "true")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_OPENAI_API_USED, "true")
 	// Missing OPENAI_API_KEY and OPENAI_API_DEFAULT_MODEL
 	defer cleanupEnv()
 
@@ -201,13 +201,13 @@ func TestLoad_LLMProviderRequirements(t *testing.T) {
 }
 
 func TestLoad_StripeConfiguration(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_STRIPE_KEY_PRIVATE, "sk_test_123")
-	os.Setenv(KEY_STRIPE_KEY_PUBLIC, "pk_test_123")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_STRIPE_KEY_PRIVATE, "sk_test_123")
+	mustSetenv(t, KEY_STRIPE_KEY_PUBLIC, "pk_test_123")
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -225,16 +225,16 @@ func TestLoad_StripeConfiguration(t *testing.T) {
 }
 
 func TestLoad_MailConfiguration(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_MAIL_DRIVER, "smtp")
-	os.Setenv(KEY_MAIL_HOST, "smtp.example.com")
-	os.Setenv(KEY_MAIL_PORT, "587")
-	os.Setenv(KEY_MAIL_USERNAME, "user@example.com")
-	os.Setenv(KEY_MAIL_FROM_ADDRESS, "noreply@example.com")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_MAIL_DRIVER, "smtp")
+	mustSetenv(t, KEY_MAIL_HOST, "smtp.example.com")
+	mustSetenv(t, KEY_MAIL_PORT, "587")
+	mustSetenv(t, KEY_MAIL_USERNAME, "user@example.com")
+	mustSetenv(t, KEY_MAIL_FROM_ADDRESS, "noreply@example.com")
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -252,11 +252,11 @@ func TestLoad_MailConfiguration(t *testing.T) {
 }
 
 func TestLoad_TranslationDefaults(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -274,13 +274,13 @@ func TestLoad_TranslationDefaults(t *testing.T) {
 }
 
 func TestLoad_VaultStoreRequirements(t *testing.T) {
-	os.Setenv(KEY_APP_HOST, "localhost")
-	os.Setenv(KEY_APP_PORT, "8080")
-	os.Setenv(KEY_APP_ENVIRONMENT, "testing")
-	os.Setenv(KEY_DB_DRIVER, "sqlite")
-	os.Setenv(KEY_DB_DATABASE, ":memory:")
-	os.Setenv(KEY_USER_STORE_USE_VAULT, "true")
-	os.Setenv(KEY_VAULT_STORE_USED, "false")
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_USER_STORE_USE_VAULT, "true")
+	mustSetenv(t, KEY_VAULT_STORE_USED, "false")
 	defer cleanupEnv()
 
 	_, err := Load()
@@ -309,4 +309,12 @@ func TestLoad_VaultStoreRequirements(t *testing.T) {
 // cleanupEnv clears all config-related environment variables
 func cleanupEnv() {
 	os.Clearenv()
+}
+
+// mustSetenv is a test helper that sets an environment variable and fails the test on error.
+func mustSetenv(t *testing.T, key, value string) {
+	t.Helper()
+	if err := os.Setenv(key, value); err != nil {
+		t.Fatalf("failed to set env %s: %v", key, err)
+	}
 }

@@ -29,7 +29,10 @@ func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 				// 1. Get token from Authorization header
 				token := r.Header.Get("Authorization")
 				if token == "" {
-					w.Write([]byte(api.Error("Authorization token required").ToString()))
+					if _, err := w.Write([]byte(api.Error("Authorization token required").ToString())); err != nil {
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
 					return
 				}
 
@@ -48,30 +51,40 @@ func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 				// 2. Validate session token
 				session, err := app.GetSessionStore().SessionFindByKey(context.Background(), token)
 				if err != nil {
-					w.Write([]byte(api.Error("Failed to validate token").ToString()))
+					if _, writeErr := w.Write([]byte(api.Error("Failed to validate token").ToString())); writeErr != nil {
+						return
+					}
 					return
 				}
 
 				if session == nil || session.IsExpired() {
-					w.Write([]byte(api.Error("Invalid or expired token").ToString()))
+					if _, err := w.Write([]byte(api.Error("Invalid or expired token").ToString())); err != nil {
+						return
+					}
 					return
 				}
 
 				// 3. Load user and add session + user to request context
 				userID := session.GetUserID()
 				if userID == "" {
-					w.Write([]byte(api.Error("Session missing user").ToString()))
+					if _, err := w.Write([]byte(api.Error("Session missing user").ToString())); err != nil {
+						return
+					}
 					return
 				}
 
 				user, err := app.GetUserStore().UserFindByID(r.Context(), userID)
 				if err != nil {
-					w.Write([]byte(api.Error("Failed to load user").ToString()))
+					if _, writeErr := w.Write([]byte(api.Error("Failed to load user").ToString())); writeErr != nil {
+						return
+					}
 					return
 				}
 
 				if user == nil {
-					w.Write([]byte(api.Error("User not found").ToString()))
+					if _, err := w.Write([]byte(api.Error("User not found").ToString())); err != nil {
+						return
+					}
 					return
 				}
 

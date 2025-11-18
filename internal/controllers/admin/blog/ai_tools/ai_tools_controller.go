@@ -29,46 +29,54 @@ func (c *aiToolsController) Handler(w http.ResponseWriter, r *http.Request) stri
 		w.Header().Set("Content-Type", "application/json")
 		model, err := shared.LlmEngine(c.app)
 		if err != nil {
-			w.Write([]byte(hb.Swal(hb.SwalOptions{
+			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
 				Text:             err.Error(),
 				Icon:             "error",
 				Timer:            15000,
 				TimerProgressBar: true,
-			}).ToHTML()))
+			}).ToHTML())); writeErr != nil {
+				return ""
+			}
 			return ""
 		}
 		if model == nil {
-			w.Write([]byte(hb.Swal(hb.SwalOptions{
+			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
 				Text:             "model is nil",
 				Icon:             "error",
 				Timer:            15000,
 				TimerProgressBar: true,
-			}).ToHTML()))
+			}).ToHTML())); writeErr != nil {
+				return ""
+			}
 			return ""
 		}
 
 		response, err := model.GenerateText("You are a helpful assistant.", "Tell me shortly about blogs.")
 		if err != nil {
-			w.Write([]byte(hb.Swal(hb.SwalOptions{
+			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
 				Text:             err.Error(),
 				Icon:             "error",
 				Timer:            15000,
 				TimerProgressBar: true,
-			}).ToHTML()))
+			}).ToHTML())); writeErr != nil {
+				return ""
+			}
 			return ""
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(hb.Swal(hb.SwalOptions{
+		if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 			Title:            "Success",
 			Text:             response,
 			Icon:             "success",
 			Timer:            15000,
 			TimerProgressBar: true,
-		}).ToHTML()))
+		}).ToHTML())); writeErr != nil {
+			return ""
+		}
 		return ""
 	}
 

@@ -146,6 +146,10 @@ func (c *AiPostGeneratorController) stepHandlerSavePost(ctx context.Context, dat
 		return ctx, data, errors.New("failed to find post record with ID " + recordPostID + ": " + err.Error())
 	}
 
+	if record == nil {
+		return ctx, data, errors.New("post record not found")
+	}
+
 	record.SetPayload(blogAiPost.ToJSON())
 
 	if err := customStore.RecordUpdate(record); err != nil {

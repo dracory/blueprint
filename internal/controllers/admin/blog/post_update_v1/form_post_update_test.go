@@ -1,4 +1,4 @@
-package post_update
+package post_update_v1
 
 import (
 	"testing"
@@ -47,13 +47,13 @@ func TestFormPostUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create test data
 			data := postUpdateControllerData{
-				view:          tt.view,
-				postID:        "test123",
-				formTitle:     "Test Title",
-				formContent:   "Test Content",
-				formStatus:    blogstore.POST_STATUS_DRAFT,
-				formEditor:    blogstore.POST_EDITOR_TEXTAREA,
-				post:          blogstore.NewPost(),
+				view:        tt.view,
+				postID:      "test123",
+				formTitle:   "Test Title",
+				formContent: "Test Content",
+				formStatus:  blogstore.POST_STATUS_DRAFT,
+				formEditor:  blogstore.POST_EDITOR_TEXTAREA,
+				post:        blogstore.NewPost(),
 			}
 
 			// Generate the form
@@ -75,9 +75,9 @@ func TestFormPostUpdate_ErrorHandling(t *testing.T) {
 	// Test with form error message
 	t.Run("Form error message", func(t *testing.T) {
 		data := postUpdateControllerData{
-			view:              VIEW_DETAILS,
-			postID:            "test123",
-			formErrorMessage:  "Test error message",
+			view:             VIEW_DETAILS,
+			postID:           "test123",
+			formErrorMessage: "Test error message",
 		}
 
 		form := formPostUpdate(data)

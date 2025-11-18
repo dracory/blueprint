@@ -19,6 +19,13 @@ func newScheduler(app types.AppInterface) *gocron.Scheduler {
 	}); err != nil {
 		cfmt.Errorln("Error scheduling stats visitor enhance task:", err.Error())
 	}
+	
+	// Blind index populate every hour
+	if _, err := scheduler.Every(1).Hour().Do(func() {
+		scheduleBlindIndexRebuildTask(app)
+	}); err != nil {
+		cfmt.Errorln("Error scheduling blind index rebuild task:", err.Error())
+	}
 
 	// Clean up every 20 minutes
 	if _, err := scheduler.Every(20).Minutes().Do(func() {

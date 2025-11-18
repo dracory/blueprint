@@ -3,7 +3,6 @@ package blind_index_rebuild
 import (
 	"context"
 	"errors"
-	"log"
 	"project/internal/helpers"
 	"project/internal/types"
 	"slices"
@@ -190,7 +189,6 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 	users, err := task.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
 
 	task.LogInfo(" - Found " + strconv.Itoa(len(users)) + " users")
-	log.Println(users)
 
 	if err != nil {
 		task.LogError("Error retrieving users: " + err.Error())
@@ -345,7 +343,9 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return true // empty first name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultStoreKey(), map[string]string{"first_name": firstNameToken})
+	m, err := helpers.Untokenize(ctx, task.app.GetVaultStore(), task.app.GetConfig().GetVaultStoreKey(), map[string]string{
+		"first_name": firstNameToken,
+	})
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + firstNameToken + " - " + err.Error())

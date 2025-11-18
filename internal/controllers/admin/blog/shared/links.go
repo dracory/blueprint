@@ -42,6 +42,12 @@ func (*Links) PostUpdate(params ...map[string]string) string {
 	return links.Admin().Blog(p)
 }
 
+func (*Links) PostUpdateV1(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	p["controller"] = CONTROLLER_POST_UPDATE_V1
+	return links.Admin().Blog(p)
+}
+
 func (*Links) BlogSettings(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	p["controller"] = CONTROLLER_BLOG_SETTINGS
@@ -51,6 +57,12 @@ func (*Links) BlogSettings(params ...map[string]string) string {
 func (*Links) AiTools(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	p["controller"] = CONTROLLER_AI_TOOLS
+	return links.Admin().Blog(p)
+}
+
+func (*Links) AiPostContentUpdate(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	p["controller"] = CONTROLLER_AI_POST_CONTENT_UPDATE
 	return links.Admin().Blog(p)
 }
 

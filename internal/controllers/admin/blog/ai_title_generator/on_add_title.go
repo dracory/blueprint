@@ -20,13 +20,15 @@ func (c *AiTitleGeneratorController) onAddTitle(r *http.Request) string {
 
 	record := customstore.NewRecord(blogai.POST_RECORD_TYPE)
 	now := time.Now().UTC().Format(time.RFC3339)
-	record.SetPayloadMap(map[string]any{
+	if err := record.SetPayloadMap(map[string]any{
 		"id":         record.ID(),
 		"title":      customTitle,
 		"status":     blogai.POST_STATUS_PENDING,
 		"created_at": now,
 		"updated_at": now,
-	})
+	}); err != nil {
+		return shared.ErrorPopup(fmt.Sprintf("Error preparing title payload: %s", err.Error())).ToHTML()
+	}
 
 	if err := c.app.GetCustomStore().RecordCreate(record); err != nil {
 		return shared.ErrorPopup(fmt.Sprintf("Error saving title: %s", err.Error())).ToHTML()

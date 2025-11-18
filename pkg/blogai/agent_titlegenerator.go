@@ -87,7 +87,7 @@ Topic: %s
 		return nil, err
 	}
 
-	cfmt.Successln("Response: ", response)
+	_, _ = cfmt.Successln("Response: ", response)
 
 	titlesResponse := gjson.Get(response, "titles").Array()
 

@@ -78,13 +78,19 @@ func userLayout(app types.AppInterface, r *http.Request, options Options) dashbo
 		titlePostfix = "" // no postfix for CMS pages
 	}
 
-	path := lo.IfF(r != nil, func() string {
-		return r.URL.Path
+	redirectURL := lo.IfF(r != nil, func() string {
+		if r.URL == nil {
+			return ""
+		}
+		if r.URL.RawQuery == "" {
+			return r.URL.Path
+		}
+		return r.URL.Path + "?" + r.URL.RawQuery
 	}).ElseF(func() string {
 		return ""
 	})
 
-	themeLink := links.Website().Theme(map[string]string{"redirect": path})
+	themeLink := links.Website().Theme(map[string]string{"redirect": redirectURL})
 
 	dashboard := dashboard.New()
 	dashboard.SetHTTPRequest(r)

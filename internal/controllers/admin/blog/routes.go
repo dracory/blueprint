@@ -8,16 +8,18 @@ import (
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 
+	aiPostContentUpdate "project/internal/controllers/admin/blog/ai_post_content_update"
 	aiPostEditor "project/internal/controllers/admin/blog/ai_post_editor"
 	aiPostGenerator "project/internal/controllers/admin/blog/ai_post_generator"
 	aiTest "project/internal/controllers/admin/blog/ai_test"
 	aiTitleGenerator "project/internal/controllers/admin/blog/ai_title_generator"
 	aiTools "project/internal/controllers/admin/blog/ai_tools"
-	blogSettings "project/internal/controllers/admin/blog/blog_settings"
-	postCreate "project/internal/controllers/admin/blog/post_create"
-	postDelete "project/internal/controllers/admin/blog/post_delete"
-	postManager "project/internal/controllers/admin/blog/post_manager"
-	postUpdate "project/internal/controllers/admin/blog/post_update"
+	blog_settings "project/internal/controllers/admin/blog/blog_settings"
+	"project/internal/controllers/admin/blog/post_create"
+	"project/internal/controllers/admin/blog/post_delete"
+	"project/internal/controllers/admin/blog/post_manager"
+	"project/internal/controllers/admin/blog/post_update"
+	"project/internal/controllers/admin/blog/post_update_v1"
 	"project/internal/controllers/admin/blog/shared"
 )
 
@@ -27,19 +29,23 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 
 		switch controller {
 		case shared.CONTROLLER_HOME:
-			return postManager.NewPostManagerController(app).Handler(w, r)
+			return post_manager.NewPostManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_CREATE:
-			return postCreate.NewPostCreateController(app).Handler(w, r)
+			return post_create.NewPostCreateController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_DELETE:
-			return postDelete.NewPostDeleteController(app).Handler(w, r)
+			return post_delete.NewPostDeleteController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_MANAGER:
-			return postManager.NewPostManagerController(app).Handler(w, r)
+			return post_manager.NewPostManagerController(app).Handler(w, r)
+		case shared.CONTROLLER_POST_UPDATE_V1:
+			return post_update_v1.NewPostUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_UPDATE:
-			return postUpdate.NewPostUpdateController(app).Handler(w, r)
+			return post_update.NewPostUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TOOLS:
 			return aiTools.NewAiToolsController(app).Handler(w, r)
 		case shared.CONTROLLER_BLOG_SETTINGS:
-			return blogSettings.NewBlogSettingsController(app).Handler(w, r)
+			return blog_settings.NewBlogSettingsController(app).Handler(w, r)
+		case shared.CONTROLLER_AI_POST_CONTENT_UPDATE:
+			return aiPostContentUpdate.NewController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_GENERATOR:
 			return aiPostGenerator.NewAiPostGeneratorController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TITLE_GENERATOR:
@@ -51,7 +57,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 		}
 
 		// Default to post manager
-		return postManager.NewPostManagerController(app).Handler(w, r)
+		return post_manager.NewPostManagerController(app).Handler(w, r)
 	}
 
 	blog := rtr.NewRoute().

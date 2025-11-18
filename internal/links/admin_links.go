@@ -36,6 +36,12 @@ func (l *adminLinks) FileManager(params ...map[string]string) string {
 	return URL(ADMIN_FILE_MANAGER, p)
 }
 
+// Logs is the logs manager
+func (l *adminLinks) Logs(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	return URL(ADMIN_LOGS, p)
+}
+
 func (l *adminLinks) MediaManager(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	return URL(ADMIN_MEDIA, p)

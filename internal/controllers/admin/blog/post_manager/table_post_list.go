@@ -57,6 +57,13 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 					ClassIf(blog.IsUnpublished(), "text-danger").
 					HTML(blog.Status())
 
+				buttonAiContent := hb.Hyperlink().
+					Class("btn btn-warning me-2").
+					Child(hb.I().Class("bi bi-magic")).
+					Title("AI Content Editor").
+					Href(shared.NewLinks().AiPostContentUpdate(map[string]string{"post_id": blog.ID()})).
+					Target("_blank")
+
 				buttonEdit := hb.Hyperlink().
 					Class("btn btn-primary me-2").
 					Child(hb.I().Class("bi bi-pencil-square")).
@@ -96,6 +103,7 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 							Class("small text-muted text-nowrap").
 							HTML(blog.UpdatedAtCarbon().Format("d M Y"))),
 					hb.TD().
+						Child(buttonAiContent).
 						Child(buttonEdit).
 						Child(buttonDelete),
 				})

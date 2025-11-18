@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -49,6 +50,9 @@ import (
 // Returns:
 // - none
 func main() {
+	// Set log flags to include file name and line number
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	cfg, err := config.Load()
 	if err != nil {
 		fmt.Printf("Failed to load config: %v\n", err)
@@ -82,7 +86,10 @@ func main() {
 	defer cancel()
 
 	background := newBackgroundGroup(ctx)
-	startBackgroundProcesses(ctx, background, application)
+	if err := startBackgroundProcesses(ctx, background, application); err != nil {
+		cfmt.Errorln("Failed to start background processes:", err.Error())
+		return
+	}
 
 	// Start the web server
 	server, err := websrv.Start(websrv.Options{

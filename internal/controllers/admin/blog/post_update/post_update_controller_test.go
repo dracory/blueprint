@@ -25,7 +25,7 @@ func TestPostUpdateController_RequiresPostID(t *testing.T) {
 
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
-	
+
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
@@ -46,75 +46,32 @@ func TestPostUpdateController_InvalidPostID(t *testing.T) {
 
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
-	
+
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
 	assert.Equal(t, "Post not found", flash.Message, "Should show correct error message")
 }
 
-func TestPostUpdateController_ShowsForm(t *testing.T) {
+func TestPostUpdateController_ShowsPage(t *testing.T) {
 	app, post := setupControllerAppAndPost(t)
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"post_id": {post.ID()},
-			"view":   {VIEW_DETAILS},
+			"view":    {"content"},
 		},
 	})
 
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "FormPostUpdate", "Should show update form")
+	assert.Contains(t, responseHTML, "Edit Post", "Should show page heading")
+	assert.Contains(t, responseHTML, "Post:", "Should show post label")
 	assert.Contains(t, responseHTML, post.Title(), "Should show post title")
 }
 
-func TestPostUpdateController_HandlesPostRequest(t *testing.T) {
-	app, post := setupControllerAppAndPost(t)
-
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostUpdateController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"post_id":         {post.ID()},
-			"view":           {VIEW_DETAILS},
-			"post_status":    {blogstore.POST_STATUS_PUBLISHED},
-			"post_title":     {post.Title()},
-			"post_content":   {post.Content()},
-		},
-	})
-
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "Post saved successfully", "Should show success message")
-}
-
-func TestPostUpdateController_ValidatesRequiredFields(t *testing.T) {
-	app, post := setupControllerAppAndPost(t)
-
-	// Test empty title in CONTENT view
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostUpdateController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"post_id": {post.ID()},
-			"view":   {VIEW_CONTENT},
-			"post_title": {""}, // Empty title
-		},
-	})
-
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "Title is required", "Should show title required error")
-
-	// Test empty status in DETAILS view
-	responseHTML, _, err = test.CallStringEndpoint(http.MethodPost, NewPostUpdateController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"post_id": {post.ID()},
-			"view":   {VIEW_DETAILS},
-			"post_status": {""}, // Empty status
-		},
-	})
-
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "Status is required", "Should show status required error")
-}
-
 func setupControllerAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Post) {
+	// Note: we reuse the same pattern as v1 tests but only for GET behavior.
 	t.Helper()
 
 	app := testutils.Setup(
@@ -127,8 +84,7 @@ func setupControllerAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Pos
 	post.SetContent("Test Content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	err := app.GetBlogStore().PostCreate(post)
-	if err != nil {
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 

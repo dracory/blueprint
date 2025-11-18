@@ -250,7 +250,9 @@ func (b *BlogWriterAgent) RegenerateSection(ai llm.LlmInterface, post RecordPost
 		post.Conclusion.Paragraphs = response.Paragraphs
 	default:
 		var sectionIndex int
-		fmt.Sscanf(section, "section_%d", &sectionIndex)
+		if _, err := fmt.Sscanf(section, "section_%d", &sectionIndex); err != nil {
+			return post, fmt.Errorf("invalid section identifier %q: %w", section, err)
+		}
 		post.Sections[sectionIndex].Title = response.Title
 		post.Sections[sectionIndex].Paragraphs = response.Paragraphs
 	}

@@ -17,7 +17,6 @@ import (
 	"github.com/dracory/cdn"
 	"github.com/dracory/customstore"
 	"github.com/dracory/hb"
-	"github.com/mingrammer/cfmt"
 )
 
 const (
@@ -218,10 +217,6 @@ func RecordFromJSON(jsonStr string) (*blogai.RecordPost, error) {
 	if err := json.Unmarshal([]byte(jsonStr), &record); err != nil {
 		return nil, err
 	}
-
-	cfmt.Successln("Meta Keywords: ", record.MetaKeywords)
-	cfmt.Successln("Meta Description: ", record.MetaDescription)
-	cfmt.Successln("Meta Title: ", record.MetaTitle)
 
 	recordPost := blogai.RecordPost{}
 	recordPost.Title = record.Title

@@ -17,6 +17,7 @@ import (
 	"github.com/dracory/liveflux"
 	"github.com/dracory/rtr"
 	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
@@ -71,21 +72,30 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return ""
 	}
 
-	return layouts.NewCmsLayout(
-		c.app,
-		r,
-		layouts.Options{
-			WebsiteSection: "Blog",
-			Title:          post.Title(),
-			StyleURLs: []string{
-				"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
-			},
-			ScriptURLs: []string{
-				"/liveflux",
-				"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
-			},
-			Content: hb.Wrap().HTML(c.page(*post)),
-		}).ToHTML()
+	options := layouts.Options{
+		WebsiteSection: "Blog",
+		Title:          post.Title(),
+		StyleURLs: []string{
+			"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
+		},
+		ScriptURLs: []string{
+			"/liveflux",
+			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
+		},
+		Content: hb.Wrap().HTML(c.page(*post)),
+	}
+
+	if c.app.GetConfig().GetCmsStoreUsed() {
+		return layouts.NewCmsLayout(
+			c.app,
+			r,
+			options).ToHTML()
+	} else {
+		return layouts.NewWebsiteLayout(
+			c.app,
+			r,
+			options).ToHTML()
+	}
 }
 
 func (controller *postController) accessAllowed(r *http.Request, post blogstore.Post) bool {
@@ -237,7 +247,7 @@ func (controller *postController) markdownToHtml(text string) string {
 
 	var buf bytes.Buffer
 	md := goldmark.New(
-		// goldmark.WithExtensions(extension.GFM),
+		goldmark.WithExtensions(extension.GFM),
 		goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 		),

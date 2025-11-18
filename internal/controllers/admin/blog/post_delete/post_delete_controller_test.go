@@ -77,7 +77,9 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	app.GetBlogStore().PostCreate(post)
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
+		t.Fatalf("failed to create test post: %v", err)
+	}
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
@@ -106,7 +108,9 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	app.GetBlogStore().PostCreate(post)
+	if err := app.GetBlogStore().PostCreate(post); err != nil {
+		t.Fatalf("failed to create test post: %v", err)
+	}
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")

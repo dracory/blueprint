@@ -42,17 +42,26 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
 	}
 
-	return layouts.NewCmsLayout(
-		controller.app,
-		r,
-		layouts.Options{
-			WebsiteSection: "Blog",
-			Title:          "Recent Posts",
-			Content:        hb.Wrap().HTML(controller.page(data)),
-			ScriptURLs: []string{
-				"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
-			},
-		}).ToHTML()
+	options := layouts.Options{
+		WebsiteSection: "Blog",
+		Title:          "Recent Posts",
+		Content:        hb.Wrap().HTML(controller.page(data)),
+		ScriptURLs: []string{
+			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
+		},
+	}
+
+	if controller.app.GetConfig().GetCmsStoreUsed() {
+		return layouts.NewCmsLayout(
+			controller.app,
+			r,
+			options).ToHTML()
+	} else {
+		return layouts.NewWebsiteLayout(
+			controller.app,
+			r,
+			options).ToHTML()
+	}
 }
 
 func (controller *blogController) page(data blogControllerData) string {

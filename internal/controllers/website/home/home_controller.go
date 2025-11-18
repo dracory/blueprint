@@ -19,10 +19,6 @@ type homeController struct {
 	app types.AppInterface
 }
 
-// type homeControllerData struct {
-// 	AuthUser userstore.UserInterface
-// }
-
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {

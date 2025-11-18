@@ -1,4 +1,4 @@
-package post_update
+package post_update_v1
 
 import (
 	"project/internal/controllers/admin/blog/shared"

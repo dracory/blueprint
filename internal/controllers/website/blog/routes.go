@@ -13,13 +13,12 @@ import (
 func Routes(
 	app types.AppInterface,
 ) []rtr.RouteInterface {
-	return []rtr.RouteInterface{
-		rtr.NewRoute().
-			SetName("Guest > Blog").
-			SetPath(links.BLOG).
-			SetHTMLHandler(home.NewBlogController(app).Handler),
-
-		rtr.NewRoute().
+	blogRoute := rtr.NewRoute().
+		SetName("Guest > Blog").
+		SetPath(links.BLOG).
+		SetHTMLHandler(NewBlogController(app).Handler)
+		
+	rtr.NewRoute().
 			SetName("Guest > Blog > Post with ID > Index").
 			SetPath(links.BLOG_POST_WITH_REGEX).
 			SetHTMLHandler(post.NewPostController(app).Handler),
@@ -29,14 +28,31 @@ func Routes(
 			SetPath(links.BLOG_POST_WITH_REGEX2).
 			SetHTMLHandler(post.NewPostController(app).Handler),
 
-		rtr.NewRoute().
-			SetName("Guest > Blog > Post with ID > Index").
-			SetPath(links.BLOG_POST_01).
-			SetHTMLHandler(post.NewPostController(app).Handler),
+	blogPost01Route := rtr.NewRoute().
+		SetName("Guest > Blog > Post (ID)").
+		SetPath(links.BLOG_01).
+		SetHTMLHandler(NewBlogPostController(app).Handler)
 
-		rtr.NewRoute().
-			SetName("Guest > Blog > Post with ID && Title > Index").
-			SetPath(links.BLOG_POST_02).
-			SetHTMLHandler(post.NewPostController(app).Handler),
+	blogPost02Route := rtr.NewRoute().
+		SetName("Guest > Blog > Post (ID && Title)").
+		SetPath(links.BLOG_02).
+		SetHTMLHandler(NewBlogPostController(app).Handler)
+
+	blogPost03Route := rtr.NewRoute().
+		SetName("Guest > Blog > Post (ID)").
+		SetPath(links.BLOG_POST_01).
+		SetHTMLHandler(NewBlogPostController(app).Handler)
+
+	blogPost04Route := rtr.NewRoute().
+		SetName("Guest > Blog > Post (ID && Title)").
+		SetPath(links.BLOG_POST_02).
+		SetHTMLHandler(NewBlogPostController(app).Handler)
+
+	return []rtr.RouteInterface{
+		blogRoute,
+		blogPost01Route,
+		blogPost02Route,
+		blogPost03Route,
+		blogPost04Route,
 	}
 }

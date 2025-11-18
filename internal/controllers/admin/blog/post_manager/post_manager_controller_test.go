@@ -52,12 +52,16 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Test Post 1")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	app.GetBlogStore().PostCreate(post1)
+	if err := app.GetBlogStore().PostCreate(post1); err != nil {
+		t.Fatalf("failed to create test post1: %v", err)
+	}
 
 	post2 := blogstore.NewPost()
 	post2.SetTitle("Test Post 2")
 	post2.SetStatus(blogstore.POST_STATUS_DRAFT)
-	app.GetBlogStore().PostCreate(post2)
+	if err := app.GetBlogStore().PostCreate(post2); err != nil {
+		t.Fatalf("failed to create test post2: %v", err)
+	}
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
@@ -86,12 +90,16 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Published Post")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	app.GetBlogStore().PostCreate(post1)
+	if err := app.GetBlogStore().PostCreate(post1); err != nil {
+		t.Fatalf("failed to create test post1: %v", err)
+	}
 
 	post2 := blogstore.NewPost()
 	post2.SetTitle("Draft Post")
 	post2.SetStatus(blogstore.POST_STATUS_DRAFT)
-	app.GetBlogStore().PostCreate(post2)
+	if err := app.GetBlogStore().PostCreate(post2); err != nil {
+		t.Fatalf("failed to create test post2: %v", err)
+	}
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
@@ -123,7 +131,9 @@ func TestManagerController_HandlesPagination(t *testing.T) {
 		post := blogstore.NewPost()
 		post.SetTitle("Post " + cast.ToString(i))
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-		app.GetBlogStore().PostCreate(post)
+		if err := app.GetBlogStore().PostCreate(post); err != nil {
+			t.Fatalf("failed to create test post %d: %v", i, err)
+		}
 	}
 
 	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)

@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"project/internal/controllers/admin/blog/blog_settings"
 	"project/internal/controllers/admin/blog/shared"
 	"project/pkg/blogai"
 
@@ -125,7 +124,7 @@ func (c *AiTitleGeneratorController) stepHandlerGenerateTitles(ctx context.Conte
 
 	existingTitles := data[dataKeyExistingTitles].([]string)
 
-	topic, err := c.loadBlogTopic(ctx)
+	blogTopic, err := c.loadBlogTopic(ctx)
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to load blog topic: %w", err)
 	}
@@ -136,7 +135,7 @@ func (c *AiTitleGeneratorController) stepHandlerGenerateTitles(ctx context.Conte
 	}
 
 	titleAgent := blogai.NewTitleGeneratorAgent()
-	titles, err := titleAgent.GenerateTitles(model, topic, existingTitles)
+	titles, err := titleAgent.GenerateTitles(model, blogTopic, existingTitles)
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to generate titles: %w", err)
 	}
@@ -148,17 +147,17 @@ func (c *AiTitleGeneratorController) stepHandlerGenerateTitles(ctx context.Conte
 func (c *AiTitleGeneratorController) loadBlogTopic(ctx context.Context) (string, error) {
 	store := c.app.GetSettingStore()
 	if store == nil {
-		return "", errors.New("Please set the blog topic in Blog Settings.")
+		return "", errors.New("setting store is not configured")
 	}
 
-	topic, err := store.Get(ctx, blog_settings.SettingKeyBlogTopic, "")
+	topic, err := store.Get(ctx, SETTING_KEY_BLOG_TOPIC, "")
 	if err != nil {
 		return "", fmt.Errorf("failed to read blog topic: %w", err)
 	}
 
 	topic = strings.TrimSpace(topic)
 	if topic == "" {
-		return "", errors.New("Please set the blog topic in Blog Settings.")
+		return "", errors.New("blog topic is empty")
 	}
 
 	return topic, nil

@@ -48,7 +48,9 @@ func (c *AiPostEditorController) onRegenerateSection(data pageData) string {
 		sectionData = data.BlogAiPost.Conclusion
 	default:
 		var sectionIndex int
-		fmt.Sscanf(section, "section_%d", &sectionIndex)
+		if _, err := fmt.Sscanf(section, "section_%d", &sectionIndex); err != nil {
+			return api.Error("Invalid section index format").ToString()
+		}
 		if sectionIndex >= 0 && sectionIndex < len(data.BlogAiPost.Sections) {
 			sectionData = data.BlogAiPost.Sections[sectionIndex]
 		} else {

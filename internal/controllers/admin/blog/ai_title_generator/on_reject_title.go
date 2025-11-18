@@ -17,15 +17,28 @@ func (c *AiTitleGeneratorController) onRejectTitle(r *http.Request) string {
 		return shared.ErrorPopup("Title ID is required").ToHTML()
 	}
 
-	record, err := c.app.GetCustomStore().RecordFindByID(titleID)
+	customStore := c.app.GetCustomStore()
+	if customStore == nil {
+		return shared.ErrorPopup("Custom store not configured").ToHTML()
+	}
+
+	record, err := customStore.RecordFindByID(titleID)
 	if err != nil {
 		return shared.ErrorPopup(fmt.Sprintf("Error finding title: %s", err.Error())).ToHTML()
 	}
 
-	record.SetPayloadMapKey("status", blogai.POST_STATUS_REJECTED)
-	record.SetPayloadMapKey("updated_at", carbon.Now().ToDateTimeString(carbon.UTC))
+	if record == nil {
+		return shared.ErrorPopup("Title not found").ToHTML()
+	}
 
-	if err := c.app.GetCustomStore().RecordUpdate(record); err != nil {
+	if err := record.SetPayloadMapKey("status", blogai.POST_STATUS_REJECTED); err != nil {
+		return shared.ErrorPopup(fmt.Sprintf("Error updating title status: %s", err.Error())).ToHTML()
+	}
+	if err := record.SetPayloadMapKey("updated_at", carbon.Now().ToDateTimeString(carbon.UTC)); err != nil {
+		return shared.ErrorPopup(fmt.Sprintf("Error updating title timestamp: %s", err.Error())).ToHTML()
+	}
+
+	if err := customStore.RecordUpdate(record); err != nil {
 		return shared.ErrorPopup(fmt.Sprintf("Error updating title: %s", err.Error())).ToHTML()
 	}
 
