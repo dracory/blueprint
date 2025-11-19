@@ -36,11 +36,20 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 
 	post, err := controller.app.GetBlogStore().PostFindByID(postID)
 	if err != nil {
-		controller.app.GetLogger().Error("postUpdateV2Controller: PostFindByID", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error(
+			"Error. postUpdateController: PostFindByID",
+			slog.String("error", err.Error()),
+			slog.String("post_id", postID),
+		)
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 
 	if post == nil {
+		controller.app.GetLogger().Warn(
+			"Warning. postUpdateController: PostFindByID",
+			slog.String("error", "Post not found"),
+			slog.String("post_id", postID),
+		)
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 

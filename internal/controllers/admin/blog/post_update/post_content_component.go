@@ -143,144 +143,46 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 }
 
 func (c *postContentComponent) Render(ctx context.Context) hb.TagInterface {
-	frm := form.NewForm(form.FormOptions{
-		ID: "FormPostUpdateContent",
-	})
 
 	// Determine editor type from loaded post
 	editor := lo.IfF(c.Post != nil, func() string { return c.Post.Editor() }).Else("")
 
-	// Base content field
-	fieldContent := form.NewField(form.FieldOptions{
-		Label:   "Content",
-		Name:    "post_content",
-		Type:    form.FORM_FIELD_TYPE_TEXTAREA,
-		Value:   c.FormContent,
-		Help:    "The content of this blog post to display on the post details page.",
-		Options: []form.FieldOption{},
+	fieldTitle := form.NewField(form.FieldOptions{
+		Label: "Title",
+		Name:  "post_title",
+		Type:  form.FORM_FIELD_TYPE_STRING,
+		Value: c.FormTitle,
+		Help:  "The title of this blog as will be seen everywhere",
 	})
 
-	// HTML Area (Trumbowyg configuration)
-	if editor == blogstore.POST_EDITOR_HTMLAREA {
-		htmlAreaFieldOptions := []form.FieldOption{
-			{
-				Key: "config",
-				Value: `{
-	btns: [
-		['viewHTML'],
-		['undo', 'redo'],
-		['formatting'],
-		['strong', 'em', 'del'],
-		['superscript', 'subscript'],
-		['link','justifyLeft','justifyRight','justifyCenter','justifyFull'],
-		['unorderedList', 'orderedList'],
-		['insertImage'],
-		['removeformat'],
-		['horizontalRule'],
-		['fullscreen'],
-	],
-	autogrow: true,
-	removeformatPasted: true,
-	tagsToRemove: ['script', 'link', 'embed', 'iframe', 'input'],
-	tagsToKeep: ['hr', 'img', 'i'],
-	autogrowOnEnter: true,
-	linkTargets: ['_blank'],
-	}`,
-			},
-		}
-		fieldContent.Type = form.FORM_FIELD_TYPE_HTMLAREA
-		fieldContent.Options = htmlAreaFieldOptions
-	}
+	fieldSummary := form.NewField(form.FieldOptions{
+		Label: "Summary",
+		Name:  "post_summary",
+		Type:  form.FORM_FIELD_TYPE_STRING,
+		Value: c.FormSummary,
+		Help:  "A short summary of this blog post to display on the post listing page.",
+	})
 
-	// BlockEditor
-	if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
-		value := fieldContent.Value
-		if value == "" {
-			value = `[]`
-		}
+	fieldPostID := form.NewField(form.FieldOptions{
+		Label:    "Post ID",
+		Name:     "post_id",
+		Type:     form.FORM_FIELD_TYPE_HIDDEN,
+		Value:    c.PostID,
+		Readonly: true,
+	})
 
-		be, err := blockeditor.NewEditor(blockeditor.NewEditorOptions{
-			Name:  fieldContent.Name,
-			Value: value,
-			HandleEndpoint: shared.NewLinks().PostUpdate(map[string]string{
-				"post_id": c.PostID,
-				"action":  "blockeditor_handle",
-			}),
-			BlockDefinitions: blogblocks.BlockEditorDefinitions(),
-		})
-		if err == nil {
-			fieldContent.Type = form.FORM_FIELD_TYPE_BLOCKEDITOR
-			fieldContent.CustomInput = be
-		}
-	}
+	fieldContent := c.fieldContent(editor)
 
-	fields := []form.FieldInterface{
-		form.NewField(form.FieldOptions{
-			Label: "Title",
-			Name:  "post_title",
-			Type:  form.FORM_FIELD_TYPE_STRING,
-			Value: c.FormTitle,
-			Help:  "The title of this blog as will be seen everywhere",
-		}),
-		form.NewField(form.FieldOptions{
-			Label: "Summary",
-			Name:  "post_summary",
-			Type:  form.FORM_FIELD_TYPE_STRING,
-			Value: c.FormSummary,
-			Help:  "A short summary of this blog post to display on the post listing page.",
-		}),
-		fieldContent,
-		form.NewField(form.FieldOptions{
-			Label:    "Post ID",
-			Name:     "post_id",
-			Type:     form.FORM_FIELD_TYPE_HIDDEN,
-			Value:    c.PostID,
-			Readonly: true,
-		}),
-	}
+	fields := []form.FieldInterface{}
+	fields = append(fields, fieldTitle)
+	fields = append(fields, fieldSummary)
+	fields = append(fields, fieldContent...)
+	fields = append(fields, fieldPostID)
 
-	// BlockArea script
-	if editor == blogstore.POST_EDITOR_BLOCKAREA {
-		contentScript := hb.Script(`
-setTimeout(() => {
-	const textArea = document.querySelector('textarea[name="post_content"]');
-	if (!textArea) return;
-	const blockArea = new BlockArea(textArea.id);
-	blockArea.setParentId('` + c.PostID + `');
-	blockArea.registerBlock(BlockAreaHeading);
-	blockArea.registerBlock(BlockAreaText);
-	blockArea.registerBlock(BlockAreaImage);
-	blockArea.registerBlock(BlockAreaCode);
-	blockArea.registerBlock(BlockAreaRawHtml);
-	blockArea.init();
-}, 2000)
-		`).
-			ToHTML()
-
-		fields = append(fields, form.NewField(form.FieldOptions{
-			Type:  form.FORM_FIELD_TYPE_RAW,
-			Value: contentScript,
-		}))
-	}
-
-	// Markdown script
-	if editor == blogstore.POST_EDITOR_MARKDOWN {
-		contentScript := hb.Script(`
-setTimeout(() => {
-	const textArea = document.querySelector('textarea[name="post_content"]');
-	if (!textArea) return;
-	textArea.style.height = '300px';
-}, 2000)
-		`).
-			ToHTML()
-
-		fields = append(fields, form.NewField(form.FieldOptions{
-			Type:  form.FORM_FIELD_TYPE_RAW,
-			Value: contentScript,
-		}))
-	}
-
-	frm.SetFields(fields)
+	frm := form.NewForm(form.FormOptions{
+		ID:     "FormPostUpdateContent",
+		Fields: fields,
+	})
 
 	if c.FormErrorMessage != "" {
 		frm.AddField(form.NewField(form.FieldOptions{
@@ -336,4 +238,204 @@ func init() {
 	if err := liveflux.Register(&postContentComponent{}); err != nil {
 		log.Printf("Failed to register postContentComponent: %v", err)
 	}
+}
+
+func (c *postContentComponent) fieldContent(editor string) []form.FieldInterface {
+	fields := []form.FieldInterface{}
+
+	fieldContent := form.NewField(form.FieldOptions{
+		Label:   "Content",
+		Name:    "post_content",
+		Type:    form.FORM_FIELD_TYPE_TEXTAREA,
+		Value:   c.FormContent,
+		Help:    "The content of this blog post to display on the post details page.",
+		Options: []form.FieldOption{},
+	})
+
+	fields = append(fields, fieldContent)
+
+	// HTML Area (Trumbowyg configuration)
+	if editor == blogstore.POST_EDITOR_HTMLAREA {
+		htmlAreaFieldOptions := []form.FieldOption{
+			{
+				Key: "config",
+				Value: `{
+	btns: [
+		['viewHTML'],
+		['undo', 'redo'],
+		['formatting'],
+		['strong', 'em', 'del'],
+		['superscript', 'subscript'],
+		['link','justifyLeft','justifyRight','justifyCenter','justifyFull'],
+		['unorderedList', 'orderedList'],
+		['insertImage'],
+		['removeformat'],
+		['horizontalRule'],
+		['fullscreen'],
+	],
+	autogrow: true,
+	removeformatPasted: true,
+	tagsToRemove: ['script', 'link', 'embed', 'iframe', 'input'],
+	tagsToKeep: ['hr', 'img', 'i'],
+	autogrowOnEnter: true,
+	linkTargets: ['_blank'],
+	}`,
+			},
+		}
+		fieldContent.Type = form.FORM_FIELD_TYPE_HTMLAREA
+		fieldContent.Options = htmlAreaFieldOptions
+	}
+
+	// BlockEditor
+	if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
+		value := fieldContent.Value
+		if value == "" {
+			value = `[]`
+		}
+
+		be, err := blockeditor.NewEditor(blockeditor.NewEditorOptions{
+			Name:  fieldContent.Name,
+			Value: value,
+			HandleEndpoint: shared.NewLinks().PostUpdate(map[string]string{
+				"post_id": c.PostID,
+				"action":  "blockeditor_handle",
+			}),
+			BlockDefinitions: blogblocks.BlockEditorDefinitions(),
+		})
+		if err == nil {
+			fieldContent.Type = form.FORM_FIELD_TYPE_BLOCKEDITOR
+			fieldContent.CustomInput = be
+		}
+	}
+
+	// BlockArea script
+	if editor == blogstore.POST_EDITOR_BLOCKAREA {
+		contentScript := hb.Script(scriptBlockArea(c.PostID)).ToHTML()
+
+		fields = append(fields, form.NewField(form.FieldOptions{
+			Type:  form.FORM_FIELD_TYPE_RAW,
+			Value: contentScript,
+		}))
+	}
+
+	// Markdown script (plain textarea with auto-resize)
+	if editor == blogstore.POST_EDITOR_MARKDOWN {
+		contentScript := hb.Script(scriptMarkdownTextarea()).ToHTML()
+
+		fields = append(fields, form.NewField(form.FieldOptions{
+			Type:  form.FORM_FIELD_TYPE_RAW,
+			Value: contentScript,
+		}))
+	}
+
+	// Markdown (EasyMDE) script
+	if editor == PostEditorMarkdownEasyMDE {
+		contentScript := hb.Script(scriptMarkdownEasyMDE()).ToHTML()
+
+		fields = append(fields, form.NewField(form.FieldOptions{
+			Type:  form.FORM_FIELD_TYPE_RAW,
+			Value: contentScript,
+		}))
+	}
+
+	return fields
+}
+
+func scriptBlockArea(postID string) string {
+	return `
+setTimeout(() => {
+	const textArea = document.querySelector('textarea[name="post_content"]');
+	if (!textArea) return;
+	const blockArea = new BlockArea(textArea.id);
+	blockArea.setParentId('` + postID + `');
+	blockArea.registerBlock(BlockAreaHeading);
+	blockArea.registerBlock(BlockAreaText);
+	blockArea.registerBlock(BlockAreaImage);
+	blockArea.registerBlock(BlockAreaCode);
+	blockArea.registerBlock(BlockAreaRawHtml);
+	blockArea.init();
+}, 2000)
+`
+}
+
+func scriptMarkdownTextarea() string {
+	return `
+setTimeout(() => {
+	const textArea = document.querySelector('textarea[name="post_content"]');
+	if (!textArea) return;
+
+	const autoResize = () => {
+		textArea.style.height = 'auto';
+		textArea.style.height = textArea.scrollHeight + 'px';
+	};
+
+	autoResize();
+	textArea.addEventListener('input', autoResize);
+}, 2000)
+`
+}
+
+func scriptMarkdownEasyMDE() string {
+	return `
+setTimeout(() => {
+	const textArea = document.querySelector('textarea[name="post_content"]');
+	if (!textArea) return;
+
+	// Ensure EasyMDE CSS is loaded
+	const ensureCss = () => {
+		const existing = document.querySelector('link[data-easymde-css="1"]');
+		if (existing) return;
+		const link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.href = 'https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css';
+		link.setAttribute('data-easymde-css', '1');
+		document.head.appendChild(link);
+	};
+
+	// Ensure EasyMDE JS is loaded
+	const ensureJs = (callback) => {
+		if (window.EasyMDE) {
+			callback();
+			return;
+		}
+
+		let script = document.querySelector('script[data-easymde-js="1"]');
+		if (!script) {
+			script = document.createElement('script');
+			script.src = 'https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js';
+			script.setAttribute('data-easymde-js', '1');
+			document.body.appendChild(script);
+		}
+
+		script.addEventListener('load', () => callback(), { once: true });
+	};
+
+	ensureCss();
+	ensureJs(() => {
+		if (!window.EasyMDE) return;
+		// Avoid re-initializing if already attached
+		if (textArea._easyMDEInstance) return;
+		const easyMDE = new EasyMDE({
+			// Bind directly to the textarea used by the form
+			element: textArea,
+		});
+		textArea._easyMDEInstance = easyMDE;
+
+		// Keep textarea value in sync with EasyMDE content
+		const form = textArea.closest('form');
+		const syncToTextarea = () => {
+			if (!textArea._easyMDEInstance) return;
+			textArea.value = textArea._easyMDEInstance.value();
+		};
+
+		// Sync on editor changes
+		easyMDE.codemirror.on('change', syncToTextarea);
+
+		// Ensure sync right before form submit
+		if (form) {
+			form.addEventListener('submit', syncToTextarea);
+		}
+	});
+}, 500)
+	`
 }

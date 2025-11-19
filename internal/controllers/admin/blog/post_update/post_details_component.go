@@ -260,6 +260,7 @@ func (c *postDetailsComponent) Render(ctx context.Context) hb.TagInterface {
 				{Key: blogstore.POST_EDITOR_BLOCKAREA, Value: "BlockArea"},
 				{Key: blogstore.POST_EDITOR_BLOCKEDITOR, Value: "BlockEditor"},
 				{Key: blogstore.POST_EDITOR_MARKDOWN, Value: "Markdown"},
+				{Key: PostEditorMarkdownEasyMDE, Value: "Markdown (EasyMDE)"},
 				{Key: blogstore.POST_EDITOR_HTMLAREA, Value: "HTML Area (WYSIWYG)"},
 				{Key: blogstore.POST_EDITOR_TEXTAREA, Value: "Text Area"},
 			},
