@@ -23,6 +23,9 @@ func TestNewPostRecommendationsComponent(t *testing.T) {
 func TestPostRecommendationsComponent_GetKind(t *testing.T) {
 	app := testutils.Setup()
 	component := NewPostRecommendationsComponent(app)
+	if component == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
 
 	kind := component.GetKind()
 	expected := "blog_post_recommendations"
@@ -46,7 +49,11 @@ func TestPostRecommendationsComponent_Mount_NoApp(t *testing.T) {
 
 func TestPostRecommendationsComponent_Mount_NoStore(t *testing.T) {
 	app := testutils.Setup() // No blog store enabled
-	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
+	componentAny := NewPostRecommendationsComponent(app)
+	if componentAny == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
+	component := componentAny.(*postRecommendationsComponent)
 
 	err := component.Mount(context.Background(), map[string]string{"post_id": "123"})
 	if err != nil {
@@ -61,6 +68,9 @@ func TestPostRecommendationsComponent_Mount_NoStore(t *testing.T) {
 func TestPostRecommendationsComponent_Mount_StoreError(t *testing.T) {
 	app := testutils.Setup(testutils.WithBlogStore(true))
 	component := NewPostRecommendationsComponent(app)
+	if component == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
 
 	// Simulate store error by not creating any posts (store might return error for empty results)
 	// This test verifies error handling in the Mount method
@@ -140,6 +150,9 @@ func TestPostRecommendationsComponent_Render_Error(t *testing.T) {
 func TestPostRecommendationsComponent_Render_NoPosts(t *testing.T) {
 	app := testutils.Setup()
 	component := NewPostRecommendationsComponent(app)
+	if component == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
 
 	// Mount without any posts
 	err := component.Mount(context.Background(), map[string]string{"post_id": "nonexistent"})
@@ -222,6 +235,9 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 func TestPostRecommendationsComponent_Handle(t *testing.T) {
 	app := testutils.Setup()
 	component := NewPostRecommendationsComponent(app)
+	if component == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
 
 	err := component.Handle(context.Background(), "test", nil)
 	// Handle method does nothing, so should not error
@@ -232,7 +248,11 @@ func TestPostRecommendationsComponent_Handle(t *testing.T) {
 
 func TestPostRecommendationsComponent_PostCard(t *testing.T) {
 	app := testutils.Setup()
-	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
+	componentAny := NewPostRecommendationsComponent(app)
+	if componentAny == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
+	component := componentAny.(*postRecommendationsComponent)
 
 	post := blogstore.NewPost()
 	post.SetID("test-post")
@@ -283,7 +303,11 @@ func TestPostRecommendationsComponent_PostCard(t *testing.T) {
 
 func TestPostRecommendationsComponent_TruncatedSummary(t *testing.T) {
 	app := testutils.Setup()
-	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
+	componentAny := NewPostRecommendationsComponent(app)
+	if componentAny == nil {
+		t.Fatal("Expected component to be created, got nil")
+	}
+	component := componentAny.(*postRecommendationsComponent)
 
 	tests := []struct {
 		input    string
