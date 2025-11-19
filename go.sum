@@ -134,8 +134,8 @@ github.com/dracory/liveflux v0.21.0 h1:qSvE72qH+E78jGHqPKPF+3epevs7z1sDjAE5kTJ2S
 github.com/dracory/liveflux v0.21.0/go.mod h1:pgR6ytdAU1FiEXmOUoFYZzh2W/RQllTxUTajpjc0mw8=
 github.com/dracory/llm v1.0.0 h1:GJllce3+thBJkO1tNDz4GpRhxssZRh06zEpcmVMN/Dg=
 github.com/dracory/llm v1.0.0/go.mod h1:XoEII96AyEM/OwF/fme8OEwxxOVYI6qTbzLZpUEu+bk=
-github.com/dracory/logstore v1.9.0 h1:Plg3Fn5HgmKi417NlNzLVt9s/VE24fSvUlqXRUeqB0s=
-github.com/dracory/logstore v1.9.0/go.mod h1:s5hyUT03ul3qQF2hfyXW/Vn1EMQU1ILi1JO2spOBpLY=
+github.com/dracory/logstore v1.11.0 h1:j0XaNsFpeslvlW1iUnLcNcWhByRmZQ/y7nYfYMIAzks=
+github.com/dracory/logstore v1.11.0/go.mod h1:s5hyUT03ul3qQF2hfyXW/Vn1EMQU1ILi1JO2spOBpLY=
 github.com/dracory/metastore v1.3.0 h1:2rf7LG37t7FzamAeD9yfMy4PLVhIoT4GjGvoqwG28gM=
 github.com/dracory/metastore v1.3.0/go.mod h1:iP80shi1HVevDrvkBPDQ/dNLuDM3Id9TxOvdP3Pdd5A=
 github.com/dracory/req v0.1.0 h1:5mKYnPiCUJG/JQlE/9nxk3OSH+rs8tr45ngg0LwDXsY=

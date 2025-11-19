@@ -108,17 +108,20 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		//scripts = append(scripts, helpers.GoogleTagInitScript(), helpers.GoogleConversionScript())
 	}
 
-	return layouts.NewBlankLayout(layouts.Options{
-		Title: "Register",
-		// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
-		Content: controller.pageHTML(data),
-		ScriptURLs: scriptURLs,
-		Scripts:   scripts,
-		StyleURLs: []string{cdn.BootstrapIconsCss_1_11_3()},
-		Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
+	return layouts.NewBlankLayout(
+		controller.app,
+		r,
+		layouts.Options{
+			Title: "Register",
+			// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
+			Content:    controller.pageHTML(data),
+			ScriptURLs: scriptURLs,
+			Scripts:    scripts,
+			StyleURLs:  []string{cdn.BootstrapIconsCss_1_11_3()},
+			Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
 		@media (min-width: 576px) {.container.container-xs {max-width: 520px;}}
 		body{background:rgba(128,0,128,0.05);}`,
-		`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
+				`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
 		#CardRegister .card-header{padding:24px;border-bottom:1px solid rgba(0,0,0,0.05);background:#f8f9ff;}
 		#CardRegister .card-header h3{font-size:14px;font-weight:600;letter-spacing:0.08em;color:#4b4b63;text-transform:uppercase;}
 		#CardRegister .card-body{padding:32px;}
@@ -128,7 +131,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		#CardRegister .form-control,#CardRegister .form-select{border-radius:14px;border-color:rgba(111,108,212,0.4);padding:12px 15px;transition:box-shadow 0.2s ease,border-color 0.2s ease;}
 		#CardRegister .form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%234e73df' d='M4.646 6.146a.5.5 0 0 1 .708 0L8 8.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:14px;}
 		#CardRegister .form-control:focus{box-shadow:0 0 0 0.25rem rgba(78,115,223,0.2);border-color:#4e73df;}`},
-	}).ToHTML()
+		}).ToHTML()
 }
 
 // == PRIVATE METHODS =========================================================

@@ -91,7 +91,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 			r,
 			options).ToHTML()
 	} else {
-		return layouts.NewWebsiteLayout(
+		return layouts.NewBlankLayout(
 			c.app,
 			r,
 			options).ToHTML()

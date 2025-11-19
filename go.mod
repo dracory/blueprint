@@ -39,7 +39,7 @@ require (
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.21.0
 	github.com/dracory/llm v1.0.0
-	github.com/dracory/logstore v1.9.0
+	github.com/dracory/logstore v1.11.0
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.1.0

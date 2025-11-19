@@ -57,7 +57,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 			r,
 			options).ToHTML()
 	} else {
-		return layouts.NewWebsiteLayout(
+		return layouts.NewBlankLayout(
 			controller.app,
 			r,
 			options).ToHTML()
