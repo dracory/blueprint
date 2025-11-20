@@ -9,6 +9,8 @@ import (
 	"project/internal/controllers/admin/blog/shared"
 	"project/internal/types"
 
+	livefluxctl "project/internal/controllers/liveflux"
+
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
 )
@@ -47,8 +49,9 @@ func (c *titleGeneratorSettingsModal) GetKind() string {
 
 func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[string]string) error {
 	if c.App == nil {
-		c.FormErrorMessage = "Application not initialized"
-		return nil
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+			c.App = app
+		}
 	}
 
 	c.ReturnURL = strings.TrimSpace(params["return_url"])

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log/slog"
 	"net/http"
+	"project/internal/controllers/admin/blog/post_update"
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
@@ -158,9 +159,12 @@ func (c *postController) css() string {
 }
 
 func (controller *postController) processContent(content string, editor string) (html string, css string) {
+	// blockarea
 	if editor == blogstore.POST_EDITOR_BLOCKAREA {
 		return helpers.BlogPostBlocksToString(content), ""
 	}
+
+	// blockeditor
 	if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
 		theme, err := blogtheme.New(content)
 
@@ -170,7 +174,14 @@ func (controller *postController) processContent(content string, editor string) 
 
 		return theme.ToHtml(), theme.Style()
 	}
+
+	// markdown
 	if editor == blogstore.POST_EDITOR_MARKDOWN {
+		return controller.markdownToHtml(content), ""
+	}
+
+	// markdown easy mde
+	if editor == post_update.PostEditorMarkdownEasyMDE {
 		return controller.markdownToHtml(content), ""
 	}
 

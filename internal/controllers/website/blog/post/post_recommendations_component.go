@@ -16,6 +16,8 @@ import (
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
+
+	livefluxctl "project/internal/controllers/liveflux"
 )
 
 const (
@@ -53,8 +55,8 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 	c.CurrentPostID = strings.TrimSpace(params["post_id"])
 
 	if c.App == nil {
-		if appCtx, ok := ctx.Value("app").(types.AppInterface); ok {
-			c.App = appCtx
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+			c.App = app
 		}
 	}
 

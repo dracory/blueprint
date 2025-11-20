@@ -4,6 +4,7 @@ import (
 	adminBlog "project/internal/controllers/admin/blog"
 	adminCms "project/internal/controllers/admin/cms"
 	adminFiles "project/internal/controllers/admin/files"
+	adminLogs "project/internal/controllers/admin/logs"
 	adminMedia "project/internal/controllers/admin/media"
 	adminShop "project/internal/controllers/admin/shop"
 	adminStats "project/internal/controllers/admin/stats"
@@ -32,6 +33,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	adminRoutes = append(adminRoutes, adminBlog.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminCms.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminFiles.Routes(app)...)
+	adminRoutes = append(adminRoutes, adminLogs.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminMedia.Routes(app)...)
 	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(app)...)
 	adminRoutes = append(adminRoutes, adminStats.Routes(app)...)
@@ -42,7 +44,9 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 
 	// Apply middlewares to all admin routes
 	for _, route := range adminRoutes {
-		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{middlewares.NewAdminMiddleware(app)})
+		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
+			middlewares.NewAdminMiddleware(app),
+		})
 	}
 
 	return adminRoutes

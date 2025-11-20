@@ -201,6 +201,12 @@ func (c *homeController) tiles() []hb.TagInterface {
 		"link":  links.Admin().Tasks(map[string]string{}),
 	}
 
+	logsTile := map[string]string{
+		"title": "Log Manager",
+		"icon":  "bi-clipboard-data",
+		"link":  links.Admin().Logs(map[string]string{}),
+	}
+
 	visitStatsTile := map[string]string{
 		"title": "Visit Stats",
 		"icon":  "bi-graph-up",
@@ -239,6 +245,10 @@ func (c *homeController) tiles() []hb.TagInterface {
 
 	if c.app.GetConfig().GetStatsStoreUsed() {
 		tiles = append(tiles, visitStatsTile)
+	}
+
+	if c.app.GetConfig().GetLogStoreUsed() {
+		tiles = append(tiles, logsTile)
 	}
 
 	cards := lo.Map(tiles, func(tile map[string]string, index int) hb.TagInterface {
