@@ -69,9 +69,9 @@ func (handler *emailToAdminTask) Description() string {
 //   - html: The HTML content of the email to send
 //
 // Returns:
-//   - taskstore.QueueInterface: The enqueued task
+//   - taskstore.TaskQueueInterface: The enqueued task
 //   - error: Any error that occurred during enqueueing
-func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.QueueInterface, err error) {
+func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueInterface, err error) {
 	// Validate task store is initialized
 	if handler.app == nil || handler.app.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")

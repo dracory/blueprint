@@ -37,12 +37,12 @@ require (
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.15.0
 	github.com/dracory/hb v1.88.0
-	github.com/dracory/liveflux v0.21.0
+	github.com/dracory/liveflux v0.22.0
 	github.com/dracory/llm v1.0.0
 	github.com/dracory/logstore v1.11.0
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.1.0
+	github.com/dracory/rtr v1.2.0
 	github.com/dracory/sb v0.12.0
 	github.com/dracory/sessionstore v1.5.2
 	github.com/dracory/settingstore v1.3.0
@@ -50,7 +50,7 @@ require (
 	github.com/dracory/statsstore v0.9.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.5.0
-	github.com/dracory/taskstore v1.8.1
+	github.com/dracory/taskstore v1.11.2
 	github.com/dracory/test v0.6.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.8.0
@@ -76,7 +76,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.7.13
-	modernc.org/sqlite v1.40.0
+	modernc.org/sqlite v1.40.1
 )
 
 require (
@@ -89,17 +89,17 @@ require (
 	cloud.google.com/go/longrunning v0.7.0 // indirect
 	cloud.google.com/go/vertexai v0.15.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.39.6 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.40.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.18.24 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.13 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.13 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.13 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.19.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.14 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.14 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.13 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.13 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.90.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.14 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.91.1 // indirect
 	github.com/aws/smithy-go v1.23.2 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
@@ -127,7 +127,7 @@ require (
 	github.com/gouniverse/base v0.9.0 // indirect
 	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.7.1 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.7.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
@@ -154,11 +154,11 @@ require (
 	golang.org/x/term v0.37.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.256.0 // indirect
-	google.golang.org/genai v1.35.0 // indirect
+	google.golang.org/genai v1.36.0 // indirect
 	google.golang.org/genproto v0.0.0-20251111163417-95abcf5c77ba // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba // indirect
-	google.golang.org/grpc v1.76.0 // indirect
+	google.golang.org/grpc v1.77.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

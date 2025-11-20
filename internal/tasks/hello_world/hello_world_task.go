@@ -32,7 +32,7 @@ func (handler *helloWorldTask) Description() string {
 	return "Say hello world"
 }
 
-func (handler *helloWorldTask) Enqueue() (task taskstore.QueueInterface, err error) {
+func (handler *helloWorldTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 	if handler.app == nil {
 		return nil, errors.New("app is nil")
 	}

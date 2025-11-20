@@ -41,7 +41,7 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Description() s
 	return "Sends a notification email to admin when a new contact form is submitted"
 }
 
-func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task taskstore.QueueInterface, err error) {
+func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 	if handler.app == nil {
 		return nil, errors.New("app is nil")
 	}

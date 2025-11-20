@@ -42,7 +42,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Description() string 
 	return "When a new user is registered to the application an email should be sent to the admin"
 }
 
-func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string) (task taskstore.QueueInterface, err error) {
+func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string) (task taskstore.TaskQueueInterface, err error) {
 	if handler.app == nil || handler.app.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")
 	}

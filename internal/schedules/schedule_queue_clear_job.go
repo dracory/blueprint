@@ -23,7 +23,7 @@ func queueClearJob(app types.AppInterface) {
 
 	alias := tasksStats.NewStatsVisitorEnhanceTask(app).Alias()
 
-	task, err := app.GetTaskStore().TaskFindByAlias(alias)
+	taskDefinition, err := app.GetTaskStore().TaskDefinitionFindByAlias(alias)
 
 	if err != nil {
 		app.GetLogger().Error("QueueClearJob > Failed to find task",
@@ -32,15 +32,15 @@ func queueClearJob(app types.AppInterface) {
 		return
 	}
 
-	if task == nil {
+	if taskDefinition == nil {
 		app.GetLogger().Error("QueueClearJob > StatsVisitorEnhanceTask task not found.")
 		return
 	}
 
 	// Find all queued tasks by alias
-	queuedTasks, err := app.GetTaskStore().QueueList(taskstore.QueueQuery().
-		SetTaskID(task.ID()).
-		SetStatus(taskstore.QueueStatusSuccess))
+	queuedTasks, err := app.GetTaskStore().TaskQueueList(taskstore.TaskQueueQuery().
+		SetTaskID(taskDefinition.ID()).
+		SetStatus(taskstore.TaskQueueStatusSuccess))
 
 	if err != nil {
 		app.GetLogger().Error("QueueClearJob > Failed to list queued tasks",
@@ -50,7 +50,7 @@ func queueClearJob(app types.AppInterface) {
 	}
 
 	for _, queuedTask := range queuedTasks {
-		err := app.GetTaskStore().QueueDelete(queuedTask)
+		err := app.GetTaskStore().TaskQueueDelete(queuedTask)
 		if err != nil {
 			app.GetLogger().Error("QueueClearJob > Failed to delete queued task",
 				slog.String("alias", alias),

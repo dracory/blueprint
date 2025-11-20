@@ -58,11 +58,11 @@ var _ taskstore.TaskHandlerInterface = (*statsVisitorEnhanceTask)(nil) // verify
 
 // == PUBLIC METHODS ==========================================================
 
-func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.QueueInterface, error) {
+func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.TaskQueueInterface, error) {
 	if t.app == nil || t.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return t.app.GetTaskStore().TaskEnqueueByAlias(t.Alias(), map[string]interface{}{})
+	return t.app.GetTaskStore().TaskEnqueueByAlias(t.Alias(), map[string]any{})
 }
 
 func (t *statsVisitorEnhanceTask) Alias() string {

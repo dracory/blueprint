@@ -34,7 +34,7 @@ func (t *cleanUpTask) Description() string {
 	return "Clean up the database"
 }
 
-func (t *cleanUpTask) Enqueue() (task taskstore.QueueInterface, err error) {
+func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 	if t.app == nil {
 		return nil, errors.New("app is nil")
 	}
@@ -67,8 +67,8 @@ func (t *cleanUpTask) Handle() bool {
 
 	purgeSince := carbon.Now(carbon.UTC).SubMinutes(30).ToDateTimeString()
 
-	purgeTasks, err := t.app.GetTaskStore().QueueList(taskstore.QueueQuery().
-		SetStatus(taskstore.QueueStatusSuccess).
+	purgeTasks, err := t.app.GetTaskStore().TaskQueueList(taskstore.TaskQueueQuery().
+		SetStatus(taskstore.TaskQueueStatusSuccess).
 		SetCreatedAtLte(purgeSince))
 
 	if err != nil {
@@ -79,7 +79,7 @@ func (t *cleanUpTask) Handle() bool {
 	t.LogInfo("Purging " + cast.ToString(len(purgeTasks)) + " tasks older than " + purgeSince + " ...")
 
 	for _, purgeTask := range purgeTasks {
-		err := t.app.GetTaskStore().QueueDeleteByID(purgeTask.ID())
+		err := t.app.GetTaskStore().TaskQueueDeleteByID(purgeTask.ID())
 
 		if err != nil {
 			t.LogError("Error purging task: " + err.Error())

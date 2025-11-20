@@ -34,7 +34,7 @@ func ExecuteJob(app types.AppInterface, args []string) {
 		return
 	}
 
-	queuedTask, err := app.GetTaskStore().QueueFindByID(queuedTaskID)
+	queuedTask, err := app.GetTaskStore().TaskQueueFindByID(queuedTaskID)
 
 	if err != nil {
 		log.Println("Task not found: ", queuedTaskID)
@@ -46,12 +46,12 @@ func ExecuteJob(app types.AppInterface, args []string) {
 		return
 	}
 
-	if queuedTask.Status() == taskstore.QueueStatusRunning {
+	if queuedTask.Status() == taskstore.TaskQueueStatusRunning {
 		log.Println("Task is currently running: ", queuedTaskID, "Aborted")
 		return
 	}
 
-	if force != "yes" && queuedTask.Status() != taskstore.QueueStatusQueued {
+	if force != "yes" && queuedTask.Status() != taskstore.TaskQueueStatusQueued {
 		log.Println("Task is not queued: ", queuedTaskID, " . You can use the --force=yes option to force the execution of the job. Aborted")
 		return
 	}

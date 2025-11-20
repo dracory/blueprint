@@ -72,7 +72,7 @@ func (task *blindIndexRebuildTask) Description() string {
 	return "Truncates a blind index table, and repopulates it with the current data"
 }
 
-func (task *blindIndexRebuildTask) Enqueue(index string) (queuedTask taskstore.QueueInterface, err error) {
+func (task *blindIndexRebuildTask) Enqueue(index string) (queuedTask taskstore.TaskQueueInterface, err error) {
 	if task.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}

@@ -186,7 +186,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 
 	if ts := app.GetTaskStore(); ts != nil {
 		group.Go(func(ctx context.Context) {
-			ts.QueueRunGoroutine(ctx, 10, 2)
+			ts.QueueRunDefault(ctx, 10, 2)
 		})
 	}
 	if cs := app.GetCacheStore(); cs != nil {
