@@ -1,11 +1,13 @@
 package testimonials
 
 import (
+	"context"
+
 	"github.com/dracory/entitystore"
 )
 
 func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
-	result, err := store.EntityList(entitystore.EntityQueryOptions{
+	result, err := store.EntityList(context.Background(), entitystore.EntityQueryOptions{
 		EntityType: "testimonial",
 	})
 

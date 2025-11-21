@@ -29,7 +29,7 @@ require (
 	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/database v0.5.0
 	github.com/dracory/dataobject v1.6.0
-	github.com/dracory/entitystore v1.1.0
+	github.com/dracory/entitystore v1.2.0
 	github.com/dracory/env v1.0.0
 	github.com/dracory/envenc v1.1.0
 	github.com/dracory/feedstore v0.6.0

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -36,7 +37,7 @@ func entityStoreMigrate(app types.AppInterface) error {
 		return errors.New("entity store is not initialized")
 	}
 
-	if err := app.GetEntityStore().AutoMigrate(); err != nil {
+	if err := app.GetEntityStore().AutoMigrate(context.Background()); err != nil {
 		return err
 	}
 
