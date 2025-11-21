@@ -77,9 +77,14 @@ func (task *blindIndexRebuildTask) Enqueue(index string) (queuedTask taskstore.T
 		return nil, errors.New("task store is nil")
 	}
 
-	return task.app.GetTaskStore().TaskEnqueueByAlias(task.Alias(), map[string]any{
-		"index": index,
-	})
+	return task.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		taskstore.DefaultQueueName,
+		task.Alias(),
+		map[string]any{
+			"index": index,
+		},
+	)
 }
 
 func (task *blindIndexRebuildTask) Handle() bool {

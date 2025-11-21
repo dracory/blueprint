@@ -21,6 +21,7 @@ package email_test
 // =================================================================
 
 import (
+	"context"
 	"errors"
 	"project/internal/emails"
 	"project/internal/types"
@@ -91,10 +92,15 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Task
 	}
 
 	// Enqueue task with the provided HTML content
-	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{
-		"to":   toEmail,
-		"html": html,
-	})
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		handler.Alias(),
+		taskstore.DefaultQueueName,
+		map[string]any{
+			"to":   toEmail,
+			"html": html,
+		},
+	)
 }
 
 // Handle processes the email task by either:

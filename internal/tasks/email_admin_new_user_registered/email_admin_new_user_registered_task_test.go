@@ -1,6 +1,7 @@
 package email_admin_new_user_registered
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -111,7 +112,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 	}
 
 	// Register task
-	if err := app.GetTaskStore().TaskHandlerAdd(NewEmailToAdminOnNewUserRegisteredTaskHandler(app), true); err != nil {
+	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewUserRegisteredTaskHandler(app), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 

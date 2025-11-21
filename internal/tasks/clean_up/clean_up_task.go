@@ -1,6 +1,7 @@
 package clean_up
 
 import (
+	"context"
 	"errors"
 	"project/internal/types"
 
@@ -43,7 +44,12 @@ func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 		return nil, errors.New("task store is nil")
 	}
 
-	return t.app.GetTaskStore().TaskEnqueueByAlias(t.Alias(), map[string]any{})
+	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		t.Alias(),
+		taskstore.DefaultQueueName,
+		map[string]any{},
+	)
 }
 
 func (t *cleanUpTask) Handle() bool {
@@ -67,7 +73,7 @@ func (t *cleanUpTask) Handle() bool {
 
 	purgeSince := carbon.Now(carbon.UTC).SubMinutes(30).ToDateTimeString()
 
-	purgeTasks, err := t.app.GetTaskStore().TaskQueueList(taskstore.TaskQueueQuery().
+	purgeTasks, err := t.app.GetTaskStore().TaskQueueList(context.Background(), taskstore.TaskQueueQuery().
 		SetStatus(taskstore.TaskQueueStatusSuccess).
 		SetCreatedAtLte(purgeSince))
 
@@ -79,7 +85,7 @@ func (t *cleanUpTask) Handle() bool {
 	t.LogInfo("Purging " + cast.ToString(len(purgeTasks)) + " tasks older than " + purgeSince + " ...")
 
 	for _, purgeTask := range purgeTasks {
-		err := t.app.GetTaskStore().TaskQueueDeleteByID(purgeTask.ID())
+		err := t.app.GetTaskStore().TaskQueueDeleteByID(context.Background(), purgeTask.ID())
 
 		if err != nil {
 			t.LogError("Error purging task: " + err.Error())

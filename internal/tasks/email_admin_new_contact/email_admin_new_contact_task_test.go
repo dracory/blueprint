@@ -1,6 +1,7 @@
 package email_admin_new_contact
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -82,7 +83,7 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *te
 	}
 
 	// Register task so that queued tasks can be processed if needed
-	if err := app.GetTaskStore().TaskHandlerAdd(NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app), true); err != nil {
+	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 

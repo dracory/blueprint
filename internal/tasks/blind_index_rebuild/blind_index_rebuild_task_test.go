@@ -1,6 +1,7 @@
 package blind_index_rebuild
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -68,7 +69,7 @@ func TestBlindIndexRebuildTask_Handle(t *testing.T) {
 	)
 
 	// Register task
-	err := app.GetTaskStore().TaskHandlerAdd(NewBlindIndexRebuildTask(app), true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(app), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}

@@ -1,6 +1,7 @@
 package email_admin
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -107,7 +108,7 @@ func TestEmailToAdminTask_Handle_SendEmail(t *testing.T) {
 	}
 
 	// Register task
-	if err := app.GetTaskStore().TaskHandlerAdd(NewEmailToAdminTask(app), true); err != nil {
+	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminTask(app), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 

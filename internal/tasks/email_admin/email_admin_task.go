@@ -20,6 +20,7 @@ package email_admin
 // =================================================================
 
 import (
+	"context"
 	"errors"
 	"project/internal/emails"
 	"project/internal/types"
@@ -82,9 +83,14 @@ func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueI
 	}
 
 	// Enqueue task with the provided HTML content
-	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{
-		"html": html,
-	})
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		handler.Alias(),
+		taskstore.DefaultQueueName,
+		map[string]any{
+			"html": html,
+		},
+	)
 }
 
 // Handle processes the email task by either:

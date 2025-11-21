@@ -1,6 +1,7 @@
 package tasks
 
 import (
+	"context"
 	"project/internal/tasks/blind_index_rebuild"
 	"project/internal/tasks/clean_up"
 	"project/internal/tasks/email_admin"
@@ -38,7 +39,7 @@ func RegisterTasks(app types.AppInterface) {
 	}
 
 	for _, task := range tasks {
-		err := app.GetTaskStore().TaskHandlerAdd(task, true)
+		err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 
 		if err != nil {
 			app.GetLogger().Error("At registerTaskHandlers", "error", "Error registering task: "+task.Alias()+" - "+err.Error())

@@ -2,7 +2,9 @@ package middlewares
 
 import (
 	"net/http"
+	"project/internal/links"
 	"project/internal/types"
+	"slices"
 	"strings"
 
 	"log/slog"
@@ -22,25 +24,75 @@ func LogRequestMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Log Request Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// uri := r.RequestURI
+			return logRequestHandler(app, next)
+		})
+}
 
-				ip := req.GetIP(r)
+func logRequestHandler(app types.AppInterface, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ip := req.GetIP(r)
 
-				method := r.Method
+		method := r.Method
 
-				app.GetLogger().Info("request",
-					slog.String("host", r.Host),
-					slog.String("path", strings.TrimLeft(r.URL.Path, "/")),
-					slog.String("ip", ip),
-					slog.String("method", method),
-					slog.String("useragent", r.Header.Get("User-Agent")),
-					slog.String("acceptlanguage", r.Header.Get("Accept-Language")),
-					slog.String("referer", r.Header.Get("Referer")),
-				)
+		rawPath := r.URL.Path
+		if shouldSkipLogForPath(rawPath) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
-				next.ServeHTTP(w, r)
-			})
-		},
+		app.GetLogger().Info("["+method+" request by "+ip+"] "+r.RequestURI,
+			slog.String("host", r.Host),
+			slog.String("path", rawPath),
+			slog.String("query", r.URL.RawQuery),
+			slog.String("scheme", r.URL.Scheme),
+			slog.String("ip", ip),
+			slog.String("method", method),
+			slog.String("proto", r.Proto),
+			slog.String("user_agent", r.Header.Get("User-Agent")),
+			slog.String("accept_language", r.Header.Get("Accept-Language")),
+			slog.String("referer", r.Header.Get("Referer")),
 		)
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func shouldSkipLogForPath(rawPath string) bool {
+	path := strings.TrimLeft(rawPath, "/")
+
+	skipPrefixes := []string{
+		"th/",
+	}
+
+	skipSuffixes := []string{
+		".css",
+		".js",
+		".png",
+		".jpg",
+		".jpeg",
+		".ico",
+		".svg",
+		".woff",
+		".woff2",
+	}
+
+	skipExact := []string{
+		"health",
+		links.LIVEFLUX,
+		"ping",
+	}
+
+	for _, prefix := range skipPrefixes {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+
+	for _, suffix := range skipSuffixes {
+		if strings.HasSuffix(path, suffix) {
+			return true
+		}
+	}
+
+	return slices.Contains(skipExact, path)
 }

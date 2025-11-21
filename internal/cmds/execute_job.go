@@ -1,6 +1,7 @@
 package cmds
 
 import (
+	"context"
 	"log"
 	"project/internal/types"
 
@@ -34,7 +35,7 @@ func ExecuteJob(app types.AppInterface, args []string) {
 		return
 	}
 
-	queuedTask, err := app.GetTaskStore().TaskQueueFindByID(queuedTaskID)
+	queuedTask, err := app.GetTaskStore().TaskQueueFindByID(context.Background(), queuedTaskID)
 
 	if err != nil {
 		log.Println("Task not found: ", queuedTaskID)
@@ -56,7 +57,7 @@ func ExecuteJob(app types.AppInterface, args []string) {
 		return
 	}
 
-	isOK, err := app.GetTaskStore().QueuedTaskProcess(queuedTask)
+	isOK, err := app.GetTaskStore().TaskQueueProcessTask(context.Background(), queuedTask)
 
 	if err != nil {
 		log.Println("Error processing task: ", queuedTaskID, " ", err.Error())

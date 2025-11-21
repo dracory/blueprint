@@ -1,6 +1,7 @@
 package email_admin_new_contact
 
 import (
+	"context"
 	"errors"
 	"project/internal/emails"
 	"project/internal/types"
@@ -49,7 +50,12 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task
 	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{})
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		handler.Alias(),
+		taskstore.DefaultQueueName,
+		map[string]any{},
+	)
 }
 
 func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {

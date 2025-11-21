@@ -51,9 +51,14 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string
 		return nil, errors.New("task store is nil")
 	}
 
-	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{
-		"user_id": userID,
-	})
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		handler.Alias(),
+		taskstore.DefaultQueueName,
+		map[string]any{
+			"user_id": userID,
+		},
+	)
 }
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {

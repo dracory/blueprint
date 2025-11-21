@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"project/internal/cmds"
+	"project/internal/emails"
 	"project/internal/routes"
 	"project/internal/types"
-	"project/internal/emails"
 
 	"github.com/dracory/base/cfmt"
 )
@@ -85,14 +85,14 @@ func handleTaskCommand(app types.AppInterface, args []string) error {
 		cfmt.Errorln(err.Error())
 		return err
 	}
-	
+
 	// Initialize email sender for tasks that require it
 	emails.InitEmailSender(app)
-	
+
 	taskAlias := args[0]
 	taskArgs := args[1:]
 	// Assuming TaskExecuteCli handles its own errors/logging internally
-	app.GetTaskStore().TaskExecuteCli(taskAlias, taskArgs)
+	app.GetTaskStore().TaskDefinitionExecuteCli(taskAlias, taskArgs)
 	// Assuming success unless TaskExecuteCli panics or indicates failure differently
 	return nil
 }

@@ -1,6 +1,7 @@
 package hello_world
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -70,7 +71,7 @@ func TestHelloWorldTask_Handle_EnqueuedTask(t *testing.T) {
 	}
 
 	// Register task
-	if err := app.GetTaskStore().TaskHandlerAdd(NewHelloWorldTask(app), true); err != nil {
+	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewHelloWorldTask(app), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 

@@ -1,6 +1,7 @@
 package schedules
 
 import (
+	"context"
 	"log/slog"
 	tasksStats "project/internal/tasks/stats"
 	"project/internal/types"
@@ -23,7 +24,7 @@ func queueClearJob(app types.AppInterface) {
 
 	alias := tasksStats.NewStatsVisitorEnhanceTask(app).Alias()
 
-	taskDefinition, err := app.GetTaskStore().TaskDefinitionFindByAlias(alias)
+	taskDefinition, err := app.GetTaskStore().TaskDefinitionFindByAlias(context.Background(), alias)
 
 	if err != nil {
 		app.GetLogger().Error("QueueClearJob > Failed to find task",
@@ -38,9 +39,11 @@ func queueClearJob(app types.AppInterface) {
 	}
 
 	// Find all queued tasks by alias
-	queuedTasks, err := app.GetTaskStore().TaskQueueList(taskstore.TaskQueueQuery().
-		SetTaskID(taskDefinition.ID()).
-		SetStatus(taskstore.TaskQueueStatusSuccess))
+	queuedTasks, err := app.GetTaskStore().TaskQueueList(
+		context.Background(),
+		taskstore.TaskQueueQuery().
+			SetTaskID(taskDefinition.ID()).
+			SetStatus(taskstore.TaskQueueStatusSuccess))
 
 	if err != nil {
 		app.GetLogger().Error("QueueClearJob > Failed to list queued tasks",
@@ -50,7 +53,7 @@ func queueClearJob(app types.AppInterface) {
 	}
 
 	for _, queuedTask := range queuedTasks {
-		err := app.GetTaskStore().TaskQueueDelete(queuedTask)
+		err := app.GetTaskStore().TaskQueueDelete(context.Background(), queuedTask)
 		if err != nil {
 			app.GetLogger().Error("QueueClearJob > Failed to delete queued task",
 				slog.String("alias", alias),

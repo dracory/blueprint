@@ -1,6 +1,7 @@
 package email_test
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
@@ -98,7 +99,7 @@ func TestEmailTestTask_Handle_SendEmail(t *testing.T) {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	err := app.GetTaskStore().TaskHandlerAdd(NewEmailTestTask(app), true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailTestTask(app), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}

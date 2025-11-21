@@ -92,6 +92,8 @@ const SHOP_PRODUCT = SHOP + "/product"
 const SHOP_PRODUCT_WITH_REGEX = SHOP_PRODUCT + "/{id:[0-9]+}"
 const SHOP_PRODUCT_WITH_REGEX2 = SHOP_PRODUCT + "/{id:[0-9]+}/{title}"
 
+const PRIVACY_POLICY = HOME + "privacy-policy"
+const TERMS_OF_USE = HOME + "terms-of-use"
 const THEME = HOME + "theme"
 const THUMB = HOME + "th/{extension:[a-z]+}/{size:[0-9x]+}/{quality:[0-9]+}/*"
 const WIDGET = HOME + "widget"

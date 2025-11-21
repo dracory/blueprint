@@ -1,6 +1,7 @@
 package hello_world
 
 import (
+	"context"
 	"errors"
 	"project/internal/types"
 
@@ -39,7 +40,12 @@ func (handler *helloWorldTask) Enqueue() (task taskstore.TaskQueueInterface, err
 	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return handler.app.GetTaskStore().TaskEnqueueByAlias(handler.Alias(), map[string]any{})
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+		context.Background(),
+		taskstore.DefaultQueueName,
+		handler.Alias(),
+		map[string]any{},
+	)
 }
 
 func (handler *helloWorldTask) Handle() bool {
