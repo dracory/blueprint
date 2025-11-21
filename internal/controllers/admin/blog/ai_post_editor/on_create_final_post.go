@@ -1,6 +1,7 @@
 package aiposteditor
 
 import (
+	"context"
 	"log/slog"
 	"project/internal/controllers/admin/blog/shared"
 	"project/pkg/blogai"
@@ -56,7 +57,7 @@ func (c *AiPostEditorController) onCreateFinalPost(data pageData) string {
 	data.BlogAiPost.Image = record.Image
 	data.BlogAiPost.Status = blogai.POST_STATUS_PUBLISHED
 
-	if err := c.app.GetBlogStore().PostCreate(post); err != nil {
+	if err := c.app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		c.app.GetLogger().Error("failed to create blog post", slog.String("error", err.Error()))
 		return api.Error("Failed to save blog post: " + err.Error()).ToString()
 	}

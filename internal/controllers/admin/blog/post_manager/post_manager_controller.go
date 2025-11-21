@@ -137,7 +137,7 @@ func (controller *postManagerController) prepareData(r *http.Request) (data post
 
 	data.blogList, err = controller.app.GetBlogStore().
 		// EnableDebug(true).
-		PostList(query)
+		PostList(r.Context(), query)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
@@ -148,7 +148,7 @@ func (controller *postManagerController) prepareData(r *http.Request) (data post
 
 	data.blogCount, err = controller.app.GetBlogStore().
 		// EnableDebug().
-		PostCount(query)
+		PostCount(r.Context(), query)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))

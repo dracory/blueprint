@@ -26,7 +26,7 @@ func setupContentTestAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Po
 	post.SetContent("Original content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
@@ -96,7 +96,7 @@ func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := app.GetBlogStore().PostFindByID(post.ID())
+	updated, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
 		assert.Equal(t, "Updated Title", updated.Title())

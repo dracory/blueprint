@@ -44,31 +44,28 @@ func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *te
 func TestLogTableComponent_LoadLogs_PopulatesFieldsFromListLogs(t *testing.T) {
 	app := testutils.Setup(testutils.WithLogStore(true))
 
-	logs := []logstore.LogInterface{nil, nil}
-	fakeStore := &fakeLogStore{
-		logsToReturn: logs,
-		count:        2,
+	// Seed real log entries via the application's logger.
+	for i := 0; i < 2; i++ {
+		app.GetLogger().Info("test log")
 	}
-
-	app.SetLogStore(fakeStore)
 
 	c := &logTableComponent{
 		App:           app,
-		Level:         "info",
-		SearchMessage: "foo",
-		SearchContext: "bar",
-		From:          "2024-01-01",
-		To:            "2024-12-31",
+		Level:         "",
+		SearchMessage: "",
+		SearchContext: "",
+		From:          "",
+		To:            "",
 		SortBy:        logstore.COLUMN_TIME,
 		SortDirection: "desc",
-		Page:          1,
+		Page:          0,
 		PerPage:       50,
 	}
 
 	err := c.loadLogs()
 
 	assert.NoError(t, err)
-	assert.Equal(t, logs, c.Logs)
+	assert.Len(t, c.Logs, 2)
 	assert.Equal(t, 2, c.Total)
 	assert.False(t, c.HasMore)
 }

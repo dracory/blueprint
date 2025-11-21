@@ -89,7 +89,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 	}
 
 	if data.action == controller.actionOnCountrySelectedTimezoneOptions {
-		return controller.selectTimezoneByCountry(data.country, data.timezone).ToHTML()
+		return controller.selectTimezoneByCountry(r.Context(), data.country, data.timezone).ToHTML()
 	}
 
 	if r.Method == http.MethodPost {
@@ -114,14 +114,14 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		layouts.Options{
 			Title: "Register",
 			// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
-			Content:    controller.pageHTML(data),
+			Content:    controller.pageHTML(r.Context(), data),
 			ScriptURLs: scriptURLs,
 			Scripts:    scripts,
 			StyleURLs:  []string{cdn.BootstrapIconsCss_1_11_3()},
 			Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
 		@media (min-width: 576px) {.container.container-xs {max-width: 520px;}}
 		body{background:rgba(128,0,128,0.05);}`,
-		`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
+				`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
 		#CardRegister .card-header{padding:24px;border-bottom:1px solid rgba(0,0,0,0.05);background:#f8f9ff;}
 		#CardRegister .card-header h3{font-size:14px;font-weight:600;letter-spacing:0.08em;color:#4b4b63;text-transform:uppercase;}
 		#CardRegister .card-body{padding:32px;}
@@ -131,7 +131,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		#CardRegister .form-control,#CardRegister .form-select{border-radius:14px;border-color:rgba(111,108,212,0.4);padding:12px 15px;transition:box-shadow 0.2s ease,border-color 0.2s ease;}
 		#CardRegister .form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%234e73df' d='M4.646 6.146a.5.5 0 0 1 .708 0L8 8.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:14px;}
 		#CardRegister .form-control:focus{box-shadow:0 0 0 0.25rem rgba(78,115,223,0.2);border-color:#4e73df;}`},
-	}).ToHTML()
+		}).ToHTML()
 }
 
 // == PRIVATE METHODS =========================================================
@@ -139,40 +139,40 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 func (controller *registerController) postUpdate(ctx context.Context, data registerControllerData) string {
 	if controller.app.GetUserStore() == nil {
 		data.formErrorMessage = "We are very sorry user store is not configured. Saving the details not possible."
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	if data.firstName == "" {
 		data.formErrorMessage = "First name is required field"
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	if data.lastName == "" {
 		data.formErrorMessage = "Last name is required field"
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	if data.country == "" {
 		data.formErrorMessage = "Country is required field"
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	if data.timezone == "" {
 		data.formErrorMessage = "Timezone is required field"
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
 		if controller.app.GetVaultStore() == nil {
 			data.formErrorMessage = "We are very sorry vault store is not configured. Saving the details not possible."
-			return controller.formRegister(data).ToHTML()
+			return controller.formRegister(ctx, data).ToHTML()
 		}
 
 		firstNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.firstName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(data).ToHTML()
+			return controller.formRegister(ctx, data).ToHTML()
 		}
 
 		lastNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.lastName, controller.app.GetConfig().GetVaultStoreKey(), 20)
@@ -180,7 +180,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating last name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(data).ToHTML()
+			return controller.formRegister(ctx, data).ToHTML()
 		}
 
 		businessNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.app.GetConfig().GetVaultStoreKey(), 20)
@@ -188,7 +188,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating business name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(data).ToHTML()
+			return controller.formRegister(ctx, data).ToHTML()
 		}
 
 		phoneToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.phone, controller.app.GetConfig().GetVaultStoreKey(), 20)
@@ -196,7 +196,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		if err != nil {
 			controller.app.GetLogger().Error("Error creating phone token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(data).ToHTML()
+			return controller.formRegister(ctx, data).ToHTML()
 		}
 
 		data.authUser.SetFirstName(firstNameToken)
@@ -214,21 +214,21 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		data.authUser.SetTimezone(data.timezone)
 	}
 
-	err := controller.app.GetUserStore().UserUpdate(context.Background(), data.authUser)
+	err := controller.app.GetUserStore().UserUpdate(ctx, data.authUser)
 
 	if err != nil {
 		controller.app.GetLogger().Error("Error updating user profile", slog.String("error", err.Error()))
 		data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-		return controller.formRegister(data).ToHTML()
+		return controller.formRegister(ctx, data).ToHTML()
 	}
 
 	data.formSuccessMessage = "Your registration completed successfully. You can now continue browsing the website."
 	data.formRedirectURL = links.User().Home()
-	return controller.formRegister(data).ToHTML()
+	return controller.formRegister(ctx, data).ToHTML()
 }
 
-func (controller *registerController) pageHTML(data registerControllerData) hb.TagInterface {
-	form := controller.formRegister(data)
+func (controller *registerController) pageHTML(ctx context.Context, data registerControllerData) hb.TagInterface {
+	form := controller.formRegister(ctx, data)
 	return hb.Div().
 		Class(`container container-xs text-center`).
 		Child(hb.BR()).
@@ -243,7 +243,7 @@ func (controller *registerController) pageHTML(data registerControllerData) hb.T
 		Child(hb.BR())
 }
 
-func (controller *registerController) formRegister(data registerControllerData) hb.TagInterface {
+func (controller *registerController) formRegister(ctx context.Context, data registerControllerData) hb.TagInterface {
 	required := hb.Sup().
 		Text("required").
 		Style("margin-left:5px;color:lightcoral;")
@@ -336,7 +336,7 @@ func (controller *registerController) formRegister(data registerControllerData) 
 		Children([]hb.TagInterface{
 			bs.FormLabel("Timezone").
 				Child(required),
-			controller.selectTimezoneByCountry(data.country, data.timezone),
+			controller.selectTimezoneByCountry(ctx, data.country, data.timezone),
 		})
 
 	formProfile := hb.Div().
@@ -497,7 +497,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 		return registerControllerData{}, "Geo store is nil"
 	}
 
-	countries, errCountries := controller.app.GetGeoStore().CountryList(geostore.CountryQueryOptions{
+	countries, errCountries := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
 		SortOrder: "asc",
 		OrderBy:   geostore.COLUMN_NAME,
 	})
@@ -547,7 +547,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 	return data, ""
 }
 
-func (controller *registerController) selectTimezoneByCountry(country string, selectedTimezone string) hb.TagInterface {
+func (controller *registerController) selectTimezoneByCountry(ctx context.Context, country string, selectedTimezone string) hb.TagInterface {
 	query := geostore.TimezoneQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_TIMEZONE,
@@ -557,7 +557,7 @@ func (controller *registerController) selectTimezoneByCountry(country string, se
 		query.CountryCode = country
 	}
 
-	timezones, errZones := controller.app.GetGeoStore().TimezoneList(query)
+	timezones, errZones := controller.app.GetGeoStore().TimezoneList(ctx, query)
 
 	if errZones != nil {
 		controller.app.GetLogger().Error("Error listing timezones", slog.String("error", errZones.Error()))

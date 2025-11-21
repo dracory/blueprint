@@ -67,7 +67,7 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 	post := blogstore.NewPost()
 	post.SetTitle(data.title)
 
-	err := controller.app.GetBlogStore().PostCreate(post)
+	err := controller.app.GetBlogStore().PostCreate(r.Context(), post)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))

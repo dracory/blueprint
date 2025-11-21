@@ -79,7 +79,7 @@ func (c *formAiPostContentUpdate) Mount(ctx context.Context, params map[string]s
 		return nil
 	}
 
-	post, err := blogStore.PostFindByID(postID)
+	post, err := blogStore.PostFindByID(ctx, postID)
 	if err != nil {
 		if c.App.GetLogger() != nil {
 			c.App.GetLogger().Error("AI content editor: failed to load post", "error", err.Error())
@@ -623,7 +623,7 @@ func (c *formAiPostContentUpdate) onSave(ctx context.Context, successMessage str
 	// preserve existing status, only updating content/title/summary
 	c.Post.SetEditor(blogstore.POST_EDITOR_MARKDOWN)
 
-	if err := c.App.GetBlogStore().PostUpdate(c.Post); err != nil {
+	if err := c.App.GetBlogStore().PostUpdate(ctx, c.Post); err != nil {
 		if c.App.GetLogger() != nil {
 			c.App.GetLogger().Error("AI content editor: failed to save post", "error", err.Error())
 		}

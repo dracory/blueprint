@@ -128,7 +128,7 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 		return profileControllerData{}, "User not found"
 	}
 
-	countryList, err := controller.app.GetGeoStore().CountryList(geostore.CountryQueryOptions{
+	countryList, err := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
 		SortOrder: "asc",
 		OrderBy:   geostore.COLUMN_NAME,
 	})

@@ -16,13 +16,13 @@ require (
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.6.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.1.0
+	github.com/dracory/blogstore v1.2.0
 	github.com/dracory/bs v0.15.0
 	github.com/dracory/cachestore v0.23.0
 	github.com/dracory/cdn v1.9.0
 	github.com/dracory/chatstore v0.7.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.0.1
+	github.com/dracory/cmsstore v1.1.0
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
@@ -32,22 +32,22 @@ require (
 	github.com/dracory/entitystore v1.1.0
 	github.com/dracory/env v1.0.0
 	github.com/dracory/envenc v1.1.0
-	github.com/dracory/feedstore v0.5.0
+	github.com/dracory/feedstore v0.6.0
 	github.com/dracory/filesystem v1.0.0
 	github.com/dracory/form v0.19.0
-	github.com/dracory/geostore v0.15.0
+	github.com/dracory/geostore v0.16.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.22.0
 	github.com/dracory/llm v1.0.0
-	github.com/dracory/logstore v1.11.0
+	github.com/dracory/logstore v1.12.0
 	github.com/dracory/metastore v1.3.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.2.0
 	github.com/dracory/sb v0.15.0
 	github.com/dracory/sessionstore v1.5.2
-	github.com/dracory/settingstore v1.3.0
+	github.com/dracory/settingstore v1.4.0
 	github.com/dracory/shopstore v1.5.1
-	github.com/dracory/statsstore v0.9.0
+	github.com/dracory/statsstore v0.10.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.5.0
 	github.com/dracory/taskstore v1.14.0

@@ -60,7 +60,7 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, "post id is required"
 	}
 
-	post, err := controller.app.GetBlogStore().PostFindByID(data.postID)
+	post, err := controller.app.GetBlogStore().PostFindByID(r.Context(), data.postID)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
@@ -77,7 +77,7 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, ""
 	}
 
-	err = controller.app.GetBlogStore().PostTrash(post)
+	err = controller.app.GetBlogStore().PostTrash(r.Context(), post)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))

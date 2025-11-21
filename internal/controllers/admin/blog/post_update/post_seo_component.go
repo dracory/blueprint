@@ -68,7 +68,7 @@ func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) 
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
 		c.App.GetLogger().Error("Error loading post for SEO component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
@@ -107,7 +107,7 @@ func (c *postSEOComponent) Handle(ctx context.Context, action string, data url.V
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -119,7 +119,7 @@ func (c *postSEOComponent) Handle(ctx context.Context, action string, data url.V
 		post.SetMetaKeywords(c.FormMetaKeywords)
 		post.SetMetaRobots(c.FormMetaRobots)
 
-		if err := c.App.GetBlogStore().PostUpdate(post); err != nil {
+		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
 			c.App.GetLogger().Error("Error saving post SEO", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""

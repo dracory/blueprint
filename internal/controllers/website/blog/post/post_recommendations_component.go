@@ -78,7 +78,7 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 		Limit:     recommendationsQueryLimit,
 	}
 
-	postList, err := store.PostList(options)
+	postList, err := store.PostList(ctx, options)
 	if err != nil {
 		if logger := c.App.GetLogger(); logger != nil {
 			logger.Error("Failed to load recommended posts", "error", err.Error())

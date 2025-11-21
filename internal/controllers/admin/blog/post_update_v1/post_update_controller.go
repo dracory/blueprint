@@ -228,7 +228,7 @@ func (controller *postUpdateController) savePost(r *http.Request, data postUpdat
 		data.post.SetMetaRobots(data.formMetaRobots)
 	}
 
-	err := controller.app.GetBlogStore().PostUpdate(data.post)
+	err := controller.app.GetBlogStore().PostUpdate(r.Context(), data.post)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))
@@ -255,7 +255,7 @@ func (controller *postUpdateController) prepareDataAndValidate(r *http.Request) 
 	}
 
 	var err error
-	data.post, err = controller.app.GetBlogStore().PostFindByID(data.postID)
+	data.post, err = controller.app.GetBlogStore().PostFindByID(r.Context(), data.postID)
 
 	if err != nil {
 		controller.app.GetLogger().Error("At postUpdateController > prepareDataAndValidate", slog.String("error", err.Error()))

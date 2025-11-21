@@ -1,6 +1,7 @@
 package post_delete
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -77,7 +78,7 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
@@ -108,7 +109,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
@@ -128,7 +129,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	assert.Contains(t, responseHTML, "post deleted successfully", "Should show success message")
 
 	// Verify post was marked as trash
-	deletedPost, err := app.GetBlogStore().PostFindByID(post.ID())
+	deletedPost, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err, "Should not return error when checking post")
 	assert.Equal(t, blogstore.POST_STATUS_TRASH, deletedPost.Status(), "Post should be marked as trash")
 }

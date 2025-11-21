@@ -1,6 +1,7 @@
 package log_manager
 
 import (
+	"context"
 	"project/internal/types"
 
 	"github.com/dracory/logstore"
@@ -87,14 +88,14 @@ func listLogs(app types.AppInterface, f logListFilters) (logListResult, error) {
 
 	// Total count for pagination
 	total := 0
-	if n, err := app.GetLogStore().LogCount(query); err == nil {
+	if n, err := app.GetLogStore().LogCount(context.Background(), query); err == nil {
 		total = n
 	}
 
 	// Apply paging for the list query
 	query = query.SetLimit(limit).SetOffset(offset)
 
-	logs, err := app.GetLogStore().LogList(query)
+	logs, err := app.GetLogStore().LogList(context.Background(), query)
 	if err != nil {
 		return logListResult{}, err
 	}

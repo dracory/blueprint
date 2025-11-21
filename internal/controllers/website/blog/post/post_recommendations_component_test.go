@@ -93,7 +93,7 @@ func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
 		post.SetContent("Test content")
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 		post.SetPublishedAt(carbon.Now().ToDateTimeString())
-		err := app.GetBlogStore().PostCreate(post)
+		err := app.GetBlogStore().PostCreate(context.Background(), post)
 		if err != nil {
 			t.Fatalf("Failed to create test post: %v", err)
 		}
@@ -102,7 +102,7 @@ func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
 	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
 
 	// Mount with a post ID that exists
-	posts, err := app.GetBlogStore().PostList(blogstore.PostQueryOptions{
+	posts, err := app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
 		Status: blogstore.POST_STATUS_PUBLISHED,
 		Limit:  1,
 	})
@@ -183,7 +183,7 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 		post.SetContent("Test content " + string(rune('A'+i)))
 		post.SetSummary("Test summary " + string(rune('A'+i)))
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-		err := app.GetBlogStore().PostCreate(post)
+		err := app.GetBlogStore().PostCreate(context.Background(), post)
 		if err != nil {
 			t.Fatalf("Failed to create test post: %v", err)
 		}

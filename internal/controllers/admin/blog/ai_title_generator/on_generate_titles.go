@@ -86,7 +86,7 @@ func (c *AiTitleGeneratorController) stepHandlerFindExistingTitles(ctx context.C
 		return ctx, data, fmt.Errorf("failed to fetch titles: %w", err)
 	}
 
-	postList, err := c.app.GetBlogStore().PostList(blogstore.PostQueryOptions{})
+	postList, err := c.app.GetBlogStore().PostList(ctx, blogstore.PostQueryOptions{})
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to fetch blog list: %w", err)
 	}

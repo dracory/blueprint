@@ -1,6 +1,7 @@
 package log_manager
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -19,14 +20,14 @@ type fakeLogStore struct {
 	countErr     error
 }
 
-func (s *fakeLogStore) LogList(q logstore.LogQueryInterface) ([]logstore.LogInterface, error) {
+func (s *fakeLogStore) LogList(ctx context.Context, q logstore.LogQueryInterface) ([]logstore.LogInterface, error) {
 	if s.listErr != nil {
 		return nil, s.listErr
 	}
 	return s.logsToReturn, nil
 }
 
-func (s *fakeLogStore) LogCount(q logstore.LogQueryInterface) (int, error) {
+func (s *fakeLogStore) LogCount(ctx context.Context, q logstore.LogQueryInterface) (int, error) {
 	if s.countErr != nil {
 		return 0, s.countErr
 	}
@@ -59,21 +60,14 @@ func TestListLogs_NilLogStore_ReturnsEmptyNoError(t *testing.T) {
 func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
 	app := testutils.Setup(testutils.WithLogStore(true))
 
-	logs := make([]logstore.LogInterface, 0, 101)
-	for i := 0; i < 101; i++ {
-		logs = append(logs, nil)
-	}
-
-	fakeStore := &fakeLogStore{
-		logsToReturn: logs,
-		count:        101,
-	}
-
-	app.SetLogStore(fakeStore)
-
 	filters := logListFilters{
 		FilterPerPage: 0,
 		FilterPage:    -1,
+	}
+
+	// Seed 101 real log entries via the application's logger.
+	for i := 0; i < 101; i++ {
+		app.GetLogger().Info("test log")
 	}
 
 	result, err := listLogs(app, filters)
@@ -87,38 +81,35 @@ func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
 func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 	app := testutils.Setup(testutils.WithLogStore(true))
 
-	logs := make([]logstore.LogInterface, 0, 100)
+	// Seed 100 real log entries via the application's logger.
 	for i := 0; i < 100; i++ {
-		logs = append(logs, nil)
+		app.GetLogger().Info("test log")
 	}
 
-	fakeStore := &fakeLogStore{
-		logsToReturn: logs,
-		count:        100,
-	}
-
-	app.SetLogStore(fakeStore)
-
-	filters := logListFilters{
+	// First page: should have 50 results and indicate there is a next page.
+	filtersPage0 := logListFilters{
 		FilterPerPage: 50,
 		FilterPage:    0,
 	}
 
-	result, err := listLogs(app, filters)
+	result, err := listLogs(app, filtersPage0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 50, len(result.Logs))
 	assert.Equal(t, 100, result.Total)
 	assert.True(t, result.HasMore)
 
-	fakeStore.logsToReturn = logs[:50]
-	fakeStore.count = 50
+	// Second page: also 50 results but no further pages available.
+	filtersPage1 := logListFilters{
+		FilterPerPage: 50,
+		FilterPage:    1,
+	}
 
-	result, err = listLogs(app, filters)
+	result, err = listLogs(app, filtersPage1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 50, len(result.Logs))
-	assert.Equal(t, 50, result.Total)
+	assert.Equal(t, 100, result.Total)
 	assert.False(t, result.HasMore)
 }
 

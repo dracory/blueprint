@@ -122,14 +122,14 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		Limit:     perPage,
 	}
 
-	postList, errList := blogStore.PostList(options)
+	postList, errList := blogStore.PostList(r.Context(), options)
 
 	if errList != nil {
 		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := blogStore.PostCount(options)
+	postCount, errCount := blogStore.PostCount(r.Context(), options)
 
 	if errCount != nil {
 		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))

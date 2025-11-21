@@ -33,7 +33,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		if geostore == nil {
 			return "N/A", errors.New("geostore is nil")
 		}
-		country, err := geostore.CountryFindByIso2(iso2Code)
+		country, err := geostore.CountryFindByIso2(r.Context(), iso2Code)
 		if err != nil {
 			return "", err
 		}

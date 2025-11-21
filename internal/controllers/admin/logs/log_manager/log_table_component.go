@@ -167,7 +167,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			return nil
 		}
 
-		if err := c.App.GetLogStore().LogDeleteByID(logID); err != nil {
+		if err := c.App.GetLogStore().LogDeleteByID(ctx, logID); err != nil {
 			return nil
 		}
 
@@ -187,7 +187,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			return nil
 		}
 
-		logEntry, err := c.App.GetLogStore().LogFindByID(logID)
+		logEntry, err := c.App.GetLogStore().LogFindByID(ctx, logID)
 		if err != nil || logEntry == nil {
 			return nil
 		}
@@ -220,7 +220,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			if id == "" {
 				continue
 			}
-			_ = c.App.GetLogStore().LogDeleteByID(id)
+			_ = c.App.GetLogStore().LogDeleteByID(ctx, id)
 		}
 
 		return c.loadLogs()

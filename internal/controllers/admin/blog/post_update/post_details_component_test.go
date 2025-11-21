@@ -29,7 +29,7 @@ func setupDetailsTestAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Po
 	post.SetEditor(blogstore.POST_EDITOR_HTMLAREA)
 	post.SetMemo("Initial memo")
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
@@ -107,7 +107,7 @@ func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := app.GetBlogStore().PostFindByID(post.ID())
+	updated, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
 		assert.Equal(t, blogstore.POST_STATUS_PUBLISHED, updated.Status())

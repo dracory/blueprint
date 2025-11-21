@@ -74,7 +74,7 @@ func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]stri
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
 		c.App.GetLogger().Error("Error loading post for details component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
@@ -123,7 +123,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -147,7 +147,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 		post.SetPublishedAt(publishedAt)
 		post.SetStatus(c.FormStatus)
 
-		if err := c.App.GetBlogStore().PostUpdate(post); err != nil {
+		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
 			c.App.GetLogger().Error("Error saving post details", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
@@ -163,7 +163,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -193,7 +193,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 		}
 
 		post.SetImageUrl(imageURL)
-		if err := c.App.GetBlogStore().PostUpdate(post); err != nil {
+		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
 			c.App.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage.Save", "error", err.Error())
 			c.FormErrorMessage = "Failed to save generated image"
 			c.FormSuccessMessage = ""

@@ -1,6 +1,7 @@
 package post_update
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -84,7 +85,7 @@ func setupControllerAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Pos
 	post.SetContent("Test Content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 

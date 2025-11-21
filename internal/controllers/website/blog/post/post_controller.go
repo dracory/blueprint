@@ -46,7 +46,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return "post is missing"
 	}
 
-	post, errPost := c.app.GetBlogStore().PostFindByID(postID)
+	post, errPost := c.app.GetBlogStore().PostFindByID(r.Context(), postID)
 
 	if errPost != nil {
 		c.app.GetLogger().Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))

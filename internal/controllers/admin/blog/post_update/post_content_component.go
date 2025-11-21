@@ -73,7 +73,7 @@ func (c *postContentComponent) Mount(ctx context.Context, params map[string]stri
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
 		c.App.GetLogger().Error("Error loading post for content component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
@@ -117,7 +117,7 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(c.PostID)
+		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -128,7 +128,7 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 		post.SetSummary(c.FormSummary)
 		post.SetContent(c.FormContent)
 
-		if err := c.App.GetBlogStore().PostUpdate(post); err != nil {
+		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
 			c.App.GetLogger().Error("Error saving post content", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""

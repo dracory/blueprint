@@ -1,6 +1,7 @@
 package post_create
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"testing"
@@ -75,7 +76,7 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 	assert.Contains(t, responseHTML, "post created successfully", "Should show success message")
 
 	// Verify post was created
-	posts, err := app.GetBlogStore().PostList(blogstore.PostQueryOptions{})
+	posts, err := app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{})
 	assert.NoError(t, err, "Should list posts without error")
 	assert.NotEmpty(t, posts, "Should have created a post")
 	assert.Equal(t, postTitle, posts[0].Title(), "Post title should match")

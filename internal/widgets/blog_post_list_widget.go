@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"project/internal/links"
@@ -186,7 +187,7 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		Limit:     perPage,
 	}
 
-	postList, errList := widget.app.GetBlogStore().PostList(options)
+	postList, errList := widget.app.GetBlogStore().PostList(context.Background(), options)
 
 	if errList != nil {
 		if widget.app.GetLogger() != nil {
@@ -195,7 +196,7 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := widget.app.GetBlogStore().PostCount(options)
+	postCount, errCount := widget.app.GetBlogStore().PostCount(context.Background(), options)
 
 	if errCount != nil {
 		if widget.app.GetLogger() != nil {

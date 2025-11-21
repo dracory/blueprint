@@ -143,7 +143,7 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 		return nil
 	}
 
-	countries, err := c.App.GetGeoStore().CountryList(geostore.CountryQueryOptions{
+	countries, err := c.App.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
@@ -156,7 +156,7 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 	}
 
 	c.Countries = countries
-	c.refreshTimezones()
+	c.refreshTimezones(ctx)
 
 	return nil
 }
@@ -171,7 +171,7 @@ func (c *formUserUpdate) Handle(ctx context.Context, action string, data url.Val
 		}
 		c.FormCountry = strings.TrimSpace(data.Get("user_country"))
 		c.FormTimezone = ""
-		c.refreshTimezones()
+		c.refreshTimezones(ctx)
 		c.FormSuccess = ""
 		return nil
 	default:
@@ -223,7 +223,7 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 	c.FormCountry = strings.TrimSpace(data.Get("user_country"))
 	c.FormTimezone = strings.TrimSpace(data.Get("user_timezone"))
 
-	c.refreshTimezones()
+	c.refreshTimezones(ctx)
 
 	if c.FormStatus == "" {
 		c.FormError = "Status is required"
@@ -491,7 +491,7 @@ func firstNonEmpty(values ...string) string {
 	return ""
 }
 
-func (c *formUserUpdate) refreshTimezones() {
+func (c *formUserUpdate) refreshTimezones(ctx context.Context) {
 	if c.App == nil || c.App.GetGeoStore() == nil {
 		c.Timezones = nil
 		if c.FormCountry == "" {
@@ -509,7 +509,7 @@ func (c *formUserUpdate) refreshTimezones() {
 		query.CountryCode = c.FormCountry
 	}
 
-	timezones, err := c.App.GetGeoStore().TimezoneList(query)
+	timezones, err := c.App.GetGeoStore().TimezoneList(ctx, query)
 	if err != nil {
 		if c.App.GetLogger() != nil {
 			c.App.GetLogger().Error("Error listing timezones", "error", err.Error())

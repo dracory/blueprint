@@ -84,7 +84,7 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
@@ -130,7 +130,7 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
@@ -191,7 +191,7 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	post.SetContent("Published content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
@@ -230,7 +230,7 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 	post.SetContent("Test content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
@@ -295,7 +295,7 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 

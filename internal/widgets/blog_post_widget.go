@@ -83,7 +83,7 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
-	post, errPost := w.app.GetBlogStore().PostFindByID(postID)
+	post, errPost := w.app.GetBlogStore().PostFindByID(r.Context(), postID)
 
 	if errPost != nil {
 		if w.app.GetLogger() != nil {

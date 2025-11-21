@@ -1,6 +1,7 @@
 package seo
 
 import (
+	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -54,7 +55,7 @@ func TestSitemapXmlController_WithBlogStore(t *testing.T) {
 		SetTitle("first-post").
 		SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := app.GetBlogStore().PostCreate(post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create post: %v", err)
 	}
 

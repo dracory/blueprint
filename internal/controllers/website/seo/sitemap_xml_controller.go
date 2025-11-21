@@ -1,6 +1,7 @@
 package seo
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"project/internal/links"
@@ -80,7 +81,7 @@ func (c sitemapXmlController) blogPostLocations() []string {
 		return []string{}
 	}
 
-	postList, err := c.app.GetBlogStore().PostList(blogstore.PostQueryOptions{
+	postList, err := c.app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		OrderBy:   "title",
 		SortOrder: sb.DESC,

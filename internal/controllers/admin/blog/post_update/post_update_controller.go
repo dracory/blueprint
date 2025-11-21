@@ -34,7 +34,7 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post ID is required", links.Admin().Blog(), 10)
 	}
 
-	post, err := controller.app.GetBlogStore().PostFindByID(postID)
+	post, err := controller.app.GetBlogStore().PostFindByID(r.Context(), postID)
 	if err != nil {
 		controller.app.GetLogger().Error(
 			"Error. postUpdateController: PostFindByID",

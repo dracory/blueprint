@@ -96,7 +96,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 		return nil
 	}
 
-	countryList, err := c.App.GetGeoStore().CountryList(geostore.CountryQueryOptions{
+	countryList, err := c.App.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
@@ -135,7 +135,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 	}
 	c.FormCountry = user.Country()
 	c.FormTimezone = user.Timezone()
-	c.refreshTimezones()
+	c.refreshTimezones(ctx)
 
 	return nil
 }
@@ -150,7 +150,7 @@ func (c *formProfileUpdate) Handle(ctx context.Context, action string, data url.
 	case "country_change":
 		c.FormCountry = strings.TrimSpace(data.Get("country"))
 		c.FormTimezone = strings.TrimSpace(data.Get("timezone"))
-		c.refreshTimezones()
+		c.refreshTimezones(ctx)
 		return nil
 	default:
 		return nil
@@ -291,7 +291,7 @@ func (c *formProfileUpdate) handleUpdate(ctx context.Context, action string, dat
 	return nil
 }
 
-func (c *formProfileUpdate) refreshTimezones() {
+func (c *formProfileUpdate) refreshTimezones(ctx context.Context) {
 	query := geostore.TimezoneQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_TIMEZONE,
@@ -301,7 +301,7 @@ func (c *formProfileUpdate) refreshTimezones() {
 		query.CountryCode = c.FormCountry
 	}
 
-	timezones, err := c.App.GetGeoStore().TimezoneList(query)
+	timezones, err := c.App.GetGeoStore().TimezoneList(ctx, query)
 	if err != nil {
 		c.App.GetLogger().Error("Error listing timezones", "error", err.Error())
 		c.FormError = "Error listing timezones"
