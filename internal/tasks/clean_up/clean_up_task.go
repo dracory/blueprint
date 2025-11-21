@@ -46,8 +46,8 @@ func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 
 	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		t.Alias(),
 		taskstore.DefaultQueueName,
+		t.Alias(),
 		map[string]any{},
 	)
 }

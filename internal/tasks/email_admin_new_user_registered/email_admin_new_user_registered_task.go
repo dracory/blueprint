@@ -53,8 +53,8 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string
 
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		handler.Alias(),
 		taskstore.DefaultQueueName,
+		handler.Alias(),
 		map[string]any{
 			"user_id": userID,
 		},

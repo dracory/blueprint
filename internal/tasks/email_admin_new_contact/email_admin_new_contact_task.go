@@ -52,8 +52,8 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task
 	}
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		handler.Alias(),
 		taskstore.DefaultQueueName,
+		handler.Alias(),
 		map[string]any{},
 	)
 }

@@ -94,8 +94,8 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Task
 	// Enqueue task with the provided HTML content
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		handler.Alias(),
 		taskstore.DefaultQueueName,
+		handler.Alias(),
 		map[string]any{
 			"to":   toEmail,
 			"html": html,

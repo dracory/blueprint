@@ -85,8 +85,8 @@ func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueI
 	// Enqueue task with the provided HTML content
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		handler.Alias(),
 		taskstore.DefaultQueueName,
+		handler.Alias(),
 		map[string]any{
 			"html": html,
 		},

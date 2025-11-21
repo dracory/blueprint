@@ -64,8 +64,8 @@ func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.TaskQueueInterface, error
 	}
 	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
-		t.Alias(),
 		taskstore.DefaultQueueName,
+		t.Alias(),
 		map[string]any{},
 	)
 }
