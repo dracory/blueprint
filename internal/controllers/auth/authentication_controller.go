@@ -133,8 +133,8 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 
 // == PRIVATE METHODS =========================================================
 
-func (c *authenticationController) findUserIDInBlindIndex(email string) (userID string, err error) {
-	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(blindindexstore.NewSearchValueQuery().
+func (c *authenticationController) findUserIDInBlindIndex(ctx context.Context, email string) (userID string, err error) {
+	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(ctx, blindindexstore.NewSearchValueQuery().
 		SetSearchValue(email).
 		SetSearchType(blindindexstore.SEARCH_TYPE_EQUALS))
 
@@ -346,7 +346,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		SetSourceReferenceID(user.ID()).
 		SetSearchValue(email)
 
-	err = c.app.GetBlindIndexStoreEmail().SearchValueCreate(searchValue)
+	err = c.app.GetBlindIndexStoreEmail().SearchValueCreate(ctx, searchValue)
 
 	if err != nil {
 		return nil, err
@@ -384,7 +384,7 @@ func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, 
 			return nil, errors.New(`vault store is nil`)
 		}
 
-		userID, err := c.findUserIDInBlindIndex(email)
+		userID, err := c.findUserIDInBlindIndex(ctx, email)
 		if err != nil {
 			return nil, err
 		}

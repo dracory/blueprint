@@ -69,7 +69,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	userIDs := []string{}
 
 	if data.formFirstName != "" {
-		firstNameUserIDs, err := controller.app.GetBlindIndexStoreFirstName().Search(data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		firstNameUserIDs, err := controller.app.GetBlindIndexStoreFirstName().Search(data.request.Context(), data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
 			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
@@ -84,7 +84,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formLastName != "" {
-		lastNameUserIDs, err := controller.app.GetBlindIndexStoreLastName().Search(data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		lastNameUserIDs, err := controller.app.GetBlindIndexStoreLastName().Search(data.request.Context(), data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
 			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
@@ -99,7 +99,7 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formEmail != "" {
-		emailUserIDs, err := controller.app.GetBlindIndexStoreEmail().Search(data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
+		emailUserIDs, err := controller.app.GetBlindIndexStoreEmail().Search(data.request.Context(), data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
 			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))

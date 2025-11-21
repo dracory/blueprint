@@ -14,7 +14,7 @@ require (
 	github.com/dracory/auditstore v0.2.0
 	github.com/dracory/auth v0.25.0
 	github.com/dracory/base v0.26.0
-	github.com/dracory/blindindexstore v1.6.0
+	github.com/dracory/blindindexstore v1.7.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.2.0
 	github.com/dracory/bs v0.15.0
@@ -49,7 +49,7 @@ require (
 	github.com/dracory/shopstore v1.5.1
 	github.com/dracory/statsstore v0.10.0
 	github.com/dracory/str v0.17.0
-	github.com/dracory/subscriptionstore v0.5.0
+	github.com/dracory/subscriptionstore v0.6.0
 	github.com/dracory/taskstore v1.14.0
 	github.com/dracory/test v0.6.0
 	github.com/dracory/ui v0.17.0
