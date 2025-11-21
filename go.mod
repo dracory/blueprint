@@ -33,7 +33,7 @@ require (
 	github.com/dracory/env v1.0.0
 	github.com/dracory/envenc v1.1.0
 	github.com/dracory/feedstore v0.6.0
-	github.com/dracory/filesystem v1.0.0
+	github.com/dracory/filesystem v1.1.0
 	github.com/dracory/form v0.19.0
 	github.com/dracory/geostore v0.16.0
 	github.com/dracory/hb v1.88.0
@@ -99,7 +99,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.14 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.14 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.91.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.92.0 // indirect
 	github.com/aws/smithy-go v1.23.2 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect
@@ -108,7 +108,7 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
-	github.com/dracory/sqlfilestore v1.0.0 // indirect
+	github.com/dracory/sqlfilestore v1.1.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
