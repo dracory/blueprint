@@ -124,7 +124,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/goravel/framework v1.16.5 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/gouniverse/validator v0.11.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.7.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
