@@ -4,8 +4,6 @@ go 1.25.0
 
 // replace github.com/dracory/base => ../base
 // replace github.com/dracory/taskstore => ../../_modules_dracory/taskstore
-// replace github.com/dracory/cachestore => ../../_modules_dracory/cachestore
-// replace github.com/dracory/sessionstore => ../../_modules_dracory/sessionstore
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
