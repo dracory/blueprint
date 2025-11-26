@@ -12,7 +12,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v0.2.0
-	github.com/dracory/auth v0.25.0
+	github.com/dracory/auth v0.26.0
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.7.0
 	github.com/dracory/blockeditor v0.24.0
