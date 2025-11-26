@@ -22,7 +22,7 @@ require (
 	github.com/dracory/cdn v1.9.0
 	github.com/dracory/chatstore v0.7.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.1.0
+	github.com/dracory/cmsstore v1.2.0
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
@@ -46,7 +46,7 @@ require (
 	github.com/dracory/sb v0.15.0
 	github.com/dracory/sessionstore v1.5.2
 	github.com/dracory/settingstore v1.4.0
-	github.com/dracory/shopstore v1.5.1
+	github.com/dracory/shopstore v1.6.0
 	github.com/dracory/statsstore v0.10.0
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.6.0
@@ -64,7 +64,6 @@ require (
 	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.9.3
-	github.com/gouniverse/responses v0.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.2
 	github.com/mileusna/useragent v1.3.5
@@ -108,6 +107,7 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
+	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.1.0 // indirect
 	github.com/dracory/versionstore v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -124,8 +124,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/goravel/framework v1.16.5 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
-	github.com/gouniverse/base v0.9.0 // indirect
-	github.com/gouniverse/shortcode v0.4.0 // indirect
 	github.com/gouniverse/validator v0.11.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.7.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
@@ -147,7 +145,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.38.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20251113190631-e25ba8c21ef6 // indirect
+	golang.org/x/exp v0.0.0-20251125195548-87e1e737ad39 // indirect
 	golang.org/x/image v0.33.0 // indirect
 	golang.org/x/oauth2 v0.33.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
@@ -162,7 +160,7 @@ require (
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.67.0 // indirect
+	modernc.org/libc v1.67.1 // indirect
 )
 
 require (
@@ -170,7 +168,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/georgysavva/scany v1.2.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gouniverse/maputils v0.7.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect

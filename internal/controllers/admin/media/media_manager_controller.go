@@ -23,7 +23,6 @@ import (
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/responses"
 
 	"github.com/samber/lo"
 )
@@ -106,11 +105,15 @@ func (c *mediaManagerController) AnyIndex(w http.ResponseWriter, r *http.Request
 		JSON_ACTION_FILE_DELETE,
 		JSON_ACTION_FILE_UPLOAD,
 	}, strings.TrimSpace(req.GetStringTrimmed(r, "action"))) {
-		responses.JSONResponseF(w, r, c.anyIndex)
+		w.Header().Set("Content-Type", "application/json")
+		body := c.anyIndex(w, r)
+		w.Write([]byte(body))
 		return ""
 	}
 
-	responses.HTMLResponseF(w, r, c.anyIndex)
+	w.Header().Set("Content-Type", "text/html")
+	body := c.anyIndex(w, r)
+	w.Write([]byte(body))
 	return ""
 }
 

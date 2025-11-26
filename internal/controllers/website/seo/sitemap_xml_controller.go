@@ -11,7 +11,6 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/sb"
 	"github.com/dromara/carbon/v2"
-	"github.com/gouniverse/responses"
 	"github.com/samber/lo"
 )
 
@@ -25,7 +24,9 @@ func NewSitemapXmlController(app types.AppInterface) *sitemapXmlController {
 }
 
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
-	responses.XMLResponseF(w, r, c.buildSitemapXML)
+	w.Header().Set("Content-Type", "text/xml")
+	body := c.buildSitemapXML(w, r)
+	w.Write([]byte(body))
 	return ""
 }
 

@@ -10,7 +10,6 @@ import (
 
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
-	"github.com/gouniverse/responses"
 )
 
 func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
@@ -33,7 +32,10 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 	req.AddCookie(cookie)
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLogoutController(application).AnyIndex))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLogoutController(application).AnyIndex(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
@@ -92,7 +94,10 @@ func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLogoutController(application).AnyIndex))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLogoutController(application).AnyIndex(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)

@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/dracory/test"
-	"github.com/gouniverse/responses"
 )
 
 func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
@@ -26,7 +25,10 @@ func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLoginController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLoginController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
@@ -69,7 +71,10 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLoginController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLoginController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
@@ -111,7 +116,10 @@ func TestLoginControllerHandler_ValidRedirectWithBackURL(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLoginController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLoginController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
@@ -136,7 +144,10 @@ func TestLoginControllerHandler_InvalidBackURL(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.HTMLHandler(NewLoginController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewLoginController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	if recorder.Code != http.StatusSeeOther {
 		t.Fatal(`Response MUST be 303`, recorder.Code)

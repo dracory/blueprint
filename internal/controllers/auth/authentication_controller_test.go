@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/dracory/test"
-	"github.com/gouniverse/responses"
 )
 
 func TestAuthControllerOnceIsRequired(t *testing.T) {
@@ -28,7 +27,10 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 
 	code := recorder.Code
 
@@ -73,7 +75,10 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 
 	code := recorder.Code
@@ -119,7 +124,10 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 	code := recorder.Code
 
@@ -187,7 +195,10 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	(http.Handler(responses.JSONHandler(NewAuthenticationController(application).Handler))).ServeHTTP(recorder, req)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(application).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
 	code := recorder.Code
 

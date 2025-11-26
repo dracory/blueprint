@@ -3,7 +3,6 @@ package helpers
 import (
 	"encoding/json"
 
-	"github.com/gouniverse/maputils"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 )
@@ -25,7 +24,7 @@ func BlogPostBlocksToString(blocksString string) string {
 		return "Error parsing content. Please try again later."
 	}
 
-	blocksMap := maputils.MapAnyToArrayMapStringAny(blocksAny)
+	blocksMap := blocksAny
 
 	html := ""
 	for _, blockMap := range blocksMap {

@@ -1,11 +1,11 @@
 package cdn
 
 import (
+	"compress/gzip"
 	"net/http"
 	"strings"
 
 	"github.com/dracory/uncdn"
-	"github.com/gouniverse/responses"
 	"github.com/samber/lo"
 )
 
@@ -19,11 +19,11 @@ func (c cdnController) Handler(w http.ResponseWriter, r *http.Request) {
 	required, extension := c.findRequiredAndExtension(r)
 
 	if len(required) < 1 {
-		responses.HTMLResponse(w, r, "Nothing requested")
+		c.writeHTML(w, "Nothing requested")
 		return
 	}
 	if extension == "" {
-		responses.HTMLResponse(w, r, "No extension provided")
+		c.writeHTML(w, "No extension provided")
 		return
 	}
 	if !lo.Contains([]string{"css", "js"}, extension) {
@@ -34,16 +34,53 @@ func (c cdnController) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if extension == "js" {
-		responses.GzipJSResponse(w, r, c.compileJS(required))
+		if err := c.writeGzip(
+			w,
+			"application/javascript; charset=utf-8",
+			c.compileJS(required),
+		); err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 		return
 	}
 
 	if extension == "css" {
-		responses.GzipCSSResponse(w, r, c.compileCSS(required))
+		if err := c.writeGzip(
+			w,
+			"text/css; charset=utf-8",
+			c.compileCSS(required),
+		); err != nil {
+			http.Error(w, "Failed to write response", http.StatusInternalServerError)
+		}
 		return
 	}
 
-	responses.HTMLResponse(w, r, "Extension "+extension+" not found")
+	c.writeHTML(w, "Extension "+extension+" not found")
+}
+
+func (c cdnController) writeHTML(w http.ResponseWriter, body string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if _, err := w.Write([]byte(body)); err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	}
+}
+
+func (c cdnController) writeGzip(
+	w http.ResponseWriter,
+	contentType string,
+	body string,
+) error {
+	w.Header().Set("Content-Type", contentType)
+	w.Header().Set("Content-Encoding", "gzip")
+
+	gz := gzip.NewWriter(w)
+	defer gz.Close()
+
+	if _, err := gz.Write([]byte(body)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c cdnController) compileJS(required []string) string {

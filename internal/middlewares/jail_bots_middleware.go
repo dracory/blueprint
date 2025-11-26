@@ -9,7 +9,6 @@ import (
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
-	"github.com/gouniverse/responses"
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/samber/lo"
 )
@@ -27,20 +26,20 @@ func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 }
 
 type JailBotsConfig struct {
-    // Exclude filters items out of the internal URI blacklist lists used by
-    // isJailable (e.g., if "wp" is in the blacklist but you want to allow it,
-    // add "wp" here). Matches are compared literally against the blacklist
-    // entries, not against request paths.
-    Exclude      []string
+	// Exclude filters items out of the internal URI blacklist lists used by
+	// isJailable (e.g., if "wp" is in the blacklist but you want to allow it,
+	// add "wp" here). Matches are compared literally against the blacklist
+	// entries, not against request paths.
+	Exclude []string
 
-    // ExcludePaths defines request path patterns that must bypass the jail logic.
-    // Supported patterns:
-    //  - With a trailing '*': treated as a simple prefix match, e.g. "/blog*" matches
-    //    "/blog", "/blog/", and any subpaths like "/blog/post".
-    //  - Without '*': segment-aware; matches exactly the path (e.g. "/blog") or any
-    //    subpath starting with that segment (e.g. "/blog/..."), but NOT lookalikes
-    //    like "/blogger".
-    ExcludePaths []string
+	// ExcludePaths defines request path patterns that must bypass the jail logic.
+	// Supported patterns:
+	//  - With a trailing '*': treated as a simple prefix match, e.g. "/blog*" matches
+	//    "/blog", "/blog/", and any subpaths like "/blog/post".
+	//  - Without '*': segment-aware; matches exactly the path (e.g. "/blog") or any
+	//    subpath starting with that segment (e.g. "/blog/..."), but NOT lookalikes
+	//    like "/blogger".
+	ExcludePaths []string
 }
 
 type jailBotsMiddleware struct {
@@ -66,7 +65,7 @@ func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 
 		if m.isJailed(ip) {
 			w.WriteHeader(http.StatusForbidden)
-			responses.HTMLResponse(w, r, "malicious access not allowed (jb)")
+			writeJailBotsHTML(w, "malicious access not allowed (jb)")
 			return
 		}
 
@@ -83,12 +82,19 @@ func (m *jailBotsMiddleware) Handler(next http.Handler) http.Handler {
 			)
 
 			w.WriteHeader(http.StatusForbidden)
-			responses.HTMLResponse(w, r, "malicious access not allowed (jb)")
+			writeJailBotsHTML(w, "malicious access not allowed (jb)")
 			return
 		}
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func writeJailBotsHTML(w http.ResponseWriter, body string) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if _, err := w.Write([]byte(body)); err != nil {
+		http.Error(w, "Failed to write response", http.StatusInternalServerError)
+	}
 }
 
 func (j *jailBotsMiddleware) isJailed(ip string) bool {

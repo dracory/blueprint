@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/dracory/auth/tests"
-	"github.com/gouniverse/responses"
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/spf13/cast"
 )
@@ -47,7 +46,7 @@ func TestJailBotsMiddlewareAllowedResponse(t *testing.T) {
 		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// DEBUG: t.Log("Passes as expected")
 			w.WriteHeader(http.StatusOK)
-			responses.HTMLResponse(w, r, "gone through")
+			_, _ = w.Write([]byte("gone through"))
 		})
 
 		rw := httptest.NewRecorder()
@@ -92,7 +91,7 @@ func TestJailBotsMiddlewareJailedResponse(t *testing.T) {
 		testHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// DEBUG: t.Log("Passes as expected")
 			w.WriteHeader(http.StatusOK)
-			responses.HTMLResponse(w, r, "gone through")
+			_, _ = w.Write([]byte("gone through"))
 		})
 
 		rw := httptest.NewRecorder()
