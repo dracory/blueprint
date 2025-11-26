@@ -61,29 +61,29 @@ type Config struct {
 	envEncryptionKey string
 
 	// Store flags
-	auditStoreUsed     bool
-	blogStoreUsed      bool
-	chatStoreUsed      bool
-	cacheStoreUsed     bool
-	cmsStoreUsed       bool
-	cmsStoreTemplateID string
-	customStoreUsed    bool
-	entityStoreUsed    bool
-	feedStoreUsed      bool
-	geoStoreUsed       bool
-	logStoreUsed       bool
-	metaStoreUsed      bool
-	sessionStoreUsed   bool
-	settingStoreUsed   bool
-	shopStoreUsed      bool
-	sqlFileStoreUsed   bool
-	statsStoreUsed     bool
+	auditStoreUsed        bool
+	blogStoreUsed         bool
+	chatStoreUsed         bool
+	cacheStoreUsed        bool
+	cmsStoreUsed          bool
+	cmsStoreTemplateID    string
+	customStoreUsed       bool
+	entityStoreUsed       bool
+	feedStoreUsed         bool
+	geoStoreUsed          bool
+	logStoreUsed          bool
+	metaStoreUsed         bool
+	sessionStoreUsed      bool
+	settingStoreUsed      bool
+	shopStoreUsed         bool
+	sqlFileStoreUsed      bool
+	statsStoreUsed        bool
 	subscriptionStoreUsed bool
-	taskStoreUsed      bool
-	userStoreUsed      bool
+	taskStoreUsed         bool
+	userStoreUsed         bool
 	userStoreVaultEnabled bool
-	vaultStoreUsed     bool
-	vaultStoreKey      string
+	vaultStoreUsed        bool
+	vaultStoreKey         string
 
 	// i18n / Translation
 	translationLanguageDefault string

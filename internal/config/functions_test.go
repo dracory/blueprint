@@ -4,9 +4,9 @@ import "testing"
 
 func TestMissingEnvErrorError(t *testing.T) {
 	tests := []struct {
-		name    string
-		err     MissingEnvError
-		want   string
+		name string
+		err  MissingEnvError
+		want string
 	}{
 		{
 			name: "with context",

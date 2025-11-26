@@ -201,7 +201,12 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		dataBase64ImageStr, err := cache.File.Fetch(data.path)
 
 		if err != nil {
-			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			// Downgrade noisy cache expiry to info level, keep other cache errors as error
+			if err.Error() == "cache expired" {
+				controller.app.GetLogger().Info("Cache expired at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			} else {
+				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			}
 			return "", err.Error()
 		}
 

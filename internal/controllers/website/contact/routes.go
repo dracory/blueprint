@@ -18,11 +18,5 @@ func Routes(
 			SetPath(links.CONTACT).
 			SetMethod(http.MethodGet).
 			SetHTMLHandler(NewContactController(app).AnyIndex),
-
-		rtr.NewRoute().
-			SetName("Website > Contact Submit Controller").
-			SetPath(links.CONTACT).
-			SetMethod(http.MethodPost).
-			SetHTMLHandler(NewContactController(app).PostSubmit),
 	}
 }

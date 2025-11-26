@@ -37,8 +37,9 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ types.AppInterface) {
 				t.Helper()
 
-				if !strings.Contains(rr.Body.String(), "You are at the website home page") {
-					t.Fatalf("expected response to contain website home copy, got %q", rr.Body.String())
+				body := rr.Body.String()
+				if !strings.Contains(body, "You are at the website home page") {
+					t.Fatalf("expected response to contain website home copy, got %q", body)
 				}
 			},
 		},

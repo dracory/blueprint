@@ -186,6 +186,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 
 	if ts := app.GetTaskStore(); ts != nil {
 		group.Go(func(ctx context.Context) {
+			// Run the default task queue worker loop using the updated TaskQueue API
+			// 10 workers, 2-second polling interval
 			ts.TaskQueueRunDefault(ctx, 10, 2)
 		})
 	}

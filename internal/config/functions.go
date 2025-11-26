@@ -9,7 +9,6 @@ import (
 
 // MissingEnvError describes an unset required environment
 // variable with optional context to aid debugging.
-//
 type MissingEnvError struct {
 	Key     string
 	Context string

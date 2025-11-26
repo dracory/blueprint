@@ -102,10 +102,12 @@ func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
 	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
 
 	// Mount with a post ID that exists
-	posts, err := app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
-		Status: blogstore.POST_STATUS_PUBLISHED,
-		Limit:  1,
-	})
+	posts, err := app.GetBlogStore().PostList(
+		context.Background(),
+		blogstore.PostQueryOptions{
+			Status: blogstore.POST_STATUS_PUBLISHED,
+			Limit:  1,
+		})
 	if err != nil || len(posts) == 0 {
 		t.Fatal("Failed to get a test post ID")
 	}
