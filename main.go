@@ -25,7 +25,7 @@ import (
 	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
-
+	"github.com/dracory/taskstore"
 	"github.com/dracory/websrv"
 )
 
@@ -168,42 +168,61 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 		return errors.New("startBackgroundProcesses called with nil app")
 	}
 
+	if app.GetConfig() == nil {
+		return errors.New("startBackgroundProcesses called with nil config")
+	}
+
 	if app.GetDB() == nil {
 		return errors.New("startBackgroundProcesses called with nil db")
 	}
 
-	if app.GetTaskStore() == nil {
-		return errors.New("startBackgroundProcesses called with nil task store")
+	if app.GetConfig().GetTaskStoreUsed() && app.GetTaskStore() == nil {
+		return errors.New("startBackgroundProcesses task store is enabled but not initialized")
 	}
 
-	if app.GetCacheStore() == nil {
-		return errors.New("startBackgroundProcesses called with nil cache store")
+	if app.GetConfig().GetCacheStoreUsed() && app.GetCacheStore() == nil {
+		return errors.New("startBackgroundProcesses cache store is enabled but not initialized")
 	}
 
-	if app.GetSessionStore() == nil {
-		return errors.New("startBackgroundProcesses called with nil session store")
+	if app.GetConfig().GetSessionStoreUsed() && app.GetSessionStore() == nil {
+		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
 	}
 
-	if ts := app.GetTaskStore(); ts != nil {
-		group.Go(func(ctx context.Context) {
-			// Run the default task queue worker loop using the updated TaskQueue API
-			// 10 workers, 2-second polling interval
-			ts.TaskQueueRunDefault(ctx, 10, 2)
-		})
+	if app.GetConfig().GetTaskStoreUsed() {
+		ts := app.GetTaskStore()
+		if ts != nil {
+			group.Go(func(ctx context.Context) {
+				// Run the default task queue worker loop using the updated TaskQueue API
+				// 10 workers, 2-second polling interval
+				runner := taskstore.NewTaskQueueRunner(ts, taskstore.TaskQueueRunnerOptions{
+					IntervalSeconds: 2,
+					UnstuckMinutes:  2,
+					MaxConcurrency:  10,
+					Logger:          log.Default(),
+				})
+				runner.Start(ctx)
+			})
+		}
 	}
-	if cs := app.GetCacheStore(); cs != nil {
-		group.Go(func(ctx context.Context) {
-			if err := cs.ExpireCacheGoroutine(ctx); err != nil {
-				slog.Error("Cache expiration goroutine failed", "error", err)
-			}
-		})
+	if app.GetConfig().GetCacheStoreUsed() {
+		cs := app.GetCacheStore()
+		if cs != nil {
+			group.Go(func(ctx context.Context) {
+				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
+					slog.Error("Cache expiration goroutine failed", "error", err)
+				}
+			})
+		}
 	}
-	if ss := app.GetSessionStore(); ss != nil {
-		group.Go(func(ctx context.Context) {
-			if err := ss.SessionExpiryGoroutine(ctx); err != nil {
-				slog.Error("Session expiry goroutine failed", "error", err)
-			}
-		})
+	if app.GetConfig().GetSessionStoreUsed() {
+		ss := app.GetSessionStore()
+		if ss != nil {
+			group.Go(func(ctx context.Context) {
+				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
+					slog.Error("Session expiry goroutine failed", "error", err)
+				}
+			})
+		}
 	}
 
 	group.Go(func(ctx context.Context) {

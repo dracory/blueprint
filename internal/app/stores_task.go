@@ -58,6 +58,7 @@ func newTaskStore(db *sql.DB) (taskstore.StoreInterface, error) {
 		DB:                      db,
 		TaskDefinitionTableName: "snv_tasks_task_definition",
 		TaskQueueTableName:      "snv_tasks_task_queue",
+		ScheduleTableName:       "snv_tasks_schedule",
 	})
 	if err != nil {
 		return nil, err

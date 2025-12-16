@@ -7,7 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/dracory/auth/tests"
+	"project/internal/testutils"
+
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/spf13/cast"
 )
@@ -37,7 +38,7 @@ func TestJailBotsMiddlewareAllowedResponse(t *testing.T) {
 
 	for _, allowedUri := range allowedUris {
 		m := JailBotsMiddleware(JailBotsConfig{})
-		req, err := tests.NewRequest("GET", allowedUri, tests.NewRequestOptions{})
+		req, err := testutils.NewRequest("GET", allowedUri, testutils.NewRequestOptions{})
 
 		if err != nil {
 			t.Fatal(err)
@@ -76,7 +77,7 @@ func TestJailBotsMiddlewareJailedResponse(t *testing.T) {
 	for _, allowedUri := range allowedUris {
 		m := JailBotsMiddleware(JailBotsConfig{})
 		randInt := rand.IntN(1000)
-		req, err := tests.NewRequest("GET", allowedUri, tests.NewRequestOptions{
+		req, err := testutils.NewRequest("GET", allowedUri, testutils.NewRequestOptions{
 			Headers: map[string]string{
 				"User-Agent":      "test-agent",
 				"Referer":         "test-referer",
