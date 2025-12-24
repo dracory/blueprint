@@ -19,7 +19,6 @@ import (
 	"project/internal/controllers/admin/blog/post_delete"
 	"project/internal/controllers/admin/blog/post_manager"
 	"project/internal/controllers/admin/blog/post_update"
-	"project/internal/controllers/admin/blog/post_update_v1"
 	"project/internal/controllers/admin/blog/shared"
 )
 
@@ -36,8 +35,6 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 			return post_delete.NewPostDeleteController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_MANAGER:
 			return post_manager.NewPostManagerController(app).Handler(w, r)
-		case shared.CONTROLLER_POST_UPDATE_V1:
-			return post_update_v1.NewPostUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_UPDATE:
 			return post_update.NewPostUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TOOLS:
