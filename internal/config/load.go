@@ -40,7 +40,7 @@ func Load() (types.ConfigInterface, error) {
 	trans := loadTranslationConfig()
 
 	if envEnc.used {
-		if err := intializeEnvEncVariables(app.env); err != nil {
+		if err := initializeEnvEncVariables(app.env); err != nil {
 			acc.add(err)
 		}
 	}
@@ -151,7 +151,7 @@ func Load() (types.ConfigInterface, error) {
 //
 // Returns:
 // - none
-func intializeEnvEncVariables(appEnvironment string) error {
+func initializeEnvEncVariables(appEnvironment string) error {
 	if appEnvironment == APP_ENVIRONMENT_TESTING {
 		return nil
 	}
@@ -182,17 +182,13 @@ func intializeEnvEncVariables(appEnvironment string) error {
 	}
 
 	if fileExists(vaultFilePath) {
-		err := envenc.HydrateEnvFromFile(vaultFilePath, derivedEnvEncKey)
-
-		if err != nil {
+		if err := envenc.HydrateEnvFromFile(vaultFilePath, derivedEnvEncKey); err != nil {
 			return err
 		}
 	}
 
 	if vaultContent != "" {
-		err = envenc.HydrateEnvFromString(vaultContent, derivedEnvEncKey)
-
-		if err != nil {
+		if err := envenc.HydrateEnvFromString(vaultContent, derivedEnvEncKey); err != nil {
 			return err
 		}
 	}

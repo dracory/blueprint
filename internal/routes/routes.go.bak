@@ -36,12 +36,12 @@ func Routes(app types.AppInterface) rtr.RouterInterface {
 	r := rtr.NewRouter()
 
 	// Add global middlewares
-	globalMiddlewareList, routeList := RoutesList(app)
+	globalMiddlewareList, routes := RoutesList(app)
 
 	r.AddBeforeMiddlewares(globalMiddlewareList)
 
 	// Add all routes
-	for _, route := range routeList {
+	for _, route := range routes {
 		r.AddRoute(route)
 	}
 

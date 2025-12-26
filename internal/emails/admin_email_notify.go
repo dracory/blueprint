@@ -41,7 +41,7 @@ func (e *emailNotifyAdmin) Send(html string) error {
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
 	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
 
-	recipientEmail := "info@sinevia.com"
+	recipientEmail := "info@sinevia.com" // admin email
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{
