@@ -163,31 +163,11 @@ type storesConfig struct {
 }
 
 func loadStoresConfig(acc *loadAccumulator) storesConfig {
-	auditStoreUsed := env.GetBool(KEY_AUDIT_STORE_USED)
-	blogStoreUsed := env.GetBool(KEY_BLOG_STORE_USED)
-	cacheStoreUsed := env.GetBool(KEY_CACHE_STORE_USED)
-	cmsStoreUsed := env.GetBool(KEY_CMS_STORE_USED)
 	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
-	customStoreUsed := env.GetBool(KEY_CUSTOM_STORE_USED)
-	entityStoreUsed := env.GetBool(KEY_ENTITY_STORE_USED)
-	feedStoreUsed := env.GetBool(KEY_FEED_STORE_USED)
-	geoStoreUsed := env.GetBool(KEY_GEO_STORE_USED)
-	logStoreUsed := env.GetBool(KEY_LOG_STORE_USED)
-	metaStoreUsed := env.GetBool(KEY_META_STORE_USED)
-	sessionStoreUsed := env.GetBool(KEY_SESSION_STORE_USED)
-	settingStoreUsed := env.GetBool(KEY_SETTING_STORE_USED)
-	shopStoreUsed := env.GetBool(KEY_SHOP_STORE_USED)
-	sqlFileStoreUsed := env.GetBool(KEY_SQL_FILE_STORE_USED)
-	statsStoreUsed := env.GetBool(KEY_STATS_STORE_USED)
-	subscriptionStoreUsed := env.GetBool(KEY_SUBSCRIPTION_STORE_USED)
-	taskStoreUsed := env.GetBool(KEY_TASK_STORE_USED)
-	userStoreUsed := env.GetBool(KEY_USER_STORE_USED)
-	userStoreVaultEnabled := env.GetBool(KEY_USER_STORE_USE_VAULT)
-	vaultStoreUsed := env.GetBool(KEY_VAULT_STORE_USED)
 	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
 
 	if userStoreVaultEnabled && !vaultStoreUsed {
-		acc.add(fmt.Errorf("%s requires %s to be true", KEY_USER_STORE_USE_VAULT, KEY_VAULT_STORE_USED))
+		acc.add(fmt.Errorf("%v requires %v to be true", userStoreVaultEnabled, vaultStoreUsed))
 	}
 
 	acc.mustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID, "required when `CMS_STORE_USED` is true", cmsStoreTemplateID)

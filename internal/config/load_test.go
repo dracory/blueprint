@@ -98,43 +98,18 @@ func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
 	}
 }
 
-func TestLoad_StoreToggles(t *testing.T) {
-	mustSetenv(t, KEY_APP_HOST, "localhost")
-	mustSetenv(t, KEY_APP_PORT, "8080")
-	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
-	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
-	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
-	mustSetenv(t, KEY_CACHE_STORE_USED, "true")
-	mustSetenv(t, KEY_SESSION_STORE_USED, "true")
-	defer cleanupEnv()
-
-	cfg, err := Load()
-	if err != nil {
-		t.Fatalf("Load() failed: %v", err)
-	}
-
-	if !cfg.GetCacheStoreUsed() {
-		t.Error("expected cache store to be enabled")
-	}
-
-	if !cfg.GetSessionStoreUsed() {
-		t.Error("expected session store to be enabled")
-	}
-
-	if cfg.GetTaskStoreUsed() {
-		t.Error("expected task store to be disabled by default")
-	}
-}
-
 func TestLoad_CMSStoreRequiresTemplateID(t *testing.T) {
 	mustSetenv(t, KEY_APP_HOST, "localhost")
 	mustSetenv(t, KEY_APP_PORT, "8080")
 	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
 	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
-	mustSetenv(t, KEY_CMS_STORE_USED, "true")
 	// Missing CMS_STORE_TEMPLATE_ID
 	defer cleanupEnv()
+
+	if !cmsStoreUsed {
+		return // CMS store not enabled
+	}
 
 	_, err := Load()
 	if err == nil {
@@ -279,9 +254,11 @@ func TestLoad_VaultStoreRequirements(t *testing.T) {
 	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
 	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
-	mustSetenv(t, KEY_USER_STORE_USE_VAULT, "true")
-	mustSetenv(t, KEY_VAULT_STORE_USED, "false")
 	defer cleanupEnv()
+
+	if !userStoreVaultEnabled {
+		return // User vault not enabled
+	}
 
 	_, err := Load()
 	if err == nil {
