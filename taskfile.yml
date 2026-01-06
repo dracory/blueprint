@@ -191,6 +191,11 @@ tasks:
   # ======================================================================== #
   # START: Tools                                                             #
   # ======================================================================== #
+  
+  air:install:
+    desc: Install air (Go live reload)
+    cmds:
+      - go install github.com/air-verse/air@latest
 
   errcheck-install:
     desc: Install errcheck or update to latest
@@ -289,4 +294,39 @@ tasks:
   # ======================================================================== #
   # END: Tools                                                               #
   # ======================================================================== #
+  
+  # ======================================================================== #
+  # START: Docker                                                             #
+  # ======================================================================== #
+  
+  docker:build:
+    desc: Build the Docker image
+    cmds:
+      - docker build -t tap-api .
+
+  docker:run:
+    desc: Run the Docker container on port 8080
+    cmds:
+      - docker run --rm -p {{.PORT}}:8080 tap-api
+
+  docker:up:
+    desc: Run with docker compose
+    cmds:
+      - docker compose up --build
+
+  docker:test:
+    desc: Run the test suite inside Docker (no local Crystal required)
+    cmds:
+      - docker build -f Dockerfile.test -t tap-api-test .
+      - docker run --rm tap-api-test
+
+  docker:down:
+    desc: Stop docker compose
+    cmds:
+      - docker compose down
+      
+  # ======================================================================== #
+  # END: Docker                                                               #
+  # ======================================================================== #
+  
 

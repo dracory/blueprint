@@ -126,6 +126,9 @@ func New(cfg types.ConfigInterface) (types.AppInterface, error) {
 
 // GetConfig returns the application config
 func (a *Application) GetConfig() types.ConfigInterface {
+	if a == nil {
+		return nil
+	}
 	return a.cfg
 }
 func (a *Application) SetConfig(cfg types.ConfigInterface) {

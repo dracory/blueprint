@@ -112,7 +112,7 @@ func handleRoutesCommand(app types.AppInterface, args []string) error {
 	}
 	// m, r := routes.RoutesList()
 	// router.List(m, r)
-	r := routes.Routes(app)
+	r := routes.Router(app)
 	r.List()
 
 	return nil

@@ -96,7 +96,7 @@ func main() {
 		Host:    application.GetConfig().GetAppHost(),
 		Port:    application.GetConfig().GetAppPort(),
 		URL:     application.GetConfig().GetAppUrl(),
-		Handler: routes.Routes(application).ServeHTTP,
+		Handler: routes.Router(application).ServeHTTP,
 	})
 
 	if err != nil {

@@ -90,7 +90,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 			t.Parallel()
 
 			app := tc.setup()
-			router := routes.Routes(app)
+			router := routes.Router(app)
 
 			req := httptest.NewRequest(tc.method, tc.path, nil)
 			rr := httptest.NewRecorder()

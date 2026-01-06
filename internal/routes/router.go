@@ -31,17 +31,17 @@ func RoutesList(app types.AppInterface) (globalMiddlewareList []rtr.MiddlewareIn
 	return globalMiddlewares(app), routes(app)
 }
 
-// Routes returns the routes of the application
-func Routes(app types.AppInterface) rtr.RouterInterface {
+// Router creates the router for the application.
+func Router(app types.AppInterface) rtr.RouterInterface {
 	r := rtr.NewRouter()
 
 	// Add global middlewares
-	globalMiddlewareList, routes := RoutesList(app)
+	globalMiddlewareList, routeList := RoutesList(app)
 
 	r.AddBeforeMiddlewares(globalMiddlewareList)
 
 	// Add all routes
-	for _, route := range routes {
+	for _, route := range routeList {
 		r.AddRoute(route)
 	}
 
