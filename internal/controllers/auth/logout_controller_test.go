@@ -17,7 +17,7 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {
@@ -33,7 +33,7 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLogoutController(application).AnyIndex(w, r)
+		_ = NewLogoutController(registry).AnyIndex(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -57,7 +57,7 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 	}
 
 	// Verify flash message
-	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {
@@ -95,7 +95,7 @@ func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLogoutController(application).AnyIndex(w, r)
+		_ = NewLogoutController(registry).AnyIndex(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -104,7 +104,7 @@ func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
 	}
 
 	// Verify flash message still works even without existing cookie
-	flashMessage, err := testutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}

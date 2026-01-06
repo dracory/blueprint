@@ -21,7 +21,7 @@ import (
 // Business Logic:
 // 1. Checks an active subscription exists for the specified user
 // ==========================================================
-func NewSubscriptionOnlyMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewSubscriptionOnlyMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	m := rtr.NewMiddleware().
 		SetName("Subscription Only Middleware").
 		SetHandler(subscriptionOnlyMiddlewareHandler(app))
@@ -29,7 +29,7 @@ func NewSubscriptionOnlyMiddleware(app types.AppInterface) rtr.MiddlewareInterfa
 	return m
 }
 
-func subscriptionOnlyMiddlewareHandler(app types.AppInterface) func(next http.Handler) http.Handler {
+func subscriptionOnlyMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authUser := helpers.GetAuthUser(r)

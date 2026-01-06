@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	ctrl := NewStatsController(app)
 	statsHome := rtr.NewRoute().
 		SetName("Admin > Visitor Analytics > Home").

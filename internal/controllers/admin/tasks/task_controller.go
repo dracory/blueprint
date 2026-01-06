@@ -12,7 +12,7 @@ import (
 	taskAdmin "github.com/dracory/taskstore/admin"
 )
 
-func NewTaskController(app types.AppInterface) *taskController {
+func NewTaskController(app types.RegistryInterface) *taskController {
 	return &taskController{
 		app:    app,
 		logger: app.GetLogger(),
@@ -20,7 +20,7 @@ func NewTaskController(app types.AppInterface) *taskController {
 }
 
 type taskController struct {
-	app    types.AppInterface
+	app    types.RegistryInterface
 	logger *slog.Logger
 }
 
@@ -44,7 +44,7 @@ func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string 
 }
 
 type adminLayout struct {
-	app   types.AppInterface
+	app   types.RegistryInterface
 	title string
 	body  string
 

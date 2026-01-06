@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/geostore"
 )
 
-func geoStoreInitialize(app types.AppInterface) error {
+func geoStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetGeoStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func geoStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func geoStoreMigrate(app types.AppInterface) error {
+func geoStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

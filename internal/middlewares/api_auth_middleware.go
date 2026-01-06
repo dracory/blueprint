@@ -19,7 +19,7 @@ type apiAuthCacheItem struct {
 	user    userstore.UserInterface
 }
 
-func NewAPIAuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewAPIAuthMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	memoryCache := app.GetMemoryCache()
 
 	return rtr.NewMiddleware().

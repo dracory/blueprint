@@ -10,7 +10,7 @@ import (
 )
 
 // statsStoreInitialize initializes the stats store if enabled in the configuration.
-func statsStoreInitialize(app types.AppInterface) error {
+func statsStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func statsStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func statsStoreMigrate(app types.AppInterface) error {
+func statsStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/dracory/auditstore"
 )
 
-func auditStoreInitialize(app types.AppInterface) error {
+func auditStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetAuditStoreUsed() {
 		return nil
 	}
@@ -39,7 +39,7 @@ func newAuditStore(db *sql.DB) (auditstore.StoreInterface, error) {
 	return store, nil
 }
 
-func auditStoreMigrate(app types.AppInterface) error {
+func auditStoreMigrate(app types.RegistryInterface) error {
 	if !app.GetConfig().GetAuditStoreUsed() {
 		return nil
 	}

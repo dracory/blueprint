@@ -11,10 +11,10 @@ import (
 )
 
 type loginController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewLoginController(app types.AppInterface) *loginController {
+func NewLoginController(app types.RegistryInterface) *loginController {
 	return &loginController{app: app}
 }
 

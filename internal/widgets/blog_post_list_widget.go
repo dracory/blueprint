@@ -26,7 +26,7 @@ var _ Widget = (*blogPostListWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *blogPostListWidget - A pointer to the show widget
-func NewBlogPostListWidget(app types.AppInterface) *blogPostListWidget {
+func NewBlogPostListWidget(app types.RegistryInterface) *blogPostListWidget {
 	return &blogPostListWidget{
 		app: app,
 	}
@@ -42,7 +42,7 @@ func NewBlogPostListWidget(app types.AppInterface) *blogPostListWidget {
 // Example:
 // <x-blog-post-list>content</x-blog-post-list>
 type blogPostListWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 type blogPostListWidgetData struct {
 	postList  []blogstore.Post

@@ -16,11 +16,11 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type logManagerController struct{ app types.AppInterface }
+type logManagerController struct{ app types.RegistryInterface }
 
 // == CONSTRUCTOR =============================================================
 
-func NewLogManagerController(app types.AppInterface) *logManagerController {
+func NewLogManagerController(app types.RegistryInterface) *logManagerController {
 	return &logManagerController{app: app}
 }
 

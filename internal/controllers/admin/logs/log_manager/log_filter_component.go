@@ -15,7 +15,7 @@ import (
 type logFilterComponent struct {
 	liveflux.Base
 
-	App              types.AppInterface
+	App              types.RegistryInterface
 	Level            string
 	SearchMessage    string
 	SearchContext    string
@@ -28,7 +28,7 @@ type logFilterComponent struct {
 	RedirectURL string
 }
 
-func NewLogFilterComponent(app types.AppInterface) liveflux.ComponentInterface {
+func NewLogFilterComponent(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&logFilterComponent{})
 	if err != nil {
 		log.Println(err)

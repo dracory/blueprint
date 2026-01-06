@@ -19,7 +19,7 @@ import (
 )
 
 type blogSettingsController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type blogSettingsData struct {
@@ -28,7 +28,7 @@ type blogSettingsData struct {
 	isEnvOverride   bool
 }
 
-func NewBlogSettingsController(app types.AppInterface) *blogSettingsController {
+func NewBlogSettingsController(app types.RegistryInterface) *blogSettingsController {
 	return &blogSettingsController{app: app}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func TaskRoutes(app types.AppInterface) []rtr.RouteInterface {
+func TaskRoutes(app types.RegistryInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		// &router.Route{
 		// 	Name:        "Admin > Users > User Create",

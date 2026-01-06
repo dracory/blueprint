@@ -8,7 +8,7 @@ import (
 	"github.com/dracory/blogstore"
 )
 
-func blogStoreInitialize(app types.AppInterface) error {
+func blogStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		return nil
 	}
@@ -22,7 +22,7 @@ func blogStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func blogStoreMigrate(app types.AppInterface) error {
+func blogStoreMigrate(app types.RegistryInterface) error {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		return nil
 	}

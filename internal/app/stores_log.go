@@ -8,7 +8,7 @@ import (
 	"github.com/dracory/logstore"
 )
 
-func logStoreInitialize(app types.AppInterface) error {
+func logStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetLogStoreUsed() {
 		return nil
 	}
@@ -22,7 +22,7 @@ func logStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func logStoreMigrate(app types.AppInterface) error {
+func logStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

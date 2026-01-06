@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cast"
 )
 
-func NewCleanUpTask(app types.AppInterface) taskstore.TaskHandlerInterface {
+func NewCleanUpTask(app types.RegistryInterface) taskstore.TaskHandlerInterface {
 	return &cleanUpTask{
 		app: app,
 	}
@@ -18,7 +18,7 @@ func NewCleanUpTask(app types.AppInterface) taskstore.TaskHandlerInterface {
 
 type cleanUpTask struct {
 	taskstore.TaskHandlerBase
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*cleanUpTask)(nil) // verify it extends the task interface

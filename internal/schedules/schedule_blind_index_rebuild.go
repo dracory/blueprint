@@ -8,7 +8,7 @@ import (
 )
 
 // scheduleBlindIndexRebuildTask schedules the blind index rebuild task
-func scheduleBlindIndexRebuildTask(app types.AppInterface) {
+func scheduleBlindIndexRebuildTask(app types.RegistryInterface) {
 	_, err := blind_index_rebuild.NewBlindIndexRebuildTask(app).
 		Enqueue(blind_index_rebuild.BlindIndexAll)
 

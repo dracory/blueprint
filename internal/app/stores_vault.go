@@ -10,7 +10,7 @@ import (
 )
 
 // vaultStoreInitialize initializes the vault store if enabled in the configuration.
-func vaultStoreInitialize(app types.AppInterface) error {
+func vaultStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func vaultStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func vaultStoreMigrate(app types.AppInterface) error {
+func vaultStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

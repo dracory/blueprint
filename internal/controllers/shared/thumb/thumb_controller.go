@@ -29,14 +29,14 @@ import (
 
 // == CONSTRUCTOR =============================================================
 
-func NewThumbController(app types.AppInterface) *thumbnailController {
+func NewThumbController(app types.RegistryInterface) *thumbnailController {
 	return &thumbnailController{app: app}
 }
 
 // == CONTROLLER ==============================================================
 
 type thumbnailController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // ThumbnailHandler

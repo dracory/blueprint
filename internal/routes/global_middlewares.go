@@ -10,7 +10,7 @@ import (
 )
 
 // globalMiddlewares returns a list of middlewares to be applied to all routes
-func globalMiddlewares(app types.AppInterface) []rtr.MiddlewareInterface {
+func globalMiddlewares(app types.RegistryInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
 		middlewares.JailBotsMiddleware(middlewares.JailBotsConfig{

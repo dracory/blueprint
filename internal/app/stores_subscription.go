@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/subscriptionstore"
 )
 
-func subscriptionStoreInitialize(app types.AppInterface) error {
+func subscriptionStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetSubscriptionStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func subscriptionStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func subscriptionStoreMigrate(app types.AppInterface) error {
+func subscriptionStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

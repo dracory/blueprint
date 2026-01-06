@@ -21,7 +21,7 @@ import (
 
 type formProfileUpdate struct {
 	liveflux.Base
-	App                    types.AppInterface
+	App                    types.RegistryInterface
 	UserID                 string
 	ReturnURL              string
 	FormEmail              string
@@ -41,7 +41,7 @@ type formProfileUpdate struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewFormProfileUpdate(app types.AppInterface) liveflux.ComponentInterface {
+func NewFormProfileUpdate(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formProfileUpdate{})
 	if err != nil {
 		log.Println(err)

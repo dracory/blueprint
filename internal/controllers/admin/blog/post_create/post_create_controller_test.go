@@ -82,7 +82,7 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 	assert.Equal(t, postTitle, posts[0].Title(), "Post title should match")
 }
 
-func setupControllerAppAndUser(t *testing.T) (types.AppInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(

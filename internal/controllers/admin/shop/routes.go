@@ -13,7 +13,7 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 )
 
-func ShopRoutes(app types.AppInterface) []rtr.RouteInterface {
+func ShopRoutes(app types.RegistryInterface) []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 

@@ -6,8 +6,8 @@ import (
 
 // dataStoresMigrate performs phase 2 of store setup. Placeholder for upcoming
 // two-phase migration once stores are split into create/migrate.
-func (a *Application) dataStoresMigrate() error {
-	migrators := []func(app types.AppInterface) error{
+func (r *Registry) dataStoresMigrate() error {
+	migrators := []func(app types.RegistryInterface) error{
 		auditStoreMigrate,
 		blogStoreMigrate,
 		blindIndexEmailStoreMigrate,
@@ -34,7 +34,7 @@ func (a *Application) dataStoresMigrate() error {
 	}
 
 	for _, m := range migrators {
-		if err := m(a); err != nil {
+		if err := m(r); err != nil {
 			return err
 		}
 	}

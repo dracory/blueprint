@@ -12,7 +12,7 @@ import (
 )
 
 type postDeleteController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type postDeleteControllerData struct {
@@ -21,7 +21,7 @@ type postDeleteControllerData struct {
 	successMessage string
 }
 
-func NewPostDeleteController(app types.AppInterface) *postDeleteController {
+func NewPostDeleteController(app types.RegistryInterface) *postDeleteController {
 	return &postDeleteController{app: app}
 }
 

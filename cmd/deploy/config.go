@@ -50,22 +50,22 @@ func GetDeployCommands(config Config) []DeployCommand {
 		},
 		{
 			Reason:   "Touch current error log to make sure it exists (only needed for the first time)",
-			Cmd:      `touch ` + config.RemoteDeployDir + `/application.error.log`,
+			Cmd:      `touch ` + config.RemoteDeployDir + `/registry.error.log`,
 			Required: false,
 		},
 		{
 			Reason:   "Rename current error log to backup (in case of failure we can restore it manually)",
-			Cmd:      `mv ` + config.RemoteDeployDir + `/application.error.log ` + config.RemoteDeployDir + `/` + config.Timestamp + `_backup_application.error.log`,
+			Cmd:      `mv ` + config.RemoteDeployDir + `/registry.error.log ` + config.RemoteDeployDir + `/` + config.Timestamp + `_backup_registry.error.log`,
 			Required: false,
 		},
 		{
 			Reason:   "Touch current log to make sure it exists (only needed for the first time)",
-			Cmd:      `touch ` + config.RemoteDeployDir + `/application.log`,
+			Cmd:      `touch ` + config.RemoteDeployDir + `/registry.log`,
 			Required: false,
 		},
 		{
 			Reason:   "Rename current log to backup (in case of failure we can restore it manually)",
-			Cmd:      `mv ` + config.RemoteDeployDir + `/application.log ` + config.RemoteDeployDir + `/` + config.Timestamp + `_backup_application.log`,
+			Cmd:      `mv ` + config.RemoteDeployDir + `/registry.log ` + config.RemoteDeployDir + `/` + config.Timestamp + `_backup_registry.log`,
 			Required: false,
 		},
 		{
@@ -75,7 +75,7 @@ func GetDeployCommands(config Config) []DeployCommand {
 		},
 		{
 			Reason:   "Start pm2 process for the new executable",
-			Cmd:      `cd ` + config.RemoteDeployDir + `; pm2 start "application" --name ` + config.PM2ProcessName + ` --log=` + config.RemoteDeployDir + `/application.log --error=` + config.RemoteDeployDir + `/application.error.log --time`,
+			Cmd:      `cd ` + config.RemoteDeployDir + `; pm2 start "application" --name ` + config.PM2ProcessName + ` --log=` + config.RemoteDeployDir + `/registry.log --error=` + config.RemoteDeployDir + `/registry.error.log --time`,
 			Required: true,
 		},
 	}

@@ -8,12 +8,12 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewEmailToAdminOnNewContactFormSubmitted(app types.AppInterface) *emailToAdminOnNewContactFormSubmitted {
+func NewEmailToAdminOnNewContactFormSubmitted(app types.RegistryInterface) *emailToAdminOnNewContactFormSubmitted {
 	return &emailToAdminOnNewContactFormSubmitted{app: app}
 }
 
 type emailToAdminOnNewContactFormSubmitted struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // Send sends an email notification to the admin when a new contact form is submitted

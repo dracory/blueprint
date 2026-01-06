@@ -22,7 +22,7 @@ import (
 //
 // Returns:
 // - none
-func RegisterTasks(app types.AppInterface) {
+func RegisterTasks(app types.RegistryInterface) {
 	if app.GetTaskStore() == nil {
 		return
 	}

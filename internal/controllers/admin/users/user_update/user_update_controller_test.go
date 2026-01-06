@@ -105,7 +105,7 @@ func TestUserUpdateController_ShowsForm(t *testing.T) {
 	}
 }
 
-func setupControllerAppAndUser(t *testing.T) (types.AppInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(

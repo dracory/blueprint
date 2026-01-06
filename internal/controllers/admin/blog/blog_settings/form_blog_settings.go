@@ -16,7 +16,7 @@ import (
 
 type formBlogSettings struct {
 	liveflux.Base
-	App                      types.AppInterface
+	App                      types.RegistryInterface
 	BlogTopic                string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -27,7 +27,7 @@ type formBlogSettings struct {
 	ReturnURL                string
 }
 
-func NewFormBlogSettings(app types.AppInterface) liveflux.ComponentInterface {
+func NewFormBlogSettings(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formBlogSettings{})
 	if err != nil {
 		log.Println(err)

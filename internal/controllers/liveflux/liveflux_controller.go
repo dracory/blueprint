@@ -12,14 +12,14 @@ import (
 // livefluxController adapts liveflux.Handler to the rtr HTML handler signature.
 type livefluxController struct {
 	Engine http.Handler
-	App    types.AppInterface
+	App    types.RegistryInterface
 }
 
 type contextKey string
 
 const AppContextKey contextKey = "app"
 
-func NewController(app types.AppInterface) *livefluxController {
+func NewController(app types.RegistryInterface) *livefluxController {
 	return &livefluxController{
 		App:    app,
 		Engine: liveflux.NewHandler(nil),

@@ -9,7 +9,7 @@ import (
 )
 
 func NewCmsLayout(
-	app types.AppInterface,
+	app types.RegistryInterface,
 	r *http.Request,
 	options Options,
 ) *cmsLayout {
@@ -26,7 +26,7 @@ func NewCmsLayout(
 }
 
 type cmsLayout struct {
-	app        types.AppInterface
+	app        types.RegistryInterface
 	request    *http.Request
 	title      string
 	content    hb.TagInterface

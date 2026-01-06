@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	adsRoute := rtr.NewRoute().
 		SetName("Website > ads.txt").
 		SetPath("/ads.txt").

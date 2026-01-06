@@ -20,7 +20,7 @@ const (
 )
 
 // commandHandler defines the function signature for command handlers.
-type commandHandler func(app types.AppInterface, args []string) error
+type commandHandler func(registry types.RegistryInterface, args []string) error
 
 // commandHandlers maps command strings to their handler functions.
 var commandHandlers = map[string]commandHandler{
@@ -45,12 +45,12 @@ var commandHandlers = map[string]commandHandler{
 // 6. Returns specific errors for invalid commands, missing arguments, or nil TaskStore via the handlers.
 //
 // Parameters:
-// - db *database.Database : The database instance to be passed to command handlers.
+// - registry types.RegistryInterface : The registry instance to be passed to command handlers.
 // - args []string : The command line arguments (excluding the program name).
 //
 // Returns:
 // - error: An error if the command execution fails or is invalid, otherwise nil.
-func ExecuteCliCommand(app types.AppInterface, args []string) error {
+func ExecuteCliCommand(registry types.RegistryInterface, args []string) error {
 	cfmt.Infoln("Executing command: ", args)
 
 	if len(args) == 0 {
@@ -71,48 +71,48 @@ func ExecuteCliCommand(app types.AppInterface, args []string) error {
 		return err
 	}
 
-	// Execute the found handler with db
-	return handler(app, remainingArgs)
+	// Execute the found handler with registry
+	return handler(registry, remainingArgs)
 }
 
 // handleTaskCommand handles the 'task' command.
-func handleTaskCommand(app types.AppInterface, args []string) error {
+func handleTaskCommand(registry types.RegistryInterface, args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("missing task alias for command '%s'", CommandTask)
 	}
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		err := errors.New("task store is nil")
 		cfmt.Errorln(err.Error())
 		return err
 	}
 
 	// Initialize email sender for tasks that require it
-	emails.InitEmailSender(app)
+	emails.InitEmailSender(registry)
 
 	taskAlias := args[0]
 	taskArgs := args[1:]
 	// Assuming TaskExecuteCli handles its own errors/logging internally
-	app.GetTaskStore().TaskDefinitionExecuteCli(taskAlias, taskArgs)
+	registry.GetTaskStore().TaskDefinitionExecuteCli(taskAlias, taskArgs)
 	// Assuming success unless TaskExecuteCli panics or indicates failure differently
 	return nil
 }
 
 // handleJobCommand handles the 'job' command.
-func handleJobCommand(app types.AppInterface, args []string) error {
+func handleJobCommand(registry types.RegistryInterface, args []string) error {
 	// Assuming ExecuteJob handles its own errors/logging internally
-	cmds.ExecuteJob(app, args)
+	cmds.ExecuteJob(registry, args)
 	// Assuming success unless ExecuteJob panics or indicates failure differently
 	return nil
 }
 
 // handleRoutesCommand handles the 'routes' command.
-func handleRoutesCommand(app types.AppInterface, args []string) error {
+func handleRoutesCommand(registry types.RegistryInterface, args []string) error {
 	if len(args) == 0 || args[0] != SubcommandList {
 		return fmt.Errorf("invalid or missing subcommand for '%s'. Use '%s %s'", CommandRoutes, CommandRoutes, SubcommandList)
 	}
 	// m, r := routes.RoutesList()
 	// router.List(m, r)
-	r := routes.Router(app)
+	r := routes.Router(registry)
 	r.List()
 
 	return nil

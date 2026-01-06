@@ -35,7 +35,7 @@ const BlindIndexLastName = "last_name"
 type blindIndexRebuildTask struct {
 	taskstore.TaskHandlerBase
 
-	app types.AppInterface
+	app types.RegistryInterface
 
 	// allowed indexes
 	allowedIndexes []string
@@ -51,7 +51,7 @@ var _ taskstore.TaskHandlerInterface = (*blindIndexRebuildTask)(nil) // verify i
 
 // == CONSTRUCTOR =============================================================
 
-func NewBlindIndexRebuildTask(app types.AppInterface) *blindIndexRebuildTask {
+func NewBlindIndexRebuildTask(app types.RegistryInterface) *blindIndexRebuildTask {
 	return &blindIndexRebuildTask{
 		app:            app,
 		allowedIndexes: []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName},

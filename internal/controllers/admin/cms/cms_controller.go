@@ -12,10 +12,10 @@ import (
 )
 
 type cmsNewController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewCmsNewController(app types.AppInterface) *cmsNewController {
+func NewCmsNewController(app types.RegistryInterface) *cmsNewController {
 	return &cmsNewController{app: app}
 }
 

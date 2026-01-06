@@ -11,12 +11,12 @@ import (
 // == CONTROLLER ===============================================================
 
 type widgetController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewWidgetController(app types.AppInterface) *widgetController {
+func NewWidgetController(app types.RegistryInterface) *widgetController {
 	return &widgetController{app: app}
 }
 

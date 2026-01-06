@@ -16,7 +16,7 @@ import (
 )
 
 type productCreateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type productCreateControllerData struct {
@@ -25,7 +25,7 @@ type productCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewProductCreateController(app types.AppInterface) *productCreateController {
+func NewProductCreateController(app types.RegistryInterface) *productCreateController {
 	return &productCreateController{app: app}
 }
 

@@ -16,7 +16,7 @@ import (
 	"project/internal/controllers/website/swagger"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	if app == nil || app.GetConfig() == nil {
 		return []rtr.RouteInterface{}
 	}

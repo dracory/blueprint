@@ -24,7 +24,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type profileController struct {
-	app                                    types.AppInterface
+	app                                    types.RegistryInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formCountry                            string
 	formTimezone                           string
@@ -32,7 +32,7 @@ type profileController struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewProfileController(app types.AppInterface) *profileController {
+func NewProfileController(app types.RegistryInterface) *profileController {
 	return &profileController{
 		app:                                    app,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",

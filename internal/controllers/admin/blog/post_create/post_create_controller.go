@@ -12,7 +12,7 @@ import (
 )
 
 type postCreateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type postCreateControllerData struct {
@@ -20,7 +20,7 @@ type postCreateControllerData struct {
 	successMessage string
 }
 
-func NewPostCreateController(app types.AppInterface) *postCreateController {
+func NewPostCreateController(app types.RegistryInterface) *postCreateController {
 	return &postCreateController{app: app}
 }
 

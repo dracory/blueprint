@@ -18,12 +18,12 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
-	app      types.AppInterface
+	app      types.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewCmsController(app types.AppInterface) *cmsController {
+func NewCmsController(app types.RegistryInterface) *cmsController {
 	return &cmsController{app: app}
 }
 
@@ -41,7 +41,7 @@ func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) 
 var instance cmsFrontend.FrontendInterface
 var once sync.Once
 
-func GetInstance(app types.AppInterface) cmsFrontend.FrontendInterface {
+func GetInstance(app types.RegistryInterface) cmsFrontend.FrontendInterface {
 	once.Do(func() {
 		list := widgets.WidgetRegistry(app)
 

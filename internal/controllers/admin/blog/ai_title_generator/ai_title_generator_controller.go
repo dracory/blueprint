@@ -29,7 +29,7 @@ const (
 )
 
 type AiTitleGeneratorController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type pageData struct {
@@ -39,7 +39,7 @@ type pageData struct {
 	HasSystemPrompt     bool
 }
 
-func NewAiTitleGeneratorController(app types.AppInterface) *AiTitleGeneratorController {
+func NewAiTitleGeneratorController(app types.RegistryInterface) *AiTitleGeneratorController {
 	return &AiTitleGeneratorController{app: app}
 }
 

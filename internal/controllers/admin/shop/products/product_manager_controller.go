@@ -29,12 +29,12 @@ const ActionModalProductFilterShow = "modal_product_filter_show"
 // == CONTROLLER ==============================================================
 
 type productManagerController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductManagerController(app types.AppInterface) *productManagerController {
+func NewProductManagerController(app types.RegistryInterface) *productManagerController {
 	return &productManagerController{app: app}
 }
 

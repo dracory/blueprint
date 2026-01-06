@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	fileManager := rtr.NewRoute().
 		SetName("Admin > File Manager").
 		SetPath(links.ADMIN_FILE_MANAGER).

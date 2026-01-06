@@ -10,10 +10,10 @@ import (
 )
 
 type logoutController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewLogoutController(app types.AppInterface) *logoutController {
+func NewLogoutController(app types.RegistryInterface) *logoutController {
 	return &logoutController{app: app}
 }
 

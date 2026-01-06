@@ -16,7 +16,7 @@ import (
 // go run . task email-to-admin-on-new-user-register --userID=12345678
 //
 // =================================================================
-func NewEmailToAdminOnNewUserRegisteredTaskHandler(app types.AppInterface) *emailToAdminOnNewUserRegisteredTaskHandler {
+func NewEmailToAdminOnNewUserRegisteredTaskHandler(app types.RegistryInterface) *emailToAdminOnNewUserRegisteredTaskHandler {
 	return &emailToAdminOnNewUserRegisteredTaskHandler{
 		app: app,
 	}
@@ -25,7 +25,7 @@ func NewEmailToAdminOnNewUserRegisteredTaskHandler(app types.AppInterface) *emai
 // emailToAdminOnNewUserRegisteredTaskHandler sends a notification email to admin
 type emailToAdminOnNewUserRegisteredTaskHandler struct {
 	taskstore.TaskHandlerBase
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewUserRegisteredTaskHandler)(nil) // verify it extends the task interface

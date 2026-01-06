@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/blindindexstore"
 )
 
-func blindIndexLastNameStoreInitialize(app types.AppInterface) error {
+func blindIndexLastNameStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func blindIndexLastNameStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func blindIndexLastNameStoreMigrate(app types.AppInterface) error {
+func blindIndexLastNameStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

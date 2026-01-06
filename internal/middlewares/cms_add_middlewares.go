@@ -8,7 +8,7 @@ import (
 	"github.com/dracory/cmsstore"
 )
 
-func CmsAddMiddlewares(app types.AppInterface) {
+func CmsAddMiddlewares(app types.RegistryInterface) {
 	if !app.GetConfig().GetCmsStoreUsed() {
 		return
 	}

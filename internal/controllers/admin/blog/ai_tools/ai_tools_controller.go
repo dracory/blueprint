@@ -15,12 +15,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type aiToolsController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewAiToolsController(app types.AppInterface) *aiToolsController {
+func NewAiToolsController(app types.RegistryInterface) *aiToolsController {
 	return &aiToolsController{app: app}
 }
 

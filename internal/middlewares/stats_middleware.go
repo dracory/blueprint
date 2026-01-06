@@ -11,7 +11,7 @@ import (
 	"github.com/dromara/carbon/v2"
 )
 
-func NewStatsMiddleware(application types.AppInterface) rtr.MiddlewareInterface {
+func NewStatsMiddleware(application types.RegistryInterface) rtr.MiddlewareInterface {
 	stats := new(statsMiddleware)
 	return rtr.NewMiddleware().
 		SetName(stats.Name()).
@@ -24,7 +24,7 @@ func (m statsMiddleware) Name() string {
 	return "Stats Middleware"
 }
 
-func (m statsMiddleware) Handler(application types.AppInterface, next http.Handler) http.Handler {
+func (m statsMiddleware) Handler(application types.RegistryInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !application.GetConfig().GetStatsStoreUsed() {
 			next.ServeHTTP(w, r)

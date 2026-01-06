@@ -31,7 +31,7 @@ type SendOptions struct {
 var emailSender baseEmail.Sender
 
 // InitEmailSender initializes the email sender
-func InitEmailSender(app types.AppInterface) {
+func InitEmailSender(app types.RegistryInterface) {
 	if app == nil {
 		return
 	}

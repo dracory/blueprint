@@ -9,7 +9,7 @@ import (
 )
 
 // sqlFileStorageInitialize initializes the SQL file storage if enabled in the configuration.
-func sqlFileStorageInitialize(app types.AppInterface) error {
+func sqlFileStorageInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -27,7 +27,7 @@ func sqlFileStorageInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func sqlFileStorageMigrate(app types.AppInterface) error {
+func sqlFileStorageMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

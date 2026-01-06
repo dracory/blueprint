@@ -7,12 +7,12 @@ import (
 
 // dataStoresInitialize performs phase 1 of store setup. For now it delegates
 // to initializeStores to preserve behavior; it will be refactored to create-only.
-func (a *Application) dataStoresInitialize() error {
-	if a.GetConfig() == nil {
+func (r *Registry) dataStoresInitialize() error {
+	if r.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	initializers := []func(app types.AppInterface) error{
+	initializers := []func(app types.RegistryInterface) error{
 		auditStoreInitialize,
 		blindIndexEmailStoreInitialize,
 		blindIndexFirstNameStoreInitialize,
@@ -39,7 +39,7 @@ func (a *Application) dataStoresInitialize() error {
 	}
 
 	for _, initializer := range initializers {
-		if err := initializer(a); err != nil {
+		if err := initializer(r); err != nil {
 			return err
 		}
 	}

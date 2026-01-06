@@ -14,7 +14,7 @@ import (
 //
 // Returns:
 //   - *contactForm - A pointer to the contactForm shrtcode
-func NewContactFormWidget(app types.AppInterface) *contactFormWidget {
+func NewContactFormWidget(app types.RegistryInterface) *contactFormWidget {
 	return &contactFormWidget{}
 }
 
@@ -24,7 +24,7 @@ var _ Widget = (*contactFormWidget)(nil) // verify it extends the interface
 //
 // This shortcode is used to send a contact message from the website.
 type contactFormWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // Alias the shortcode alias to be used in the template.

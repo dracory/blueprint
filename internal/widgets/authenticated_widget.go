@@ -17,7 +17,7 @@ var _ Widget = (*authenticatedWidget)(nil) // verify it extends the interface
 //
 // Returns:
 // - *authenticatedWidget: a pointer to an authenticatedWidget.
-func NewAuthenticatedWidget(app types.AppInterface) *authenticatedWidget {
+func NewAuthenticatedWidget(app types.RegistryInterface) *authenticatedWidget {
 	return &authenticatedWidget{app: app}
 }
 
@@ -27,7 +27,7 @@ func NewAuthenticatedWidget(app types.AppInterface) *authenticatedWidget {
 //
 // It displays the content of the shortcode if the user is authenticated.
 type authenticatedWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == PUBLIC METHODS =========================================================

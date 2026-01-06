@@ -19,7 +19,7 @@ import (
 //
 // Returns:
 //   - None
-func CmsAddShortcodes(app types.AppInterface) {
+func CmsAddShortcodes(app types.RegistryInterface) {
 	if !app.GetConfig().GetCmsStoreUsed() {
 		return
 	}

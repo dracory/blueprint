@@ -11,7 +11,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	home := rtr.NewRoute().
 		SetName("User > Home").
 		SetPath(links.USER_HOME).
@@ -41,7 +41,7 @@ func Routes(app types.AppInterface) []rtr.RouteInterface {
 	return userRoutes
 }
 
-func applyUserMiddleware(app types.AppInterface, routes []rtr.RouteInterface) {
+func applyUserMiddleware(app types.RegistryInterface, routes []rtr.RouteInterface) {
 	for _, route := range routes {
 		middlewaresToAdd := []rtr.MiddlewareInterface{
 			middlewares.NewUserMiddleware(app),

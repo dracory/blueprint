@@ -14,12 +14,12 @@ import (
 
 // userImpersonateController represents a controller for handling user impersonation.
 type userImpersonateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewUserImpersonateController(app types.AppInterface) *userImpersonateController {
+func NewUserImpersonateController(app types.RegistryInterface) *userImpersonateController {
 	return &userImpersonateController{app: app}
 }
 

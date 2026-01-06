@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupDetailsTestAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Post) {
+func setupDetailsTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
 	app := testutils.Setup(

@@ -15,10 +15,10 @@ import (
 )
 
 type Controller struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewController(app types.AppInterface) *Controller {
+func NewController(app types.RegistryInterface) *Controller {
 	return &Controller{app: app}
 }
 

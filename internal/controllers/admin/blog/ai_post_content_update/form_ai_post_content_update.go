@@ -24,7 +24,7 @@ import (
 
 type formAiPostContentUpdate struct {
 	liveflux.Base
-	App        types.AppInterface
+	App        types.RegistryInterface
 	Post       *blogstore.Post
 	Blocks     []Block
 	Error      string
@@ -43,7 +43,7 @@ const (
 
 // == CONSTRUCTOR =============================================================
 
-func NewFormAiPostContentUpdate(app types.AppInterface) liveflux.ComponentInterface {
+func NewFormAiPostContentUpdate(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formAiPostContentUpdate{})
 	if err != nil {
 		log.Println(err)

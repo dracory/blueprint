@@ -6,11 +6,11 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewEmailNotifyAdmin(app types.AppInterface) *emailNotifyAdmin {
+func NewEmailNotifyAdmin(app types.RegistryInterface) *emailNotifyAdmin {
 	return &emailNotifyAdmin{app: app}
 }
 
-type emailNotifyAdmin struct{ app types.AppInterface }
+type emailNotifyAdmin struct{ app types.RegistryInterface }
 
 // Send sends an email notification to the admin
 func (e *emailNotifyAdmin) Send(html string) error {

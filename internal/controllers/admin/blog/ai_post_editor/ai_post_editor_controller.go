@@ -31,7 +31,7 @@ const (
 )
 
 type AiPostEditorController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type pageData struct {
@@ -40,7 +40,7 @@ type pageData struct {
 	Record     customstore.RecordInterface
 }
 
-func NewAiPostEditorController(app types.AppInterface) *AiPostEditorController {
+func NewAiPostEditorController(app types.RegistryInterface) *AiPostEditorController {
 	return &AiPostEditorController{app: app}
 }
 

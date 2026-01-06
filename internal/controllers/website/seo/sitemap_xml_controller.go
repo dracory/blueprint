@@ -15,11 +15,11 @@ import (
 )
 
 type sitemapXmlController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // NewSitemapXmlController creates a new instance of the sitemapXmlController struct.
-func NewSitemapXmlController(app types.AppInterface) *sitemapXmlController {
+func NewSitemapXmlController(app types.RegistryInterface) *sitemapXmlController {
 	return &sitemapXmlController{app: app}
 }
 

@@ -14,10 +14,10 @@ import (
 )
 
 type AiTestController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewAiTestController(app types.AppInterface) *AiTestController {
+func NewAiTestController(app types.RegistryInterface) *AiTestController {
 	return &AiTestController{app: app}
 }
 
@@ -104,7 +104,7 @@ func (c *AiTestController) view() *hb.Tag {
 
 	desc := hb.Paragraph().
 		HTML(`Welcome to the AI Diagnostics page!<br><br>
-		Here you can verify that your AI model is correctly configured and reachable from the application.<br>
+		Here you can verify that your AI model is correctly configured and reachable from the registry.<br>
 		Enter a custom message below and click the button to send a test request to your configured AI provider.<br>
 		If everything is set up correctly, you will see a response from the AI.<br>
 		If not, you will see an error message with details.<br><br>

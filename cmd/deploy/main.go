@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-// main is the entry point of the application.
+// main is the entry point of the registry.
 func main() {
 	config := InitConfig()
 

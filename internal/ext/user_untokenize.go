@@ -12,7 +12,7 @@ import (
 
 func UserUntokenize(
 	ctx context.Context,
-	app types.AppInterface,
+	app types.RegistryInterface,
 	vaultKey string,
 	user userstore.UserInterface,
 ) (
@@ -85,7 +85,7 @@ func UserUntokenize(
 // is enabled, it delegates to UserUntokenize to read and decrypt the tokens.
 func UserUntokenizeTransparently(
 	ctx context.Context,
-	app types.AppInterface,
+	app types.RegistryInterface,
 	user userstore.UserInterface,
 ) (
 	email string,

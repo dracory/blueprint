@@ -39,12 +39,12 @@ var ipLookupHTTPClient = &http.Client{
 // =================================================================
 type statsVisitorEnhanceTask struct {
 	taskstore.TaskHandlerBase
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewStatsVisitorEnhanceTask(app types.AppInterface) *statsVisitorEnhanceTask {
+func NewStatsVisitorEnhanceTask(app types.RegistryInterface) *statsVisitorEnhanceTask {
 	if app == nil {
 		log.Fatal("app is nil")
 	}

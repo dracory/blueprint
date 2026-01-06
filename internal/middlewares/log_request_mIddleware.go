@@ -20,7 +20,7 @@ import (
 // malicious spiders, DDOS, etc
 // ==================================================================
 // it is useful to detect spamming bots
-func LogRequestMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func LogRequestMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Log Request Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -28,7 +28,7 @@ func LogRequestMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 		})
 }
 
-func logRequestHandler(app types.AppInterface, next http.Handler) http.Handler {
+func logRequestHandler(app types.RegistryInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := req.GetIP(r)
 

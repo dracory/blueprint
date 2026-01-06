@@ -13,7 +13,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func routes(app types.AppInterface) []rtr.RouteInterface {
+func routes(app types.RegistryInterface) []rtr.RouteInterface {
 	routes := []rtr.RouteInterface{}
 
 	routes = append(routes, admin.Routes(app)...)
@@ -27,12 +27,12 @@ func routes(app types.AppInterface) []rtr.RouteInterface {
 	return routes
 }
 
-func RoutesList(app types.AppInterface) (globalMiddlewareList []rtr.MiddlewareInterface, routeList []rtr.RouteInterface) {
+func RoutesList(app types.RegistryInterface) (globalMiddlewareList []rtr.MiddlewareInterface, routeList []rtr.RouteInterface) {
 	return globalMiddlewares(app), routes(app)
 }
 
-// Router creates the router for the application.
-func Router(app types.AppInterface) rtr.RouterInterface {
+// Router creates the router for the registry.
+func Router(app types.RegistryInterface) rtr.RouterInterface {
 	r := rtr.NewRouter()
 
 	// Add global middlewares

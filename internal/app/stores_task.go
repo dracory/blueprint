@@ -10,7 +10,7 @@ import (
 )
 
 // taskStoreInitialize initializes the task store if enabled in the configuration.
-func taskStoreInitialize(app types.AppInterface) error {
+func taskStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func taskStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func taskStoreMigrate(app types.AppInterface) error {
+func taskStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewAdminLayout(app types.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+func NewAdminLayout(app types.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
 	return adminLayout(app, r, options)
 }
 
@@ -24,7 +24,7 @@ func NewAdminLayout(app types.AppInterface, r *http.Request, options Options) da
 //
 // Returns:
 // - a dashboardTypes.DashboardInterface object representing the generated dashboard.
-func adminLayout(app types.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+func adminLayout(app types.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
 	authUser := helpers.GetAuthUser(r)
 
 	dashboardUser := dashboardTypes.User{}

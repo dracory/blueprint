@@ -174,7 +174,7 @@ const KEY_ENVENC_USED = "ENVENC_USED"
 // == START: Store Configurations
 // ============================================================================
 //
-// This is where you can configure the stores used by the application.
+// This is where you can configure the stores used by the registry.
 //
 
 // KEY_CMS_STORE_TEMPLATE_ID identifies the CMS template to hydrate when the

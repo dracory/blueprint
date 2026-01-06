@@ -20,7 +20,7 @@ import (
 
 type formUserUpdate struct {
 	liveflux.Base
-	App            types.AppInterface
+	App            types.RegistryInterface
 	UserID         string
 	ReturnURL      string
 	FormStatus     string
@@ -57,7 +57,7 @@ func newUserStatusOptions() []userStatusOption {
 	}
 }
 
-func NewFormUserUpdate(app types.AppInterface) liveflux.ComponentInterface {
+func NewFormUserUpdate(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formUserUpdate{})
 	if err != nil {
 		log.Println(err)

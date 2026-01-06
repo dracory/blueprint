@@ -17,7 +17,7 @@ import (
 //  1. user must be authenticated
 //  2. user must be active
 //  3. user must be registered
-func NewUserMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewUserMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	m := rtr.NewMiddleware().
 		SetName("User Middleware").
 		SetHandler(userMiddlewareHandler(app))
@@ -25,7 +25,7 @@ func NewUserMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 	return m
 }
 
-func userMiddlewareHandler(app types.AppInterface) func(next http.Handler) http.Handler {
+func userMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			returnURL := links.URL(r.URL.Path, map[string]string{})

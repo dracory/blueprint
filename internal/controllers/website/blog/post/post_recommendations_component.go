@@ -27,13 +27,13 @@ const (
 
 type postRecommendationsComponent struct {
 	liveflux.Base
-	App           types.AppInterface
+	App           types.RegistryInterface
 	CurrentPostID string
 	Posts         []blogstore.Post
 	errorMessage  string
 }
 
-func NewPostRecommendationsComponent(app types.AppInterface) liveflux.ComponentInterface {
+func NewPostRecommendationsComponent(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postRecommendationsComponent{})
 	if err != nil {
 		log.Println(err)
@@ -55,7 +55,7 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 	c.CurrentPostID = strings.TrimSpace(params["post_id"])
 
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
 			c.App = app
 		}
 	}

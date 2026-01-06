@@ -10,7 +10,7 @@ import (
 )
 
 // chatStoreInitialize initializes the chat store when enabled via configuration.
-func chatStoreInitialize(app types.AppInterface) error {
+func chatStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func chatStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func chatStoreMigrate(app types.AppInterface) error {
+func chatStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

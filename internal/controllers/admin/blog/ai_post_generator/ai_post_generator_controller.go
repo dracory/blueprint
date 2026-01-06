@@ -20,7 +20,7 @@ import (
 const ACTION_GENERATE_POST = "generate_post"
 
 type AiPostGeneratorController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type pageData struct {
@@ -29,7 +29,7 @@ type pageData struct {
 	ApprovedBlogAiPosts []blogai.RecordPost
 }
 
-func NewAiPostGeneratorController(app types.AppInterface) *AiPostGeneratorController {
+func NewAiPostGeneratorController(app types.RegistryInterface) *AiPostGeneratorController {
 	return &AiPostGeneratorController{app: app}
 }
 

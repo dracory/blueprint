@@ -12,7 +12,7 @@ import (
 	"github.com/dracory/userstore"
 )
 
-func setupAppAndUser(t *testing.T) (types.AppInterface, userstore.UserInterface) {
+func setupAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(
@@ -40,7 +40,7 @@ func setupAppAndUser(t *testing.T) (types.AppInterface, userstore.UserInterface)
 	return app, user
 }
 
-func tokenizeUserForTest(t *testing.T, app types.AppInterface, user userstore.UserInterface, firstName, lastName, email, businessName, phone string) {
+func tokenizeUserForTest(t *testing.T, app types.RegistryInterface, user userstore.UserInterface, firstName, lastName, email, businessName, phone string) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -71,7 +71,7 @@ func tokenizeUserForTest(t *testing.T, app types.AppInterface, user userstore.Us
 	}
 }
 
-func newMountedForm(t *testing.T, app types.AppInterface, user userstore.UserInterface, returnURL string) *formUserUpdate {
+func newMountedForm(t *testing.T, app types.RegistryInterface, user userstore.UserInterface, returnURL string) *formUserUpdate {
 	t.Helper()
 
 	component := NewFormUserUpdate(app)

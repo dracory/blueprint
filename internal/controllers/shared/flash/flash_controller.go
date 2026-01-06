@@ -17,12 +17,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type flashController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewFlashController(app types.AppInterface) *flashController {
+func NewFlashController(app types.RegistryInterface) *flashController {
 	return &flashController{app: app}
 }
 

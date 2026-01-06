@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/feedstore"
 )
 
-func feedStoreInitialize(app types.AppInterface) error {
+func feedStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetFeedStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func feedStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func feedStoreMigrate(app types.AppInterface) error {
+func feedStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

@@ -21,7 +21,7 @@ var _ Widget = (*visibleWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget
-func NewVisibleWidget(app types.AppInterface) *visibleWidget {
+func NewVisibleWidget(app types.RegistryInterface) *visibleWidget {
 	return &visibleWidget{
 		app: app,
 	}
@@ -40,7 +40,7 @@ func NewVisibleWidget(app types.AppInterface) *visibleWidget {
 // <x-visible environment="staging" auth="no">content</x-visible>
 // <x-visible environment="local" auth="yes">content</x-visible>
 type visibleWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == PUBLIC METHODS =========================================================

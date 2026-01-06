@@ -22,7 +22,7 @@ const (
 	userCachePrefix    = "auth:user:"
 )
 
-func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func AuthMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Auth Middleware").
 		SetHandler(func(next http.Handler) http.Handler { return authHandler(app, next) })
@@ -43,7 +43,7 @@ func AuthMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
 //
 // Returns
 // - an http.Handler which represents the modified handler with the user.
-func authHandler(app types.AppInterface, next http.Handler) http.Handler {
+func authHandler(app types.RegistryInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !app.GetConfig().GetSessionStoreUsed() {
 			w.WriteHeader(http.StatusInternalServerError)

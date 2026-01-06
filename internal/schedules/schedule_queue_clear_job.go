@@ -11,7 +11,7 @@ import (
 )
 
 // queueClearJob clears the queue for a specific task
-func queueClearJob(app types.AppInterface) {
+func queueClearJob(app types.RegistryInterface) {
 	if app == nil {
 		cfmt.Errorln("QueueClearJob called with nil app; skipping")
 		return

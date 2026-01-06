@@ -29,13 +29,13 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 )
 
-// AppInterface defines accessors for application-scoped runtime services.
+// RegistryInterface defines accessors for registry-scoped runtime services.
 // It mirrors the style of ConfigInterface, enabling DI and testability.
 //
 // Typical implementations will wire these in an Initialize step.
 // For now, we also provide a runtime adapter in internal/app that returns
 // the current process-level resources.
-type AppInterface interface {
+type RegistryInterface interface {
 	// Logger
 	GetLogger() *slog.Logger
 	SetLogger(l *slog.Logger)

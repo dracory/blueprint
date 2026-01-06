@@ -406,9 +406,9 @@ func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -418,7 +418,7 @@ func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -465,9 +465,9 @@ func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -477,7 +477,7 @@ func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -523,9 +523,9 @@ func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -535,7 +535,7 @@ func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -583,9 +583,9 @@ func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -595,7 +595,7 @@ func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -642,9 +642,9 @@ func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -654,7 +654,7 @@ func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -703,9 +703,9 @@ func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -715,7 +715,7 @@ func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -763,9 +763,9 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -775,7 +775,7 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},
@@ -826,9 +826,9 @@ func TestRegisterController_Success_WithVaultStore(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(application.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -838,7 +838,7 @@ func TestRegisterController_Success_WithVaultStore(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(application).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"email":      {user.Email()},
 			"first_name": {"FirstName"},

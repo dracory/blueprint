@@ -34,7 +34,7 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewMediaManagerController(app types.AppInterface) *mediaManagerController {
+func NewMediaManagerController(app types.RegistryInterface) *mediaManagerController {
 	cfg := app.GetConfig()
 	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
@@ -61,7 +61,7 @@ type FileEntry struct {
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
-	app         types.AppInterface
+	app         types.RegistryInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }

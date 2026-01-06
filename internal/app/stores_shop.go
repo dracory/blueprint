@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/shopstore"
 )
 
-func shopStoreInitialize(app types.AppInterface) error {
+func shopStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetShopStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func shopStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func shopStoreMigrate(app types.AppInterface) error {
+func shopStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

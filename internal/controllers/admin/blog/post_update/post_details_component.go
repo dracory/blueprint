@@ -22,7 +22,7 @@ import (
 type postDetailsComponent struct {
 	liveflux.Base
 
-	App types.AppInterface
+	App types.RegistryInterface
 
 	PostID string
 	Post   *blogstore.Post
@@ -38,7 +38,7 @@ type postDetailsComponent struct {
 	FormSuccessMessage string
 }
 
-func NewPostDetailsComponent(app types.AppInterface) liveflux.ComponentInterface {
+func NewPostDetailsComponent(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postDetailsComponent{})
 	if err != nil {
 		log.Println(err)
@@ -58,7 +58,7 @@ func (c *postDetailsComponent) GetKind() string {
 
 func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]string) error {
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
 			c.App = app
 		}
 	}

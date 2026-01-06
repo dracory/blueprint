@@ -10,7 +10,7 @@ import (
 	"github.com/dracory/sessionstore"
 )
 
-func sessionStoreInitialize(app types.AppInterface) error {
+func sessionStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetSessionStoreUsed() {
 		return nil
 	}
@@ -24,7 +24,7 @@ func sessionStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func sessionStoreMigrate(app types.AppInterface) error {
+func sessionStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

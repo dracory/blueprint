@@ -16,7 +16,7 @@ import (
 )
 
 type userCreateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type userCreateControllerData struct {
@@ -27,7 +27,7 @@ type userCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewUserCreateController(app types.AppInterface) *userCreateController {
+func NewUserCreateController(app types.RegistryInterface) *userCreateController {
 	return &userCreateController{app: app}
 }
 

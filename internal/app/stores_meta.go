@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/metastore"
 )
 
-func metaStoreInitialize(app types.AppInterface) error {
+func metaStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetMetaStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func metaStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func metaStoreMigrate(app types.AppInterface) error {
+func metaStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

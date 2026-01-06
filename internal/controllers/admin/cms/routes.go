@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	cmsManager := rtr.NewRoute().
 		SetName("Admin > Cms Manager").
 		SetPath(links.ADMIN_CMS).

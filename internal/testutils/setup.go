@@ -185,9 +185,9 @@ func DefaultConf() *types.Config {
 	return cfg
 }
 
-// Setup initializes a default in-memory SQLite application for tests,
-// unless overridden via options. It returns the initialized application.
-func Setup(options ...SetupOption) types.AppInterface {
+// Setup initializes a default in-memory SQLite registry for tests,
+// unless overridden via options. It returns the initialized registry.
+func Setup(options ...SetupOption) types.RegistryInterface {
 	// collect options
 	opts := &setupOptions{}
 	for _, opt := range options {
@@ -301,17 +301,17 @@ func Setup(options ...SetupOption) types.AppInterface {
 		}
 	}
 
-	// Build application using app.New (opens DB and initializes stores)
-	application, err := app.New(opts.cfg)
+	// Build registry using app.New (opens DB and initializes stores)
+	registry, err := app.New(opts.cfg)
 	if err != nil {
-		panic("testutils.Setup: failed to build application: " + err.Error())
+		panic("testutils.Setup: failed to build registry: " + err.Error())
 	}
 
-	if application.GetLogger() == nil {
-		application.SetLogger(slog.Default())
+	if registry.GetLogger() == nil {
+		registry.SetLogger(slog.Default())
 	}
 
-	return application
+	return registry
 }
 
 // func setupMailServer() {

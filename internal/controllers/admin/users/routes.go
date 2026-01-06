@@ -13,7 +13,7 @@ import (
 	userUpdate "project/internal/controllers/admin/users/user_update"
 )
 
-func UserRoutes(app types.AppInterface) []rtr.RouteInterface {
+func UserRoutes(app types.RegistryInterface) []rtr.RouteInterface {
 	userCreate := rtr.NewRoute().
 		SetName("Admin > Users > User Create").
 		SetPath(links.ADMIN_USERS_USER_CREATE).

@@ -20,10 +20,10 @@ import (
 )
 
 type discountController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewDiscountController(app types.AppInterface) *discountController {
+func NewDiscountController(app types.RegistryInterface) *discountController {
 	return &discountController{app: app}
 }
 

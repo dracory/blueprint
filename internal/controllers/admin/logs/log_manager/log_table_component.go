@@ -18,7 +18,7 @@ import (
 type logTableComponent struct {
 	liveflux.Base
 
-	App              types.AppInterface
+	App              types.RegistryInterface
 	Level            string
 	SearchMessage    string
 	SearchContext    string
@@ -38,7 +38,7 @@ type logTableComponent struct {
 	ContextLog    logstore.LogInterface
 }
 
-func NewLogTableComponent(app types.AppInterface) liveflux.ComponentInterface {
+func NewLogTableComponent(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&logTableComponent{})
 	if err != nil {
 		log.Println(err)
@@ -59,7 +59,7 @@ func (c *logTableComponent) GetKind() string {
 func (c *logTableComponent) Mount(ctx context.Context, params map[string]string) error {
 	// Ensure App is set when component is instantiated via Liveflux placeholder
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
 			c.App = app
 		}
 	}

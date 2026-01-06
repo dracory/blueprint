@@ -71,7 +71,7 @@ func TestPostUpdateController_ShowsPage(t *testing.T) {
 	assert.Contains(t, responseHTML, post.Title(), "Should show post title")
 }
 
-func setupControllerAppAndPost(t *testing.T) (types.AppInterface, *blogstore.Post) {
+func setupControllerAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.Post) {
 	// Note: we reuse the same pattern as v1 tests but only for GET behavior.
 	t.Helper()
 

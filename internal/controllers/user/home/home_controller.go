@@ -18,12 +18,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type homeController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewHomeController(app types.AppInterface) *homeController {
+func NewHomeController(app types.RegistryInterface) *homeController {
 	return &homeController{app: app}
 }
 

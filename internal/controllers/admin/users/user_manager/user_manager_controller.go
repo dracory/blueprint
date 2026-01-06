@@ -13,11 +13,11 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type userManagerController struct{ app types.AppInterface }
+type userManagerController struct{ app types.RegistryInterface }
 
 // == CONSTRUCTOR =============================================================
 
-func NewUserManagerController(app types.AppInterface) *userManagerController {
+func NewUserManagerController(app types.RegistryInterface) *userManagerController {
 	return &userManagerController{app: app}
 }
 

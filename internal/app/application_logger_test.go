@@ -17,12 +17,12 @@ func TestNew_SetsDefaultLogger(t *testing.T) {
 	cfg.SetDatabaseDriver("sqlite")
 	cfg.SetDatabaseName(fmt.Sprintf("file:mp_test_%d?mode=memory&cache=shared", time.Now().UnixNano()))
 
-	application, err := apppkg.New(cfg)
+	registry, err := apppkg.New(cfg)
 	if err != nil {
 		t.Fatalf("app.New returned error: %v", err)
 	}
 
-	if application.GetLogger() == nil {
-		t.Fatalf("expected application logger to be non-nil right after app.New; got nil")
+	if registry.GetLogger() == nil {
+		t.Fatalf("expected registry logger to be non-nil right after app.New; got nil")
 	}
 }

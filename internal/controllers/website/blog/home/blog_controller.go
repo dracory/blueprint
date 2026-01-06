@@ -19,7 +19,7 @@ import (
 )
 
 type blogController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type blogControllerData struct {
@@ -29,7 +29,7 @@ type blogControllerData struct {
 	perPage   int
 }
 
-func NewBlogController(app types.AppInterface) *blogController {
+func NewBlogController(app types.RegistryInterface) *blogController {
 	return &blogController{
 		app: app,
 	}

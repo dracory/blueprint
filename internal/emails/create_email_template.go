@@ -9,7 +9,7 @@ import (
 
 // CreateEmailTemplate creates an email template using the base email package
 // This is a new function to avoid conflicts with the original blankEmailTemplate function
-func CreateEmailTemplate(app types.AppInterface, title string, htmlContent string) string {
+func CreateEmailTemplate(app types.RegistryInterface, title string, htmlContent string) string {
 	// Create header links
 	headerLinks := map[string]string{}
 

@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/cachestore"
 )
 
-func cacheStoreInitialize(app types.AppInterface) error {
+func cacheStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetCacheStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func cacheStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func cacheStoreMigrate(app types.AppInterface) error {
+func cacheStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

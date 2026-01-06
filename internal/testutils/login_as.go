@@ -11,7 +11,7 @@ import (
 	"github.com/dracory/userstore"
 )
 
-func LoginAs(app types.AppInterface, r *http.Request, user userstore.UserInterface) (*http.Request, error) {
+func LoginAs(app types.RegistryInterface, r *http.Request, user userstore.UserInterface) (*http.Request, error) {
 	session, err := SeedSession(app.GetSessionStore(), r, user, 10)
 
 	if err != nil {
@@ -23,7 +23,7 @@ func LoginAs(app types.AppInterface, r *http.Request, user userstore.UserInterfa
 	return r.WithContext(ctx), nil
 }
 
-func CallStringHandlerAsUser(app types.AppInterface, method string, handler func(http.ResponseWriter, *http.Request) string, options test.NewRequestOptions, userID string) (body string, response *http.Response, err error) {
+func CallStringHandlerAsUser(app types.RegistryInterface, method string, handler func(http.ResponseWriter, *http.Request) string, options test.NewRequestOptions, userID string) (body string, response *http.Response, err error) {
 	user, session, err := SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), userID, httptest.NewRequest("GET", "/", nil), 1)
 	if err != nil {
 		return "", nil, err

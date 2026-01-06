@@ -59,22 +59,22 @@ func main() {
 		return
 	}
 
-	// Initialize application (logger, caches, database)
-	application, err := app.New(cfg)
+	// Initialize registry (logger, caches, database)
+	registry, err := app.New(cfg)
 	if err != nil {
 		fmt.Printf("Failed to initialize app: %v\n", err)
 		return
 	}
 
-	defer closeResourcesDB(application.GetDB()) // Defer Closing the database
+	defer closeResourcesDB(registry.GetDB()) // Defer Closing the database
 
-	tasks.RegisterTasks(application) // Register the task handlers
+	tasks.RegisterTasks(registry) // Register the task handlers
 
 	if isCliMode() {
 		if len(os.Args) < 2 {
 			return
 		}
-		if err := cli.ExecuteCliCommand(application, os.Args[1:]); err != nil {
+		if err := cli.ExecuteCliCommand(registry, os.Args[1:]); err != nil {
 			fmt.Printf("Failed to execute CLI command: %v\n", err)
 			os.Exit(1)
 		}
@@ -86,17 +86,17 @@ func main() {
 	defer cancel()
 
 	background := newBackgroundGroup(ctx)
-	if err := startBackgroundProcesses(ctx, background, application); err != nil {
+	if err := startBackgroundProcesses(ctx, background, registry); err != nil {
 		cfmt.Errorln("Failed to start background processes:", err.Error())
 		return
 	}
 
 	// Start the web server
 	server, err := websrv.Start(websrv.Options{
-		Host:    application.GetConfig().GetAppHost(),
-		Port:    application.GetConfig().GetAppPort(),
-		URL:     application.GetConfig().GetAppUrl(),
-		Handler: routes.Router(application).ServeHTTP,
+		Host:    registry.GetConfig().GetAppHost(),
+		Port:    registry.GetConfig().GetAppPort(),
+		URL:     registry.GetConfig().GetAppUrl(),
+		Handler: routes.Router(registry).ServeHTTP,
 	})
 
 	if err != nil {
@@ -163,7 +163,7 @@ func isCliMode() bool {
 //
 // Returns:
 // - error: the error if any
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.AppInterface) error {
+func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.RegistryInterface) error {
 	if app == nil {
 		return errors.New("startBackgroundProcesses called with nil app")
 	}

@@ -18,7 +18,7 @@ import (
 )
 
 // Routes these are the routes for the administrator
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	home := rtr.NewRoute().
 		SetName("Admin > Home").
 		SetPath(links.ADMIN_HOME).

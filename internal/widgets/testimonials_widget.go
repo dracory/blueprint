@@ -20,7 +20,7 @@ var _ Widget = (*testimonialsWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *print - A pointer to the print struct
-func NewTestimonialsWidget(app types.AppInterface) *testimonialsWidget {
+func NewTestimonialsWidget(app types.RegistryInterface) *testimonialsWidget {
 	return &testimonialsWidget{app: app}
 }
 
@@ -33,7 +33,7 @@ func NewTestimonialsWidget(app types.AppInterface) *testimonialsWidget {
 //
 // It uses Otto as the engine.
 type testimonialsWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == PUBLIC METHODS =========================================================

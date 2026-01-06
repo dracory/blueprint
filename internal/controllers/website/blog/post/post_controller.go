@@ -24,11 +24,11 @@ import (
 )
 
 type postController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 func NewPostController(
-	app types.AppInterface,
+	app types.RegistryInterface,
 ) *postController {
 	return &postController{
 		app: app,

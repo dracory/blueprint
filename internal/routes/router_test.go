@@ -18,15 +18,15 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 		name           string
 		method         string
 		path           string
-		setup          func() types.AppInterface
+		setup          func() types.RegistryInterface
 		expectedStatus int
-		assert         func(*testing.T, *httptest.ResponseRecorder, types.AppInterface)
+		assert         func(*testing.T, *httptest.ResponseRecorder, types.RegistryInterface)
 	}{
 		{
 			name:   "website home returns ok",
 			method: http.MethodGet,
 			path:   "/",
-			setup: func() types.AppInterface {
+			setup: func() types.RegistryInterface {
 				return testutils.Setup(
 					testutils.WithCacheStore(true),
 					testutils.WithSessionStore(true),
@@ -34,7 +34,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				)
 			},
 			expectedStatus: http.StatusOK,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ types.AppInterface) {
+			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ types.RegistryInterface) {
 				t.Helper()
 
 				body := rr.Body.String()
@@ -47,7 +47,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 			name:   "user home redirects unauthenticated users",
 			method: http.MethodGet,
 			path:   "/user",
-			setup: func() types.AppInterface {
+			setup: func() types.RegistryInterface {
 				return testutils.Setup(
 					testutils.WithCacheStore(true),
 					testutils.WithGeoStore(true),
@@ -57,7 +57,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				)
 			},
 			expectedStatus: http.StatusSeeOther,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, app types.AppInterface) {
+			assert: func(t *testing.T, rr *httptest.ResponseRecorder, app types.RegistryInterface) {
 				t.Helper()
 
 				if rr.Header().Get("Location") == "" {

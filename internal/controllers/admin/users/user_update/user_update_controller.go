@@ -19,10 +19,10 @@ import (
 )
 
 type userUpdateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
-func NewUserUpdateController(app types.AppInterface) *userUpdateController {
+func NewUserUpdateController(app types.RegistryInterface) *userUpdateController {
 	return &userUpdateController{app: app}
 }
 

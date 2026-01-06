@@ -22,12 +22,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type postManagerController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewPostManagerController(app types.AppInterface) *postManagerController {
+func NewPostManagerController(app types.RegistryInterface) *postManagerController {
 	return &postManagerController{app: app}
 }
 

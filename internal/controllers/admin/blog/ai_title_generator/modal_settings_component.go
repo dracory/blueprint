@@ -18,7 +18,7 @@ import (
 type titleGeneratorSettingsModal struct {
 	liveflux.Base
 
-	App                      types.AppInterface
+	App                      types.RegistryInterface
 	FormBlogTopic            string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -29,7 +29,7 @@ type titleGeneratorSettingsModal struct {
 	IsOpen                   bool
 }
 
-func NewTitleGeneratorSettingsModal(app types.AppInterface) liveflux.ComponentInterface {
+func NewTitleGeneratorSettingsModal(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&titleGeneratorSettingsModal{})
 	if err != nil {
 		log.Println(err)
@@ -49,7 +49,7 @@ func (c *titleGeneratorSettingsModal) GetKind() string {
 
 func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[string]string) error {
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
 			c.App = app
 		}
 	}
@@ -83,7 +83,7 @@ func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[stri
 
 func (c *titleGeneratorSettingsModal) Handle(ctx context.Context, action string, data url.Values) error {
 	// get app from context
-	// c.App = ctx.Value("app").(types.AppInterface)
+	// c.App = ctx.Value("app").(types.RegistryInterface)
 
 	switch action {
 	case "open":

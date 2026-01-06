@@ -36,7 +36,7 @@ import (
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
-func NewEmailTestTask(app types.AppInterface) taskstore.TaskHandlerInterface {
+func NewEmailTestTask(app types.RegistryInterface) taskstore.TaskHandlerInterface {
 	return &emailTestTask{
 		app: app,
 	}
@@ -45,7 +45,7 @@ func NewEmailTestTask(app types.AppInterface) taskstore.TaskHandlerInterface {
 // emailTestTask send a notification email to admin
 type emailTestTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	app                       types.AppInterface
+	app                       types.RegistryInterface
 }
 
 // Alias returns the unique identifier for this task handler

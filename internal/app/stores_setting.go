@@ -11,7 +11,7 @@ import (
 )
 
 // settingStoreInitialize initializes the setting store if enabled in the configuration.
-func settingStoreInitialize(app types.AppInterface) error {
+func settingStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -29,7 +29,7 @@ func settingStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func settingStoreMigrate(app types.AppInterface) error {
+func settingStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

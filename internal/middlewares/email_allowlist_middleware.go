@@ -17,7 +17,7 @@ var allowedEmails = map[string]struct{}{
 	"info@sinevia.com": {},
 }
 
-func NewEmailAllowlistMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewEmailAllowlistMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Email Allowlist Middleware").
 		SetHandler(func(next http.Handler) http.Handler {

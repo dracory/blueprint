@@ -11,12 +11,12 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewInviteFriendEmail(app types.AppInterface, us userstore.StoreInterface) *inviteFriendEmail {
+func NewInviteFriendEmail(app types.RegistryInterface, us userstore.StoreInterface) *inviteFriendEmail {
 	return &inviteFriendEmail{app: app, userStore: us}
 }
 
 type inviteFriendEmail struct {
-	app       types.AppInterface
+	app       types.RegistryInterface
 	userStore userstore.StoreInterface
 }
 

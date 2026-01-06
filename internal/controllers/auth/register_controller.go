@@ -24,7 +24,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type registerController struct {
-	app                                    types.AppInterface
+	app                                    types.RegistryInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formFirstName                          string
 	formLastName                           string
@@ -53,7 +53,7 @@ type registerControllerData struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewRegisterController(app types.AppInterface) *registerController {
+func NewRegisterController(app types.RegistryInterface) *registerController {
 	return &registerController{
 		app:                                    app,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",

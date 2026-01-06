@@ -8,11 +8,11 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewEmailToAdminOnNewUserRegistered(app types.AppInterface) *emailToAdminOnNewUserRegistered {
+func NewEmailToAdminOnNewUserRegistered(app types.RegistryInterface) *emailToAdminOnNewUserRegistered {
 	return &emailToAdminOnNewUserRegistered{app: app}
 }
 
-type emailToAdminOnNewUserRegistered struct{ app types.AppInterface }
+type emailToAdminOnNewUserRegistered struct{ app types.RegistryInterface }
 
 // Send sends an email notification to the admin when a new user registers
 func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {

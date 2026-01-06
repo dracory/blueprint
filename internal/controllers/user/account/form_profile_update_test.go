@@ -15,7 +15,7 @@ import (
 	"github.com/dracory/userstore"
 )
 
-func userTokenize(app types.AppInterface, user userstore.UserInterface) error {
+func userTokenize(app types.RegistryInterface, user userstore.UserInterface) error {
 	ctx := context.Background()
 	vaultStore := app.GetVaultStore()
 	vaultKey := app.GetConfig().GetVaultStoreKey()

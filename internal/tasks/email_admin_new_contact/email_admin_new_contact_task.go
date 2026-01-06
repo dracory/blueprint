@@ -16,7 +16,7 @@ import (
 // go run . task email-to-admin-on-new-contact-form-submitted --html=HTML
 //
 // =================================================================
-func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app types.AppInterface) *emailToAdminOnNewContactFormSubmittedTaskHandler {
+func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app types.RegistryInterface) *emailToAdminOnNewContactFormSubmittedTaskHandler {
 	return &emailToAdminOnNewContactFormSubmittedTaskHandler{
 		app: app,
 	}
@@ -25,7 +25,7 @@ func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app types.AppInterface)
 // emailToAdminOnNewContactFormSubmittedTaskHandler sends a notification email to admin
 type emailToAdminOnNewContactFormSubmittedTaskHandler struct {
 	taskstore.TaskHandlerBase
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewContactFormSubmittedTaskHandler)(nil) // verify it extends the task interface

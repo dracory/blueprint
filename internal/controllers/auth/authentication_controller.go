@@ -33,13 +33,13 @@ const msgUserNotFound = `An unexpected error has occurred trying to find your ac
 // authenticationController handles the authentication of the user,
 // once the user has logged in successfully via the AuthKnight service.
 type authenticationController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
 // NewAuthenticationController creates a new instance with injected app only.
-func NewAuthenticationController(application types.AppInterface) *authenticationController {
+func NewAuthenticationController(application types.RegistryInterface) *authenticationController {
 	return &authenticationController{app: application}
 }
 

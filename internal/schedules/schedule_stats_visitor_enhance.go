@@ -9,7 +9,7 @@ import (
 )
 
 // scheduleStatsVisitorEnhanceTask schedules the stats visitor enhance task
-func scheduleStatsVisitorEnhanceTask(app types.AppInterface) {
+func scheduleStatsVisitorEnhanceTask(app types.RegistryInterface) {
 	if app == nil {
 		cfmt.Errorln("StatsVisitorEnhance scheduling skipped; app is nil")
 		return

@@ -17,7 +17,7 @@ import (
 //
 // Args: an array of strings representing the arguments for the job.
 // Return type: None.
-func ExecuteJob(app types.AppInterface, args []string) {
+func ExecuteJob(app types.RegistryInterface, args []string) {
 	name := "No name"
 	argumentsMap := cmd.ArgsToMap(args)
 	log.Println("Executing job: ", name, " with arguments: ", argumentsMap, " ...")

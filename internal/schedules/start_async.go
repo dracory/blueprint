@@ -10,7 +10,7 @@ import (
 	"github.com/go-co-op/gocron"
 )
 
-func newScheduler(app types.AppInterface) *gocron.Scheduler {
+func newScheduler(app types.RegistryInterface) *gocron.Scheduler {
 	scheduler := gocron.NewScheduler(time.UTC)
 
 	// Schedule Building the Stats Every 2 Minutes
@@ -45,7 +45,7 @@ func newScheduler(app types.AppInterface) *gocron.Scheduler {
 }
 
 // StartAsync starts the scheduler and stops it when the context is cancelled.
-func StartAsync(ctx context.Context, app types.AppInterface) {
+func StartAsync(ctx context.Context, app types.RegistryInterface) {
 	if app == nil {
 		cfmt.Errorln("Scheduler StartAsync called with nil app; skipping job registration")
 		return

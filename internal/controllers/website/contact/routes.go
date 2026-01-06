@@ -10,7 +10,7 @@ import (
 
 // Routes returns the GET and POST routes for the contact page
 func Routes(
-	app types.AppInterface,
+	app types.RegistryInterface,
 ) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		rtr.NewRoute().

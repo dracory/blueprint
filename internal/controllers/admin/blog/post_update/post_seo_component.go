@@ -18,7 +18,7 @@ import (
 type postSEOComponent struct {
 	liveflux.Base
 
-	App types.AppInterface
+	App types.RegistryInterface
 
 	PostID string
 	Post   *blogstore.Post
@@ -32,7 +32,7 @@ type postSEOComponent struct {
 	FormSuccessMessage string
 }
 
-func NewPostSEOComponent(app types.AppInterface) liveflux.ComponentInterface {
+func NewPostSEOComponent(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postSEOComponent{})
 	if err != nil {
 		log.Println(err)
@@ -52,7 +52,7 @@ func (c *postSEOComponent) GetKind() string {
 
 func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) error {
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.AppInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
 			c.App = app
 		}
 	}

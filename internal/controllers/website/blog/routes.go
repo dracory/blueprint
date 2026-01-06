@@ -11,7 +11,7 @@ import (
 )
 
 func Routes(
-	app types.AppInterface,
+	app types.RegistryInterface,
 ) []rtr.RouteInterface {
 	blogRoute := rtr.NewRoute().
 		SetName("Guest > Blog").

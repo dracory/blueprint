@@ -17,10 +17,10 @@ import (
 
 type statsController struct {
 	logger *slog.Logger
-	app    types.AppInterface
+	app    types.RegistryInterface
 }
 
-func NewStatsController(app types.AppInterface) *statsController {
+func NewStatsController(app types.RegistryInterface) *statsController {
 	return &statsController{
 		logger: app.GetLogger(),
 		app:    app,
@@ -63,7 +63,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminLayout struct {
-	app   types.AppInterface
+	app   types.RegistryInterface
 	title string
 	body  string
 

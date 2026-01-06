@@ -10,7 +10,7 @@ import (
 )
 
 // userStoreInitialize initializes the user store if enabled in the configuration.
-func userStoreInitialize(app types.AppInterface) error {
+func userStoreInitialize(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +28,7 @@ func userStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func userStoreMigrate(app types.AppInterface) error {
+func userStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

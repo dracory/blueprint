@@ -14,7 +14,7 @@ import (
 )
 
 type userDeleteController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 type userDeleteControllerData struct {
@@ -24,7 +24,7 @@ type userDeleteControllerData struct {
 	//errorMessage   string
 }
 
-func NewUserDeleteController(app types.AppInterface) *userDeleteController {
+func NewUserDeleteController(app types.RegistryInterface) *userDeleteController {
 	return &userDeleteController{app: app}
 }
 

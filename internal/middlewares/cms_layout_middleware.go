@@ -25,7 +25,7 @@ import (
 //
 // It uses the "page" context value to transfer the page data (i.e. title,
 // meta keywords, description) from the CMS frontend to the layout.
-func NewCmsLayoutMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewCmsLayoutMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("CmsLayoutMiddleware").
 		SetHandler(func(next http.Handler) http.Handler {

@@ -28,12 +28,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type productUpdateController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductUpdateController(app types.AppInterface) *productUpdateController {
+func NewProductUpdateController(app types.RegistryInterface) *productUpdateController {
 	return &productUpdateController{app: app}
 }
 

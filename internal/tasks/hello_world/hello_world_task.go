@@ -8,7 +8,7 @@ import (
 	"github.com/dracory/taskstore"
 )
 
-func NewHelloWorldTask(app types.AppInterface) *helloWorldTask {
+func NewHelloWorldTask(app types.RegistryInterface) *helloWorldTask {
 	return &helloWorldTask{
 		app: app,
 	}
@@ -16,7 +16,7 @@ func NewHelloWorldTask(app types.AppInterface) *helloWorldTask {
 
 type helloWorldTask struct {
 	taskstore.TaskHandlerBase
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*helloWorldTask)(nil) // verify it extends the task interface

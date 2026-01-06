@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/customstore"
 )
 
-func customStoreInitialize(app types.AppInterface) error {
+func customStoreInitialize(app types.RegistryInterface) error {
 	if !app.GetConfig().GetCustomStoreUsed() {
 		return nil
 	}
@@ -23,7 +23,7 @@ func customStoreInitialize(app types.AppInterface) error {
 	return nil
 }
 
-func customStoreMigrate(app types.AppInterface) error {
+func customStoreMigrate(app types.RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

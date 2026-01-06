@@ -11,7 +11,7 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 

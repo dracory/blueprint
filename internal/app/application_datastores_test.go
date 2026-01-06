@@ -15,7 +15,7 @@ import (
 )
 
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
-func newTestApp(t *testing.T) types.AppInterface {
+func newTestApp(t *testing.T) types.RegistryInterface {
 	t.Helper()
 	cfg := &types.Config{}
 	cfg.SetAppEnv("testing")

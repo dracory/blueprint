@@ -37,9 +37,9 @@ import (
 	"github.com/lmittmann/tint"
 )
 
-// Application is the orchestration facade for starting the app.
+// Registry is the orchestration facade for starting the app.
 // It encapsulates configuration and database (container removed).
-type Application struct {
+type Registry struct {
 	cfg types.ConfigInterface
 	db  *sql.DB
 
@@ -73,11 +73,11 @@ type Application struct {
 	vaultStore          vaultstore.StoreInterface
 }
 
-var _ types.AppInterface = (*Application)(nil)
+var _ types.RegistryInterface = (*Registry)(nil)
 
-// New constructs and initializes the Application (logger, caches, database).
+// New constructs and initializes the Registry (logger, caches, database).
 // It centralizes the boot logic so callers only use this single constructor.
-func New(cfg types.ConfigInterface) (types.AppInterface, error) {
+func New(cfg types.ConfigInterface) (types.RegistryInterface, error) {
 	if cfg == nil {
 		return nil, errors.New("cfg is nil")
 	}
@@ -101,82 +101,82 @@ func New(cfg types.ConfigInterface) (types.AppInterface, error) {
 		return nil, err
 	}
 
-	// Build application instance
-	application := &Application{cfg: cfg}
-	application.SetConsole(consoleLogger)
-	application.SetLogger(consoleLogger)
-	application.SetMemoryCache(cache.Memory)
-	application.SetFileCache(cache.File)
-	application.SetDB(db)
+	// Build registry instance
+	registry := &Registry{cfg: cfg}
+	registry.SetConsole(consoleLogger)
+	registry.SetLogger(consoleLogger)
+	registry.SetMemoryCache(cache.Memory)
+	registry.SetFileCache(cache.File)
+	registry.SetDB(db)
 
-	if err := application.dataStoresInitialize(); err != nil {
+	if err := registry.dataStoresInitialize(); err != nil {
 		return nil, err
 	}
 
-	if err := application.dataStoresMigrate(); err != nil {
+	if err := registry.dataStoresMigrate(); err != nil {
 		return nil, err
 	}
 
-	if application.GetLogStore() != nil {
-		application.SetLogger(slog.New(logstore.NewSlogHandler(application.GetLogStore())))
+	if registry.GetLogStore() != nil {
+		registry.SetLogger(slog.New(logstore.NewSlogHandler(registry.GetLogStore())))
 	}
 
-	return application, nil
+	return registry, nil
 }
 
-// GetConfig returns the application config
-func (a *Application) GetConfig() types.ConfigInterface {
-	if a == nil {
+// GetConfig returns the registry config
+func (r *Registry) GetConfig() types.ConfigInterface {
+	if r == nil {
 		return nil
 	}
-	return a.cfg
+	return r.cfg
 }
-func (a *Application) SetConfig(cfg types.ConfigInterface) {
-	a.cfg = cfg
-}
-
-// GetDB returns the application database
-func (a *Application) GetDB() *sql.DB {
-	return a.db
+func (r *Registry) SetConfig(cfg types.ConfigInterface) {
+	r.cfg = cfg
 }
 
-// SetDB sets the application database
-func (a *Application) SetDB(db *sql.DB) {
-	a.db = db
+// GetDB returns the registry database
+func (r *Registry) GetDB() *sql.DB {
+	return r.db
+}
+
+// SetDB sets the registry database
+func (r *Registry) SetDB(db *sql.DB) {
+	r.db = db
 }
 
 // Run remains for future consolidation of boot logic.
-func (a *Application) Run() error { return nil }
+func (r *Registry) Run() error { return nil }
 
 // Logger accessors (delegate to package-level logger singletons)
-func (a *Application) GetLogger() *slog.Logger {
-	return a.databaseLogger
+func (r *Registry) GetLogger() *slog.Logger {
+	return r.databaseLogger
 }
-func (a *Application) SetLogger(l *slog.Logger) {
-	a.databaseLogger = l
+func (r *Registry) SetLogger(l *slog.Logger) {
+	r.databaseLogger = l
 }
 
-func (a *Application) GetConsole() *slog.Logger {
-	return a.consoleLogger
+func (r *Registry) GetConsole() *slog.Logger {
+	return r.consoleLogger
 }
-func (a *Application) SetConsole(l *slog.Logger) {
-	a.consoleLogger = l
+func (r *Registry) SetConsole(l *slog.Logger) {
+	r.consoleLogger = l
 }
 
 // Cache accessors (delegate to package-level cache singletons)
-func (a *Application) GetMemoryCache() *ttlcache.Cache[string, any] {
+func (r *Registry) GetMemoryCache() *ttlcache.Cache[string, any] {
 	return cache.Memory
 }
 
-func (a *Application) SetMemoryCache(c *ttlcache.Cache[string, any]) {
+func (r *Registry) SetMemoryCache(c *ttlcache.Cache[string, any]) {
 	cache.Memory = c
 }
 
-func (a *Application) GetFileCache() cachego.Cache {
+func (r *Registry) GetFileCache() cachego.Cache {
 	return cache.File
 }
 
-func (a *Application) SetFileCache(c cachego.Cache) {
+func (r *Registry) SetFileCache(c cachego.Cache) {
 	cache.File = c
 }
 
@@ -211,181 +211,181 @@ func cacheDirectory() string {
 // == Store accessors
 // ============================================================================
 
-func (a *Application) GetAuditStore() auditstore.StoreInterface {
-	return a.auditStore
+func (r *Registry) GetAuditStore() auditstore.StoreInterface {
+	return r.auditStore
 }
-func (a *Application) SetAuditStore(s auditstore.StoreInterface) {
-	a.auditStore = s
+func (r *Registry) SetAuditStore(s auditstore.StoreInterface) {
+	r.auditStore = s
 }
 
 // BlogStore
-func (a *Application) GetBlogStore() blogstore.StoreInterface {
-	return a.blogStore
+func (r *Registry) GetBlogStore() blogstore.StoreInterface {
+	return r.blogStore
 }
-func (a *Application) SetBlogStore(s blogstore.StoreInterface) {
-	a.blogStore = s
+func (r *Registry) SetBlogStore(s blogstore.StoreInterface) {
+	r.blogStore = s
 }
 
 // ChatStore
-func (a *Application) GetChatStore() chatstore.StoreInterface {
-	return a.chatStore
+func (r *Registry) GetChatStore() chatstore.StoreInterface {
+	return r.chatStore
 }
-func (a *Application) SetChatStore(s chatstore.StoreInterface) {
-	a.chatStore = s
+func (r *Registry) SetChatStore(s chatstore.StoreInterface) {
+	r.chatStore = s
 }
 
 // CacheStore
-func (a *Application) GetCacheStore() cachestore.StoreInterface {
-	return a.cacheStore
+func (r *Registry) GetCacheStore() cachestore.StoreInterface {
+	return r.cacheStore
 }
-func (a *Application) SetCacheStore(s cachestore.StoreInterface) {
-	a.cacheStore = s
+func (r *Registry) SetCacheStore(s cachestore.StoreInterface) {
+	r.cacheStore = s
 }
 
 // CmsStore
-func (a *Application) GetCmsStore() cmsstore.StoreInterface {
-	return a.cmsStore
+func (r *Registry) GetCmsStore() cmsstore.StoreInterface {
+	return r.cmsStore
 }
-func (a *Application) SetCmsStore(s cmsstore.StoreInterface) {
-	a.cmsStore = s
+func (r *Registry) SetCmsStore(s cmsstore.StoreInterface) {
+	r.cmsStore = s
 }
 
 // CustomStore
-func (a *Application) GetCustomStore() customstore.StoreInterface {
-	return a.customStore
+func (r *Registry) GetCustomStore() customstore.StoreInterface {
+	return r.customStore
 }
-func (a *Application) SetCustomStore(s customstore.StoreInterface) {
-	a.customStore = s
+func (r *Registry) SetCustomStore(s customstore.StoreInterface) {
+	r.customStore = s
 }
 
 // EntityStore
-func (a *Application) GetEntityStore() entitystore.StoreInterface {
-	return a.entityStore
+func (r *Registry) GetEntityStore() entitystore.StoreInterface {
+	return r.entityStore
 }
-func (a *Application) SetEntityStore(s entitystore.StoreInterface) {
-	a.entityStore = s
+func (r *Registry) SetEntityStore(s entitystore.StoreInterface) {
+	r.entityStore = s
 }
 
 // FeedStore
-func (a *Application) GetFeedStore() feedstore.StoreInterface {
-	return a.feedStore
+func (r *Registry) GetFeedStore() feedstore.StoreInterface {
+	return r.feedStore
 }
-func (a *Application) SetFeedStore(s feedstore.StoreInterface) {
-	a.feedStore = s
+func (r *Registry) SetFeedStore(s feedstore.StoreInterface) {
+	r.feedStore = s
 }
 
 // GeoStore
-func (a *Application) GetGeoStore() geostore.StoreInterface {
-	return a.geoStore
+func (r *Registry) GetGeoStore() geostore.StoreInterface {
+	return r.geoStore
 }
-func (a *Application) SetGeoStore(s geostore.StoreInterface) {
-	a.geoStore = s
+func (r *Registry) SetGeoStore(s geostore.StoreInterface) {
+	r.geoStore = s
 }
 
 // LogStore
-func (a *Application) GetLogStore() logstore.StoreInterface {
-	return a.logStore
+func (r *Registry) GetLogStore() logstore.StoreInterface {
+	return r.logStore
 }
-func (a *Application) SetLogStore(s logstore.StoreInterface) {
-	a.logStore = s
+func (r *Registry) SetLogStore(s logstore.StoreInterface) {
+	r.logStore = s
 }
 
 // MetaStore
-func (a *Application) GetMetaStore() metastore.StoreInterface {
-	return a.metaStore
+func (r *Registry) GetMetaStore() metastore.StoreInterface {
+	return r.metaStore
 }
 
-func (a *Application) SetMetaStore(s metastore.StoreInterface) {
-	a.metaStore = s
+func (r *Registry) SetMetaStore(s metastore.StoreInterface) {
+	r.metaStore = s
 }
 
 // SessionStore
-func (a *Application) GetSessionStore() sessionstore.StoreInterface {
-	return a.sessionStore
+func (r *Registry) GetSessionStore() sessionstore.StoreInterface {
+	return r.sessionStore
 }
-func (a *Application) SetSessionStore(s sessionstore.StoreInterface) {
-	a.sessionStore = s
+func (r *Registry) SetSessionStore(s sessionstore.StoreInterface) {
+	r.sessionStore = s
 }
 
 // ShopStore
-func (a *Application) GetShopStore() shopstore.StoreInterface {
-	return a.shopStore
+func (r *Registry) GetShopStore() shopstore.StoreInterface {
+	return r.shopStore
 }
-func (a *Application) SetShopStore(s shopstore.StoreInterface) {
-	a.shopStore = s
+func (r *Registry) SetShopStore(s shopstore.StoreInterface) {
+	r.shopStore = s
 }
 
 // SqlFileStorage
-func (a *Application) GetSqlFileStorage() filesystem.StorageInterface {
-	return a.sqlFileStorage
+func (r *Registry) GetSqlFileStorage() filesystem.StorageInterface {
+	return r.sqlFileStorage
 }
-func (a *Application) SetSqlFileStorage(s filesystem.StorageInterface) {
-	a.sqlFileStorage = s
+func (r *Registry) SetSqlFileStorage(s filesystem.StorageInterface) {
+	r.sqlFileStorage = s
 }
 
 // StatsStore
-func (a *Application) GetStatsStore() statsstore.StoreInterface {
-	return a.statsStore
+func (r *Registry) GetStatsStore() statsstore.StoreInterface {
+	return r.statsStore
 }
-func (a *Application) SetStatsStore(s statsstore.StoreInterface) {
-	a.statsStore = s
+func (r *Registry) SetStatsStore(s statsstore.StoreInterface) {
+	r.statsStore = s
 }
 
 // TaskStore
-func (a *Application) GetTaskStore() taskstore.StoreInterface {
-	return a.taskStore
+func (r *Registry) GetTaskStore() taskstore.StoreInterface {
+	return r.taskStore
 }
-func (a *Application) SetTaskStore(s taskstore.StoreInterface) {
-	a.taskStore = s
+func (r *Registry) SetTaskStore(s taskstore.StoreInterface) {
+	r.taskStore = s
 }
 
 // UserStore
-func (a *Application) GetUserStore() userstore.StoreInterface {
-	return a.userStore
+func (r *Registry) GetUserStore() userstore.StoreInterface {
+	return r.userStore
 }
-func (a *Application) SetUserStore(s userstore.StoreInterface) {
-	a.userStore = s
+func (r *Registry) SetUserStore(s userstore.StoreInterface) {
+	r.userStore = s
 }
 
 // VaultStore
-func (a *Application) GetVaultStore() vaultstore.StoreInterface {
-	return a.vaultStore
+func (r *Registry) GetVaultStore() vaultstore.StoreInterface {
+	return r.vaultStore
 }
-func (a *Application) SetVaultStore(s vaultstore.StoreInterface) {
-	a.vaultStore = s
+func (r *Registry) SetVaultStore(s vaultstore.StoreInterface) {
+	r.vaultStore = s
 }
 
 // SettingStore
-func (a *Application) GetSettingStore() settingstore.StoreInterface {
-	return a.settingStore
+func (r *Registry) GetSettingStore() settingstore.StoreInterface {
+	return r.settingStore
 }
-func (a *Application) SetSettingStore(s settingstore.StoreInterface) {
-	a.settingStore = s
+func (r *Registry) SetSettingStore(s settingstore.StoreInterface) {
+	r.settingStore = s
 }
 
-func (a *Application) GetSubscriptionStore() subscriptionstore.StoreInterface {
-	return a.subscriptionStore
+func (r *Registry) GetSubscriptionStore() subscriptionstore.StoreInterface {
+	return r.subscriptionStore
 }
-func (a *Application) SetSubscriptionStore(s subscriptionstore.StoreInterface) {
-	a.subscriptionStore = s
+func (r *Registry) SetSubscriptionStore(s subscriptionstore.StoreInterface) {
+	r.subscriptionStore = s
 }
 
 // Blind index stores
-func (a *Application) GetBlindIndexStoreEmail() blindindexstore.StoreInterface {
-	return a.blindIndexEmail
+func (r *Registry) GetBlindIndexStoreEmail() blindindexstore.StoreInterface {
+	return r.blindIndexEmail
 }
-func (a *Application) SetBlindIndexStoreEmail(s blindindexstore.StoreInterface) {
-	a.blindIndexEmail = s
+func (r *Registry) SetBlindIndexStoreEmail(s blindindexstore.StoreInterface) {
+	r.blindIndexEmail = s
 }
-func (a *Application) GetBlindIndexStoreFirstName() blindindexstore.StoreInterface {
-	return a.blindIndexFirstName
+func (r *Registry) GetBlindIndexStoreFirstName() blindindexstore.StoreInterface {
+	return r.blindIndexFirstName
 }
-func (a *Application) SetBlindIndexStoreFirstName(s blindindexstore.StoreInterface) {
-	a.blindIndexFirstName = s
+func (r *Registry) SetBlindIndexStoreFirstName(s blindindexstore.StoreInterface) {
+	r.blindIndexFirstName = s
 }
-func (a *Application) GetBlindIndexStoreLastName() blindindexstore.StoreInterface {
-	return a.blindIndexLastName
+func (r *Registry) GetBlindIndexStoreLastName() blindindexstore.StoreInterface {
+	return r.blindIndexLastName
 }
-func (a *Application) SetBlindIndexStoreLastName(s blindindexstore.StoreInterface) {
-	a.blindIndexLastName = s
+func (r *Registry) SetBlindIndexStoreLastName(s blindindexstore.StoreInterface) {
+	r.blindIndexLastName = s
 }

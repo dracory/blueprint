@@ -31,7 +31,7 @@ type logListResult struct {
 
 // listLogs encapsulates the log listing logic so it can be reused by
 // both controllers and LiveFlux components.
-func listLogs(app types.AppInterface, f logListFilters) (logListResult, error) {
+func listLogs(app types.RegistryInterface, f logListFilters) (logListResult, error) {
 	if app == nil || app.GetLogStore() == nil {
 		return logListResult{}, nil
 	}

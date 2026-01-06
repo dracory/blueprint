@@ -28,7 +28,7 @@ import (
 // - lastName: the user's last name
 // - err: the error
 func userDisplayNames(
-	app types.AppInterface,
+	app types.RegistryInterface,
 	r *http.Request,
 	authUser userstore.UserInterface,
 	vaultKey string,

@@ -14,12 +14,12 @@ import (
 // == CONTROLLER ==============================================================
 
 type contactController struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewContactController(app types.AppInterface) *contactController {
+func NewContactController(app types.RegistryInterface) *contactController {
 	return &contactController{app: app}
 }
 

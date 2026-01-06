@@ -17,7 +17,7 @@ import (
 //  2. user must be active
 //  3. user must be registered
 //  4. user must be an admin or superuser
-func NewAdminMiddleware(app types.AppInterface) rtr.MiddlewareInterface {
+func NewAdminMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Admin Middleware").
 		SetHandler(func(next http.Handler) http.Handler {

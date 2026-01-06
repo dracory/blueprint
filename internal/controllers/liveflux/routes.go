@@ -9,7 +9,7 @@ import (
 )
 
 // Routes registers the /liveflux endpoint for the Liveflux handler.
-func Routes(app types.AppInterface) []rtr.RouteInterface {
+func Routes(app types.RegistryInterface) []rtr.RouteInterface {
 	ctrl := NewController(app)
 
 	livefluxPost := rtr.NewRoute().

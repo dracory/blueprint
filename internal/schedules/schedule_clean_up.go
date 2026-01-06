@@ -8,7 +8,7 @@ import (
 )
 
 // scheduleCleanUpTask schedules the clean up task
-func scheduleCleanUpTask(app types.AppInterface) {
+func scheduleCleanUpTask(app types.RegistryInterface) {
 	if app == nil {
 		cfmt.Errorln("CleanUp scheduling skipped; app is nil")
 		return

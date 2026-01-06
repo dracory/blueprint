@@ -11,7 +11,7 @@ import "project/internal/types"
 //
 // Returns:
 //   - []Widget - A list of all widgets
-func WidgetRegistry(app types.AppInterface) []Widget {
+func WidgetRegistry(app types.RegistryInterface) []Widget {
 	return []Widget{
 		NewAuthenticatedWidget(app),
 		// NewContactFormWidget(app),

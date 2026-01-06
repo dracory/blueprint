@@ -17,7 +17,7 @@ var _ Widget = (*unauthenticatedWidget)(nil) // verify it extends the interface
 //
 // Returns:
 // - *unauthenticatedWidget: a pointer to an unauthenticatedWidget.
-func NewUnauthenticatedWidget(app types.AppInterface) *unauthenticatedWidget {
+func NewUnauthenticatedWidget(app types.RegistryInterface) *unauthenticatedWidget {
 	return &unauthenticatedWidget{
 		app: app,
 	}
@@ -28,7 +28,7 @@ func NewUnauthenticatedWidget(app types.AppInterface) *unauthenticatedWidget {
 // unauthenticatedWidget used to render the unauthenticatedWidget shortcode.
 //
 // It displays the content of the shortcode if the user is not authenticated.
-type unauthenticatedWidget struct{ app types.AppInterface }
+type unauthenticatedWidget struct{ app types.RegistryInterface }
 
 // == PUBLIC METHODS =========================================================
 

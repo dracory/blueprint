@@ -7,7 +7,7 @@ import (
 	"github.com/dracory/llm"
 )
 
-func LlmEngine(app types.AppInterface) (llm.LlmInterface, error) {
+func LlmEngine(app types.RegistryInterface) (llm.LlmInterface, error) {
 	return llm.JSONModel(llm.ProviderOpenRouter, llm.LlmOptions{
 		ApiKey: app.GetConfig().GetOpenRouterApiKey(),
 		Model:  llm.OPENROUTER_MODEL_GEMINI_2_5_FLASH_LITE,

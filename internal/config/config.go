@@ -4,7 +4,7 @@ package config
 // == START: Store Configurations
 // ============================================================================
 //
-// This is where you can configure the database stores used by the application.
+// This is where you can configure the database stores used by the registry.
 //
 // ============================================================================
 

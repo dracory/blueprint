@@ -15,11 +15,11 @@ func TestSubscriptionOnlyMiddleware_AdminUserPassesThrough(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 
-	application := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
-		application.GetUserStore(),
-		application.GetSessionStore(),
+		registry.GetUserStore(),
+		registry.GetSessionStore(),
 		testutils.ADMIN_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
@@ -31,7 +31,7 @@ func TestSubscriptionOnlyMiddleware_AdminUserPassesThrough(t *testing.T) {
 
 	body, response, err := test.CallMiddleware(
 		"GET",
-		NewSubscriptionOnlyMiddleware(application).GetHandler(),
+		NewSubscriptionOnlyMiddleware(registry).GetHandler(),
 		func(w http.ResponseWriter, r *http.Request) {
 			if _, err := w.Write([]byte("ok")); err != nil {
 				t.Fatalf("failed to write response: %v", err)

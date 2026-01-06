@@ -226,12 +226,12 @@ var termsOfUse = `
 `
 
 type termsOfUseWidget struct {
-	app types.AppInterface
+	app types.RegistryInterface
 }
 
 var _ Widget = (*termsOfUseWidget)(nil)
 
-func NewTermsOfUseWidget(app types.AppInterface) *termsOfUseWidget {
+func NewTermsOfUseWidget(app types.RegistryInterface) *termsOfUseWidget {
 	return &termsOfUseWidget{
 		app: app,
 	}

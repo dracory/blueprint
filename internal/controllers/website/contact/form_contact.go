@@ -25,7 +25,7 @@ import (
 
 type formContact struct {
 	liveflux.Base
-	App             types.AppInterface
+	App             types.RegistryInterface
 	UserID          string
 	Email           string
 	FirstName       string
@@ -43,7 +43,7 @@ type formContact struct {
 	CaptchaAnswer   string
 }
 
-func NewFormContact(app types.AppInterface) liveflux.ComponentInterface {
+func NewFormContact(app types.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formContact{})
 	if err != nil {
 		log.Println(err)
