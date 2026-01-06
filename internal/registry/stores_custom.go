@@ -14,7 +14,7 @@ func customStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newCustomStore(app.GetDB()); err != nil {
+	if store, err := newCustomStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetCustomStore(store)

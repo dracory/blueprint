@@ -19,7 +19,7 @@ func statsStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newStatsStore(app.GetDB()); err != nil {
+	if store, err := newStatsStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetStatsStore(store)

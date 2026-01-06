@@ -19,7 +19,7 @@ func blindIndexLastNameStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newBlindIndexLastNameStore(app.GetDB()); err != nil {
+	if store, err := newBlindIndexLastNameStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetBlindIndexStoreLastName(store)

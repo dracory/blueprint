@@ -14,7 +14,7 @@ func metaStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newMetaStore(app.GetDB()); err != nil {
+	if store, err := newMetaStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetMetaStore(store)

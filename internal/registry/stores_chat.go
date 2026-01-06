@@ -19,7 +19,7 @@ func chatStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	store, err := newChatStore(app.GetDB())
+	store, err := newChatStore(app.GetDatabase())
 	if err != nil {
 		return err
 	}

@@ -19,7 +19,7 @@ func blindIndexEmailStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newBlindIndexEmailStore(app.GetDB()); err != nil {
+	if store, err := newBlindIndexEmailStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetBlindIndexStoreEmail(store)

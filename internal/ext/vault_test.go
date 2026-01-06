@@ -116,7 +116,7 @@ func TestVaultTokenUpsertReturnsErrorWhenCreateFails(t *testing.T) {
 	ctx := context.Background()
 	store := app.GetVaultStore()
 
-	if _, err := app.GetDB().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
+	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 

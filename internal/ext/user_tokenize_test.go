@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"testing"
 
+	"project/internal/testutils"
+
 	"github.com/dracory/userstore"
 	"github.com/dracory/vaultstore"
-	"project/internal/testutils"
 )
 
 const (
@@ -85,7 +86,7 @@ func TestUserTokenizePropagatesVaultErrors(t *testing.T) {
 	store := app.GetVaultStore()
 	user := userstore.NewUser()
 
-	if _, err := app.GetDB().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
+	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 

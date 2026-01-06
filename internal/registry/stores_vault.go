@@ -19,7 +19,7 @@ func vaultStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newVaultStore(app.GetDB()); err != nil {
+	if store, err := newVaultStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetVaultStore(store)

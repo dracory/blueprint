@@ -66,7 +66,7 @@ func main() {
 		return
 	}
 
-	defer closeResourcesDB(registry.GetDB()) // Defer Closing the database
+	defer closeResourcesDB(registry.GetDatabase()) // Defer Closing the database
 
 	tasks.RegisterTasks(registry) // Register the task handlers
 
@@ -172,7 +172,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 		return errors.New("startBackgroundProcesses called with nil config")
 	}
 
-	if app.GetDB() == nil {
+	if app.GetDatabase() == nil {
 		return errors.New("startBackgroundProcesses called with nil db")
 	}
 

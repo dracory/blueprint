@@ -18,7 +18,7 @@ func sqlFileStorageInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	store, err := newSqlFileStorage(app.GetDB())
+	store, err := newSqlFileStorage(app.GetDatabase())
 	if err != nil {
 		return err
 	}

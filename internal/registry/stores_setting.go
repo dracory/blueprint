@@ -20,7 +20,7 @@ func settingStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newSettingStore(app.GetDB()); err != nil {
+	if store, err := newSettingStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetSettingStore(store)

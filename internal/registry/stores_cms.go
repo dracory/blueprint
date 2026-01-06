@@ -15,7 +15,7 @@ func cmsStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newCmsStore(app.GetDB()); err != nil {
+	if store, err := newCmsStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetCmsStore(store)

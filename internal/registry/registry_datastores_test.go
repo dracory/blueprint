@@ -102,7 +102,7 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 		"snv_bindx_last_name",
 	}
 
-	db := a.GetDB()
+	db := a.GetDatabase()
 	require.NotNil(t, db)
 	for _, tbl := range mustHaveTables {
 		t.Run("has_"+tbl, func(t *testing.T) {

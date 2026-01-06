@@ -14,7 +14,7 @@ func geoStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newGeoStore(app.GetDB()); err != nil {
+	if store, err := newGeoStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetGeoStore(store)

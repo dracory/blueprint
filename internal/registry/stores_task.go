@@ -19,7 +19,7 @@ func taskStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newTaskStore(app.GetDB()); err != nil {
+	if store, err := newTaskStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetTaskStore(store)

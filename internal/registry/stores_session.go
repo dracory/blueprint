@@ -15,7 +15,7 @@ func sessionStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newSessionStore(app.GetDB()); err != nil {
+	if store, err := newSessionStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetSessionStore(store)

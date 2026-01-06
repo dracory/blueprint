@@ -120,7 +120,7 @@ func TestUserUntokenizePropagatesVaultErrors(t *testing.T) {
 	user.SetPhone(phoneToken)
 	user.SetBusinessName(businessToken)
 
-	if _, err := app.GetDB().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", app.GetVaultStore().GetVaultTableName())); err != nil {
+	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", app.GetVaultStore().GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 

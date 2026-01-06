@@ -35,6 +35,7 @@ import (
 	"github.com/faabiosr/cachego/file"
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/lmittmann/tint"
+	// "gorm.io/gorm"
 )
 
 // Registry is the orchestration facade for starting the app.
@@ -73,6 +74,7 @@ type Registry struct {
 	vaultStore          vaultstore.StoreInterface
 }
 
+// Ensure Registry satisfies the RegistryInterface contract.
 var _ types.RegistryInterface = (*Registry)(nil)
 
 // New constructs and initializes the Registry (logger, caches, database).
@@ -107,7 +109,7 @@ func New(cfg types.ConfigInterface) (types.RegistryInterface, error) {
 	registry.SetLogger(consoleLogger)
 	registry.SetMemoryCache(cache.Memory)
 	registry.SetFileCache(cache.File)
-	registry.SetDB(db)
+	registry.SetDatabase(db)
 
 	if err := registry.dataStoresInitialize(); err != nil {
 		return nil, err
@@ -135,18 +137,29 @@ func (r *Registry) SetConfig(cfg types.ConfigInterface) {
 	r.cfg = cfg
 }
 
-// GetDB returns the registry database
-func (r *Registry) GetDB() *sql.DB {
+// GetDatabase returns the registry database
+func (r *Registry) GetDatabase() *sql.DB {
 	return r.db
 }
 
-// SetDB sets the registry database
-func (r *Registry) SetDB(db *sql.DB) {
+// SetDatabase sets the registry database
+func (r *Registry) SetDatabase(db *sql.DB) {
 	r.db = db
 }
 
-// Run remains for future consolidation of boot logic.
-func (r *Registry) Run() error { return nil }
+// Enable if you want to use GORM
+// // GetDatabaseGorm returns the GORM database handle.
+// func (r *Registry) GetDatabaseGorm() *gorm.DB {
+// 	if r == nil {
+// 		return nil
+// 	}
+// 	return r.gormDb
+// }
+
+// // SetDatabaseGorm sets the GORM database handle for the application.
+// func (r *Registry) SetDatabaseGorm(gormDb *gorm.DB) {
+// 	r.gormDb = gormDb
+// }
 
 // Logger accessors (delegate to package-level logger singletons)
 func (r *Registry) GetLogger() *slog.Logger {
@@ -300,7 +313,12 @@ func (r *Registry) SetMetaStore(s metastore.StoreInterface) {
 }
 
 // SessionStore
+
+// GetSessionStore returns the session store.
 func (r *Registry) GetSessionStore() sessionstore.StoreInterface {
+	if r == nil {
+		return nil
+	}
 	return r.sessionStore
 }
 func (r *Registry) SetSessionStore(s sessionstore.StoreInterface) {

@@ -14,7 +14,7 @@ func cacheStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newCacheStore(app.GetDB()); err != nil {
+	if store, err := newCacheStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetCacheStore(store)

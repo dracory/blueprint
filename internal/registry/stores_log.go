@@ -13,7 +13,7 @@ func logStoreInitialize(app types.RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newLogStore(app.GetDB()); err != nil {
+	if store, err := newLogStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
 		app.SetLogStore(store)

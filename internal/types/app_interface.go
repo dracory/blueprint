@@ -51,8 +51,8 @@ type RegistryInterface interface {
 	SetFileCache(c cachego.Cache)
 
 	// DB
-	GetDB() *sql.DB
-	SetDB(db *sql.DB)
+	GetDatabase() *sql.DB
+	SetDatabase(db *sql.DB)
 
 	// ========================================================================
 	// == Stores (all specific data stores)
