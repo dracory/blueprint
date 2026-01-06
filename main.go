@@ -13,11 +13,11 @@ import (
 	"syscall"
 	"time"
 
-	"project/internal/app"
 	"project/internal/cli"
 	"project/internal/config"
 	"project/internal/emails"
 	"project/internal/middlewares"
+	app "project/internal/registry"
 	"project/internal/routes"
 	"project/internal/schedules"
 	"project/internal/tasks"

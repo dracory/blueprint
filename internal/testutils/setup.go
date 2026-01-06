@@ -3,7 +3,7 @@ package testutils
 import (
 	"fmt"
 	"log/slog"
-	"project/internal/app"
+	registrypkg "project/internal/registry"
 	"project/internal/types"
 	"time"
 
@@ -301,8 +301,8 @@ func Setup(options ...SetupOption) types.RegistryInterface {
 		}
 	}
 
-	// Build registry using app.New (opens DB and initializes stores)
-	registry, err := app.New(opts.cfg)
+	// Build registry using registrypkg.New (opens DB and initializes stores)
+	registry, err := registrypkg.New(opts.cfg)
 	if err != nil {
 		panic("testutils.Setup: failed to build registry: " + err.Error())
 	}

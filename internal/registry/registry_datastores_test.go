@@ -8,7 +8,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"project/internal/app"
+	app "project/internal/registry"
 	"project/internal/types"
 
 	"github.com/stretchr/testify/require"

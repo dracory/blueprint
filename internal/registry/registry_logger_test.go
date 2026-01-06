@@ -7,7 +7,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	apppkg "project/internal/app"
+	registrypkg "project/internal/registry"
 	"project/internal/types"
 )
 
@@ -17,7 +17,7 @@ func TestNew_SetsDefaultLogger(t *testing.T) {
 	cfg.SetDatabaseDriver("sqlite")
 	cfg.SetDatabaseName(fmt.Sprintf("file:mp_test_%d?mode=memory&cache=shared", time.Now().UnixNano()))
 
-	registry, err := apppkg.New(cfg)
+	registry, err := registrypkg.New(cfg)
 	if err != nil {
 		t.Fatalf("app.New returned error: %v", err)
 	}
