@@ -234,7 +234,7 @@ func (c *postController) recommendationsSection(post blogstore.Post) hb.TagInter
 }
 
 func (c *postController) postImage(post blogstore.Post) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
 
 	return hb.Image(``).
 		Class("img img-responsive img-thumbnail w-100").

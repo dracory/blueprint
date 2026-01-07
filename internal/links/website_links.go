@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/faabiosr/cachego"
+
 	"github.com/dracory/str"
 	"github.com/samber/lo"
 )
@@ -93,7 +95,7 @@ func (l *websiteLinks) Theme(params map[string]string) string {
 	return URL(THEME, params)
 }
 
-func (l *websiteLinks) Thumbnail(extension, width, height, quality, path string) string {
+func (l *websiteLinks) Thumbnail(extension, width, height, quality, path string, caches ...cachego.Cache) string {
 	if quality == "" {
 		quality = "80"
 	}
@@ -112,8 +114,13 @@ func (l *websiteLinks) Thumbnail(extension, width, height, quality, path string)
 	}
 	if strings.HasPrefix(path, "data") {
 		hash := str.MD5(path)
-		if cache.File != nil {
-			if err := cache.File.Save(hash, path, 5*time.Minute); err != nil {
+
+		fileCache := cache.File
+		if len(caches) > 0 && caches[0] != nil {
+			fileCache = caches[0]
+		}
+		if fileCache != nil {
+			if err := fileCache.Save(hash, path, 5*time.Minute); err != nil {
 				return RootURL() + "/th/cache-error"
 			}
 			path = "cache-" + hash

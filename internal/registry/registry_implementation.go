@@ -48,6 +48,10 @@ type registryImplementation struct {
 	databaseLogger *slog.Logger
 	consoleLogger  *slog.Logger
 
+	// Caches (instance-scoped)
+	memoryCache *ttlcache.Cache[string, any]
+	fileCache   cachego.Cache
+
 	// Database stores
 	auditStore          auditstore.StoreInterface
 	blogStore           blogstore.StoreInterface
@@ -84,16 +88,13 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 		return nil, errors.New("cfg is nil")
 	}
 
-	// Caches
-	if cache.Memory == nil {
-		cache.Memory = ttlcache.New[string, any]()
-	}
-	// Ensure cache directory exists for file cache
+	// Caches (instance-scoped)
+	memoryCache := ttlcache.New[string, any]()
 	cacheDir := cacheDirectory()
-	_ = os.MkdirAll(cacheDir, os.ModePerm)
-	if cache.File == nil {
-		cache.File = file.New(cacheDir)
+	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
+		return nil, err
 	}
+	fileCache := file.New(cacheDir)
 
 	consoleLogger := slog.New(tint.NewHandler(os.Stdout, nil))
 
@@ -107,8 +108,8 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	registry := &registryImplementation{cfg: cfg}
 	registry.SetConsole(consoleLogger)
 	registry.SetLogger(consoleLogger)
-	registry.SetMemoryCache(cache.Memory)
-	registry.SetFileCache(cache.File)
+	registry.SetMemoryCache(memoryCache)
+	registry.SetFileCache(fileCache)
 	registry.SetDatabase(db)
 
 	if err := registry.dataStoresInitialize(); err != nil {
@@ -122,6 +123,10 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	if registry.GetLogStore() != nil {
 		registry.SetLogger(slog.New(logstore.NewSlogHandler(registry.GetLogStore())))
 	}
+
+	// Mirror caches into internal/cache for transitional compatibility
+	cache.Memory = memoryCache
+	cache.File = fileCache
 
 	return registry, nil
 }
@@ -147,6 +152,7 @@ func (r *registryImplementation) GetConfig() config.ConfigInterface {
 	}
 	return r.cfg
 }
+
 func (r *registryImplementation) SetConfig(cfg config.ConfigInterface) {
 	r.cfg = cfg
 }
@@ -165,6 +171,7 @@ func (r *registryImplementation) SetDatabase(db *sql.DB) {
 func (r *registryImplementation) GetLogger() *slog.Logger {
 	return r.databaseLogger
 }
+
 func (r *registryImplementation) SetLogger(l *slog.Logger) {
 	r.databaseLogger = l
 }
@@ -172,25 +179,38 @@ func (r *registryImplementation) SetLogger(l *slog.Logger) {
 func (r *registryImplementation) GetConsole() *slog.Logger {
 	return r.consoleLogger
 }
+
 func (r *registryImplementation) SetConsole(l *slog.Logger) {
 	r.consoleLogger = l
 }
 
-// Cache accessors (delegate to package-level cache singletons)
+// Cache accessors (instance-scoped)
 func (r *registryImplementation) GetMemoryCache() *ttlcache.Cache[string, any] {
-	return cache.Memory
+	if r == nil {
+		return nil
+	}
+	return r.memoryCache
 }
 
 func (r *registryImplementation) SetMemoryCache(c *ttlcache.Cache[string, any]) {
-	cache.Memory = c
+	if r == nil {
+		return
+	}
+	r.memoryCache = c
 }
 
 func (r *registryImplementation) GetFileCache() cachego.Cache {
-	return cache.File
+	if r == nil {
+		return nil
+	}
+	return r.fileCache
 }
 
 func (r *registryImplementation) SetFileCache(c cachego.Cache) {
-	cache.File = c
+	if r == nil {
+		return
+	}
+	r.fileCache = c
 }
 
 // cacheDirectory returns the path to the shared filesystem cache directory.

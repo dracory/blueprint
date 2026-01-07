@@ -191,7 +191,10 @@ Right now, tasks/controllers commonly accept `registry.RegistryInterface`, which
 
 #### Current gap
 
-`main.go` currently closes the DB and stops background work, but ownership is split across the application entrypoint and the registry. Consolidating shutdown into `Close()` makes it easier to test and harder to forget resources.
+DB shutdown is now delegated to `registry.Close()`, but background worker lifecycle is still coordinated by `main.go` via context cancellation and the background group. If we want a single owner for all shutdown, either:
+
+- keep DB and runtime dependency shutdown in `registry.Close()` and leave goroutine lifecycle in `main.go`, or
+- introduce a higher-level application type that owns both registry resources and background process management.
 
 #### Expected impact
 

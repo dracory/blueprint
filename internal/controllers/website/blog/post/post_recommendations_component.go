@@ -229,17 +229,13 @@ func (c *postRecommendationsComponent) truncatedSummary(text string) string {
 // func (c *postRecommendationsComponent) postImage(post blogstore.Post) *hb.Tag {
 // 	thumbnailURL := thumbnailURL(post)
 
-// 	return hb.Image(thumbnailURL).
-// 		Class("card-img-top rounded-3").
-// 		Style("object-fit: cover;").
-// 		Style("max-height: 180px;").
-// 		Style("aspect-ratio: 9/6;").
-// 		Style("border-radius: 0.5rem").
-// 		Alt("")
-// }
-
+// return hb.Image(thumbnailURL).
+//
+//	Class("card-img-top rounded-3").
+//	Style("object-fit: cover;").
+//	Style("max-height: 180px;").
 func (c *postRecommendationsComponent) postImage(post blogstore.Post) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(c.App, post, "300", "200", "80")
 
 	return hb.Image(``).
 		Class("card-img-top").

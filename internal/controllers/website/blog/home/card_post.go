@@ -94,7 +94,7 @@ func cardPost(post blogstore.Post) hb.TagInterface {
 }
 
 func postImage(post blogstore.Post) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(nil, post, "300", "200", "80")
 
 	postImage := hb.Image(``).
 		Class("card-img-top rounded-3").

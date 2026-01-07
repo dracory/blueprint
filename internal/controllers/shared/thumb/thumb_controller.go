@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"project/internal/cache"
 	"project/internal/links"
 	"project/internal/registry"
 	"project/internal/resources"
@@ -16,10 +15,10 @@ import (
 
 	"strings"
 
+	"github.com/disintegration/imaging"
 	"github.com/dracory/rtr"
 	"github.com/dracory/str"
 
-	"github.com/disintegration/imaging"
 	"github.com/dracory/base/img"
 	"github.com/spf13/cast"
 
@@ -57,9 +56,10 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 
 	cacheKey := str.MD5(fmt.Sprint(data.path, data.extension, data.width, "x", data.height, data.quality))
 
-	if cache.File != nil {
-		if cache.File.Contains(cacheKey) {
-			thumb, err := cache.File.Fetch(cacheKey)
+	fileCache := controller.registry.GetFileCache()
+	if fileCache != nil {
+		if fileCache.Contains(cacheKey) {
+			thumb, err := fileCache.Fetch(cacheKey)
 
 			if err == nil {
 				controller.setHeaders(w, data.extension)
@@ -74,8 +74,8 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 		return errorMessage
 	}
 
-	if cache.File != nil {
-		err := cache.File.Save(cacheKey, thumb, 5*time.Minute) // cache for 5 minutes
+	if fileCache != nil {
+		err := fileCache.Save(cacheKey, thumb, 5*time.Minute) // cache for 5 minutes
 
 		if err != nil {
 			cfmt.Errorln("Error at thumbnailController > CacheFile.Save", "error", err.Error())
@@ -194,11 +194,12 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 			return "", err.Error()
 		}
 	} else if data.isCache {
-		if cache.File == nil {
+		fileCache := controller.registry.GetFileCache()
+		if fileCache == nil {
 			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
 			return "", "cache not initialized"
 		}
-		dataBase64ImageStr, err := cache.File.Fetch(data.path)
+		dataBase64ImageStr, err := fileCache.Fetch(data.path)
 
 		if err != nil {
 			// Downgrade noisy cache expiry to info level, keep other cache errors as error
