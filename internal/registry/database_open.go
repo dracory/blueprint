@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"project/internal/types"
+	"project/internal/config"
 
 	"github.com/dracory/database"
 	// "gorm.io/driver/postgres"
@@ -15,7 +15,7 @@ import (
 )
 
 // databaseOpen opens the database connection using the provided config and returns it.
-func databaseOpen(cfg types.ConfigInterface) (*sql.DB, error) {
+func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 	if cfg == nil {
 		return nil, errors.New("databaseOpen: cfg is nil")
 	}
