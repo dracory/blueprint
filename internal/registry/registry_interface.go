@@ -1,8 +1,10 @@
-package types
+package registry
 
 import (
 	"database/sql"
 	"log/slog"
+
+	"project/internal/types"
 
 	"github.com/dracory/auditstore"
 	"github.com/dracory/blindindexstore"
@@ -31,124 +33,90 @@ import (
 
 // RegistryInterface defines accessors for registry-scoped runtime services.
 //
-// Note: This interface is currently used as a broad service container contract.
-// Prefer passing narrower dependency interfaces to controllers/tasks.
-//
-// Typical implementations will wire these in an Initialize step.
-// For now, we also provide a runtime adapter in internal/app that returns
-// the current process-level resources.
+// This interface is intended to be used at the composition root (startup wiring)
+// and for edge integration points. Prefer passing narrower dependency
+// interfaces to controllers/tasks.
 type RegistryInterface interface {
-	// Logger
 	GetLogger() *slog.Logger
 	SetLogger(l *slog.Logger)
 
-	// Config
-	GetConfig() ConfigInterface
-	SetConfig(c ConfigInterface)
+	GetConfig() types.ConfigInterface
+	SetConfig(c types.ConfigInterface)
 
-	// Caches
 	GetMemoryCache() *ttlcache.Cache[string, any]
 	SetMemoryCache(c *ttlcache.Cache[string, any])
 	GetFileCache() cachego.Cache
 	SetFileCache(c cachego.Cache)
 
-	// DB
 	GetDatabase() *sql.DB
 	SetDatabase(db *sql.DB)
 
-	// ========================================================================
-	// == Stores (all specific data stores)
-	// ========================================================================
-
-	// Audit store
 	GetAuditStore() auditstore.StoreInterface
 	SetAuditStore(s auditstore.StoreInterface)
 
-	// Blog store
 	GetBlogStore() blogstore.StoreInterface
 	SetBlogStore(s blogstore.StoreInterface)
 
-	// Chat store
 	GetChatStore() chatstore.StoreInterface
 	SetChatStore(s chatstore.StoreInterface)
 
-	// Blind index store
 	GetBlindIndexStoreEmail() blindindexstore.StoreInterface
 	SetBlindIndexStoreEmail(s blindindexstore.StoreInterface)
 
-	// Blind index store
 	GetBlindIndexStoreFirstName() blindindexstore.StoreInterface
 	SetBlindIndexStoreFirstName(s blindindexstore.StoreInterface)
 
-	// Blind index store
 	GetBlindIndexStoreLastName() blindindexstore.StoreInterface
 	SetBlindIndexStoreLastName(s blindindexstore.StoreInterface)
 
-	// Cache store
 	GetCacheStore() cachestore.StoreInterface
 	SetCacheStore(s cachestore.StoreInterface)
 
-	// CMS store
 	GetCmsStore() cmsstore.StoreInterface
 	SetCmsStore(s cmsstore.StoreInterface)
 
-	// Custom store
 	GetCustomStore() customstore.StoreInterface
 	SetCustomStore(s customstore.StoreInterface)
 
-	// Entity store
 	GetEntityStore() entitystore.StoreInterface
 	SetEntityStore(s entitystore.StoreInterface)
 
-	// Feed store
 	GetFeedStore() feedstore.StoreInterface
 	SetFeedStore(s feedstore.StoreInterface)
 
-	// Geo store
 	GetGeoStore() geostore.StoreInterface
 	SetGeoStore(s geostore.StoreInterface)
 
-	// Log store
 	GetLogStore() logstore.StoreInterface
 	SetLogStore(s logstore.StoreInterface)
 
-	// Meta store
 	GetMetaStore() metastore.StoreInterface
 	SetMetaStore(s metastore.StoreInterface)
 
-	// Session store
 	GetSessionStore() sessionstore.StoreInterface
 	SetSessionStore(s sessionstore.StoreInterface)
 
-	// Setting store
 	GetSettingStore() settingstore.StoreInterface
 	SetSettingStore(s settingstore.StoreInterface)
 
-	// Shop store
 	GetShopStore() shopstore.StoreInterface
 	SetShopStore(s shopstore.StoreInterface)
 
-	// SQL file storage
 	GetSqlFileStorage() filesystem.StorageInterface
 	SetSqlFileStorage(s filesystem.StorageInterface)
 
-	// Stats store
 	GetStatsStore() statsstore.StoreInterface
 	SetStatsStore(s statsstore.StoreInterface)
 
-	// Subscription store
 	GetSubscriptionStore() subscriptionstore.StoreInterface
 	SetSubscriptionStore(s subscriptionstore.StoreInterface)
 
-	// Task store
 	GetTaskStore() taskstore.StoreInterface
 	SetTaskStore(s taskstore.StoreInterface)
 
-	// User store
 	GetUserStore() userstore.StoreInterface
 	SetUserStore(s userstore.StoreInterface)
 
-	// Vault store
 	GetVaultStore() vaultstore.StoreInterface
 	SetVaultStore(s vaultstore.StoreInterface)
 }

@@ -75,11 +75,11 @@ type Registry struct {
 }
 
 // Ensure Registry satisfies the RegistryInterface contract.
-var _ types.RegistryInterface = (*Registry)(nil)
+var _ RegistryInterface = (*Registry)(nil)
 
 // New constructs and initializes the Registry (logger, caches, database).
 // It centralizes the boot logic so callers only use this single constructor.
-func New(cfg types.ConfigInterface) (types.RegistryInterface, error) {
+func New(cfg types.ConfigInterface) (RegistryInterface, error) {
 	if cfg == nil {
 		return nil, errors.New("cfg is nil")
 	}
