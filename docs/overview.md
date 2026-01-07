@@ -29,7 +29,7 @@ features rapidly while keeping operational risk low.
  tests, and scripts to become productive within a single working session.
 
 ## Application Summary
-- Root entrypoint `main.go` wires configuration, datastore initialization, routing, background tasks, and
+- Root entrypoint `cmd/server/main.go` wires configuration, datastore initialization, routing, background tasks, and
   graceful shutdown handling.
 - `/internal/registry` owns runtime dependencies, including database access, caching, and store wiring.
 - `/internal/routes` (and feature subpackages) collect HTTP handlers, middlewares, and view composition for
@@ -48,11 +48,11 @@ features rapidly while keeping operational risk low.
 
 ## Architecture Contracts
 
-- **Composition root:** `main.go` constructs the `registry` via `registry.New(cfg)` and wires the HTTP router.
+- **Composition root:** `cmd/server/main.go` constructs the `registry` via `registry.New(cfg)` and wires the HTTP router.
 - **Registry ownership:** `registry` owns the database handle and store instances.
 - **Caches:** caches are instance-scoped on the registry (do not rely on package-level cache globals).
 - **Lifecycle:** `registry.Close()` is responsible for shutting down registry-owned resources (for example, the
-  database). Background goroutine lifecycle is coordinated by `main.go` via context cancellation.
+  database). Background goroutine lifecycle is coordinated by `cmd/server/main.go` via context cancellation.
 
 ## Linked References
 - `README.md` – quickstart commands, environment setup, and deployment pathways.

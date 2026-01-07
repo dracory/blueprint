@@ -28,9 +28,9 @@ const BlindIndexLastName = "last_name"
 // and will be removed if it exists.
 // ============================================================================
 // Example:
-// - go run . task BlindIndexUpdate --index=all
-// - go run . task BlindIndexUpdate --index=first_name
-// - go run . task BlindIndexUpdate --index=first_name --truncate=yes
+// - go run ./cmd/server task BlindIndexUpdate --index=all
+// - go run ./cmd/server task BlindIndexUpdate --index=first_name
+// - go run ./cmd/server task BlindIndexUpdate --index=first_name --truncate=yes
 // ============================================================================
 type blindIndexRebuildTask struct {
 	taskstore.TaskHandlerBase

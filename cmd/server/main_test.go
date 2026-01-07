@@ -21,7 +21,6 @@ func TestIsCliMode(t *testing.T) {
 }
 
 func TestStartBackgroundProcesses(t *testing.T) {
-	// Initialize minimal stores for background processes
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
@@ -35,7 +34,6 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Should not panic
 	if err := startBackgroundProcesses(ctx, group, app); err != nil {
 		t.Fatalf("startBackgroundProcesses returned error: %v", err)
 	}

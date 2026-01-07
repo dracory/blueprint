@@ -13,7 +13,7 @@ import (
 // ExecuteJob executes a job (queued task) with the given arguments.
 //
 // Example:
-// go run . job run --task_id=20231008040147830106 --force=yes
+// go run ./cmd/server job run --task_id=20231008040147830106 --force=yes
 //
 // Args: an array of strings representing the arguments for the job.
 // Return type: None.

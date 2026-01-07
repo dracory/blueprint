@@ -107,19 +107,19 @@ task deploy:staging
 List Routes:
 
 ```bash
-go run . routes list
+go run ./cmd/server routes list
 ```
 
 Run task:
 
 ```bash
-go run . task run ...
+go run ./cmd/server task run ...
 ```
 
 Run job:
 
 ```bash
-go run . job run ...
+go run ./cmd/server job run ...
 ```
 
 ## License

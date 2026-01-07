@@ -21,7 +21,7 @@ tasks:
 
   - name: Install Dependencies and Run
     init: go get && go build ./... && go test ./...
-    command: go run
+    command: go run ./cmd/server
 
 ports:
   - name: Mail test server

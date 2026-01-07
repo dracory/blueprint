@@ -3,7 +3,7 @@
 ## Project Setup
 - Use Go 1.25 or later
 - Install dependencies: `go mod download`
-- Run the application: `go run main.go`
+- Run the application: `go run ./cmd/server`
 - Run tests: `go test ./...`
 
 ## Code Style

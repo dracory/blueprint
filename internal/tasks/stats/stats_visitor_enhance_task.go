@@ -33,7 +33,7 @@ var ipLookupHTTPClient = &http.Client{
 // =================================================================
 // Example:
 //
-// go run main.go task stats-visitor-enhance
+// go run ./cmd/server task stats-visitor-enhance
 //
 // =================================================================
 type statsVisitorEnhanceTask struct {

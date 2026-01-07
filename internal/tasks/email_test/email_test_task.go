@@ -7,10 +7,10 @@ package email_test
 // Example Usage:
 //
 // 1. Direct execution:
-//    go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
+//    go run ./cmd/server task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
 //
 // 2. Enqueue for background processing:
-//    go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com" --enqueue=yes
+//    go run ./cmd/server task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com" --enqueue=yes
 //
 // Required Parameters:
 // - html: HTML content of the email to be sent
@@ -32,7 +32,7 @@ import (
 // NewEmailToAdminTaskHandler constructs a new task handler for sending emails to admin
 // Example usage:
 //
-//	go run . task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
+//	go run ./cmd/server task EmailTestTask --html="<p>Notification content</p>" --to="test@example.com"
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler

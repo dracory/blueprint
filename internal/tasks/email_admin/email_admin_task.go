@@ -7,10 +7,10 @@ package email_admin
 // Example Usage:
 //
 // 1. Direct execution:
-//    go run . task EmailToAdminTask --html="<p>Notification content</p>"
+//    go run ./cmd/server task EmailToAdminTask --html="<p>Notification content</p>"
 //
 // 2. Enqueue for background processing:
-//    go run . task EmailToAdminTask --html="<p>Notification content</p>" --enqueue=yes
+//    go run ./cmd/server task EmailToAdminTask --html="<p>Notification content</p>" --enqueue=yes
 //
 // Required Parameters:
 // - html: HTML content of the email to be sent
@@ -31,7 +31,7 @@ import (
 // NewEmailToAdminTaskHandler constructs a new task handler for sending emails to admin
 // Example usage:
 //
-//	go run . task EmailToAdminTask --html=HTML
+//	go run ./cmd/server task EmailToAdminTask --html=HTML
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
