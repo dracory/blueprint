@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"project/internal/config"
 	registrypkg "project/internal/registry"
-	"project/internal/types"
 	"time"
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
@@ -35,14 +34,14 @@ type setupOptions struct {
 	VaultStoreKey         string
 	CmsStoreTemplateID    string
 
-	cfg types.ConfigInterface
+	cfg config.ConfigInterface
 }
 
 // SetupOption is a functional option for Setup
 type SetupOption func(*setupOptions)
 
 // WithCfg allows providing a custom config for Setup
-func WithCfg(cfg types.ConfigInterface) SetupOption {
+func WithCfg(cfg config.ConfigInterface) SetupOption {
 	return func(opts *setupOptions) {
 		opts.cfg = cfg
 	}
@@ -163,7 +162,7 @@ func WithAuditStore(enable bool) SetupOption {
 	}
 }
 
-func DefaultConf() types.ConfigInterface {
+func DefaultConf() config.ConfigInterface {
 	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
@@ -188,7 +187,7 @@ func DefaultConf() types.ConfigInterface {
 
 // Setup initializes a default in-memory SQLite registry for tests,
 // unless overridden via options. It returns the initialized registry.
-func Setup(options ...SetupOption) types.RegistryInterface {
+func Setup(options ...SetupOption) registrypkg.RegistryInterface {
 	// collect options
 	opts := &setupOptions{}
 	for _, opt := range options {

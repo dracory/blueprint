@@ -3,6 +3,7 @@ package types
 import (
 	"database/sql"
 	"log/slog"
+	"project/internal/config"
 
 	"github.com/dracory/auditstore"
 	"github.com/dracory/blindindexstore"
@@ -43,8 +44,8 @@ type RegistryInterface interface {
 	SetLogger(l *slog.Logger)
 
 	// Config
-	GetConfig() ConfigInterface
-	SetConfig(c ConfigInterface)
+	GetConfig() config.ConfigInterface
+	SetConfig(c config.ConfigInterface)
 
 	// Caches
 	GetMemoryCache() *ttlcache.Cache[string, any]
