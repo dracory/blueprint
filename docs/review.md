@@ -19,8 +19,8 @@ The project is exceptionally well-structured. Logic is cleanly separated into `c
 ### 2. Pervasive Dependency Injection (DI)
 The project's use of DI is exemplary and is the cornerstone of its clean architecture.
 
-- **Application Context:** A central `Application` struct, implementing a `types.AppInterface`, acts as a service container.
-- **Constructor Injection:** This `app` object is passed into components (controllers, tasks, etc.) via their constructors (e.g., `NewHomeController(app)`). This makes dependencies explicit and avoids global state, significantly improving testability and clarity.
+- **Registry Context:** A central `Registry` implementation (via `registry.RegistryInterface`) acts as the runtime service container.
+- **Constructor Injection:** This `registry` object is passed into components (controllers, tasks, etc.) via their constructors (e.g., `NewHomeController(registry)`). This makes dependencies explicit and avoids global state, significantly improving testability and clarity.
 
 ### 3. Production-Ready Features
 The project is not a toy example; it includes features essential for running a real-world application.
@@ -30,7 +30,7 @@ The project is not a toy example; it includes features essential for running a r
 - **Background Task Management:** The system includes a dedicated `taskstore` and scheduler (`gocron`) for managing and running asynchronous jobs, with the same context-aware shutdown mechanism as the main server.
 
 ### 4. Testability
-The architecture is designed for testability from the ground up. The pervasive use of interfaces (`AppInterface`, `StoreInterface`, etc.) means that any component can be easily unit-tested by providing mock implementations of its dependencies.
+The architecture is designed for testability from the ground up. The pervasive use of interfaces (`RegistryInterface`, `StoreInterface`, etc.) means that any component can be easily unit-tested by providing mock implementations of its dependencies.
 
 ### 5. Configuration-Driven Behavior
 The application can be deployed in different configurations by changing its settings. The most notable example is the conditional routing for the CMS, which allows the application to run with or without the CMS feature enabled, altering its routing table accordingly.
@@ -38,9 +38,9 @@ The application can be deployed in different configurations by changing its sett
 ## Constructive Feedback & Areas for Improvement
 
 ### 1. Verbosity of the `Application` Struct
-The central `Application` struct, while effective, is becoming large. It contains a separate field for every data store.
+The central registry implementation, while effective, is becoming large. It contains a separate field for every data store.
 
-- **Recommendation:** Consider grouping the stores into a single nested struct (e.g., `app.Stores.UserStore`). This would reduce the number of fields on the `Application` struct and improve namespacing without sacrificing the benefits of the current design.
+- **Recommendation:** Consider grouping the stores into a single nested struct (e.g., `registry.Stores.UserStore`). This would reduce the number of fields on the registry and improve namespacing without sacrificing the benefits of the current design.
 
 ### 2. Reliance on a Proprietary Ecosystem
 The project makes heavy use of packages from the `github.com/dracory` organization (e.g., `rtr`, `websrv`, and the various stores).

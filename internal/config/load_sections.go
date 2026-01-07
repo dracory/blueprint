@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/dracory/env"
+	"github.com/dracory/envenc"
 	"github.com/spf13/cast"
 )
 
@@ -56,7 +57,7 @@ func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
 		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}
 	}
 
-	derived, err := deriveEnvEncKey(privateKey)
+	derived, err := envenc.DeriveKey(privateKey, ENVENC_KEY_PUBLIC)
 	acc.add(err)
 	if err != nil {
 		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}

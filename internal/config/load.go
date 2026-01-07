@@ -174,7 +174,7 @@ func initializeEnvEncVariables(appEnvironment string) error {
 		return err
 	}
 
-	derivedEnvEncKey, err := deriveEnvEncKey(envEncryptionKey)
+	derivedEnvEncKey, err := envenc.DeriveKey(envEncryptionKey, ENVENC_KEY_PUBLIC)
 
 	if err != nil {
 		return err
