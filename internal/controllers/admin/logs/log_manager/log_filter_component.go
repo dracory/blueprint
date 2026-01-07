@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
@@ -15,7 +15,7 @@ import (
 type logFilterComponent struct {
 	liveflux.Base
 
-	App              types.RegistryInterface
+	App              registry.RegistryInterface
 	Level            string
 	SearchMessage    string
 	SearchContext    string
@@ -28,7 +28,7 @@ type logFilterComponent struct {
 	RedirectURL string
 }
 
-func NewLogFilterComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewLogFilterComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&logFilterComponent{})
 	if err != nil {
 		log.Println(err)
@@ -36,7 +36,7 @@ func NewLogFilterComponent(app types.RegistryInterface) liveflux.ComponentInterf
 	}
 
 	if c, ok := inst.(*logFilterComponent); ok {
-		c.App = app
+		c.App = registry
 	}
 
 	return inst

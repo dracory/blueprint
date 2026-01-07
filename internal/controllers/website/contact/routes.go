@@ -3,20 +3,20 @@ package contact
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
 // Routes returns the GET and POST routes for the contact page
 func Routes(
-	app types.RegistryInterface,
+	registry registry.RegistryInterface,
 ) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		rtr.NewRoute().
 			SetName("Website > Contact Controller").
 			SetPath(links.CONTACT).
 			SetMethod(http.MethodGet).
-			SetHTMLHandler(NewContactController(app).AnyIndex),
+			SetHTMLHandler(NewContactController(registry).AnyIndex),
 	}
 }

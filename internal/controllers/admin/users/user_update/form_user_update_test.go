@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"project/internal/ext"
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/userstore"
 )
 
-func setupAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
+func setupAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(
@@ -40,15 +40,15 @@ func setupAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInter
 	return app, user
 }
 
-func tokenizeUserForTest(t *testing.T, app types.RegistryInterface, user userstore.UserInterface, firstName, lastName, email, businessName, phone string) {
+func tokenizeUserForTest(t *testing.T, registry registry.RegistryInterface, user userstore.UserInterface, firstName, lastName, email, businessName, phone string) {
 	t.Helper()
 
 	ctx := context.Background()
 
 	firstToken, lastToken, emailToken, phoneToken, businessToken, err := ext.UserTokenize(
 		ctx,
-		app.GetVaultStore(),
-		app.GetConfig().GetVaultStoreKey(),
+		registry.GetVaultStore(),
+		registry.GetConfig().GetVaultStoreKey(),
 		user,
 		firstName,
 		lastName,
@@ -66,15 +66,15 @@ func tokenizeUserForTest(t *testing.T, app types.RegistryInterface, user usersto
 	user.SetPhone(phoneToken)
 	user.SetBusinessName(businessToken)
 
-	if err := app.GetUserStore().UserUpdate(ctx, user); err != nil {
+	if err := registry.GetUserStore().UserUpdate(ctx, user); err != nil {
 		t.Fatalf("UserUpdate returned error: %v", err)
 	}
 }
 
-func newMountedForm(t *testing.T, app types.RegistryInterface, user userstore.UserInterface, returnURL string) *formUserUpdate {
+func newMountedForm(t *testing.T, registry registry.RegistryInterface, user userstore.UserInterface, returnURL string) *formUserUpdate {
 	t.Helper()
 
-	component := NewFormUserUpdate(app)
+	component := NewFormUserUpdate(registry)
 	if component == nil {
 		t.Fatalf("NewFormUserUpdate returned nil component")
 	}

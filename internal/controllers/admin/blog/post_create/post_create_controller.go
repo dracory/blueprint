@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/hb"
@@ -12,7 +12,7 @@ import (
 )
 
 type postCreateController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 type postCreateControllerData struct {
@@ -20,8 +20,8 @@ type postCreateControllerData struct {
 	successMessage string
 }
 
-func NewPostCreateController(app types.RegistryInterface) *postCreateController {
-	return &postCreateController{app: app}
+func NewPostCreateController(registry registry.RegistryInterface) *postCreateController {
+	return &postCreateController{registry: registry}
 }
 
 func (controller *postCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -67,10 +67,10 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 	post := blogstore.NewPost()
 	post.SetTitle(data.title)
 
-	err := controller.app.GetBlogStore().PostCreate(r.Context(), post)
+	err := controller.registry.GetBlogStore().PostCreate(r.Context(), post)
 
 	if err != nil {
-		controller.app.GetLogger().Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("At postCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating post failed. Please contact an administrator."
 	}
 

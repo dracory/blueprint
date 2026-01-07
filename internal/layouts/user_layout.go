@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/dashboard"
@@ -12,8 +12,8 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewUserLayout(app types.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
-	return userLayout(app, r, options)
+func NewUserLayout(registry registry.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+	return userLayout(registry, r, options)
 }
 
 // layout generates a dashboard based on the provided request and layout options.
@@ -24,12 +24,12 @@ func NewUserLayout(app types.RegistryInterface, r *http.Request, options Options
 //
 // Returns:
 // - a pointer to a dashboard.Dashboard object representing the generated dashboard.
-func userLayout(app types.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+func userLayout(registry registry.RegistryInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
 	authUser := helpers.GetAuthUser(r)
 
 	dashboardUser := dashboardTypes.User{}
 	if authUser != nil {
-		firstName, lastName, err := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
+		firstName, lastName, err := userDisplayNames(registry, r, authUser, registry.GetConfig().GetVaultStoreKey())
 		if err == nil {
 			dashboardUser = dashboardTypes.User{
 				FirstName: firstName,
@@ -68,8 +68,8 @@ func userLayout(app types.RegistryInterface, r *http.Request, options Options) d
 
 	titlePostfix := ` | ` + lo.Ternary(authUser == nil, `Guest`, `User`)
 
-	if app.GetConfig().GetAppName() != "" {
-		titlePostfix += ` | ` + app.GetConfig().GetAppName()
+	if registry.GetConfig().GetAppName() != "" {
+		titlePostfix += ` | ` + registry.GetConfig().GetAppName()
 	}
 
 	_, isPage := r.Context().Value("page").(cmsstore.PageInterface)

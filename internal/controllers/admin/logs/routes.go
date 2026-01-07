@@ -5,23 +5,23 @@ import (
 	"project/internal/controllers/admin/logs/log_manager"
 	"project/internal/controllers/admin/logs/shared"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
 		switch controller {
 		case shared.CONTROLLER_LOG_MANAGER:
-			return log_manager.NewLogManagerController(app).Handler(w, r)
+			return log_manager.NewLogManagerController(registry).Handler(w, r)
 		}
 
 		// Default to post manager
-		return log_manager.NewLogManagerController(app).Handler(w, r)
+		return log_manager.NewLogManagerController(registry).Handler(w, r)
 	}
 
 	blog := rtr.NewRoute().

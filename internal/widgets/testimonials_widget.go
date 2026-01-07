@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"net/http"
-	"project/internal/types"
+	"project/internal/registry"
 	"project/pkg/testimonials"
 
 	"github.com/dracory/hb"
@@ -20,8 +20,8 @@ var _ Widget = (*testimonialsWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *print - A pointer to the print struct
-func NewTestimonialsWidget(app types.RegistryInterface) *testimonialsWidget {
-	return &testimonialsWidget{app: app}
+func NewTestimonialsWidget(registry registry.RegistryInterface) *testimonialsWidget {
+	return &testimonialsWidget{registry: registry}
 }
 
 // == WIDGET ================================================================
@@ -33,7 +33,7 @@ func NewTestimonialsWidget(app types.RegistryInterface) *testimonialsWidget {
 //
 // It uses Otto as the engine.
 type testimonialsWidget struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == PUBLIC METHODS =========================================================
@@ -50,11 +50,11 @@ func (t *testimonialsWidget) Description() string {
 
 // Render implements the shortcode interface.
 func (t *testimonialsWidget) Render(r *http.Request, content string, params map[string]string) string {
-	if t.app.GetEntityStore() == nil {
+	if t.registry.GetEntityStore() == nil {
 		return "Error: Testimonials store is not initialized"
 	}
 
-	testimonialList, err := testimonials.TestimonialList(t.app.GetEntityStore())
+	testimonialList, err := testimonials.TestimonialList(t.registry.GetEntityStore())
 
 	if err != nil {
 		return "Error: " + err.Error()

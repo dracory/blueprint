@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
@@ -17,7 +17,7 @@ var allowedEmails = map[string]struct{}{
 	"info@sinevia.com": {},
 }
 
-func NewEmailAllowlistMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Email Allowlist Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -26,7 +26,7 @@ func NewEmailAllowlistMiddleware(app types.RegistryInterface) rtr.MiddlewareInte
 
 				// if the user is not authenticated, redirect to login
 				if user == nil {
-					helpers.ToFlashError(app.GetCacheStore(), w, r, "Only authenticated users can access this page", links.AUTH_LOGIN, 15)
+					helpers.ToFlashError(registry.GetCacheStore(), w, r, "Only authenticated users can access this page", links.AUTH_LOGIN, 15)
 					return
 				}
 
@@ -46,7 +46,7 @@ func NewEmailAllowlistMiddleware(app types.RegistryInterface) rtr.MiddlewareInte
 				}
 
 				homeURL := links.Website().Home()
-				helpers.ToFlashError(app.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
+				helpers.ToFlashError(registry.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
 			})
 		})
 }

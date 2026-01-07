@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -16,7 +16,7 @@ import (
 )
 
 type userCreateController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 type userCreateControllerData struct {
@@ -27,8 +27,8 @@ type userCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewUserCreateController(app types.RegistryInterface) *userCreateController {
-	return &userCreateController{app: app}
+func NewUserCreateController(registry registry.RegistryInterface) *userCreateController {
+	return &userCreateController{registry: registry}
 }
 
 func (controller userCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -138,7 +138,7 @@ func (controller *userCreateController) modal(data userCreateControllerData) hb.
 }
 
 func (controller *userCreateController) prepareDataAndValidate(r *http.Request) (data userCreateControllerData, errorMessage string) {
-	if controller.app.GetUserStore() == nil {
+	if controller.registry.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -173,11 +173,11 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 	user.SetLastName(data.lastName)
 	user.SetEmail(data.email)
 
-	err := controller.app.GetUserStore().UserCreate(context.Background(), user)
+	err := controller.registry.GetUserStore().UserCreate(context.Background(), user)
 
 	if err != nil {
-		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.registry.GetLogger() != nil {
+			controller.registry.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		}
 		return data, "Creating user failed. Please contact an administrator."
 	}

@@ -9,16 +9,16 @@ import (
 
 	"project/internal/ext"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/userstore"
 )
 
-func userTokenize(app types.RegistryInterface, user userstore.UserInterface) error {
+func userTokenize(registry registry.RegistryInterface, user userstore.UserInterface) error {
 	ctx := context.Background()
-	vaultStore := app.GetVaultStore()
-	vaultKey := app.GetConfig().GetVaultStoreKey()
+	vaultStore := registry.GetVaultStore()
+	vaultKey := registry.GetConfig().GetVaultStoreKey()
 
 	ensureToken := func(existingToken string, value string, field string) (string, error) {
 		if existingToken == "" {
@@ -69,7 +69,7 @@ func userTokenize(app types.RegistryInterface, user userstore.UserInterface) err
 	user.SetCountry("GB")
 	user.SetTimezone("Europe/London")
 
-	if err := app.GetUserStore().UserUpdate(ctx, user); err != nil {
+	if err := registry.GetUserStore().UserUpdate(ctx, user); err != nil {
 		return errors.New("UserUpdate returned error: " + err.Error())
 	}
 
@@ -77,22 +77,22 @@ func userTokenize(app types.RegistryInterface, user userstore.UserInterface) err
 }
 
 func TestFormProfileUpdate_Mount(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenUpdate (email) returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -124,18 +124,18 @@ func TestFormProfileUpdate_Mount(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -154,7 +154,7 @@ func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -169,22 +169,22 @@ func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -203,7 +203,7 @@ func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -218,22 +218,22 @@ func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -252,7 +252,7 @@ func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
 		"timezone":   {""},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -267,22 +267,22 @@ func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -301,7 +301,7 @@ func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -316,22 +316,22 @@ func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -350,7 +350,7 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -365,22 +365,22 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -470,7 +470,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := form.Handle(context.Background(), "apply", tc.formData)
+			err := form.Handle(context.Background(), "registryly", tc.formData)
 			if err != nil {
 				t.Fatalf("Handle returned error: %v", err)
 			}
@@ -487,22 +487,22 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -523,7 +523,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 		"timezone":      {"America/New_York"},
 	}
 
-	err = form.Handle(context.Background(), "apply", formData)
+	err = form.Handle(context.Background(), "registryly", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -537,11 +537,11 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 	}
 
 	if form.FormRedirectTo != "" {
-		t.Fatalf("Expected no redirect for apply action, got: %s", form.FormRedirectTo)
+		t.Fatalf("Expected no redirect for registryly action, got: %s", form.FormRedirectTo)
 	}
 
 	// Verify the user was updated in the store
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -550,7 +550,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 		t.Fatalf("Expected user to be found")
 	}
 
-	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
+	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
 		t.Fatalf("UserUntokenized returned error: %v", err)
 	}
@@ -569,23 +569,23 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
 	user.SetEmail("user@example.com")
-	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatalf("UserUpdate returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -624,7 +624,7 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 		t.Fatalf("Expected redirect to %s, got: %s", links.User().Home(), form.FormRedirectTo)
 	}
 
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -643,23 +643,23 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -698,7 +698,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 		t.Fatalf("Expected redirect to %s, got: %s", links.User().Home(), form.FormRedirectTo)
 	}
 
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -715,7 +715,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 		t.Fatalf("Expected timezone to be 'Timezone', got: %s", updatedUser.Timezone())
 	}
 
-	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
+	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
 		t.Fatalf("UserUntokenized returned error: %v", err)
 	}
@@ -726,23 +726,23 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_Save(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -783,7 +783,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 	}
 
 	// Verify the user was updated in the store
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -792,7 +792,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 		t.Fatalf("Expected user to be found")
 	}
 
-	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
+	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
 		t.Fatalf("UserUntokenized returned error: %v", err)
 	}
@@ -811,21 +811,21 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Render(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	if err := userTokenize(app, user); err != nil {
+	if err := userTokenize(registry, user); err != nil {
 		t.Fatalf("TokenizeUser returned error: %v", err)
 	}
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
@@ -863,8 +863,8 @@ func TestFormProfileUpdate_Render(t *testing.T) {
 }
 
 func TestFormProfileUpdate_GetKind(t *testing.T) {
-	app := testutils.Setup()
-	component := NewFormProfileUpdate(app)
+	registry := testutils.Setup()
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	kind := form.GetKind()
@@ -875,17 +875,17 @@ func TestFormProfileUpdate_GetKind(t *testing.T) {
 }
 
 func TestFormProfileUpdate_Handle_CountryChange(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	component := NewFormProfileUpdate(app)
+	component := NewFormProfileUpdate(registry)
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{

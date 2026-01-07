@@ -57,14 +57,14 @@ func (c *AiPostEditorController) onCreateFinalPost(data pageData) string {
 	data.BlogAiPost.Image = record.Image
 	data.BlogAiPost.Status = blogai.POST_STATUS_PUBLISHED
 
-	if err := c.app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
-		c.app.GetLogger().Error("failed to create blog post", slog.String("error", err.Error()))
+	if err := c.registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+		c.registry.GetLogger().Error("failed to create blog post", slog.String("error", err.Error()))
 		return api.Error("Failed to save blog post: " + err.Error()).ToString()
 	}
 
 	data.Record.SetPayload(data.BlogAiPost.ToJSON())
-	if err := c.app.GetCustomStore().RecordUpdate(data.Record); err != nil {
-		c.app.GetLogger().Error("failed to update blog post", slog.String("error", err.Error()))
+	if err := c.registry.GetCustomStore().RecordUpdate(data.Record); err != nil {
+		c.registry.GetLogger().Error("failed to update blog post", slog.String("error", err.Error()))
 		return api.Error("Failed to update blog post record: " + err.Error()).ToString()
 	}
 

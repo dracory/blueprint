@@ -5,14 +5,14 @@ import (
 	"errors"
 	"log/slog"
 	"project/internal/helpers"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/userstore"
 )
 
 func UserUntokenize(
 	ctx context.Context,
-	app types.RegistryInterface,
+	registry registry.RegistryInterface,
 	vaultKey string,
 	user userstore.UserInterface,
 ) (
@@ -23,7 +23,7 @@ func UserUntokenize(
 	phone string,
 	err error,
 ) {
-	if app.GetVaultStore() == nil {
+	if registry.GetVaultStore() == nil {
 		return "", "", "", "", "", errors.New("user_untokenized: vaultstore is nil")
 	}
 
@@ -63,10 +63,10 @@ func UserUntokenize(
 		keyTokenMap[keyPhone] = phoneToken
 	}
 
-	untokenized, err := helpers.Untokenize(ctx, app.GetVaultStore(), vaultKey, keyTokenMap) // use Untokenize as more resource optimized
+	untokenized, err := helpers.Untokenize(ctx, registry.GetVaultStore(), vaultKey, keyTokenMap) // use Untokenize as more resource optimized
 
 	if err != nil {
-		app.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))
+		registry.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))
 		return "", "", "", "", "", err
 	}
 
@@ -85,7 +85,7 @@ func UserUntokenize(
 // is enabled, it delegates to UserUntokenize to read and decrypt the tokens.
 func UserUntokenizeTransparently(
 	ctx context.Context,
-	app types.RegistryInterface,
+	registry registry.RegistryInterface,
 	user userstore.UserInterface,
 ) (
 	email string,
@@ -100,15 +100,15 @@ func UserUntokenizeTransparently(
 	}
 
 	// Vault disabled: treat fields as plain text
-	if !app.GetConfig().GetUserStoreVaultEnabled() {
+	if !registry.GetConfig().GetUserStoreVaultEnabled() {
 		return user.Email(), user.FirstName(), user.LastName(), user.BusinessName(), user.Phone(), nil
 	}
 
 	// Vault enabled: ensure vault store is available and untokenize
 	firstName, lastName, email, businessName, phone, err = UserUntokenize(
 		ctx,
-		app,
-		app.GetConfig().GetVaultStoreKey(),
+		registry,
+		registry.GetConfig().GetVaultStoreKey(),
 		user,
 	)
 	if err != nil {

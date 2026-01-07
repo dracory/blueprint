@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	livefluxctl "project/internal/controllers/liveflux"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
@@ -18,7 +18,7 @@ import (
 type logTableComponent struct {
 	liveflux.Base
 
-	App              types.RegistryInterface
+	registry         registry.RegistryInterface
 	Level            string
 	SearchMessage    string
 	SearchContext    string
@@ -38,7 +38,7 @@ type logTableComponent struct {
 	ContextLog    logstore.LogInterface
 }
 
-func NewLogTableComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewLogTableComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&logTableComponent{})
 	if err != nil {
 		log.Println(err)
@@ -46,7 +46,7 @@ func NewLogTableComponent(app types.RegistryInterface) liveflux.ComponentInterfa
 	}
 
 	if c, ok := inst.(*logTableComponent); ok {
-		c.App = app
+		c.registry = registry
 	}
 
 	return inst
@@ -58,9 +58,9 @@ func (c *logTableComponent) GetKind() string {
 
 func (c *logTableComponent) Mount(ctx context.Context, params map[string]string) error {
 	// Ensure App is set when component is instantiated via Liveflux placeholder
-	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
-			c.App = app
+	if c.registry == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = app
 		}
 	}
 
@@ -163,11 +163,11 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			return nil
 		}
 
-		if c.App == nil || c.App.GetLogStore() == nil {
+		if c.registry == nil || c.registry.GetLogStore() == nil {
 			return nil
 		}
 
-		if err := c.App.GetLogStore().LogDeleteByID(ctx, logID); err != nil {
+		if err := c.registry.GetLogStore().LogDeleteByID(ctx, logID); err != nil {
 			return nil
 		}
 
@@ -183,11 +183,11 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			return nil
 		}
 
-		if c.App == nil || c.App.GetLogStore() == nil {
+		if c.registry == nil || c.registry.GetLogStore() == nil {
 			return nil
 		}
 
-		logEntry, err := c.App.GetLogStore().LogFindByID(ctx, logID)
+		logEntry, err := c.registry.GetLogStore().LogFindByID(ctx, logID)
 		if err != nil || logEntry == nil {
 			return nil
 		}
@@ -207,7 +207,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			data = url.Values{}
 		}
 
-		if c.App == nil || c.App.GetLogStore() == nil {
+		if c.registry == nil || c.registry.GetLogStore() == nil {
 			return nil
 		}
 
@@ -220,7 +220,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 			if id == "" {
 				continue
 			}
-			_ = c.App.GetLogStore().LogDeleteByID(ctx, id)
+			_ = c.registry.GetLogStore().LogDeleteByID(ctx, id)
 		}
 
 		return c.loadLogs()
@@ -230,7 +230,7 @@ func (c *logTableComponent) Handle(ctx context.Context, action string, data url.
 }
 
 func (c *logTableComponent) loadLogs() error {
-	res, err := listLogs(c.App, logListFilters{
+	res, err := listLogs(c.registry, logListFilters{
 		FilterLevel:            c.Level,
 		FilterSearchMessage:    c.SearchMessage,
 		FilterSearchContext:    c.SearchContext,

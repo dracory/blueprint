@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cdn"
@@ -22,23 +22,23 @@ import (
 // == CONTROLLER ==============================================================
 
 type postManagerController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewPostManagerController(app types.RegistryInterface) *postManagerController {
-	return &postManagerController{app: app}
+func NewPostManagerController(registry registry.RegistryInterface) *postManagerController {
+	return &postManagerController{registry: registry}
 }
 
 func (controller *postManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Blog | Post Manager",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -135,23 +135,23 @@ func (controller *postManagerController) prepareData(r *http.Request) (data post
 		OrderBy:              data.sortBy,
 	}
 
-	data.blogList, err = controller.app.GetBlogStore().
+	data.blogList, err = controller.registry.GetBlogStore().
 		// EnableDebug(true).
 		PostList(r.Context(), query)
 
 	if err != nil {
-		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving posts"
 	}
 
 	// DEBUG: cfmt.Successln("Invoice List: ", blogList)
 
-	data.blogCount, err = controller.app.GetBlogStore().
+	data.blogCount, err = controller.registry.GetBlogStore().
 		// EnableDebug().
 		PostCount(r.Context(), query)
 
 	if err != nil {
-		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "Error retrieving posts count"
 	}
 

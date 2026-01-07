@@ -4,12 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"project/internal/types"
 
 	"github.com/dracory/subscriptionstore"
 )
 
-func subscriptionStoreInitialize(app types.RegistryInterface) error {
+func subscriptionStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetSubscriptionStoreUsed() {
 		return nil
 	}
@@ -23,7 +22,7 @@ func subscriptionStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func subscriptionStoreMigrate(app types.RegistryInterface) error {
+func subscriptionStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

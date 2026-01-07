@@ -4,12 +4,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/blindindexstore"
 )
 
-func blindIndexLastNameStoreInitialize(app types.RegistryInterface) error {
+func blindIndexLastNameStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func blindIndexLastNameStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func blindIndexLastNameStoreMigrate(app types.RegistryInterface) error {
+func blindIndexLastNameStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

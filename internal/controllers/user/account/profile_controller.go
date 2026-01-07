@@ -11,6 +11,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/dracory/cdn"
@@ -24,7 +25,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type profileController struct {
-	app                                    types.RegistryInterface
+	registry                               types.RegistryInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formCountry                            string
 	formTimezone                           string
@@ -32,9 +33,9 @@ type profileController struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewProfileController(app types.RegistryInterface) *profileController {
+func NewProfileController(registry registry.RegistryInterface) *profileController {
 	return &profileController{
-		app:                                    app,
+		registry:                               registry,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",
 		formCountry:                            "country",
 		formTimezone:                           "timezone",
@@ -47,7 +48,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.User().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.User().Home(), 10)
 	}
 
 	if data.action == controller.actionOnCountrySelectedTimezoneOptions {
@@ -59,12 +60,12 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	}
 
 	rendered := liveflux.SSR(
-		NewFormProfileUpdate(controller.app),
+		NewFormProfileUpdate(controller.registry),
 		params,
 	)
 
 	if rendered == nil {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error rendering profile form", links.User().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Error rendering profile form", links.User().Home(), 10)
 	}
 
 	pageHeader := partials.PageHeader("bi-person", "My Account", []layouts.Breadcrumb{
@@ -85,7 +86,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 				Child(hb.BR()),
 		)
 
-	return layouts.NewUserLayout(controller.app, r, layouts.Options{
+	return layouts.NewUserLayout(controller.registry, r, layouts.Options{
 		Title:   "My Account",
 		Content: hb.NewDiv().Class("p-3").Child(page),
 		ScriptURLs: []string{
@@ -98,15 +99,15 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 }
 
 func (controller *profileController) onCountrySelectedTimezoneOptions(data profileControllerData) string {
-	component := NewFormProfileUpdate(controller.app)
+	component := NewFormProfileUpdate(controller.registry)
 	if component == nil {
-		controller.app.GetLogger().Error("Error creating profile update form component for country change")
+		controller.registry.GetLogger().Error("Error creating profile update form component for country change")
 		return ""
 	}
 
 	form, ok := component.(*formProfileUpdate)
 	if !ok {
-		controller.app.GetLogger().Error("Unexpected component type for profile update form during country change")
+		controller.registry.GetLogger().Error("Unexpected component type for profile update form during country change")
 		return ""
 	}
 
@@ -114,7 +115,7 @@ func (controller *profileController) onCountrySelectedTimezoneOptions(data profi
 		"country":  {data.country},
 		"timezone": {data.timezone},
 	}); err != nil {
-		controller.app.GetLogger().Error("Error handling country change", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("Error handling country change", slog.String("error", err.Error()))
 		return ""
 	}
 
@@ -128,24 +129,24 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 		return profileControllerData{}, "User not found"
 	}
 
-	countryList, err := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
+	countryList, err := controller.registry.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
 		SortOrder: "asc",
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 
 	if err != nil {
-		controller.app.GetLogger().Error("Error listing countries", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("Error listing countries", slog.String("error", err.Error()))
 		return profileControllerData{}, "Error listing countries"
 	}
 
 	email, firstName, lastName, buinessName, phone, err := ext.UserUntokenizeTransparently(
 		r.Context(),
-		controller.app,
+		controller.registry,
 		authUser,
 	)
 
 	if err != nil {
-		controller.app.GetLogger().Error("Error reading profile data", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("Error reading profile data", slog.String("error", err.Error()))
 		return profileControllerData{}, "Error reading profile data"
 	}
 
@@ -182,14 +183,14 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 // 	}
 
 // 	// If vault is not used, treat fields as plaintext
-// 	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
-// 		if controller.app.GetUserStore() == nil {
+// 	if controller.registry.GetConfig().GetUserStoreVaultEnabled() {
+// 		if controller.registry.GetUserStore() == nil {
 // 			return "", "", "", "", "", errors.New("UserStore is not initialized")
 // 		}
 // 		return ext.UserUntokenize(
 // 			ctx,
-// 			controller.app,
-// 			controller.app.GetConfig().GetVaultStoreKey(),
+// 			controller.registry,
+// 			controller.registry.GetConfig().GetVaultStoreKey(),
 // 			user)
 // 	}
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	livefluxctl "project/internal/controllers/liveflux"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/form"
@@ -18,7 +18,7 @@ import (
 type postSEOComponent struct {
 	liveflux.Base
 
-	App types.RegistryInterface
+	registry registry.RegistryInterface
 
 	PostID string
 	Post   *blogstore.Post
@@ -32,7 +32,7 @@ type postSEOComponent struct {
 	FormSuccessMessage string
 }
 
-func NewPostSEOComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewPostSEOComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postSEOComponent{})
 	if err != nil {
 		log.Println(err)
@@ -40,7 +40,7 @@ func NewPostSEOComponent(app types.RegistryInterface) liveflux.ComponentInterfac
 	}
 
 	if c, ok := inst.(*postSEOComponent); ok {
-		c.App = app
+		c.registry = registry
 	}
 
 	return inst
@@ -51,9 +51,9 @@ func (c *postSEOComponent) GetKind() string {
 }
 
 func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
-			c.App = app
+	if c.registry == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = app
 		}
 	}
 
@@ -63,14 +63,14 @@ func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) 
 		return nil
 	}
 
-	if c.App == nil || c.App.GetBlogStore() == nil {
+	if c.registry == nil || c.registry.GetBlogStore() == nil {
 		c.FormErrorMessage = "Blog store not available"
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+	post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
-		c.App.GetLogger().Error("Error loading post for SEO component", "error", err.Error())
+		c.registry.GetLogger().Error("Error loading post for SEO component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
 		return nil
 	}
@@ -101,13 +101,13 @@ func (c *postSEOComponent) Handle(ctx context.Context, action string, data url.V
 		c.FormMetaKeywords = strings.TrimSpace(data.Get("post_meta_keywords"))
 		c.FormMetaRobots = strings.TrimSpace(data.Get("post_meta_robots"))
 
-		if c.App == nil || c.App.GetBlogStore() == nil {
+		if c.registry == nil || c.registry.GetBlogStore() == nil {
 			c.FormErrorMessage = "Blog store not available"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+		post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -119,8 +119,8 @@ func (c *postSEOComponent) Handle(ctx context.Context, action string, data url.V
 		post.SetMetaKeywords(c.FormMetaKeywords)
 		post.SetMetaRobots(c.FormMetaRobots)
 
-		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
-			c.App.GetLogger().Error("Error saving post SEO", "error", err.Error())
+		if err := c.registry.GetBlogStore().PostUpdate(ctx, post); err != nil {
+			c.registry.GetLogger().Error("Error saving post SEO", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
 			return nil

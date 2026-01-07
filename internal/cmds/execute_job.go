@@ -3,7 +3,7 @@ package cmds
 import (
 	"context"
 	"log"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cmd"
 	"github.com/dracory/taskstore"
@@ -17,7 +17,7 @@ import (
 //
 // Args: an array of strings representing the arguments for the job.
 // Return type: None.
-func ExecuteJob(app types.RegistryInterface, args []string) {
+func ExecuteJob(registry registry.RegistryInterface, args []string) {
 	name := "No name"
 	argumentsMap := cmd.ArgsToMap(args)
 	log.Println("Executing job: ", name, " with arguments: ", argumentsMap, " ...")
@@ -30,12 +30,12 @@ func ExecuteJob(app types.RegistryInterface, args []string) {
 		return
 	}
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		log.Println("TaskStore is nil")
 		return
 	}
 
-	queuedTask, err := app.GetTaskStore().TaskQueueFindByID(context.Background(), queuedTaskID)
+	queuedTask, err := registry.GetTaskStore().TaskQueueFindByID(context.Background(), queuedTaskID)
 
 	if err != nil {
 		log.Println("Task not found: ", queuedTaskID)
@@ -57,7 +57,7 @@ func ExecuteJob(app types.RegistryInterface, args []string) {
 		return
 	}
 
-	isOK, err := app.GetTaskStore().TaskQueueProcessTask(context.Background(), queuedTask)
+	isOK, err := registry.GetTaskStore().TaskQueueProcessTask(context.Background(), queuedTask)
 
 	if err != nil {
 		log.Println("Error processing task: ", queuedTaskID, " ", err.Error())

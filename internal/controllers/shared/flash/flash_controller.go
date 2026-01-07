@@ -5,7 +5,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -17,13 +17,13 @@ import (
 // == CONTROLLER ==============================================================
 
 type flashController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewFlashController(app types.RegistryInterface) *flashController {
-	return &flashController{app: app}
+func NewFlashController(registry registry.RegistryInterface) *flashController {
+	return &flashController{registry: registry}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -35,7 +35,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 	html := controller.pageHTML(r)
 
 	if authUser != nil && authUser.IsRegistrationCompleted() {
-		return layouts.NewUserLayout(controller.app, r, layouts.Options{
+		return layouts.NewUserLayout(controller.registry, r, layouts.Options{
 			Title:      title,
 			Content:    html,
 			ScriptURLs: []string{},
@@ -46,9 +46,9 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		}).ToHTML()
 	}
 
-	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreTemplateID() != "" {
+	if controller.registry.GetCmsStore() != nil && controller.registry.GetConfig() != nil && controller.registry.GetConfig().GetCmsStoreTemplateID() != "" {
 		return layouts.NewCmsLayout(
-			controller.app,
+			controller.registry,
 			r,
 			layouts.Options{
 				Title:   title,
@@ -60,7 +60,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 			},
 		).ToHTML()
 	} else {
-		return layouts.NewUserLayout(controller.app, r, layouts.Options{
+		return layouts.NewUserLayout(controller.registry, r, layouts.Options{
 			Title:   title,
 			Content: html,
 			StyleURLs: []string{
@@ -72,7 +72,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 
 func (c flashController) pageHTML(r *http.Request) hb.TagInterface {
 	messageID := req.GetStringTrimmed(r, "message_id")
-	msgData, err := c.app.GetCacheStore().GetJSON(messageID+"_flash_message", "")
+	msgData, err := c.registry.GetCacheStore().GetJSON(messageID+"_flash_message", "")
 
 	msgType := "error"
 	message := "The message is no longer available"

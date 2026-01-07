@@ -6,7 +6,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -16,22 +16,22 @@ import (
 
 // == CONTROLLER ==============================================================
 
-type logManagerController struct{ app types.RegistryInterface }
+type logManagerController struct{ registry registry.RegistryInterface }
 
 // == CONSTRUCTOR =============================================================
 
-func NewLogManagerController(app types.RegistryInterface) *logManagerController {
-	return &logManagerController{app: app}
+func NewLogManagerController(registry registry.RegistryInterface) *logManagerController {
+	return &logManagerController{registry: registry}
 }
 
 func (controller *logManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Log Manager | Logs",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -56,7 +56,7 @@ func (controller *logManagerController) page(data logManagerData) hb.TagInterfac
 		},
 	})
 
-	// filterComponent := NewLogFilterComponent(controller.app)
+	// filterComponent := NewLogFilterComponent(controller.registry)
 	// filterSSR := liveflux.SSR(filterComponent, map[string]string{
 	// 	"level":              data.FilterLevel,
 	// 	"search_message":     data.FilterSearchMessage,
@@ -67,7 +67,7 @@ func (controller *logManagerController) page(data logManagerData) hb.TagInterfac
 	// 	"to":                 data.FilterTo,
 	// })
 
-	// tableComponent := NewLogTableComponent(controller.app)
+	// tableComponent := NewLogTableComponent(controller.registry)
 	// tableSSR := liveflux.SSR(tableComponent, map[string]string{
 	// 	"level":              data.FilterLevel,
 	// 	"search_message":     data.FilterSearchMessage,
@@ -78,7 +78,7 @@ func (controller *logManagerController) page(data logManagerData) hb.TagInterfac
 	// 	"to":                 data.FilterTo,
 	// })
 
-	filterComponent := NewLogFilterComponent(controller.app)
+	filterComponent := NewLogFilterComponent(controller.registry)
 	filterSSR := liveflux.Placeholder(filterComponent, map[string]string{
 		"level":              data.FilterLevel,
 		"search_message":     data.FilterSearchMessage,
@@ -89,7 +89,7 @@ func (controller *logManagerController) page(data logManagerData) hb.TagInterfac
 		"to":                 data.FilterTo,
 	})
 
-	tableComponent := NewLogTableComponent(controller.app)
+	tableComponent := NewLogTableComponent(controller.registry)
 	tableSSR := liveflux.Placeholder(tableComponent, map[string]string{
 		"level":              data.FilterLevel,
 		"search_message":     data.FilterSearchMessage,
@@ -121,7 +121,7 @@ func (controller *logManagerController) page(data logManagerData) hb.TagInterfac
 }
 
 func (controller *logManagerController) prepareData(r *http.Request) (logManagerData, string) {
-	if controller.app.GetLogStore() == nil {
+	if controller.registry.GetLogStore() == nil {
 		return logManagerData{}, "Log store is not initialized"
 	}
 

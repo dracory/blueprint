@@ -10,6 +10,7 @@ import (
 
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/dracory/blogstore"
@@ -33,7 +34,7 @@ type postRecommendationsComponent struct {
 	errorMessage  string
 }
 
-func NewPostRecommendationsComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewPostRecommendationsComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postRecommendationsComponent{})
 	if err != nil {
 		log.Println(err)
@@ -41,7 +42,7 @@ func NewPostRecommendationsComponent(app types.RegistryInterface) liveflux.Compo
 	}
 
 	if component, ok := inst.(*postRecommendationsComponent); ok {
-		component.App = app
+		component.App = registry
 	}
 
 	return inst

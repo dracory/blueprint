@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 
@@ -17,13 +17,13 @@ import (
 
 type statsController struct {
 	logger *slog.Logger
-	app    types.RegistryInterface
+	app    registry.RegistryInterface
 }
 
-func NewStatsController(app types.RegistryInterface) *statsController {
+func NewStatsController(registry registry.RegistryInterface) *statsController {
 	return &statsController{
-		logger: app.GetLogger(),
-		app:    app,
+		logger: registry.GetLogger(),
+		app:    registry,
 	}
 }
 
@@ -63,7 +63,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminLayout struct {
-	app   types.RegistryInterface
+	app   registry.RegistryInterface
 	title string
 	body  string
 

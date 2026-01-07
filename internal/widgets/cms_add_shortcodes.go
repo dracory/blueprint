@@ -1,7 +1,7 @@
 package widgets
 
 import (
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cmsstore"
 )
@@ -19,22 +19,22 @@ import (
 //
 // Returns:
 //   - None
-func CmsAddShortcodes(app types.RegistryInterface) {
-	if !app.GetConfig().GetCmsStoreUsed() {
+func CmsAddShortcodes(registry registry.RegistryInterface) {
+	if !registry.GetConfig().GetCmsStoreUsed() {
 		return
 	}
 
-	if app.GetCmsStore() == nil {
+	if registry.GetCmsStore() == nil {
 		return
 	}
 
 	shortcodes := []cmsstore.ShortcodeInterface{}
 
-	list := WidgetRegistry(app)
+	list := WidgetRegistry(registry)
 
 	for _, widget := range list {
 		shortcodes = append(shortcodes, widget)
 	}
 
-	app.GetCmsStore().AddShortcodes(shortcodes)
+	registry.GetCmsStore().AddShortcodes(shortcodes)
 }

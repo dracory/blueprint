@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
@@ -21,19 +21,19 @@ import (
 // == CONTROLLER ===============================================================
 
 type homeController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController(app types.RegistryInterface) *homeController {
-	return &homeController{app: app}
+func NewHomeController(registry registry.RegistryInterface) *homeController {
+	return &homeController{registry: registry}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Home",
 		Content: controller.view(),
 		ScriptURLs: []string{
@@ -71,7 +71,7 @@ func (c *homeController) view() *hb.Tag {
 }
 
 func (c *homeController) cardDailyVisitors() hb.TagInterface {
-	if !c.app.GetConfig().GetStatsStoreUsed() {
+	if !c.registry.GetConfig().GetStatsStoreUsed() {
 		return nil
 	}
 
@@ -215,39 +215,39 @@ func (c *homeController) tiles() []hb.TagInterface {
 
 	tiles := []map[string]string{}
 
-	if c.app.GetConfig().GetCmsStoreUsed() {
+	if c.registry.GetConfig().GetCmsStoreUsed() {
 		tiles = append(tiles, cmsTile)
 	}
 
-	if c.app.GetConfig().GetBlogStoreUsed() {
+	if c.registry.GetConfig().GetBlogStoreUsed() {
 		tiles = append(tiles, blogTile)
 	}
 
-	if c.app.GetConfig().GetUserStoreUsed() {
+	if c.registry.GetConfig().GetUserStoreUsed() {
 		tiles = append(tiles, userTile)
 	}
 
-	if c.app.GetConfig().GetShopStoreUsed() {
+	if c.registry.GetConfig().GetShopStoreUsed() {
 		tiles = append(tiles, shopTile)
 	}
 
-	if c.app.GetConfig().GetSqlFileStoreUsed() {
+	if c.registry.GetConfig().GetSqlFileStoreUsed() {
 		tiles = append(tiles, fileManagerTile)
 	}
 
-	if c.app.GetConfig().GetMediaDriver() != "" {
+	if c.registry.GetConfig().GetMediaDriver() != "" {
 		tiles = append(tiles, mediaManagerTile)
 	}
 
-	if c.app.GetConfig().GetTaskStoreUsed() {
+	if c.registry.GetConfig().GetTaskStoreUsed() {
 		tiles = append(tiles, queueTile)
 	}
 
-	if c.app.GetConfig().GetStatsStoreUsed() {
+	if c.registry.GetConfig().GetStatsStoreUsed() {
 		tiles = append(tiles, visitStatsTile)
 	}
 
-	if c.app.GetConfig().GetLogStoreUsed() {
+	if c.registry.GetConfig().GetLogStoreUsed() {
 		tiles = append(tiles, logsTile)
 	}
 
@@ -309,7 +309,7 @@ func (c *homeController) datesInRange(timeStart, timeEnd *carbon.Carbon) []strin
 }
 
 func (c *homeController) visitorsData() (dates []string, visits []int64, err error) {
-	if c.app.GetStatsStore() == nil {
+	if c.registry.GetStatsStore() == nil {
 		return nil, nil, errors.New("statsstore is nil")
 	}
 
@@ -320,7 +320,7 @@ func (c *homeController) visitorsData() (dates []string, visits []int64, err err
 
 	ctx := context.Background()
 	for _, date := range datesInRange {
-		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, statsstore.VisitorQueryOptions{
+		visitorCount, err := c.registry.GetStatsStore().VisitorCount(ctx, statsstore.VisitorQueryOptions{
 			CreatedAtGte: date + " 00:00:00",
 			CreatedAtLte: date + " 23:59:59",
 			Distinct:     statsstore.COLUMN_IP_ADDRESS,

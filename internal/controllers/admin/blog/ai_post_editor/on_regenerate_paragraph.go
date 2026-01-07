@@ -15,12 +15,12 @@ func (c *AiPostEditorController) onRegenerateParagraph(data pageData) string {
 	sectionIndexStr := req.Value(data.Request, "section_index")
 	paragraphIndexStr := req.Value(data.Request, "paragraph_index")
 
-	agent := blogai.NewBlogWriterAgent(c.app.GetLogger())
+	agent := blogai.NewBlogWriterAgent(c.registry.GetLogger())
 	if agent == nil {
 		return api.Error("failed to initialize LLM engine").ToString()
 	}
 
-	llmEngine, err := shared.LlmEngine(c.app)
+	llmEngine, err := shared.LlmEngine(c.registry)
 	if err != nil {
 		return api.Error("failed to initialize LLM engine: " + err.Error()).ToString()
 	}
@@ -33,7 +33,7 @@ func (c *AiPostEditorController) onRegenerateParagraph(data pageData) string {
 
 	newParagraph, err := agent.RegenerateParagraph(llmEngine, data.BlogAiPost, sectionType, sectionIndex, paragraphIndex)
 	if err != nil {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Regenerate Paragraph. Failed", slog.String("error", err.Error()))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Regenerate Paragraph. Failed", slog.String("error", err.Error()))
 		return api.Error("Failed to regenerate paragraph: " + err.Error()).ToString()
 	}
 
@@ -59,7 +59,7 @@ func (c *AiPostEditorController) onRegenerateParagraph(data pageData) string {
 	}
 
 	data.Record.SetPayload(data.BlogAiPost.ToJSON())
-	if err := c.app.GetCustomStore().RecordUpdate(data.Record); err != nil {
+	if err := c.registry.GetCustomStore().RecordUpdate(data.Record); err != nil {
 		return api.Error("Failed to save updated blog post: " + err.Error()).ToString()
 	}
 

@@ -3,14 +3,14 @@ package liveflux
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
 // Routes registers the /liveflux endpoint for the Liveflux handler.
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
-	ctrl := NewController(app)
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+	ctrl := NewController(registry)
 
 	livefluxPost := rtr.NewRoute().
 		SetName("Liveflux > Handler").

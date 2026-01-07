@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/layouts"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/hb"
@@ -25,7 +25,7 @@ import (
 //
 // It uses the "page" context value to transfer the page data (i.e. title,
 // meta keywords, description) from the CMS frontend to the layout.
-func NewCmsLayoutMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func NewCmsLayoutMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("CmsLayoutMiddleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -46,7 +46,7 @@ func NewCmsLayoutMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface
 				next.ServeHTTP(rec, r)
 				finalContent := rec.Body.String()
 
-				fullPage := layouts.NewUserLayout(app, r, layouts.Options{
+				fullPage := layouts.NewUserLayout(registry, r, layouts.Options{
 					Title:      title,
 					Content:    hb.Raw(finalContent),
 					ScriptURLs: []string{},
@@ -54,11 +54,11 @@ func NewCmsLayoutMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface
 				}).ToHTML()
 
 				if _, err := w.Write([]byte(fullPage)); err != nil {
-					app.GetLogger().Error("Failed to write response", 
+					registry.GetLogger().Error("Failed to write response",
 						slog.String("error", err.Error()),
 						slog.String("path", r.URL.Path),
 					)
-					// At this point, we've already started writing the response, 
+					// At this point, we've already started writing the response,
 					// so we can't send a different status code
 					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 					return

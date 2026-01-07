@@ -1,6 +1,6 @@
 package widgets
 
-import "project/internal/types"
+import "project/internal/registry"
 
 // WidgetRegistry returns a list of all widgets
 //
@@ -11,11 +11,11 @@ import "project/internal/types"
 //
 // Returns:
 //   - []Widget - A list of all widgets
-func WidgetRegistry(app types.RegistryInterface) []Widget {
+func WidgetRegistry(registry registry.RegistryInterface) []Widget {
 	return []Widget{
-		NewAuthenticatedWidget(app),
-		// NewContactFormWidget(app),
-		NewUnauthenticatedWidget(app),
-		NewVisibleWidget(app),
+		NewAuthenticatedWidget(registry),
+		// NewContactFormWidget(registry),
+		NewUnauthenticatedWidget(registry),
+		NewVisibleWidget(registry),
 	}
 }

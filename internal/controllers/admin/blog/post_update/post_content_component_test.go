@@ -5,14 +5,14 @@ import (
 	"net/url"
 	"testing"
 
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupContentTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.Post) {
+func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
 	app := testutils.Setup(
@@ -36,7 +36,7 @@ func setupContentTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogsto
 func TestPostContentComponent_MountRequiresPostID(t *testing.T) {
 	app, _ := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{App: app}
+	c := &postContentComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -47,7 +47,7 @@ func TestPostContentComponent_MountRequiresPostID(t *testing.T) {
 func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
 	app, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{App: app}
+	c := &postContentComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -64,7 +64,7 @@ func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
 func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 	app, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{App: app, PostID: post.ID()}
+	c := &postContentComponent{registry: app, PostID: post.ID()}
 
 	values := url.Values{
 		"post_title":   {""},
@@ -82,7 +82,7 @@ func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	app, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{App: app, PostID: post.ID()}
+	c := &postContentComponent{registry: app, PostID: post.ID()}
 
 	values := url.Values{
 		"post_title":   {"Updated Title"},

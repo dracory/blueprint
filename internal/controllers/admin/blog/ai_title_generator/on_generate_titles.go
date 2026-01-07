@@ -80,13 +80,13 @@ func (c *AiTitleGeneratorController) onGenerateTitles(r *http.Request) string {
 // 3. Merges the two lists into a single slice
 // 4. Adds the merged list to the data map as dataKeyExistingTitles
 func (c *AiTitleGeneratorController) stepHandlerFindExistingTitles(ctx context.Context, data map[string]any) (context.Context, map[string]any, error) {
-	records, err := c.app.GetCustomStore().RecordList(customstore.RecordQuery().
+	records, err := c.registry.GetCustomStore().RecordList(customstore.RecordQuery().
 		SetType(blogai.POST_RECORD_TYPE))
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to fetch titles: %w", err)
 	}
 
-	postList, err := c.app.GetBlogStore().PostList(ctx, blogstore.PostQueryOptions{})
+	postList, err := c.registry.GetBlogStore().PostList(ctx, blogstore.PostQueryOptions{})
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to fetch blog list: %w", err)
 	}
@@ -129,7 +129,7 @@ func (c *AiTitleGeneratorController) stepHandlerGenerateTitles(ctx context.Conte
 		return ctx, data, fmt.Errorf("failed to load blog topic: %w", err)
 	}
 
-	model, err := shared.LlmEngine(c.app)
+	model, err := shared.LlmEngine(c.registry)
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to initialize LLM engine: %w", err)
 	}
@@ -145,7 +145,7 @@ func (c *AiTitleGeneratorController) stepHandlerGenerateTitles(ctx context.Conte
 }
 
 func (c *AiTitleGeneratorController) loadBlogTopic(ctx context.Context) (string, error) {
-	store := c.app.GetSettingStore()
+	store := c.registry.GetSettingStore()
 	if store == nil {
 		return "", errors.New("setting store is not configured")
 	}
@@ -181,7 +181,7 @@ func (c *AiTitleGeneratorController) stepHandlerSaveTitles(ctx context.Context, 
 			"updated_at": time.Now().UTC().Format(time.RFC3339),
 		})
 
-		if err := c.app.GetCustomStore().RecordCreate(record); err != nil {
+		if err := c.registry.GetCustomStore().RecordCreate(record); err != nil {
 			return ctx, data, fmt.Errorf("failed to save title '%s': %w", title, err)
 		}
 	}

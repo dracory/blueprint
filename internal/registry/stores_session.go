@@ -5,12 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/sessionstore"
 )
 
-func sessionStoreInitialize(app types.RegistryInterface) error {
+func sessionStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetSessionStoreUsed() {
 		return nil
 	}
@@ -24,7 +22,7 @@ func sessionStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func sessionStoreMigrate(app types.RegistryInterface) error {
+func sessionStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

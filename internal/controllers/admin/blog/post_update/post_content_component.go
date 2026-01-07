@@ -8,7 +8,7 @@ import (
 
 	"project/internal/controllers/admin/blog/shared"
 	livefluxctl "project/internal/controllers/liveflux"
-	"project/internal/types"
+	"project/internal/registry"
 	"project/pkg/blogblocks"
 
 	"github.com/dracory/blockeditor"
@@ -22,7 +22,7 @@ import (
 type postContentComponent struct {
 	liveflux.Base
 
-	App types.RegistryInterface
+	registry registry.RegistryInterface
 
 	PostID string
 	Post   *blogstore.Post
@@ -37,7 +37,7 @@ type postContentComponent struct {
 	FormSuccessMessage string
 }
 
-func NewPostContentComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewPostContentComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postContentComponent{})
 	if err != nil {
 		log.Println(err)
@@ -45,7 +45,7 @@ func NewPostContentComponent(app types.RegistryInterface) liveflux.ComponentInte
 	}
 
 	if c, ok := inst.(*postContentComponent); ok {
-		c.App = app
+		c.registry = registry
 	}
 
 	return inst
@@ -56,9 +56,9 @@ func (c *postContentComponent) GetKind() string {
 }
 
 func (c *postContentComponent) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
-			c.App = app
+	if c.registry == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = app
 		}
 	}
 
@@ -68,14 +68,14 @@ func (c *postContentComponent) Mount(ctx context.Context, params map[string]stri
 		return nil
 	}
 
-	if c.App == nil || c.App.GetBlogStore() == nil {
+	if c.registry == nil || c.registry.GetBlogStore() == nil {
 		c.FormErrorMessage = "Blog store not available"
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+	post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
-		c.App.GetLogger().Error("Error loading post for content component", "error", err.Error())
+		c.registry.GetLogger().Error("Error loading post for content component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
 		return nil
 	}
@@ -111,13 +111,13 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		if c.App == nil || c.App.GetBlogStore() == nil {
+		if c.registry == nil || c.registry.GetBlogStore() == nil {
 			c.FormErrorMessage = "Blog store not available"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+		post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -128,8 +128,8 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 		post.SetSummary(c.FormSummary)
 		post.SetContent(c.FormContent)
 
-		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
-			c.App.GetLogger().Error("Error saving post content", "error", err.Error())
+		if err := c.registry.GetBlogStore().PostUpdate(ctx, post); err != nil {
+			c.registry.GetLogger().Error("Error saving post content", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
 			return nil

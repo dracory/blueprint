@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -19,11 +19,11 @@ import (
 )
 
 type postUpdateController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewPostUpdateController(app types.RegistryInterface) *postUpdateController {
-	return &postUpdateController{app: app}
+func NewPostUpdateController(registry registry.RegistryInterface) *postUpdateController {
+	return &postUpdateController{registry: registry}
 }
 
 func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -31,31 +31,31 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 	view := req.GetStringTrimmedOr(r, "view", "content")
 
 	if postID == "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post ID is required", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post ID is required", links.Admin().Blog(), 10)
 	}
 
-	post, err := controller.app.GetBlogStore().PostFindByID(r.Context(), postID)
+	post, err := controller.registry.GetBlogStore().PostFindByID(r.Context(), postID)
 	if err != nil {
-		controller.app.GetLogger().Error(
+		controller.registry.GetLogger().Error(
 			"Error. postUpdateController: PostFindByID",
 			slog.String("error", err.Error()),
 			slog.String("post_id", postID),
 		)
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 
 	if post == nil {
-		controller.app.GetLogger().Warn(
+		controller.registry.GetLogger().Warn(
 			"Warning. postUpdateController: PostFindByID",
 			slog.String("error", "Post not found"),
 			slog.String("post_id", postID),
 		)
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 
 	pageContent := controller.page(r, post, view)
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Edit Post | Blog",
 		Content: pageContent,
 		ScriptURLs: []string{
@@ -141,17 +141,17 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 
 	switch view {
 	case "details":
-		component := NewPostDetailsComponent(controller.app)
+		component := NewPostDetailsComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
 			"post_id": post.ID(),
 		})
 	case "content":
-		component := NewPostContentComponent(controller.app)
+		component := NewPostContentComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
 			"post_id": post.ID(),
 		})
 	case "seo":
-		component := NewPostSEOComponent(controller.app)
+		component := NewPostSEOComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
 			"post_id": post.ID(),
 		})

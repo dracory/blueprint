@@ -34,8 +34,8 @@ func (c *AiPostEditorController) onSaveDraft(data pageData) string {
 	data.BlogAiPost.Title = record.Title
 
 	data.Record.SetPayload(data.BlogAiPost.ToJSON())
-	if err := c.app.GetCustomStore().RecordUpdate(data.Record); err != nil {
-		c.app.GetLogger().Error("failed to update blog post draft", slog.String("error", err.Error()))
+	if err := c.registry.GetCustomStore().RecordUpdate(data.Record); err != nil {
+		c.registry.GetLogger().Error("failed to update blog post draft", slog.String("error", err.Error()))
 		return api.Error("Failed to save draft: " + err.Error()).ToString()
 	}
 

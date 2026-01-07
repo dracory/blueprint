@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/dracory/liveflux"
@@ -19,9 +20,9 @@ type contextKey string
 
 const AppContextKey contextKey = "app"
 
-func NewController(app types.RegistryInterface) *livefluxController {
+func NewController(registry registry.RegistryInterface) *livefluxController {
 	return &livefluxController{
-		App:    app,
+		App:    registry,
 		Engine: liveflux.NewHandler(nil),
 	}
 }

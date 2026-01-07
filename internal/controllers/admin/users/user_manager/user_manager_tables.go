@@ -49,11 +49,11 @@ func (controller *userManagerController) tableUsers(data userManagerControllerDa
 				lastName := user.LastName()
 				email := user.Email()
 
-				if controller.app.GetConfig().GetVaultStoreUsed() {
-					firstName, lastName, email, _, _, err = ext.UserUntokenize(context.Background(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
+				if controller.registry.GetConfig().GetVaultStoreUsed() {
+					firstName, lastName, email, _, _, err = ext.UserUntokenize(context.Background(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
 
 					if err != nil {
-						controller.app.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
+						controller.registry.GetLogger().Error("At userManagerController > tableUsers", slog.String("error", err.Error()))
 						firstName = "n/a"
 						lastName = "n/a"
 						email = "n/a"

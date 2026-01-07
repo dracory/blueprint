@@ -5,13 +5,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/settingstore"
 )
 
 // settingStoreInitialize initializes the setting store if enabled in the configuration.
-func settingStoreInitialize(app types.RegistryInterface) error {
+func settingStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -29,7 +27,7 @@ func settingStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func settingStoreMigrate(app types.RegistryInterface) error {
+func settingStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

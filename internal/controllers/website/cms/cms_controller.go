@@ -2,6 +2,7 @@ package cms
 
 import (
 	"net/http"
+	"project/internal/registry"
 	"project/internal/types"
 	"project/internal/widgets"
 	"project/pkg/webtheme"
@@ -18,19 +19,19 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
-	app      types.RegistryInterface
+	registry types.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewCmsController(app types.RegistryInterface) *cmsController {
-	return &cmsController{app: app}
+func NewCmsController(registry registry.RegistryInterface) *cmsController {
+	return &cmsController{registry: registry}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) string {
-	instance := GetInstance(controller.app)
+	instance := GetInstance(controller.registry)
 	if instance == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return "cms is not configured"
@@ -41,9 +42,9 @@ func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) 
 var instance cmsFrontend.FrontendInterface
 var once sync.Once
 
-func GetInstance(app types.RegistryInterface) cmsFrontend.FrontendInterface {
+func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterface {
 	once.Do(func() {
-		list := widgets.WidgetRegistry(app)
+		list := widgets.WidgetRegistry(registry)
 
 		shortcodes := []cmsstore.ShortcodeInterface{}
 		for _, widget := range list {
@@ -55,8 +56,8 @@ func GetInstance(app types.RegistryInterface) cmsFrontend.FrontendInterface {
 			BlockEditorRenderer: func(blocks []ui.BlockInterface) string {
 				return webtheme.New(blocks).ToHtml()
 			},
-			Store:              app.GetCmsStore(),
-			Logger:             app.GetLogger(),
+			Store:              registry.GetCmsStore(),
+			Logger:             registry.GetLogger(),
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
 		})

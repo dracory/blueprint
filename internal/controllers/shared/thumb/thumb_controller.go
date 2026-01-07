@@ -10,8 +10,8 @@ import (
 	"os"
 	"project/internal/cache"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/resources"
-	"project/internal/types"
 	"time"
 
 	"strings"
@@ -29,14 +29,14 @@ import (
 
 // == CONSTRUCTOR =============================================================
 
-func NewThumbController(app types.RegistryInterface) *thumbnailController {
-	return &thumbnailController{app: app}
+func NewThumbController(registry registry.RegistryInterface) *thumbnailController {
+	return &thumbnailController{registry: registry}
 }
 
 // == CONTROLLER ==============================================================
 
 type thumbnailController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // ThumbnailHandler
@@ -190,12 +190,12 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = controller.urlToBytes(data.path)
 
 		if err != nil {
-			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
 			return "", err.Error()
 		}
 	} else if data.isCache {
 		if cache.File == nil {
-			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
 			return "", "cache not initialized"
 		}
 		dataBase64ImageStr, err := cache.File.Fetch(data.path)
@@ -203,9 +203,9 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		if err != nil {
 			// Downgrade noisy cache expiry to info level, keep other cache errors as error
 			if err.Error() == "cache expired" {
-				controller.app.GetLogger().Info("Cache expired at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+				controller.registry.GetLogger().Info("Cache expired at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			} else {
-				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+				controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			}
 			return "", err.Error()
 		}
@@ -218,7 +218,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 			if len(parts) == 2 {
 				payload = parts[1]
 			} else {
-				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "invalid data URL format")
+				controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "invalid data URL format")
 				return "", "invalid data URL format"
 			}
 		}
@@ -226,7 +226,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = base64.StdEncoding.DecodeString(payload)
 
 		if err != nil {
-			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			return "", err.Error()
 		}
 	} else {
@@ -234,7 +234,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = resources.ToBytes(data.path)
 
 		if err != nil {
-			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
 			return "", err.Error()
 		}
 	}
@@ -242,7 +242,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 	imgBytesResized, err := img.Resize(imgBytes, int(data.width), int(data.height), ext)
 
 	if err != nil {
-		controller.app.GetLogger().Error("Error at thumbnailController > generateThumb", "error", err.Error())
+		controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb", "error", err.Error())
 		return "", err.Error()
 	}
 

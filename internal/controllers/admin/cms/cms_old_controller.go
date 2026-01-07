@@ -2,15 +2,15 @@ package admin
 
 import (
 	"net/http"
-	"project/internal/types"
+	"project/internal/registry"
 )
 
 type cmsController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewCmsOldController(app types.RegistryInterface) *cmsController {
-	return &cmsController{app: app}
+func NewCmsOldController(registry registry.RegistryInterface) *cmsController {
+	return &cmsController{registry: registry}
 }
 
 func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) string {

@@ -50,7 +50,7 @@ func (controller *userManagerController) prepareData(r *http.Request) (data user
 	userList, userCount, err := controller.fetchUserList(data)
 
 	if err != nil {
-		controller.app.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Creating user failed. Please contact an administrator."
 	}
 
@@ -62,17 +62,17 @@ func (controller *userManagerController) prepareData(r *http.Request) (data user
 }
 
 func (controller *userManagerController) fetchUserList(data userManagerControllerData) ([]userstore.UserInterface, int64, error) {
-	if controller.app == nil || controller.app.GetUserStore() == nil {
+	if controller.registry == nil || controller.registry.GetUserStore() == nil {
 		return []userstore.UserInterface{}, 0, errors.New("UserStore is not initialized")
 	}
 
 	userIDs := []string{}
 
 	if data.formFirstName != "" {
-		firstNameUserIDs, err := controller.app.GetBlindIndexStoreFirstName().Search(data.request.Context(), data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		firstNameUserIDs, err := controller.registry.GetBlindIndexStoreFirstName().Search(data.request.Context(), data.formFirstName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.registry.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -84,10 +84,10 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formLastName != "" {
-		lastNameUserIDs, err := controller.app.GetBlindIndexStoreLastName().Search(data.request.Context(), data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		lastNameUserIDs, err := controller.registry.GetBlindIndexStoreLastName().Search(data.request.Context(), data.formLastName, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.registry.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -99,10 +99,10 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 	}
 
 	if data.formEmail != "" {
-		emailUserIDs, err := controller.app.GetBlindIndexStoreEmail().Search(data.request.Context(), data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
+		emailUserIDs, err := controller.registry.GetBlindIndexStoreEmail().Search(data.request.Context(), data.formEmail, blindindexstore.SEARCH_TYPE_CONTAINS)
 
 		if err != nil {
-			controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+			controller.registry.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 			return []userstore.UserInterface{}, 0, err
 		}
 
@@ -135,17 +135,17 @@ func (controller *userManagerController) fetchUserList(data userManagerControlle
 		query.SetCreatedAtLte(data.formCreatedTo + " 23:59:59")
 	}
 
-	userList, err := controller.app.GetUserStore().UserList(data.request.Context(), query)
+	userList, err := controller.registry.GetUserStore().UserList(data.request.Context(), query)
 
 	if err != nil {
-		controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 
-	userCount, err := controller.app.GetUserStore().UserCount(data.request.Context(), query)
+	userCount, err := controller.registry.GetUserStore().UserCount(data.request.Context(), query)
 
 	if err != nil {
-		controller.app.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
+		controller.registry.GetLogger().Error("At userManagerController > prepareData", slog.String("error", err.Error()))
 		return []userstore.UserInterface{}, 0, err
 	}
 

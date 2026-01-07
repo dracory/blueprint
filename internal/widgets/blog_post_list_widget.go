@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -26,9 +26,9 @@ var _ Widget = (*blogPostListWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *blogPostListWidget - A pointer to the show widget
-func NewBlogPostListWidget(app types.RegistryInterface) *blogPostListWidget {
+func NewBlogPostListWidget(registry registry.RegistryInterface) *blogPostListWidget {
 	return &blogPostListWidget{
-		app: app,
+		registry: registry,
 	}
 }
 
@@ -42,7 +42,7 @@ func NewBlogPostListWidget(app types.RegistryInterface) *blogPostListWidget {
 // Example:
 // <x-blog-post-list>content</x-blog-post-list>
 type blogPostListWidget struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 type blogPostListWidgetData struct {
 	postList  []blogstore.Post
@@ -187,20 +187,20 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		Limit:     perPage,
 	}
 
-	postList, errList := widget.app.GetBlogStore().PostList(context.Background(), options)
+	postList, errList := widget.registry.GetBlogStore().PostList(context.Background(), options)
 
 	if errList != nil {
-		if widget.app.GetLogger() != nil {
-			widget.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
+		if widget.registry.GetLogger() != nil {
+			widget.registry.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		}
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
-	postCount, errCount := widget.app.GetBlogStore().PostCount(context.Background(), options)
+	postCount, errCount := widget.registry.GetBlogStore().PostCount(context.Background(), options)
 
 	if errCount != nil {
-		if widget.app.GetLogger() != nil {
-			widget.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
+		if widget.registry.GetLogger() != nil {
+			widget.registry.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
 		}
 		return data, "Sorry, there was an error loading the posts count. Please try again later."
 	}

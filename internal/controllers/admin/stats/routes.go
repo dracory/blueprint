@@ -2,13 +2,13 @@ package stats
 
 import (
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
-	ctrl := NewStatsController(app)
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+	ctrl := NewStatsController(registry)
 	statsHome := rtr.NewRoute().
 		SetName("Admin > Visitor Analytics > Home").
 		SetPath(links.ADMIN_STATS).

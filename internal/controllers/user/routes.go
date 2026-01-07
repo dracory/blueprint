@@ -3,7 +3,7 @@ package user
 import (
 	userAccount "project/internal/controllers/user/account"
 	userHome "project/internal/controllers/user/home"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"project/internal/links"
 	"project/internal/middlewares"
@@ -11,40 +11,40 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	home := rtr.NewRoute().
 		SetName("User > Home").
 		SetPath(links.USER_HOME).
-		SetHTMLHandler(userHome.NewHomeController(app).Handler)
+		SetHTMLHandler(userHome.NewHomeController(registry).Handler)
 
 	homeCatchAll := rtr.NewRoute().
 		SetName("User > Catch All Controller > Index Page").
 		SetPath(links.USER_HOME + links.CATCHALL).
-		SetHTMLHandler(userHome.NewHomeController(app).Handler)
+		SetHTMLHandler(userHome.NewHomeController(registry).Handler)
 
 	profile := rtr.NewRoute().
 		SetName("User > Profile").
 		SetPath(links.USER_PROFILE).
-		SetHTMLHandler(userAccount.NewProfileController(app).Handler)
+		SetHTMLHandler(userAccount.NewProfileController(registry).Handler)
 
 	// IMPORTANT: Specific routes must come BEFORE catch-all routes
 	// The catch-all route /user/* will match any path starting with /user/
 	// so it must be registered last to avoid intercepting specific routes
-	
+
 	userRoutes := []rtr.RouteInterface{}
 	userRoutes = append(userRoutes, profile)
 	userRoutes = append(userRoutes, home)
 	userRoutes = append(userRoutes, homeCatchAll) // Must be last!
 
-	applyUserMiddleware(app, userRoutes)
+	applyUserMiddleware(registry, userRoutes)
 
 	return userRoutes
 }
 
-func applyUserMiddleware(app types.RegistryInterface, routes []rtr.RouteInterface) {
+func applyUserMiddleware(registry registry.RegistryInterface, routes []rtr.RouteInterface) {
 	for _, route := range routes {
 		middlewaresToAdd := []rtr.MiddlewareInterface{
-			middlewares.NewUserMiddleware(app),
+			middlewares.NewUserMiddleware(registry),
 		}
 
 		route.AddBeforeMiddlewares(middlewaresToAdd)

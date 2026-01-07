@@ -10,7 +10,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"project/pkg/blogai"
 
 	"github.com/dracory/base/req"
@@ -31,7 +31,7 @@ const (
 )
 
 type AiPostEditorController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 type pageData struct {
@@ -40,16 +40,16 @@ type pageData struct {
 	Record     customstore.RecordInterface
 }
 
-func NewAiPostEditorController(app types.RegistryInterface) *AiPostEditorController {
-	return &AiPostEditorController{app: app}
+func NewAiPostEditorController(registry registry.RegistryInterface) *AiPostEditorController {
+	return &AiPostEditorController{registry: registry}
 }
 
 func (c *AiPostEditorController) Handler(w http.ResponseWriter, r *http.Request) string {
-	c.app.GetLogger().Info("Post Editor Handler called")
+	c.registry.GetLogger().Info("Post Editor Handler called")
 
 	data, errorMessage := c.prepareDataAndValidate(r)
 	if errorMessage != "" {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, shared.NewLinks().Home(), 10)
+		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, errorMessage, shared.NewLinks().Home(), 10)
 	}
 
 	action := req.Value(r, "action")
@@ -72,7 +72,7 @@ func (c *AiPostEditorController) Handler(w http.ResponseWriter, r *http.Request)
 		return c.onRegenerateMetas(data)
 	}
 
-	return layouts.NewAdminLayout(c.app, r, layouts.Options{
+	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
 		Title:   "Edit & Save Blog Post",
 		Content: c.view(data),
 		ScriptURLs: []string{
@@ -173,25 +173,25 @@ func (c *AiPostEditorController) prepareDataAndValidate(r *http.Request) (pageDa
 		return data, "Record Post ID is missing"
 	}
 
-	data.Record, err = c.app.GetCustomStore().RecordFindByID(recordPostID)
+	data.Record, err = c.registry.GetCustomStore().RecordFindByID(recordPostID)
 	if err != nil {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Error finding record post", slog.String("error", err.Error()))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Error finding record post", slog.String("error", err.Error()))
 		return data, fmt.Sprintf("Failed to find record post: %s", err)
 	}
 
 	if data.Record == nil {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Post record not found", slog.String("record_id", recordPostID))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Post record not found", slog.String("record_id", recordPostID))
 		return data, "Post record not found"
 	}
 
 	if data.Record.Type() != blogai.POST_RECORD_TYPE {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Invalid record type", slog.String("record_type", data.Record.Type()), slog.String("record_id", recordPostID))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Invalid record type", slog.String("record_type", data.Record.Type()), slog.String("record_id", recordPostID))
 		return data, "Invalid record type"
 	}
 
 	data.BlogAiPost, err = blogai.NewRecordPostFromCustomRecord(data.Record)
 	if err != nil {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Failed to parse blog record", slog.String("error", err.Error()))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Prepare Data. Failed to parse blog record", slog.String("error", err.Error()))
 		return data, fmt.Sprintf("Failed to parse blog record: %s", err)
 	}
 

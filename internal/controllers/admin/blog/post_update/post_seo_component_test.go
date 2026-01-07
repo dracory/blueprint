@@ -5,14 +5,14 @@ import (
 	"net/url"
 	"testing"
 
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupSEOTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.Post) {
+func setupSEOTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
 	app := testutils.Setup(
@@ -38,7 +38,7 @@ func setupSEOTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.P
 func TestPostSEOComponent_MountRequiresPostID(t *testing.T) {
 	app, _ := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{App: app}
+	c := &postSEOComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -49,7 +49,7 @@ func TestPostSEOComponent_MountRequiresPostID(t *testing.T) {
 func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
 	app, post := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{App: app}
+	c := &postSEOComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -67,7 +67,7 @@ func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
 func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	app, post := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{App: app, PostID: post.ID()}
+	c := &postSEOComponent{registry: app, PostID: post.ID()}
 
 	values := url.Values{
 		"post_canonical_url":    {"https://example.com/updated"},

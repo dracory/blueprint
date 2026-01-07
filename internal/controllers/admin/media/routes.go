@@ -2,16 +2,16 @@ package admin
 
 import (
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	mediaManager := rtr.NewRoute().
 		SetName("Admin > Media Manager").
 		SetPath(links.ADMIN_MEDIA).
-		SetHTMLHandler(NewMediaManagerController(app).AnyIndex)
+		SetHTMLHandler(NewMediaManagerController(registry).AnyIndex)
 
 	return []rtr.RouteInterface{
 		mediaManager,

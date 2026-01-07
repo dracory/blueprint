@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
+	"project/internal/registry"
 
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -29,27 +29,27 @@ const ActionModalProductFilterShow = "modal_product_filter_show"
 // == CONTROLLER ==============================================================
 
 type productManagerController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductManagerController(app types.RegistryInterface) *productManagerController {
-	return &productManagerController{app: app}
+func NewProductManagerController(registry registry.RegistryInterface) *productManagerController {
+	return &productManagerController{registry: registry}
 }
 
 func (controller *productManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	if data.action == ActionModalProductFilterShow {
 		return controller.onModalProductFilterShow(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Products | Shop",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -224,7 +224,7 @@ func (controller *productManagerController) page(data productManagerControllerDa
 	return layouts.AdminPage(
 		breadcrumbs,
 		hb.HR(),
-		shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), data.request),
+		shared.Header(controller.registry.GetShopStore(), controller.registry.GetLogger(), data.request),
 		hb.HR(),
 		title,
 		controller.tableProducts(data),
@@ -510,7 +510,7 @@ func (controller *productManagerController) prepareData(r *http.Request) (data p
 }
 
 func (controller *productManagerController) fetchProductList(data productManagerControllerData) ([]shopstore.ProductInterface, int64, error) {
-	if controller.app.GetShopStore() == nil {
+	if controller.registry.GetShopStore() == nil {
 		return nil, 0, errors.New("ShopStore is nil")
 	}
 
@@ -552,14 +552,14 @@ func (controller *productManagerController) fetchProductList(data productManager
 		query.SetCreatedAtLte(data.formCreatedTo + " 23:59:59")
 	}
 
-	productList, err := controller.app.GetShopStore().ProductList(context.Background(), query)
+	productList, err := controller.registry.GetShopStore().ProductList(context.Background(), query)
 
 	if err != nil {
 		slog.Error("At productManagerController > prepareData", slog.String("error", err.Error()))
 		return []shopstore.ProductInterface{}, 0, err
 	}
 
-	productCount, err := controller.app.GetShopStore().ProductCount(context.Background(), query)
+	productCount, err := controller.registry.GetShopStore().ProductCount(context.Background(), query)
 
 	if err != nil {
 		slog.Error("At productManagerController > prepareData", slog.String("error", err.Error()))

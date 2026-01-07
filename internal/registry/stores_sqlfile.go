@@ -3,13 +3,12 @@ package registry
 import (
 	"database/sql"
 	"errors"
-	"project/internal/types"
 
 	"github.com/dracory/filesystem"
 )
 
 // sqlFileStorageInitialize initializes the SQL file storage if enabled in the configuration.
-func sqlFileStorageInitialize(app types.RegistryInterface) error {
+func sqlFileStorageInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -27,7 +26,7 @@ func sqlFileStorageInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func sqlFileStorageMigrate(app types.RegistryInterface) error {
+func sqlFileStorageMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

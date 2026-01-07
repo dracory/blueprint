@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"net/http"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/base/bbcode"
 )
@@ -226,14 +226,14 @@ var termsOfUse = `
 `
 
 type termsOfUseWidget struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 var _ Widget = (*termsOfUseWidget)(nil)
 
-func NewTermsOfUseWidget(app types.RegistryInterface) *termsOfUseWidget {
+func NewTermsOfUseWidget(registry registry.RegistryInterface) *termsOfUseWidget {
 	return &termsOfUseWidget{
-		app: app,
+		registry: registry,
 	}
 }
 

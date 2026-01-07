@@ -5,7 +5,7 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
@@ -15,19 +15,19 @@ import (
 // == CONTROLLER ==============================================================
 
 type homeController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController(app types.RegistryInterface) *homeController {
-	return &homeController{app: app}
+func NewHomeController(registry registry.RegistryInterface) *homeController {
+	return &homeController{registry: registry}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:      "Shop",
 		Content:    controller.view(r),
 		ScriptURLs: []string{},
@@ -63,7 +63,7 @@ func (controller *homeController) view(r *http.Request) *hb.Tag {
 	return hb.Wrap().
 		Child(breadcrumbs).
 		Child(hb.HR()).
-		Child(shared.Header(controller.app.GetShopStore(), controller.app.GetLogger(), r)).
+		Child(shared.Header(controller.registry.GetShopStore(), controller.registry.GetLogger(), r)).
 		Child(hb.HR()).
 		Child(header).
 		Child(sectionTiles)

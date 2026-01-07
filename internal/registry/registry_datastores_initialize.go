@@ -2,7 +2,6 @@ package registry
 
 import (
 	"errors"
-	"project/internal/types"
 )
 
 // dataStoresInitialize performs phase 1 of store setup. For now it delegates
@@ -12,7 +11,7 @@ func (r *registryImplementation) dataStoresInitialize() error {
 		return errors.New("config is not initialized")
 	}
 
-	initializers := []func(app types.RegistryInterface) error{
+	initializers := []func(app RegistryInterface) error{
 		auditStoreInitialize,
 		blindIndexEmailStoreInitialize,
 		blindIndexFirstNameStoreInitialize,

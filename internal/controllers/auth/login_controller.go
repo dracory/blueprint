@@ -4,30 +4,30 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/req"
 )
 
 type loginController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewLoginController(app types.RegistryInterface) *loginController {
-	return &loginController{app: app}
+func NewLoginController(registry registry.RegistryInterface) *loginController {
+	return &loginController{registry: registry}
 }
 
 func (controller *loginController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
 	userURL := links.User().Home()
 
-	if controller.app.GetUserStore() == nil {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
+	if controller.registry.GetUserStore() == nil {
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
-	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() == nil {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
+	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() == nil {
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
 	}
 
 	backUrl := req.GetStringTrimmedOr(r, "back_url", userURL)

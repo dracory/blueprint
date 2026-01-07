@@ -9,25 +9,25 @@ import (
 )
 
 func (c *AiPostEditorController) onRegenerateImage(data pageData) string {
-	agent := blogai.NewBlogWriterAgent(c.app.GetLogger())
+	agent := blogai.NewBlogWriterAgent(c.registry.GetLogger())
 	if agent == nil {
 		return api.Error("failed to initialize LLM engine").ToString()
 	}
 
-	llmEngine, err := shared.LlmEngine(c.app)
+	llmEngine, err := shared.LlmEngine(c.registry)
 	if err != nil {
 		return api.Error("failed to initialize LLM engine").ToString()
 	}
 
 	imageDataURL, err := agent.GenerateImage(llmEngine, data.BlogAiPost.Title, data.BlogAiPost.Summary)
 	if err != nil {
-		c.app.GetLogger().Error("BlogAi. Post Editor. Generate Image. Failed to generate image", slog.String("error", err.Error()))
+		c.registry.GetLogger().Error("BlogAi. Post Editor. Generate Image. Failed to generate image", slog.String("error", err.Error()))
 		return api.Error("Failed to generate image").ToString()
 	}
 
 	data.BlogAiPost.Image = imageDataURL
 	data.Record.SetPayload(data.BlogAiPost.ToJSON())
-	if err := c.app.GetCustomStore().RecordUpdate(data.Record); err != nil {
+	if err := c.registry.GetCustomStore().RecordUpdate(data.Record); err != nil {
 		return api.Error("Failed to save updated blog post with image: " + err.Error()).ToString()
 	}
 

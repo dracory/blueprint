@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"project/internal/controllers/admin/blog/shared"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
@@ -16,7 +16,7 @@ import (
 
 type formBlogSettings struct {
 	liveflux.Base
-	App                      types.RegistryInterface
+	App                      registry.RegistryInterface
 	BlogTopic                string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -27,14 +27,14 @@ type formBlogSettings struct {
 	ReturnURL                string
 }
 
-func NewFormBlogSettings(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewFormBlogSettings(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formBlogSettings{})
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	if c, ok := inst.(*formBlogSettings); ok {
-		c.App = app
+		c.App = registry
 	}
 	return inst
 }

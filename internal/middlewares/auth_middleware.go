@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"project/internal/config"
-	"project/internal/types"
+	"project/internal/registry"
 	"time"
 
 	"github.com/dracory/auth"
@@ -22,10 +22,10 @@ const (
 	userCachePrefix    = "auth:user:"
 )
 
-func AuthMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func AuthMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Auth Middleware").
-		SetHandler(func(next http.Handler) http.Handler { return authHandler(app, next) })
+		SetHandler(func(next http.Handler) http.Handler { return authHandler(registry, next) })
 }
 
 // authHandler adds the user and session to the context.
@@ -43,36 +43,36 @@ func AuthMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 //
 // Returns
 // - an http.Handler which represents the modified handler with the user.
-func authHandler(app types.RegistryInterface, next http.Handler) http.Handler {
+func authHandler(registry registry.RegistryInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !app.GetConfig().GetSessionStoreUsed() {
+		if !registry.GetConfig().GetSessionStoreUsed() {
 			w.WriteHeader(http.StatusInternalServerError)
 			if _, err := w.Write([]byte("session store not enabled")); err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 			}
 			return
 		}
 
-		if app.GetSessionStore() == nil {
+		if registry.GetSessionStore() == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			if _, err := w.Write([]byte("session store not initialized")); err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 			}
 			return
 		}
 
-		if !app.GetConfig().GetUserStoreUsed() {
+		if !registry.GetConfig().GetUserStoreUsed() {
 			w.WriteHeader(http.StatusInternalServerError)
 			if _, err := w.Write([]byte("user store not enabled")); err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 			}
 			return
 		}
 
-		if app.GetUserStore() == nil {
+		if registry.GetUserStore() == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			if _, err := w.Write([]byte("user store not initialized")); err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 			}
 			return
 		}
@@ -84,8 +84,8 @@ func authHandler(app types.RegistryInterface, next http.Handler) http.Handler {
 			return
 		}
 
-		sessionStore := app.GetSessionStore()
-		memoryCache := app.GetMemoryCache()
+		sessionStore := registry.GetSessionStore()
+		memoryCache := registry.GetMemoryCache()
 
 		session := cacheGetSession(memoryCache, sessionKey)
 
@@ -94,7 +94,7 @@ func authHandler(app types.RegistryInterface, next http.Handler) http.Handler {
 			session, err = sessionStore.SessionFindByKey(r.Context(), sessionKey)
 
 			if err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -122,10 +122,10 @@ func authHandler(app types.RegistryInterface, next http.Handler) http.Handler {
 		user := cacheGetUser(memoryCache, userID)
 
 		if user == nil {
-			fetchedUser, err := app.GetUserStore().UserFindByID(r.Context(), userID)
+			fetchedUser, err := registry.GetUserStore().UserFindByID(r.Context(), userID)
 
 			if err != nil {
-				app.GetLogger().Error("auth_middleware", "error", err.Error())
+				registry.GetLogger().Error("auth_middleware", "error", err.Error())
 				next.ServeHTTP(w, r)
 				return
 			}

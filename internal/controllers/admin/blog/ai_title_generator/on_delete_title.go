@@ -15,7 +15,7 @@ func (c *AiTitleGeneratorController) onDeleteTitle(r *http.Request) string {
 		return shared.ErrorPopup("Title ID is required").ToHTML()
 	}
 
-	err := c.app.GetCustomStore().RecordDeleteByID(titleID)
+	err := c.registry.GetCustomStore().RecordDeleteByID(titleID)
 	if err != nil {
 		return shared.ErrorPopup(fmt.Sprintf("Error deleting title: %s", err.Error())).ToHTML()
 	}

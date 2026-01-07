@@ -3,12 +3,11 @@ package registry
 import (
 	"database/sql"
 	"errors"
-	"project/internal/types"
 
 	"github.com/dracory/logstore"
 )
 
-func logStoreInitialize(app types.RegistryInterface) error {
+func logStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetLogStoreUsed() {
 		return nil
 	}
@@ -22,7 +21,7 @@ func logStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func logStoreMigrate(app types.RegistryInterface) error {
+func logStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

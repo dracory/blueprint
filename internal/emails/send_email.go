@@ -2,7 +2,7 @@ package emails
 
 import (
 	"fmt"
-	"project/internal/types"
+	"project/internal/registry"
 
 	baseEmail "github.com/dracory/base/email"
 	"github.com/spf13/cast"
@@ -31,20 +31,20 @@ type SendOptions struct {
 var emailSender baseEmail.Sender
 
 // InitEmailSender initializes the email sender
-func InitEmailSender(app types.RegistryInterface) {
-	if app == nil {
+func InitEmailSender(registry registry.RegistryInterface) {
+	if registry == nil {
 		return
 	}
 
-	if app.GetConfig() == nil {
+	if registry.GetConfig() == nil {
 		return
 	}
 
 	emailSender = baseEmail.NewSMTPSender(baseEmail.Config{
-		Host:     app.GetConfig().GetMailHost(),
-		Port:     cast.ToString(app.GetConfig().GetMailPort()),
-		Username: app.GetConfig().GetMailUsername(),
-		Password: app.GetConfig().GetMailPassword(),
+		Host:     registry.GetConfig().GetMailHost(),
+		Port:     cast.ToString(registry.GetConfig().GetMailPort()),
+		Username: registry.GetConfig().GetMailUsername(),
+		Password: registry.GetConfig().GetMailPassword(),
 		// Skip logger for now as it's causing type compatibility issues
 	})
 }

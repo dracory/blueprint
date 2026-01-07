@@ -8,6 +8,7 @@ import (
 
 	"project/internal/ext"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/dracory/geostore"
@@ -41,14 +42,14 @@ type formProfileUpdate struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewFormProfileUpdate(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewFormProfileUpdate(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formProfileUpdate{})
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	if c, ok := inst.(*formProfileUpdate); ok {
-		c.App = app
+		c.App = registry
 	}
 	return inst
 }

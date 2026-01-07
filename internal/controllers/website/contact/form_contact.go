@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/tasks/email_admin_new_contact"
 	"project/internal/types"
 
@@ -43,7 +44,7 @@ type formContact struct {
 	CaptchaAnswer   string
 }
 
-func NewFormContact(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewFormContact(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formContact{})
 	if err != nil {
 		log.Println(err)
@@ -51,7 +52,7 @@ func NewFormContact(app types.RegistryInterface) liveflux.ComponentInterface {
 	}
 
 	if c, ok := inst.(*formContact); ok {
-		c.App = app
+		c.App = registry
 	}
 
 	return inst

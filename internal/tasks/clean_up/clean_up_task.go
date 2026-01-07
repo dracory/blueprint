@@ -3,22 +3,22 @@ package clean_up
 import (
 	"context"
 	"errors"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/taskstore"
 	"github.com/dromara/carbon/v2"
 	"github.com/spf13/cast"
 )
 
-func NewCleanUpTask(app types.RegistryInterface) taskstore.TaskHandlerInterface {
+func NewCleanUpTask(registry registry.RegistryInterface) taskstore.TaskHandlerInterface {
 	return &cleanUpTask{
-		app: app,
+		registry: registry,
 	}
 }
 
 type cleanUpTask struct {
 	taskstore.TaskHandlerBase
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*cleanUpTask)(nil) // verify it extends the task interface
@@ -36,15 +36,15 @@ func (t *cleanUpTask) Description() string {
 }
 
 func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
-	if t.app == nil {
+	if t.registry == nil {
 		return nil, errors.New("app is nil")
 	}
 
-	if t.app.GetTaskStore() == nil {
+	if t.registry.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
-	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return t.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		t.Alias(),
@@ -54,7 +54,7 @@ func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 
 func (t *cleanUpTask) Handle() bool {
 	// Defensive: if TaskStore isn't initialized (e.g., during early DI cutover), skip work gracefully
-	if t.app.GetTaskStore() == nil {
+	if t.registry.GetTaskStore() == nil {
 		t.LogInfo("TaskStore not configured; skipping CleanUpTask run.")
 		return true
 	}
@@ -73,7 +73,7 @@ func (t *cleanUpTask) Handle() bool {
 
 	purgeSince := carbon.Now(carbon.UTC).SubMinutes(30).ToDateTimeString()
 
-	purgeTasks, err := t.app.GetTaskStore().TaskQueueList(context.Background(), taskstore.TaskQueueQuery().
+	purgeTasks, err := t.registry.GetTaskStore().TaskQueueList(context.Background(), taskstore.TaskQueueQuery().
 		SetStatus(taskstore.TaskQueueStatusSuccess).
 		SetCreatedAtLte(purgeSince))
 
@@ -85,7 +85,7 @@ func (t *cleanUpTask) Handle() bool {
 	t.LogInfo("Purging " + cast.ToString(len(purgeTasks)) + " tasks older than " + purgeSince + " ...")
 
 	for _, purgeTask := range purgeTasks {
-		err := t.app.GetTaskStore().TaskQueueDeleteByID(context.Background(), purgeTask.ID())
+		err := t.registry.GetTaskStore().TaskQueueDeleteByID(context.Background(), purgeTask.ID())
 
 		if err != nil {
 			t.LogError("Error purging task: " + err.Error())

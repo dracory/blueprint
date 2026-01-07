@@ -2,7 +2,7 @@ package log_manager
 
 import (
 	"context"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/logstore"
 )
@@ -31,8 +31,8 @@ type logListResult struct {
 
 // listLogs encapsulates the log listing logic so it can be reused by
 // both controllers and LiveFlux components.
-func listLogs(app types.RegistryInterface, f logListFilters) (logListResult, error) {
-	if app == nil || app.GetLogStore() == nil {
+func listLogs(registry registry.RegistryInterface, f logListFilters) (logListResult, error) {
+	if registry == nil || registry.GetLogStore() == nil {
 		return logListResult{}, nil
 	}
 
@@ -88,14 +88,14 @@ func listLogs(app types.RegistryInterface, f logListFilters) (logListResult, err
 
 	// Total count for pagination
 	total := 0
-	if n, err := app.GetLogStore().LogCount(context.Background(), query); err == nil {
+	if n, err := registry.GetLogStore().LogCount(context.Background(), query); err == nil {
 		total = n
 	}
 
 	// Apply paging for the list query
 	query = query.SetLimit(limit).SetOffset(offset)
 
-	logs, err := app.GetLogStore().LogList(context.Background(), query)
+	logs, err := registry.GetLogStore().LogList(context.Background(), query)
 	if err != nil {
 		return logListResult{}, err
 	}

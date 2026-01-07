@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/userstore"
@@ -18,13 +18,13 @@ import (
 // == CONTROLLER ==============================================================
 
 type homeController struct {
-	app types.RegistryInterface
+	app registry.RegistryInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewHomeController(app types.RegistryInterface) *homeController {
-	return &homeController{app: app}
+func NewHomeController(registry registry.RegistryInterface) *homeController {
+	return &homeController{app: registry}
 }
 
 // == PUBLIC METHODS ==========================================================

@@ -2,7 +2,7 @@ package routes
 
 import (
 	"project/internal/middlewares"
-	"project/internal/types"
+	"project/internal/registry"
 	"time"
 
 	"github.com/dracory/rtr"
@@ -10,11 +10,11 @@ import (
 )
 
 // globalMiddlewares returns a list of middlewares to be applied to all routes
-func globalMiddlewares(app types.RegistryInterface) []rtr.MiddlewareInterface {
+func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
 		middlewares.JailBotsMiddleware(middlewares.JailBotsConfig{
-			Exclude:      []string{"/new",},
+			Exclude:      []string{"/new"},
 			ExcludePaths: []string{"/blog*", "/th*", "/liveflux*"},
 		}),
 		rtrMiddleware.CompressMiddleware(5, "text/html", "text/css"),
@@ -29,8 +29,8 @@ func globalMiddlewares(app types.RegistryInterface) []rtr.MiddlewareInterface {
 	}
 
 	// Conditionally add logger and recovery when not running tests
-	if app.GetConfig() != nil {
-		isNotTesting := !app.GetConfig().IsEnvTesting()
+	if registry.GetConfig() != nil {
+		isNotTesting := !registry.GetConfig().IsEnvTesting()
 		if isNotTesting {
 			globalMiddlewares = append(globalMiddlewares,
 				rtrMiddleware.LoggerMiddleware(),
@@ -40,9 +40,9 @@ func globalMiddlewares(app types.RegistryInterface) []rtr.MiddlewareInterface {
 	}
 
 	globalMiddlewares = append(globalMiddlewares,
-		middlewares.LogRequestMiddleware(app),
+		middlewares.LogRequestMiddleware(registry),
 		middlewares.ThemeMiddleware(),
-		middlewares.AuthMiddleware(app),
+		middlewares.AuthMiddleware(registry),
 	)
 
 	return globalMiddlewares

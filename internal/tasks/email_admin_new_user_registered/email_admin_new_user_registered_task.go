@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/emails"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/taskstore"
 )
@@ -16,16 +16,16 @@ import (
 // go run . task email-to-admin-on-new-user-register --userID=12345678
 //
 // =================================================================
-func NewEmailToAdminOnNewUserRegisteredTaskHandler(app types.RegistryInterface) *emailToAdminOnNewUserRegisteredTaskHandler {
+func NewEmailToAdminOnNewUserRegisteredTaskHandler(registry registry.RegistryInterface) *emailToAdminOnNewUserRegisteredTaskHandler {
 	return &emailToAdminOnNewUserRegisteredTaskHandler{
-		app: app,
+		registry: registry,
 	}
 }
 
 // emailToAdminOnNewUserRegisteredTaskHandler sends a notification email to admin
 type emailToAdminOnNewUserRegisteredTaskHandler struct {
 	taskstore.TaskHandlerBase
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewUserRegisteredTaskHandler)(nil) // verify it extends the task interface
@@ -43,15 +43,15 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Description() string 
 }
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string) (task taskstore.TaskQueueInterface, err error) {
-	if handler.app == nil || handler.app.GetConfig() == nil {
+	if handler.registry == nil || handler.registry.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")
 	}
 
-	if handler.app.GetTaskStore() == nil {
+	if handler.registry.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
-	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return handler.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		handler.Alias(),
@@ -62,12 +62,12 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string
 }
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {
-	if handler.app == nil || handler.app.GetConfig() == nil {
+	if handler.registry == nil || handler.registry.GetConfig() == nil {
 		handler.LogError("App/Config is nil. Aborted.")
 		return false
 	}
 
-	if handler.app.GetUserStore() == nil {
+	if handler.registry.GetUserStore() == nil {
 		handler.LogError("User store is nil. Aborted.")
 		return false
 	}
@@ -93,7 +93,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {
 
 	handler.LogInfo("Parameters ok ...")
 
-	user, errUser := handler.app.GetUserStore().UserFindByID(context.Background(), userID)
+	user, errUser := handler.registry.GetUserStore().UserFindByID(context.Background(), userID)
 
 	if errUser != nil {
 		handler.LogError("Error getting user: " + errUser.Error())
@@ -105,7 +105,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {
 		return false
 	}
 
-	err := emails.NewEmailToAdminOnNewUserRegistered(handler.app).Send(user.ID())
+	err := emails.NewEmailToAdminOnNewUserRegistered(handler.registry).Send(user.ID())
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

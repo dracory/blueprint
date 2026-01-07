@@ -24,6 +24,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/emails"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/dracory/taskstore"
@@ -36,16 +37,16 @@ import (
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
-func NewEmailTestTask(app types.RegistryInterface) taskstore.TaskHandlerInterface {
+func NewEmailTestTask(registry registry.RegistryInterface) taskstore.TaskHandlerInterface {
 	return &emailTestTask{
-		app: app,
+		registry: registry,
 	}
 }
 
 // emailTestTask send a notification email to admin
 type emailTestTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	app                       types.RegistryInterface
+	registry                  types.RegistryInterface
 }
 
 // Alias returns the unique identifier for this task handler
@@ -75,11 +76,11 @@ func (handler *emailTestTask) Description() string {
 //   - error: Any error that occurred during enqueueing
 func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.TaskQueueInterface, err error) {
 	// Validate task store is initialized
-	if handler.app == nil || handler.app.GetConfig() == nil {
+	if handler.registry == nil || handler.registry.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")
 	}
 
-	if handler.app.GetTaskStore() == nil {
+	if handler.registry.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
@@ -92,7 +93,7 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Task
 	}
 
 	// Enqueue task with the provided HTML content
-	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return handler.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		handler.Alias(),
@@ -116,7 +117,7 @@ func (handler *emailTestTask) Enqueue(toEmail, html string) (task taskstore.Task
 // Returns:
 //   - bool: true if task was processed successfully, false otherwise
 func (handler *emailTestTask) Handle() bool {
-	if handler.app == nil || handler.app.GetConfig() == nil {
+	if handler.registry == nil || handler.registry.GetConfig() == nil {
 		handler.LogError("App/Config is nil. Aborted.")
 		return false
 	}
@@ -153,8 +154,8 @@ func (handler *emailTestTask) Handle() bool {
 
 	// Send email using the email service
 	err := emails.SendEmail(emails.SendOptions{
-		From:     handler.app.GetConfig().GetMailFromAddress(),
-		FromName: handler.app.GetConfig().GetMailFromName(),
+		From:     handler.registry.GetConfig().GetMailFromAddress(),
+		FromName: handler.registry.GetConfig().GetMailFromName(),
 		To:       []string{toEmail},
 		HtmlBody: html,
 		Subject:  "Test email",

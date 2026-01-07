@@ -1,13 +1,9 @@
 package registry
 
-import (
-	"project/internal/types"
-)
-
 // dataStoresMigrate performs phase 2 of store setup. Placeholder for upcoming
 // two-phase migration once stores are split into create/migrate.
 func (r *registryImplementation) dataStoresMigrate() error {
-	migrators := []func(app types.RegistryInterface) error{
+	migrators := []func(app RegistryInterface) error{
 		auditStoreMigrate,
 		blogStoreMigrate,
 		blindIndexEmailStoreMigrate,

@@ -10,13 +10,12 @@ import (
 
 	"project/internal/config"
 	app "project/internal/registry"
-	"project/internal/types"
 
 	"github.com/stretchr/testify/require"
 )
 
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
-func newTestApp(t *testing.T) types.RegistryInterface {
+func newTestApp(t *testing.T) app.RegistryInterface {
 	t.Helper()
 	cfg := config.New()
 	cfg.SetAppEnv("testing")

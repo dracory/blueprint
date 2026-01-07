@@ -5,7 +5,7 @@ import (
 	"project/internal/controllers/admin/blog/shared"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/base/req"
 	"github.com/dracory/cdn"
@@ -14,11 +14,11 @@ import (
 )
 
 type AiTestController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewAiTestController(app types.RegistryInterface) *AiTestController {
-	return &AiTestController{app: app}
+func NewAiTestController(registry registry.RegistryInterface) *AiTestController {
+	return &AiTestController{registry: registry}
 }
 
 func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -28,7 +28,7 @@ func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) strin
 			userMsg = "Tell me shortly about blogs."
 		}
 
-		model, err := shared.LlmEngine(c.app)
+		model, err := shared.LlmEngine(c.registry)
 		if err != nil {
 			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
@@ -84,7 +84,7 @@ func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) strin
 		return ""
 	}
 
-	return layouts.NewAdminLayout(c.app, r, layouts.Options{
+	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
 		Title:      "Test AI Connectivity",
 		Content:    c.view(),
 		ScriptURLs: []string{cdn.Sweetalert2_11()},

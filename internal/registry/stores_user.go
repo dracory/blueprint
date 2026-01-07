@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/userstore"
 )
 
 // userStoreInitialize initializes the user store if enabled in the configuration.
-func userStoreInitialize(app types.RegistryInterface) error {
+func userStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func userStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func userStoreMigrate(app types.RegistryInterface) error {
+func userStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

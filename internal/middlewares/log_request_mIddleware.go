@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"slices"
 	"strings"
 
@@ -16,19 +16,19 @@ import (
 // LogRequestMiddleware logs every request to the database using the LogStore logger
 // ==================================================================
 // This is userful so that we can identify where all the visits
-// come from and keep the application protected - i.e. bots,
+// come from and keep the registrylication protected - i.e. bots,
 // malicious spiders, DDOS, etc
 // ==================================================================
 // it is useful to detect spamming bots
-func LogRequestMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func LogRequestMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Log Request Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
-			return logRequestHandler(app, next)
+			return logRequestHandler(registry, next)
 		})
 }
 
-func logRequestHandler(app types.RegistryInterface, next http.Handler) http.Handler {
+func logRequestHandler(registry registry.RegistryInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := req.GetIP(r)
 
@@ -40,7 +40,7 @@ func logRequestHandler(app types.RegistryInterface, next http.Handler) http.Hand
 			return
 		}
 
-		app.GetLogger().Info("["+method+" request by "+ip+"] "+r.RequestURI,
+		registry.GetLogger().Info("["+method+" request by "+ip+"] "+r.RequestURI,
 			slog.String("host", r.Host),
 			slog.String("path", rawPath),
 			slog.String("query", r.URL.RawQuery),

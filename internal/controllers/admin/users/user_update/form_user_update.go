@@ -8,6 +8,7 @@ import (
 
 	"project/internal/ext"
 	"project/internal/links"
+	"project/internal/registry"
 	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
@@ -57,14 +58,14 @@ func newUserStatusOptions() []userStatusOption {
 	}
 }
 
-func NewFormUserUpdate(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewFormUserUpdate(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formUserUpdate{})
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	if c, ok := inst.(*formUserUpdate); ok {
-		c.App = app
+		c.App = registry
 	}
 	return inst
 }

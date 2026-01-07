@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/statsstore"
 )
 
 // statsStoreInitialize initializes the stats store if enabled in the configuration.
-func statsStoreInitialize(app types.RegistryInterface) error {
+func statsStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func statsStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func statsStoreMigrate(app types.RegistryInterface) error {
+func statsStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

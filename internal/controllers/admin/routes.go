@@ -12,40 +12,40 @@ import (
 	adminUsers "project/internal/controllers/admin/users"
 	"project/internal/links"
 	"project/internal/middlewares"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
 // Routes these are the routes for the administrator
-func Routes(app types.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	home := rtr.NewRoute().
 		SetName("Admin > Home").
 		SetPath(links.ADMIN_HOME).
-		SetHTMLHandler(NewHomeController(app).Handler)
+		SetHTMLHandler(NewHomeController(registry).Handler)
 
 	homeCatchAll := rtr.NewRoute().
 		SetName("Admin > Catch All").
 		SetPath(links.ADMIN_HOME + links.CATCHALL).
-		SetHTMLHandler(NewHomeController(app).Handler)
+		SetHTMLHandler(NewHomeController(registry).Handler)
 
 	adminRoutes := []rtr.RouteInterface{}
-	adminRoutes = append(adminRoutes, adminBlog.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminCms.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminFiles.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminLogs.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminMedia.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(app)...)
-	adminRoutes = append(adminRoutes, adminStats.Routes(app)...)
-	adminRoutes = append(adminRoutes, adminTasks.TaskRoutes(app)...)
-	adminRoutes = append(adminRoutes, adminUsers.UserRoutes(app)...)
+	adminRoutes = append(adminRoutes, adminBlog.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminCms.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminFiles.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminLogs.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminMedia.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(registry)...)
+	adminRoutes = append(adminRoutes, adminStats.Routes(registry)...)
+	adminRoutes = append(adminRoutes, adminTasks.TaskRoutes(registry)...)
+	adminRoutes = append(adminRoutes, adminUsers.UserRoutes(registry)...)
 	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)
 	adminRoutes = append(adminRoutes, []rtr.RouteInterface{home, homeCatchAll}...)
 
 	// Apply middlewares to all admin routes
 	for _, route := range adminRoutes {
 		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
-			middlewares.NewAdminMiddleware(app),
+			middlewares.NewAdminMiddleware(registry),
 		})
 	}
 

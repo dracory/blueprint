@@ -5,12 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/entitystore"
 )
 
-func entityStoreInitialize(app types.RegistryInterface) error {
+func entityStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetEntityStoreUsed() {
 		return nil
 	}
@@ -24,7 +22,7 @@ func entityStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func entityStoreMigrate(app types.RegistryInterface) error {
+func entityStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"project/internal/config"
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
@@ -82,7 +82,7 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 	assert.Equal(t, postTitle, posts[0].Title(), "Post title should match")
 }
 
-func setupControllerAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(

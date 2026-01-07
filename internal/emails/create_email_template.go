@@ -1,7 +1,7 @@
 package emails
 
 import (
-	"project/internal/types"
+	"project/internal/registry"
 
 	baseEmail "github.com/dracory/base/email"
 	"github.com/samber/lo"
@@ -9,22 +9,22 @@ import (
 
 // CreateEmailTemplate creates an email template using the base email package
 // This is a new function to avoid conflicts with the original blankEmailTemplate function
-func CreateEmailTemplate(app types.RegistryInterface, title string, htmlContent string) string {
+func CreateEmailTemplate(registry registry.RegistryInterface, title string, htmlContent string) string {
 	// Create header links
 	headerLinks := map[string]string{}
 
-	appName := lo.IfF(app != nil, func() string {
-		if app.GetConfig() == nil {
+	registryName := lo.IfF(registry != nil, func() string {
+		if registry.GetConfig() == nil {
 			return ""
 		}
-		return app.GetConfig().GetAppName()
+		return registry.GetConfig().GetAppName()
 	}).Else("")
 
 	// Use the base email template
 	return baseEmail.DefaultTemplate(baseEmail.TemplateOptions{
 		Title:       title,
 		Content:     htmlContent,
-		AppName:     appName,
+		AppName:     registryName,
 		HeaderLinks: headerLinks,
 	})
 }

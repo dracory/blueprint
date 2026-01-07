@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/taskstore"
 )
 
 // taskStoreInitialize initializes the task store if enabled in the configuration.
-func taskStoreInitialize(app types.RegistryInterface) error {
+func taskStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func taskStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func taskStoreMigrate(app types.RegistryInterface) error {
+func taskStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

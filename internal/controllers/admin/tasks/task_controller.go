@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/layouts"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
@@ -12,15 +12,15 @@ import (
 	taskAdmin "github.com/dracory/taskstore/admin"
 )
 
-func NewTaskController(app types.RegistryInterface) *taskController {
+func NewTaskController(registry registry.RegistryInterface) *taskController {
 	return &taskController{
-		app:    app,
-		logger: app.GetLogger(),
+		app:    registry,
+		logger: registry.GetLogger(),
 	}
 }
 
 type taskController struct {
-	app    types.RegistryInterface
+	app    registry.RegistryInterface
 	logger *slog.Logger
 }
 
@@ -44,7 +44,7 @@ func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string 
 }
 
 type adminLayout struct {
-	app   types.RegistryInterface
+	app   registry.RegistryInterface
 	title string
 	body  string
 

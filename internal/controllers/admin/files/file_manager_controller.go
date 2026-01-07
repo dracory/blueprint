@@ -9,7 +9,7 @@ import (
 	"os"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 	"time"
 
@@ -34,17 +34,17 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewFileManagerController(app types.RegistryInterface) *FileManagerController {
-	cfg := app.GetConfig()
+func NewFileManagerController(registry registry.RegistryInterface) *FileManagerController {
+	cfg := registry.GetConfig()
 	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
 	rootDirPath = "/" + rootDirPath
 
 	return &FileManagerController{
-		app:         app,
+		app:         registry,
 		rootDirPath: rootDirPath,
-		storage:     app.GetSqlFileStorage(),
+		storage:     registry.GetSqlFileStorage(),
 	}
 }
 
@@ -61,7 +61,7 @@ type FileEntry struct {
 
 type FileManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
-	app         types.RegistryInterface
+	app         registry.RegistryInterface
 	rootDirPath string
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface

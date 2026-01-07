@@ -2,46 +2,46 @@ package emails
 
 import (
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
 )
 
-func NewEmailToAdminOnNewUserRegistered(app types.RegistryInterface) *emailToAdminOnNewUserRegistered {
-	return &emailToAdminOnNewUserRegistered{app: app}
+func NewEmailToAdminOnNewUserRegistered(registry registry.RegistryInterface) *emailToAdminOnNewUserRegistered {
+	return &emailToAdminOnNewUserRegistered{registry: registry}
 }
 
-type emailToAdminOnNewUserRegistered struct{ app types.RegistryInterface }
+type emailToAdminOnNewUserRegistered struct{ registry registry.RegistryInterface }
 
 // Send sends an email notification to the admin when a new user registers
 func (e *emailToAdminOnNewUserRegistered) Send(userID string) error {
-	appName := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	appName := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetAppName()
+		return e.registry.GetConfig().GetAppName()
 	}).Else("")
 
-	fromEmail := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	fromEmail := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetMailFromAddress()
+		return e.registry.GetConfig().GetMailFromAddress()
 	}).Else("")
 
-	fromName := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	fromName := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetMailFromName()
+		return e.registry.GetConfig().GetMailFromName()
 	}).Else("")
 
 	emailSubject := appName + ". New User Registered"
 	emailContent := e.template(appName, userID)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.registry, emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com"
 

@@ -17,11 +17,10 @@ import (
 	"project/internal/config"
 	"project/internal/emails"
 	"project/internal/middlewares"
-	app "project/internal/registry"
+	"project/internal/registry"
 	"project/internal/routes"
 	"project/internal/schedules"
 	"project/internal/tasks"
-	"project/internal/types"
 	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
@@ -29,7 +28,7 @@ import (
 	"github.com/dracory/websrv"
 )
 
-// main starts the application
+// main starts the registrylication
 //
 // Business Logic:
 // 1. Initialize the environment
@@ -60,9 +59,9 @@ func main() {
 	}
 
 	// Initialize registry (logger, caches, database)
-	registry, err := app.New(cfg)
+	registry, err := registry.New(cfg)
 	if err != nil {
-		fmt.Printf("Failed to initialize app: %v\n", err)
+		fmt.Printf("Failed to initialize registry: %v\n", err)
 		return
 	}
 
@@ -143,13 +142,13 @@ func closeResourcesDB(db *sql.DB) {
 	}
 }
 
-// isCliMode checks if the application is running in CLI mode.
+// isCliMode checks if the registrylication is running in CLI mode.
 //
 // Parameters:
 // - none
 //
 // Returns:
-// - bool: true if the application is running in CLI mode, false otherwise.
+// - bool: true if the registrylication is running in CLI mode, false otherwise.
 func isCliMode() bool {
 	return len(os.Args) > 1
 }
@@ -159,37 +158,37 @@ func isCliMode() bool {
 // Parameters:
 // - ctx: the context
 // - group: the background group
-// - app: the application
+// - registry: the registrylication
 //
 // Returns:
 // - error: the error if any
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app types.RegistryInterface) error {
-	if app == nil {
-		return errors.New("startBackgroundProcesses called with nil app")
+func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
+	if registry == nil {
+		return errors.New("startBackgroundProcesses called with nil registry")
 	}
 
-	if app.GetConfig() == nil {
+	if registry.GetConfig() == nil {
 		return errors.New("startBackgroundProcesses called with nil config")
 	}
 
-	if app.GetDatabase() == nil {
+	if registry.GetDatabase() == nil {
 		return errors.New("startBackgroundProcesses called with nil db")
 	}
 
-	if app.GetConfig().GetTaskStoreUsed() && app.GetTaskStore() == nil {
+	if registry.GetConfig().GetTaskStoreUsed() && registry.GetTaskStore() == nil {
 		return errors.New("startBackgroundProcesses task store is enabled but not initialized")
 	}
 
-	if app.GetConfig().GetCacheStoreUsed() && app.GetCacheStore() == nil {
+	if registry.GetConfig().GetCacheStoreUsed() && registry.GetCacheStore() == nil {
 		return errors.New("startBackgroundProcesses cache store is enabled but not initialized")
 	}
 
-	if app.GetConfig().GetSessionStoreUsed() && app.GetSessionStore() == nil {
+	if registry.GetConfig().GetSessionStoreUsed() && registry.GetSessionStore() == nil {
 		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
 	}
 
-	if app.GetConfig().GetTaskStoreUsed() {
-		ts := app.GetTaskStore()
+	if registry.GetConfig().GetTaskStoreUsed() {
+		ts := registry.GetTaskStore()
 		if ts != nil {
 			group.Go(func(ctx context.Context) {
 				// Run the default task queue worker loop using the updated TaskQueue API
@@ -204,8 +203,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 			})
 		}
 	}
-	if app.GetConfig().GetCacheStoreUsed() {
-		cs := app.GetCacheStore()
+	if registry.GetConfig().GetCacheStoreUsed() {
+		cs := registry.GetCacheStore()
 		if cs != nil {
 			group.Go(func(ctx context.Context) {
 				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
@@ -214,8 +213,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 			})
 		}
 	}
-	if app.GetConfig().GetSessionStoreUsed() {
-		ss := app.GetSessionStore()
+	if registry.GetConfig().GetSessionStoreUsed() {
+		ss := registry.GetSessionStore()
 		if ss != nil {
 			group.Go(func(ctx context.Context) {
 				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
@@ -226,13 +225,13 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app t
 	}
 
 	group.Go(func(ctx context.Context) {
-		schedules.StartAsync(ctx, app)
+		schedules.StartAsync(ctx, registry)
 	})
 
 	// Initialize email sender
-	emails.InitEmailSender(app)
-	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
-	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
+	emails.InitEmailSender(registry)
+	middlewares.CmsAddMiddlewares(registry) // Add CMS middlewares
+	widgets.CmsAddShortcodes(registry)      // Add CMS shortcodes
 
 	return nil
 }

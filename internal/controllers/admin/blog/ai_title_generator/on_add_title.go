@@ -30,7 +30,7 @@ func (c *AiTitleGeneratorController) onAddTitle(r *http.Request) string {
 		return shared.ErrorPopup(fmt.Sprintf("Error preparing title payload: %s", err.Error())).ToHTML()
 	}
 
-	if err := c.app.GetCustomStore().RecordCreate(record); err != nil {
+	if err := c.registry.GetCustomStore().RecordCreate(record); err != nil {
 		return shared.ErrorPopup(fmt.Sprintf("Error saving title: %s", err.Error())).ToHTML()
 	}
 

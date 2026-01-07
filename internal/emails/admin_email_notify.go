@@ -1,45 +1,45 @@
 package emails
 
 import (
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/samber/lo"
 )
 
-func NewEmailNotifyAdmin(app types.RegistryInterface) *emailNotifyAdmin {
-	return &emailNotifyAdmin{app: app}
+func NewEmailNotifyAdmin(registry registry.RegistryInterface) *emailNotifyAdmin {
+	return &emailNotifyAdmin{registry: registry}
 }
 
-type emailNotifyAdmin struct{ app types.RegistryInterface }
+type emailNotifyAdmin struct{ registry registry.RegistryInterface }
 
 // Send sends an email notification to the admin
 func (e *emailNotifyAdmin) Send(html string) error {
-	appName := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	appName := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetAppName()
+		return e.registry.GetConfig().GetAppName()
 	}).Else("")
 
-	fromEmail := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	fromEmail := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetMailFromAddress()
+		return e.registry.GetConfig().GetMailFromAddress()
 	}).Else("")
 
-	fromName := lo.IfF(e.app != nil, func() string {
-		if e.app.GetConfig() == nil {
+	fromName := lo.IfF(e.registry != nil, func() string {
+		if e.registry.GetConfig() == nil {
 			return ""
 		}
-		return e.app.GetConfig().GetMailFromName()
+		return e.registry.GetConfig().GetMailFromName()
 	}).Else("")
 
 	emailSubject := appName + ". Admin Notification"
 	emailContent := html
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.registry, emailSubject, emailContent)
 
 	recipientEmail := "info@sinevia.com" // admin email
 

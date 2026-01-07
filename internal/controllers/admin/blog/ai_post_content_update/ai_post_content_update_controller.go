@@ -7,7 +7,7 @@ import (
 	"project/internal/controllers/admin/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/liveflux"
@@ -15,32 +15,32 @@ import (
 )
 
 type Controller struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewController(app types.RegistryInterface) *Controller {
-	return &Controller{app: app}
+func NewController(registry registry.RegistryInterface) *Controller {
+	return &Controller{registry: registry}
 }
 
 func (c *Controller) Handler(w http.ResponseWriter, r *http.Request) string {
 	postID := req.GetStringTrimmed(r, "post_id")
 	if strings.TrimSpace(postID) == "" {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Post ID is required", shared.NewLinks().PostManager(), 10)
+		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Post ID is required", shared.NewLinks().PostManager(), 10)
 	}
 
-	component := NewFormAiPostContentUpdate(c.app)
+	component := NewFormAiPostContentUpdate(c.registry)
 	if component == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize AI content editor", shared.NewLinks().PostManager(), 10)
+		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Failed to initialize AI content editor", shared.NewLinks().PostManager(), 10)
 	}
 
 	rendered := liveflux.SSR(component, map[string]string{
 		"post_id": postID,
 	})
 	if rendered == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error rendering AI content editor", shared.NewLinks().PostManager(), 10)
+		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Error rendering AI content editor", shared.NewLinks().PostManager(), 10)
 	}
 
-	return layouts.NewAdminLayout(c.app, r, layouts.Options{
+	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
 		Title:   "Edit Post Content",
 		Content: rendered,
 		ScriptURLs: []string{

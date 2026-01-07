@@ -3,20 +3,20 @@ package hello_world
 import (
 	"context"
 	"errors"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/taskstore"
 )
 
-func NewHelloWorldTask(app types.RegistryInterface) *helloWorldTask {
+func NewHelloWorldTask(registry registry.RegistryInterface) *helloWorldTask {
 	return &helloWorldTask{
-		app: app,
+		registry: registry,
 	}
 }
 
 type helloWorldTask struct {
 	taskstore.TaskHandlerBase
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*helloWorldTask)(nil) // verify it extends the task interface
@@ -34,13 +34,13 @@ func (handler *helloWorldTask) Description() string {
 }
 
 func (handler *helloWorldTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
-	if handler.app == nil {
+	if handler.registry == nil {
 		return nil, errors.New("app is nil")
 	}
-	if handler.app.GetTaskStore() == nil {
+	if handler.registry.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return handler.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		handler.Alias(),

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/rtr"
@@ -17,21 +17,21 @@ import (
 //  1. user must be authenticated
 //  2. user must be active
 //  3. user must be registered
-func NewUserMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func NewUserMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	m := rtr.NewMiddleware().
 		SetName("User Middleware").
-		SetHandler(userMiddlewareHandler(app))
+		SetHandler(userMiddlewareHandler(registry))
 
 	return m
 }
 
-func userMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) http.Handler {
+func userMiddlewareHandler(registry registry.RegistryInterface) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			returnURL := links.URL(r.URL.Path, map[string]string{})
 			loginURL := links.Auth().Login(returnURL)
 			homeURL := links.Website().Home()
-			registrationEnabled := app.GetConfig().GetRegistrationEnabled()
+			registrationEnabled := registry.GetConfig().GetRegistrationEnabled()
 			registerURL := links.Auth().Register()
 
 			// User validation logic here. Change with your own
@@ -40,13 +40,13 @@ func userMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) 
 
 			// Check if user is authenticated? No => redirect to login
 			if authUser == nil {
-				helpers.ToFlashError(app.GetCacheStore(), w, r, "Only authenticated users can access this page", loginURL, 15)
+				helpers.ToFlashError(registry.GetCacheStore(), w, r, "Only authenticated users can access this page", loginURL, 15)
 				return
 			}
 
 			// Check if user is active? No => redirect to website home
 			if !authUser.IsActive() {
-				helpers.ToFlashError(app.GetCacheStore(), w, r, "User account not active", homeURL, 15)
+				helpers.ToFlashError(registry.GetCacheStore(), w, r, "User account not active", homeURL, 15)
 				return
 			}
 
@@ -56,7 +56,7 @@ func userMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) 
 
 			if !authUser.IsRegistrationCompleted() && notOnProfilePage {
 				if registrationEnabled {
-					helpers.ToFlashInfo(app.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
+					helpers.ToFlashInfo(registry.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
 					return
 				}
 			}

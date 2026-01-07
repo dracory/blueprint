@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"project/internal/controllers/admin/blog/shared"
-	"project/internal/types"
+	"project/internal/registry"
 
 	livefluxctl "project/internal/controllers/liveflux"
 
@@ -18,7 +18,7 @@ import (
 type titleGeneratorSettingsModal struct {
 	liveflux.Base
 
-	App                      types.RegistryInterface
+	App                      registry.RegistryInterface
 	FormBlogTopic            string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -29,7 +29,7 @@ type titleGeneratorSettingsModal struct {
 	IsOpen                   bool
 }
 
-func NewTitleGeneratorSettingsModal(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewTitleGeneratorSettingsModal(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&titleGeneratorSettingsModal{})
 	if err != nil {
 		log.Println(err)
@@ -37,7 +37,7 @@ func NewTitleGeneratorSettingsModal(app types.RegistryInterface) liveflux.Compon
 	}
 
 	if c, ok := inst.(*titleGeneratorSettingsModal); ok {
-		c.App = app
+		c.App = registry
 	}
 
 	return inst
@@ -49,7 +49,7 @@ func (c *titleGeneratorSettingsModal) GetKind() string {
 
 func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[string]string) error {
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
 			c.App = app
 		}
 	}
@@ -83,7 +83,7 @@ func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[stri
 
 func (c *titleGeneratorSettingsModal) Handle(ctx context.Context, action string, data url.Values) error {
 	// get app from context
-	// c.App = ctx.Value("app").(types.RegistryInterface)
+	// c.App = ctx.Value("app").(registry.RegistryInterface)
 
 	switch action {
 	case "open":

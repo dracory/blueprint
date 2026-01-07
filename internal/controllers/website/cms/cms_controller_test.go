@@ -126,7 +126,7 @@ func TestNewCmsController(t *testing.T) {
 	if controller == nil {
 		t.Fatal("Expected controller to not be nil")
 	}
-	if controller.app == nil {
+	if controller.registry == nil {
 		t.Fatal("Expected controller.app to not be nil")
 	}
 }

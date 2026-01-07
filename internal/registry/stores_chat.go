@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/chatstore"
 )
 
 // chatStoreInitialize initializes the chat store when enabled via configuration.
-func chatStoreInitialize(app types.RegistryInterface) error {
+func chatStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func chatStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func chatStoreMigrate(app types.RegistryInterface) error {
+func chatStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

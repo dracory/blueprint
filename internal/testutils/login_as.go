@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/config"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
 )
 
-func LoginAs(app types.RegistryInterface, r *http.Request, user userstore.UserInterface) (*http.Request, error) {
-	session, err := SeedSession(app.GetSessionStore(), r, user, 10)
+func LoginAs(registry registry.RegistryInterface, r *http.Request, user userstore.UserInterface) (*http.Request, error) {
+	session, err := SeedSession(registry.GetSessionStore(), r, user, 10)
 
 	if err != nil {
 		return nil, err
@@ -23,8 +23,8 @@ func LoginAs(app types.RegistryInterface, r *http.Request, user userstore.UserIn
 	return r.WithContext(ctx), nil
 }
 
-func CallStringHandlerAsUser(app types.RegistryInterface, method string, handler func(http.ResponseWriter, *http.Request) string, options test.NewRequestOptions, userID string) (body string, response *http.Response, err error) {
-	user, session, err := SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), userID, httptest.NewRequest("GET", "/", nil), 1)
+func CallStringHandlerAsUser(registry registry.RegistryInterface, method string, handler func(http.ResponseWriter, *http.Request) string, options test.NewRequestOptions, userID string) (body string, response *http.Response, err error) {
+	user, session, err := SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), userID, httptest.NewRequest("GET", "/", nil), 1)
 	if err != nil {
 		return "", nil, err
 	}

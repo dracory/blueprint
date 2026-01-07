@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"project/pkg/blogai"
 
 	"github.com/dracory/cdn"
@@ -20,7 +20,7 @@ import (
 const ACTION_GENERATE_POST = "generate_post"
 
 type AiPostGeneratorController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 type pageData struct {
@@ -29,15 +29,15 @@ type pageData struct {
 	ApprovedBlogAiPosts []blogai.RecordPost
 }
 
-func NewAiPostGeneratorController(app types.RegistryInterface) *AiPostGeneratorController {
-	return &AiPostGeneratorController{app: app}
+func NewAiPostGeneratorController(registry registry.RegistryInterface) *AiPostGeneratorController {
+	return &AiPostGeneratorController{registry: registry}
 }
 
 func (c *AiPostGeneratorController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := c.prepareData(r)
 
 	if errorMessage != "" {
-		if cache := c.app.GetCacheStore(); cache != nil {
+		if cache := c.registry.GetCacheStore(); cache != nil {
 			return helpers.ToFlashError(cache, w, r, errorMessage, shared.NewLinks().Home(), 10)
 		}
 		return shared.ErrorPopup(errorMessage).ToHTML()
@@ -47,9 +47,9 @@ func (c *AiPostGeneratorController) Handler(w http.ResponseWriter, r *http.Reque
 		return c.onGeneratePost(r)
 	}
 
-	return layouts.NewAdminLayout(c.app, r, layouts.Options{
+	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
 		Title:   "Post Generator",
-		AppName: c.app.GetConfig().GetAppName(),
+		AppName: c.registry.GetConfig().GetAppName(),
 		Content: c.view(data),
 		ScriptURLs: []string{
 			cdn.Htmx_2_0_0(),
@@ -110,7 +110,7 @@ func (c *AiPostGeneratorController) prepareData(r *http.Request) (data pageData,
 	data.Request = r
 	data.Action = req.GetStringTrimmed(r, "action")
 
-	customStore := c.app.GetCustomStore()
+	customStore := c.registry.GetCustomStore()
 	if customStore == nil {
 		return data, "custom store not configured"
 	}
@@ -128,7 +128,7 @@ func (c *AiPostGeneratorController) prepareData(r *http.Request) (data pageData,
 	for _, record := range approvedTitleRecords {
 		recordPost, err := blogai.NewRecordPostFromCustomRecord(record)
 		if err != nil {
-			if logger := c.app.GetLogger(); logger != nil {
+			if logger := c.registry.GetLogger(); logger != nil {
 				logger.Warn("Failed to parse custom record into RecordPost", slog.String("error", err.Error()))
 			}
 			continue

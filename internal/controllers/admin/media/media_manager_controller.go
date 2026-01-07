@@ -9,7 +9,7 @@ import (
 	"os"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 	"strings"
 	"time"
 
@@ -34,8 +34,8 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewMediaManagerController(app types.RegistryInterface) *mediaManagerController {
-	cfg := app.GetConfig()
+func NewMediaManagerController(registry registry.RegistryInterface) *mediaManagerController {
+	cfg := registry.GetConfig()
 	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
@@ -43,7 +43,7 @@ func NewMediaManagerController(app types.RegistryInterface) *mediaManagerControl
 
 	return &mediaManagerController{
 		rootDirPath: rootDirPath,
-		app:         app,
+		app:         registry,
 	}
 }
 
@@ -61,7 +61,7 @@ type FileEntry struct {
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
-	app         types.RegistryInterface
+	app         registry.RegistryInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }

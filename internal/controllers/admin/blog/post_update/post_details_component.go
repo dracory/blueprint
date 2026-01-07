@@ -8,7 +8,7 @@ import (
 
 	"project/internal/controllers/admin/blog/shared"
 	livefluxctl "project/internal/controllers/liveflux"
-	"project/internal/types"
+	"project/internal/registry"
 	"project/pkg/blogai"
 
 	"github.com/dracory/blogstore"
@@ -22,7 +22,7 @@ import (
 type postDetailsComponent struct {
 	liveflux.Base
 
-	App types.RegistryInterface
+	registry registry.RegistryInterface
 
 	PostID string
 	Post   *blogstore.Post
@@ -38,7 +38,7 @@ type postDetailsComponent struct {
 	FormSuccessMessage string
 }
 
-func NewPostDetailsComponent(app types.RegistryInterface) liveflux.ComponentInterface {
+func NewPostDetailsComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postDetailsComponent{})
 	if err != nil {
 		log.Println(err)
@@ -46,7 +46,7 @@ func NewPostDetailsComponent(app types.RegistryInterface) liveflux.ComponentInte
 	}
 
 	if c, ok := inst.(*postDetailsComponent); ok {
-		c.App = app
+		c.registry = registry
 	}
 
 	return inst
@@ -57,9 +57,9 @@ func (c *postDetailsComponent) GetKind() string {
 }
 
 func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
-			c.App = app
+	if c.registry == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = app
 		}
 	}
 
@@ -69,14 +69,14 @@ func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]stri
 		return nil
 	}
 
-	if c.App == nil || c.App.GetBlogStore() == nil {
+	if c.registry == nil || c.registry.GetBlogStore() == nil {
 		c.FormErrorMessage = "Blog store not available"
 		return nil
 	}
 
-	post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+	post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 	if err != nil {
-		c.App.GetLogger().Error("Error loading post for details component", "error", err.Error())
+		c.registry.GetLogger().Error("Error loading post for details component", "error", err.Error())
 		c.FormErrorMessage = "Error loading post"
 		return nil
 	}
@@ -117,13 +117,13 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		if c.App == nil || c.App.GetBlogStore() == nil {
+		if c.registry == nil || c.registry.GetBlogStore() == nil {
 			c.FormErrorMessage = "Blog store not available"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+		post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
@@ -147,8 +147,8 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 		post.SetPublishedAt(publishedAt)
 		post.SetStatus(c.FormStatus)
 
-		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
-			c.App.GetLogger().Error("Error saving post details", "error", err.Error())
+		if err := c.registry.GetBlogStore().PostUpdate(ctx, post); err != nil {
+			c.registry.GetLogger().Error("Error saving post details", "error", err.Error())
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
 			return nil
@@ -157,27 +157,27 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 		c.FormErrorMessage = ""
 		c.FormSuccessMessage = "Post saved successfully"
 	case "regenerate_image":
-		if c.App == nil || c.App.GetBlogStore() == nil {
+		if c.registry == nil || c.registry.GetBlogStore() == nil {
 			c.FormErrorMessage = "Blog store not available"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		post, err := c.App.GetBlogStore().PostFindByID(ctx, c.PostID)
+		post, err := c.registry.GetBlogStore().PostFindByID(ctx, c.PostID)
 		if err != nil || post == nil {
 			c.FormErrorMessage = "Post not found"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		agent := blogai.NewBlogWriterAgent(c.App.GetLogger())
+		agent := blogai.NewBlogWriterAgent(c.registry.GetLogger())
 		if agent == nil {
 			c.FormErrorMessage = "Failed to initialize AI engine"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
-		llmEngine, err := shared.LlmEngine(c.App)
+		llmEngine, err := shared.LlmEngine(c.registry)
 		if err != nil || llmEngine == nil {
 			c.FormErrorMessage = "Failed to initialize AI engine"
 			c.FormSuccessMessage = ""
@@ -186,15 +186,15 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 
 		imageURL, err := agent.GenerateImage(llmEngine, post.Title(), post.Summary())
 		if err != nil {
-			c.App.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage", "error", err.Error())
+			c.registry.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage", "error", err.Error())
 			c.FormErrorMessage = "Failed to generate image"
 			c.FormSuccessMessage = ""
 			return nil
 		}
 
 		post.SetImageUrl(imageURL)
-		if err := c.App.GetBlogStore().PostUpdate(ctx, post); err != nil {
-			c.App.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage.Save", "error", err.Error())
+		if err := c.registry.GetBlogStore().PostUpdate(ctx, post); err != nil {
+			c.registry.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage.Save", "error", err.Error())
 			c.FormErrorMessage = "Failed to save generated image"
 			c.FormSuccessMessage = ""
 			return nil

@@ -4,13 +4,11 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/vaultstore"
 )
 
 // vaultStoreInitialize initializes the vault store if enabled in the configuration.
-func vaultStoreInitialize(app types.RegistryInterface) error {
+func vaultStoreInitialize(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
@@ -28,7 +26,7 @@ func vaultStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func vaultStoreMigrate(app types.RegistryInterface) error {
+func vaultStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

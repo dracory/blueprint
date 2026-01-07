@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
@@ -17,7 +17,7 @@ import (
 //  2. user must be active
 //  3. user must be registered
 //  4. user must be an admin or superuser
-func NewAdminMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func NewAdminMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Admin Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -30,27 +30,27 @@ func NewAdminMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
 				if authUser == nil {
 					returnURL := links.URL(r.URL.Path, map[string]string{})
 					loginURL := links.Auth().Login(returnURL)
-					helpers.ToFlashError(app.GetCacheStore(), w, r, "You must be logged in to access this page", loginURL, 15)
+					helpers.ToFlashError(registry.GetCacheStore(), w, r, "You must be logged in to access this page", loginURL, 15)
 					return
 				}
 
 				if !authUser.IsRegistrationCompleted() {
 					registerURL := links.Auth().Register(map[string]string{})
-					helpers.ToFlashInfo(app.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
+					helpers.ToFlashInfo(registry.GetCacheStore(), w, r, "Please complete your registration to continue", registerURL, 15)
 					return
 				}
 
 				// Check if user is active? No => redirect to website home
 				if !authUser.IsActive() {
 					homeURL := links.Website().Home()
-					helpers.ToFlash(app.GetCacheStore(), w, r, "error", "Your account is not active", homeURL, 15)
+					helpers.ToFlash(registry.GetCacheStore(), w, r, "error", "Your account is not active", homeURL, 15)
 					return
 				}
 
 				// Check if user is an admin? No => redirect to website home
 				if !authUser.IsAdministrator() && !authUser.IsSuperuser() {
 					homeURL := links.Website().Home()
-					helpers.ToFlash(app.GetCacheStore(), w, r, "error", "You must be an administrator to access this page", homeURL, 15)
+					helpers.ToFlash(registry.GetCacheStore(), w, r, "error", "You must be an administrator to access this page", homeURL, 15)
 					return
 				}
 

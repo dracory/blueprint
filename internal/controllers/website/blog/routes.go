@@ -2,7 +2,7 @@ package blog
 
 import (
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"project/internal/controllers/website/blog/home"
 	"project/internal/controllers/website/blog/post"
@@ -11,42 +11,42 @@ import (
 )
 
 func Routes(
-	app types.RegistryInterface,
+	registry registry.RegistryInterface,
 ) []rtr.RouteInterface {
 	blogRoute := rtr.NewRoute().
 		SetName("Guest > Blog").
 		SetPath(links.BLOG).
-		SetHTMLHandler(home.NewBlogController(app).Handler)
+		SetHTMLHandler(home.NewBlogController(registry).Handler)
 
 	blogPostRegex01Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post with ID > Index").
 		SetPath(links.BLOG_POST_WITH_REGEX).
-		SetHTMLHandler(post.NewPostController(app).Handler)
+		SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	blogPostRegex02Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post with ID && Title > Index").
 		SetPath(links.BLOG_POST_WITH_REGEX2).
-		SetHTMLHandler(post.NewPostController(app).Handler)
+		SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	// blogPost01Route := rtr.NewRoute().
 	// 	SetName("Guest > Blog > Post (ID)").
 	// 	SetPath(links.BLOG_01).
-	// 	SetHTMLHandler(post.NewPostController(app).Handler)
+	// 	SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	// blogPost02Route := rtr.NewRoute().
 	// 	SetName("Guest > Blog > Post (ID && Title)").
 	// 	SetPath(links.BLOG_02).
-	// 	SetHTMLHandler(post.NewPostController(app).Handler)
+	// 	SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	blogPost01Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post (ID)").
 		SetPath(links.BLOG_POST_01).
-		SetHTMLHandler(post.NewPostController(app).Handler)
+		SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	blogPost02Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post (ID && Title)").
 		SetPath(links.BLOG_POST_02).
-		SetHTMLHandler(post.NewPostController(app).Handler)
+		SetHTMLHandler(post.NewPostController(registry).Handler)
 
 	return []rtr.RouteInterface{
 		blogRoute,

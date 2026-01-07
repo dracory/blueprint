@@ -3,12 +3,11 @@ package registry
 import (
 	"database/sql"
 	"errors"
-	"project/internal/types"
 
 	"github.com/dracory/auditstore"
 )
 
-func auditStoreInitialize(app types.RegistryInterface) error {
+func auditStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetAuditStoreUsed() {
 		return nil
 	}
@@ -39,7 +38,7 @@ func newAuditStore(db *sql.DB) (auditstore.StoreInterface, error) {
 	return store, nil
 }
 
-func auditStoreMigrate(app types.RegistryInterface) error {
+func auditStoreMigrate(app RegistryInterface) error {
 	if !app.GetConfig().GetAuditStoreUsed() {
 		return nil
 	}

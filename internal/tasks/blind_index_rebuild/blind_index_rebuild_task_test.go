@@ -10,12 +10,12 @@ import (
 )
 
 func TestNewBlindIndexRebuildTask_InitializesFields(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(app)
+	task := NewBlindIndexRebuildTask(registry)
 
-	if task.app != app {
-		t.Fatalf("expected app to be set on task")
+	if task.registry != registry {
+		t.Fatalf("expected registry to be set on task")
 	}
 
 	expected := []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName}
@@ -25,8 +25,8 @@ func TestNewBlindIndexRebuildTask_InitializesFields(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Metadata(t *testing.T) {
-	app := testutils.Setup()
-	task := NewBlindIndexRebuildTask(app)
+	registry := testutils.Setup()
+	task := NewBlindIndexRebuildTask(registry)
 
 	if got, want := task.Alias(), "BlindIndexUpdate"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -44,9 +44,9 @@ func TestBlindIndexRebuildTask_Metadata(t *testing.T) {
 func TestBlindIndexRebuildTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	task := NewBlindIndexRebuildTask(app)
+	task := NewBlindIndexRebuildTask(registry)
 
 	if _, err := task.Enqueue(BlindIndexAll); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
@@ -54,8 +54,8 @@ func TestBlindIndexRebuildTask_Enqueue_TaskStoreNil(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Enqueue_InvalidIndex(t *testing.T) {
-	app := testutils.Setup()
-	task := NewBlindIndexRebuildTask(app)
+	registry := testutils.Setup()
+	task := NewBlindIndexRebuildTask(registry)
 
 	if _, err := task.Enqueue("invalid"); err == nil {
 		t.Fatalf("expected error when invalid index is provided, got nil")
@@ -63,25 +63,25 @@ func TestBlindIndexRebuildTask_Enqueue_InvalidIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Handle(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
 	// Register task
-	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(app), true)
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(registry), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task with valid funnel and lead
-	queuedTask, err := NewBlindIndexRebuildTask(app).Enqueue(BlindIndexAll)
+	queuedTask, err := NewBlindIndexRebuildTask(registry).Enqueue(BlindIndexAll)
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}
 
 	// Set queued task
-	task := NewBlindIndexRebuildTask(app)
+	task := NewBlindIndexRebuildTask(registry)
 	task.SetQueuedTask(queuedTask)
 
 	// ACT

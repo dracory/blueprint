@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"project/internal/registry"
 	"project/internal/routes"
 	"project/internal/testutils"
 	"project/internal/types"
@@ -57,14 +58,14 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				)
 			},
 			expectedStatus: http.StatusSeeOther,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, app types.RegistryInterface) {
+			assert: func(t *testing.T, rr *httptest.ResponseRecorder, registry registry.RegistryInterface) {
 				t.Helper()
 
 				if rr.Header().Get("Location") == "" {
 					t.Fatalf("expected redirect Location header to be set")
 				}
 
-				flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
+				flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), rr.Result())
 				if err != nil {
 					t.Fatalf("failed to fetch flash message: %v", err)
 				}

@@ -5,12 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"project/internal/types"
-
 	"github.com/dracory/cmsstore"
 )
 
-func cmsStoreInitialize(app types.RegistryInterface) error {
+func cmsStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetCmsStoreUsed() {
 		return nil
 	}
@@ -24,7 +22,7 @@ func cmsStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func cmsStoreMigrate(app types.RegistryInterface) error {
+func cmsStoreMigrate(app RegistryInterface) error {
 	if app.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}

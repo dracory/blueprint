@@ -7,7 +7,7 @@ import (
 	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/subscriptionstore"
 
@@ -21,15 +21,15 @@ import (
 // Business Logic:
 // 1. Checks an active subscription exists for the specified user
 // ==========================================================
-func NewSubscriptionOnlyMiddleware(app types.RegistryInterface) rtr.MiddlewareInterface {
+func NewSubscriptionOnlyMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	m := rtr.NewMiddleware().
 		SetName("Subscription Only Middleware").
-		SetHandler(subscriptionOnlyMiddlewareHandler(app))
+		SetHandler(subscriptionOnlyMiddlewareHandler(registry))
 
 	return m
 }
 
-func subscriptionOnlyMiddlewareHandler(app types.RegistryInterface) func(next http.Handler) http.Handler {
+func subscriptionOnlyMiddlewareHandler(registry registry.RegistryInterface) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authUser := helpers.GetAuthUser(r)
@@ -52,7 +52,7 @@ func subscriptionOnlyMiddlewareHandler(app types.RegistryInterface) func(next ht
 				return
 			}
 
-			activeSubscriptions, errSubscriptions := app.GetSubscriptionStore().
+			activeSubscriptions, errSubscriptions := registry.GetSubscriptionStore().
 				SubscriptionList(context.Background(), subscriptionstore.NewSubscriptionQuery().
 					SetSubscriberID(authenticatedUser.ID()).
 					SetStatus(subscriptionstore.SUBSCRIPTION_STATUS_ACTIVE))

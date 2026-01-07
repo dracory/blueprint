@@ -9,7 +9,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -19,30 +19,30 @@ import (
 )
 
 type userUpdateController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewUserUpdateController(app types.RegistryInterface) *userUpdateController {
-	return &userUpdateController{app: app}
+func NewUserUpdateController(registry registry.RegistryInterface) *userUpdateController {
+	return &userUpdateController{registry: registry}
 }
 
-func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
+func (controller *userUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().UsersUserManager(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().UsersUserManager(), 10)
 	}
 
-	rendered := liveflux.SSR(NewFormUserUpdate(controller.app), map[string]string{
+	rendered := liveflux.SSR(NewFormUserUpdate(controller.registry), map[string]string{
 		"user_id":    data.userID,
 		"return_url": data.returnURL,
 	})
 
 	if rendered == nil {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error rendering user form", links.Admin().UsersUserManager(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Error rendering user form", links.Admin().UsersUserManager(), 10)
 	}
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Edit User | Users",
 		Content: controller.page(data, rendered),
 		ScriptURLs: []string{
@@ -54,7 +54,7 @@ func (controller userUpdateController) Handler(w http.ResponseWriter, r *http.Re
 	}).ToHTML()
 }
 
-func (controller userUpdateController) page(data userUpdateControllerData, component hb.TagInterface) hb.TagInterface {
+func (controller *userUpdateController) page(data userUpdateControllerData, component hb.TagInterface) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
@@ -110,8 +110,8 @@ func (controller userUpdateController) page(data userUpdateControllerData, compo
 	)
 }
 
-func (controller userUpdateController) prepareData(r *http.Request) (data userUpdateControllerData, errorMessage string) {
-	if controller.app.GetUserStore() == nil {
+func (controller *userUpdateController) prepareData(r *http.Request) (data userUpdateControllerData, errorMessage string) {
+	if controller.registry.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -121,11 +121,11 @@ func (controller userUpdateController) prepareData(r *http.Request) (data userUp
 		return data, "User ID is required"
 	}
 
-	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), data.userID)
+	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		if controller.app.GetLogger() != nil {
-			controller.app.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
+		if controller.registry.GetLogger() != nil {
+			controller.registry.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
 		}
 		return data, "User not found"
 	}
@@ -138,12 +138,12 @@ func (controller userUpdateController) prepareData(r *http.Request) (data userUp
 	lastName := user.LastName()
 	email := user.Email()
 
-	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
-		firstName, lastName, email, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
+	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
+		firstName, lastName, email, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
 
 		if err != nil {
-			if controller.app.GetLogger() != nil {
-				controller.app.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
+			if controller.registry.GetLogger() != nil {
+				controller.registry.GetLogger().Error("At userUpdateController > prepareData", slog.String("error", err.Error()))
 			}
 			return data, "Tokens failed to be read"
 		}

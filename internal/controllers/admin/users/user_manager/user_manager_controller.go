@@ -6,33 +6,33 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/cdn"
 )
 
 // == CONTROLLER ==============================================================
 
-type userManagerController struct{ app types.RegistryInterface }
+type userManagerController struct{ registry registry.RegistryInterface }
 
 // == CONSTRUCTOR =============================================================
 
-func NewUserManagerController(app types.RegistryInterface) *userManagerController {
-	return &userManagerController{app: app}
+func NewUserManagerController(registry registry.RegistryInterface) *userManagerController {
+	return &userManagerController{registry: registry}
 }
 
 func (controller *userManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().Home(), 10)
 	}
 
 	if data.action == ActionModalUserFilterShow {
 		return controller.onModalUserFilterShow(data).ToHTML()
 	}
 
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 		Title:   "Users | User Manager",
 		Content: controller.page(data),
 		ScriptURLs: []string{

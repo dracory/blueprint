@@ -5,14 +5,14 @@ import (
 	"net/url"
 	"testing"
 
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupDetailsTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogstore.Post) {
+func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
 	app := testutils.Setup(
@@ -39,7 +39,7 @@ func setupDetailsTestAppAndPost(t *testing.T) (types.RegistryInterface, *blogsto
 func TestPostDetailsComponent_MountRequiresPostID(t *testing.T) {
 	app, _ := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{App: app}
+	c := &postDetailsComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -50,7 +50,7 @@ func TestPostDetailsComponent_MountRequiresPostID(t *testing.T) {
 func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
 	app, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{App: app}
+	c := &postDetailsComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -69,7 +69,7 @@ func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
 func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 	app, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{App: app, PostID: post.ID()}
+	c := &postDetailsComponent{registry: app, PostID: post.ID()}
 
 	values := url.Values{
 		"post_status":       {""},
@@ -90,7 +90,7 @@ func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	app, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{App: app, PostID: post.ID()}
+	c := &postDetailsComponent{registry: app, PostID: post.ID()}
 
 	values := url.Values{
 		"post_status":       {blogstore.POST_STATUS_PUBLISHED},
@@ -124,7 +124,7 @@ func TestPostDetailsComponent_HandleRegenerateImage_BlogStoreNotAvailable(t *tes
 	// Ensure we hit the early error branch without requiring AI wiring.
 	app := testutils.Setup(testutils.WithCacheStore(true))
 
-	c := &postDetailsComponent{App: app, PostID: "some-id"}
+	c := &postDetailsComponent{registry: app, PostID: "some-id"}
 
 	err := c.Handle(context.Background(), "regenerate_image", nil)
 

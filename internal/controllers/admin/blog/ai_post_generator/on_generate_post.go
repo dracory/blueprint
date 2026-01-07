@@ -65,7 +65,7 @@ func (c *AiPostGeneratorController) stepHandlerGetPostDetails(ctx context.Contex
 		return ctx, data, errors.New("record_post_id is missing from pipeline data")
 	}
 
-	customStore := c.app.GetCustomStore()
+	customStore := c.registry.GetCustomStore()
 	if customStore == nil {
 		return ctx, data, errors.New("custom store not configured")
 	}
@@ -100,12 +100,12 @@ func (c *AiPostGeneratorController) stepHandlerGeneratePost(ctx context.Context,
 		return ctx, data, errors.New("post_title is missing from pipeline data")
 	}
 
-	blogAgent := blogai.NewBlogWriterAgent(c.app.GetLogger())
+	blogAgent := blogai.NewBlogWriterAgent(c.registry.GetLogger())
 	if blogAgent == nil {
 		return ctx, data, errors.New("failed to initialize LLM engine")
 	}
 
-	model, err := shared.LlmEngine(c.app)
+	model, err := shared.LlmEngine(c.registry)
 	if err != nil {
 		return ctx, data, fmt.Errorf("failed to initialize LLM engine: %w", err)
 	}
@@ -136,7 +136,7 @@ func (c *AiPostGeneratorController) stepHandlerSavePost(ctx context.Context, dat
 		return ctx, data, errors.New("blogai_post is missing from pipeline data for saving")
 	}
 
-	customStore := c.app.GetCustomStore()
+	customStore := c.registry.GetCustomStore()
 	if customStore == nil {
 		return ctx, data, errors.New("custom store not configured")
 	}

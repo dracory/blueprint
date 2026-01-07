@@ -2,21 +2,21 @@ package home
 
 import (
 	"net/http"
-	"project/internal/types"
+	"project/internal/registry"
 )
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController(app types.RegistryInterface) *homeController {
+func NewHomeController(registry registry.RegistryInterface) *homeController {
 	return &homeController{
-		app: app,
+		registry: registry,
 	}
 }
 
 // == CONTROLLER ===============================================================
 
 type homeController struct {
-	app types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == PUBLIC METHODS ===========================================================

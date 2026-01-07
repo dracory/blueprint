@@ -3,12 +3,11 @@ package registry
 import (
 	"database/sql"
 	"errors"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 )
 
-func blogStoreInitialize(app types.RegistryInterface) error {
+func blogStoreInitialize(app RegistryInterface) error {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		return nil
 	}
@@ -22,7 +21,7 @@ func blogStoreInitialize(app types.RegistryInterface) error {
 	return nil
 }
 
-func blogStoreMigrate(app types.RegistryInterface) error {
+func blogStoreMigrate(app RegistryInterface) error {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		return nil
 	}

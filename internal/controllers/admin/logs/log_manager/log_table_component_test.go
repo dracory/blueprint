@@ -14,7 +14,7 @@ import (
 func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
 	app := testutils.Setup()
 
-	c := &logTableComponent{App: app}
+	c := &logTableComponent{registry: app}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -27,7 +27,7 @@ func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
 
 func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *testing.T) {
 	app := testutils.Setup()
-	c := &logTableComponent{App: app}
+	c := &logTableComponent{registry: app}
 	ctx := context.Background()
 
 	err := c.Handle(ctx, "sort", nil)
@@ -50,7 +50,7 @@ func TestLogTableComponent_LoadLogs_PopulatesFieldsFromListLogs(t *testing.T) {
 	}
 
 	c := &logTableComponent{
-		App:           app,
+		registry:      app,
 		Level:         "",
 		SearchMessage: "",
 		SearchContext: "",
