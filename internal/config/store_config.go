@@ -82,7 +82,7 @@ const taskStoreUsed = true
 
 // userStoreUsed enables / disables the user store. User authentication and profile
 // management will fail if the necessary tables are missing.
-const userStoreUsed = false
+const userStoreUsed = true
 
 // userStoreVaultEnabled enables / disables the user store vault
 const userStoreVaultEnabled = false
