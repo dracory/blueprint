@@ -28,7 +28,8 @@ func TestHomeController_Handler(t *testing.T) {
 	}
 
 	expecteds := []string{
-		`You are at the website home page`,
+		`Welcome to TEST APP NAME`,
+		`<!doctype html>`,
 	}
 
 	for _, expected := range expecteds {

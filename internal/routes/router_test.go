@@ -38,8 +38,8 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				t.Helper()
 
 				body := rr.Body.String()
-				if !strings.Contains(body, "You are at the website home page") {
-					t.Fatalf("expected response to contain website home copy, got %q", body)
+				if !strings.Contains(body, "<!doctype html>") {
+					t.Fatalf("expected response to contain html doctype, got %q", body)
 				}
 			},
 		},
