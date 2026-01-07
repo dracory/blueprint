@@ -8,11 +8,6 @@ import (
 	"project/internal/testutils"
 )
 
-func TestCloseResources(t *testing.T) {
-	// Should not panic when db handle is nil
-	closeResourcesDB(nil)
-}
-
 func TestIsCliMode(t *testing.T) {
 	os.Args = []string{"main", "task", "testTask"}
 	if !isCliMode() {

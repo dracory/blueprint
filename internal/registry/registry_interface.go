@@ -37,6 +37,8 @@ import (
 // and for edge integration points. Prefer passing narrower dependency
 // interfaces to controllers/tasks.
 type RegistryInterface interface {
+	Close() error
+
 	GetLogger() *slog.Logger
 	SetLogger(l *slog.Logger)
 

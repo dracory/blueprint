@@ -27,10 +27,9 @@ Date: 2026-01-07
 ### `internal/types`
 
 - `internal/types` currently contains:
-  - a compatibility alias `types.RegistryInterface = registry.RegistryInterface`
   - unrelated small app types (`flash_message.go`)
 
-This makes the package a catch-all. Over time it becomes harder to reason about responsibilities and changes tend to cause broad rebuild ripple.
+`internal/types` is currently small, but it is historically a common place for catch-all growth. The intent is to prevent it from becoming a dumping ground for runtime wiring interfaces or unrelated DTOs.
 
 #### Configuration is mutable and very wide
 
@@ -68,11 +67,11 @@ Risks:
 
 - `docs/overview.md` is a good introduction, but it does not define runtime ownership contracts (who closes DB? who owns task runners? are caches global?).
 - `docs/review.md` appears partially out of sync with the current code:
-  - it references an `Application` and `types.AppInterface`, while the code uses `Registry` and `types.RegistryInterface`.
+  - it references an `Application` and `types.AppInterface`, while the code uses `Registry` and `registry.RegistryInterface`.
 
 ### What the code currently implies (facts)
 
-- `types.RegistryInterface` is a type alias to `registry.RegistryInterface`.
+- `internal/types` is not a composition-root surface; it currently only contains `FlashMessage`.
 - `registry.RegistryInterface` is setter-heavy (service locator + mutation).
 - `registry.New(cfg)` sets cache values by mutating `internal/cache` package globals; the registry cache accessors currently delegate back to those globals.
 - `main.go` already has partial lifecycle handling:
@@ -86,12 +85,15 @@ Risks:
 
 #### Recommendation
 
-- Split responsibilities currently living in `internal/types`:
-  - current state: configuration types live under `internal/config` (`config.ConfigInterface`, private implementation)
-  - current state: `RegistryInterface` exists under `internal/registry` (`registry.RegistryInterface`) and is aliased from `internal/types`
-  - keep `internal/types` only for truly shared domain types, and treat it as a transition-only compatibility layer
+- Standardize on canonical packages:
+  - configuration lives under `internal/config` (`config.ConfigInterface`, private implementation)
+  - registry lives under `internal/registry` (`registry.RegistryInterface`)
 
-Note: keep the existing alias short-term to avoid churn, but make `internal/registry` the canonical import path.
+- Keep `internal/types` minimal:
+  - current state: it contains `FlashMessage`
+  - target state: either move remaining app-specific types to a more specific package, or keep `internal/types` as a small shared-types package with a clear boundary
+
+Note: prefer direct imports from `internal/registry` and `internal/config`; do not reintroduce composition-root interfaces into `internal/types`.
 
 #### Expected impact
 
@@ -126,7 +128,7 @@ If `ConfigReader` still exposes 100+ getters, it will reduce mutation risk but n
 
 ### 3) Replace “wide Registry passed everywhere” with role-based dependency interfaces
 
-Right now, tasks/controllers commonly accept `types.RegistryInterface`, which allows pulling any dependency at runtime.
+Right now, tasks/controllers commonly accept `registry.RegistryInterface`, which allows pulling any dependency at runtime.
 
 #### Recommendation
 
@@ -211,40 +213,30 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 
 ## Migration plan (incremental)
 
-### Phase 1: Naming and docs alignment (low risk)
+Prerequisite (already done in this repo): standardize on canonical packages (`internal/config`, `internal/registry`) and keep `internal/types` minimal.
 
-- Keep `internal/registry` as the canonical package.
-- Treat `internal/types.RegistryInterface` as a compatibility alias.
-- Update docs to match the current code shape.
-
-### Phase 2: Introduce narrow interfaces (no behavior change)
+### Phase 1: Introduce narrow interfaces (no behavior change)
 
 - Start with 1-2 tasks and 1 controller to establish a pattern.
 - Add dependency interfaces locally to the consuming package.
 - Migrate tasks first (they’re typically simple to adjust).
 
-### Phase 3: Config read-only adoption
+### Phase 2: Config read-only adoption
 
 - Add `ConfigReader`.
 - Migrate constructors to accept it.
 
 Optional: introduce smaller config views where it meaningfully reduces coupling.
 
-### Phase 4: Remove global caches
+### Phase 3: Remove global caches
 
 - Move cache instances into `Registry`.
 - Stop using `project/internal/cache` global variables as the registry source of truth.
 - Delete or deprecate the globals once no longer referenced.
 
-### Phase 5: Lifecycle closure
+### Phase 4: Clarify ownership of `internal/types` (optional, last)
 
-- Add `Close()` on registry.
-- Ensure `main` calls it during shutdown.
-
-### Phase 6: Remove `internal/types` aliasing (optional, last)
-
-- After call-sites have moved to `internal/registry`, delete `types.RegistryInterface` alias.
-- Move `FlashMessage` to a more specific package (to be decided) if it remains in use.
+- Decide whether `FlashMessage` belongs in a more specific package (e.g. a `flash`/`ui`/controller-adjacent package) or whether `internal/types` should be removed entirely.
 
 ## Open decision
 

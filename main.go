@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -64,8 +63,11 @@ func main() {
 		fmt.Printf("Failed to initialize registry: %v\n", err)
 		return
 	}
-
-	defer closeResourcesDB(registry.GetDatabase()) // Defer Closing the database
+	defer func() {
+		if err := registry.Close(); err != nil {
+			cfmt.Errorf("Failed to close registry: %v", err)
+		}
+	}()
 
 	tasks.RegisterTasks(registry) // Register the task handlers
 
@@ -123,22 +125,6 @@ func main() {
 		if err := server.Shutdown(shutdownCtx); err != nil {
 			slog.Error("Server shutdown failed", "error", err)
 		}
-	}
-}
-
-// closeResources closes the database connection if it exists.
-//
-// Parameters:
-// - db: the database handle
-//
-// Returns:
-// - none
-func closeResourcesDB(db *sql.DB) {
-	if db == nil {
-		return
-	}
-	if err := db.Close(); err != nil {
-		cfmt.Errorf("Failed to close database connection: %v", err)
 	}
 }
 

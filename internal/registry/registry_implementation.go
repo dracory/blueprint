@@ -126,6 +126,20 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	return registry, nil
 }
 
+func (r *registryImplementation) Close() error {
+	if r == nil {
+		return nil
+	}
+
+	if r.db == nil {
+		return nil
+	}
+
+	err := r.db.Close()
+	r.db = nil
+	return err
+}
+
 // GetConfig returns the registry config
 func (r *registryImplementation) GetConfig() config.ConfigInterface {
 	if r == nil {
