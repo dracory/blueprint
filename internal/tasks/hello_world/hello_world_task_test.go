@@ -19,9 +19,9 @@ func TestNewHelloWorldTask_InitializesFields(t *testing.T) {
 	}
 
 	// verify app is set via reflection since app field is unexported
-	v := reflect.ValueOf(handler).Elem().FieldByName("app")
+	v := reflect.ValueOf(handler).Elem().FieldByName("registry")
 	if !v.IsValid() || v.IsNil() {
-		t.Fatalf("expected app to be set on handler")
+		t.Fatalf("expected registry to be set on handler")
 	}
 }
 

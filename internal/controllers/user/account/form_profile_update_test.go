@@ -154,7 +154,7 @@ func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -203,7 +203,7 @@ func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -252,7 +252,7 @@ func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
 		"timezone":   {""},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -301,7 +301,7 @@ func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -350,7 +350,7 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 		"timezone":   {"Timezone"},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -470,7 +470,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := form.Handle(context.Background(), "registryly", tc.formData)
+			err := form.Handle(context.Background(), "apply", tc.formData)
 			if err != nil {
 				t.Fatalf("Handle returned error: %v", err)
 			}
@@ -523,7 +523,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 		"timezone":      {"America/New_York"},
 	}
 
-	err = form.Handle(context.Background(), "registryly", formData)
+	err = form.Handle(context.Background(), "apply", formData)
 	if err != nil {
 		t.Fatalf("Handle returned error: %v", err)
 	}
@@ -537,7 +537,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 	}
 
 	if form.FormRedirectTo != "" {
-		t.Fatalf("Expected no redirect for registryly action, got: %s", form.FormRedirectTo)
+		t.Fatalf("Expected no redirect for apply action, got: %s", form.FormRedirectTo)
 	}
 
 	// Verify the user was updated in the store
