@@ -6,7 +6,7 @@ import (
 
 // dataStoresMigrate performs phase 2 of store setup. Placeholder for upcoming
 // two-phase migration once stores are split into create/migrate.
-func (r *Registry) dataStoresMigrate() error {
+func (r *registryImplementation) dataStoresMigrate() error {
 	migrators := []func(app types.RegistryInterface) error{
 		auditStoreMigrate,
 		blogStoreMigrate,

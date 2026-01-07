@@ -7,7 +7,7 @@ import (
 
 // dataStoresInitialize performs phase 1 of store setup. For now it delegates
 // to initializeStores to preserve behavior; it will be refactored to create-only.
-func (r *Registry) dataStoresInitialize() error {
+func (r *registryImplementation) dataStoresInitialize() error {
 	if r.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
