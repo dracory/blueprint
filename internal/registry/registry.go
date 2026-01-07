@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"project/internal/cache"
-	"project/internal/types"
+	"project/internal/config"
 
 	"github.com/dracory/auditstore"
 	"github.com/dracory/blindindexstore"
@@ -41,7 +41,7 @@ import (
 // Registry is the orchestration facade for starting the app.
 // It encapsulates configuration and database (container removed).
 type Registry struct {
-	cfg types.ConfigInterface
+	cfg config.ConfigInterface
 	db  *sql.DB
 
 	// Loggers
@@ -79,7 +79,7 @@ var _ RegistryInterface = (*Registry)(nil)
 
 // New constructs and initializes the Registry (logger, caches, database).
 // It centralizes the boot logic so callers only use this single constructor.
-func New(cfg types.ConfigInterface) (RegistryInterface, error) {
+func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	if cfg == nil {
 		return nil, errors.New("cfg is nil")
 	}
@@ -127,13 +127,13 @@ func New(cfg types.ConfigInterface) (RegistryInterface, error) {
 }
 
 // GetConfig returns the registry config
-func (r *Registry) GetConfig() types.ConfigInterface {
+func (r *Registry) GetConfig() config.ConfigInterface {
 	if r == nil {
 		return nil
 	}
 	return r.cfg
 }
-func (r *Registry) SetConfig(cfg types.ConfigInterface) {
+func (r *Registry) SetConfig(cfg config.ConfigInterface) {
 	r.cfg = cfg
 }
 

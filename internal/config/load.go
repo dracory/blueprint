@@ -3,7 +3,6 @@ package config
 import (
 	"os"
 	"project/internal/resources"
-	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/env"
@@ -24,7 +23,7 @@ import (
 // Returns:
 // - none
 
-func Load() (types.ConfigInterface, error) {
+func Load() (ConfigInterface, error) {
 	env.Load(".env")
 
 	acc := &loadAccumulator{}
@@ -49,7 +48,7 @@ func Load() (types.ConfigInterface, error) {
 		return nil, err
 	}
 
-	cfg := &types.Config{}
+	cfg := &Config{}
 
 	cfg.SetAppName(app.name)
 	cfg.SetAppUrl(app.url)
