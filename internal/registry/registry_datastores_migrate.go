@@ -1,4 +1,4 @@
-package app
+package registry
 
 import (
 	"project/internal/types"

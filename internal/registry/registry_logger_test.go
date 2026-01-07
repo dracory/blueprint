@@ -1,4 +1,4 @@
-package app_test
+package registry_test
 
 import (
 	"fmt"
