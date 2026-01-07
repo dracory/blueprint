@@ -8,6 +8,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
+	"project/internal/config"
 	app "project/internal/registry"
 	"project/internal/types"
 
@@ -17,7 +18,7 @@ import (
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
 func newTestApp(t *testing.T) types.RegistryInterface {
 	t.Helper()
-	cfg := &types.Config{}
+	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
 	cfg.SetDatabaseDriver("sqlite")

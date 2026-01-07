@@ -1,8 +1,8 @@
 package config
 
-var _ ConfigInterface = (*Config)(nil)
+var _ ConfigInterface = (*configImplementation)(nil)
 
-type Config struct {
+type configImplementation struct {
 	// App configuration
 	appName  string
 	appType  string
@@ -108,228 +108,242 @@ type Config struct {
 	mediaUrl      string
 }
 
-func (c *Config) SetAppName(appName string) { c.appName = appName }
-func (c *Config) GetAppName() string        { return c.appName }
+func New() ConfigInterface {
+	return &configImplementation{}
+}
 
-func (c *Config) SetAppType(appType string) { c.appType = appType }
-func (c *Config) GetAppType() string        { return c.appType }
+func (c *configImplementation) SetAppName(appName string) { c.appName = appName }
+func (c *configImplementation) GetAppName() string        { return c.appName }
 
-func (c *Config) SetAppEnv(appEnv string) { c.appEnv = appEnv }
-func (c *Config) GetAppEnv() string       { return c.appEnv }
+func (c *configImplementation) SetAppType(appType string) { c.appType = appType }
+func (c *configImplementation) GetAppType() string        { return c.appType }
 
-func (c *Config) SetAppHost(appHost string) { c.appHost = appHost }
-func (c *Config) GetAppHost() string        { return c.appHost }
+func (c *configImplementation) SetAppEnv(appEnv string) { c.appEnv = appEnv }
+func (c *configImplementation) GetAppEnv() string       { return c.appEnv }
 
-func (c *Config) SetAppPort(appPort string) { c.appPort = appPort }
-func (c *Config) GetAppPort() string        { return c.appPort }
+func (c *configImplementation) SetAppHost(appHost string) { c.appHost = appHost }
+func (c *configImplementation) GetAppHost() string        { return c.appHost }
 
-func (c *Config) SetAppUrl(appUrl string) { c.appUrl = appUrl }
-func (c *Config) GetAppUrl() string       { return c.appUrl }
+func (c *configImplementation) SetAppPort(appPort string) { c.appPort = appPort }
+func (c *configImplementation) GetAppPort() string        { return c.appPort }
 
-func (c *Config) SetAppDebug(appDebug bool) { c.appDebug = appDebug }
-func (c *Config) GetAppDebug() bool         { return c.appDebug }
+func (c *configImplementation) SetAppUrl(appUrl string) { c.appUrl = appUrl }
+func (c *configImplementation) GetAppUrl() string       { return c.appUrl }
 
-func (c *Config) IsEnvDevelopment() bool { return c.appEnv == "development" }
-func (c *Config) IsEnvLocal() bool       { return c.appEnv == "local" }
-func (c *Config) IsEnvProduction() bool  { return c.appEnv == "production" }
-func (c *Config) IsEnvStaging() bool     { return c.appEnv == "staging" }
-func (c *Config) IsEnvTesting() bool     { return c.appEnv == "testing" }
+func (c *configImplementation) SetAppDebug(appDebug bool) { c.appDebug = appDebug }
+func (c *configImplementation) GetAppDebug() bool         { return c.appDebug }
 
-func (c *Config) SetMailDriver(v string)      { c.emailDriver = v }
-func (c *Config) GetMailDriver() string       { return c.emailDriver }
-func (c *Config) SetMailHost(v string)        { c.emailHost = v }
-func (c *Config) GetMailHost() string         { return c.emailHost }
-func (c *Config) SetMailPort(v int)           { c.emailPort = v }
-func (c *Config) GetMailPort() int            { return c.emailPort }
-func (c *Config) SetMailUsername(v string)    { c.emailUsername = v }
-func (c *Config) GetMailUsername() string     { return c.emailUsername }
-func (c *Config) SetMailPassword(v string)    { c.emailPassword = v }
-func (c *Config) GetMailPassword() string     { return c.emailPassword }
-func (c *Config) SetMailFromName(v string)    { c.emailFromName = v }
-func (c *Config) GetMailFromName() string     { return c.emailFromName }
-func (c *Config) SetMailFromAddress(v string) { c.emailFromAddress = v }
-func (c *Config) GetMailFromAddress() string  { return c.emailFromAddress }
+func (c *configImplementation) IsEnvDevelopment() bool { return c.appEnv == "development" }
+func (c *configImplementation) IsEnvLocal() bool       { return c.appEnv == "local" }
+func (c *configImplementation) IsEnvProduction() bool  { return c.appEnv == "production" }
+func (c *configImplementation) IsEnvStaging() bool     { return c.appEnv == "staging" }
+func (c *configImplementation) IsEnvTesting() bool     { return c.appEnv == "testing" }
 
-func (c *Config) SetDatabaseDriver(v string) { c.databaseDriver = v }
-func (c *Config) GetDatabaseDriver() string  { return c.databaseDriver }
-func (c *Config) SetDatabaseHost(v string)   { c.databaseHost = v }
-func (c *Config) GetDatabaseHost() string    { return c.databaseHost }
-func (c *Config) SetDatabasePort(v string)   { c.databasePort = v }
-func (c *Config) GetDatabasePort() string    { return c.databasePort }
-func (c *Config) SetDatabaseName(v string)   { c.databaseName = v }
-func (c *Config) GetDatabaseName() string    { return c.databaseName }
-func (c *Config) SetDatabaseUsername(v string) {
+func (c *configImplementation) SetMailDriver(v string)      { c.emailDriver = v }
+func (c *configImplementation) GetMailDriver() string       { return c.emailDriver }
+func (c *configImplementation) SetMailHost(v string)        { c.emailHost = v }
+func (c *configImplementation) GetMailHost() string         { return c.emailHost }
+func (c *configImplementation) SetMailPort(v int)           { c.emailPort = v }
+func (c *configImplementation) GetMailPort() int            { return c.emailPort }
+func (c *configImplementation) SetMailUsername(v string)    { c.emailUsername = v }
+func (c *configImplementation) GetMailUsername() string     { return c.emailUsername }
+func (c *configImplementation) SetMailPassword(v string)    { c.emailPassword = v }
+func (c *configImplementation) GetMailPassword() string     { return c.emailPassword }
+func (c *configImplementation) SetMailFromName(v string)    { c.emailFromName = v }
+func (c *configImplementation) GetMailFromName() string     { return c.emailFromName }
+func (c *configImplementation) SetMailFromAddress(v string) { c.emailFromAddress = v }
+func (c *configImplementation) GetMailFromAddress() string  { return c.emailFromAddress }
+
+func (c *configImplementation) SetDatabaseDriver(v string) { c.databaseDriver = v }
+func (c *configImplementation) GetDatabaseDriver() string  { return c.databaseDriver }
+func (c *configImplementation) SetDatabaseHost(v string)   { c.databaseHost = v }
+func (c *configImplementation) GetDatabaseHost() string    { return c.databaseHost }
+func (c *configImplementation) SetDatabasePort(v string)   { c.databasePort = v }
+func (c *configImplementation) GetDatabasePort() string    { return c.databasePort }
+func (c *configImplementation) SetDatabaseName(v string)   { c.databaseName = v }
+func (c *configImplementation) GetDatabaseName() string    { return c.databaseName }
+func (c *configImplementation) SetDatabaseUsername(v string) {
 	c.databaseUsername = v
 }
-func (c *Config) GetDatabaseUsername() string { return c.databaseUsername }
-func (c *Config) SetDatabasePassword(v string) {
+func (c *configImplementation) GetDatabaseUsername() string { return c.databaseUsername }
+func (c *configImplementation) SetDatabasePassword(v string) {
 	c.databasePassword = v
 }
-func (c *Config) GetDatabasePassword() string { return c.databasePassword }
-func (c *Config) SetDatabaseSSLMode(v string) { c.databaseSSLMode = v }
-func (c *Config) GetDatabaseSSLMode() string  { return c.databaseSSLMode }
+func (c *configImplementation) GetDatabasePassword() string { return c.databasePassword }
+func (c *configImplementation) SetDatabaseSSLMode(v string) { c.databaseSSLMode = v }
+func (c *configImplementation) GetDatabaseSSLMode() string  { return c.databaseSSLMode }
 
-func (c *Config) SetAnthropicApiUsed(v bool) { c.anthropicApiUsed = v }
-func (c *Config) GetAnthropicApiUsed() bool  { return c.anthropicApiUsed }
-func (c *Config) SetAnthropicApiKey(v string) {
+func (c *configImplementation) SetAnthropicApiUsed(v bool) { c.anthropicApiUsed = v }
+func (c *configImplementation) GetAnthropicApiUsed() bool  { return c.anthropicApiUsed }
+func (c *configImplementation) SetAnthropicApiKey(v string) {
 	c.anthropicApiKey = v
 }
-func (c *Config) GetAnthropicApiKey() string { return c.anthropicApiKey }
-func (c *Config) SetAnthropicApiDefaultModel(v string) {
+func (c *configImplementation) GetAnthropicApiKey() string { return c.anthropicApiKey }
+func (c *configImplementation) SetAnthropicApiDefaultModel(v string) {
 	c.anthropicApiDefaultModel = v
 }
-func (c *Config) GetAnthropicApiDefaultModel() string { return c.anthropicApiDefaultModel }
+func (c *configImplementation) GetAnthropicApiDefaultModel() string {
+	return c.anthropicApiDefaultModel
+}
 
-func (c *Config) SetGoogleGeminiApiUsed(v bool) { c.googleGeminiApiUsed = v }
-func (c *Config) GetGoogleGeminiApiUsed() bool  { return c.googleGeminiApiUsed }
-func (c *Config) SetGoogleGeminiApiKey(v string) {
+func (c *configImplementation) SetGoogleGeminiApiUsed(v bool) { c.googleGeminiApiUsed = v }
+func (c *configImplementation) GetGoogleGeminiApiUsed() bool  { return c.googleGeminiApiUsed }
+func (c *configImplementation) SetGoogleGeminiApiKey(v string) {
 	c.googleGeminiApiKey = v
 }
-func (c *Config) GetGoogleGeminiApiKey() string { return c.googleGeminiApiKey }
-func (c *Config) SetGoogleGeminiApiDefaultModel(v string) {
+func (c *configImplementation) GetGoogleGeminiApiKey() string { return c.googleGeminiApiKey }
+func (c *configImplementation) SetGoogleGeminiApiDefaultModel(v string) {
 	c.googleGeminiApiDefaultModel = v
 }
-func (c *Config) GetGoogleGeminiApiDefaultModel() string { return c.googleGeminiApiDefaultModel }
+func (c *configImplementation) GetGoogleGeminiApiDefaultModel() string {
+	return c.googleGeminiApiDefaultModel
+}
 
-func (c *Config) SetOpenAiApiUsed(v bool) { c.openAiApiUsed = v }
-func (c *Config) GetOpenAiApiUsed() bool  { return c.openAiApiUsed }
-func (c *Config) SetOpenAiApiKey(v string) {
+func (c *configImplementation) SetOpenAiApiUsed(v bool) { c.openAiApiUsed = v }
+func (c *configImplementation) GetOpenAiApiUsed() bool  { return c.openAiApiUsed }
+func (c *configImplementation) SetOpenAiApiKey(v string) {
 	c.openAiApiKey = v
 }
-func (c *Config) GetOpenAiApiKey() string { return c.openAiApiKey }
-func (c *Config) SetOpenAiApiDefaultModel(v string) {
+func (c *configImplementation) GetOpenAiApiKey() string { return c.openAiApiKey }
+func (c *configImplementation) SetOpenAiApiDefaultModel(v string) {
 	c.openAiApiDefaultModel = v
 }
-func (c *Config) GetOpenAiApiDefaultModel() string { return c.openAiApiDefaultModel }
+func (c *configImplementation) GetOpenAiApiDefaultModel() string { return c.openAiApiDefaultModel }
 
-func (c *Config) SetOpenRouterApiKey(v string) { c.openRouterApiKey = v }
-func (c *Config) GetOpenRouterApiKey() string  { return c.openRouterApiKey }
-func (c *Config) SetOpenRouterApiUsed(v bool)  { c.openRouterApiUsed = v }
-func (c *Config) GetOpenRouterApiUsed() bool   { return c.openRouterApiUsed }
-func (c *Config) SetOpenRouterApiDefaultModel(v string) {
+func (c *configImplementation) SetOpenRouterApiKey(v string) { c.openRouterApiKey = v }
+func (c *configImplementation) GetOpenRouterApiKey() string  { return c.openRouterApiKey }
+func (c *configImplementation) SetOpenRouterApiUsed(v bool)  { c.openRouterApiUsed = v }
+func (c *configImplementation) GetOpenRouterApiUsed() bool   { return c.openRouterApiUsed }
+func (c *configImplementation) SetOpenRouterApiDefaultModel(v string) {
 	c.openRouterApiDefaultModel = v
 }
-func (c *Config) GetOpenRouterApiDefaultModel() string { return c.openRouterApiDefaultModel }
+func (c *configImplementation) GetOpenRouterApiDefaultModel() string {
+	return c.openRouterApiDefaultModel
+}
 
-func (c *Config) SetVertexAiApiUsed(v bool) { c.vertexAiApiUsed = v }
-func (c *Config) GetVertexAiApiUsed() bool  { return c.vertexAiApiUsed }
-func (c *Config) SetVertexAiApiDefaultModel(v string) {
+func (c *configImplementation) SetVertexAiApiUsed(v bool) { c.vertexAiApiUsed = v }
+func (c *configImplementation) GetVertexAiApiUsed() bool  { return c.vertexAiApiUsed }
+func (c *configImplementation) SetVertexAiApiDefaultModel(v string) {
 	c.vertexAiApiDefaultModel = v
 }
-func (c *Config) GetVertexAiApiDefaultModel() string { return c.vertexAiApiDefaultModel }
-func (c *Config) SetVertexAiApiProjectID(v string)   { c.vertexAiApiProjectID = v }
-func (c *Config) GetVertexAiApiProjectID() string    { return c.vertexAiApiProjectID }
-func (c *Config) SetVertexAiApiRegionID(v string)    { c.vertexAiApiRegionID = v }
-func (c *Config) GetVertexAiApiRegionID() string     { return c.vertexAiApiRegionID }
-func (c *Config) SetVertexAiApiModelID(v string)     { c.vertexAiApiModelID = v }
-func (c *Config) GetVertexAiApiModelID() string      { return c.vertexAiApiModelID }
+func (c *configImplementation) GetVertexAiApiDefaultModel() string { return c.vertexAiApiDefaultModel }
+func (c *configImplementation) SetVertexAiApiProjectID(v string)   { c.vertexAiApiProjectID = v }
+func (c *configImplementation) GetVertexAiApiProjectID() string    { return c.vertexAiApiProjectID }
+func (c *configImplementation) SetVertexAiApiRegionID(v string)    { c.vertexAiApiRegionID = v }
+func (c *configImplementation) GetVertexAiApiRegionID() string     { return c.vertexAiApiRegionID }
+func (c *configImplementation) SetVertexAiApiModelID(v string)     { c.vertexAiApiModelID = v }
+func (c *configImplementation) GetVertexAiApiModelID() string      { return c.vertexAiApiModelID }
 
-func (c *Config) SetEnvEncryptionKey(v string) { c.envEncryptionKey = v }
-func (c *Config) GetEnvEncryptionKey() string  { return c.envEncryptionKey }
+func (c *configImplementation) SetEnvEncryptionKey(v string) { c.envEncryptionKey = v }
+func (c *configImplementation) GetEnvEncryptionKey() string  { return c.envEncryptionKey }
 
-func (c *Config) SetBlogStoreUsed(v bool) { c.blogStoreUsed = v }
-func (c *Config) GetBlogStoreUsed() bool  { return c.blogStoreUsed }
+func (c *configImplementation) SetBlogStoreUsed(v bool) { c.blogStoreUsed = v }
+func (c *configImplementation) GetBlogStoreUsed() bool  { return c.blogStoreUsed }
 
-func (c *Config) SetChatStoreUsed(v bool) { c.chatStoreUsed = v }
-func (c *Config) GetChatStoreUsed() bool  { return c.chatStoreUsed }
+func (c *configImplementation) SetChatStoreUsed(v bool) { c.chatStoreUsed = v }
+func (c *configImplementation) GetChatStoreUsed() bool  { return c.chatStoreUsed }
 
-func (c *Config) SetCacheStoreUsed(v bool) { c.cacheStoreUsed = v }
-func (c *Config) GetCacheStoreUsed() bool  { return c.cacheStoreUsed }
+func (c *configImplementation) SetCacheStoreUsed(v bool) { c.cacheStoreUsed = v }
+func (c *configImplementation) GetCacheStoreUsed() bool  { return c.cacheStoreUsed }
 
-func (c *Config) SetCmsStoreUsed(v bool) { c.cmsStoreUsed = v }
-func (c *Config) GetCmsStoreUsed() bool  { return c.cmsStoreUsed }
-func (c *Config) SetCmsStoreTemplateID(v string) {
+func (c *configImplementation) SetCmsStoreUsed(v bool) { c.cmsStoreUsed = v }
+func (c *configImplementation) GetCmsStoreUsed() bool  { return c.cmsStoreUsed }
+func (c *configImplementation) SetCmsStoreTemplateID(v string) {
 	c.cmsStoreTemplateID = v
 }
-func (c *Config) GetCmsStoreTemplateID() string { return c.cmsStoreTemplateID }
+func (c *configImplementation) GetCmsStoreTemplateID() string { return c.cmsStoreTemplateID }
 
-func (c *Config) SetCustomStoreUsed(v bool) { c.customStoreUsed = v }
-func (c *Config) GetCustomStoreUsed() bool  { return c.customStoreUsed }
+func (c *configImplementation) SetCustomStoreUsed(v bool) { c.customStoreUsed = v }
+func (c *configImplementation) GetCustomStoreUsed() bool  { return c.customStoreUsed }
 
-func (c *Config) SetEntityStoreUsed(v bool) { c.entityStoreUsed = v }
-func (c *Config) GetEntityStoreUsed() bool  { return c.entityStoreUsed }
+func (c *configImplementation) SetEntityStoreUsed(v bool) { c.entityStoreUsed = v }
+func (c *configImplementation) GetEntityStoreUsed() bool  { return c.entityStoreUsed }
 
-func (c *Config) SetFeedStoreUsed(v bool) { c.feedStoreUsed = v }
-func (c *Config) GetFeedStoreUsed() bool  { return c.feedStoreUsed }
+func (c *configImplementation) SetFeedStoreUsed(v bool) { c.feedStoreUsed = v }
+func (c *configImplementation) GetFeedStoreUsed() bool  { return c.feedStoreUsed }
 
-func (c *Config) SetGeoStoreUsed(v bool) { c.geoStoreUsed = v }
-func (c *Config) GetGeoStoreUsed() bool  { return c.geoStoreUsed }
+func (c *configImplementation) SetGeoStoreUsed(v bool) { c.geoStoreUsed = v }
+func (c *configImplementation) GetGeoStoreUsed() bool  { return c.geoStoreUsed }
 
-func (c *Config) SetLogStoreUsed(v bool) { c.logStoreUsed = v }
-func (c *Config) GetLogStoreUsed() bool  { return c.logStoreUsed }
+func (c *configImplementation) SetLogStoreUsed(v bool) { c.logStoreUsed = v }
+func (c *configImplementation) GetLogStoreUsed() bool  { return c.logStoreUsed }
 
-func (c *Config) SetMetaStoreUsed(v bool) { c.metaStoreUsed = v }
-func (c *Config) GetMetaStoreUsed() bool  { return c.metaStoreUsed }
+func (c *configImplementation) SetMetaStoreUsed(v bool) { c.metaStoreUsed = v }
+func (c *configImplementation) GetMetaStoreUsed() bool  { return c.metaStoreUsed }
 
-func (c *Config) SetSessionStoreUsed(v bool) { c.sessionStoreUsed = v }
-func (c *Config) GetSessionStoreUsed() bool  { return c.sessionStoreUsed }
+func (c *configImplementation) SetSessionStoreUsed(v bool) { c.sessionStoreUsed = v }
+func (c *configImplementation) GetSessionStoreUsed() bool  { return c.sessionStoreUsed }
 
-func (c *Config) SetSqlFileStoreUsed(v bool) { c.sqlFileStoreUsed = v }
-func (c *Config) GetSqlFileStoreUsed() bool  { return c.sqlFileStoreUsed }
+func (c *configImplementation) SetSqlFileStoreUsed(v bool) { c.sqlFileStoreUsed = v }
+func (c *configImplementation) GetSqlFileStoreUsed() bool  { return c.sqlFileStoreUsed }
 
-func (c *Config) SetSettingStoreUsed(v bool) { c.settingStoreUsed = v }
-func (c *Config) GetSettingStoreUsed() bool  { return c.settingStoreUsed }
+func (c *configImplementation) SetSettingStoreUsed(v bool) { c.settingStoreUsed = v }
+func (c *configImplementation) GetSettingStoreUsed() bool  { return c.settingStoreUsed }
 
-func (c *Config) SetShopStoreUsed(v bool) { c.shopStoreUsed = v }
-func (c *Config) GetShopStoreUsed() bool  { return c.shopStoreUsed }
+func (c *configImplementation) SetShopStoreUsed(v bool) { c.shopStoreUsed = v }
+func (c *configImplementation) GetShopStoreUsed() bool  { return c.shopStoreUsed }
 
-func (c *Config) SetSubscriptionStoreUsed(v bool) { c.subscriptionStoreUsed = v }
-func (c *Config) GetSubscriptionStoreUsed() bool  { return c.subscriptionStoreUsed }
+func (c *configImplementation) SetSubscriptionStoreUsed(v bool) { c.subscriptionStoreUsed = v }
+func (c *configImplementation) GetSubscriptionStoreUsed() bool  { return c.subscriptionStoreUsed }
 
-func (c *Config) SetTaskStoreUsed(v bool) { c.taskStoreUsed = v }
-func (c *Config) GetTaskStoreUsed() bool  { return c.taskStoreUsed }
+func (c *configImplementation) SetTaskStoreUsed(v bool) { c.taskStoreUsed = v }
+func (c *configImplementation) GetTaskStoreUsed() bool  { return c.taskStoreUsed }
 
-func (c *Config) SetUserStoreUsed(v bool) { c.userStoreUsed = v }
-func (c *Config) GetUserStoreUsed() bool  { return c.userStoreUsed }
+func (c *configImplementation) SetUserStoreUsed(v bool) { c.userStoreUsed = v }
+func (c *configImplementation) GetUserStoreUsed() bool  { return c.userStoreUsed }
 
-func (c *Config) SetUserStoreVaultEnabled(v bool) { c.userStoreVaultEnabled = v }
-func (c *Config) GetUserStoreVaultEnabled() bool  { return c.userStoreVaultEnabled }
+func (c *configImplementation) SetUserStoreVaultEnabled(v bool) { c.userStoreVaultEnabled = v }
+func (c *configImplementation) GetUserStoreVaultEnabled() bool  { return c.userStoreVaultEnabled }
 
-func (c *Config) SetStatsStoreUsed(v bool) { c.statsStoreUsed = v }
-func (c *Config) GetStatsStoreUsed() bool  { return c.statsStoreUsed }
+func (c *configImplementation) SetStatsStoreUsed(v bool) { c.statsStoreUsed = v }
+func (c *configImplementation) GetStatsStoreUsed() bool  { return c.statsStoreUsed }
 
-func (c *Config) SetTranslationLanguageDefault(v string) {
+func (c *configImplementation) SetTranslationLanguageDefault(v string) {
 	c.translationLanguageDefault = v
 }
-func (c *Config) GetTranslationLanguageDefault() string { return c.translationLanguageDefault }
-func (c *Config) SetTranslationLanguageList(v map[string]string) {
+func (c *configImplementation) GetTranslationLanguageDefault() string {
+	return c.translationLanguageDefault
+}
+func (c *configImplementation) SetTranslationLanguageList(v map[string]string) {
 	c.translationLanguageList = v
 }
-func (c *Config) GetTranslationLanguageList() map[string]string { return c.translationLanguageList }
+func (c *configImplementation) GetTranslationLanguageList() map[string]string {
+	return c.translationLanguageList
+}
 
-func (c *Config) SetStripeKeyPrivate(v string) { c.stripeKeyPrivate = v }
-func (c *Config) GetStripeKeyPrivate() string  { return c.stripeKeyPrivate }
-func (c *Config) SetStripeKeyPublic(v string)  { c.stripeKeyPublic = v }
-func (c *Config) GetStripeKeyPublic() string   { return c.stripeKeyPublic }
-func (c *Config) SetStripeUsed(v bool)         { c.stripeUsed = v }
-func (c *Config) GetStripeUsed() bool          { return c.stripeUsed }
+func (c *configImplementation) SetStripeKeyPrivate(v string) { c.stripeKeyPrivate = v }
+func (c *configImplementation) GetStripeKeyPrivate() string  { return c.stripeKeyPrivate }
+func (c *configImplementation) SetStripeKeyPublic(v string)  { c.stripeKeyPublic = v }
+func (c *configImplementation) GetStripeKeyPublic() string   { return c.stripeKeyPublic }
+func (c *configImplementation) SetStripeUsed(v bool)         { c.stripeUsed = v }
+func (c *configImplementation) GetStripeUsed() bool          { return c.stripeUsed }
 
-func (c *Config) SetRegistrationEnabled(v bool) { c.registrationEnabled = v }
-func (c *Config) GetRegistrationEnabled() bool  { return c.registrationEnabled }
+func (c *configImplementation) SetRegistrationEnabled(v bool) { c.registrationEnabled = v }
+func (c *configImplementation) GetRegistrationEnabled() bool  { return c.registrationEnabled }
 
-func (c *Config) SetAuditStoreUsed(v bool) { c.auditStoreUsed = v }
-func (c *Config) GetAuditStoreUsed() bool  { return c.auditStoreUsed }
+func (c *configImplementation) SetAuditStoreUsed(v bool) { c.auditStoreUsed = v }
+func (c *configImplementation) GetAuditStoreUsed() bool  { return c.auditStoreUsed }
 
-func (c *Config) SetVaultStoreUsed(v bool) { c.vaultStoreUsed = v }
-func (c *Config) GetVaultStoreUsed() bool  { return c.vaultStoreUsed }
-func (c *Config) SetVaultStoreKey(v string) {
+func (c *configImplementation) SetVaultStoreUsed(v bool) { c.vaultStoreUsed = v }
+func (c *configImplementation) GetVaultStoreUsed() bool  { return c.vaultStoreUsed }
+func (c *configImplementation) SetVaultStoreKey(v string) {
 	c.vaultStoreKey = v
 }
-func (c *Config) GetVaultStoreKey() string { return c.vaultStoreKey }
+func (c *configImplementation) GetVaultStoreKey() string { return c.vaultStoreKey }
 
-func (c *Config) SetMediaBucket(v string)   { c.mediaBucket = v }
-func (c *Config) GetMediaBucket() string    { return c.mediaBucket }
-func (c *Config) SetMediaDriver(v string)   { c.mediaDriver = v }
-func (c *Config) GetMediaDriver() string    { return c.mediaDriver }
-func (c *Config) SetMediaKey(v string)      { c.mediaKey = v }
-func (c *Config) GetMediaKey() string       { return c.mediaKey }
-func (c *Config) SetMediaEndpoint(v string) { c.mediaEndpoint = v }
-func (c *Config) GetMediaEndpoint() string  { return c.mediaEndpoint }
-func (c *Config) SetMediaRegion(v string)   { c.mediaRegion = v }
-func (c *Config) GetMediaRegion() string    { return c.mediaRegion }
-func (c *Config) SetMediaRoot(v string)     { c.mediaRoot = v }
-func (c *Config) GetMediaRoot() string      { return c.mediaRoot }
-func (c *Config) SetMediaSecret(v string)   { c.mediaSecret = v }
-func (c *Config) GetMediaSecret() string    { return c.mediaSecret }
-func (c *Config) SetMediaUrl(v string)      { c.mediaUrl = v }
-func (c *Config) GetMediaUrl() string       { return c.mediaUrl }
+func (c *configImplementation) SetMediaBucket(v string)   { c.mediaBucket = v }
+func (c *configImplementation) GetMediaBucket() string    { return c.mediaBucket }
+func (c *configImplementation) SetMediaDriver(v string)   { c.mediaDriver = v }
+func (c *configImplementation) GetMediaDriver() string    { return c.mediaDriver }
+func (c *configImplementation) SetMediaKey(v string)      { c.mediaKey = v }
+func (c *configImplementation) GetMediaKey() string       { return c.mediaKey }
+func (c *configImplementation) SetMediaEndpoint(v string) { c.mediaEndpoint = v }
+func (c *configImplementation) GetMediaEndpoint() string  { return c.mediaEndpoint }
+func (c *configImplementation) SetMediaRegion(v string)   { c.mediaRegion = v }
+func (c *configImplementation) GetMediaRegion() string    { return c.mediaRegion }
+func (c *configImplementation) SetMediaRoot(v string)     { c.mediaRoot = v }
+func (c *configImplementation) GetMediaRoot() string      { return c.mediaRoot }
+func (c *configImplementation) SetMediaSecret(v string)   { c.mediaSecret = v }
+func (c *configImplementation) GetMediaSecret() string    { return c.mediaSecret }
+func (c *configImplementation) SetMediaUrl(v string)      { c.mediaUrl = v }
+func (c *configImplementation) GetMediaUrl() string       { return c.mediaUrl }

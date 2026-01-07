@@ -2,7 +2,6 @@ package testutils
 
 import (
 	"project/internal/config"
-	"project/internal/types"
 	"testing"
 
 	"github.com/dracory/test"
@@ -11,7 +10,7 @@ import (
 func TestTestKeyIntegration(t *testing.T) {
 	// Test that the TestKey function from the blueprint project
 	// produces the same result as the TestKey function from the base project
-	cfg := &types.Config{}
+	cfg := config.New()
 	cfg.SetDatabaseDriver("sqlite")
 	cfg.SetDatabaseHost("")
 	cfg.SetDatabasePort("")
@@ -28,7 +27,7 @@ func TestTestKeyIntegration(t *testing.T) {
 
 func TestTestConfigIntegration(t *testing.T) {
 	// Create a test configuration
-	testConfig := types.Config{}
+	testConfig := config.New()
 	// App
 	testConfig.SetAppHost("localhost")
 	testConfig.SetAppPort("8080")

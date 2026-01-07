@@ -3,6 +3,7 @@ package testutils
 import (
 	"fmt"
 	"log/slog"
+	"project/internal/config"
 	registrypkg "project/internal/registry"
 	"project/internal/types"
 	"time"
@@ -162,8 +163,8 @@ func WithAuditStore(enable bool) SetupOption {
 	}
 }
 
-func DefaultConf() *types.Config {
-	cfg := &types.Config{}
+func DefaultConf() types.ConfigInterface {
+	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
 	cfg.SetDatabaseDriver("sqlite")

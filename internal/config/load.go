@@ -48,7 +48,7 @@ func Load() (ConfigInterface, error) {
 		return nil, err
 	}
 
-	cfg := &Config{}
+	cfg := New()
 
 	cfg.SetAppName(app.name)
 	cfg.SetAppUrl(app.url)
