@@ -25,7 +25,6 @@ import (
 	"errors"
 	"project/internal/emails"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/taskstore"
 )
@@ -46,7 +45,7 @@ func NewEmailTestTask(registry registry.RegistryInterface) taskstore.TaskHandler
 // emailTestTask send a notification email to admin
 type emailTestTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	registry                  types.RegistryInterface
+	registry                  registry.RegistryInterface
 }
 
 // Alias returns the unique identifier for this task handler

@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"project/internal/config"
+	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/types"
 
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
@@ -105,7 +105,7 @@ func TestUserUpdateController_ShowsForm(t *testing.T) {
 	}
 }
 
-func setupControllerAppAndUser(t *testing.T) (types.RegistryInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
 	app := testutils.Setup(

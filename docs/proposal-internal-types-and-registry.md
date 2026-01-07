@@ -10,6 +10,12 @@ Date: 2026-01-07
 - Align folder/package naming and docs with the actual code.
 - Reduce global state (especially caches) to support isolated tests and multi-instance operation.
 
+## Non-goals
+
+- Replace the project with a full DI framework.
+- Perform a large rename/refactor across the whole tree in one PR.
+- Redesign external store packages (e.g. `github.com/dracory/*store`).
+
 ## Terminology
 
 - This proposal uses “composition root” to mean the place where concrete dependencies are constructed and wired together at startup.
@@ -21,7 +27,7 @@ Date: 2026-01-07
 ### `internal/types`
 
 - `internal/types` currently contains:
-  - composition root surface (`RegistryInterface`)
+  - a compatibility alias `types.RegistryInterface = registry.RegistryInterface`
   - unrelated small app types (`flash_message.go`)
 
 This makes the package a catch-all. Over time it becomes harder to reason about responsibilities and changes tend to cause broad rebuild ripple.
@@ -64,6 +70,16 @@ Risks:
 - `docs/review.md` appears partially out of sync with the current code:
   - it references an `Application` and `types.AppInterface`, while the code uses `Registry` and `types.RegistryInterface`.
 
+### What the code currently implies (facts)
+
+- `types.RegistryInterface` is a type alias to `registry.RegistryInterface`.
+- `registry.RegistryInterface` is setter-heavy (service locator + mutation).
+- `registry.New(cfg)` sets cache values by mutating `internal/cache` package globals; the registry cache accessors currently delegate back to those globals.
+- `main.go` already has partial lifecycle handling:
+  - DB closure is deferred explicitly (`closeResourcesDB(registry.GetDatabase())`)
+  - background work is started under a context and stopped on signals
+  - there is not yet a single `registry.Close()` that owns all shutdown.
+
 ## Proposal
 
 ### 1) Clarify package boundaries and naming
@@ -72,10 +88,10 @@ Risks:
 
 - Split responsibilities currently living in `internal/types`:
   - current state: configuration types live under `internal/config` (`config.ConfigInterface`, private implementation)
-  - current state: `RegistryInterface` exists under `internal/registry` (`registry.RegistryInterface`)
-  - keep `internal/types` only for truly shared domain types (or delete it over time)
+  - current state: `RegistryInterface` exists under `internal/registry` (`registry.RegistryInterface`) and is aliased from `internal/types`
+  - keep `internal/types` only for truly shared domain types, and treat it as a transition-only compatibility layer
 
-Note: `internal/types` no longer provides compatibility aliases to config; consumers should import `internal/config`.
+Note: keep the existing alias short-term to avoid churn, but make `internal/registry` the canonical import path.
 
 #### Expected impact
 
@@ -90,6 +106,10 @@ Note: `internal/types` no longer provides compatibility aliases to config; consu
   - It should only expose `GetX()` methods.
 - Keep existing `ConfigInterface` temporarily for compatibility.
 - Gradually update consumers (controllers/tasks/schedules) to accept `ConfigReader`.
+
+#### Critical note
+
+If `ConfigReader` still exposes 100+ getters, it will reduce mutation risk but not coupling. Prefer to also introduce feature-focused config views (example: `EmailConfig`, `DatabaseConfig`) where it reduces dependencies.
 
 #### Follow-up
 
@@ -110,16 +130,19 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 
 #### Recommendation
 
-- Introduce small, role-based interfaces:
-  - `HasLogger`
-  - `HasConfig`
-  - `HasDatabase`
-  - `HasUserStore`, `HasTaskStore`, etc.
+- Introduce small, role-based interfaces, but do it in a way that does not simply recreate the full registry via interface embedding.
+- Prefer feature-focused dependency sets over one-interface-per-store.
 
 - Update tasks/controllers to accept only what they need:
-  - For example, a task that needs logging + task store should accept an interface that embeds only those.
+  - For example, a task that needs logging + task store should accept a local interface that embeds only those methods.
 
 - Keep the full `registry.RegistryInterface` limited to startup wiring/bootstrapping and edge integration points.
+
+#### Suggested style
+
+- Define dependency interfaces close to the consumer (same package) unless reuse is proven.
+- Avoid “mega-interfaces” like `HasEverything` that become a renamed `RegistryInterface`.
+- Prefer constructor injection over pulling dependencies at runtime.
 
 #### Expected impact
 
@@ -141,6 +164,11 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 - Handle filesystem errors:
   - do not ignore `os.MkdirAll`; bubble up errors from `New()`.
 
+#### Transitional approach
+
+- Keep `internal/cache` temporarily, but stop using its globals as the source of truth.
+- If something truly needs process-wide caching, make it explicit (a dedicated package with explicit initialization and lifecycle), rather than accidental globals.
+
 #### Expected impact
 
 - Isolated tests.
@@ -158,6 +186,10 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 - Document lifecycle contract:
   - what is safe to call after shutdown
   - order of shutdown
+
+#### Current gap
+
+`main.go` currently closes the DB and stops background work, but ownership is split across the application entrypoint and the registry. Consolidating shutdown into `Close()` makes it easier to test and harder to forget resources.
 
 #### Expected impact
 
@@ -181,12 +213,14 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 
 ### Phase 1: Naming and docs alignment (low risk)
 
-- Align folder/package naming (`internal/registry` package name).
+- Keep `internal/registry` as the canonical package.
+- Treat `internal/types.RegistryInterface` as a compatibility alias.
 - Update docs to match the current code shape.
 
 ### Phase 2: Introduce narrow interfaces (no behavior change)
 
-- Add role-based dependency interfaces.
+- Start with 1-2 tasks and 1 controller to establish a pattern.
+- Add dependency interfaces locally to the consuming package.
 - Migrate tasks first (they’re typically simple to adjust).
 
 ### Phase 3: Config read-only adoption
@@ -194,15 +228,23 @@ Right now, tasks/controllers commonly accept `types.RegistryInterface`, which al
 - Add `ConfigReader`.
 - Migrate constructors to accept it.
 
+Optional: introduce smaller config views where it meaningfully reduces coupling.
+
 ### Phase 4: Remove global caches
 
 - Move cache instances into `Registry`.
-- Delete or deprecate `project/internal/cache` global variables.
+- Stop using `project/internal/cache` global variables as the registry source of truth.
+- Delete or deprecate the globals once no longer referenced.
 
 ### Phase 5: Lifecycle closure
 
 - Add `Close()` on registry.
 - Ensure `main` calls it during shutdown.
+
+### Phase 6: Remove `internal/types` aliasing (optional, last)
+
+- After call-sites have moved to `internal/registry`, delete `types.RegistryInterface` alias.
+- Move `FlashMessage` to a more specific package (to be decided) if it remains in use.
 
 ## Open decision
 
@@ -213,3 +255,5 @@ Choose one:
 
 If you pick A, this proposal naturally evolves the current code with minimal renaming.
 If you pick B, update `docs/review.md` and reintroduce `Application` as the canonical DI type.
+
+Recommendation: pick **A** for now, because it matches the current entrypoint (`registry.New(cfg)`) and minimizes churn while still enabling interface segregation.

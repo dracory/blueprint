@@ -3,7 +3,6 @@ package cms
 import (
 	"net/http"
 	"project/internal/registry"
-	"project/internal/types"
 	"project/internal/widgets"
 	"project/pkg/webtheme"
 	"sync"
@@ -19,7 +18,7 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
-	registry types.RegistryInterface
+	registry registry.RegistryInterface
 }
 
 // == CONSTRUCTOR ==============================================================

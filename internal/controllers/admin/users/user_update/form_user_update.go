@@ -9,7 +9,6 @@ import (
 	"project/internal/ext"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/geostore"
@@ -21,7 +20,7 @@ import (
 
 type formUserUpdate struct {
 	liveflux.Base
-	App            types.RegistryInterface
+	App            registry.RegistryInterface
 	UserID         string
 	ReturnURL      string
 	FormStatus     string

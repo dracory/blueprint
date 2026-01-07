@@ -3,7 +3,6 @@ package layouts
 import (
 	"net/http"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -19,7 +18,7 @@ import (
 // NOTE: It is used for the registration page, which only has a
 // registration form and no navigation
 type blankLayout struct {
-	registry   types.RegistryInterface
+	registry   registry.RegistryInterface
 	r          *http.Request
 	title      string
 	content    hb.TagInterface

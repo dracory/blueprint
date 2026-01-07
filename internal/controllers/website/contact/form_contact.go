@@ -15,7 +15,6 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 	"project/internal/tasks/email_admin_new_contact"
-	"project/internal/types"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/csrf"
@@ -26,7 +25,7 @@ import (
 
 type formContact struct {
 	liveflux.Base
-	App             types.RegistryInterface
+	App             registry.RegistryInterface
 	UserID          string
 	Email           string
 	FirstName       string

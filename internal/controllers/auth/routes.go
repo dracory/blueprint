@@ -2,12 +2,12 @@ package auth
 
 import (
 	"project/internal/links"
-	"project/internal/types"
+	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(application types.RegistryInterface) []rtr.RouteInterface {
+func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
 	routes := []rtr.RouteInterface{
 		rtr.NewRoute().
 			SetName("Auth > Auth Controller").

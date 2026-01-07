@@ -3,7 +3,6 @@ package layouts
 import (
 	"net/http"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/cmsstore/frontend"
 	"github.com/dracory/hb"
@@ -27,7 +26,7 @@ func NewCmsLayout(
 }
 
 type cmsLayout struct {
-	registry   types.RegistryInterface
+	registry   registry.RegistryInterface
 	request    *http.Request
 	title      string
 	content    hb.TagInterface

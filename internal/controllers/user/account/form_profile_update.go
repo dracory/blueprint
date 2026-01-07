@@ -9,7 +9,6 @@ import (
 	"project/internal/ext"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
@@ -22,7 +21,7 @@ import (
 
 type formProfileUpdate struct {
 	liveflux.Base
-	App                    types.RegistryInterface
+	App                    registry.RegistryInterface
 	UserID                 string
 	ReturnURL              string
 	FormEmail              string

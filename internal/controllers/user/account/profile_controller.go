@@ -12,7 +12,6 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/geostore"
@@ -25,7 +24,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type profileController struct {
-	registry                               types.RegistryInterface
+	registry                               registry.RegistryInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formCountry                            string
 	formTimezone                           string

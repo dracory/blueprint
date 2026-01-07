@@ -9,7 +9,6 @@ import (
 	"project/internal/registry"
 	"project/internal/routes"
 	"project/internal/testutils"
-	"project/internal/types"
 )
 
 func TestRoutes_HTTPWorkflows(t *testing.T) {
@@ -19,15 +18,15 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 		name           string
 		method         string
 		path           string
-		setup          func() types.RegistryInterface
+		setup          func() registry.RegistryInterface
 		expectedStatus int
-		assert         func(*testing.T, *httptest.ResponseRecorder, types.RegistryInterface)
+		assert         func(*testing.T, *httptest.ResponseRecorder, registry.RegistryInterface)
 	}{
 		{
 			name:   "website home returns ok",
 			method: http.MethodGet,
 			path:   "/",
-			setup: func() types.RegistryInterface {
+			setup: func() registry.RegistryInterface {
 				return testutils.Setup(
 					testutils.WithCacheStore(true),
 					testutils.WithSessionStore(true),
@@ -35,7 +34,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				)
 			},
 			expectedStatus: http.StatusOK,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ types.RegistryInterface) {
+			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ registry.RegistryInterface) {
 				t.Helper()
 
 				body := rr.Body.String()
@@ -48,7 +47,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 			name:   "user home redirects unauthenticated users",
 			method: http.MethodGet,
 			path:   "/user",
-			setup: func() types.RegistryInterface {
+			setup: func() registry.RegistryInterface {
 				return testutils.Setup(
 					testutils.WithCacheStore(true),
 					testutils.WithGeoStore(true),

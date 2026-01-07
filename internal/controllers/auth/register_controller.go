@@ -9,7 +9,6 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -25,7 +24,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type registerController struct {
-	registry                               types.RegistryInterface
+	registry                               registry.RegistryInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formFirstName                          string
 	formLastName                           string

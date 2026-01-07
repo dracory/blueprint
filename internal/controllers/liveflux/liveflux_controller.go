@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/liveflux"
 )
@@ -13,7 +12,7 @@ import (
 // livefluxController adapts liveflux.Handler to the rtr HTML handler signature.
 type livefluxController struct {
 	Engine http.Handler
-	App    types.RegistryInterface
+	App    registry.RegistryInterface
 }
 
 type contextKey string

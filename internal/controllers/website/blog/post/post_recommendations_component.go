@@ -11,7 +11,6 @@ import (
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -28,7 +27,7 @@ const (
 
 type postRecommendationsComponent struct {
 	liveflux.Base
-	App           types.RegistryInterface
+	App           registry.RegistryInterface
 	CurrentPostID string
 	Posts         []blogstore.Post
 	errorMessage  string
@@ -56,7 +55,7 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 	c.CurrentPostID = strings.TrimSpace(params["post_id"])
 
 	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(types.RegistryInterface); ok {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
 			c.App = app
 		}
 	}

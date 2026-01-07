@@ -5,7 +5,6 @@ import (
 	"errors"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/internal/types"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
@@ -17,7 +16,7 @@ func NewInviteFriendEmail(registry registry.RegistryInterface, us userstore.Stor
 }
 
 type inviteFriendEmail struct {
-	registry  types.RegistryInterface
+	registry  registry.RegistryInterface
 	userStore userstore.StoreInterface
 }
 
