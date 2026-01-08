@@ -27,7 +27,7 @@ import (
 	"github.com/dracory/websrv"
 )
 
-// main starts the registrylication
+// main starts the application
 //
 // Business Logic:
 // 1. Initialize the environment
@@ -134,7 +134,7 @@ func main() {
 // - none
 //
 // Returns:
-// - bool: true if the registrylication is running in CLI mode, false otherwise.
+// - bool: true if the application is running in CLI mode, false otherwise.
 func isCliMode() bool {
 	return len(os.Args) > 1
 }
@@ -144,15 +144,15 @@ func isCliMode() bool {
 // Parameters:
 // - ctx: the context
 // - group: the background group
-// - registry: the registrylication
+// - app: the application
 //
 // Returns:
 // - error: the error if any
 func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
 	if registry == nil {
-		return errors.New("startBackgroundProcesses called with nil registry")
+		return errors.New("startBackgroundProcesses called with nil app")
 	}
-
+	
 	if registry.GetConfig() == nil {
 		return errors.New("startBackgroundProcesses called with nil config")
 	}
