@@ -13,7 +13,7 @@ func CreateEmailTemplate(registry registry.RegistryInterface, title string, html
 	// Create header links
 	headerLinks := map[string]string{}
 
-	registryName := lo.IfF(registry != nil, func() string {
+	appName := lo.IfF(registry != nil, func() string {
 		if registry.GetConfig() == nil {
 			return ""
 		}

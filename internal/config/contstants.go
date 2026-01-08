@@ -197,7 +197,7 @@ const ENVENC_KEY_PUBLIC = "YOUR_PUBLIC_KEY"
 // == START: Store Configurations
 // ============================================================================
 //
-// This is where you can configure the stores used by the registry.
+// This is where you can configure the stores used by the application.
 //
 
 // KEY_CMS_STORE_TEMPLATE_ID identifies the CMS template to hydrate when the

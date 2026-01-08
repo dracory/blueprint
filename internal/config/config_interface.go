@@ -69,6 +69,7 @@ type authConfigInterface interface {
 }
 
 type llmConfigInterface interface {
+	// Anthropic
 	SetAnthropicApiUsed(bool)
 	GetAnthropicApiUsed() bool
 	SetAnthropicApiKey(string)
@@ -76,6 +77,7 @@ type llmConfigInterface interface {
 	SetAnthropicApiDefaultModel(string)
 	GetAnthropicApiDefaultModel() string
 
+	// Google Gemini
 	SetGoogleGeminiApiUsed(bool)
 	GetGoogleGeminiApiUsed() bool
 	SetGoogleGeminiApiKey(string)
@@ -83,6 +85,7 @@ type llmConfigInterface interface {
 	SetGoogleGeminiApiDefaultModel(string)
 	GetGoogleGeminiApiDefaultModel() string
 
+	// OpenRouter
 	SetOpenRouterApiUsed(bool)
 	GetOpenRouterApiUsed() bool
 	SetOpenRouterApiKey(string)
@@ -90,6 +93,7 @@ type llmConfigInterface interface {
 	SetOpenRouterApiDefaultModel(string)
 	GetOpenRouterApiDefaultModel() string
 
+	// OpenAI
 	SetOpenAiApiUsed(bool)
 	GetOpenAiApiUsed() bool
 	SetOpenAiApiKey(string)
@@ -97,6 +101,7 @@ type llmConfigInterface interface {
 	SetOpenAiApiDefaultModel(string)
 	GetOpenAiApiDefaultModel() string
 
+	// Vertex AI
 	SetVertexAiApiUsed(bool)
 	GetVertexAiApiUsed() bool
 	SetVertexAiApiDefaultModel(string)
@@ -256,6 +261,7 @@ type mediaConfigInterface interface {
 }
 
 type ConfigInterface interface {
+	// App-specific settings
 	appConfigInterface
 	authConfigInterface
 	databaseConfigInterface
@@ -265,6 +271,8 @@ type ConfigInterface interface {
 	llmConfigInterface
 	mediaConfigInterface
 	paymentConfigInterface
+
+	// Datastores
 	auditStoreConfigInterface
 	blogStoreConfigInterface
 	chatStoreConfigInterface
@@ -286,3 +294,4 @@ type ConfigInterface interface {
 	userStoreConfigInterface
 	vaultStoreConfigInterface
 }
+
