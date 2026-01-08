@@ -38,7 +38,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				t.Helper()
 
 				body := rr.Body.String()
-				if !strings.Contains(body, "<!doctype html>") {
+				if !strings.Contains(body, "<!DOCTYPE html>") {
 					t.Fatalf("expected response to contain html doctype, got %q", body)
 				}
 			},

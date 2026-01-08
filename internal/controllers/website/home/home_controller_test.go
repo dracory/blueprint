@@ -29,7 +29,7 @@ func TestHomeController_Handler(t *testing.T) {
 
 	expecteds := []string{
 		`Welcome to TEST APP NAME`,
-		`<!doctype html>`,
+		`<!DOCTYPE html>`,
 	}
 
 	for _, expected := range expecteds {
