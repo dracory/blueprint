@@ -41,6 +41,8 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 
 	globalMiddlewares = append(globalMiddlewares,
 		middlewares.LogRequestMiddleware(registry),
+		middlewares.NewHTTPSRedirectMiddleware(),
+		middlewares.NewSecurityHeadersMiddleware(),
 		middlewares.ThemeMiddleware(),
 		middlewares.AuthMiddleware(registry),
 	)

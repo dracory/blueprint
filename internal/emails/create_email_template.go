@@ -24,7 +24,7 @@ func CreateEmailTemplate(registry registry.RegistryInterface, title string, html
 	return baseEmail.DefaultTemplate(baseEmail.TemplateOptions{
 		Title:       title,
 		Content:     htmlContent,
-		AppName:     registryName,
+		AppName:     appName,
 		HeaderLinks: headerLinks,
 	})
 }
