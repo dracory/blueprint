@@ -56,12 +56,18 @@ const USER_SUBSCRIPTION_PLAN_SELECT_AJAX = USER_SUBSCRIPTION + "/plan-select-aja
 const USER_SUBSCRIPTION_PAYMENT_CANCELED = USER_SUBSCRIPTION + "/payment-canceled"
 const USER_SUBSCRIPTION_PAYMENT_SUCCESS = USER_SUBSCRIPTION + "/payment-success"
 
-
 // ===========================================================================
 // == CHAT LINKS
 // ===========================================================================
 
 const CHAT_HOME = "/chat"
+
+// ===========================================================================
+// == MCP LINKS
+// ===========================================================================
+
+const MCP_CMS = "/mcp/cms"
+const MCP_BLOG = "/mcp/blog"
 
 // ===========================================================================
 // == WEBSITE LINKS
