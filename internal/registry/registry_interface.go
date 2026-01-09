@@ -53,15 +53,20 @@ type RegistryInterface interface {
 	GetDatabase() *sql.DB
 	SetDatabase(db *sql.DB)
 
+
+    // Audit store
 	GetAuditStore() auditstore.StoreInterface
 	SetAuditStore(s auditstore.StoreInterface)
 
+	// Blog store
 	GetBlogStore() blogstore.StoreInterface
 	SetBlogStore(s blogstore.StoreInterface)
 
+	// Chat store
 	GetChatStore() chatstore.StoreInterface
 	SetChatStore(s chatstore.StoreInterface)
 
+	// Blind index stores
 	GetBlindIndexStoreEmail() blindindexstore.StoreInterface
 	SetBlindIndexStoreEmail(s blindindexstore.StoreInterface)
 
@@ -71,54 +76,71 @@ type RegistryInterface interface {
 	GetBlindIndexStoreLastName() blindindexstore.StoreInterface
 	SetBlindIndexStoreLastName(s blindindexstore.StoreInterface)
 
+	// Cache store
 	GetCacheStore() cachestore.StoreInterface
 	SetCacheStore(s cachestore.StoreInterface)
 
+	// CMS store
 	GetCmsStore() cmsstore.StoreInterface
 	SetCmsStore(s cmsstore.StoreInterface)
 
+	// Custom store
 	GetCustomStore() customstore.StoreInterface
 	SetCustomStore(s customstore.StoreInterface)
 
+	// Entity store
 	GetEntityStore() entitystore.StoreInterface
 	SetEntityStore(s entitystore.StoreInterface)
 
+	// Feed store
 	GetFeedStore() feedstore.StoreInterface
 	SetFeedStore(s feedstore.StoreInterface)
 
+	// Geo store
 	GetGeoStore() geostore.StoreInterface
 	SetGeoStore(s geostore.StoreInterface)
 
+	// Log store
 	GetLogStore() logstore.StoreInterface
 	SetLogStore(s logstore.StoreInterface)
 
+	// Meta store
 	GetMetaStore() metastore.StoreInterface
 	SetMetaStore(s metastore.StoreInterface)
 
+	// Session store
 	GetSessionStore() sessionstore.StoreInterface
 	SetSessionStore(s sessionstore.StoreInterface)
 
+	// Setting store
 	GetSettingStore() settingstore.StoreInterface
 	SetSettingStore(s settingstore.StoreInterface)
 
+	// Shop store
 	GetShopStore() shopstore.StoreInterface
 	SetShopStore(s shopstore.StoreInterface)
 
+	// SQL file storage
 	GetSqlFileStorage() filesystem.StorageInterface
 	SetSqlFileStorage(s filesystem.StorageInterface)
 
+	// Stats store
 	GetStatsStore() statsstore.StoreInterface
 	SetStatsStore(s statsstore.StoreInterface)
 
+	// Subscription store
 	GetSubscriptionStore() subscriptionstore.StoreInterface
 	SetSubscriptionStore(s subscriptionstore.StoreInterface)
 
+	// Task store
 	GetTaskStore() taskstore.StoreInterface
 	SetTaskStore(s taskstore.StoreInterface)
 
+	// User store
 	GetUserStore() userstore.StoreInterface
 	SetUserStore(s userstore.StoreInterface)
 
+	// Vault store
 	GetVaultStore() vaultstore.StoreInterface
 	SetVaultStore(s vaultstore.StoreInterface)
 }

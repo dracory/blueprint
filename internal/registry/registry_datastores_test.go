@@ -9,13 +9,13 @@ import (
 	_ "modernc.org/sqlite"
 
 	"project/internal/config"
-	app "project/internal/registry"
+	"project/internal/registry"
 
 	"github.com/stretchr/testify/require"
 )
 
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
-func newTestApp(t *testing.T) app.RegistryInterface {
+func newTestApp(t *testing.T) registry.RegistryInterface {
 	t.Helper()
 	cfg := config.New()
 	cfg.SetAppEnv("testing")
@@ -48,7 +48,7 @@ func newTestApp(t *testing.T) app.RegistryInterface {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetVaultStoreUsed(true)
 
-	a, err := app.New(cfg)
+	a, err := registry.New(cfg)
 	require.NoError(t, err)
 	return a
 }
@@ -88,10 +88,12 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 		"snv_sessions_session",
 		"snv_caches_cache",
 		"snv_blogs_post",
+		"snv_blogs_version",
 		"snv_files_file",
 		"snv_logs_log",
 		"snv_metas_meta",
 		"snv_stats_visitor",
+		"snv_tasks_schedule",
 		"snv_tasks_task_definition",
 		"snv_tasks_task_queue",
 		"snv_subscriptions_plan",
@@ -118,6 +120,6 @@ func TestAppNew_IsIdempotent(t *testing.T) {
 	a := newTestApp(t)
 
 	// Second call should also succeed
-	_, err := app.New(a.GetConfig())
+	_, err := registry.New(a.GetConfig())
 	require.NoError(t, err)
 }
