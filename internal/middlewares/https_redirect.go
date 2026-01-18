@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"slices"
 
 	"github.com/dracory/rtr"
 )
@@ -14,11 +13,17 @@ func NewHTTPSRedirectMiddleware() rtr.MiddlewareInterface {
 		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Skip redirection for localhost and in development
-				if slices.Contains([]string{
-					"localhost",
-					"127.0.0.",
-					".local",
-				}, r.Host) || r.TLS != nil {
+				host := r.Host
+				isLocal := host == "localhost" ||
+					host == "127.0.0.1" ||
+					host == "0.0.0.0" ||
+					len(host) > 6 && host[len(host)-6:] == ".local" || // Ends with .local
+					len(host) > 9 && host[:9] == "127.0.0." || // Starts with 127.0.0.
+					len(host) > 10 && host[:10] == "192.168." || // Starts with 192.168.
+					len(host) > 7 && host[:7] == "10.0.0." || // Starts with 10.0.0.
+					r.TLS != nil
+
+				if isLocal {
 					next.ServeHTTP(w, r)
 					return
 				}
