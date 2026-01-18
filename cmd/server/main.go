@@ -128,7 +128,7 @@ func main() {
 	}
 }
 
-// isCliMode checks if the registrylication is running in CLI mode.
+// isCliMode checks if the application is running in CLI mode.
 //
 // Parameters:
 // - none
@@ -144,13 +144,16 @@ func isCliMode() bool {
 // Parameters:
 // - ctx: the context
 // - group: the background group
-// - app: the application
+// - registry: the registry
 //
 // Returns:
 // - error: the error if any
 func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
+	// TODO: Use ctx parameter when needed for cancellation or context propagation
+	_ = ctx // Suppress unused parameter warning for now
+
 	if registry == nil {
-		return errors.New("startBackgroundProcesses called with nil app")
+		return errors.New("startBackgroundProcesses called with nil registry")
 	}
 	
 	if registry.GetConfig() == nil {
