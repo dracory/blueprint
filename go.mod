@@ -13,13 +13,13 @@ require (
 	github.com/dracory/base v0.26.0
 	github.com/dracory/blindindexstore v1.7.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.2.1
+	github.com/dracory/blogstore v1.4.1
 	github.com/dracory/bs v0.16.0
 	github.com/dracory/cachestore v0.23.0
 	github.com/dracory/cdn v1.9.0
 	github.com/dracory/chatstore v0.7.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.2.0
+	github.com/dracory/cmsstore v1.5.0
 	github.com/dracory/crud/v2 v2.0.0-20251030193142-403ea1e5e710
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.6.0
@@ -72,7 +72,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.7.16
-	modernc.org/sqlite v1.42.2
+	modernc.org/sqlite v1.43.0
 )
 
 require (
@@ -146,7 +146,7 @@ require (
 	golang.org/x/image v0.34.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/term v0.38.0 // indirect
+	golang.org/x/term v0.39.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	google.golang.org/api v0.259.0 // indirect
 	google.golang.org/genai v1.40.0 // indirect
@@ -174,8 +174,8 @@ require (
 	github.com/samber/lo v1.52.0
 	golang.org/x/crypto v0.46.0 // indirect
 	golang.org/x/net v0.48.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
