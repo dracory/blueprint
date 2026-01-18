@@ -65,7 +65,7 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 	userEmail := authUser.Email()
 
 	if controller.registry.GetConfig().GetUserStoreVaultEnabled() {
-		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), authUser)
+		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), authUser)
 
 		if err != nil {
 			controller.registry.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))

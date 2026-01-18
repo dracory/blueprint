@@ -327,7 +327,7 @@ func TestUserHomePage(t *testing.T) {
 
 	expected := `<title>Home | User | Test registry</title>`
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)

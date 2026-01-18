@@ -13,13 +13,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		SetPath(links.ADMIN_CMS).
 		SetHandler(NewCmsNewController(registry).Handler)
 
-	cmsOldManager := rtr.NewRoute().
-		SetName("Admin > CMS Old Manager").
-		SetPath(links.ADMIN_CMS_OLD).
-		SetHTMLHandler(NewCmsOldController(registry).Handler)
-
 	return []rtr.RouteInterface{
 		cmsManager,
-		cmsOldManager,
 	}
 }
