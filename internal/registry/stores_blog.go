@@ -43,8 +43,11 @@ func newBlogStore(db *sql.DB) (blogstore.StoreInterface, error) {
 	}
 
 	st, err := blogstore.NewStore(blogstore.NewStoreOptions{
-		DB:            db,
-		PostTableName: "snv_blogs_post",
+		DB:                  db,
+		PostTableName:       "snv_blogs_post",
+		VersioningEnabled:   true,
+		VersioningTableName: "snv_blogs_version",
+		AutomigrateEnabled:  true,
 	})
 
 	if err != nil {
