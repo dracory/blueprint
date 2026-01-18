@@ -39,8 +39,10 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 		}
 	}
 
-	// Add HTTPS redirect middleware only when not running tests
-	if registry.GetConfig() != nil && !registry.GetConfig().IsEnvTesting() {
+	// Add HTTPS redirect middleware only in production (not in development or testing)
+	if registry.GetConfig() != nil &&
+		!registry.GetConfig().IsEnvTesting() &&
+		!registry.GetConfig().IsEnvDevelopment() {
 		globalMiddlewares = append(globalMiddlewares,
 			middlewares.NewHTTPSRedirectMiddleware(),
 		)
