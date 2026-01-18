@@ -11,7 +11,7 @@ func (r *registryImplementation) dataStoresInitialize() error {
 		return errors.New("config is not initialized")
 	}
 
-	initializers := []func(app RegistryInterface) error{
+	initializers := []func(registry RegistryInterface) error{
 		auditStoreInitialize,
 		blindIndexEmailStoreInitialize,
 		blindIndexFirstNameStoreInitialize,

@@ -18,9 +18,9 @@ func TestVaultStoreInitialize_Success(t *testing.T) {
 func TestVaultStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetVaultStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetVaultStore() != nil {
+	if registry.GetVaultStore() != nil {
 		t.Error("expected vault store to be nil when not used")
 	}
 }

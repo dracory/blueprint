@@ -3,7 +3,7 @@ package registry
 // dataStoresMigrate performs phase 2 of store setup. Placeholder for upcoming
 // two-phase migration once stores are split into create/migrate.
 func (r *registryImplementation) dataStoresMigrate() error {
-	migrators := []func(app RegistryInterface) error{
+	migrators := []func(registry RegistryInterface) error{
 		auditStoreMigrate,
 		blogStoreMigrate,
 		blindIndexEmailStoreMigrate,

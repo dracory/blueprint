@@ -7,34 +7,34 @@ import (
 	"github.com/dracory/logstore"
 )
 
-func logStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetLogStoreUsed() {
+func logStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetLogStoreUsed() {
 		return nil
 	}
 
-	if store, err := newLogStore(app.GetDatabase()); err != nil {
+	if store, err := newLogStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetLogStore(store)
+		registry.SetLogStore(store)
 	}
 
 	return nil
 }
 
-func logStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func logStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetLogStoreUsed() {
+	if !registry.GetConfig().GetLogStoreUsed() {
 		return nil
 	}
 
-	if app.GetLogStore() == nil {
+	if registry.GetLogStore() == nil {
 		return errors.New("log store is not initialized")
 	}
 
-	if err := app.GetLogStore().AutoMigrate(); err != nil {
+	if err := registry.GetLogStore().AutoMigrate(); err != nil {
 		return err
 	}
 

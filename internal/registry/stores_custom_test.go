@@ -18,9 +18,9 @@ func TestCustomStoreInitialize_Success(t *testing.T) {
 func TestCustomStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCustomStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetCustomStore() != nil {
+	if registry.GetCustomStore() != nil {
 		t.Error("expected custom store to be nil when not used")
 	}
 }

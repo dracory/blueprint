@@ -7,34 +7,34 @@ import (
 	"github.com/dracory/geostore"
 )
 
-func geoStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetGeoStoreUsed() {
+func geoStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetGeoStoreUsed() {
 		return nil
 	}
 
-	if store, err := newGeoStore(app.GetDatabase()); err != nil {
+	if store, err := newGeoStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetGeoStore(store)
+		registry.SetGeoStore(store)
 	}
 
 	return nil
 }
 
-func geoStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func geoStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetGeoStoreUsed() {
+	if !registry.GetConfig().GetGeoStoreUsed() {
 		return nil
 	}
 
-	if app.GetGeoStore() == nil {
+	if registry.GetGeoStore() == nil {
 		return errors.New("geo store is not initialized")
 	}
 
-	if err := app.GetGeoStore().AutoMigrate(); err != nil {
+	if err := registry.GetGeoStore().AutoMigrate(); err != nil {
 		return err
 	}
 

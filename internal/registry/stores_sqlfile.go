@@ -8,38 +8,38 @@ import (
 )
 
 // sqlFileStorageInitialize initializes the SQL file storage if enabled in the configuration.
-func sqlFileStorageInitialize(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func sqlFileStorageInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetSqlFileStoreUsed() {
+	if !registry.GetConfig().GetSqlFileStoreUsed() {
 		return nil
 	}
 
-	store, err := newSqlFileStorage(app.GetDatabase())
+	store, err := newSqlFileStorage(registry.GetDatabase())
 	if err != nil {
 		return err
 	}
 
-	app.SetSqlFileStorage(store)
+	registry.SetSqlFileStorage(store)
 	return nil
 }
 
-func sqlFileStorageMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func sqlFileStorageMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetSqlFileStoreUsed() {
+	if !registry.GetConfig().GetSqlFileStoreUsed() {
 		return nil
 	}
 
-	if app.GetSqlFileStorage() == nil {
+	if registry.GetSqlFileStorage() == nil {
 		return errors.New("sql file storage is not initialized")
 	}
 
-	// if err := app.GetSqlFileStorage().AutoMigrate(); err != nil {
+	// if err := registry.GetSqlFileStorage().AutoMigrate(); err != nil {
 	// 	return err
 	// }
 

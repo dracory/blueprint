@@ -16,9 +16,9 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -33,7 +33,7 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)

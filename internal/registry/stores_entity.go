@@ -8,34 +8,34 @@ import (
 	"github.com/dracory/entitystore"
 )
 
-func entityStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetEntityStoreUsed() {
+func entityStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetEntityStoreUsed() {
 		return nil
 	}
 
-	if store, err := newEntityStore(app.GetDatabase()); err != nil {
+	if store, err := newEntityStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetEntityStore(store)
+		registry.SetEntityStore(store)
 	}
 
 	return nil
 }
 
-func entityStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func entityStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetEntityStoreUsed() {
+	if !registry.GetConfig().GetEntityStoreUsed() {
 		return nil
 	}
 
-	if app.GetEntityStore() == nil {
+	if registry.GetEntityStore() == nil {
 		return errors.New("entity store is not initialized")
 	}
 
-	if err := app.GetEntityStore().AutoMigrate(context.Background()); err != nil {
+	if err := registry.GetEntityStore().AutoMigrate(context.Background()); err != nil {
 		return err
 	}
 

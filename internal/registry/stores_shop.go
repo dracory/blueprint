@@ -7,34 +7,34 @@ import (
 	"github.com/dracory/shopstore"
 )
 
-func shopStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetShopStoreUsed() {
+func shopStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetShopStoreUsed() {
 		return nil
 	}
 
-	if store, err := newShopStore(app.GetDatabase()); err != nil {
+	if store, err := newShopStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetShopStore(store)
+		registry.SetShopStore(store)
 	}
 
 	return nil
 }
 
-func shopStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func shopStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetShopStoreUsed() {
+	if !registry.GetConfig().GetShopStoreUsed() {
 		return nil
 	}
 
-	if app.GetShopStore() == nil {
+	if registry.GetShopStore() == nil {
 		return errors.New("shop store is not initialized")
 	}
 
-	if err := app.GetShopStore().AutoMigrate(); err != nil {
+	if err := registry.GetShopStore().AutoMigrate(); err != nil {
 		return err
 	}
 

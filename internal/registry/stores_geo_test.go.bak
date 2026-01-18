@@ -18,9 +18,9 @@ func TestGeoStoreInitialize_Success(t *testing.T) {
 func TestGeoStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetGeoStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if registry.GetGeoStore() != nil {
+	if app.GetGeoStore() != nil {
 		t.Error("expected geo store to be nil when not used")
 	}
 }

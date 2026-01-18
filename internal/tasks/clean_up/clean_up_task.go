@@ -37,7 +37,7 @@ func (t *cleanUpTask) Description() string {
 
 func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 	if t.registry == nil {
-		return nil, errors.New("app is nil")
+		return nil, errors.New("registry is nil")
 	}
 
 	if t.registry.GetTaskStore() == nil {

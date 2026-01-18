@@ -22,6 +22,7 @@ type appConfigInterface interface {
 	SetAppDebug(bool)
 	GetAppDebug() bool
 
+	// Environment helpers
 	IsEnvDevelopment() bool
 	IsEnvLocal() bool
 	IsEnvProduction() bool

@@ -38,7 +38,7 @@ import (
 	// "gorm.io/gorm"
 )
 
-// Registry is the orchestration facade for starting the app.
+// registryImplementation is the orchestration facade for starting the registry.
 // It encapsulates configuration and database (container removed).
 type registryImplementation struct {
 	cfg config.ConfigInterface
@@ -131,6 +131,7 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	return registry, nil
 }
 
+// Close closes the registry and its resources
 func (r *registryImplementation) Close() error {
 	if r == nil {
 		return nil

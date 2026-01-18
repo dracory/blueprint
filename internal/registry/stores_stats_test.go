@@ -18,9 +18,9 @@ func TestStatsStoreInitialize_Success(t *testing.T) {
 func TestStatsStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetStatsStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetStatsStore() != nil {
+	if registry.GetStatsStore() != nil {
 		t.Error("expected stats store to be nil when not used")
 	}
 }

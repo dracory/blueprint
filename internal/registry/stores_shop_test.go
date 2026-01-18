@@ -18,9 +18,9 @@ func TestShopStoreInitialize_Success(t *testing.T) {
 func TestShopStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetShopStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetShopStore() != nil {
+	if registry.GetShopStore() != nil {
 		t.Error("expected shop store to be nil when not used")
 	}
 }

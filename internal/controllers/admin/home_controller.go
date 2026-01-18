@@ -182,6 +182,12 @@ func (c *homeController) tiles() []hb.TagInterface {
 		"icon":  "bi-box",
 		"link":  links.Admin().FileManager(map[string]string{}),
 	}
+	
+	logsTile := map[string]string{
+		"title": "Log Manager",
+		"icon":  "bi-clipboard-data",
+		"link":  links.Admin().Logs(map[string]string{}),
+	}
 
 	mediaManagerTile := map[string]string{
 		"title": "Media Manager (Old, S3)",
@@ -199,12 +205,6 @@ func (c *homeController) tiles() []hb.TagInterface {
 		"title": "Queue Manager",
 		"icon":  "bi-heart-pulse",
 		"link":  links.Admin().Tasks(map[string]string{}),
-	}
-
-	logsTile := map[string]string{
-		"title": "Log Manager",
-		"icon":  "bi-clipboard-data",
-		"link":  links.Admin().Logs(map[string]string{}),
 	}
 
 	visitStatsTile := map[string]string{

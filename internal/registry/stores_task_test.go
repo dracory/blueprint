@@ -18,9 +18,9 @@ func TestTaskStoreInitialize_Success(t *testing.T) {
 func TestTaskStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetTaskStore() != nil {
+	if registry.GetTaskStore() != nil {
 		t.Error("expected task store to be nil when not used")
 	}
 }

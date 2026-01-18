@@ -8,34 +8,34 @@ import (
 	"github.com/dracory/cmsstore"
 )
 
-func cmsStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetCmsStoreUsed() {
+func cmsStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetCmsStoreUsed() {
 		return nil
 	}
 
-	if store, err := newCmsStore(app.GetDatabase()); err != nil {
+	if store, err := newCmsStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetCmsStore(store)
+		registry.SetCmsStore(store)
 	}
 
 	return nil
 }
 
-func cmsStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func cmsStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetCmsStoreUsed() {
+	if !registry.GetConfig().GetCmsStoreUsed() {
 		return nil
 	}
 
-	if app.GetCmsStore() == nil {
+	if registry.GetCmsStore() == nil {
 		return errors.New("cms store is not initialized")
 	}
 
-	if err := app.GetCmsStore().AutoMigrate(context.Background()); err != nil {
+	if err := registry.GetCmsStore().AutoMigrate(context.Background()); err != nil {
 		return err
 	}
 

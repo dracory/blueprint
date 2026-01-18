@@ -18,9 +18,9 @@ func TestFeedStoreInitialize_Success(t *testing.T) {
 func TestFeedStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetFeedStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetFeedStore() != nil {
+	if registry.GetFeedStore() != nil {
 		t.Error("expected feed store to be nil when not used")
 	}
 }

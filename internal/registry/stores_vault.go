@@ -8,38 +8,38 @@ import (
 )
 
 // vaultStoreInitialize initializes the vault store if enabled in the configuration.
-func vaultStoreInitialize(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func vaultStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetVaultStoreUsed() {
+	if !registry.GetConfig().GetVaultStoreUsed() {
 		return nil
 	}
 
-	if store, err := newVaultStore(app.GetDatabase()); err != nil {
+	if store, err := newVaultStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetVaultStore(store)
+		registry.SetVaultStore(store)
 	}
 
 	return nil
 }
 
-func vaultStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func vaultStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetVaultStoreUsed() {
+	if !registry.GetConfig().GetVaultStoreUsed() {
 		return nil
 	}
 
-	if app.GetVaultStore() == nil {
+	if registry.GetVaultStore() == nil {
 		return errors.New("vault store is not initialized")
 	}
 
-	if err := app.GetVaultStore().AutoMigrate(); err != nil {
+	if err := registry.GetVaultStore().AutoMigrate(); err != nil {
 		return err
 	}
 

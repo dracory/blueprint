@@ -8,38 +8,38 @@ import (
 )
 
 // taskStoreInitialize initializes the task store if enabled in the configuration.
-func taskStoreInitialize(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func taskStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetTaskStoreUsed() {
+	if !registry.GetConfig().GetTaskStoreUsed() {
 		return nil
 	}
 
-	if store, err := newTaskStore(app.GetDatabase()); err != nil {
+	if store, err := newTaskStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetTaskStore(store)
+		registry.SetTaskStore(store)
 	}
 
 	return nil
 }
 
-func taskStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func taskStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetTaskStoreUsed() {
+	if !registry.GetConfig().GetTaskStoreUsed() {
 		return nil
 	}
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		return errors.New("task store is not initialized")
 	}
 
-	if err := app.GetTaskStore().AutoMigrate(); err != nil {
+	if err := registry.GetTaskStore().AutoMigrate(); err != nil {
 		return err
 	}
 
@@ -54,9 +54,9 @@ func newTaskStore(db *sql.DB) (taskstore.StoreInterface, error) {
 
 	st, err := taskstore.NewStore(taskstore.NewStoreOptions{
 		DB:                      db,
+		ScheduleTableName:       "snv_tasks_schedule",
 		TaskDefinitionTableName: "snv_tasks_task_definition",
 		TaskQueueTableName:      "snv_tasks_task_queue",
-		ScheduleTableName:       "snv_tasks_schedule",
 	})
 	if err != nil {
 		return nil, err

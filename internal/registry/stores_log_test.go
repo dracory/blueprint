@@ -19,9 +19,9 @@ func TestLogStoreInitialize_Success(t *testing.T) {
 func TestLogStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetLogStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetLogStore() != nil {
+	if registry.GetLogStore() != nil {
 		t.Error("expected log store to be nil when not used")
 	}
 }

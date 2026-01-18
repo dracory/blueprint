@@ -110,8 +110,7 @@ func handleRoutesCommand(registry registry.RegistryInterface, args []string) err
 	if len(args) == 0 || args[0] != SubcommandList {
 		return fmt.Errorf("invalid or missing subcommand for '%s'. Use '%s %s'", CommandRoutes, CommandRoutes, SubcommandList)
 	}
-	// m, r := routes.RoutesList()
-	// router.List(m, r)
+	
 	r := routes.Router(registry)
 	r.List()
 

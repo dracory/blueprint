@@ -7,40 +7,40 @@ import (
 	"github.com/dracory/blindindexstore"
 )
 
-func blindIndexFirstNameStoreInitialize(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func blindIndexFirstNameStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
 	// Blind index stores: create and set only if user store is enabled and vault store is enabled
-	if !app.GetConfig().GetUserStoreUsed() || !app.GetConfig().GetVaultStoreUsed() {
+	if !registry.GetConfig().GetUserStoreUsed() || !registry.GetConfig().GetVaultStoreUsed() {
 		return nil
 	}
 
-	if store, err := newBlindIndexFirstNameStore(app.GetDatabase()); err != nil {
+	if store, err := newBlindIndexFirstNameStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetBlindIndexStoreFirstName(store)
+		registry.SetBlindIndexStoreFirstName(store)
 	}
 
 	return nil
 }
 
-func blindIndexFirstNameStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func blindIndexFirstNameStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
 	// Blind index stores: create and set only if user store is enabled and vault store is enabled
-	if !app.GetConfig().GetUserStoreUsed() || !app.GetConfig().GetVaultStoreUsed() {
+	if !registry.GetConfig().GetUserStoreUsed() || !registry.GetConfig().GetVaultStoreUsed() {
 		return nil
 	}
 
-	if app.GetBlindIndexStoreFirstName() == nil {
+	if registry.GetBlindIndexStoreFirstName() == nil {
 		return errors.New("blind index first name store is not initialized")
 	}
 
-	if err := app.GetBlindIndexStoreFirstName().AutoMigrate(); err != nil {
+	if err := registry.GetBlindIndexStoreFirstName().AutoMigrate(); err != nil {
 		return err
 	}
 

@@ -19,8 +19,8 @@ func TestExecuteJob_MissingTaskID(t *testing.T) {
 	defer log.SetOutput(oldLogger.Writer())
 
 	// Setup test environment and execute
-	app := testutils.Setup()
-	ExecuteJob(app, []string{})
+	registry := testutils.Setup()
+	ExecuteJob(registry, []string{})
 
 	// Get the captured output
 	output := logOutput.String()
@@ -44,10 +44,10 @@ func TestExecuteJob_TaskNotFound(t *testing.T) {
 	// Setup test environment and execute
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Pass the task ID as a proper command-line argument
-	ExecuteJob(app, []string{"--task_id=nonexistent"})
+	ExecuteJob(registry, []string{"--task_id=nonexistent"})
 
 	// Get the captured output
 	output := logOutput.String()

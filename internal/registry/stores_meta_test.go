@@ -18,9 +18,9 @@ func TestMetaStoreInitialize_Success(t *testing.T) {
 func TestMetaStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetMetaStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetMetaStore() != nil {
+	if registry.GetMetaStore() != nil {
 		t.Error("expected meta store to be nil when not used")
 	}
 }

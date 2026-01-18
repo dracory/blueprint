@@ -7,34 +7,34 @@ import (
 	"github.com/dracory/customstore"
 )
 
-func customStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetCustomStoreUsed() {
+func customStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetCustomStoreUsed() {
 		return nil
 	}
 
-	if store, err := newCustomStore(app.GetDatabase()); err != nil {
+	if store, err := newCustomStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetCustomStore(store)
+		registry.SetCustomStore(store)
 	}
 
 	return nil
 }
 
-func customStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func customStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetCustomStoreUsed() {
+	if !registry.GetConfig().GetCustomStoreUsed() {
 		return nil
 	}
 
-	if app.GetCustomStore() == nil {
+	if registry.GetCustomStore() == nil {
 		return errors.New("custom store is not initialized")
 	}
 
-	if err := app.GetCustomStore().AutoMigrate(); err != nil {
+	if err := registry.GetCustomStore().AutoMigrate(); err != nil {
 		return err
 	}
 

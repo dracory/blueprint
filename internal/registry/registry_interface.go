@@ -32,6 +32,7 @@ import (
 )
 
 // RegistryInterface defines accessors for registry-scoped runtime services.
+// It mirrors the style of ConfigInterface, enabling DI and testability.
 //
 // This interface is intended to be used at the composition root (startup wiring)
 // and for edge integration points. Prefer passing narrower dependency
@@ -39,20 +40,27 @@ import (
 type RegistryInterface interface {
 	Close() error
 
+	// Logger
 	GetLogger() *slog.Logger
 	SetLogger(l *slog.Logger)
 
+	// Config
 	GetConfig() config.ConfigInterface
 	SetConfig(c config.ConfigInterface)
 
+	// Caches
 	GetMemoryCache() *ttlcache.Cache[string, any]
 	SetMemoryCache(c *ttlcache.Cache[string, any])
 	GetFileCache() cachego.Cache
 	SetFileCache(c cachego.Cache)
 
+	// DB
 	GetDatabase() *sql.DB
 	SetDatabase(db *sql.DB)
 
+	// ========================================================================
+	// == Stores (all specific data stores)
+	// ========================================================================
 
     // Audit store
 	GetAuditStore() auditstore.StoreInterface
@@ -66,13 +74,15 @@ type RegistryInterface interface {
 	GetChatStore() chatstore.StoreInterface
 	SetChatStore(s chatstore.StoreInterface)
 
-	// Blind index stores
+	// Blind index store
 	GetBlindIndexStoreEmail() blindindexstore.StoreInterface
 	SetBlindIndexStoreEmail(s blindindexstore.StoreInterface)
 
+	// Blind index store
 	GetBlindIndexStoreFirstName() blindindexstore.StoreInterface
 	SetBlindIndexStoreFirstName(s blindindexstore.StoreInterface)
 
+	// Blind index store
 	GetBlindIndexStoreLastName() blindindexstore.StoreInterface
 	SetBlindIndexStoreLastName(s blindindexstore.StoreInterface)
 

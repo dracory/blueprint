@@ -18,9 +18,9 @@ func TestBlogStoreInitialize_Success(t *testing.T) {
 func TestBlogStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetBlogStore() != nil {
+	if registry.GetBlogStore() != nil {
 		t.Error("expected blog store to be nil when not used")
 	}
 }

@@ -16,14 +16,14 @@ import (
 
 // TestUserRoutesCount verifies the number of user routes registered.
 func TestUserRoutesCount(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	// We expect at least the core user routes
 	// (order routes + apikey routes + profile + home + homeCatchAll)
@@ -34,14 +34,14 @@ func TestUserRoutesCount(t *testing.T) {
 
 // TestUserRoutesNotNil ensures no route entries are nil.
 func TestUserRoutesNotNil(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	for i, rt := range routes {
 		if rt == nil {
@@ -52,14 +52,14 @@ func TestUserRoutesNotNil(t *testing.T) {
 
 // TestUserRoutesAreAdded verifies that expected user routes are present.
 func TestUserRoutesAreAdded(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	expectedPaths := []string{
 		links.USER_HOME,
@@ -84,14 +84,14 @@ func TestUserRoutesAreAdded(t *testing.T) {
 // TestUserCatchAllRouteIsLast verifies that the catch-all route is registered last.
 // This is critical to prevent the catch-all from intercepting specific routes.
 func TestUserCatchAllRouteIsLast(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	if len(routes) == 0 {
 		t.Fatal("no routes found")
@@ -110,14 +110,14 @@ func TestUserCatchAllRouteIsLast(t *testing.T) {
 // This ensures that specific routes like /user/orders/create/contract-details
 // are matched before the catch-all /user/* route.
 func TestUserSpecificRoutesBeforeCatchAll(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	catchAllPath := links.USER_HOME + links.CATCHALL
 	catchAllIndex := -1
@@ -158,14 +158,14 @@ func TestUserSpecificRoutesBeforeCatchAll(t *testing.T) {
 
 // TestUserHomeRouteBeforeCatchAll verifies that the home route comes before the catch-all.
 func TestUserHomeRouteBeforeCatchAll(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := userDir.Routes(app)
+	routes := userDir.Routes(registry)
 
 	catchAllPath := links.USER_HOME + links.CATCHALL
 	homePath := links.USER_HOME
@@ -196,7 +196,7 @@ func TestUserHomeRouteBeforeCatchAll(t *testing.T) {
 }
 
 func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
@@ -217,7 +217,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 	// Call the ServeHTTP method directly and pass in the request and response recorder.
 	r := rtr.NewRouter()
-	r.AddRoutes(userDir.Routes(app))
+	r.AddRoutes(userDir.Routes(registry))
 	r.ServeHTTP(rr, req)
 
 	// Check the status code is what we expect.
@@ -228,7 +228,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 	body := rr.Body.String()
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), rr.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -259,7 +259,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 }
 
 // func TestUserHomePage_RedirectsWhenSubscriptionRequired(t *testing.T) {
-// 	app := testutils.Setup(
+// 	registry := testutils.Setup(
 // 		testutils.WithCacheStore(true),
 // 		testutils.WithGeoStore(true),
 // 		testutils.WithSessionStore(true),
@@ -269,7 +269,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 // 	expectedRedirect := "/user/subscriptions/plan-select"
 
-// 	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+// 	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -279,7 +279,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 // 	user.SetFirstName("Test")
 // 	user.SetLastName("User")
 // 	user.SetEmail("test@example.com")
-// 	err = app.GetUserStore().UserUpdate(context.Background(), user)
+// 	err = registry.GetUserStore().UserUpdate(context.Background(), user)
 // 	if err != nil {
 // 		t.Fatal(err)
 // 	}
@@ -300,7 +300,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 // 	// Call the ServeHTTP method directly and pass in the request and response recorder.
 // 	r := rtr.NewRouter()
-// 	r.AddRoutes(userDir.Routes(app))
+// 	r.AddRoutes(userDir.Routes(registry))
 // 	r.ServeHTTP(rr, req)
 
 // 	// Check the status code is what we expect.
@@ -317,7 +317,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 // }
 
 func TestUserHomePage(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
@@ -325,9 +325,9 @@ func TestUserHomePage(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	expected := `<title>Home | User</title>`
+	expected := `<title>Home | User | Test registry</title>`
 
-	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -336,12 +336,12 @@ func TestUserHomePage(t *testing.T) {
 	user.SetFirstName("Test")
 	user.SetLastName("User")
 	user.SetEmail("test@example.com")
-	err = app.GetUserStore().UserUpdate(context.Background(), user)
+	err = registry.GetUserStore().UserUpdate(context.Background(), user)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// _, err = testutils.SeedSubscription(app.GetSubscriptionStore(), user.ID(), testutils.PLAN_01)
+	// _, err = testutils.SeedSubscription(registry.GetSubscriptionStore(), user.ID(), testutils.PLAN_01)
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
@@ -362,7 +362,7 @@ func TestUserHomePage(t *testing.T) {
 
 	// Call the ServeHTTP method directly and pass in the request and response recorder.
 	r := rtr.NewRouter()
-	r.AddRoutes(userDir.Routes(app))
+	r.AddRoutes(userDir.Routes(registry))
 	r.ServeHTTP(rr, req)
 
 	// Check the status code is what we expect.

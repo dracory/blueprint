@@ -18,9 +18,9 @@ func TestCacheStoreInitialize_Success(t *testing.T) {
 func TestCacheStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetCacheStore() != nil {
+	if registry.GetCacheStore() != nil {
 		t.Error("expected cache store to be nil when not used")
 	}
 }

@@ -18,9 +18,9 @@ func TestSessionStoreInitialize_Success(t *testing.T) {
 func TestSessionStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetSessionStore() != nil {
+	if registry.GetSessionStore() != nil {
 		t.Error("expected session store to be nil when not used")
 	}
 }

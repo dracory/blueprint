@@ -18,9 +18,9 @@ func TestUserStoreInitialize_Success(t *testing.T) {
 func TestUserStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetUserStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() != nil {
+	if registry.GetUserStore() != nil {
 		t.Error("expected user store to be nil when not used")
 	}
 }

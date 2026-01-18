@@ -7,34 +7,34 @@ import (
 	"github.com/dracory/feedstore"
 )
 
-func feedStoreInitialize(app RegistryInterface) error {
-	if !app.GetConfig().GetFeedStoreUsed() {
+func feedStoreInitialize(registry RegistryInterface) error {
+	if !registry.GetConfig().GetFeedStoreUsed() {
 		return nil
 	}
 
-	if store, err := newFeedStore(app.GetDatabase()); err != nil {
+	if store, err := newFeedStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetFeedStore(store)
+		registry.SetFeedStore(store)
 	}
 
 	return nil
 }
 
-func feedStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func feedStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetFeedStoreUsed() {
+	if !registry.GetConfig().GetFeedStoreUsed() {
 		return nil
 	}
 
-	if app.GetFeedStore() == nil {
+	if registry.GetFeedStore() == nil {
 		return errors.New("feed store is not initialized")
 	}
 
-	if err := app.GetFeedStore().AutoMigrate(); err != nil {
+	if err := registry.GetFeedStore().AutoMigrate(); err != nil {
 		return err
 	}
 

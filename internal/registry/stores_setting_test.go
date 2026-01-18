@@ -18,9 +18,9 @@ func TestSettingStoreInitialize_Success(t *testing.T) {
 func TestSettingStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetSettingStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetSettingStore() != nil {
+	if registry.GetSettingStore() != nil {
 		t.Error("expected setting store to be nil when not used")
 	}
 }

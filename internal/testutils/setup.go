@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"project/internal/config"
-	registrypkg "project/internal/registry"
+	"project/internal/registry"
 	"time"
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
@@ -17,9 +17,9 @@ import (
 type setupOptions struct {
 	WithAuditStore        bool
 	WithBlogStore         bool
+	WithCacheStore        bool
 	WithChatStore         bool
 	WithCmsStore          bool
-	WithCacheStore        bool
 	WithGeoStore          bool
 	WithLogStore          bool
 	WithMetaStore         bool
@@ -54,6 +54,13 @@ func WithBlogStore(enable bool) SetupOption {
 	}
 }
 
+// WithCacheStore enables the cache store during test setup
+func WithCacheStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithCacheStore = enable
+	}
+}
+
 // WithChatStore enables the chat store during test setup
 func WithChatStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
@@ -69,13 +76,6 @@ func WithCmsStore(enable bool, templateID ...string) SetupOption {
 		if enable {
 			opts.CmsStoreTemplateID = lo.FirstOr(templateID, opts.CmsStoreTemplateID)
 		}
-	}
-}
-
-// WithCacheStore enables the cache store during test setup
-func WithCacheStore(enable bool) SetupOption {
-	return func(opts *setupOptions) {
-		opts.WithCacheStore = enable
 	}
 }
 
@@ -166,6 +166,7 @@ func DefaultConf() config.ConfigInterface {
 	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
+	cfg.SetAppName("Test registry")
 	cfg.SetDatabaseDriver("sqlite")
 	cfg.SetDatabaseHost("")
 	cfg.SetDatabasePort("")
@@ -187,7 +188,7 @@ func DefaultConf() config.ConfigInterface {
 
 // Setup initializes a default in-memory SQLite registry for tests,
 // unless overridden via options. It returns the initialized registry.
-func Setup(options ...SetupOption) registrypkg.RegistryInterface {
+func Setup(options ...SetupOption) registry.RegistryInterface {
 	// collect options
 	opts := &setupOptions{}
 	for _, opt := range options {
@@ -217,9 +218,11 @@ func Setup(options ...SetupOption) registrypkg.RegistryInterface {
 		if opts.WithCacheStore {
 			opts.cfg.SetCacheStoreUsed(true)
 		}
+
 		if opts.WithGeoStore {
 			opts.cfg.SetGeoStoreUsed(true)
 		}
+
 		if opts.WithLogStore {
 			opts.cfg.SetLogStoreUsed(true)
 		}
@@ -301,8 +304,8 @@ func Setup(options ...SetupOption) registrypkg.RegistryInterface {
 		}
 	}
 
-	// Build registry using registrypkg.New (opens DB and initializes stores)
-	registry, err := registrypkg.New(opts.cfg)
+	// Build registry using registry.New (opens DB and initializes stores)
+	registry, err := registry.New(opts.cfg)
 	if err != nil {
 		panic("testutils.Setup: failed to build registry: " + err.Error())
 	}

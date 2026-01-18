@@ -8,38 +8,38 @@ import (
 )
 
 // statsStoreInitialize initializes the stats store if enabled in the configuration.
-func statsStoreInitialize(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func statsStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetStatsStoreUsed() {
+	if !registry.GetConfig().GetStatsStoreUsed() {
 		return nil
 	}
 
-	if store, err := newStatsStore(app.GetDatabase()); err != nil {
+	if store, err := newStatsStore(registry.GetDatabase()); err != nil {
 		return err
 	} else {
-		app.SetStatsStore(store)
+		registry.SetStatsStore(store)
 	}
 
 	return nil
 }
 
-func statsStoreMigrate(app RegistryInterface) error {
-	if app.GetConfig() == nil {
+func statsStoreMigrate(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
 	}
 
-	if !app.GetConfig().GetStatsStoreUsed() {
+	if !registry.GetConfig().GetStatsStoreUsed() {
 		return nil
 	}
 
-	if app.GetStatsStore() == nil {
+	if registry.GetStatsStore() == nil {
 		return errors.New("stats store is not initialized")
 	}
 
-	if err := app.GetStatsStore().AutoMigrate(); err != nil {
+	if err := registry.GetStatsStore().AutoMigrate(); err != nil {
 		return err
 	}
 

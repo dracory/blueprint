@@ -18,9 +18,9 @@ func TestCmsStoreInitialize_Success(t *testing.T) {
 func TestCmsStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetCmsStore() != nil {
+	if registry.GetCmsStore() != nil {
 		t.Error("expected CMS store to be nil when not used")
 	}
 }
