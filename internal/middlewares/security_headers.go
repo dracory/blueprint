@@ -17,7 +17,7 @@ func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
 				w.Header().Set("X-Frame-Options", "DENY")
 				w.Header().Set("X-Content-Type-Options", "nosniff")
 				w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-				w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:")
+				w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: https://cdn.jsdelivr.net")
 
 				next.ServeHTTP(w, r)
 			})
