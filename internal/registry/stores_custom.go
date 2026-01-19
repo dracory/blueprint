@@ -7,7 +7,12 @@ import (
 	"github.com/dracory/customstore"
 )
 
+// customStoreInitialize initializes the custom store if enabled in the configuration.
 func customStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetCustomStoreUsed() {
 		return nil
 	}
@@ -30,17 +35,20 @@ func customStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetCustomStore() == nil {
+	customStore := registry.GetCustomStore()
+	if customStore == nil {
 		return errors.New("custom store is not initialized")
 	}
 
-	if err := registry.GetCustomStore().AutoMigrate(); err != nil {
+	err := customStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newCustomStore constructs the Custom store without running migrations
 func newCustomStore(db *sql.DB) (customstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

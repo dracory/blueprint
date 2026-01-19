@@ -8,7 +8,12 @@ import (
 	"github.com/dracory/entitystore"
 )
 
+// entityStoreInitialize initializes the entity store if enabled in the configuration.
 func entityStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetEntityStoreUsed() {
 		return nil
 	}
@@ -31,7 +36,8 @@ func entityStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetEntityStore() == nil {
+	entityStore := registry.GetEntityStore()
+	if entityStore == nil {
 		return errors.New("entity store is not initialized")
 	}
 
@@ -42,6 +48,7 @@ func entityStoreMigrate(registry RegistryInterface) error {
 	return nil
 }
 
+// newEntityStore constructs the Entity store without running migrations
 func newEntityStore(db *sql.DB) (entitystore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

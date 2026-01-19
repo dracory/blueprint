@@ -35,11 +35,13 @@ func statsStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetStatsStore() == nil {
+	statsStore := registry.GetStatsStore()
+	if statsStore == nil {
 		return errors.New("stats store is not initialized")
 	}
 
-	if err := registry.GetStatsStore().AutoMigrate(); err != nil {
+	err := statsStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 

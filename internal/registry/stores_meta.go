@@ -7,7 +7,12 @@ import (
 	"github.com/dracory/metastore"
 )
 
+// metaStoreInitialize initializes the meta store if enabled in the configuration.
 func metaStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetMetaStoreUsed() {
 		return nil
 	}
@@ -30,17 +35,20 @@ func metaStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetMetaStore() == nil {
+	metaStore := registry.GetMetaStore()
+	if metaStore == nil {
 		return errors.New("meta store is not initialized")
 	}
 
-	if err := registry.GetMetaStore().AutoMigrate(); err != nil {
+	err := metaStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newMetaStore constructs the Meta store without running migrations
 func newMetaStore(db *sql.DB) (metastore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

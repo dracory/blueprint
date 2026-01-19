@@ -35,17 +35,20 @@ func userStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetUserStore() == nil {
+	userStore := registry.GetUserStore()
+	if userStore == nil {
 		return errors.New("user store is not initialized")
 	}
 
-	if err := registry.GetUserStore().AutoMigrate(); err != nil {
+	err := userStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newUserStore constructs the User store without running migrations
 func newUserStore(db *sql.DB) (userstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

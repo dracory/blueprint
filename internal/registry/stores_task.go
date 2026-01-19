@@ -35,11 +35,13 @@ func taskStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetTaskStore() == nil {
+	taskStore := registry.GetTaskStore()
+	if taskStore == nil {
 		return errors.New("task store is not initialized")
 	}
 
-	if err := registry.GetTaskStore().AutoMigrate(); err != nil {
+	err := taskStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 

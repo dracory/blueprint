@@ -8,7 +8,12 @@ import (
 	"github.com/dracory/sessionstore"
 )
 
+// sessionStoreInitialize initializes the session store if enabled in the configuration.
 func sessionStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetSessionStoreUsed() {
 		return nil
 	}
@@ -31,17 +36,19 @@ func sessionStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetSessionStore() == nil {
+	sessionStore := registry.GetSessionStore()
+	if sessionStore == nil {
 		return errors.New("session store is not initialized")
 	}
 
-	if err := registry.GetSessionStore().AutoMigrate(context.Background()); err != nil {
+	if err := sessionStore.AutoMigrate(context.Background()); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newSessionStore constructs the Session store without running migrations
 func newSessionStore(db *sql.DB) (sessionstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

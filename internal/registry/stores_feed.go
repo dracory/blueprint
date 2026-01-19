@@ -7,7 +7,12 @@ import (
 	"github.com/dracory/feedstore"
 )
 
+// feedStoreInitialize initializes the feed store if enabled in the configuration.
 func feedStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetFeedStoreUsed() {
 		return nil
 	}
@@ -30,17 +35,20 @@ func feedStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetFeedStore() == nil {
+	feedStore := registry.GetFeedStore()
+	if feedStore == nil {
 		return errors.New("feed store is not initialized")
 	}
 
-	if err := registry.GetFeedStore().AutoMigrate(); err != nil {
+	err := feedStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newFeedStore constructs the Feed store without running migrations
 func newFeedStore(db *sql.DB) (feedstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

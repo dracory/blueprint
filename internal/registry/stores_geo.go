@@ -7,7 +7,12 @@ import (
 	"github.com/dracory/geostore"
 )
 
+// geoStoreInitialize initializes the geo store if enabled in the configuration.
 func geoStoreInitialize(registry RegistryInterface) error {
+	if registry.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
 	if !registry.GetConfig().GetGeoStoreUsed() {
 		return nil
 	}
@@ -30,17 +35,20 @@ func geoStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetGeoStore() == nil {
+	geoStore := registry.GetGeoStore()
+	if geoStore == nil {
 		return errors.New("geo store is not initialized")
 	}
 
-	if err := registry.GetGeoStore().AutoMigrate(); err != nil {
+	err := geoStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newGeoStore constructs the Geo store without running migrations
 func newGeoStore(db *sql.DB) (geostore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

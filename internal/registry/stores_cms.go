@@ -42,6 +42,7 @@ func cmsStoreMigrate(registry RegistryInterface) error {
 	return nil
 }
 
+// newCmsStore constructs the CMS store without running migrations
 func newCmsStore(db *sql.DB) (cmsstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")

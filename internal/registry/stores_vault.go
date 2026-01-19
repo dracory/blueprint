@@ -35,21 +35,25 @@ func vaultStoreMigrate(registry RegistryInterface) error {
 		return nil
 	}
 
-	if registry.GetVaultStore() == nil {
+	vaultStore := registry.GetVaultStore()
+	if vaultStore == nil {
 		return errors.New("vault store is not initialized")
 	}
 
-	if err := registry.GetVaultStore().AutoMigrate(); err != nil {
+	err := vaultStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newVaultStore constructs the Vault store without running migrations
 func newVaultStore(db *sql.DB) (vaultstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")
 	}
+
 	st, err := vaultstore.NewStore(vaultstore.NewStoreOptions{
 		DB:             db,
 		VaultTableName: "snv_vault_vault",
