@@ -93,10 +93,10 @@ func (controller *indexNowController) sectionKey() hb.TagInterface {
 
 	keyCode := hb.Code().
 		Class("d-block p-3 bg-light rounded text-break").
-		Text("YOUR_INDEXNOW_KEY")
+		Text(controller.app.GetConfig().GetIndexNowKey())
 
 	keyLink := hb.A().
-		Href("/YOUR_INDEXNOW_KEY.txt").
+		Href("/" + controller.app.GetConfig().GetIndexNowKey() + ".txt").
 		Text("View key file")
 
 	cardBody := hb.Div().

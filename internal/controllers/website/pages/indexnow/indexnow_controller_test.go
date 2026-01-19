@@ -12,6 +12,7 @@ import (
 func TestIndexNowController_Handler_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false) // use shared layout to avoid CMS dependencies
+	cfg.SetIndexNowKey("cd325dd195454606a8316fb303224f37")
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	controller := NewIndexNowController(app)
