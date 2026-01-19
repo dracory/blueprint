@@ -73,6 +73,11 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return ""
 	}
 
+	canonicalURL := strings.TrimSpace(post.CanonicalURL())
+	if canonicalURL == "" {
+		canonicalURL = links.Website().BlogPost(post.ID(), post.Slug())
+	}
+
 	options := layouts.Options{
 		WebsiteSection: "Blog",
 		Title:          post.Title(),
@@ -83,7 +88,8 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 			"/liveflux",
 			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
 		},
-		Content: hb.Wrap().HTML(c.page(*post)),
+		Content:      hb.Wrap().HTML(c.page(*post)),
+		CanonicalURL: canonicalURL,
 	}
 
 	if c.registry.GetConfig().GetCmsStoreUsed() {

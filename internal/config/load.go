@@ -39,8 +39,10 @@ func Load() (ConfigInterface, error) {
 	trans := loadTranslationConfig()
 
 	if envEnc.used {
-		if err := initializeEnvEncVariables(app.env); err != nil {
+		if err := initializeEnvEncVariables(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey); err != nil {
 			acc.add(err)
+		} else {
+			envEnc.privateKey = "removed" // reset the private key
 		}
 	}
 
@@ -56,10 +58,6 @@ func Load() (ConfigInterface, error) {
 	cfg.SetAppPort(app.port)
 	cfg.SetAppEnv(app.env)
 	cfg.SetAppDebug(app.debug)
-
-	if envEnc.derivedKey != "" {
-		cfg.SetEnvEncryptionKey(envEnc.derivedKey)
-	}
 
 	cfg.SetDatabaseDriver(db.driver)
 	cfg.SetDatabaseHost(db.host)
@@ -147,10 +145,12 @@ func Load() (ConfigInterface, error) {
 //
 // Parameters:
 // - appEnvironment: the app environment
+// - publicKey: the public encryption key
+// - privateKey: the private encryption key
 //
 // Returns:
 // - none
-func initializeEnvEncVariables(appEnvironment string) error {
+func initializeEnvEncVariables(appEnvironment string, publicKey string, privateKey string) error {
 	if appEnvironment == APP_ENVIRONMENT_TESTING {
 		return nil
 	}
@@ -160,11 +160,6 @@ func initializeEnvEncVariables(appEnvironment string) error {
 	}
 
 	appEnvironment = strings.ToLower(appEnvironment)
-	envEncryptionKey := env.GetString(KEY_ENVENC_KEY_PRIVATE)
-
-	if err := ensureRequired(envEncryptionKey, KEY_ENVENC_KEY_PRIVATE, "required to hydrate EnvEnc variables"); err != nil {
-		return err
-	}
 
 	vaultFilePath := ".env." + appEnvironment + ".vault"
 
@@ -174,20 +169,19 @@ func initializeEnvEncVariables(appEnvironment string) error {
 		return err
 	}
 
-	derivedEnvEncKey, err := envenc.DeriveKey(envEncryptionKey, ENVENC_KEY_PUBLIC)
-
+	derivedKey, err := envenc.DeriveKey(publicKey, privateKey)
 	if err != nil {
 		return err
 	}
 
 	if fileExists(vaultFilePath) {
-		if err := envenc.HydrateEnvFromFile(vaultFilePath, derivedEnvEncKey); err != nil {
+		if err := envenc.HydrateEnvFromFile(vaultFilePath, derivedKey); err != nil {
 			return err
 		}
 	}
 
 	if vaultContent != "" {
-		if err := envenc.HydrateEnvFromString(vaultContent, derivedEnvEncKey); err != nil {
+		if err := envenc.HydrateEnvFromString(vaultContent, derivedKey); err != nil {
 			return err
 		}
 	}

@@ -261,6 +261,11 @@ type mediaConfigInterface interface {
 	GetMediaUrl() string
 }
 
+type seoConfigInterface interface {
+	SetIndexNowKey(string)
+	GetIndexNowKey() string
+}
+
 type ConfigInterface interface {
 	// App-specific settings
 	appConfigInterface
@@ -272,6 +277,7 @@ type ConfigInterface interface {
 	llmConfigInterface
 	mediaConfigInterface
 	paymentConfigInterface
+	seoConfigInterface
 
 	// Datastores
 	auditStoreConfigInterface
@@ -295,4 +301,3 @@ type ConfigInterface interface {
 	userStoreConfigInterface
 	vaultStoreConfigInterface
 }
-

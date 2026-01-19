@@ -106,6 +106,9 @@ type configImplementation struct {
 	mediaRoot     string
 	mediaSecret   string
 	mediaUrl      string
+
+	// SEO configuration
+	indexNowKey string
 }
 
 func New() ConfigInterface {
@@ -704,3 +707,7 @@ func (c *configImplementation) SetMediaSecret(v string)   { c.mediaSecret = v }
 func (c *configImplementation) GetMediaSecret() string    { return c.mediaSecret }
 func (c *configImplementation) SetMediaUrl(v string)      { c.mediaUrl = v }
 func (c *configImplementation) GetMediaUrl() string       { return c.mediaUrl }
+
+// == SEO Getters/Setters ==
+func (c *configImplementation) SetIndexNowKey(v string) { c.indexNowKey = v }
+func (c *configImplementation) GetIndexNowKey() string  { return c.indexNowKey }

@@ -97,7 +97,11 @@ const SHOP_PRODUCT = SHOP + "/product"
 const SHOP_PRODUCT_WITH_REGEX = SHOP_PRODUCT + "/{id:[0-9]+}"
 const SHOP_PRODUCT_WITH_REGEX2 = SHOP_PRODUCT + "/{id:[0-9]+}/{title}"
 
-const SITEMAPXML = HOME + "sitemap.xml"
+const SITEMAP_XML = HOME + "sitemap.xml"
+const ROBOTS_TXT = HOME + "robots.txt"
+const SECURITY_TXT = HOME + "security.txt"
+
+const INDEXNOW = HOME + "indexnow"
 
 const PRIVACY_POLICY = HOME + "privacy-policy"
 const TERMS_OF_USE = HOME + "terms-of-use"

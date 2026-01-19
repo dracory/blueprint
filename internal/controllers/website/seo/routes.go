@@ -2,6 +2,8 @@ package seo
 
 import (
 	"net/http"
+	"project/internal/controllers/website/pages/indexnow"
+	"project/internal/links"
 	"project/internal/registry"
 
 	"github.com/dracory/rtr"
@@ -18,23 +20,35 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 
 	robotsRoute := rtr.NewRoute().
 		SetName("Website > RobotsTxt").
-		SetPath("/robots.txt").
+		SetPath(links.ROBOTS_TXT).
 		SetHTMLHandler(NewRobotsTxtController().Handler)
 
 	securityRoute := rtr.NewRoute().
 		SetName("Website > SecurityTxt").
-		SetPath("/security.txt").
+		SetPath(links.SECURITY_TXT).
 		SetHTMLHandler(NewSecurityTxtController().Handler)
 
 	sitemapRoute := rtr.NewRoute().
 		SetName("Website > Sitemap").
-		SetPath("/sitemap.xml").
+		SetPath(links.SITEMAP_XML).
 		SetHTMLHandler(NewSitemapXmlController(registry).Handler)
+
+	indexNowRoute := rtr.NewRoute().
+		SetName("Website > IndexNow Controller").
+		SetPath(links.INDEXNOW).
+		SetHTMLHandler(indexnow.NewIndexNowController(registry).Handler)
+
+	indexNowKeyRoute := rtr.NewRoute().
+		SetName("Website > IndexNow Key").
+		SetPath("/" + registry.GetConfig().GetIndexNowKey() + ".txt").
+		SetHTMLHandler(NewIndexNowKeyController(registry).Handler)
 
 	return []rtr.RouteInterface{
 		adsRoute,
 		robotsRoute,
 		securityRoute,
 		sitemapRoute,
+		indexNowRoute,
+		indexNowKeyRoute,
 	}
 }

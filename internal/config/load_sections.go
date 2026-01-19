@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/dracory/env"
-	"github.com/dracory/envenc"
 	"github.com/spf13/cast"
 )
 
@@ -30,40 +29,32 @@ func loadAppConfig(acc *loadAccumulator) appConfig {
 	}
 }
 
-// envEncryptionConfig captures optional environment encryption key usage state and derived key.
+// envEncryptionConfig captures optional environment encryption key usage state.
 type envEncryptionConfig struct {
 	privateKey string
-	derivedKey string
 	used       bool
 }
 
 func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
 	used := env.GetBool(KEY_ENVENC_USED)
-	privateKey := strings.TrimSpace(env.GetString(KEY_ENVENC_KEY_PRIVATE))
-
-	if used {
-		if err := ensureRequired(privateKey, KEY_ENVENC_KEY_PRIVATE, "required when ENVENC_USED is yes"); err != nil {
-			acc.add(err)
-			return envEncryptionConfig{used: used}
-		}
-	}
 
 	if !used {
-		return envEncryptionConfig{privateKey: privateKey, derivedKey: "", used: used}
+		return envEncryptionConfig{privateKey: "", used: used}
+	}
+
+	privateKey := strings.TrimSpace(env.GetString(KEY_ENVENC_KEY_PRIVATE))
+
+	if err := ensureRequired(privateKey, KEY_ENVENC_KEY_PRIVATE, "required when ENVENC_USED is yes"); err != nil {
+		acc.add(err)
+		return envEncryptionConfig{used: used}
 	}
 
 	if privateKey == "" {
 		acc.add(fmt.Errorf("private key is required when env encryption is enabled"))
-		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}
+		return envEncryptionConfig{used: used, privateKey: privateKey}
 	}
 
-	derived, err := envenc.DeriveKey(privateKey, ENVENC_KEY_PUBLIC)
-	acc.add(err)
-	if err != nil {
-		return envEncryptionConfig{used: used, privateKey: privateKey, derivedKey: ""}
-	}
-
-	return envEncryptionConfig{privateKey: privateKey, derivedKey: derived, used: used}
+	return envEncryptionConfig{privateKey: privateKey, used: used}
 }
 
 // databaseConfig captures database connection settings.

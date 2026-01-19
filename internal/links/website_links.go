@@ -133,3 +133,7 @@ func (l *websiteLinks) Widget(alias string, params map[string]string) string {
 	params["alias"] = alias
 	return URL(WIDGET, params)
 }
+
+func (l *websiteLinks) SitemapXml() string {
+	return URL(SITEMAP_XML, map[string]string{})
+}

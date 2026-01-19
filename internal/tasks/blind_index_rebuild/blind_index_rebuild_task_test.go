@@ -68,7 +68,7 @@ func TestBlindIndexRebuildTask_Handle(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	// Register task
+	// Register task (this is needed for the task definition to be available)
 	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(registry), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)

@@ -33,6 +33,7 @@ Allow: /faq
 Allow: /marketplace
 Allow: /privacy-policy
 Allow: /terms-of-use
+Allow: /sitemap.xml
 
 Disallow: /admin/
 Disallow: /api/
@@ -49,7 +50,7 @@ Disallow: /theme
 Disallow: /user/
 Disallow: /*-ajax$
 
-Sitemap: ` + links.RootURL() + `/sitemap.xml
+Sitemap: ` + links.Website().SitemapXml() + `
 	`
 
 	w.Header().Set("Content-Type", "text/plain")

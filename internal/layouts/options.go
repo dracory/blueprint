@@ -14,4 +14,5 @@ type Options struct {
 	Scripts        []string
 	StyleURLs      []string
 	Styles         []string
+	CanonicalURL   string
 }
