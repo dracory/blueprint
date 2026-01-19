@@ -7,6 +7,7 @@ import (
 	"github.com/dracory/blindindexstore"
 )
 
+// blindIndexLastNameStoreInitialize initializes the blind index last name store if enabled in the configuration.
 func blindIndexLastNameStoreInitialize(registry RegistryInterface) error {
 	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
@@ -31,26 +32,30 @@ func blindIndexLastNameStoreMigrate(registry RegistryInterface) error {
 		return errors.New("config is not initialized")
 	}
 
-	// Blind index stores: create and set only if user store is enabled and vault store is enabled
+	// Blind index stores: migrate only if user store is enabled and vault store is enabled
 	if !registry.GetConfig().GetUserStoreUsed() || !registry.GetConfig().GetVaultStoreUsed() {
 		return nil
 	}
 
-	if registry.GetBlindIndexStoreLastName() == nil {
+	blindIndexLastNameStore := registry.GetBlindIndexStoreLastName()
+	if blindIndexLastNameStore == nil {
 		return errors.New("blind index last name store is not initialized")
 	}
 
-	if err := registry.GetBlindIndexStoreLastName().AutoMigrate(); err != nil {
+	err := blindIndexLastNameStore.AutoMigrate()
+	if err != nil {
 		return err
 	}
 
 	return nil
 }
 
+// newBlindIndexLastNameStore constructs the Blind Index Last Name store without running migrations
 func newBlindIndexLastNameStore(db *sql.DB) (blindindexstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")
 	}
+
 	st, err := blindindexstore.NewStore(blindindexstore.NewStoreOptions{
 		DB:          db,
 		TableName:   "snv_bindx_last_name",
