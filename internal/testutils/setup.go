@@ -47,6 +47,13 @@ func WithCfg(cfg config.ConfigInterface) SetupOption {
 	}
 }
 
+// WithAuditStore enables the audit store during test setup
+func WithAuditStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithAuditStore = enable
+	}
+}
+
 // WithBlogStore enables the blog store during test setup
 func WithBlogStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
@@ -79,13 +86,6 @@ func WithCmsStore(enable bool, templateID ...string) SetupOption {
 	}
 }
 
-// WithSettingStore enables the setting store during test setup
-func WithSettingStore(enable bool) SetupOption {
-	return func(opts *setupOptions) {
-		opts.WithSettingStore = enable
-	}
-}
-
 // WithGeoStore enables the geo store during test setup
 func WithGeoStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
@@ -111,6 +111,13 @@ func WithMetaStore(enable bool) SetupOption {
 func WithSessionStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithSessionStore = enable
+	}
+}
+
+// WithSettingStore enables the setting store during test setup
+func WithSettingStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithSettingStore = enable
 	}
 }
 
@@ -152,13 +159,6 @@ func WithVaultStore(enable bool, vaultKeys ...string) SetupOption {
 func WithSubscriptionStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithSubscriptionStore = enable
-	}
-}
-
-// WithAuditStore enables the audit store during test setup
-func WithAuditStore(enable bool) SetupOption {
-	return func(opts *setupOptions) {
-		opts.WithAuditStore = enable
 	}
 }
 
