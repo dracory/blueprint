@@ -15,7 +15,7 @@
 *.out
 
 # Dependency directories (remove the comment below to ignore)
-# vendor/
+vendor/
 
 # Go workspace file
 go.work
@@ -50,5 +50,4 @@ google-cloud-sdk/
 .cache/
 
 old/
-/vendor/
 __debug_bin*
