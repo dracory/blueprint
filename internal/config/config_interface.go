@@ -33,16 +33,22 @@ type appConfigInterface interface {
 type databaseConfigInterface interface {
 	SetDatabaseDriver(string)
 	GetDatabaseDriver() string
+
 	SetDatabaseHost(string)
 	GetDatabaseHost() string
+
 	SetDatabasePort(string)
 	GetDatabasePort() string
+
 	SetDatabaseName(string)
 	GetDatabaseName() string
+
 	SetDatabaseUsername(string)
 	GetDatabaseUsername() string
+
 	SetDatabasePassword(string)
 	GetDatabasePassword() string
+
 	SetDatabaseSSLMode(string)
 	GetDatabaseSSLMode() string
 }
@@ -50,16 +56,22 @@ type databaseConfigInterface interface {
 type emailConfigInterface interface {
 	SetMailDriver(string)
 	GetMailDriver() string
+
 	SetMailHost(string)
 	GetMailHost() string
+
 	SetMailPort(int)
 	GetMailPort() int
+
 	SetMailUsername(string)
 	GetMailUsername() string
+
 	SetMailPassword(string)
 	GetMailPassword() string
+
 	SetMailFromAddress(string)
 	GetMailFromAddress() string
+
 	SetMailFromName(string)
 	GetMailFromName() string
 }
@@ -73,44 +85,56 @@ type llmConfigInterface interface {
 	// Anthropic
 	SetAnthropicApiUsed(bool)
 	GetAnthropicApiUsed() bool
+
 	SetAnthropicApiKey(string)
 	GetAnthropicApiKey() string
+
 	SetAnthropicApiDefaultModel(string)
 	GetAnthropicApiDefaultModel() string
 
 	// Google Gemini
 	SetGoogleGeminiApiUsed(bool)
 	GetGoogleGeminiApiUsed() bool
+
 	SetGoogleGeminiApiKey(string)
 	GetGoogleGeminiApiKey() string
+
 	SetGoogleGeminiApiDefaultModel(string)
 	GetGoogleGeminiApiDefaultModel() string
 
 	// OpenRouter
 	SetOpenRouterApiUsed(bool)
 	GetOpenRouterApiUsed() bool
+
 	SetOpenRouterApiKey(string)
 	GetOpenRouterApiKey() string
+
 	SetOpenRouterApiDefaultModel(string)
 	GetOpenRouterApiDefaultModel() string
 
 	// OpenAI
 	SetOpenAiApiUsed(bool)
 	GetOpenAiApiUsed() bool
+
 	SetOpenAiApiKey(string)
 	GetOpenAiApiKey() string
+
 	SetOpenAiApiDefaultModel(string)
 	GetOpenAiApiDefaultModel() string
 
 	// Vertex AI
 	SetVertexAiApiUsed(bool)
 	GetVertexAiApiUsed() bool
+
 	SetVertexAiApiDefaultModel(string)
 	GetVertexAiApiDefaultModel() string
+
 	SetVertexAiApiProjectID(string)
 	GetVertexAiApiProjectID() string
+
 	SetVertexAiApiRegionID(string)
 	GetVertexAiApiRegionID() string
+
 	SetVertexAiApiModelID(string)
 	GetVertexAiApiModelID() string
 }
@@ -138,6 +162,7 @@ type cacheStoreConfigInterface interface {
 type cmsStoreConfigInterface interface {
 	SetCmsStoreUsed(bool)
 	GetCmsStoreUsed() bool
+
 	SetCmsStoreTemplateID(string)
 	GetCmsStoreTemplateID() string
 }
@@ -210,6 +235,7 @@ type taskStoreConfigInterface interface {
 type userStoreConfigInterface interface {
 	SetUserStoreUsed(bool)
 	GetUserStoreUsed() bool
+
 	SetUserStoreVaultEnabled(bool)
 	GetUserStoreVaultEnabled() bool
 }
@@ -222,6 +248,7 @@ type auditStoreConfigInterface interface {
 type vaultStoreConfigInterface interface {
 	SetVaultStoreUsed(bool)
 	GetVaultStoreUsed() bool
+
 	SetVaultStoreKey(string)
 	GetVaultStoreKey() string
 }
@@ -229,6 +256,7 @@ type vaultStoreConfigInterface interface {
 type i18nConfigInterface interface {
 	SetTranslationLanguageDefault(string)
 	GetTranslationLanguageDefault() string
+
 	SetTranslationLanguageList(map[string]string)
 	GetTranslationLanguageList() map[string]string
 }
@@ -236,8 +264,10 @@ type i18nConfigInterface interface {
 type paymentConfigInterface interface {
 	SetStripeKeyPrivate(string)
 	GetStripeKeyPrivate() string
+
 	SetStripeKeyPublic(string)
 	GetStripeKeyPublic() string
+
 	SetStripeUsed(bool)
 	GetStripeUsed() bool
 }
@@ -245,18 +275,25 @@ type paymentConfigInterface interface {
 type mediaConfigInterface interface {
 	SetMediaBucket(string)
 	GetMediaBucket() string
+
 	SetMediaDriver(string)
 	GetMediaDriver() string
+
 	SetMediaKey(string)
 	GetMediaKey() string
+
 	SetMediaEndpoint(string)
 	GetMediaEndpoint() string
+
 	SetMediaRegion(string)
 	GetMediaRegion() string
+
 	SetMediaRoot(string)
 	GetMediaRoot() string
+
 	SetMediaSecret(string)
 	GetMediaSecret() string
+
 	SetMediaUrl(string)
 	GetMediaUrl() string
 }
