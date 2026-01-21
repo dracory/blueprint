@@ -25,6 +25,7 @@ func JailBotsMiddleware(config JailBotsConfig) rtr.MiddlewareInterface {
 	return m
 }
 
+// JailBotsConfig defines configuration for jail bots middleware
 type JailBotsConfig struct {
 	// Exclude filters items out of the internal URI blacklist lists used by
 	// isJailable (e.g., if "wp" is in the blacklist but you want to allow it,
@@ -48,7 +49,7 @@ type jailBotsMiddleware struct {
 	excludePaths []string
 }
 
-func (j *jailBotsMiddleware) Name() string {
+func (m *jailBotsMiddleware) Name() string {
 	return "Jail Bots Middleware"
 }
 
