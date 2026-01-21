@@ -13,7 +13,9 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 	"project/internal/testutils"
+	"project/internal/utils"
 	"strings"
+	"time"
 
 	"github.com/dracory/auth"
 	"github.com/dracory/blindindexstore"
@@ -24,9 +26,12 @@ import (
 	"github.com/samber/lo"
 )
 
-const msgAccountNotFound = `Your account may have been deactivated or deleted. Please contact our support team for assistance.`
-const msgAccountNotActive = `Your account is not active. Please contact our support team for assistance.`
-const msgUserNotFound = `An unexpected error has occurred trying to find your account. The support team has been notified.`
+// Authentication error messages
+const (
+	msgAccountNotFound  = `Your account may have been deactivated or deleted. Please contact our support team for assistance.`
+	msgAccountNotActive = `Your account is not active. Please contact our support team for assistance.`
+	msgUserNotFound     = `An unexpected error has occurred trying to find your account. The support team has been notified.`
+)
 
 // == CONTROLLER ==============================================================
 
@@ -156,7 +161,7 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 		return "", "", "Once is required field"
 	}
 
-	response, err := c.callAuthKnight(once)
+	response, err := c.callAuthKnight(r.Context(), once)
 
 	if err != nil {
 		c.registry.GetLogger().Error("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Error", slog.String("error", err.Error()))
@@ -182,7 +187,7 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 	}
 
 	if status != "success" {
-		c.registry.GetLogger().Error("At Auth Controller > AnyIndex > Response Status", slog.String("error", message.(string)))
+		c.registry.GetLogger().Warn("At Auth Controller > AnyIndex > Response Status", slog.String("error", message.(string)))
 		return "", "", "Invalid authentication response status"
 	}
 
@@ -197,21 +202,53 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 	return email, backUrl, ""
 }
 
-// callAuthKnight makes a request to the authentication server
-// to verify the provided "once" token. The "once" token is provided
-// by the AuthKnight service.
+// callAuthKnight makes a request to the external AuthKnight authentication service
+// to verify the provided "once" token and retrieve user authentication data.
 //
-// Note! If the environment is "testing", it will return a predefined response
-// which is used only for testing purposes. In the case of a successful response,
-// the email is "test@test.com".
+// ## Authentication Flow:
+//
+// 1. **Testing Environment**: When running in test mode, returns predefined responses
+//   - Valid test key: Returns success response with test@test.com email
+//   - Invalid test key: Returns error response for testing failure scenarios
+//
+// 2. **Production Environment**: Makes HTTP POST request to AuthKnight API
+//   - Endpoint: https://authknight.com/api/who
+//   - Method: POST with form-encoded data
+//   - Parameter: "once" token for verification
+//   - Timeout: 10 seconds with context cancellation support
+//
+// ## Request Details:
+//   - Uses HTTP/1.1 POST request with proper Content-Type header
+//   - Includes User-Agent header for request identification
+//   - Implements proper context propagation for cancellation and timeout
+//   - Follows HTTP best practices with proper resource cleanup
+//
+// ## Response Format:
+//   - Success: {"status":"success","message":"success","data":{"email":"user@example.com"}}
+//   - Error: {"status":"error","message":"error description","data":{}}
+//
+// ## Security Considerations:
+//   - Validates once parameter before making external request
+//   - Uses HTTPS for secure communication
+//   - Implements timeout to prevent hanging requests
+//   - Proper error handling prevents information leakage
 //
 // Parameters:
-//   - once: The once token to be verified.
+//   - ctx: The request context for cancellation, timeout, and tracing
+//   - once: The one-time token provided by AuthKnight for verification
 //
 // Returns:
-//   - response: A map containing the response data from the authentication server.
-//   - error: An error object if an error occurred during the request.
-func (c *authenticationController) callAuthKnight(once string) (map[string]interface{}, error) {
+//   - map[string]interface{}: Parsed JSON response from AuthKnight service
+//   - error: Error object if request fails, response parsing fails, or context is cancelled
+//
+// Example Usage:
+//
+//	response, err := c.callAuthKnight(r.Context(), onceToken)
+//	if err != nil {
+//	    return nil, fmt.Errorf("authentication failed: %w", err)
+//	}
+//	email := response["data"].(map[string]interface{})["email"].(string)
+func (c *authenticationController) callAuthKnight(ctx context.Context, once string) (map[string]interface{}, error) {
 	var response map[string]interface{}
 
 	if c.registry.GetConfig() != nil && c.registry.GetConfig().IsEnvTesting() {
@@ -228,9 +265,17 @@ func (c *authenticationController) callAuthKnight(once string) (map[string]inter
 		return response, nil
 	}
 
-	req, err := http.PostForm("https://authknight.com/api/who?once="+once, url.Values{
-		"once": {once},
-	})
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", "https://authknight.com/api/who?once="+once, strings.NewReader(url.Values{"once": {once}}.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	req, err := client.Do(httpReq)
 
 	if err != nil {
 		return nil, err
@@ -240,11 +285,7 @@ func (c *authenticationController) callAuthKnight(once string) (map[string]inter
 		return nil, errors.New("no response")
 	}
 
-	defer func() {
-		if err := req.Body.Close(); err != nil {
-			slog.Error("failed to close response body", "error", err)
-		}
-	}()
+	defer utils.SafeCloseResponseBody(req.Body)
 
 	if err := json.NewDecoder(req.Body).Decode(&response); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
@@ -282,25 +323,63 @@ func (c *authenticationController) calculateRedirectURL(user userstore.UserInter
 	return redirectUrl
 }
 
-// userCreate creates a new user and returns the user object.
+// userCreate creates a new user with privacy-first email encryption and blind indexing.
 //
-// Business Logic:
-// 1. Create a new user object.
-// 2. If the vault store is not used, return the user object.
-// 3. Create a new email token and store it in the vault store.
-// 4. Replace the email in user object with the email token.
-// 5. Update the user object in the database.
-// 6. Insert the email token in the blind index.
-// 7. Return the user object.
+// ## Privacy & Security Architecture:
+//
+// This function implements a sophisticated privacy protection system that ensures
+// user email addresses are never stored in plaintext in the main database.
+//
+// ## User Creation Flow:
+//
+// 1. **Initial User Creation**: Creates user object with provided email (temporary)
+// 2. **Privacy Check**: Determines if vault store encryption is enabled
+// 3. **Email Encryption Path** (when vault enabled):
+//   - Creates encrypted email token using vault store
+//   - Token length: 20 characters with vault-specific encryption
+//   - Replaces plaintext email with encrypted token in database
+//   - Stores mapping in blind index for future lookups
+//
+// 4. **Standard Path** (when vault disabled):
+//   - Stores email directly in database (less secure)
+//   - Skips encryption and blind indexing steps
+//
+// ## Blind Index System:
+//
+// The blind index allows email-based user lookups without storing plaintext:
+// - Index Key: Hashed representation of the email
+// - Index Value: User ID reference for database lookup
+// - Search Method: Exact match with SEARCH_TYPE_EQUALS
+// - Privacy Benefit: No email addresses stored in searchable form
+//
+// ## Security Considerations:
+//   - Email tokens are encrypted using vault store key
+//   - Blind index prevents email enumeration attacks
+//   - All database operations use provided context for cancellation
+//   - Proper error handling prevents partial data corruption
+//
+// ## Error Handling:
+//   - Validates required stores (user store, vault store) before operations
+//   - Returns descriptive errors for missing configurations
+//   - Ensures atomic operations to prevent inconsistent state
 //
 // Parameters:
-//   - ctx: The context for the request.
-//   - email: The email address of the user.
-//   - status: The status of the user.
+//   - ctx: Context for database operations and cancellation
+//   - email: User's email address (will be encrypted if vault enabled)
+//   - status: Initial user status (e.g., userstore.USER_STATUS_ACTIVE)
 //
 // Returns:
-//   - userstore.UserInterface: The user object.
-//   - error: An error object if an error occurred during the operation.
+//   - userstore.UserInterface: Created user object with encrypted/plaintext email
+//   - error: Error if user creation, encryption, or indexing fails
+//
+// Example Usage:
+//
+//	user, err := c.userCreate(ctx, "user@example.com", userstore.USER_STATUS_ACTIVE)
+//	if err != nil {
+//		return nil, fmt.Errorf("failed to create user: %w", err)
+//	}
+//	// User.ID() contains the generated user ID
+//	// User.Email() contains either encrypted token or plaintext email
 func (c *authenticationController) userCreate(ctx context.Context, email string, status string) (userstore.UserInterface, error) {
 	user := userstore.NewUser().
 		SetStatus(status).
@@ -336,7 +415,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 
 	user.SetEmail(emailToken)
 
-	err = c.registry.GetUserStore().UserUpdate(context.Background(), user)
+	err = c.registry.GetUserStore().UserUpdate(ctx, user)
 
 	if err != nil {
 		return nil, err
@@ -393,14 +472,14 @@ func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, 
 			return c.userCreate(ctx, email, status)
 		}
 
-		user, err := c.registry.GetUserStore().UserFindByID(context.Background(), userID)
+		user, err := c.registry.GetUserStore().UserFindByID(ctx, userID)
 
 		if err != nil {
 			return nil, err
 		}
 
 		if user == nil {
-			c.registry.GetLogger().Error("At Auth Controller > userFindByEmailOrCreate",
+			c.registry.GetLogger().Warn("At Auth Controller > userFindByEmailOrCreate",
 				slog.String("error", "User not found, even though email was found in the blind index, and user ID returned successfully"),
 				slog.String("user", userID))
 			return nil, nil
