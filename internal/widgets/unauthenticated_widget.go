@@ -13,7 +13,7 @@ var _ Widget = (*unauthenticatedWidget)(nil) // verify it extends the interface
 // NewUnauthenticatedWidget creates a new instance of unauthenticatedWidget.
 //
 // Parameters:
-// - none
+// - registry: Registry interface for accessing services
 //
 // Returns:
 // - *unauthenticatedWidget: a pointer to an unauthenticatedWidget.

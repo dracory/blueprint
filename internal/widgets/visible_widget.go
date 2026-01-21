@@ -17,7 +17,7 @@ var _ Widget = (*visibleWidget)(nil) // verify it extends the interface
 // NewVisibleWidget creates a new instance of the show widget
 //
 // Parameters:
-//   - None
+//   - registry: Registry interface for accessing services
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget

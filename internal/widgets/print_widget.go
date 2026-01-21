@@ -2,6 +2,7 @@ package widgets
 
 import (
 	"net/http"
+	"project/internal/registry"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/robertkrimen/otto"
@@ -14,7 +15,7 @@ var _ Widget = (*printWidget)(nil) // verify it extends the interface
 // NewPrintWidget creates a new instance of the print struct.
 //
 // Parameters:
-//   - None
+//   - registry: Registry interface for accessing services
 //
 // Returns:
 //   - *print - A pointer to the print struct
@@ -30,7 +31,9 @@ func NewPrintWidget() *printWidget {
 // and return it.
 //
 // It uses Otto as the engine.
-type printWidget struct{}
+type printWidget struct {
+	registry registry.RegistryInterface
+}
 
 // == PUBLIC METHODS =========================================================
 
