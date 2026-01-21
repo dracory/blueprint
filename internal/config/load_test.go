@@ -12,6 +12,9 @@ func TestLoad_Success(t *testing.T) {
 	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
 	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -85,6 +88,9 @@ func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
 	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
 	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
 	// No ENVENC_KEY_PRIVATE set
 	defer cleanupEnv()
 
@@ -183,6 +189,9 @@ func TestLoad_StripeConfiguration(t *testing.T) {
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	mustSetenv(t, KEY_STRIPE_KEY_PRIVATE, "sk_test_123")
 	mustSetenv(t, KEY_STRIPE_KEY_PUBLIC, "pk_test_123")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -210,6 +219,9 @@ func TestLoad_MailConfiguration(t *testing.T) {
 	mustSetenv(t, KEY_MAIL_PORT, "587")
 	mustSetenv(t, KEY_MAIL_USERNAME, "user@example.com")
 	mustSetenv(t, KEY_MAIL_FROM_ADDRESS, "noreply@example.com")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
 	defer cleanupEnv()
 
 	cfg, err := Load()
@@ -232,6 +244,9 @@ func TestLoad_TranslationDefaults(t *testing.T) {
 	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
 	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
 	defer cleanupEnv()
 
 	cfg, err := Load()
