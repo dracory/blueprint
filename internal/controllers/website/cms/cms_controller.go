@@ -56,6 +56,7 @@ func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterf
 				return webtheme.New(blocks).ToHtml()
 			},
 			Store:              registry.GetCmsStore(),
+			Shortcodes:         shortcodes,
 			Logger:             registry.GetLogger(),
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
