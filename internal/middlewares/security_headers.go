@@ -45,7 +45,7 @@ func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
 					"'self'",
 					"data:",
 					"https://sfs.ams3.digitaloceanspaces.com",
-					"https://dracory.ams3.digitaloceanspaces.com",
+					"https://lesichkov.ams3.digitaloceanspaces.com",
 				}
 
 				// Join arrays into CSP strings

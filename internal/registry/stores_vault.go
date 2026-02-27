@@ -55,8 +55,10 @@ func newVaultStore(db *sql.DB) (vaultstore.StoreInterface, error) {
 	}
 
 	st, err := vaultstore.NewStore(vaultstore.NewStoreOptions{
-		DB:             db,
-		VaultTableName: "snv_vault_vault",
+		DB:                 db,
+		VaultTableName:     "snv_vault_vault",
+		VaultMetaTableName: "snv_vault_meta",
+		PasswordMinLength:  6,
 	})
 	if err != nil {
 		return nil, err

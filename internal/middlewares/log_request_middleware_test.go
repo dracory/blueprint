@@ -12,15 +12,15 @@ import (
 
 func TestLogRequestMiddleware(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	app.SetLogger(logger)
+	registry.SetLogger(logger)
 
 	// Act
-	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -51,12 +51,12 @@ func TestLogRequestMiddleware(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered(t *testing.T) {
 	// Arrange
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	app.SetLogger(logger)
+	registry.SetLogger(logger)
 
 	tests := []struct {
 		name string
@@ -77,7 +77,7 @@ func TestLogRequestMiddleware_Filtered(t *testing.T) {
 			buf.Reset() // Clear buffer for each test
 
 			// Act
-			handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			}))
 

@@ -15,6 +15,7 @@ func WidgetRegistry(registry registry.RegistryInterface) []Widget {
 	return []Widget{
 		NewAuthenticatedWidget(registry),
 		// NewContactFormWidget(registry),
+		// NewTermsOfUseWidget(registry),
 		NewUnauthenticatedWidget(registry),
 		NewVisibleWidget(registry),
 	}
