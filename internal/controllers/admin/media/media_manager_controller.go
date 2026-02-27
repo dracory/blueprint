@@ -13,15 +13,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dracory/base/files"
-	"github.com/dracory/filesystem"
-	"github.com/dracory/req"
-
-	"github.com/dracory/base/cfmt"
-
 	"github.com/dracory/api"
+	"github.com/dracory/base/cfmt"
+	"github.com/dracory/base/files"
 	"github.com/dracory/cdn"
+	"github.com/dracory/filesystem"
 	"github.com/dracory/hb"
+	"github.com/dracory/req"
 	"github.com/dromara/carbon/v2"
 
 	"github.com/samber/lo"
@@ -43,7 +41,7 @@ func NewMediaManagerController(registry registry.RegistryInterface) *mediaManage
 
 	return &mediaManagerController{
 		rootDirPath: rootDirPath,
-		app:         registry,
+		registry:    registry,
 	}
 }
 
@@ -57,26 +55,25 @@ type FileEntry struct {
 	LastModified      time.Time
 	LastModifiedHuman string
 }
-
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
-	app         registry.RegistryInterface
+	registry    registry.RegistryInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }
 
 func (controller *mediaManagerController) init(r *http.Request) string {
 	var err error
-
+	
 	controller.storage, err = filesystem.NewStorage(filesystem.Disk{
 		DiskName:             "S3",
 		Driver:               filesystem.DRIVER_S3,
-		Url:                  controller.app.GetConfig().GetMediaUrl(),
-		Region:               controller.app.GetConfig().GetMediaRegion(),
-		Key:                  controller.app.GetConfig().GetMediaKey(),
-		Secret:               controller.app.GetConfig().GetMediaSecret(),
-		Bucket:               controller.app.GetConfig().GetMediaBucket(),
+		Url:                  controller.registry.GetConfig().GetMediaUrl(),
+		Region:               controller.registry.GetConfig().GetMediaRegion(),
+		Key:                  controller.registry.GetConfig().GetMediaKey(),
+		Secret:               controller.registry.GetConfig().GetMediaSecret(),
+		Bucket:               controller.registry.GetConfig().GetMediaBucket(),
 		UsePathStyleEndpoint: true,
 	})
 
@@ -86,7 +83,7 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	}
 
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+		return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 			Title:   "Media Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()
@@ -105,16 +102,9 @@ func (c *mediaManagerController) AnyIndex(w http.ResponseWriter, r *http.Request
 		JSON_ACTION_FILE_DELETE,
 		JSON_ACTION_FILE_UPLOAD,
 	}, strings.TrimSpace(req.GetStringTrimmed(r, "action"))) {
-		w.Header().Set("Content-Type", "application/json")
-		body := c.anyIndex(w, r)
-		w.Write([]byte(body))
-		return ""
+		return api.Success(c.anyIndex(w, r)).ToString()
 	}
-
-	w.Header().Set("Content-Type", "text/html")
-	body := c.anyIndex(w, r)
-	w.Write([]byte(body))
-	return ""
+	return api.Success(c.anyIndex(w, r)).ToString()
 }
 
 func (c *mediaManagerController) anyIndex(w http.ResponseWriter, r *http.Request) string {

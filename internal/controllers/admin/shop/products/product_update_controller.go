@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
-	"project/internal/registry"
 	"slices"
 	"strconv"
 	"strings"
@@ -13,6 +12,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/registry"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/base/cfmt"

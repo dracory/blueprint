@@ -59,8 +59,8 @@ func (c *logTableComponent) GetKind() string {
 func (c *logTableComponent) Mount(ctx context.Context, params map[string]string) error {
 	// Ensure App is set when component is instantiated via Liveflux placeholder
 	if c.registry == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.registry = app
+		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = registry
 		}
 	}
 

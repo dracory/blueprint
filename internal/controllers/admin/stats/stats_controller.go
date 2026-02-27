@@ -16,19 +16,19 @@ import (
 )
 
 type statsController struct {
-	logger *slog.Logger
-	app    registry.RegistryInterface
+	logger   *slog.Logger
+	registry registry.RegistryInterface
 }
 
 func NewStatsController(registry registry.RegistryInterface) *statsController {
 	return &statsController{
-		logger: registry.GetLogger(),
-		app:    registry,
+		logger:   registry.GetLogger(),
+		registry: registry,
 	}
 }
 
 func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
-	geostore := c.app.GetGeoStore()
+	geostore := c.registry.GetGeoStore()
 	f := func(iso2Code string) (string, error) {
 		if geostore == nil {
 			return "N/A", errors.New("geostore is nil")
@@ -43,9 +43,9 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
 		ResponseWriter:    w,
 		Request:           r,
-		Logger:            c.app.GetLogger(),
-		Store:             c.app.GetStatsStore(),
-		Layout:            &adminLayout{app: c.app},
+		Logger:            c.registry.GetLogger(),
+		Store:             c.registry.GetStatsStore(),
+		Layout:            &adminLayout{app: c.registry},
 		HomeURL:           links.Admin().Home(),
 		WebsiteUrl:        links.Website().Home(),
 		CountryNameByIso2: f,
@@ -55,7 +55,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		if c.logger != nil {
 			c.logger.Error("At admin > statsController > Handler", "error", err.Error())
 		}
-		helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
+		helpers.ToFlashError(c.registry.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
 		return
 	}
 

@@ -15,7 +15,7 @@ import (
 type logFilterComponent struct {
 	liveflux.Base
 
-	App              registry.RegistryInterface
+	registry         registry.RegistryInterface
 	Level            string
 	SearchMessage    string
 	SearchContext    string
@@ -36,7 +36,7 @@ func NewLogFilterComponent(registry registry.RegistryInterface) liveflux.Compone
 	}
 
 	if c, ok := inst.(*logFilterComponent); ok {
-		c.App = registry
+		c.registry = registry
 	}
 
 	return inst

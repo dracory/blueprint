@@ -12,9 +12,9 @@ import (
 )
 
 func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	c := &logTableComponent{registry: app}
+	c := &logTableComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -26,8 +26,8 @@ func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
 }
 
 func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *testing.T) {
-	app := testutils.Setup()
-	c := &logTableComponent{registry: app}
+	registry := testutils.Setup()
+	c := &logTableComponent{registry: registry}
 	ctx := context.Background()
 
 	err := c.Handle(ctx, "sort", nil)
@@ -42,15 +42,15 @@ func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *te
 }
 
 func TestLogTableComponent_LoadLogs_PopulatesFieldsFromListLogs(t *testing.T) {
-	app := testutils.Setup(testutils.WithLogStore(true))
+	registry := testutils.Setup(testutils.WithLogStore(true))
 
 	// Seed real log entries via the application's logger.
 	for i := 0; i < 2; i++ {
-		app.GetLogger().Info("test log")
+		registry.GetLogger().Info("test log")
 	}
 
 	c := &logTableComponent{
-		registry:      app,
+		registry:      registry,
 		Level:         "",
 		SearchMessage: "",
 		SearchContext: "",

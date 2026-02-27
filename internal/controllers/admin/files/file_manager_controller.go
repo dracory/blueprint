@@ -42,7 +42,7 @@ func NewFileManagerController(registry registry.RegistryInterface) *FileManagerC
 	rootDirPath = "/" + rootDirPath
 
 	return &FileManagerController{
-		app:         registry,
+		registry:    registry,
 		rootDirPath: rootDirPath,
 		storage:     registry.GetSqlFileStorage(),
 	}
@@ -61,7 +61,7 @@ type FileEntry struct {
 
 type FileManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
-	app         registry.RegistryInterface
+	registry    registry.RegistryInterface
 	rootDirPath string
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
@@ -76,7 +76,7 @@ type FileManagerController struct {
 //   - string - an empty string, used for chaining
 func (controller *FileManagerController) init(r *http.Request) string {
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+		return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
 			Title:   "File Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()
@@ -95,19 +95,13 @@ func (c *FileManagerController) Handler(w http.ResponseWriter, r *http.Request) 
 		JSON_ACTION_FILE_DELETE,
 		JSON_ACTION_FILE_UPLOAD,
 	}, strings.TrimSpace(req.GetStringTrimmed(r, "action"))) {
-		w.Header().Set("Content-Type", "application/json")
-		body := c.anyIndex(w, r)
-		w.Write([]byte(body))
-		return ""
+		return api.Success(c.anyIndex(w, r)).ToString()
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	body := c.anyIndex(w, r)
-	w.Write([]byte(body))
-	return ""
+	return api.Success(c.anyIndex(w, r)).ToString()
 }
 
-func (c *FileManagerController) anyIndex(w http.ResponseWriter, r *http.Request) string {
+func (c *FileManagerController) anyIndex(_ http.ResponseWriter, r *http.Request) string {
 	action := strings.TrimSpace(req.GetStringTrimmed(r, "action"))
 	if action == JSON_ACTION_FILE_RENAME {
 		return c.fileRenameAjax(r)
@@ -330,11 +324,11 @@ func (c *FileManagerController) fileRenameAjax(r *http.Request) string {
 }
 
 func (controller *FileManagerController) getMediaManager(r *http.Request) string {
-	if controller.app == nil {
+	if controller.registry == nil {
 		return api.Error("app is required").ToString()
 	}
 
-	cfg := controller.app.GetConfig()
+	cfg := controller.registry.GetConfig()
 	if cfg == nil {
 		return api.Error("config is required").ToString()
 	}

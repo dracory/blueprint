@@ -47,9 +47,9 @@ func TestListLogs_NilApp_ReturnsEmptyNoError(t *testing.T) {
 }
 
 func TestListLogs_NilLogStore_ReturnsEmptyNoError(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	result, err := listLogs(app, logListFilters{})
+	result, err := listLogs(registry, logListFilters{})
 
 	assert.NoError(t, err)
 	assert.Empty(t, result.Logs)
@@ -58,7 +58,7 @@ func TestListLogs_NilLogStore_ReturnsEmptyNoError(t *testing.T) {
 }
 
 func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
-	app := testutils.Setup(testutils.WithLogStore(true))
+	registry := testutils.Setup(testutils.WithLogStore(true))
 
 	filters := logListFilters{
 		FilterPerPage: 0,
@@ -67,10 +67,10 @@ func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
 
 	// Seed 101 real log entries via the application's logger.
 	for i := 0; i < 101; i++ {
-		app.GetLogger().Info("test log")
+		registry.GetLogger().Info("test log")
 	}
 
-	result, err := listLogs(app, filters)
+	result, err := listLogs(registry, filters)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 100, len(result.Logs))
@@ -79,11 +79,11 @@ func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
 }
 
 func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
-	app := testutils.Setup(testutils.WithLogStore(true))
+	registry := testutils.Setup(testutils.WithLogStore(true))
 
 	// Seed 100 real log entries via the application's logger.
 	for i := 0; i < 100; i++ {
-		app.GetLogger().Info("test log")
+		registry.GetLogger().Info("test log")
 	}
 
 	// First page: should have 50 results and indicate there is a next page.
@@ -92,7 +92,7 @@ func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 		FilterPage:    0,
 	}
 
-	result, err := listLogs(app, filtersPage0)
+	result, err := listLogs(registry, filtersPage0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 50, len(result.Logs))
@@ -105,7 +105,7 @@ func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 		FilterPage:    1,
 	}
 
-	result, err = listLogs(app, filtersPage1)
+	result, err = listLogs(registry, filtersPage1)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 50, len(result.Logs))
@@ -114,7 +114,7 @@ func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 }
 
 func TestListLogs_LogCountErrorDoesNotFailListing(t *testing.T) {
-	app := testutils.Setup(testutils.WithLogStore(true))
+	registry := testutils.Setup(testutils.WithLogStore(true))
 
 	logs := []logstore.LogInterface{nil, nil, nil}
 
@@ -123,14 +123,14 @@ func TestListLogs_LogCountErrorDoesNotFailListing(t *testing.T) {
 		countErr:     errors.New("count failed"),
 	}
 
-	app.SetLogStore(fakeStore)
+	registry.SetLogStore(fakeStore)
 
 	filters := logListFilters{
 		FilterPerPage: 10,
 		FilterPage:    0,
 	}
 
-	result, err := listLogs(app, filters)
+	result, err := listLogs(registry, filters)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(result.Logs))
@@ -139,20 +139,20 @@ func TestListLogs_LogCountErrorDoesNotFailListing(t *testing.T) {
 }
 
 func TestListLogs_LogListErrorIsReturned(t *testing.T) {
-	app := testutils.Setup(testutils.WithLogStore(true))
+	registry := testutils.Setup(testutils.WithLogStore(true))
 
 	fakeStore := &fakeLogStore{
 		listErr: errors.New("list failed"),
 	}
 
-	app.SetLogStore(fakeStore)
+	registry.SetLogStore(fakeStore)
 
 	filters := logListFilters{
 		FilterPerPage: 10,
 		FilterPage:    0,
 	}
 
-	result, err := listLogs(app, filters)
+	result, err := listLogs(registry, filters)
 
 	assert.Error(t, err)
 	assert.Empty(t, result.Logs)

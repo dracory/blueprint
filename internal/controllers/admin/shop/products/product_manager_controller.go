@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
-	"project/internal/registry"
 
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/bs"

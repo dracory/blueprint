@@ -48,85 +48,85 @@ func (discountController *discountController) AnyIndex(w http.ResponseWriter, r 
 				Type:  crud.FORM_FIELD_TYPE_STRING,
 			}),
 		},
-		ReadFields: []form.FieldInterface{
-			form.NewField(form.FieldOptions{
-				Label: "Title",
-				Name:  "title",
-				Type:  crud.FORM_FIELD_TYPE_STRING,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Status",
-				Name:  "status",
-				Type:  crud.FORM_FIELD_TYPE_SELECT,
-				Options: []form.FieldOption{
-					{
-						Key:   "",
-						Value: "",
-					},
-					{
-						Key:   shopstore.DISCOUNT_STATUS_DRAFT,
-						Value: shopstore.DISCOUNT_STATUS_DRAFT,
-					},
-					{
-						Key:   shopstore.DISCOUNT_STATUS_INACTIVE,
-						Value: shopstore.DISCOUNT_STATUS_INACTIVE,
-					},
-					{
-						Key:   shopstore.DISCOUNT_STATUS_ACTIVE,
-						Value: shopstore.DISCOUNT_STATUS_ACTIVE,
-					},
-				},
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Type",
-				Name:  "type",
-				Type:  crud.FORM_FIELD_TYPE_SELECT,
-				Options: []form.FieldOption{
-					{
-						Key:   "",
-						Value: "",
-					},
-					{
-						Key:   shopstore.DISCOUNT_TYPE_AMOUNT,
-						Value: shopstore.DISCOUNT_TYPE_AMOUNT,
-					},
-					{
-						Key:   shopstore.DISCOUNT_TYPE_PERCENT,
-						Value: shopstore.DISCOUNT_TYPE_PERCENT,
-					},
-				},
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Code",
-				Name:  "code",
-				Type:  crud.FORM_FIELD_TYPE_STRING,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Starts",
-				Name:  "starts_at",
-				Type:  crud.FORM_FIELD_TYPE_DATETIME,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Ends",
-				Name:  "ends_at",
-				Type:  crud.FORM_FIELD_TYPE_DATETIME,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Created",
-				Name:  "created_at",
-				Type:  crud.FORM_FIELD_TYPE_DATETIME,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Updated",
-				Name:  "updated_at",
-				Type:  crud.FORM_FIELD_TYPE_DATETIME,
-			}),
-			form.NewField(form.FieldOptions{
-				Label: "Description",
-				Name:  "description",
-				Type:  crud.FORM_FIELD_TYPE_HTMLAREA,
-			}),
-		},
+		// ReadFields: []form.FieldInterface{
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Title",
+		// 		Name:  "title",
+		// 		Type:  crud.FORM_FIELD_TYPE_STRING,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Status",
+		// 		Name:  "status",
+		// 		Type:  crud.FORM_FIELD_TYPE_SELECT,
+		// 		Options: []form.FieldOption{
+		// 			{
+		// 				Key:   "",
+		// 				Value: "",
+		// 			},
+		// 			{
+		// 				Key:   shopstore.DISCOUNT_STATUS_DRAFT,
+		// 				Value: shopstore.DISCOUNT_STATUS_DRAFT,
+		// 			},
+		// 			{
+		// 				Key:   shopstore.DISCOUNT_STATUS_INACTIVE,
+		// 				Value: shopstore.DISCOUNT_STATUS_INACTIVE,
+		// 			},
+		// 			{
+		// 				Key:   shopstore.DISCOUNT_STATUS_ACTIVE,
+		// 				Value: shopstore.DISCOUNT_STATUS_ACTIVE,
+		// 			},
+		// 		},
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Type",
+		// 		Name:  "type",
+		// 		Type:  crud.FORM_FIELD_TYPE_SELECT,
+		// 		Options: []form.FieldOption{
+		// 			{
+		// 				Key:   "",
+		// 				Value: "",
+		// 			},
+		// 			{
+		// 				Key:   shopstore.DISCOUNT_TYPE_AMOUNT,
+		// 				Value: shopstore.DISCOUNT_TYPE_AMOUNT,
+		// 			},
+		// 			{
+		// 				Key:   shopstore.DISCOUNT_TYPE_PERCENT,
+		// 				Value: shopstore.DISCOUNT_TYPE_PERCENT,
+		// 			},
+		// 		},
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Code",
+		// 		Name:  "code",
+		// 		Type:  crud.FORM_FIELD_TYPE_STRING,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Starts",
+		// 		Name:  "starts_at",
+		// 		Type:  crud.FORM_FIELD_TYPE_DATETIME,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Ends",
+		// 		Name:  "ends_at",
+		// 		Type:  crud.FORM_FIELD_TYPE_DATETIME,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Created",
+		// 		Name:  "created_at",
+		// 		Type:  crud.FORM_FIELD_TYPE_DATETIME,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Updated",
+		// 		Name:  "updated_at",
+		// 		Type:  crud.FORM_FIELD_TYPE_DATETIME,
+		// 	}),
+		// 	form.NewField(form.FieldOptions{
+		// 		Label: "Description",
+		// 		Name:  "description",
+		// 		Type:  crud.FORM_FIELD_TYPE_HTMLAREA,
+		// 	}),
+		// },
 		UpdateFields: []form.FieldInterface{
 			form.NewField(form.FieldOptions{
 				Label: "Status",
@@ -237,7 +237,7 @@ func (discountController *discountController) FuncLayout(w http.ResponseWriter, 
 	}).ToHTML()
 }
 
-func (discountController *discountController) FuncRows() ([]crud.Row, error) {
+func (discountController *discountController) FuncRows(r *http.Request) ([]crud.Row, error) {
 	if discountController.registry.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
@@ -266,7 +266,7 @@ func (discountController *discountController) FuncRows() ([]crud.Row, error) {
 	return rows, nil
 }
 
-func (discountController *discountController) FuncUpdate(entityID string, data map[string]string) error {
+func (discountController *discountController) FuncUpdate(r *http.Request, entityID string, data map[string]string) error {
 	if discountController.registry.GetShopStore() == nil {
 		return errors.New("shop store not configured")
 	}
@@ -339,7 +339,7 @@ func (discountController *discountController) FuncUpdate(entityID string, data m
 	return nil
 }
 
-func (discountController *discountController) FuncFetchReadData(discountID string) ([][2]string, error) {
+func (discountController *discountController) FuncFetchReadData(r *http.Request, discountID string) ([]crud.KeyValue, error) {
 	if discountController.registry.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
@@ -354,22 +354,22 @@ func (discountController *discountController) FuncFetchReadData(discountID strin
 		return nil, errors.New("discount not found")
 	}
 
-	data := [][2]string{
-		{"Title", discount.Title()},
-		{"Status", discount.Status()},
-		{"Description", discount.Description()},
-		{"Type", discount.Type()},
-		{"Amount", cast.ToString(discount.Amount())},
-		{"Starts At", discount.StartsAtCarbon().Format("d M Y")},
-		{"Ends At", discount.EndsAtCarbon().Format("d M Y")},
-		{"Created", discount.CreatedAtCarbon().Format("d M Y")},
-		{"Updated", discount.UpdatedAtCarbon().Format("d M Y")},
+	data := []crud.KeyValue{
+		{Key: "Title", Value: discount.Title()},
+		{Key: "Status", Value: discount.Status()},
+		{Key: "Description", Value: discount.Description()},
+		{Key: "Type", Value: discount.Type()},
+		{Key: "Amount", Value: cast.ToString(discount.Amount())},
+		{Key: "Starts At", Value: discount.StartsAtCarbon().Format("d M Y")},
+		{Key: "Ends At", Value: discount.EndsAtCarbon().Format("d M Y")},
+		{Key: "Created", Value: discount.CreatedAtCarbon().Format("d M Y")},
+		{Key: "Updated", Value: discount.UpdatedAtCarbon().Format("d M Y")},
 	}
 
 	return data, nil
 }
 
-func (discountController *discountController) FuncFetchUpdateData(discountID string) (map[string]string, error) {
+func (discountController *discountController) FuncFetchUpdateData(r *http.Request, discountID string) (map[string]string, error) {
 	if discountController.registry.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
@@ -398,7 +398,7 @@ func (discountController *discountController) FuncFetchUpdateData(discountID str
 	}, nil
 }
 
-func (discountController *discountController) FuncCreate(data map[string]string) (discountID string, err error) {
+func (discountController *discountController) FuncCreate(r *http.Request, data map[string]string) (discountID string, err error) {
 	if discountController.registry.GetShopStore() == nil {
 		return "", errors.New("shop store not configured")
 	}
@@ -417,7 +417,7 @@ func (discountController *discountController) FuncCreate(data map[string]string)
 	return discount.ID(), nil
 }
 
-func (discountController *discountController) FuncTrash(discountID string) error {
+func (discountController *discountController) FuncTrash(r *http.Request, discountID string) error {
 	if discountController.registry.GetShopStore() == nil {
 		return errors.New("shop store not configured")
 	}
