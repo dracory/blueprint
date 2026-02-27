@@ -7,6 +7,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
+	"github.com/aws/smithy-go/ptr"
 	"github.com/dracory/base/req"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -57,7 +58,7 @@ func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) strin
 
 		response, err := model.GenerateText("You are a helpful assistant.", userMsg, llm.LlmOptions{
 			MaxTokens:   128,
-			Temperature: 0.7,
+			Temperature: ptr.Float64(0.7),
 		})
 		if err != nil {
 			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{

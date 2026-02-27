@@ -58,8 +58,8 @@ func (c *postDetailsComponent) GetKind() string {
 
 func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]string) error {
 	if c.registry == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.registry = app
+		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = registry
 		}
 	}
 
@@ -141,6 +141,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 		}
 
 		post.SetEditor(c.FormEditor)
+		post.SetContentType(c.getContentTypeFromEditor(c.FormEditor))
 		post.SetFeatured(c.FormFeatured)
 		post.SetImageUrl(c.FormImageUrl)
 		post.SetMemo(c.FormMemo)
@@ -152,6 +153,10 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
 			return nil
+		}
+
+		if err := createPostVersioning(context.Background(), c.registry, post); err != nil {
+			c.registry.GetLogger().Error("Error creating post versioning", "error", err.Error())
 		}
 
 		c.FormErrorMessage = ""
@@ -415,6 +420,21 @@ document.addEventListener('click', function(e) {
 		Child(hb.Raw(confirmScript))
 
 	return c.Root(content)
+}
+
+func (c *postDetailsComponent) getContentTypeFromEditor(editor string) string {
+	switch editor {
+	case blogstore.POST_EDITOR_MARKDOWN:
+		return blogstore.POST_CONTENT_TYPE_MARKDOWN
+	case blogstore.POST_EDITOR_HTMLAREA:
+		return blogstore.POST_CONTENT_TYPE_HTML
+	case blogstore.POST_EDITOR_TEXTAREA:
+		return blogstore.POST_CONTENT_TYPE_PLAIN_TEXT
+	case blogstore.POST_EDITOR_BLOCKEDITOR, blogstore.POST_EDITOR_BLOCKAREA:
+		return blogstore.POST_CONTENT_TYPE_BLOCKS
+	default:
+		return blogstore.POST_CONTENT_TYPE_PLAIN_TEXT
+	}
 }
 
 func init() {

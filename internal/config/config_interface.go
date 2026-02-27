@@ -30,6 +30,11 @@ type appConfigInterface interface {
 	IsEnvTesting() bool
 }
 
+type cmsMcpConfigInterface interface {
+	SetCmsMcpApiKey(string)
+	GetCmsMcpApiKey() string
+}
+
 type databaseConfigInterface interface {
 	SetDatabaseDriver(string)
 	GetDatabaseDriver() string
@@ -306,6 +311,7 @@ type seoConfigInterface interface {
 type ConfigInterface interface {
 	// App-specific settings
 	appConfigInterface
+	cmsMcpConfigInterface
 	authConfigInterface
 	databaseConfigInterface
 	emailConfigInterface

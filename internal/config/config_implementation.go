@@ -67,6 +67,7 @@ type configImplementation struct {
 	cacheStoreUsed        bool
 	cmsStoreUsed          bool
 	cmsStoreTemplateID    string
+	cmsMcpApiKey          string
 	customStoreUsed       bool
 	entityStoreUsed       bool
 	feedStoreUsed         bool
@@ -169,6 +170,14 @@ func (c *configImplementation) SetAppDebug(appDebug bool) {
 
 func (c *configImplementation) GetAppDebug() bool {
 	return c.appDebug
+}
+
+func (c *configImplementation) SetCmsMcpApiKey(v string) {
+	c.cmsMcpApiKey = v
+}
+
+func (c *configImplementation) GetCmsMcpApiKey() string {
+	return c.cmsMcpApiKey
 }
 
 // == Environment Helpers ==

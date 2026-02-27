@@ -52,8 +52,8 @@ func (c *postSEOComponent) GetKind() string {
 
 func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) error {
 	if c.registry == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.registry = app
+		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = registry
 		}
 	}
 
@@ -124,6 +124,10 @@ func (c *postSEOComponent) Handle(ctx context.Context, action string, data url.V
 			c.FormErrorMessage = "System error. Saving post failed"
 			c.FormSuccessMessage = ""
 			return nil
+		}
+
+		if err := createPostVersioning(context.Background(), c.registry, post); err != nil {
+			c.registry.GetLogger().Error("Error creating post versioning", "error", err.Error())
 		}
 
 		c.FormErrorMessage = ""

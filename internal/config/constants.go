@@ -46,6 +46,7 @@ const KEY_APP_NAME = "APP_NAME"
 const KEY_APP_URL = "APP_URL"
 const KEY_APP_HOST = "APP_HOST"
 const KEY_APP_PORT = "APP_PORT"
+const KEY_MCP_API_KEY = "MCP_API_KEY"
 
 // ============================================================================
 // == END: App Configurations

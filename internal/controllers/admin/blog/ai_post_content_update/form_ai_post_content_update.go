@@ -12,6 +12,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
+	"github.com/aws/smithy-go/ptr"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
@@ -24,7 +25,7 @@ import (
 
 type formAiPostContentUpdate struct {
 	liveflux.Base
-	App        registry.RegistryInterface
+	registry   registry.RegistryInterface
 	Post       *blogstore.Post
 	Blocks     []Block
 	Error      string
@@ -50,7 +51,7 @@ func NewFormAiPostContentUpdate(registry registry.RegistryInterface) liveflux.Co
 		return nil
 	}
 	if c, ok := inst.(*formAiPostContentUpdate); ok {
-		c.App = registry
+		c.registry = registry
 	}
 	return inst
 }
@@ -62,7 +63,7 @@ func (c *formAiPostContentUpdate) GetKind() string {
 }
 
 func (c *formAiPostContentUpdate) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
+	if c.registry == nil {
 		c.Error = "Application not initialized"
 		return nil
 	}
@@ -73,16 +74,16 @@ func (c *formAiPostContentUpdate) Mount(ctx context.Context, params map[string]s
 		return nil
 	}
 
-	blogStore := c.App.GetBlogStore()
+	blogStore := c.registry.GetBlogStore()
 	if blogStore == nil {
 		c.Error = "Blog store is not configured"
 		return nil
 	}
 
-	post, err := blogStore.PostFindByID(ctx, postID)
+	post, err := blogStore.PostFindByID(context.Background(), postID)
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("AI content editor: failed to load post", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("AI content editor: failed to load post", "error", err.Error())
 		}
 		c.Error = "Post not found"
 		return nil
@@ -257,7 +258,7 @@ Return ONLY the rewritten text for that block as markdown, with no additional ex
 	fmt.Println("System Prompt:", systemPrompt)
 	fmt.Println("User Prompt:", strings.Join(userPrompt, "\n\n"))
 
-	engine, err := shared.LlmEngine(c.App)
+	engine, err := shared.LlmEngine(c.registry)
 	if err != nil || engine == nil {
 		c.Error = "Failed to initialize LLM engine. Please try again later."
 		c.Success = ""
@@ -266,7 +267,7 @@ Return ONLY the rewritten text for that block as markdown, with no additional ex
 	}
 	resp, err := engine.Generate(systemPrompt, strings.Join(userPrompt, "\n\n"), llm.LlmOptions{
 		MaxTokens:    512,
-		Temperature:  0.7,
+		Temperature:  ptr.Float64(0.7),
 		OutputFormat: llm.OutputFormatText,
 		// Verbose:      true,
 	})
@@ -578,7 +579,7 @@ document.querySelectorAll('textarea.auto-resize-textarea').forEach(function(t) {
 }
 
 func (c *formAiPostContentUpdate) onSave(ctx context.Context, successMessage string, redirect bool, data url.Values) error {
-	if c.App == nil || c.Post == nil {
+	if c.registry == nil || c.Post == nil {
 		c.Error = "Post is not loaded"
 		c.Success = ""
 		return nil
@@ -623,9 +624,9 @@ func (c *formAiPostContentUpdate) onSave(ctx context.Context, successMessage str
 	// preserve existing status, only updating content/title/summary
 	c.Post.SetEditor(blogstore.POST_EDITOR_MARKDOWN)
 
-	if err := c.App.GetBlogStore().PostUpdate(ctx, c.Post); err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("AI content editor: failed to save post", "error", err.Error())
+	if err := c.registry.GetBlogStore().PostUpdate(context.Background(), c.Post); err != nil {
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("AI content editor: failed to save post", "error", err.Error())
 		}
 		c.Error = "Failed to save post. Please try again later."
 		c.Success = ""

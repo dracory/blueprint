@@ -10,9 +10,9 @@ import (
 )
 
 func TestNewHelloWorldTask_InitializesFields(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	handler := NewHelloWorldTask(app)
+	handler := NewHelloWorldTask(registry)
 
 	if handler == nil {
 		t.Fatalf("expected handler to be non-nil")
@@ -26,8 +26,8 @@ func TestNewHelloWorldTask_InitializesFields(t *testing.T) {
 }
 
 func TestHelloWorldTask_Metadata(t *testing.T) {
-	app := testutils.Setup()
-	handler := NewHelloWorldTask(app)
+	registry := testutils.Setup()
+	handler := NewHelloWorldTask(registry)
 
 	if got, want := handler.Alias(), "HelloWorldTask"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -54,9 +54,9 @@ func TestHelloWorldTask_Enqueue_AppNil(t *testing.T) {
 func TestHelloWorldTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler := NewHelloWorldTask(app)
+	handler := NewHelloWorldTask(registry)
 
 	if _, err := handler.Enqueue(); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
@@ -64,26 +64,26 @@ func TestHelloWorldTask_Enqueue_TaskStoreNil(t *testing.T) {
 }
 
 func TestHelloWorldTask_Handle_EnqueuedTask(t *testing.T) {
-	app := testutils.Setup(testutils.WithTaskStore(true))
+	registry := testutils.Setup(testutils.WithTaskStore(true))
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
 	// Register task
-	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewHelloWorldTask(app), true); err != nil {
+	if err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewHelloWorldTask(registry), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task
-	enqueueHandler := NewHelloWorldTask(app)
+	enqueueHandler := NewHelloWorldTask(registry)
 	queuedTask, err := enqueueHandler.Enqueue()
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}
 
 	// Handle using queued task
-	handler := NewHelloWorldTask(app)
+	handler := NewHelloWorldTask(registry)
 	handler.SetQueuedTask(queuedTask)
 
 	if ok := handler.Handle(); !ok {

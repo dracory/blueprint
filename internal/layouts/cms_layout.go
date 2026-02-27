@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	"log/slog"
 	"net/http"
 	"project/internal/registry"
 
@@ -107,8 +108,11 @@ func (layout *cmsLayout) ToHTML() string {
 		})
 
 	if err != nil {
-		layout.registry.GetLogger().Error("At CmsLayout", "error", err.Error())
-		return "Template error. Please try again later"
+		layout.registry.GetLogger().Error(
+			"At CmsLayout",
+			slog.Any("error", err),
+			slog.Any("template_id", layout.registry.GetConfig().GetCmsStoreTemplateID()))
+		return "Template (" + layout.registry.GetConfig().GetCmsStoreTemplateID() + ") error. Please try again later"
 	}
 
 	return html

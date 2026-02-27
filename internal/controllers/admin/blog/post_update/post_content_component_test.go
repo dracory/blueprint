@@ -15,7 +15,7 @@ import (
 func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
@@ -26,17 +26,17 @@ func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blog
 	post.SetContent("Original content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	return app, post
+	return registry, post
 }
 
 func TestPostContentComponent_MountRequiresPostID(t *testing.T) {
-	app, _ := setupContentTestAppAndPost(t)
+	registry, _ := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: app}
+	c := &postContentComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -45,9 +45,9 @@ func TestPostContentComponent_MountRequiresPostID(t *testing.T) {
 }
 
 func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
-	app, post := setupContentTestAppAndPost(t)
+	registry, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: app}
+	c := &postContentComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -62,9 +62,9 @@ func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
 }
 
 func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
-	app, post := setupContentTestAppAndPost(t)
+	registry, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: app, PostID: post.ID()}
+	c := &postContentComponent{registry: registry, PostID: post.ID()}
 
 	values := url.Values{
 		"post_title":   {""},
@@ -80,9 +80,9 @@ func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 }
 
 func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
-	app, post := setupContentTestAppAndPost(t)
+	registry, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: app, PostID: post.ID()}
+	c := &postContentComponent{registry: registry, PostID: post.ID()}
 
 	values := url.Values{
 		"post_title":   {"Updated Title"},
@@ -96,7 +96,7 @@ func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
 		assert.Equal(t, "Updated Title", updated.Title())

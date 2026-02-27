@@ -90,7 +90,7 @@ tasks:
     silent: true
 
   dev:
-    desc: Start development locally
+    desc: Start development locally with hot reload
     cmds:
       - air
 

@@ -18,19 +18,19 @@ import (
 )
 
 func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err)
 
 	// Seed existing value to ensure store is operational
-	assert.NoError(t, app.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"))
+	assert.NoError(t, registry.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"))
 
-	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
+	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -45,13 +45,13 @@ func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
 }
 
 func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err)
 
 	const envValue = "Env Topic"
@@ -59,7 +59,7 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 	t.Cleanup(func() { os.Unsetenv("BLOG_TOPIC") })
 
 	// GET should render env override messaging and disable inputs
-	getHTML, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
+	getHTML, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -73,7 +73,7 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 	assert.Contains(t, getHTML, "disabled=\"true\"")
 
 	// POST should not mutate the store and should show error message
-	postHTML, postResp, err := test.CallStringEndpoint(http.MethodPost, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
+	postHTML, postResp, err := test.CallStringEndpoint(http.MethodPost, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},

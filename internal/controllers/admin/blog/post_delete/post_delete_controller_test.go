@@ -15,28 +15,28 @@ import (
 )
 
 func TestPostDeleteController_RequiresAuthentication(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(app).Handler, test.NewRequestOptions{})
+	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{})
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Contains(t, response, "not logged in", "Should require authentication")
 }
 
 func TestPostDeleteController_RequiresPostID(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
-	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(app).Handler, test.NewRequestOptions{
+	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -46,16 +46,16 @@ func TestPostDeleteController_RequiresPostID(t *testing.T) {
 }
 
 func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
-	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(app).Handler, test.NewRequestOptions{
+	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"post_id": {"invalid_id"},
 		},
@@ -68,7 +68,7 @@ func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
 }
 
 func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -78,14 +78,14 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"post_id": {post.ID()},
 		},
@@ -99,7 +99,7 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 }
 
 func TestPostDeleteController_DeletesPost(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -109,15 +109,15 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Send POST request to delete
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostDeleteController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"post_id": {post.ID()},
 		},
@@ -129,7 +129,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	assert.Contains(t, responseHTML, "post deleted successfully", "Should show success message")
 
 	// Verify post was marked as trash
-	deletedPost, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	deletedPost, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err, "Should not return error when checking post")
 	assert.Equal(t, blogstore.POST_STATUS_TRASH, deletedPost.Status(), "Post should be marked as trash")
 }

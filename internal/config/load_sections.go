@@ -10,22 +10,26 @@ import (
 
 // appConfig captures application-level settings.
 type appConfig struct {
-	name  string
-	url   string
-	host  string
-	port  string
-	env   string
-	debug bool
+	name         string
+	url          string
+	host         string
+	port         string
+	env          string
+	debug        bool
+	cmsMcpApiKey string
 }
 
 func loadAppConfig(acc *loadAccumulator) appConfig {
+	mcpApiKey := strings.TrimSpace(env.GetString(KEY_MCP_API_KEY))
+
 	return appConfig{
-		name:  env.GetString(KEY_APP_NAME),
-		url:   env.GetString(KEY_APP_URL),
-		host:  acc.mustString(KEY_APP_HOST, "set the application host address"),
-		port:  acc.mustString(KEY_APP_PORT, "set the application port"),
-		env:   acc.mustString(KEY_APP_ENVIRONMENT, "set the application environment"),
-		debug: env.GetBool(KEY_APP_DEBUG),
+		name:         env.GetString(KEY_APP_NAME),
+		url:          env.GetString(KEY_APP_URL),
+		host:         acc.mustString(KEY_APP_HOST, "set the application host address"),
+		port:         acc.mustString(KEY_APP_PORT, "set the application port"),
+		env:          acc.mustString(KEY_APP_ENVIRONMENT, "set the application environment"),
+		debug:        env.GetBool(KEY_APP_DEBUG),
+		cmsMcpApiKey: mcpApiKey,
 	}
 }
 

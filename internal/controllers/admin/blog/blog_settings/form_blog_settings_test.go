@@ -13,13 +13,13 @@ import (
 
 func TestBlogSettingsForm_RenderStructure(t *testing.T) {
 	// Create a mock app for testing
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	component := NewFormBlogSettings(app)
+	component := NewFormBlogSettings(registry)
 	if component == nil {
 		t.Fatal("Failed to create component")
 	}
@@ -51,13 +51,13 @@ func TestBlogSettingsForm_RenderStructure(t *testing.T) {
 func TestBlogSettingsForm_RenderStructure_WithEnvOverride(t *testing.T) {
 	infoMessage := "The BLOG_TOPIC environment variable is set, so updates are disabled here."
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	component := NewFormBlogSettings(app)
+	component := NewFormBlogSettings(registry)
 	if component == nil {
 		t.Fatal("Failed to create component")
 	}
@@ -85,13 +85,13 @@ func TestBlogSettingsForm_RenderStructure_WithEnvOverride(t *testing.T) {
 }
 
 func TestBlogSettingsForm_FlashMessages(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	component := NewFormBlogSettings(app)
+	component := NewFormBlogSettings(registry)
 	if component == nil {
 		t.Fatal("Failed to create component")
 	}

@@ -81,6 +81,7 @@ func Load() (ConfigInterface, error) {
 	cfg.SetBlogStoreUsed(stores.blogStoreUsed)
 	cfg.SetCacheStoreUsed(stores.cacheStoreUsed)
 	cfg.SetCmsStoreUsed(stores.cmsStoreUsed)
+	cfg.SetCmsMcpApiKey(app.cmsMcpApiKey)
 	cfg.SetCmsStoreTemplateID(stores.cmsStoreTemplateID)
 	cfg.SetCustomStoreUsed(stores.customStoreUsed)
 	cfg.SetEntityStoreUsed(stores.entityStoreUsed)

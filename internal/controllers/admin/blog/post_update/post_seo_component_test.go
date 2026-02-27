@@ -15,7 +15,7 @@ import (
 func setupSEOTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
@@ -28,17 +28,17 @@ func setupSEOTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstor
 	post.SetMetaKeywords("foo,bar")
 	post.SetMetaRobots("INDEX, FOLLOW")
 
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	return app, post
+	return registry, post
 }
 
 func TestPostSEOComponent_MountRequiresPostID(t *testing.T) {
-	app, _ := setupSEOTestAppAndPost(t)
+	registry, _ := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{registry: app}
+	c := &postSEOComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -47,9 +47,9 @@ func TestPostSEOComponent_MountRequiresPostID(t *testing.T) {
 }
 
 func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
-	app, post := setupSEOTestAppAndPost(t)
+	registry, post := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{registry: app}
+	c := &postSEOComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -65,9 +65,9 @@ func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
 }
 
 func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
-	app, post := setupSEOTestAppAndPost(t)
+	registry, post := setupSEOTestAppAndPost(t)
 
-	c := &postSEOComponent{registry: app, PostID: post.ID()}
+	c := &postSEOComponent{registry: registry, PostID: post.ID()}
 
 	values := url.Values{
 		"post_canonical_url":    {"https://example.com/updated"},
@@ -83,7 +83,7 @@ func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
 	// Reload post from store and verify fields were updated
-	updated, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
 		assert.Equal(t, "https://example.com/updated", updated.CanonicalURL())

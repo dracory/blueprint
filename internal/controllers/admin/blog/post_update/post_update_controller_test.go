@@ -15,12 +15,12 @@ import (
 )
 
 func TestPostUpdateController_RequiresPostID(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	_, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(app).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
 
@@ -28,18 +28,18 @@ func TestPostUpdateController_RequiresPostID(t *testing.T) {
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
-	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
 	assert.Equal(t, "Post ID is required", flash.Message, "Should show correct error message")
 }
 
 func TestPostUpdateController_InvalidPostID(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	_, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(app).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"post_id": {"invalid_id"},
 		},
@@ -49,15 +49,15 @@ func TestPostUpdateController_InvalidPostID(t *testing.T) {
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
-	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
 	assert.Equal(t, "Post not found", flash.Message, "Should show correct error message")
 }
 
 func TestPostUpdateController_ShowsPage(t *testing.T) {
-	app, post := setupControllerAppAndPost(t)
+	registry, post := setupControllerAppAndPost(t)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"post_id": {post.ID()},
 			"view":    {"content"},
@@ -75,7 +75,7 @@ func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, *blogs
 	// Note: we reuse the same pattern as v1 tests but only for GET behavior.
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
@@ -85,9 +85,9 @@ func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, *blogs
 	post.SetContent("Test Content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	return app, post
+	return registry, post
 }

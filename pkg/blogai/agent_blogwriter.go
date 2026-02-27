@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/aws/smithy-go/ptr"
 	"github.com/dracory/llm"
 )
 
@@ -71,7 +72,7 @@ Do not include any text outside of this JSON structure. The response must be par
 	// Generate the blog post
 	content, err := ai.Generate(systemPrompt, userPrompt, llm.LlmOptions{
 		MaxTokens:    8192, // Increased token limit for longer responses
-		Temperature:  0.7,
+		Temperature:  ptr.Float64(0.7),
 		OutputFormat: llm.OutputFormatJSON,
 	})
 	if err != nil {
@@ -208,7 +209,7 @@ func (b *BlogWriterAgent) RegenerateSection(ai llm.LlmInterface, post RecordPost
 	// Generate the content
 	content, err := ai.Generate(systemPrompt, userPrompt, llm.LlmOptions{
 		MaxTokens:    4096,
-		Temperature:  0.7,
+		Temperature:  ptr.Float64(0.7),
 		OutputFormat: llm.OutputFormatJSON,
 	})
 	if err != nil {
@@ -325,7 +326,7 @@ Return ONLY the paragraph as a plain string, no JSON, no markdown, no explanatio
 
 	paragraph, err := ai.Generate(systemPrompt, userPrompt, llm.LlmOptions{
 		MaxTokens:    512,
-		Temperature:  0.7,
+		Temperature:  ptr.Float64(0.7),
 		OutputFormat: llm.OutputFormatText,
 	})
 	if err != nil {
@@ -352,7 +353,7 @@ The image should be visually appealing and relevant to the content.
 	imageURL, err := ai.GenerateImage(prompt, llm.LlmOptions{
 		Verbose:      true,
 		MaxTokens:    100,
-		Temperature:  0.7,
+		Temperature:  ptr.Float64(0.7),
 		OutputFormat: llm.OutputFormatImagePNG,
 		Model:        llm.OPENROUTER_MODEL_GEMINI_2_5_FLASH_IMAGE,
 	})
@@ -392,7 +393,7 @@ the main points and be suitable for use as an excerpt or meta description.
 
 	summary, err := ai.Generate(systemPrompt, userPrompt, llm.LlmOptions{
 		MaxTokens:    200,
-		Temperature:  0.6,
+		Temperature:  ptr.Float64(0.6),
 		OutputFormat: llm.OutputFormatText,
 	})
 	if err != nil {
@@ -430,7 +431,7 @@ You are an experienced SEO specialist. Generate the following for the given blog
 
 	response, err := ai.Generate(systemPrompt, userPrompt, llm.LlmOptions{
 		MaxTokens:    300,
-		Temperature:  0.6,
+		Temperature:  ptr.Float64(0.6),
 		OutputFormat: llm.OutputFormatJSON,
 	})
 	if err != nil {

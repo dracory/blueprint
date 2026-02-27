@@ -130,7 +130,15 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 					"post_id": post.ID(),
 					"view":    "seo",
 				})).
-				HTML("SEO")))
+				HTML("SEO"))).
+		Child(bs.NavItem().
+			Child(bs.NavLink().
+				ClassIf(view == "versions", "active").
+				Href(shared.NewLinks().PostUpdate(map[string]string{
+					"post_id": post.ID(),
+					"view":    "versions",
+				})).
+				HTML("Versions")))
 
 	postTitle := hb.Heading2().
 		Class("mb-3").
@@ -155,6 +163,11 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 		body = liveflux.Placeholder(component, map[string]string{
 			"post_id": post.ID(),
 		})
+	case "versions":
+		component := NewPostVersioningComponent(controller.registry)
+		body = liveflux.Placeholder(component, map[string]string{
+			"post_id": post.ID(),
+		})
 	default:
 		body = hb.Div().Text("Not implemented yet")
 	}
@@ -168,6 +181,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 					HTMLIf(view == "details", "Post Details").
 					HTMLIf(view == "content", "Post Contents").
 					HTMLIf(view == "seo", "Post SEO").
+					HTMLIf(view == "versions", "Post Versions").
 					Style("margin-bottom:0;display:inline-block;")),
 		).
 		Child(

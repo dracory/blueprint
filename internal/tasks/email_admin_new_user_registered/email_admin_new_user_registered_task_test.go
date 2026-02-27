@@ -11,9 +11,9 @@ import (
 )
 
 func TestNewEmailToAdminOnNewUserRegisteredTaskHandler_InitializesFields(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 
 	if handler == nil {
 		t.Fatalf("expected handler to be non-nil")
@@ -27,8 +27,8 @@ func TestNewEmailToAdminOnNewUserRegisteredTaskHandler_InitializesFields(t *test
 }
 
 func TestEmailToAdminOnNewUserRegisteredTaskHandler_Metadata(t *testing.T) {
-	app := testutils.Setup()
-	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	registry := testutils.Setup()
+	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 
 	if got, want := handler.Alias(), "email-to-admin-on-new-user-registered"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -56,9 +56,9 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Enqueue_TaskStoreNil(t *test
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 
 	if _, err := handler.Enqueue(testutils.USER_01); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
@@ -66,8 +66,8 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Enqueue_TaskStoreNil(t *test
 }
 
 func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_MissingUserID(t *testing.T) {
-	app := testutils.Setup(testutils.WithTaskStore(true), testutils.WithUserStore(true))
-	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	registry := testutils.Setup(testutils.WithTaskStore(true), testutils.WithUserStore(true))
+	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 
 	// no user_id provided via params or queue
 	if ok := handler.Handle(); ok {
@@ -89,20 +89,20 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 	cfg.SetTaskStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	emails.InitEmailSender(app)
+	emails.InitEmailSender(registry)
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	if app.GetUserStore() == nil {
+	if registry.GetUserStore() == nil {
 		t.Fatalf("expected user store to be initialized")
 	}
 
 	// Seed a user for the happy path
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser() expected nil error, got %q", err)
 	}
@@ -112,19 +112,19 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 	}
 
 	// Register task
-	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewUserRegisteredTaskHandler(app), true); err != nil {
+	if err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewUserRegisteredTaskHandler(registry), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task with user ID
-	enqueueHandler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	enqueueHandler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 	queuedTask, err := enqueueHandler.Enqueue(user.ID())
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}
 
 	// Handle using queued task (parameters come from queue details)
-	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
+	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 	handler.SetQueuedTask(queuedTask)
 
 	if ok := handler.Handle(); !ok {

@@ -15,7 +15,7 @@ import (
 func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithBlogStore(true),
 	)
@@ -29,17 +29,17 @@ func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blog
 	post.SetEditor(blogstore.POST_EDITOR_HTMLAREA)
 	post.SetMemo("Initial memo")
 
-	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	return app, post
+	return registry, post
 }
 
 func TestPostDetailsComponent_MountRequiresPostID(t *testing.T) {
-	app, _ := setupDetailsTestAppAndPost(t)
+	registry, _ := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: app}
+	c := &postDetailsComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{})
 
@@ -48,9 +48,9 @@ func TestPostDetailsComponent_MountRequiresPostID(t *testing.T) {
 }
 
 func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
-	app, post := setupDetailsTestAppAndPost(t)
+	registry, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: app}
+	c := &postDetailsComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{
 		"post_id": post.ID(),
@@ -67,9 +67,9 @@ func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
 }
 
 func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
-	app, post := setupDetailsTestAppAndPost(t)
+	registry, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: app, PostID: post.ID()}
+	c := &postDetailsComponent{registry: registry, PostID: post.ID()}
 
 	values := url.Values{
 		"post_status":       {""},
@@ -88,9 +88,9 @@ func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 }
 
 func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
-	app, post := setupDetailsTestAppAndPost(t)
+	registry, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: app, PostID: post.ID()}
+	c := &postDetailsComponent{registry: registry, PostID: post.ID()}
 
 	values := url.Values{
 		"post_status":       {blogstore.POST_STATUS_PUBLISHED},
@@ -107,7 +107,7 @@ func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := app.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
 		assert.Equal(t, blogstore.POST_STATUS_PUBLISHED, updated.Status())
@@ -122,9 +122,9 @@ func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 
 func TestPostDetailsComponent_HandleRegenerateImage_BlogStoreNotAvailable(t *testing.T) {
 	// Ensure we hit the early error branch without requiring AI wiring.
-	app := testutils.Setup(testutils.WithCacheStore(true))
+	registry := testutils.Setup(testutils.WithCacheStore(true))
 
-	c := &postDetailsComponent{registry: app, PostID: "some-id"}
+	c := &postDetailsComponent{registry: registry, PostID: "some-id"}
 
 	err := c.Handle(context.Background(), "regenerate_image", nil)
 

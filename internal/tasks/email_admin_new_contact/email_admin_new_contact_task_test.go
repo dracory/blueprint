@@ -10,9 +10,9 @@ import (
 )
 
 func TestNewEmailToAdminOnNewContactFormSubmittedTaskHandler_InitializesFields(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
+	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry)
 
 	if handler == nil {
 		t.Fatalf("expected handler to be non-nil")
@@ -26,8 +26,8 @@ func TestNewEmailToAdminOnNewContactFormSubmittedTaskHandler_InitializesFields(t
 }
 
 func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Metadata(t *testing.T) {
-	app := testutils.Setup()
-	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
+	registry := testutils.Setup()
+	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry)
 
 	if got, want := handler.Alias(), "email-to-admin-on-new-contact-form-submitted"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -54,9 +54,9 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Enqueue_AppNil(t *test
 func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
+	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry)
 
 	if _, err := handler.Enqueue(); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
@@ -76,26 +76,26 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *te
 	cfg.SetMailPassword("")
 	cfg.SetTaskStoreUsed(true)
 
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
 	// Register task so that queued tasks can be processed if needed
-	if err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app), true); err != nil {
+	if err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry), true); err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task (no extra params required; contact data is derived elsewhere)
-	enqueueHandler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
+	enqueueHandler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry)
 	queuedTask, err := enqueueHandler.Enqueue()
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}
 
 	// Handle using queued task
-	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
+	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry)
 	handler.SetQueuedTask(queuedTask)
 
 	if ok := handler.Handle(); !ok {

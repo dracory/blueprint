@@ -5,13 +5,20 @@ import (
 	"log/slog"
 	"project/internal/config"
 	"project/internal/registry"
-	"time"
+	"sync/atomic"
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
 
 	"github.com/samber/lo"
 	_ "modernc.org/sqlite"
 )
+
+// testDBCounter provides unique IDs for in-memory SQLite databases across
+// parallel test goroutines. Using time.Now().UnixNano() is insufficient
+// because two goroutines can call DefaultConf() within the same nanosecond
+// and receive the same DSN, causing them to share a database and race on
+// schema creation ("table already exists").
+var testDBCounter atomic.Int64
 
 // setupOptions holds configuration flags for Setup
 type setupOptions struct {
@@ -171,8 +178,8 @@ func DefaultConf() config.ConfigInterface {
 	cfg.SetDatabaseHost("")
 	cfg.SetDatabasePort("")
 	// Use a unique in-memory DB per Setup call to avoid cross-test leakage when running package tests
-	// Example DSN: file:mp_test_123456789?mode=memory&cache=shared
-	uniqueDSN := fmt.Sprintf("file:mp_test_%d?mode=memory&cache=shared", time.Now().UnixNano())
+	// Example DSN: file:mp_test_1?mode=memory&cache=shared
+	uniqueDSN := fmt.Sprintf("file:mp_test_%d?mode=memory&cache=shared", testDBCounter.Add(1))
 	cfg.SetDatabaseName(uniqueDSN)
 	cfg.SetDatabaseUsername("")
 	cfg.SetDatabasePassword("")

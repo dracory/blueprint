@@ -63,7 +63,7 @@ Each HTMX endpoint returns a SweetAlert modal payload. Success alerts typically 
 
 ## Integrations
 
-- **Custom Store** (`app.GetCustomStore`) – Persistent storage for title records.
+- **Custom Store** (`registry.GetCustomStore`) – Persistent storage for title records.
 - **HTMX** – Buttons and forms use `hx-post` and `hx-target="body"` to append modal responses.
 - **SweetAlert2** – User feedback for success/failure and timed redirects.
 - **AI Post Generator** – Approved titles expose a "Generate Post" button linking to the AI Post Generator controller with the record ID.

@@ -280,3 +280,4 @@ func tablePagination(data postManagerControllerData, count int, page int, perPag
 		Class(`d-flex justify-content-left mt-5 pagination-primary-soft rounded mb-0`).
 		HTML(pagination)
 }
+

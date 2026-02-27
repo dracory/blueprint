@@ -8,9 +8,9 @@ import (
 )
 
 func TestNewCleanUpTask_InitializesFields(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	handlerIface := NewCleanUpTask(app)
+	handlerIface := NewCleanUpTask(registry)
 	handler, ok := handlerIface.(*cleanUpTask)
 	if !ok {
 		t.Fatalf("expected *cleanUpTask, got different type")
@@ -28,8 +28,8 @@ func TestNewCleanUpTask_InitializesFields(t *testing.T) {
 }
 
 func TestCleanUpTask_Metadata(t *testing.T) {
-	app := testutils.Setup()
-	handler := NewCleanUpTask(app)
+	registry := testutils.Setup()
+	handler := NewCleanUpTask(registry)
 
 	if got, want := handler.Alias(), "CleanUpTask"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -56,9 +56,9 @@ func TestCleanUpTask_Enqueue_AppNil(t *testing.T) {
 func TestCleanUpTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	handlerIface := NewCleanUpTask(app)
+	handlerIface := NewCleanUpTask(registry)
 	handler, ok := handlerIface.(*cleanUpTask)
 	if !ok {
 		t.Fatalf("expected *cleanUpTask, got different type")
@@ -72,9 +72,9 @@ func TestCleanUpTask_Enqueue_TaskStoreNil(t *testing.T) {
 func TestCleanUpTask_Handle_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler := NewCleanUpTask(app)
+	handler := NewCleanUpTask(registry)
 
 	if ok := handler.Handle(); !ok {
 		t.Fatalf("Handle() expected true when task store is nil, got false")
@@ -82,13 +82,13 @@ func TestCleanUpTask_Handle_TaskStoreNil(t *testing.T) {
 }
 
 func TestCleanUpTask_Handle_Success(t *testing.T) {
-	app := testutils.Setup(testutils.WithTaskStore(true))
+	registry := testutils.Setup(testutils.WithTaskStore(true))
 
-	if app.GetTaskStore() == nil {
+	if registry.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	handler := NewCleanUpTask(app)
+	handler := NewCleanUpTask(registry)
 
 	if ok := handler.Handle(); !ok {
 		t.Fatalf("Handle() expected true, got false")

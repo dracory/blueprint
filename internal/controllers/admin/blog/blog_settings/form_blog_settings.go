@@ -16,7 +16,7 @@ import (
 
 type formBlogSettings struct {
 	liveflux.Base
-	App                      registry.RegistryInterface
+	registry                 registry.RegistryInterface
 	BlogTopic                string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -34,7 +34,7 @@ func NewFormBlogSettings(registry registry.RegistryInterface) liveflux.Component
 		return nil
 	}
 	if c, ok := inst.(*formBlogSettings); ok {
-		c.App = registry
+		c.registry = registry
 	}
 	return inst
 }
@@ -44,7 +44,7 @@ func (c *formBlogSettings) GetKind() string {
 }
 
 func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
+	if c.registry == nil {
 		c.FormErrorMessage = "Application not initialized"
 		return nil
 	}
@@ -54,7 +54,7 @@ func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) 
 		c.ReturnURL = shared.NewLinks().PostManager()
 	}
 
-	store := c.App.GetSettingStore()
+	store := c.registry.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		return nil
@@ -62,8 +62,8 @@ func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) 
 
 	value, err := store.Get(ctx, SettingKeyBlogTopic, "")
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Blog settings form: failed to load blog topic", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Blog settings form: failed to load blog topic", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to load blog settings"
 		return nil
@@ -108,7 +108,7 @@ func (c *formBlogSettings) handleUpdate(ctx context.Context, action string, data
 		return nil
 	}
 
-	store := c.App.GetSettingStore()
+	store := c.registry.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		c.FormSuccessMessage = ""
@@ -116,8 +116,8 @@ func (c *formBlogSettings) handleUpdate(ctx context.Context, action string, data
 	}
 
 	if err := store.Set(ctx, SettingKeyBlogTopic, topic); err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Blog settings form: failed to save blog topic", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Blog settings form: failed to save blog topic", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to save blog topic. Please try again later."
 		c.FormSuccessMessage = ""

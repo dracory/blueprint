@@ -16,23 +16,23 @@ import (
 )
 
 func TestManagerController_RequiresAuthentication(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
 	// Test without authentication
-	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(app).Handler, test.NewRequestOptions{})
+	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{})
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Equal(t, http.StatusSeeOther, responseObj.StatusCode, "Should redirect when unauthenticated")
 	assert.Contains(t, response, "See Other", "Should show redirect response")
 
 	// Test with authentication
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
-	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(app).Handler, test.NewRequestOptions{
+	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -43,7 +43,7 @@ func TestManagerController_RequiresAuthentication(t *testing.T) {
 }
 
 func TestManagerController_ShowsPostList(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -53,21 +53,21 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Test Post 1")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post1); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post1); err != nil {
 		t.Fatalf("failed to create test post1: %v", err)
 	}
 
 	post2 := blogstore.NewPost()
 	post2.SetTitle("Test Post 2")
 	post2.SetStatus(blogstore.POST_STATUS_DRAFT)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post2); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post2); err != nil {
 		t.Fatalf("failed to create test post2: %v", err)
 	}
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -81,7 +81,7 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 }
 
 func TestManagerController_HandlesFilters(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -91,22 +91,22 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Published Post")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post1); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post1); err != nil {
 		t.Fatalf("failed to create test post1: %v", err)
 	}
 
 	post2 := blogstore.NewPost()
 	post2.SetTitle("Draft Post")
 	post2.SetStatus(blogstore.POST_STATUS_DRAFT)
-	if err := app.GetBlogStore().PostCreate(context.Background(), post2); err != nil {
+	if err := registry.GetBlogStore().PostCreate(context.Background(), post2); err != nil {
 		t.Fatalf("failed to create test post2: %v", err)
 	}
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Test status filter
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"status": {blogstore.POST_STATUS_PUBLISHED},
 		},
@@ -121,7 +121,7 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 }
 
 func TestManagerController_HandlesPagination(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -132,16 +132,16 @@ func TestManagerController_HandlesPagination(t *testing.T) {
 		post := blogstore.NewPost()
 		post.SetTitle("Post " + cast.ToString(i))
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-		if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+		if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 			t.Fatalf("failed to create test post %d: %v", i, err)
 		}
 	}
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Test pagination by requesting page 2
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"page":     {"1"},
 			"per_page": {"10"},

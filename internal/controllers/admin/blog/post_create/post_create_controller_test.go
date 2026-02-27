@@ -17,11 +17,11 @@ import (
 )
 
 func TestPostCreateController_RequiresAuthentication(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"post_title": {"Test Post"},
 		},
@@ -32,9 +32,9 @@ func TestPostCreateController_RequiresAuthentication(t *testing.T) {
 }
 
 func TestPostCreateController_RequiresPostTitle(t *testing.T) {
-	app, user := setupControllerAppAndUser(t)
+	registry, user := setupControllerAppAndUser(t)
 
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{},
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
@@ -46,9 +46,9 @@ func TestPostCreateController_RequiresPostTitle(t *testing.T) {
 }
 
 func TestPostCreateController_ShowsFormOnGet(t *testing.T) {
-	app, user := setupControllerAppAndUser(t)
+	registry, user := setupControllerAppAndUser(t)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostCreateController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostCreateController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -60,10 +60,10 @@ func TestPostCreateController_ShowsFormOnGet(t *testing.T) {
 }
 
 func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
-	app, user := setupControllerAppAndUser(t)
+	registry, user := setupControllerAppAndUser(t)
 	postTitle := "Test Post Title"
 
-	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(app).Handler, test.NewRequestOptions{
+	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostCreateController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"post_title": {postTitle},
 		},
@@ -76,7 +76,7 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 	assert.Contains(t, responseHTML, "post created successfully", "Should show success message")
 
 	// Verify post was created
-	posts, err := app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{})
+	posts, err := registry.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{})
 	assert.NoError(t, err, "Should list posts without error")
 	assert.NotEmpty(t, posts, "Should have created a post")
 	assert.Equal(t, postTitle, posts[0].Title(), "Post title should match")
@@ -85,15 +85,15 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithUserStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
 
-	return app, user
+	return registry, user
 }
