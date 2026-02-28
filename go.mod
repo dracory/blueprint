@@ -6,7 +6,7 @@ go 1.25.0
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/aws/smithy-go v1.24.1
+	github.com/aws/smithy-go v1.24.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v0.2.0
