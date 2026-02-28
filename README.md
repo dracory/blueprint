@@ -2,12 +2,6 @@
 
 ![tests](https://github.com/dracory/blueprint/workflows/tests/badge.svg)
 
-## Development IDE
-
-<a href="https://gitpod.io/#https://github.com/dracory/blueprint" style="float:right:" target="_blank">
-    <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy">
-</a>
-
 ## URLS
 
 - https://YOURAPPURL
