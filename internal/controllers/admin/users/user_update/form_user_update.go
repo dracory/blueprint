@@ -20,7 +20,7 @@ import (
 
 type formUserUpdate struct {
 	liveflux.Base
-	App            registry.RegistryInterface
+	registry       registry.RegistryInterface
 	UserID         string
 	ReturnURL      string
 	FormStatus     string
@@ -64,7 +64,7 @@ func NewFormUserUpdate(registry registry.RegistryInterface) liveflux.ComponentIn
 		return nil
 	}
 	if c, ok := inst.(*formUserUpdate); ok {
-		c.App = registry
+		c.registry = registry
 	}
 	return inst
 }
@@ -74,7 +74,7 @@ func (c *formUserUpdate) GetKind() string {
 }
 
 func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) error {
-	if c.App == nil {
+	if c.registry == nil {
 		c.FormError = "Application not initialized"
 		return nil
 	}
@@ -90,15 +90,15 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 		c.ReturnURL = links.Admin().UsersUserManager()
 	}
 
-	if c.App.GetUserStore() == nil {
+	if c.registry.GetUserStore() == nil {
 		c.FormError = "User store is not configured"
 		return nil
 	}
 
-	user, err := c.App.GetUserStore().UserFindByID(ctx, c.UserID)
+	user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Error loading user", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Error loading user", "error", err.Error())
 		}
 		c.FormError = "Error loading user"
 		return nil
@@ -115,11 +115,11 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 	businessName := user.BusinessName()
 	phone := user.Phone()
 
-	if c.App.GetConfig().GetVaultStoreUsed() && c.App.GetVaultStore() != nil {
-		firstName, lastName, email, businessName, phone, err = ext.UserUntokenize(ctx, c.App, c.App.GetConfig().GetVaultStoreKey(), user)
+	if c.registry.GetConfig().GetVaultStoreUsed() && c.registry.GetVaultStore() != nil {
+		firstName, lastName, email, businessName, phone, err = ext.UserUntokenize(ctx, c.registry, c.registry.GetConfig().GetVaultStoreKey(), user)
 		if err != nil {
-			if c.App.GetLogger() != nil {
-				c.App.GetLogger().Error("Error untokenizing user", "error", err.Error())
+			if c.registry.GetLogger() != nil {
+				c.registry.GetLogger().Error("Error untokenizing user", "error", err.Error())
 			}
 			c.FormError = "Error reading user details"
 			return nil
@@ -138,18 +138,18 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 	c.DisplayName = strings.TrimSpace(strings.Join([]string{firstName, lastName}, " "))
 	c.StatusOptions = newUserStatusOptions()
 
-	if c.App.GetGeoStore() == nil {
+	if c.registry.GetGeoStore() == nil {
 		c.FormError = "Geo store is not configured"
 		return nil
 	}
 
-	countries, err := c.App.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
+	countries, err := c.registry.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Error listing countries", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Error listing countries", "error", err.Error())
 		}
 		c.FormError = "Error listing countries"
 		return nil
@@ -191,16 +191,16 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		return nil
 	}
 
-	if c.App == nil || c.App.GetUserStore() == nil {
+	if c.registry == nil || c.registry.GetUserStore() == nil {
 		c.FormError = "User store is not configured"
 		c.FormSuccess = ""
 		return nil
 	}
 
-	user, err := c.App.GetUserStore().UserFindByID(ctx, userID)
+	user, err := c.registry.GetUserStore().UserFindByID(ctx, userID)
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Error loading user", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Error loading user", "error", err.Error())
 		}
 		c.FormError = "Error loading user"
 		c.FormSuccess = ""
@@ -272,11 +272,11 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 	user.SetCountry(c.FormCountry)
 	user.SetTimezone(c.FormTimezone)
 
-	if c.App.GetConfig().GetUserStoreVaultEnabled() && c.App.GetVaultStore() != nil {
+	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetVaultStore() != nil {
 		firstToken, lastToken, emailToken, phoneToken, businessToken, err := ext.UserTokenize(
 			ctx,
-			c.App.GetVaultStore(),
-			c.App.GetConfig().GetVaultStoreKey(),
+			c.registry.GetVaultStore(),
+			c.registry.GetConfig().GetVaultStoreKey(),
 			user,
 			c.FormFirstName,
 			c.FormLastName,
@@ -285,8 +285,8 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 			c.FormBusiness,
 		)
 		if err != nil {
-			if c.App.GetLogger() != nil {
-				c.App.GetLogger().Error("Error tokenizing user", "error", err.Error())
+			if c.registry.GetLogger() != nil {
+				c.registry.GetLogger().Error("Error tokenizing user", "error", err.Error())
 			}
 			c.FormError = "System error. Saving user failed"
 			c.FormSuccess = ""
@@ -305,9 +305,9 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		user.SetBusinessName(c.FormBusiness)
 	}
 
-	if err := c.App.GetUserStore().UserUpdate(ctx, user); err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Error updating user", "error", err.Error())
+	if err := c.registry.GetUserStore().UserUpdate(ctx, user); err != nil {
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Error updating user", "error", err.Error())
 		}
 		c.FormError = "System error. Saving user failed"
 		c.FormSuccess = ""
@@ -492,7 +492,7 @@ func firstNonEmpty(values ...string) string {
 }
 
 func (c *formUserUpdate) refreshTimezones(ctx context.Context) {
-	if c.App == nil || c.App.GetGeoStore() == nil {
+	if c.registry == nil || c.registry.GetGeoStore() == nil {
 		c.Timezones = nil
 		if c.FormCountry == "" {
 			c.FormTimezone = ""
@@ -509,10 +509,10 @@ func (c *formUserUpdate) refreshTimezones(ctx context.Context) {
 		query.CountryCode = c.FormCountry
 	}
 
-	timezones, err := c.App.GetGeoStore().TimezoneList(ctx, query)
+	timezones, err := c.registry.GetGeoStore().TimezoneList(ctx, query)
 	if err != nil {
-		if c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("Error listing timezones", "error", err.Error())
+		if c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("Error listing timezones", "error", err.Error())
 		}
 		c.FormError = "Error listing timezones"
 		return

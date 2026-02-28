@@ -17,12 +17,12 @@ import (
 )
 
 func TestUserUpdateController_RequiresUserID(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -39,7 +39,7 @@ func TestUserUpdateController_RequiresUserID(t *testing.T) {
 		t.Fatalf("Response MUST be %d but was %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,9 +58,9 @@ func TestUserUpdateController_RequiresUserID(t *testing.T) {
 }
 
 func TestUserUpdateController_ShowsForm(t *testing.T) {
-	app, user := setupControllerAppAndUser(t)
+	registry, user := setupControllerAppAndUser(t)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"user_id": {user.ID()},
 		},
@@ -108,12 +108,12 @@ func TestUserUpdateController_ShowsForm(t *testing.T) {
 func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -128,9 +128,9 @@ func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userst
 	user.SetCountry("GB")
 	user.SetTimezone("Europe/London")
 
-	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatalf("UserUpdate returned error: %v", err)
 	}
 
-	return app, user
+	return registry, user
 }

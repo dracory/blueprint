@@ -11,8 +11,8 @@ import (
 
 // livefluxController adapts liveflux.Handler to the rtr HTML handler signature.
 type livefluxController struct {
-	Engine http.Handler
-	App    registry.RegistryInterface
+	Engine   http.Handler
+	registry registry.RegistryInterface
 }
 
 type contextKey string
@@ -21,15 +21,15 @@ const AppContextKey contextKey = "app"
 
 func NewController(registry registry.RegistryInterface) *livefluxController {
 	return &livefluxController{
-		App:    registry,
-		Engine: liveflux.NewHandler(nil),
+		registry: registry,
+		Engine:   liveflux.NewHandler(nil),
 	}
 }
 
 // Handler returns the rendered HTML string for the component action/mount.
 func (c *livefluxController) Handler(w http.ResponseWriter, r *http.Request) string {
 	// add app to context
-	ctx := context.WithValue(r.Context(), AppContextKey, c.App)
+	ctx := context.WithValue(r.Context(), AppContextKey, c.registry)
 	r = r.WithContext(ctx)
 
 	rec := httptest.NewRecorder()

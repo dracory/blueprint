@@ -9,15 +9,29 @@ import (
 )
 
 func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
+	authRoute := rtr.NewRoute().
+		SetName("Auth > Auth Controller").
+		SetPath(links.AUTH_AUTH).
+		SetHTMLHandler(NewAuthenticationController(application).Handler)
+
+	loginRoute := rtr.NewRoute().
+		SetName("Auth > Login Controller").
+		SetPath(links.AUTH_LOGIN).
+		SetHTMLHandler(NewLoginController(application).Handler)
+
+	logoutRoute := rtr.NewRoute().
+		SetName("Auth > Logout Controller").
+		SetPath(links.AUTH_LOGOUT).
+		SetHTMLHandler(NewLogoutController(application).AnyIndex)
+
+	registerRoute := rtr.NewRoute().
+		SetName("Auth > Register Controller").
+		SetPath(links.AUTH_REGISTER).
+		SetHTMLHandler(NewRegisterController(application).Handler)
+
 	authRoutes := []rtr.RouteInterface{
-		rtr.NewRoute().
-			SetName("Auth > Auth Controller").
-			SetPath(links.AUTH_AUTH).
-			SetHTMLHandler(NewAuthenticationController(application).Handler),
-		rtr.NewRoute().
-			SetName("Auth > Login Controller").
-			SetPath(links.AUTH_LOGIN).
-			SetHTMLHandler(NewLoginController(application).Handler),
+		authRoute,
+		loginRoute,
 	}
 
 	// Apply stricter rate limiting to sensitive authentication routes only
@@ -30,19 +44,9 @@ func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
 	}
 
 	// Logout doesn't need rate limiting - it's not security-sensitive
-	logoutRoute := rtr.NewRoute().
-		SetName("Auth > Logout Controller").
-		SetPath(links.AUTH_LOGOUT).
-		SetHTMLHandler(NewLogoutController(application).AnyIndex)
-
 	routes := append(authRoutes, logoutRoute)
 
 	if application.GetConfig().GetRegistrationEnabled() {
-		registerRoute := rtr.NewRoute().
-			SetName("Auth > Register Controller").
-			SetPath(links.AUTH_REGISTER).
-			SetHTMLHandler(NewRegisterController(application).Handler)
-
 		// Apply even stricter rate limiting for registration
 		registerRoute.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 			// Stricter rate limiting for registration endpoint

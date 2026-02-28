@@ -14,14 +14,14 @@ import (
 
 func NewTaskController(registry registry.RegistryInterface) *taskController {
 	return &taskController{
-		app:    registry,
-		logger: registry.GetLogger(),
+		registry: registry,
+		logger:   registry.GetLogger(),
 	}
 }
 
 type taskController struct {
-	app    registry.RegistryInterface
-	logger *slog.Logger
+	registry registry.RegistryInterface
+	logger   *slog.Logger
 }
 
 func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -29,8 +29,8 @@ func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string 
 		ResponseWriter: w,
 		Request:        r,
 		Logger:         c.logger,
-		Store:          c.app.GetTaskStore(),
-		Layout:         &adminLayout{app: c.app},
+		Store:          c.registry.GetTaskStore(),
+		Layout:         &adminLayout{app: c.registry},
 	})
 
 	ui := lo.IfF(err != nil, func() hb.TagInterface {

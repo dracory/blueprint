@@ -15,13 +15,13 @@ import (
 func setupAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
 	t.Helper()
 
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithUserStore(true, true),
 		testutils.WithVaultStore(true, "test-key"),
 		testutils.WithGeoStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -31,13 +31,13 @@ func setupAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserIn
 	user.SetCountry("GB")
 	user.SetTimezone("Europe/London")
 
-	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatalf("UserUpdate returned error: %v", err)
 	}
 
-	tokenizeUserForTest(t, app, user, "John", "Doe", "john@example.com", "JD Consulting", "+44111222333")
+	tokenizeUserForTest(t, registry, user, "John", "Doe", "john@example.com", "JD Consulting", "+44111222333")
 
-	return app, user
+	return registry, user
 }
 
 func tokenizeUserForTest(t *testing.T, registry registry.RegistryInterface, user userstore.UserInterface, firstName, lastName, email, businessName, phone string) {
@@ -107,8 +107,8 @@ func cloneValues(values url.Values) url.Values {
 }
 
 func TestFormUserUpdate_CountryChangeClearsTimezone(t *testing.T) {
-	app, user := setupAppAndUser(t)
-	form := newMountedForm(t, app, user, "/admin/users")
+	registry, user := setupAppAndUser(t)
+	form := newMountedForm(t, registry, user, "/admin/users")
 
 	if err := form.Handle(context.Background(), "country_change", url.Values{
 		"user_country": {"US"},
@@ -122,8 +122,8 @@ func TestFormUserUpdate_CountryChangeClearsTimezone(t *testing.T) {
 }
 
 func TestFormUserUpdate_Mount(t *testing.T) {
-	app, user := setupAppAndUser(t)
-	form := newMountedForm(t, app, user, "/admin/users")
+	registry, user := setupAppAndUser(t)
+	form := newMountedForm(t, registry, user, "/admin/users")
 
 	if form.FormFirstName != "John" {
 		t.Fatalf("expected first name 'John', got %q", form.FormFirstName)
@@ -225,8 +225,8 @@ func TestFormUserUpdate_HandleValidation(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			app, user := setupAppAndUser(t)
-			form := newMountedForm(t, app, user, "/admin/users")
+			registry, user := setupAppAndUser(t)
+			form := newMountedForm(t, registry, user, "/admin/users")
 
 			values := url.Values{
 				"user_id":            {user.ID()},
@@ -262,8 +262,8 @@ func TestFormUserUpdate_HandleValidation(t *testing.T) {
 }
 
 func TestFormUserUpdate_HandleApplySuccess(t *testing.T) {
-	app, user := setupAppAndUser(t)
-	form := newMountedForm(t, app, user, "/admin/users")
+	registry, user := setupAppAndUser(t)
+	form := newMountedForm(t, registry, user, "/admin/users")
 
 	payload := url.Values{
 		"user_id":            {user.ID()},
@@ -298,7 +298,7 @@ func TestFormUserUpdate_HandleApplySuccess(t *testing.T) {
 		t.Fatalf("expected display name 'Alice Smith', got %q", form.DisplayName)
 	}
 
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -306,7 +306,7 @@ func TestFormUserUpdate_HandleApplySuccess(t *testing.T) {
 		t.Fatal("UserFindByID returned nil user")
 	}
 
-	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
+	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
 		t.Fatalf("UserUntokenize returned error: %v", err)
 	}
@@ -349,9 +349,9 @@ func TestFormUserUpdate_HandleApplySuccess(t *testing.T) {
 }
 
 func TestFormUserUpdate_HandleSaveRedirect(t *testing.T) {
-	app, user := setupAppAndUser(t)
+	registry, user := setupAppAndUser(t)
 	returnURL := "/admin/users/list"
-	form := newMountedForm(t, app, user, returnURL)
+	form := newMountedForm(t, registry, user, returnURL)
 
 	payload := url.Values{
 		"user_id":            {user.ID()},
@@ -382,7 +382,7 @@ func TestFormUserUpdate_HandleSaveRedirect(t *testing.T) {
 		t.Fatalf("expected redirect to %q, got %q", returnURL, form.FormRedirectTo)
 	}
 
-	updatedUser, err := app.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -390,7 +390,7 @@ func TestFormUserUpdate_HandleSaveRedirect(t *testing.T) {
 		t.Fatal("UserFindByID returned nil user")
 	}
 
-	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), app, app.GetConfig().GetVaultStoreKey(), updatedUser)
+	firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
 	if err != nil {
 		t.Fatalf("UserUntokenize returned error: %v", err)
 	}

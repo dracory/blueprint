@@ -9,7 +9,7 @@ import (
 
 func TestImpersonate(t *testing.T) {
 	// Setup
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
@@ -20,7 +20,7 @@ func TestImpersonate(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	// Act
-	err := Impersonate(app.GetSessionStore(), w, req, userID)
+	err := Impersonate(registry.GetSessionStore(), w, req, userID)
 
 	// Assert
 	if err != nil {

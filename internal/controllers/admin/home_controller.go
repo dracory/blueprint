@@ -141,12 +141,6 @@ func (c *homeController) cardDailyVisitors() hb.TagInterface {
 }
 
 func (c *homeController) tiles() []hb.TagInterface {
-	// cmsTileOld := map[string]string{
-	// 	"title": "Website Manager (Old)",
-	// 	"icon":  "bi-globe",
-	// 	"link":  links.Admin().CmsOld(),
-	// }
-
 	cmsTile := map[string]string{
 		"title": "Website Manager",
 		"icon":  "bi-globe",
