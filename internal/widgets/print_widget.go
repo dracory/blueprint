@@ -19,8 +19,8 @@ var _ Widget = (*printWidget)(nil) // verify it extends the interface
 //
 // Returns:
 //   - *print - A pointer to the print struct
-func NewPrintWidget() *printWidget {
-	return &printWidget{}
+func NewPrintWidget(registry registry.RegistryInterface) *printWidget {
+	return &printWidget{registry: registry}
 }
 
 // == WIDGET ================================================================

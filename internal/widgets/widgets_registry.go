@@ -7,7 +7,7 @@ import "project/internal/registry"
 // Register all the new widgets here so that they can be used in the CMS
 //
 // Parameters:
-//   - None
+//   - registry: Registry interface for accessing services
 //
 // Returns:
 //   - []Widget - A list of all widgets
@@ -18,5 +18,7 @@ func WidgetRegistry(registry registry.RegistryInterface) []Widget {
 		// NewTermsOfUseWidget(registry),
 		NewUnauthenticatedWidget(registry),
 		NewVisibleWidget(registry),
+		NewPrintWidget(registry),
+		NewBlockeditotWidget(registry),
 	}
 }

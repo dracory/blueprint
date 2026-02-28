@@ -3,6 +3,7 @@ package widgets
 import (
 	"net/http"
 	"project/internal/links"
+	"project/internal/registry"
 
 	"github.com/dracory/blockeditor"
 	"github.com/dracory/cdn"
@@ -20,11 +21,11 @@ var _ Widget = (*blockeditorWidget)(nil) // verify it extends the interface
 // NewBlockeditotWidget creates a new instance of the blockeditor widget
 //
 // Parameters:
-//   - None
+//   - registry: Registry interface for accessing services
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget
-func NewBlockeditotWidget() *blockeditorWidget {
+func NewBlockeditotWidget(registry registry.RegistryInterface) *blockeditorWidget {
 	return &blockeditorWidget{}
 }
 
@@ -34,7 +35,9 @@ func NewBlockeditotWidget() *blockeditorWidget {
 //
 // Example:
 // <x-blockeditor environment="production">content</x-visible>
-type blockeditorWidget struct{}
+type blockeditorWidget struct {
+	registry registry.RegistryInterface
+}
 
 func (w *blockeditorWidget) Alias() string {
 	return "x-blockeditor"
