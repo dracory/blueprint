@@ -269,7 +269,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 // 	expectedRedirect := "/user/subscriptions/plan-select"
 
-// 	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), app.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+// 	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 // 	if err != nil {
 // 		t.Fatal(err)

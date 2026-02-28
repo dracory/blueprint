@@ -11,12 +11,12 @@ import (
 const vaultTestKey = "test-key"
 
 func TestVaultTokenUpsertCreatesTokenWhenMissing(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	store := app.GetVaultStore()
+	store := registry.GetVaultStore()
 
 	if store == nil {
 		t.Fatalf("expected vault store to be initialized")
@@ -51,12 +51,12 @@ func TestVaultTokenUpsertCreatesTokenWhenMissing(t *testing.T) {
 }
 
 func TestVaultTokenUpsertUpdatesExistingToken(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	store := app.GetVaultStore()
+	store := registry.GetVaultStore()
 
 	if store == nil {
 		t.Fatalf("expected vault store to be initialized")
@@ -109,14 +109,14 @@ func TestVaultTokenUpsertUpdatesExistingToken(t *testing.T) {
 }
 
 func TestVaultTokenUpsertReturnsErrorWhenCreateFails(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	store := app.GetVaultStore()
+	store := registry.GetVaultStore()
 
-	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
+	if _, err := registry.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 

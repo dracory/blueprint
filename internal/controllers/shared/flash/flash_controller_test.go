@@ -17,9 +17,9 @@ func TestFlash(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"type":    {"success"},
 			"message": {"Authentication Provider Error. Once is required field"},
@@ -51,13 +51,13 @@ func TestFlashMessage_Info(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(registry.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -89,13 +89,13 @@ func TestFlashMessage_Error(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	errorUrl := helpers.ToFlashErrorURL(app.GetCacheStore(), "This is an error message", "/testbackendpoint", 5)
+	errorUrl := helpers.ToFlashErrorURL(registry.GetCacheStore(), "This is an error message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(errorUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -127,13 +127,13 @@ func TestFlashMessage_Success(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	successUrl := helpers.ToFlashSuccessURL(app.GetCacheStore(), "This is a success message", "/testbackendpoint", 5)
+	successUrl := helpers.ToFlashSuccessURL(registry.GetCacheStore(), "This is a success message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(successUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -165,13 +165,13 @@ func TestFlashMessage_Warning(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	warningUrl := helpers.ToFlashWarningURL(app.GetCacheStore(), "This is a warning message", "/testbackendpoint", 5)
+	warningUrl := helpers.ToFlashWarningURL(registry.GetCacheStore(), "This is a warning message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(warningUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -203,13 +203,13 @@ func TestFlashMessage_Get(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(registry.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodGet, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodGet, NewFlashController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -241,13 +241,13 @@ func TestFlashMessage_Delete(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(registry.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodDelete, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodDelete, NewFlashController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -279,13 +279,13 @@ func TestFlashMessage_Post(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(registry.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPost, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},
@@ -317,13 +317,13 @@ func TestFlashMessage_Put(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	infoUrl := helpers.ToFlashInfoURL(app.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
+	infoUrl := helpers.ToFlashInfoURL(registry.GetCacheStore(), "This is an info message", "/testbackendpoint", 5)
 
 	flashMessageID := str.RightFrom(infoUrl, `/flash?message_id=`)
 
-	body, response, err := test.CallStringEndpoint(http.MethodPut, NewFlashController(app).Handler, test.NewRequestOptions{
+	body, response, err := test.CallStringEndpoint(http.MethodPut, NewFlashController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"message_id": {flashMessageID},
 		},

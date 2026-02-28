@@ -89,8 +89,8 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			app := tc.setup()
-			router := routes.Router(app)
+			registry := tc.setup()
+			router := routes.Router(registry)
 
 			req := httptest.NewRequest(tc.method, tc.path, nil)
 			rr := httptest.NewRecorder()
@@ -101,7 +101,7 @@ func TestRoutes_HTTPWorkflows(t *testing.T) {
 				t.Fatalf("expected status %d, got %d", tc.expectedStatus, rr.Code)
 			}
 
-			tc.assert(t, rr, app)
+			tc.assert(t, rr, registry)
 		})
 	}
 }

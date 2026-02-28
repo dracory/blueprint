@@ -15,18 +15,18 @@ const (
 )
 
 func TestUserUntokenizeSuccess(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	app.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
+	registry.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
 
 	user := userstore.NewUser()
 
 	firstToken, lastToken, emailToken, phoneToken, businessToken, err := UserTokenize(
 		ctx,
-		app.GetVaultStore(),
+		registry.GetVaultStore(),
 		untokenizeVaultKey,
 		user,
 		"John",
@@ -45,7 +45,7 @@ func TestUserUntokenizeSuccess(t *testing.T) {
 	user.SetPhone(phoneToken)
 	user.SetBusinessName(businessToken)
 
-	firstName, lastName, email, businessName, phone, err := UserUntokenize(ctx, app, untokenizeVaultKey, user)
+	firstName, lastName, email, businessName, phone, err := UserUntokenize(ctx, registry, untokenizeVaultKey, user)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -72,36 +72,36 @@ func TestUserUntokenizeSuccess(t *testing.T) {
 }
 
 func TestUserUntokenizeReturnsErrorWhenVaultStoreNil(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	if _, _, _, _, _, err := UserUntokenize(context.Background(), app, untokenizeVaultKey, userstore.NewUser()); err == nil {
+	if _, _, _, _, _, err := UserUntokenize(context.Background(), registry, untokenizeVaultKey, userstore.NewUser()); err == nil {
 		t.Fatalf("expected error when vault store is nil")
 	}
 }
 
 func TestUserUntokenizeReturnsErrorWhenUserNil(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
-	if _, _, _, _, _, err := UserUntokenize(context.Background(), app, untokenizeVaultKey, nil); err == nil {
+	if _, _, _, _, _, err := UserUntokenize(context.Background(), registry, untokenizeVaultKey, nil); err == nil {
 		t.Fatalf("expected error when user is nil")
 	}
 }
 
 func TestUserUntokenizePropagatesVaultErrors(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	app.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
+	registry.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
 
 	user := userstore.NewUser()
 
 	firstToken, lastToken, emailToken, phoneToken, businessToken, err := UserTokenize(
 		ctx,
-		app.GetVaultStore(),
+		registry.GetVaultStore(),
 		untokenizeVaultKey,
 		user,
 		"John",
@@ -120,17 +120,17 @@ func TestUserUntokenizePropagatesVaultErrors(t *testing.T) {
 	user.SetPhone(phoneToken)
 	user.SetBusinessName(businessToken)
 
-	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", app.GetVaultStore().GetVaultTableName())); err != nil {
+	if _, err := registry.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", registry.GetVaultStore().GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 
-	if _, _, _, _, _, err := UserUntokenize(ctx, app, untokenizeVaultKey, user); err == nil {
+	if _, _, _, _, _, err := UserUntokenize(ctx, registry, untokenizeVaultKey, user); err == nil {
 		t.Fatalf("expected error when vault table is missing")
 	}
 }
 
 func TestUserUntokenizeTransparently_VaultDisabledReturnsPlainValues(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 	ctx := context.Background()
 
 	user := userstore.NewUser()
@@ -140,7 +140,7 @@ func TestUserUntokenizeTransparently_VaultDisabledReturnsPlainValues(t *testing.
 	user.SetPhone("+44111222333")
 	user.SetBusinessName("JD Consulting")
 
-	email, firstName, lastName, businessName, phone, err := UserUntokenizeTransparently(ctx, app, user)
+	email, firstName, lastName, businessName, phone, err := UserUntokenizeTransparently(ctx, registry, user)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -163,18 +163,18 @@ func TestUserUntokenizeTransparently_VaultDisabledReturnsPlainValues(t *testing.
 }
 
 func TestUserUntokenizeTransparently_VaultEnabledUntokenizes(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithVaultStore(true),
 	)
 	ctx := context.Background()
-	app.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
-	app.GetConfig().SetUserStoreVaultEnabled(true)
+	registry.GetConfig().SetVaultStoreKey(untokenizeVaultKey)
+	registry.GetConfig().SetUserStoreVaultEnabled(true)
 
 	user := userstore.NewUser()
 
 	firstToken, lastToken, emailToken, phoneToken, businessToken, err := UserTokenize(
 		ctx,
-		app.GetVaultStore(),
+		registry.GetVaultStore(),
 		untokenizeVaultKey,
 		user,
 		"John",
@@ -193,7 +193,7 @@ func TestUserUntokenizeTransparently_VaultEnabledUntokenizes(t *testing.T) {
 	user.SetPhone(phoneToken)
 	user.SetBusinessName(businessToken)
 
-	email, firstName, lastName, businessName, phone, err := UserUntokenizeTransparently(ctx, app, user)
+	email, firstName, lastName, businessName, phone, err := UserUntokenizeTransparently(ctx, registry, user)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -216,10 +216,10 @@ func TestUserUntokenizeTransparently_VaultEnabledUntokenizes(t *testing.T) {
 }
 
 func TestUserUntokenizeTransparently_ReturnsErrorWhenUserNil(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 	ctx := context.Background()
 
-	if _, _, _, _, _, err := UserUntokenizeTransparently(ctx, app, nil); err == nil {
+	if _, _, _, _, _, err := UserUntokenizeTransparently(ctx, registry, nil); err == nil {
 		t.Fatalf("expected error when user is nil")
 	}
 }

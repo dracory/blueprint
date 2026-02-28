@@ -164,7 +164,39 @@ func (c *postController) css() string {
 	`
 }
 
-func (controller *postController) processContent(content string, editor string) (html string, css string) {
+func (controller *postController) processContent(content string, editor string, contentType string) (html string, css string) {
+	// Use content type as primary determinant, fallback to editor for compatibility
+
+	// blocks content type
+	if contentType == blogstore.POST_CONTENT_TYPE_BLOCKS {
+		if editor == blogstore.POST_EDITOR_BLOCKAREA {
+			return helpers.BlogPostBlocksToString(content), ""
+		}
+		if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
+			theme, err := blogtheme.New(content)
+			if err != nil {
+				return "Error parsing content. Please try again later.", ""
+			}
+			return theme.ToHtml(), theme.Style()
+		}
+	}
+
+	// markdown content type
+	if contentType == blogstore.POST_CONTENT_TYPE_MARKDOWN {
+		return controller.markdownToHtml(content), ""
+	}
+
+	// html content type
+	if contentType == blogstore.POST_CONTENT_TYPE_HTML {
+		return content, ""
+	}
+
+	// plain text content type (default)
+	if contentType == blogstore.POST_CONTENT_TYPE_PLAIN_TEXT || contentType == "" {
+		return content, ""
+	}
+
+	// Fallback to editor-based processing for backward compatibility
 	// blockarea
 	if editor == blogstore.POST_EDITOR_BLOCKAREA {
 		return helpers.BlogPostBlocksToString(content), ""
@@ -195,7 +227,7 @@ func (controller *postController) processContent(content string, editor string) 
 }
 
 func (c *postController) sectionPost(post blogstore.Post) *hb.Tag {
-	postHtml, themeStyle := c.processContent(post.Content(), post.Editor())
+	postHtml, themeStyle := c.processContent(post.Content(), post.Editor(), post.ContentType())
 
 	rowTitle := hb.Div().
 		Class("BlogTitle").
@@ -230,8 +262,8 @@ func (c *postController) recommendationsSection(post blogstore.Post) hb.TagInter
 	})
 
 	// if rendered == nil {
-	// 	if c.app != nil && c.app.GetLogger() != nil {
-	// 		c.app.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
+	// 	if c.registry != nil && c.registry.GetLogger() != nil {
+	// 		c.registry.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
 	// 	}
 	// 	return hb.Div()
 	// }

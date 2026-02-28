@@ -27,7 +27,7 @@ const (
 
 type postRecommendationsComponent struct {
 	liveflux.Base
-	App           registry.RegistryInterface
+	registry      registry.RegistryInterface
 	CurrentPostID string
 	Posts         []blogstore.Post
 	errorMessage  string
@@ -41,7 +41,7 @@ func NewPostRecommendationsComponent(registry registry.RegistryInterface) livefl
 	}
 
 	if component, ok := inst.(*postRecommendationsComponent); ok {
-		component.App = registry
+		component.registry = registry
 	}
 
 	return inst
@@ -54,18 +54,18 @@ func (c *postRecommendationsComponent) GetKind() string {
 func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[string]string) error {
 	c.CurrentPostID = strings.TrimSpace(params["post_id"])
 
-	if c.App == nil {
-		if app, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.App = app
+	if c.registry == nil {
+		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
+			c.registry = registry
 		}
 	}
 
-	if c.App == nil {
+	if c.registry == nil {
 		c.errorMessage = "Application not initialized"
 		return nil
 	}
 
-	store := c.App.GetBlogStore()
+	store := c.registry.GetBlogStore()
 	if store == nil {
 		c.errorMessage = "Blog store is not configured"
 		return nil
@@ -78,9 +78,9 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 		Limit:     recommendationsQueryLimit,
 	}
 
-	postList, err := store.PostList(ctx, options)
+	postList, err := store.PostList(context.Background(), options)
 	if err != nil {
-		if logger := c.App.GetLogger(); logger != nil {
+		if logger := c.registry.GetLogger(); logger != nil {
 			logger.Error("Failed to load recommended posts", "error", err.Error())
 		}
 		c.errorMessage = "Unable to load more posts right now"
@@ -226,16 +226,8 @@ func (c *postRecommendationsComponent) truncatedSummary(text string) string {
 	return strings.TrimSpace(string(runes[:maxLength])) + "..."
 }
 
-// func (c *postRecommendationsComponent) postImage(post blogstore.Post) *hb.Tag {
-// 	thumbnailURL := thumbnailURL(post)
-
-// return hb.Image(thumbnailURL).
-//
-//	Class("card-img-top rounded-3").
-//	Style("object-fit: cover;").
-//	Style("max-height: 180px;").
 func (c *postRecommendationsComponent) postImage(post blogstore.Post) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(c.App, post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
 
 	return hb.Image(``).
 		Class("card-img-top").

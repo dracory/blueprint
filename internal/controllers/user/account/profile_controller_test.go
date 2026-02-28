@@ -13,14 +13,14 @@ import (
 )
 
 func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -48,7 +48,7 @@ func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,14 +64,14 @@ func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
 }
 
 func TestProfileController_ShowsProfileForm(t *testing.T) {
-	app := testutils.Setup(
+	registry := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func TestProfileController_ShowsProfileForm(t *testing.T) {
 		t.Fatal("user should not be nil")
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(app).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
 			auth.AuthenticatedUserID{}:           user.ID(),

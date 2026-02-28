@@ -145,10 +145,10 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 // for both browsers and CDNs.
 //
 // Content-Type Mapping:
-//   - jpg/jpeg → image/jpeg
-//   - png → image/png
-//   - gif → image/gif
-//   - other extensions → empty string (will be handled by browser)
+//   - jpg/jpeg --> image/jpeg
+//   - png --> image/png
+//   - gif --> image/gif
+//   - other extensions --> empty string (will be handled by browser)
 //
 // Cache Strategy:
 //   - Sets Cache-Control: max-age=604800 (7 days)
@@ -185,15 +185,15 @@ func (controller *thumbnailController) setHeaders(w http.ResponseWriter, fileExt
 //   - path: Image source path or URL
 //
 // Path Processing Rules:
-//   - "http/" → "http://" (URL normalization)
-//   - "https/" → "https://" (URL normalization)
-//   - "cache-" prefix → cache lookup mode
-//   - "files/" prefix → converted to full URL via links.URL()
+//   - "http/" --> "http://" (URL normalization)
+//   - "https/" --> "https://" (URL normalization)
+//   - "cache-" prefix --> cache lookup mode
+//   - "files/" prefix --> converted to full URL via links.URL()
 //
 // Size Parsing:
-//   - "WIDTHxHEIGHT" → Both dimensions set
-//   - "WIDTH" → Width set, height defaults to 0 (maintain aspect ratio)
-//   - Missing size → Error returned
+//   - "WIDTHxHEIGHT" --> Both dimensions set
+//   - "WIDTH" --> Width set, height defaults to 0 (maintain aspect ratio)
+//   - Missing size --> Error returned
 //
 // Validation:
 //   - All parameters must be present
