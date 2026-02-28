@@ -18,9 +18,9 @@ func TestAuditStoreInitialize_Success(t *testing.T) {
 func TestAuditStoreInitialize_NotUsed(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetAuditStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetAuditStore() != nil {
+	if registry.GetAuditStore() != nil {
 		t.Error("expected audit store to be nil when not used")
 	}
 }

@@ -19,10 +19,10 @@ func TestNew_SetsDefaultLogger(t *testing.T) {
 
 	registry, err := registry.New(cfg)
 	if err != nil {
-		t.Fatalf("app.New returned error: %v", err)
+		t.Fatalf("registry.New returned error: %v", err)
 	}
 
 	if registry.GetLogger() == nil {
-		t.Fatalf("expected registry logger to be non-nil right after app.New; got nil")
+		t.Fatalf("expected registry logger to be non-nil right after registry.New; got nil")
 	}
 }

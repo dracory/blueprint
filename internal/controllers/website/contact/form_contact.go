@@ -79,11 +79,11 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	c.CaptchaExpected = hashCaptchaValue(sumStr)
 	c.CaptchaAnswer = ""
 
-	if c.UserID == "" || c.App == nil || c.App.GetUserStore() == nil {
+	if c.UserID == "" || c.App == nil || c.registry.GetUserStore() == nil {
 		return nil
 	}
 
-	user, err := c.App.GetUserStore().UserFindByID(ctx, c.UserID)
+	user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
 	if err != nil || user == nil {
 		return nil
 	}
@@ -176,33 +176,33 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		"email":      c.Email,
 		"text":       c.Text,
 	}); err != nil {
-		if c.App != nil && c.App.GetLogger() != nil {
-			c.App.GetLogger().Error("At formContact.Handle", "error", err.Error())
+		if c.App != nil && c.registry.GetLogger() != nil {
+			c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
 		}
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
-	if c.App == nil || c.App.GetCustomStore() == nil {
+	if c.App == nil || c.registry.GetCustomStore() == nil {
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
-	if err := c.App.GetCustomStore().RecordCreate(record); err != nil {
-		c.App.GetLogger().Error("At formContact.Handle", "error", err.Error())
+	if err := c.registry.GetCustomStore().RecordCreate(record); err != nil {
+		c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
 	if _, err := email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(c.App).Enqueue(); err != nil {
-		c.App.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
+		c.registry.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
 	}
 
-	if c.UserID != "" && c.App != nil && c.App.GetUserStore() != nil {
-		user, err := c.App.GetUserStore().UserFindByID(ctx, c.UserID)
+	if c.UserID != "" && c.App != nil && c.registry.GetUserStore() != nil {
+		user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
 		if err == nil && user != nil {
 			if c.CanUpdateFirst {
 				user.SetFirstName(c.FirstName)
@@ -211,8 +211,8 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 				user.SetLastName(c.LastName)
 			}
 
-			if err := c.App.GetUserStore().UserUpdate(context.Background(), user); err != nil {
-				c.App.GetLogger().Error("At formContact.Handle", "error", err.Error())
+			if err := c.registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+				c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
 			}
 		}
 	}

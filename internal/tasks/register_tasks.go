@@ -18,7 +18,7 @@ import (
 // RegisterTasks registers the task handlers to the task store
 //
 // Parameters:
-// - none
+// - registry: the registry
 //
 // Returns:
 // - none

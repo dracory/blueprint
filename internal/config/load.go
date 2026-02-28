@@ -39,7 +39,7 @@ func Load() (ConfigInterface, error) {
 	trans := loadTranslationConfig()
 
 	if envEnc.used {
-		if err := initializeEnvEncVariables(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey); err != nil {
+		if err := initializeEnvEncVariables(registry.env, ENVENC_KEY_PUBLIC, envEnc.privateKey); err != nil {
 			acc.add(err)
 		} else {
 			envEnc.privateKey = "removed" // reset the private key
@@ -52,12 +52,12 @@ func Load() (ConfigInterface, error) {
 
 	cfg := New()
 
-	cfg.SetAppName(app.name)
-	cfg.SetAppUrl(app.url)
-	cfg.SetAppHost(app.host)
-	cfg.SetAppPort(app.port)
-	cfg.SetAppEnv(app.env)
-	cfg.SetAppDebug(app.debug)
+	cfg.SetAppName(registry.name)
+	cfg.SetAppUrl(registry.url)
+	cfg.SetAppHost(registry.host)
+	cfg.SetAppPort(registry.port)
+	cfg.SetAppEnv(registry.env)
+	cfg.SetAppDebug(registry.debug)
 
 	cfg.SetDatabaseDriver(db.driver)
 	cfg.SetDatabaseHost(db.host)
@@ -81,7 +81,7 @@ func Load() (ConfigInterface, error) {
 	cfg.SetBlogStoreUsed(stores.blogStoreUsed)
 	cfg.SetCacheStoreUsed(stores.cacheStoreUsed)
 	cfg.SetCmsStoreUsed(stores.cmsStoreUsed)
-	cfg.SetCmsMcpApiKey(app.cmsMcpApiKey)
+	cfg.SetCmsMcpApiKey(registry.cmsMcpApiKey)
 	cfg.SetCmsStoreTemplateID(stores.cmsStoreTemplateID)
 	cfg.SetCustomStoreUsed(stores.customStoreUsed)
 	cfg.SetEntityStoreUsed(stores.entityStoreUsed)
