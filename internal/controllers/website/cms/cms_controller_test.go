@@ -1,11 +1,15 @@
 package cms
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"project/internal/links"
 	"project/internal/testutils"
 	"strings"
 	"testing"
+
+	"github.com/dracory/rtr"
 )
 
 func TestCmsController_Handler_Success(t *testing.T) {
@@ -13,15 +17,15 @@ func TestCmsController_Handler_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
-	controller := NewCmsController(app)
+	controller := NewCmsController(registry)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -51,9 +55,9 @@ func TestCmsController_Handler_CmsNotConfigured(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false) // CMS store is not enabled
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	controller := NewCmsController(app)
+	controller := NewCmsController(registry)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -80,16 +84,16 @@ func TestGetInstance_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
 	// --- Execute ---
-	instance := GetInstance(app)
+	instance := GetInstance(registry)
 
 	// --- Assert ---
 	if instance == nil {
@@ -101,10 +105,10 @@ func TestGetInstance_NilWhenCmsNotConfigured(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	// --- Execute ---
-	instance := GetInstance(app)
+	instance := GetInstance(registry)
 
 	// --- Assert ---
 	// When CMS store is nil, the instance should still be created but won't work properly
@@ -117,16 +121,54 @@ func TestGetInstance_NilWhenCmsNotConfigured(t *testing.T) {
 func TestNewCmsController(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	// --- Execute ---
-	controller := NewCmsController(app)
+	controller := NewCmsController(registry)
 
 	// --- Assert ---
 	if controller == nil {
 		t.Fatal("Expected controller to not be nil")
 	}
 	if controller.registry == nil {
-		t.Fatal("Expected controller.app to not be nil")
+		t.Fatal("Expected controller.registry to not be nil")
+	}
+}
+
+func TestCmsMcpEndpoint_RequiresApiKey(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetCmsStoreUsed(true)
+	cfg.SetCmsStoreTemplateID("test-template")
+	cfg.SetCmsMcpApiKey("test-mcp-key")
+
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	r := rtr.NewRouter()
+	r.AddRoutes(Routes(registry))
+
+	// Missing key
+	reqMissing := httptest.NewRequest(http.MethodPost, links.MCP_CMS, bytes.NewBuffer([]byte(`{"jsonrpc":"2.0","id":"1","method":"list_tools","params":{}}`)))
+	resMissing := httptest.NewRecorder()
+	r.ServeHTTP(resMissing, reqMissing)
+	if resMissing.Code != http.StatusUnauthorized {
+		t.Fatalf("expected %d, got %d", http.StatusUnauthorized, resMissing.Code)
+	}
+
+	// Wrong key
+	reqWrong := httptest.NewRequest(http.MethodPost, links.MCP_CMS, bytes.NewBuffer([]byte(`{"jsonrpc":"2.0","id":"1","method":"list_tools","params":{}}`)))
+	reqWrong.Header.Set("X-MCP-API-Key", "wrong")
+	resWrong := httptest.NewRecorder()
+	r.ServeHTTP(resWrong, reqWrong)
+	if resWrong.Code != http.StatusUnauthorized {
+		t.Fatalf("expected %d, got %d", http.StatusUnauthorized, resWrong.Code)
+	}
+
+	// Correct key
+	reqOk := httptest.NewRequest(http.MethodPost, links.MCP_CMS, bytes.NewBuffer([]byte(`{"jsonrpc":"2.0","id":"1","method":"list_tools","params":{}}`)))
+	reqOk.Header.Set("X-MCP-API-Key", "test-mcp-key")
+	resOk := httptest.NewRecorder()
+	r.ServeHTTP(resOk, reqOk)
+	if resOk.Code != http.StatusOK {
+		t.Fatalf("expected %d, got %d", http.StatusOK, resOk.Code)
 	}
 }

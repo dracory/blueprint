@@ -75,7 +75,7 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 		Child(hb.Paragraph().HTML("Your application is running. This starter includes routing, controllers, and optional modules you can enable as you build.")).
 		Child(actions).
 		Child(grid).
-		Child(hb.Div().Class("footer").HTML("Go · " + appName))
+		Child(hb.Div().Class("footer").HTML("Go - " + appName))
 
 	card := hb.Div().
 		Class("card").

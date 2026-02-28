@@ -12,17 +12,17 @@ import (
 )
 
 func TestNewPostRecommendationsComponent(t *testing.T) {
-	app := testutils.Setup()
+	registry := testutils.Setup()
 
-	component := NewPostRecommendationsComponent(app)
+	component := NewPostRecommendationsComponent(registry)
 	if component == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
 }
 
 func TestPostRecommendationsComponent_GetKind(t *testing.T) {
-	app := testutils.Setup()
-	component := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup()
+	component := NewPostRecommendationsComponent(registry)
 	if component == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -48,8 +48,8 @@ func TestPostRecommendationsComponent_Mount_NoApp(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Mount_NoStore(t *testing.T) {
-	app := testutils.Setup() // No blog store enabled
-	componentAny := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup() // No blog store enabled
+	componentAny := NewPostRecommendationsComponent(registry)
 	if componentAny == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -66,8 +66,8 @@ func TestPostRecommendationsComponent_Mount_NoStore(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Mount_StoreError(t *testing.T) {
-	app := testutils.Setup(testutils.WithBlogStore(true))
-	component := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup(testutils.WithBlogStore(true))
+	component := NewPostRecommendationsComponent(registry)
 	if component == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -84,7 +84,7 @@ func TestPostRecommendationsComponent_Mount_StoreError(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
-	app := testutils.Setup(testutils.WithBlogStore(true))
+	registry := testutils.Setup(testutils.WithBlogStore(true))
 
 	// Create some test posts
 	for i := 0; i < 5; i++ {
@@ -93,21 +93,19 @@ func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
 		post.SetContent("Test content")
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 		post.SetPublishedAt(carbon.Now().ToDateTimeString())
-		err := app.GetBlogStore().PostCreate(context.Background(), post)
+		err := registry.GetBlogStore().PostCreate(context.Background(), post)
 		if err != nil {
 			t.Fatalf("Failed to create test post: %v", err)
 		}
 	}
 
-	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
+	component := NewPostRecommendationsComponent(registry).(*postRecommendationsComponent)
 
 	// Mount with a post ID that exists
-	posts, err := app.GetBlogStore().PostList(
-		context.Background(),
-		blogstore.PostQueryOptions{
-			Status: blogstore.POST_STATUS_PUBLISHED,
-			Limit:  1,
-		})
+	posts, err := registry.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
+		Status: blogstore.POST_STATUS_PUBLISHED,
+		Limit:  1,
+	})
 	if err != nil || len(posts) == 0 {
 		t.Fatal("Failed to get a test post ID")
 	}
@@ -150,8 +148,8 @@ func TestPostRecommendationsComponent_Render_Error(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Render_NoPosts(t *testing.T) {
-	app := testutils.Setup()
-	component := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup()
+	component := NewPostRecommendationsComponent(registry)
 	if component == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -175,7 +173,7 @@ func TestPostRecommendationsComponent_Render_NoPosts(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
-	app := testutils.Setup(testutils.WithBlogStore(true))
+	registry := testutils.Setup(testutils.WithBlogStore(true))
 
 	// Create test posts
 	posts := make([]blogstore.Post, 3)
@@ -185,14 +183,14 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 		post.SetContent("Test content " + string(rune('A'+i)))
 		post.SetSummary("Test summary " + string(rune('A'+i)))
 		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-		err := app.GetBlogStore().PostCreate(context.Background(), post)
+		err := registry.GetBlogStore().PostCreate(context.Background(), post)
 		if err != nil {
 			t.Fatalf("Failed to create test post: %v", err)
 		}
 		posts[i] = *post
 	}
 
-	component := NewPostRecommendationsComponent(app).(*postRecommendationsComponent)
+	component := NewPostRecommendationsComponent(registry).(*postRecommendationsComponent)
 
 	// Mount with first post as current
 	err := component.Mount(context.Background(), map[string]string{"post_id": posts[0].ID()})
@@ -235,8 +233,8 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_Handle(t *testing.T) {
-	app := testutils.Setup()
-	component := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup()
+	component := NewPostRecommendationsComponent(registry)
 	if component == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -249,8 +247,8 @@ func TestPostRecommendationsComponent_Handle(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_PostCard(t *testing.T) {
-	app := testutils.Setup()
-	componentAny := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup()
+	componentAny := NewPostRecommendationsComponent(registry)
 	if componentAny == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}
@@ -304,8 +302,8 @@ func TestPostRecommendationsComponent_PostCard(t *testing.T) {
 }
 
 func TestPostRecommendationsComponent_TruncatedSummary(t *testing.T) {
-	app := testutils.Setup()
-	componentAny := NewPostRecommendationsComponent(app)
+	registry := testutils.Setup()
+	componentAny := NewPostRecommendationsComponent(registry)
 	if componentAny == nil {
 		t.Fatal("Expected component to be created, got nil")
 	}

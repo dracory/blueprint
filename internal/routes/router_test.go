@@ -6,102 +6,74 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/registry"
 	"project/internal/routes"
 	"project/internal/testutils"
 )
 
-func TestRoutes_HTTPWorkflows(t *testing.T) {
+func TestRoutes_HTTPWorkflows_WebsiteHomeReturnsOk(t *testing.T) {
 	t.Parallel()
 
-	testCases := []struct {
-		name           string
-		method         string
-		path           string
-		setup          func() registry.RegistryInterface
-		expectedStatus int
-		assert         func(*testing.T, *httptest.ResponseRecorder, registry.RegistryInterface)
-	}{
-		{
-			name:   "website home returns ok",
-			method: http.MethodGet,
-			path:   "/",
-			setup: func() registry.RegistryInterface {
-				return testutils.Setup(
-					testutils.WithCacheStore(true),
-					testutils.WithSessionStore(true),
-					testutils.WithUserStore(true),
-				)
-			},
-			expectedStatus: http.StatusOK,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, _ registry.RegistryInterface) {
-				t.Helper()
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+	router := routes.Router(registry)
 
-				body := rr.Body.String()
-				if !strings.Contains(body, "<!DOCTYPE html>") {
-					t.Fatalf("expected response to contain html doctype, got %q", body)
-				}
-			},
-		},
-		{
-			name:   "user home redirects unauthenticated users",
-			method: http.MethodGet,
-			path:   "/user",
-			setup: func() registry.RegistryInterface {
-				return testutils.Setup(
-					testutils.WithCacheStore(true),
-					testutils.WithGeoStore(true),
-					testutils.WithSessionStore(true),
-					testutils.WithShopStore(true),
-					testutils.WithUserStore(true),
-				)
-			},
-			expectedStatus: http.StatusSeeOther,
-			assert: func(t *testing.T, rr *httptest.ResponseRecorder, registry registry.RegistryInterface) {
-				t.Helper()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rr := httptest.NewRecorder()
 
-				if rr.Header().Get("Location") == "" {
-					t.Fatalf("expected redirect Location header to be set")
-				}
+	router.ServeHTTP(rr, req)
 
-				flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), rr.Result())
-				if err != nil {
-					t.Fatalf("failed to fetch flash message: %v", err)
-				}
-
-				if flashMessage == nil {
-					t.Fatalf("expected flash message to be stored for redirect")
-				}
-
-				if flashMessage.Type != "error" {
-					t.Fatalf("expected flash message type error, got %s", flashMessage.Type)
-				}
-
-				if flashMessage.Message != "Only authenticated users can access this page" {
-					t.Fatalf("unexpected flash message: %s", flashMessage.Message)
-				}
-			},
-		},
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, rr.Code)
 	}
 
-	for _, tc := range testCases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
+	body := rr.Body.String()
+	if !strings.Contains(body, "<!DOCTYPE html>") {
+		t.Fatalf("expected response to contain html doctype, got %q", body)
+	}
+}
 
-			registry := tc.setup()
-			router := routes.Router(registry)
+func TestRoutes_HTTPWorkflows_UserHomeRedirectsUnauthenticatedUsers(t *testing.T) {
+	t.Parallel()
 
-			req := httptest.NewRequest(tc.method, tc.path, nil)
-			rr := httptest.NewRecorder()
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithShopStore(true),
+		testutils.WithUserStore(true),
+	)
+	router := routes.Router(registry)
 
-			router.ServeHTTP(rr, req)
+	req := httptest.NewRequest(http.MethodGet, "/user", nil)
+	rr := httptest.NewRecorder()
 
-			if rr.Code != tc.expectedStatus {
-				t.Fatalf("expected status %d, got %d", tc.expectedStatus, rr.Code)
-			}
+	router.ServeHTTP(rr, req)
 
-			tc.assert(t, rr, registry)
-		})
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("expected status %d, got %d", http.StatusSeeOther, rr.Code)
+	}
+
+	if rr.Header().Get("Location") == "" {
+		t.Fatalf("expected redirect Location header to be set")
+	}
+
+	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), rr.Result())
+	if err != nil {
+		t.Fatalf("failed to fetch flash message: %v", err)
+	}
+
+	if flashMessage == nil {
+		t.Fatalf("expected flash message to be stored for redirect")
+	}
+
+	if flashMessage.Type != "error" {
+		t.Fatalf("expected flash message type error, got %s", flashMessage.Type)
+	}
+
+	if flashMessage.Message != "Only authenticated users can access this page" {
+		t.Fatalf("unexpected flash message: %s", flashMessage.Message)
 	}
 }
