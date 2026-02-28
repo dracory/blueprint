@@ -25,7 +25,7 @@ import (
 
 type formContact struct {
 	liveflux.Base
-	App             registry.RegistryInterface
+	registry        registry.RegistryInterface
 	UserID          string
 	Email           string
 	FirstName       string
@@ -51,7 +51,7 @@ func NewFormContact(registry registry.RegistryInterface) liveflux.ComponentInter
 	}
 
 	if c, ok := inst.(*formContact); ok {
-		c.App = registry
+		c.registry = registry
 	}
 
 	return inst
@@ -79,7 +79,7 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	c.CaptchaExpected = hashCaptchaValue(sumStr)
 	c.CaptchaAnswer = ""
 
-	if c.UserID == "" || c.App == nil || c.registry.GetUserStore() == nil {
+	if c.UserID == "" || c.registry == nil || c.registry.GetUserStore() == nil {
 		return nil
 	}
 
@@ -176,7 +176,7 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		"email":      c.Email,
 		"text":       c.Text,
 	}); err != nil {
-		if c.App != nil && c.registry.GetLogger() != nil {
+		if c.registry != nil && c.registry.GetLogger() != nil {
 			c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
 		}
 		c.ErrorMessage = "System error occurred. Please try again later."
@@ -184,7 +184,7 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		return nil
 	}
 
-	if c.App == nil || c.registry.GetCustomStore() == nil {
+	if c.registry == nil || c.registry.GetCustomStore() == nil {
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
@@ -197,11 +197,11 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		return nil
 	}
 
-	if _, err := email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(c.App).Enqueue(); err != nil {
+	if _, err := email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(c.registry).Enqueue(); err != nil {
 		c.registry.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
 	}
 
-	if c.UserID != "" && c.App != nil && c.registry.GetUserStore() != nil {
+	if c.UserID != "" && c.registry != nil && c.registry.GetUserStore() != nil {
 		user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
 		if err == nil && user != nil {
 			if c.CanUpdateFirst {
