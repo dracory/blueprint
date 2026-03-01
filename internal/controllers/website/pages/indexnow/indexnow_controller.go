@@ -10,12 +10,12 @@ import (
 )
 
 type indexNowController struct {
-	app registry.RegistryInterface
+	registry registry.RegistryInterface
 }
 
-func NewIndexNowController(app registry.RegistryInterface) *indexNowController {
+func NewIndexNowController(registry registry.RegistryInterface) *indexNowController {
 	return &indexNowController{
-		app: app,
+		registry: registry,
 	}
 }
 
@@ -27,14 +27,14 @@ func (controller *indexNowController) Handler(w http.ResponseWriter, r *http.Req
 		ScriptURLs:     []string{},
 	}
 
-	if controller.app.GetConfig().GetCmsStoreUsed() {
+	if controller.registry.GetConfig().GetCmsStoreUsed() {
 		return layouts.NewCmsLayout(
-			controller.app,
+			controller.registry,
 			r,
 			options).ToHTML()
 	} else {
 		return layouts.NewBlankLayout(
-			controller.app,
+			controller.registry,
 			r,
 			options).ToHTML()
 	}
@@ -93,10 +93,10 @@ func (controller *indexNowController) sectionKey() hb.TagInterface {
 
 	keyCode := hb.Code().
 		Class("d-block p-3 bg-light rounded text-break").
-		Text(controller.app.GetConfig().GetIndexNowKey())
+		Text(controller.registry.GetConfig().GetIndexNowKey())
 
 	keyLink := hb.A().
-		Href("/" + controller.app.GetConfig().GetIndexNowKey() + ".txt").
+		Href("/" + controller.registry.GetConfig().GetIndexNowKey() + ".txt").
 		Text("View key file")
 
 	cardBody := hb.Div().
