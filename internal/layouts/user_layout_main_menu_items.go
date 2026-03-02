@@ -27,16 +27,17 @@ func userLayoutMainMenuItems(user userstore.UserInterface) []dashboardTypes.Menu
 		URL:   websiteHomeLink,
 	}
 
-	profileMenuItem := dashboardTypes.MenuItem{
-		Icon:  hb.I().Class("bi bi-person").Style("margin-right:10px;").ToHTML(),
-		Title: "My Account",
-		URL:   links.User().Profile(),
-	}
-
 	loginMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-door-open").Style("margin-right:10px;").ToHTML(),
 		Title: "Login",
 		URL:   loginLink,
+	}
+	
+
+	profileMenuItem := dashboardTypes.MenuItem{
+		Icon:  hb.I().Class("bi bi-person").Style("margin-right:10px;").ToHTML(),
+		Title: "My Account",
+		URL:   links.User().Profile(),
 	}
 
 	// shopMenuItem := dashboard.MenuItem{
