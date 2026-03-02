@@ -27,6 +27,12 @@ func NewHTTPSRedirectMiddleware() rtr.MiddlewareInterface {
 					next.ServeHTTP(w, r)
 					return
 				}
+				
+				// Check if already HTTPS
+				if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
+					next.ServeHTTP(w, r)
+					return
+				}
 
 				// Redirect to HTTPS version of same URL
 				httpsURL := "https://" + r.Host + r.URL.Path
