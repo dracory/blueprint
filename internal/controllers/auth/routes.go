@@ -1,6 +1,10 @@
 package auth
 
 import (
+	"project/internal/controllers/auth/authentication"
+	"project/internal/controllers/auth/login"
+	"project/internal/controllers/auth/logout"
+	"project/internal/controllers/auth/register"
 	"project/internal/links"
 	"project/internal/registry"
 
@@ -12,22 +16,22 @@ func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
 	authRoute := rtr.NewRoute().
 		SetName("Auth > Auth Controller").
 		SetPath(links.AUTH_AUTH).
-		SetHTMLHandler(NewAuthenticationController(application).Handler)
+		SetHTMLHandler(authentication.NewAuthenticationController(application).Handler)
 
 	loginRoute := rtr.NewRoute().
 		SetName("Auth > Login Controller").
 		SetPath(links.AUTH_LOGIN).
-		SetHTMLHandler(NewLoginController(application).Handler)
+		SetHTMLHandler(login.NewLoginController(application).Handler)
 
 	logoutRoute := rtr.NewRoute().
 		SetName("Auth > Logout Controller").
 		SetPath(links.AUTH_LOGOUT).
-		SetHTMLHandler(NewLogoutController(application).AnyIndex)
+		SetHTMLHandler(logout.NewLogoutController(application).AnyIndex)
 
 	registerRoute := rtr.NewRoute().
 		SetName("Auth > Register Controller").
 		SetPath(links.AUTH_REGISTER).
-		SetHTMLHandler(NewRegisterController(application).Handler)
+		SetHTMLHandler(register.NewRegisterController(application).Handler)
 
 	authRoutes := []rtr.RouteInterface{
 		authRoute,
