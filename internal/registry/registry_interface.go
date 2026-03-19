@@ -62,7 +62,7 @@ type RegistryInterface interface {
 	// == Stores (all specific data stores)
 	// ========================================================================
 
-    // Audit store
+	// Audit store
 	GetAuditStore() auditstore.StoreInterface
 	SetAuditStore(s auditstore.StoreInterface)
 
