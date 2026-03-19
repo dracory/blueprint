@@ -30,9 +30,47 @@ type appConfigInterface interface {
 	IsEnvTesting() bool
 }
 
+type auditStoreConfigInterface interface {
+	SetAuditStoreUsed(bool)
+	GetAuditStoreUsed() bool
+}
+
+type authConfigInterface interface {
+	SetRegistrationEnabled(bool)
+	GetRegistrationEnabled() bool
+}
+
+type blogStoreConfigInterface interface {
+	SetBlogStoreUsed(bool)
+	GetBlogStoreUsed() bool
+}
+
+type cacheStoreConfigInterface interface {
+	SetCacheStoreUsed(bool)
+	GetCacheStoreUsed() bool
+}
+
+type chatStoreConfigInterface interface {
+	SetChatStoreUsed(bool)
+	GetChatStoreUsed() bool
+}
+
 type cmsMcpConfigInterface interface {
 	SetCmsMcpApiKey(string)
 	GetCmsMcpApiKey() string
+}
+
+type cmsStoreConfigInterface interface {
+	SetCmsStoreUsed(bool)
+	GetCmsStoreUsed() bool
+
+	SetCmsStoreTemplateID(string)
+	GetCmsStoreTemplateID() string
+}
+
+type customStoreConfigInterface interface {
+	SetCustomStoreUsed(bool)
+	GetCustomStoreUsed() bool
 }
 
 type databaseConfigInterface interface {
@@ -81,9 +119,32 @@ type emailConfigInterface interface {
 	GetMailFromName() string
 }
 
-type authConfigInterface interface {
-	SetRegistrationEnabled(bool)
-	GetRegistrationEnabled() bool
+type entityStoreConfigInterface interface {
+	SetEntityStoreUsed(bool)
+	GetEntityStoreUsed() bool
+}
+
+type envEncryptionConfigInterface interface {
+	SetEnvEncryptionKey(string)
+	GetEnvEncryptionKey() string
+}
+
+type feedStoreConfigInterface interface {
+	SetFeedStoreUsed(bool)
+	GetFeedStoreUsed() bool
+}
+
+type geoStoreConfigInterface interface {
+	SetGeoStoreUsed(bool)
+	GetGeoStoreUsed() bool
+}
+
+type i18nConfigInterface interface {
+	SetTranslationLanguageDefault(string)
+	GetTranslationLanguageDefault() string
+
+	SetTranslationLanguageList(map[string]string)
+	GetTranslationLanguageList() map[string]string
 }
 
 type llmConfigInterface interface {
@@ -144,137 +205,9 @@ type llmConfigInterface interface {
 	GetVertexAiApiModelID() string
 }
 
-type envEncryptionConfigInterface interface {
-	SetEnvEncryptionKey(string)
-	GetEnvEncryptionKey() string
-}
-
-type blogStoreConfigInterface interface {
-	SetBlogStoreUsed(bool)
-	GetBlogStoreUsed() bool
-}
-
-type chatStoreConfigInterface interface {
-	SetChatStoreUsed(bool)
-	GetChatStoreUsed() bool
-}
-
-type cacheStoreConfigInterface interface {
-	SetCacheStoreUsed(bool)
-	GetCacheStoreUsed() bool
-}
-
-type cmsStoreConfigInterface interface {
-	SetCmsStoreUsed(bool)
-	GetCmsStoreUsed() bool
-
-	SetCmsStoreTemplateID(string)
-	GetCmsStoreTemplateID() string
-}
-
-type customStoreConfigInterface interface {
-	SetCustomStoreUsed(bool)
-	GetCustomStoreUsed() bool
-}
-
-type entityStoreConfigInterface interface {
-	SetEntityStoreUsed(bool)
-	GetEntityStoreUsed() bool
-}
-
-type feedStoreConfigInterface interface {
-	SetFeedStoreUsed(bool)
-	GetFeedStoreUsed() bool
-}
-
-type geoStoreConfigInterface interface {
-	SetGeoStoreUsed(bool)
-	GetGeoStoreUsed() bool
-}
-
 type logStoreConfigInterface interface {
 	SetLogStoreUsed(bool)
 	GetLogStoreUsed() bool
-}
-
-type metaStoreConfigInterface interface {
-	SetMetaStoreUsed(bool)
-	GetMetaStoreUsed() bool
-}
-
-type subscriptionStoreConfigInterface interface {
-	SetSubscriptionStoreUsed(bool)
-	GetSubscriptionStoreUsed() bool
-}
-
-type sessionStoreConfigInterface interface {
-	SetSessionStoreUsed(bool)
-	GetSessionStoreUsed() bool
-}
-
-type settingStoreConfigInterface interface {
-	SetSettingStoreUsed(bool)
-	GetSettingStoreUsed() bool
-}
-
-type shopStoreConfigInterface interface {
-	SetShopStoreUsed(bool)
-	GetShopStoreUsed() bool
-}
-
-type sqlFileStoreConfigInterface interface {
-	SetSqlFileStoreUsed(bool)
-	GetSqlFileStoreUsed() bool
-}
-
-type statsStoreConfigInterface interface {
-	SetStatsStoreUsed(bool)
-	GetStatsStoreUsed() bool
-}
-
-type taskStoreConfigInterface interface {
-	SetTaskStoreUsed(bool)
-	GetTaskStoreUsed() bool
-}
-
-type userStoreConfigInterface interface {
-	SetUserStoreUsed(bool)
-	GetUserStoreUsed() bool
-
-	SetUserStoreVaultEnabled(bool)
-	GetUserStoreVaultEnabled() bool
-}
-
-type auditStoreConfigInterface interface {
-	SetAuditStoreUsed(bool)
-	GetAuditStoreUsed() bool
-}
-
-type vaultStoreConfigInterface interface {
-	SetVaultStoreUsed(bool)
-	GetVaultStoreUsed() bool
-
-	SetVaultStoreKey(string)
-	GetVaultStoreKey() string
-}
-
-type i18nConfigInterface interface {
-	SetTranslationLanguageDefault(string)
-	GetTranslationLanguageDefault() string
-
-	SetTranslationLanguageList(map[string]string)
-	GetTranslationLanguageList() map[string]string
-}
-
-type paymentConfigInterface interface {
-	SetStripeKeyPrivate(string)
-	GetStripeKeyPrivate() string
-
-	SetStripeKeyPublic(string)
-	GetStripeKeyPublic() string
-
-	SetStripeUsed(bool)
-	GetStripeUsed() bool
 }
 
 type mediaConfigInterface interface {
@@ -303,13 +236,82 @@ type mediaConfigInterface interface {
 	GetMediaUrl() string
 }
 
+type metaStoreConfigInterface interface {
+	SetMetaStoreUsed(bool)
+	GetMetaStoreUsed() bool
+}
+
+type paymentConfigInterface interface {
+	SetStripeKeyPrivate(string)
+	GetStripeKeyPrivate() string
+
+	SetStripeKeyPublic(string)
+	GetStripeKeyPublic() string
+
+	SetStripeUsed(bool)
+	GetStripeUsed() bool
+}
+
 type seoConfigInterface interface {
 	SetIndexNowKey(string)
 	GetIndexNowKey() string
 }
 
+type sessionStoreConfigInterface interface {
+	SetSessionStoreUsed(bool)
+	GetSessionStoreUsed() bool
+}
+
+type settingStoreConfigInterface interface {
+	SetSettingStoreUsed(bool)
+	GetSettingStoreUsed() bool
+}
+
+type shopStoreConfigInterface interface {
+	SetShopStoreUsed(bool)
+	GetShopStoreUsed() bool
+}
+
+type sqlFileStoreConfigInterface interface {
+	SetSqlFileStoreUsed(bool)
+	GetSqlFileStoreUsed() bool
+}
+
+type statsStoreConfigInterface interface {
+	SetStatsStoreUsed(bool)
+	GetStatsStoreUsed() bool
+}
+
+type subscriptionStoreConfigInterface interface {
+	SetSubscriptionStoreUsed(bool)
+	GetSubscriptionStoreUsed() bool
+}
+
+type taskStoreConfigInterface interface {
+	SetTaskStoreUsed(bool)
+	GetTaskStoreUsed() bool
+}
+
+type userStoreConfigInterface interface {
+	SetUserStoreUsed(bool)
+	GetUserStoreUsed() bool
+
+	SetUserStoreVaultEnabled(bool)
+	GetUserStoreVaultEnabled() bool
+}
+
+type vaultStoreConfigInterface interface {
+	SetVaultStoreUsed(bool)
+	GetVaultStoreUsed() bool
+
+	SetVaultStoreKey(string)
+	GetVaultStoreKey() string
+}
+
+// ConfigInterface defines the contract for application configuration.
+// It provides access to all application settings and environment-specific
+// configuration values.
 type ConfigInterface interface {
-	// App-specific settings
 	appConfigInterface
 	cmsMcpConfigInterface
 	authConfigInterface
