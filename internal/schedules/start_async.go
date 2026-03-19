@@ -2,8 +2,9 @@ package schedules
 
 import (
 	"context"
-	"project/internal/registry"
 	"time"
+
+	"project/internal/registry"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/go-co-op/gocron"
