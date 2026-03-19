@@ -63,6 +63,11 @@ func UserUntokenize(
 		keyTokenMap[keyPhone] = phoneToken
 	}
 
+	// If no tokens exist, return empty values without calling vault store
+	if len(keyTokenMap) == 0 {
+		return "", "", "", "", "", nil
+	}
+
 	untokenized, err := helpers.Untokenize(ctx, registry.GetVaultStore(), vaultKey, keyTokenMap) // use Untokenize as more resource optimized
 
 	if err != nil {
