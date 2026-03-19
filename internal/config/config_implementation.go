@@ -436,10 +436,16 @@ func (c *configImplementation) GetVertexAiApiProjectID() string {
 func (c *configImplementation) SetVertexAiApiRegionID(v string) {
 	c.vertexAiApiRegionID = v
 }
-func (c *configImplementation) GetVertexAiApiRegionID() string { return c.vertexAiApiRegionID }
+func (c *configImplementation) GetVertexAiApiRegionID() string {
+	return c.vertexAiApiRegionID
+}
 
-func (c *configImplementation) SetVertexAiApiModelID(v string) { c.vertexAiApiModelID = v }
-func (c *configImplementation) GetVertexAiApiModelID() string  { return c.vertexAiApiModelID }
+func (c *configImplementation) SetVertexAiApiModelID(v string) {
+	c.vertexAiApiModelID = v
+}
+func (c *configImplementation) GetVertexAiApiModelID() string {
+	return c.vertexAiApiModelID
+}
 
 // == Encryption Getters/Setters ==
 func (c *configImplementation) SetEnvEncryptionKey(v string) {
@@ -695,6 +701,7 @@ func (c *configImplementation) GetVaultStoreUsed() bool {
 func (c *configImplementation) SetVaultStoreKey(v string) {
 	c.vaultStoreKey = v
 }
+
 func (c *configImplementation) GetVaultStoreKey() string {
 	return c.vaultStoreKey
 }

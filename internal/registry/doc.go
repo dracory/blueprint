@@ -5,7 +5,7 @@
 // for:
 //
 //   1. Providing typed access to core services:
-//        - Database connections (GetDB())
+//        - Database connections (GetDatabase())
 //        - Logger (GetLogger())
 //        - Router (GetRouter())
 //        - Config (GetConfig())
@@ -50,7 +50,7 @@
 //
 //    registry := NewRegistry(config)
 //
-//    db := registry.GetDB()
+//    db := registry.GetDatabase()
 //    userStore := registry.GetUserStore()  // may be nil if disabled by config
 //
 package registry
