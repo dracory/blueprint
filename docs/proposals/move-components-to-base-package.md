@@ -19,23 +19,6 @@ If the same block editor format is used across multiple Dracory projects (e.g., 
 
 ---
 
-### 4. Shared UI & Domain Packages (High Priority)
-
-#### Directories to Move:
-- `pkg/blogai`
-- `pkg/blogblocks`
-- `pkg/blogtheme`
-- `pkg/testimonials`
-- `pkg/webtheme`
-
-#### Reasoning:
-These packages in `pkg/` are already structured as libraries but are currently local to Blueprint. They should be moved to their own repositories if they are intended to be reused.
-
-#### Proposed Location:
-`github.com/dracory/*` (Independent repositories)
-
----
-
 ### 5. Standardized Configuration & Context Keys (High Priority)
 
 #### Logic to Move:
@@ -61,22 +44,6 @@ All projects use the same orchestration logic for caches, loggers, and database 
 
 #### Proposed Location:
 `github.com/dracory/base/registry` or `github.com/dracory/registry`
-
----
-
-### 7. Generic Session & User Helpers (Medium Priority)
-
-#### Files to Move:
-- `internal/helpers/extend_session.go`
-- `internal/helpers/get_auth_sesson.go`
-- `internal/helpers/user_settings.go`
-- `internal/ext/user.go` - `DisplayNameFull`, `IsClient`, etc.
-
-#### Reasoning:
-Once the context keys are standardized, these helpers become framework-agnostic utilities that work with any `sessionstore` or `userstore` implementation.
-
-#### Proposed Location:
-`github.com/dracory/base/session` and `github.com/dracory/base/user`
 
 ---
 
