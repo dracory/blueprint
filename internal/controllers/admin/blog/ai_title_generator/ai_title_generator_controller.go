@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"net/http"
 	"project/internal/controllers/admin/blog/shared"
-	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+
 	"project/internal/registry"
 	"project/pkg/blogai"
 	"strings"
 
+	"github.com/dracory/base/htmx"
 	"github.com/dracory/cdn"
 	"github.com/dracory/customstore"
 	"github.com/dracory/hb"
@@ -80,7 +81,7 @@ func (c *AiTitleGeneratorController) Handler(w http.ResponseWriter, r *http.Requ
 			liveflux.Script().ToHTML(),
 		},
 		Styles: []string{
-			ext.HxHideIndicatorCSS(),
+			htmx.HxHideIndicatorCSS(),
 		},
 	}).ToHTML()
 }

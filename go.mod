@@ -2,8 +2,9 @@ module project
 
 go 1.26.1
 
-replace github.com/dracory/base => ../../_modules_dracory/base
-replace github.com/dracory/test => ../../_modules_dracory/test
+// replace github.com/dracory/base => ../../_modules_dracory/base
+
+// replace github.com/dracory/test => ../../_modules_dracory/test
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -12,7 +13,7 @@ require (
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v0.3.0
 	github.com/dracory/auth v0.29.0
-	github.com/dracory/base v0.26.0
+	github.com/dracory/base v0.31.0
 	github.com/dracory/blindindexstore v1.8.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.6.0
