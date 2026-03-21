@@ -64,23 +64,23 @@ func UserTokenize(
 	phoneToken := user.Phone()
 	businessNameToken := user.BusinessName()
 
-	if firstNameTokenUpserted, err = VaultTokenUpsert(ctx, vaultStore, vaultKey, firstNameToken, firstNameValue); err != nil {
+	if firstNameTokenUpserted, err = vaultStore.TokenUpsert(ctx, firstNameToken, firstNameValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating first name"))
 	}
 
-	if lastNameTokenUpserted, err = VaultTokenUpsert(ctx, vaultStore, vaultKey, lastNameToken, lastNameValue); err != nil {
+	if lastNameTokenUpserted, err = vaultStore.TokenUpsert(ctx, lastNameToken, lastNameValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating last name"))
 	}
 
-	if emailTokenUpserted, err = VaultTokenUpsert(ctx, vaultStore, vaultKey, emailToken, emailValue); err != nil {
+	if emailTokenUpserted, err = vaultStore.TokenUpsert(ctx, emailToken, emailValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating email"))
 	}
 
-	if phoneTokenUpserted, err = VaultTokenUpsert(ctx, vaultStore, vaultKey, phoneToken, phoneValue); err != nil {
+	if phoneTokenUpserted, err = vaultStore.TokenUpsert(ctx, phoneToken, phoneValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating phone"))
 	}
 
-	if businessNameTokenUpserted, err = VaultTokenUpsert(ctx, vaultStore, vaultKey, businessNameToken, businessNameValue); err != nil {
+	if businessNameTokenUpserted, err = vaultStore.TokenUpsert(ctx, businessNameToken, businessNameValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating business name"))
 	}
 

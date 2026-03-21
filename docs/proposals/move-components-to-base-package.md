@@ -6,20 +6,6 @@ This proposal identifies components from the Blueprint project that should be mo
 
 ## Components to Move from Blueprint
 
-### 1. Vault & Tokenization Helpers (Medium Priority)
-
-#### Files to Move:
-- `internal/ext/vault.go` - `VaultTokenUpsert` function
-- `internal/helpers/untokenize.go` - Batch untokenization utility
-
-#### Reasoning:
-These functions provide a higher-level API over the `vaultstore` package for common operations like "create or update token" and "untokenize a map of values".
-
-#### Proposed Location:
-`github.com/dracory/base/vault`
-
----
-
 ### 2. Config Encryption Loader (Medium Priority)
 
 #### Logic to Move:
