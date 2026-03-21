@@ -13,7 +13,7 @@ import (
 func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
-		middlewares.JailBotsMiddleware(middlewares.JailBotsConfig{
+		rtrMiddleware.JailBotsMiddleware(rtrMiddleware.JailBotsConfig{
 			Exclude:      []string{"/new"},
 			ExcludePaths: []string{"/blog*", "/th*", "/liveflux*"},
 		}),

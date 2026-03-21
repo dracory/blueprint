@@ -2,9 +2,11 @@ module project
 
 go 1.26.1
 
-// replace github.com/dracory/base => ../../_modules_dracory/base
+replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
+
+replace github.com/dracory/rtr => ../../_modules_dracory/rtr
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
