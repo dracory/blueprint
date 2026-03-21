@@ -11,7 +11,6 @@ import (
 
 	"github.com/dracory/cdn"
 	crud "github.com/dracory/crud/v2"
-	"github.com/dracory/form"
 	"github.com/dracory/hb"
 	"github.com/dracory/shopstore"
 	"github.com/dromara/carbon/v2"
@@ -41,19 +40,19 @@ func (discountController *discountController) AnyIndex(w http.ResponseWriter, r 
 			"Discount Code",
 			"Created",
 		},
-		CreateFields: []form.FieldInterface{
-			form.NewField(form.FieldOptions{
+		CreateFields: []crud.FieldInterface{
+			crud.NewField(crud.FieldOptions{
 				Label: "Title",
 				Name:  "title",
 				Type:  crud.FORM_FIELD_TYPE_STRING,
 			}),
 		},
-		UpdateFields: []form.FieldInterface{
-			form.NewField(form.FieldOptions{
+		UpdateFields: []crud.FieldInterface{
+			crud.NewField(crud.FieldOptions{
 				Label: "Status",
 				Name:  "status",
 				Type:  crud.FORM_FIELD_TYPE_SELECT,
-				Options: []form.FieldOption{
+				Options: []crud.FieldOption{
 					{
 						Key:   "",
 						Value: "",
@@ -72,16 +71,16 @@ func (discountController *discountController) AnyIndex(w http.ResponseWriter, r 
 					},
 				},
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Title",
 				Name:  "title",
 				Type:  crud.FORM_FIELD_TYPE_STRING,
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Type",
 				Name:  "type",
 				Type:  crud.FORM_FIELD_TYPE_SELECT,
-				Options: []form.FieldOption{
+				Options: []crud.FieldOption{
 					{
 						Key:   "",
 						Value: "",
@@ -96,27 +95,27 @@ func (discountController *discountController) AnyIndex(w http.ResponseWriter, r 
 					},
 				},
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Amount",
 				Name:  "amount",
 				Type:  crud.FORM_FIELD_TYPE_NUMBER,
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Discount Code",
 				Name:  "code",
 				Type:  crud.FORM_FIELD_TYPE_STRING,
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Starts",
 				Name:  "starts_at",
 				Type:  crud.FORM_FIELD_TYPE_DATETIME,
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Ends",
 				Name:  "ends_at",
 				Type:  crud.FORM_FIELD_TYPE_DATETIME,
 			}),
-			form.NewField(form.FieldOptions{
+			crud.NewField(crud.FieldOptions{
 				Label: "Description",
 				Name:  "description",
 				Type:  crud.FORM_FIELD_TYPE_HTMLAREA,
