@@ -3,10 +3,15 @@ package middlewares
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
 func TestHTTPSRedirectMiddleware(t *testing.T) {
+	// Set development environment for localhost testing
+	os.Setenv("APP_ENV", "development")
+	defer os.Unsetenv("APP_ENV")
+
 	tests := []struct {
 		name           string
 		url            string

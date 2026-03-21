@@ -3,6 +3,7 @@ package email_admin_new_contact
 import (
 	"context"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -67,13 +68,24 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Enqueue_TaskStoreNil(t
 
 func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *testing.T) {
 	// configure mock SMTP server
-	server, _, cleanup := test.SetupMailServer(t)
+	_, addr, cleanup := test.SetupMailServer(t)
 	defer cleanup()
+
+	// Parse the dynamic address to get host and port
+	hostPort := strings.Split(addr, ":")
+	if len(hostPort) != 2 {
+		t.Fatalf("Expected address in format host:port, got %q", addr)
+	}
+	host := hostPort[0]
+	portInt, err := strconv.Atoi(hostPort[1])
+	if err != nil {
+		t.Fatalf("Failed to convert port to int: %v", err)
+	}
 
 	cfg := testutils.DefaultConf()
 	cfg.SetMailDriver("smtp")
-	cfg.SetMailHost("127.0.0.1")
-	cfg.SetMailPort(server.PortNumber)
+	cfg.SetMailHost(host)
+	cfg.SetMailPort(portInt) // Use dynamic port from mock server
 	cfg.SetMailUsername("")
 	cfg.SetMailPassword("")
 	cfg.SetTaskStoreUsed(true)

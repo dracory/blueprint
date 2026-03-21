@@ -183,8 +183,8 @@ github.com/dracory/subscriptionstore v0.7.0 h1:8nR3E5rbLbCuNTQ8/29HOq/XCk3njxrq+
 github.com/dracory/subscriptionstore v0.7.0/go.mod h1:AIqCBoIUrRbXOjBXasYLXRbhCqtf1A0WYKfeOlZFP48=
 github.com/dracory/taskstore v1.19.0 h1:SEfK0Jm19hNRKG65eBJsBHzi5Fn5dWAhtceZMpNIP6c=
 github.com/dracory/taskstore v1.19.0/go.mod h1:VHgOaKt+C05TMDDXD/p5ZNdnYjEOBdlLVGbzaMoUPag=
-github.com/dracory/test v0.7.0 h1:/Wo0kaQYQoqZp1IDRyV64j04JzT7dG66i0kWr6+DqXg=
-github.com/dracory/test v0.7.0/go.mod h1:eMC5H7Eb4rDep0rdrVUVgKGSx94zgR7npFKM/QOYQb4=
+github.com/dracory/test v0.9.0 h1:24pBLJIfYRNAVVge1ySBPcFKBLnKolmCPB2fvbo6YvU=
+github.com/dracory/test v0.9.0/go.mod h1:eMC5H7Eb4rDep0rdrVUVgKGSx94zgR7npFKM/QOYQb4=
 github.com/dracory/ui v0.17.0 h1:h8MQk0H41LuMAWlCQDG02DymAf0OBgJi/BuxrKPf1Bs=
 github.com/dracory/ui v0.17.0/go.mod h1:ItkhffHGUvwu0O+mwzXYy2nxGUYedFcm5KtmC8PHVak=
 github.com/dracory/uid v1.9.0 h1:R7QbJp/0ztO1wYsRLJgyfieqNRS2aWXMz83QdgQlfx0=

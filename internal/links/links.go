@@ -11,7 +11,7 @@ import (
 func init() {
 	appURL := os.Getenv("APP_URL")
 	if os.Getenv("APP_ENV") == "testing" {
-		appURL = ""
+		appURL = "http://localhost:8080" // Set a default URL for testing
 	}
 	baseurl.SetDefaultURL(appURL)
 }

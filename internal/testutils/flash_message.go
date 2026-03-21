@@ -3,6 +3,7 @@ package testutils
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	basetypes "github.com/dracory/base/types"
 
@@ -42,7 +43,24 @@ func FlashMessageFindFromBody(cacheStore cachestore.StoreInterface, body string)
 }
 
 func FlashMessageFindFromResponse(cacheStore cachestore.StoreInterface, r *http.Response) (msg *basetypes.FlashMessage, err error) {
+	if r == nil {
+		return msg, errors.New("flash message find from response: response is nil")
+	}
+
 	location := r.Header.Get("Location")
+	if location == "" {
+		return msg, errors.New("flash message find from response: no Location header found")
+	}
+
+	// Check if the location contains the flash message pattern
+	if !strings.Contains(location, "/flash?message_id=") {
+		return msg, errors.New("flash message find from response: Location header does not contain flash message pattern")
+	}
+
 	flashMessageID := str.RightFrom(location, `/flash?message_id=`)
+	if flashMessageID == "" {
+		return msg, errors.New("flash message find from response: could not extract message ID from Location header")
+	}
+
 	return FlashMessageFind(cacheStore, flashMessageID)
 }

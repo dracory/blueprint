@@ -3,6 +3,7 @@ module project
 go 1.26.1
 
 replace github.com/dracory/base => ../../_modules_dracory/base
+replace github.com/dracory/test => ../../_modules_dracory/test
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -49,7 +50,7 @@ require (
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.7.0
 	github.com/dracory/taskstore v1.19.0
-	github.com/dracory/test v0.7.0
+	github.com/dracory/test v0.9.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
