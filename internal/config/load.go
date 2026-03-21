@@ -1,12 +1,10 @@
 package config
 
 import (
-	"os"
 	"project/internal/resources"
-	"strings"
 
+	baseCfg "github.com/dracory/base/config"
 	"github.com/dracory/env"
-	"github.com/dracory/envenc"
 )
 
 // Load loads the configuration
@@ -39,7 +37,8 @@ func Load() (ConfigInterface, error) {
 	trans := loadTranslationConfig()
 
 	if envEnc.used {
-		if err := initializeEnvEncVariables(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey); err != nil {
+		// Use base package config loader with embedded resources support
+		if err := baseCfg.InitializeEnvEncVariablesFromResources(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey, resources.Resource); err != nil {
 			acc.add(err)
 		} else {
 			envEnc.privateKey = "removed" // reset the private key
@@ -131,70 +130,4 @@ func Load() (ConfigInterface, error) {
 	cfg.SetTranslationLanguageList(trans.languageList)
 
 	return cfg, nil
-}
-
-// initializeEnvEncVariables initializes the envenc variables
-// based on the app environment
-//
-// Business logic:
-//   - check if the app environment is testing, skipped as not needed
-//   - requires the ENV_ENCRYPTION_KEY env variable
-//   - looks for file the file name is .env.<app_environment>.vault
-//     both in the local file system and in the resources folder
-//   - if none found, it will panic
-//   - if it fails for other reasons, it will panic
-//
-// Parameters:
-// - appEnvironment: the app environment
-// - publicKey: the public encryption key
-// - privateKey: the private encryption key
-//
-// Returns:
-// - none
-func initializeEnvEncVariables(appEnvironment string, publicKey string, privateKey string) error {
-	if appEnvironment == APP_ENVIRONMENT_TESTING {
-		return nil
-	}
-
-	if strings.TrimSpace(appEnvironment) == "" {
-		return MissingEnvError{Key: KEY_APP_ENVIRONMENT, Context: "required to initialize EnvEnc variables"}
-	}
-
-	appEnvironment = strings.ToLower(appEnvironment)
-
-	vaultFilePath := ".env." + appEnvironment + ".vault"
-
-	vaultContent, err := resources.Resource(".env." + appEnvironment + ".vault")
-
-	if err != nil {
-		return err
-	}
-
-	derivedKey, err := envenc.DeriveKey(publicKey, privateKey)
-	if err != nil {
-		return err
-	}
-
-	if fileExists(vaultFilePath) {
-		if err := envenc.HydrateEnvFromFile(vaultFilePath, derivedKey); err != nil {
-			return err
-		}
-	}
-
-	if vaultContent != "" {
-		if err := envenc.HydrateEnvFromString(vaultContent, derivedKey); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// fileExists checks if a file exists at the given path.
-func fileExists(path string) bool {
-	if _, err := os.Stat(path); err == nil {
-		return true
-	} else {
-		return !os.IsNotExist(err)
-	}
 }

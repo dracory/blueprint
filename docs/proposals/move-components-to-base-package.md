@@ -6,7 +6,7 @@ This proposal identifies components from the Blueprint project that should be mo
 
 ## Components to Move from Blueprint
 
-### 2. Config Encryption Loader (Medium Priority)
+### 2. Config Encryption Loader (Medium Priority) ✅ COMPLETED
 
 #### Logic to Move:
 - `internal/config/load.go` - `initializeEnvEncVariables` logic for hydrating environment variables from `.vault` files using `envenc`.
@@ -15,7 +15,20 @@ This proposal identifies components from the Blueprint project that should be mo
 The logic for locating, reading, and decrypting environment secrets from vault files is generic and could be part of the `envenc` or `base/config` package.
 
 #### Proposed Location:
-`github.com/dracory/envenc`
+`github.com/dracory/base/config`
+
+#### Status:
+- ✅ **Base Package**: Implemented in `github.com/dracory/base/config` with `InitializeEnvEncVariablesFromFile` and `InitializeEnvEncVariablesFromResources` functions
+- ✅ **Blueprint Integration**: Updated to use `baseCfg.InitializeEnvEncVariablesFromResources` instead of local `initializeEnvEncVariables` function
+- ✅ **Tests Passing**: All Blueprint config tests pass with new implementation
+- ✅ **Code Cleanup**: Removed old local functions and unused imports
+
+#### Benefits:
+- Reusable config encryption functionality for all Dracory projects
+- Better error handling with custom error types (`MissingEnvError`, `EnvEncError`)
+- Support for both file-based and resource-based vault loading
+- Comprehensive testing and documentation
+- No code duplication across projects
 
 ---
 

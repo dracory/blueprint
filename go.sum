@@ -103,8 +103,8 @@ github.com/dracory/auditstore v0.3.0 h1:/q5hjr+ZM51aVlqqooFTon2l39vsLyzN0yYsCRig
 github.com/dracory/auditstore v0.3.0/go.mod h1:4vQc00no7L1mtepEauIUALhOkOF3rJaLdZOvuE+SzDc=
 github.com/dracory/auth v0.29.0 h1:XoxvMW08ue03fg5dEfgYBiks70GVXfUABi6dbw9M7jc=
 github.com/dracory/auth v0.29.0/go.mod h1:fwm1qBpNkUBUIfME42stvB9mX5QD7JsXOo1GMvwQ3ao=
-github.com/dracory/base v0.33.0 h1:us/unEgeGbBEUkM2Rx8Z6DAuZyaZzfHk/refH6iSKWc=
-github.com/dracory/base v0.33.0/go.mod h1:NcXXaKEPfB72DfVmL69TdVEkIW8f4dPX+MGPTuZ2T3g=
+github.com/dracory/base v0.34.1 h1:II9B8WBugDVGwzFSMi+d6r+gc7npTUJRRJo4eiNEuZM=
+github.com/dracory/base v0.34.1/go.mod h1:g98e0LRprlDGfyQNE0ZwBP2yi4KMWZdritxrohWiDiA=
 github.com/dracory/blindindexstore v1.8.0 h1:Y4/fiDc2AI5WCBzVwikjas313M0a9ln3Fgc/I5cCP14=
 github.com/dracory/blindindexstore v1.8.0/go.mod h1:R58Drzv4HIYrcKydB9O6eaCSmZ3epf5bTs31v5BNPEs=
 github.com/dracory/blockeditor v0.24.0 h1:PFDwGQR0qsCviyExvM1fQkCqNsU85/1Trr2Rx8gdVvM=
