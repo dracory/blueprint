@@ -32,6 +32,7 @@ func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
 					"https://maxcdn.bootstrapcdn.com",
 					"https://cdnjs.cloudflare.com",
 					"https://fonts.googleapis.com",
+					"https://unpkg.com",
 				}
 				fontDomains := []string{
 					"'self'",

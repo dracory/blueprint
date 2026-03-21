@@ -13,11 +13,11 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 	"project/internal/testutils"
-	"project/internal/utils"
 	"strings"
 	"time"
 
 	"github.com/dracory/auth"
+	basehttp "github.com/dracory/base/http"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/req"
 	"github.com/dracory/sessionstore"
@@ -285,7 +285,7 @@ func (c *authenticationController) callAuthKnight(ctx context.Context, once stri
 		return nil, errors.New("no response")
 	}
 
-	defer utils.SafeCloseResponseBody(req.Body)
+	defer basehttp.SafeCloseResponseBody(req.Body)
 
 	if err := json.NewDecoder(req.Body).Decode(&response); err != nil {
 		return nil, fmt.Errorf("failed to decode response: %w", err)
