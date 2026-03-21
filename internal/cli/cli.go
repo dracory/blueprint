@@ -1,14 +1,14 @@
 package cli
 
 import (
-	"errors"
 	"fmt"
 	"project/internal/cmds"
 	"project/internal/emails"
 	"project/internal/registry"
 	"project/internal/routes"
 
-	"github.com/dracory/base/cfmt"
+	baseCfmt "github.com/dracory/base/cfmt"
+	"github.com/dracory/base/cli"
 )
 
 // Constants for command names
@@ -19,30 +19,22 @@ const (
 	SubcommandList = "list"
 )
 
-// commandHandler defines the function signature for command handlers.
-type commandHandler func(registry registry.RegistryInterface, args []string) error
+// NewDispatcher creates a new CLI dispatcher with blueprint-specific commands registered.
+func NewDispatcher() *cli.Dispatcher[registry.RegistryInterface] {
+	dispatcher := cli.NewDispatcher[registry.RegistryInterface]()
 
-// commandHandlers maps command strings to their handler functions.
-var commandHandlers = map[string]commandHandler{
-	CommandTask:   handleTaskCommand,
-	CommandJob:    handleJobCommand,
-	CommandRoutes: handleRoutesCommand,
+	// Register blueprint-specific commands
+	dispatcher.RegisterCommand(CommandTask, "Execute a task by alias", handleTaskCommand)
+	dispatcher.RegisterCommand(CommandJob, "Execute a job with arguments", handleJobCommand)
+	dispatcher.RegisterCommand(CommandRoutes, "List all registered routes", handleRoutesCommand)
+
+	return dispatcher
 }
 
-// ExecuteCliCommand executes a CLI command based on the provided arguments using a handler map.
+// ExecuteCliCommand executes a CLI command using the generic dispatcher.
 //
-// The command can be one of the following:
-// - task <alias> <arguments>
-// - job <arguments>
-// - routes list
-//
-// Business logic:
-// 1. Logs the command being executed.
-// 2. Validates that at least one argument (the command) is provided.
-// 3. Looks up the command in the `commandHandlers` map.
-// 4. If a handler is found, executes it with the remaining arguments.
-// 5. If no handler is found, returns an "unrecognized command" error.
-// 6. Returns specific errors for invalid commands, missing arguments, or nil TaskStore via the handlers.
+// This function creates a new dispatcher with blueprint-specific commands
+// and delegates execution to the generic dispatcher.
 //
 // Parameters:
 // - registry registry.RegistryInterface : The registry instance to be passed to command handlers.
@@ -51,28 +43,8 @@ var commandHandlers = map[string]commandHandler{
 // Returns:
 // - error: An error if the command execution fails or is invalid, otherwise nil.
 func ExecuteCliCommand(registry registry.RegistryInterface, args []string) error {
-	cfmt.Infoln("Executing command: ", args)
-
-	if len(args) == 0 {
-		cfmt.Warningln("No command provided.")
-		// Optionally, print usage instructions here
-		return errors.New("no command provided")
-	}
-
-	command := args[0]
-	remainingArgs := args[1:] // Arguments after the main command
-
-	// Look up the handler for the command
-	handler, found := commandHandlers[command]
-	if !found {
-		err := fmt.Errorf("unrecognized command: %s", command)
-		cfmt.Warningln(err.Error())
-		// Optionally, print usage instructions here
-		return err
-	}
-
-	// Execute the found handler with registry
-	return handler(registry, remainingArgs)
+	dispatcher := NewDispatcher()
+	return dispatcher.ExecuteCommand(registry, args)
 }
 
 // handleTaskCommand handles the 'task' command.
@@ -81,8 +53,8 @@ func handleTaskCommand(registry registry.RegistryInterface, args []string) error
 		return fmt.Errorf("missing task alias for command '%s'", CommandTask)
 	}
 	if registry.GetTaskStore() == nil {
-		err := errors.New("task store is nil")
-		cfmt.Errorln(err.Error())
+		err := fmt.Errorf("task store is nil")
+		baseCfmt.Errorln(err.Error())
 		return err
 	}
 
@@ -110,7 +82,7 @@ func handleRoutesCommand(registry registry.RegistryInterface, args []string) err
 	if len(args) == 0 || args[0] != SubcommandList {
 		return fmt.Errorf("invalid or missing subcommand for '%s'. Use '%s %s'", CommandRoutes, CommandRoutes, SubcommandList)
 	}
-	
+
 	r := routes.Router(registry)
 	r.List()
 

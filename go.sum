@@ -131,8 +131,8 @@ github.com/dracory/customstore v1.7.0 h1:rkFKLimqX5mk62wi+1Ub+YH3KeozNmQkyeOvIGg
 github.com/dracory/customstore v1.7.0/go.mod h1:EcKeANboU4G7Ua7bYA2EM2FWAIgHaMoJ2/6WR4MMLXY=
 github.com/dracory/dashboard v1.11.0 h1:BJXfEG9litaSdDpJJ9IUBoHukh9Q3Lrif1phPkqd04M=
 github.com/dracory/dashboard v1.11.0/go.mod h1:KJYOeO8aAkXK6pHiGPyhV0siqgTghX+CBj6h3qZZ2HY=
-github.com/dracory/database v0.6.0 h1:5V8R2ahlL9gjgxbXXsL7alIU2wSekngYM2TjlmO8k8w=
-github.com/dracory/database v0.6.0/go.mod h1:XLWwdxQ9LL8DqJuqnp1wyzNZ47bnMYEJR38c2PanYtI=
+github.com/dracory/database v0.7.0 h1:7pZbNKOhaMOwQ9WDU4AKgqvqmmKU/x5lNGliLH4aH0k=
+github.com/dracory/database v0.7.0/go.mod h1:SySNVnsfJSo2OQOMKrnVM4D98F5h9w2xoBVKjKLUl2E=
 github.com/dracory/dataobject v1.6.0 h1:k9kVYthGqK3giZvG/HMF9wGjwY9sRLv8XJ543nsUTiE=
 github.com/dracory/dataobject v1.6.0/go.mod h1:eo0pRMmHAEpWKQo29F6TTs43Cpp7J5QRj9wiJ0eQrJ0=
 github.com/dracory/entitystore v1.3.0 h1:RQwQXwCXMy0X+zWsFNKoSJoREazRWoidr92dpfFTnoU=
@@ -161,6 +161,8 @@ github.com/dracory/metastore v1.4.0 h1:cCvdDWuTg4ujENm5EAgFZS2fUqNqVv1dneEpzPVt8
 github.com/dracory/metastore v1.4.0/go.mod h1:ZWLFCEg5jExpKrBbtN6UA9EXgRJppV6zTv8rQrXJmBI=
 github.com/dracory/req v0.1.0 h1:5mKYnPiCUJG/JQlE/9nxk3OSH+rs8tr45ngg0LwDXsY=
 github.com/dracory/req v0.1.0/go.mod h1:XxIjAncVAKKNaVtO+4Qmd3mDfC0NIBVXqQPwwb4qhHs=
+github.com/dracory/rtr v1.6.0 h1:wRUq0fBfojma4gxtMUZ34dWoFzpn/iukkZeIUH+NyCA=
+github.com/dracory/rtr v1.6.0/go.mod h1:++F0P6e+Jk/Gx9T0IXiUhnmOg8rEb4p68wVa1Y50vj8=
 github.com/dracory/sb v0.20.0 h1:M/k6Z7UKcGf0MV48a5obe0R31nlzZyIxWBOPruxvdSc=
 github.com/dracory/sb v0.20.0/go.mod h1:XALk/NNOyInf06hTo4Ce5mA3u2oRnep+aD/IlmNB35Q=
 github.com/dracory/sessionstore v1.6.0 h1:RGEefe5uduDg4aaY/T5eWHbDPjsKIC6vA2RHitsAzl8=

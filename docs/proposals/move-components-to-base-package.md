@@ -6,40 +6,7 @@ This proposal identifies components from the Blueprint project that should be mo
 
 ## Components to Move from Blueprint
 
-### 1. HTMX Utilities ✅ COMPLETED
-
-#### Files to Move:
-- `internal/ext/hx.go` - HTMX header checking and utility functions
-
-#### Reasoning:
-These are generic utilities for interacting with HTMX headers (`HX-Request`, `HX-Trigger`, etc.) that are useful for any project using HTMX.
-
-#### Proposed Location:
-`github.com/dracory/base/htmx` or `github.com/dracory/htmx`
-
-#### Implementation:
-- ✅ Moved HTMX utilities to `github.com/dracory/base/htmx`
-- ✅ Updated Blueprint project to use new HTMX package
-- ✅ Removed old `hx.go` file from Blueprint's ext package
-- ✅ Added comprehensive tests for HTMX utilities
-- ✅ Verified build and tests pass in both projects
-
----
-
-### 2. Jail Bots Middleware (High Priority)
-
-#### Files to Move:
-- `internal/middlewares/jail_bots_middleware.go` - Malicious bot detection and blocking
-
-#### Reasoning:
-Bot protection is a common requirement for all web applications. The blacklist and jailing logic are largely generic, though they should support project-specific exclusions.
-
-#### Proposed Location:
-`github.com/dracory/rtr/middleware/security/jailbots`
-
----
-
-### 3. Vault & Tokenization Helpers (Medium Priority)
+### 1. Vault & Tokenization Helpers (Medium Priority)
 
 #### Files to Move:
 - `internal/ext/vault.go` - `VaultTokenUpsert` function
@@ -53,33 +20,7 @@ These functions provide a higher-level API over the `vaultstore` package for com
 
 ---
 
-### 4. Database Connection & SQLite Optimization (Medium Priority)
-
-#### Logic to Move:
-- `internal/registry/database_open.go` - SQLite PRAGMA settings (WAL mode, busy timeout) and connection pool configuration logic.
-
-#### Reasoning:
-Setting up SQLite correctly for concurrency (WAL, synchronous=NORMAL) and configuring pool sizes for different drivers is a recurring task that should be handled automatically by the database package.
-
-#### Proposed Location:
-`github.com/dracory/database` (Integrated into the `Open` or `Connect` logic)
-
----
-
-### 5. CLI Command Dispatcher (Medium Priority)
-
-#### Files to Move:
-- `internal/cli/cli.go` - Generic command-to-handler mapping and execution logic.
-
-#### Reasoning:
-The pattern of mapping CLI arguments to specific handlers using a registry or dependency container is common. Generalizing this would simplify creating CLI tools for all projects.
-
-#### Proposed Location:
-`github.com/dracory/base/cli`
-
----
-
-### 6. Config Encryption Loader (Medium Priority)
+### 4. Config Encryption Loader (Medium Priority)
 
 #### Logic to Move:
 - `internal/config/load.go` - `initializeEnvEncVariables` logic for hydrating environment variables from `.vault` files using `envenc`.
@@ -92,7 +33,7 @@ The logic for locating, reading, and decrypting environment secrets from vault f
 
 ---
 
-### 7. Block Editor Renderer (Low Priority)
+### 5. Block Editor Renderer (Low Priority)
 
 #### Files to Move:
 - `internal/helpers/blog_post_blocks_to_string.go` - Logic for converting JSON blocks to HTML.
@@ -105,7 +46,7 @@ If the same block editor format is used across multiple Dracory projects (e.g., 
 
 ---
 
-### 8. Shared UI & Domain Packages (High Priority)
+### 6. Shared UI & Domain Packages (High Priority)
 
 #### Directories to Move:
 - `pkg/blogai`

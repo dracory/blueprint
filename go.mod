@@ -6,7 +6,9 @@ replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
 
-replace github.com/dracory/rtr => ../../_modules_dracory/rtr
+// replace github.com/dracory/rtr => ../../_modules_dracory/rtr
+
+// replace github.com/dracory/database => ../../_modules_dracory/database
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
@@ -29,7 +31,7 @@ require (
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.7.0
 	github.com/dracory/dashboard v1.11.0
-	github.com/dracory/database v0.6.0
+	github.com/dracory/database v0.7.0
 	github.com/dracory/dataobject v1.6.0
 	github.com/dracory/entitystore v1.3.0
 	github.com/dracory/env v1.0.0
@@ -44,7 +46,7 @@ require (
 	github.com/dracory/logstore v1.13.0
 	github.com/dracory/metastore v1.4.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.5.0
+	github.com/dracory/rtr v1.6.0
 	github.com/dracory/sb v0.20.0
 	github.com/dracory/sessionstore v1.6.0
 	github.com/dracory/settingstore v1.5.0

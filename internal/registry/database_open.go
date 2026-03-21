@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
-	"time"
 
 	"project/internal/config"
 
@@ -15,12 +14,11 @@ import (
 )
 
 // databaseOpen opens the database connection using the provided config and returns it.
+// The database package now includes SQLite optimizations and connection pool settings automatically.
 func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 	if cfg == nil {
 		return nil, errors.New("databaseOpen: cfg is nil")
 	}
-
-	isSQLite := strings.Contains(strings.ToLower(cfg.GetDatabaseDriver()), "sqlite")
 
 	options := database.Options().
 		SetDatabaseType(cfg.GetDatabaseDriver()).
@@ -32,6 +30,8 @@ func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 		SetUserName(cfg.GetDatabaseUsername()).
 		SetPassword(cfg.GetDatabasePassword())
 
+	// Set SSL mode for non-SQLite databases
+	isSQLite := strings.Contains(strings.ToLower(cfg.GetDatabaseDriver()), "sqlite")
 	if !isSQLite {
 		sslMode := cfg.GetDatabaseSSLMode()
 		if sslMode == "" {
@@ -40,37 +40,7 @@ func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 		options = options.SetSSLMode(sslMode)
 	}
 
-	db, err := database.Open(options)
-
-	if err != nil {
-		return nil, err
-	}
-
-	// Add connection pool and driver-specific settings
-	// For SQLite, reduce lock contention by enabling WAL and busy timeout,
-	// and by constraining pool concurrency.
-	if isSQLite {
-		// Enable WAL mode for better concurrency; ignore errors if already set.
-		_, _ = db.Exec("PRAGMA journal_mode=WAL;")
-		// Use NORMAL synchronous for WAL (durable enough, faster writes).
-		_, _ = db.Exec("PRAGMA synchronous=NORMAL;")
-		// Ensure foreign keys are enforced.
-		_, _ = db.Exec("PRAGMA foreign_keys=ON;")
-		// Back off up to 5s when the database is busy instead of returning SQLITE_BUSY immediately.
-		_, _ = db.Exec("PRAGMA busy_timeout=5000;")
-
-		// Constrain the pool to avoid multiple concurrent writers on SQLite.
-		// Increase carefully if needed; 1 is the safest to avoid SQLITE_BUSY.
-		db.SetMaxOpenConns(1)
-		db.SetMaxIdleConns(1)
-	} else {
-		// Provide sensible defaults for production databases; adjust after load testing.
-		db.SetMaxOpenConns(25)
-		db.SetMaxIdleConns(5)
-		db.SetConnMaxLifetime(5 * time.Minute)
-	}
-
-	return db, nil
+	return database.Open(options)
 }
 
 // Enable, if you want to use GORM
