@@ -10,8 +10,9 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/pkg/blogtheme"
 	"strings"
+
+	"github.com/dracory/base/blogtheme"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/hb"

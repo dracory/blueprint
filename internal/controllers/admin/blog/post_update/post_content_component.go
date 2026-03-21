@@ -9,8 +9,8 @@ import (
 	"project/internal/controllers/admin/blog/shared"
 	livefluxctl "project/internal/controllers/liveflux"
 	"project/internal/registry"
-	"project/pkg/blogblocks"
 
+	"github.com/dracory/base/blogblocks"
 	"github.com/dracory/blockeditor"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/form"

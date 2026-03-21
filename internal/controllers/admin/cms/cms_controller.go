@@ -5,7 +5,8 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/pkg/webtheme"
+
+	"github.com/dracory/base/webtheme"
 
 	adminCmsStore "github.com/dracory/cmsstore/admin"
 	"github.com/dracory/hb"

@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"project/internal/registry"
 	"project/internal/widgets"
-	"project/pkg/webtheme"
 	"sync"
+
+	"github.com/dracory/base/webtheme"
 
 	"github.com/dracory/cmsstore"
 	cmsFrontend "github.com/dracory/cmsstore/frontend"
