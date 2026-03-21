@@ -81,7 +81,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -146,7 +146,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -221,7 +221,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -301,7 +301,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)

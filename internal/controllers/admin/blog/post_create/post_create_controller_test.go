@@ -90,7 +90,7 @@ func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userst
 		testutils.WithBlogStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}

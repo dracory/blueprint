@@ -8,6 +8,8 @@ import (
 
 	"project/internal/emails"
 	"project/internal/testutils"
+
+	"github.com/dracory/test"
 )
 
 func TestNewEmailTestTask_InitializesFields(t *testing.T) {
@@ -79,7 +81,7 @@ func TestEmailTestTask_Enqueue_InvalidParams(t *testing.T) {
 
 func TestEmailTestTask_Handle_SendEmail(t *testing.T) {
 	// configure mock SMTP server
-	server, cleanup := testutils.SetupMailServer(t)
+	server, _, cleanup := test.SetupMailServer(t)
 	defer cleanup()
 
 	cfg := testutils.DefaultConf()

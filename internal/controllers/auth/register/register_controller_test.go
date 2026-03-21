@@ -184,7 +184,7 @@ func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -239,7 +239,7 @@ func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
 		testutils.WithVaultStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -293,7 +293,7 @@ func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -351,7 +351,7 @@ func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
 		testutils.WithVaultStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -408,7 +408,7 @@ func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -467,7 +467,7 @@ func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
 	cfg.SetVaultStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -525,7 +525,7 @@ func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -585,7 +585,7 @@ func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
 	cfg.SetVaultStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -644,7 +644,7 @@ func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -705,7 +705,7 @@ func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
 	cfg.SetVaultStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -765,7 +765,7 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -828,7 +828,7 @@ func TestRegisterController_Success_WithVaultStore(t *testing.T) {
 	cfg.SetVaultStoreUsed(true)
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)

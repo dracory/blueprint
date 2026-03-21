@@ -88,7 +88,7 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.USER_01,
+		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)
@@ -166,7 +166,7 @@ func TestUserMiddleware_RegistrationDisabledAllowsAccess(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.USER_01,
+		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)
@@ -221,7 +221,7 @@ func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.USER_01,
+		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)
@@ -313,7 +313,7 @@ func TestUserMiddleware_Success(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.USER_01,
+		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)

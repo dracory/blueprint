@@ -40,7 +40,7 @@ require (
 	github.com/dracory/logstore v1.13.0
 	github.com/dracory/metastore v1.4.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.4.0
+	github.com/dracory/rtr v1.5.0
 	github.com/dracory/sb v0.20.0
 	github.com/dracory/sessionstore v1.6.0
 	github.com/dracory/settingstore v1.5.0
@@ -49,7 +49,7 @@ require (
 	github.com/dracory/str v0.17.0
 	github.com/dracory/subscriptionstore v0.7.0
 	github.com/dracory/taskstore v1.19.0
-	github.com/dracory/test v0.6.0
+	github.com/dracory/test v0.7.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
@@ -67,7 +67,6 @@ require (
 	github.com/lmittmann/tint v1.1.3
 	github.com/mileusna/useragent v1.3.5
 	github.com/mingrammer/cfmt v1.1.0
-	github.com/mocktools/go-smtp-mock v1.10.0
 	github.com/robertkrimen/otto v0.5.1
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
 	github.com/spf13/cast v1.10.0
@@ -139,6 +138,7 @@ require (
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-runewidth v0.0.21 // indirect
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
+	github.com/mocktools/go-smtp-mock v1.10.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pkg/sftp v1.13.10 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect

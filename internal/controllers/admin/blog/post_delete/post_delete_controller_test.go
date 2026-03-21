@@ -33,7 +33,7 @@ func TestPostDeleteController_RequiresPostID(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
@@ -52,7 +52,7 @@ func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
@@ -82,7 +82,7 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
@@ -113,7 +113,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Send POST request to delete

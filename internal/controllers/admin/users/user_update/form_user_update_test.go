@@ -9,6 +9,7 @@ import (
 	"project/internal/registry"
 	"project/internal/testutils"
 
+	"github.com/dracory/test"
 	"github.com/dracory/userstore"
 )
 
@@ -21,7 +22,7 @@ func setupAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserIn
 		testutils.WithGeoStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}

@@ -24,7 +24,7 @@ func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err)
 
 	// Seed existing value to ensure store is operational
@@ -51,7 +51,7 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err)
 
 	const envValue = "Env Topic"

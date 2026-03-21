@@ -12,6 +12,7 @@ import (
 	"project/internal/registry"
 	"project/internal/testutils"
 
+	"github.com/dracory/test"
 	"github.com/dracory/userstore"
 )
 
@@ -57,7 +58,7 @@ func TestFormProfileUpdate_Mount(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -104,7 +105,7 @@ func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -149,7 +150,7 @@ func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -198,7 +199,7 @@ func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -247,7 +248,7 @@ func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -296,7 +297,7 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -345,7 +346,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -467,7 +468,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -549,7 +550,7 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -624,7 +625,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -707,7 +708,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -791,7 +792,7 @@ func TestFormProfileUpdate_Render(t *testing.T) {
 		testutils.WithVaultStore(true, "test-key"),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}
@@ -854,7 +855,7 @@ func TestFormProfileUpdate_Handle_CountryChange(t *testing.T) {
 		testutils.WithUserStore(true, true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser returned error: %v", err)
 	}

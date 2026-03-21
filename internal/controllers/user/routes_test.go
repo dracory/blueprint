@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/dracory/rtr"
+	"github.com/dracory/test"
 )
 
 // TestUserRoutesCount verifies the number of user routes registered.
@@ -269,7 +270,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 // 	expectedRedirect := "/user/subscriptions/plan-select"
 
-// 	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+// 	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 // 	if err != nil {
 // 		t.Fatal(err)
@@ -327,7 +328,7 @@ func TestUserHomePage(t *testing.T) {
 
 	expected := `<title>Home | User | Test registry</title>`
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), testutils.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)

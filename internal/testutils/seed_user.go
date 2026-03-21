@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/dracory/test"
 	"github.com/dracory/userstore"
 )
 
@@ -31,11 +32,11 @@ func SeedUser(userStore userstore.StoreInterface, userID string) (userstore.User
 		SetID(userID).
 		SetStatus(userstore.USER_STATUS_ACTIVE)
 
-	if userID == USER_01 {
+	if userID == test.USER_01 {
 		user.SetRole(userstore.USER_ROLE_USER)
 	}
 
-	if userID == ADMIN_01 {
+	if userID == test.ADMIN_01 {
 		user.SetRole(userstore.USER_ROLE_ADMINISTRATOR)
 	}
 

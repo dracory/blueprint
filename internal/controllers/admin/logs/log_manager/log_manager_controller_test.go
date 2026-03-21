@@ -30,7 +30,7 @@ func TestLogManagerController_RendersPlaceholders(t *testing.T) {
 		testutils.WithLogStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err)
 
 	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewLogManagerController(registry).Handler, test.NewRequestOptions{

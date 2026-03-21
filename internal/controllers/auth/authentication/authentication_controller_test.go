@@ -166,7 +166,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)

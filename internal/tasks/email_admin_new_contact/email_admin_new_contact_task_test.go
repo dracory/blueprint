@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"project/internal/testutils"
+
+	"github.com/dracory/test"
 )
 
 func TestNewEmailToAdminOnNewContactFormSubmittedTaskHandler_InitializesFields(t *testing.T) {
@@ -65,7 +67,7 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Enqueue_TaskStoreNil(t
 
 func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *testing.T) {
 	// configure mock SMTP server
-	server, cleanup := testutils.SetupMailServer(t)
+	server, _, cleanup := test.SetupMailServer(t)
 	defer cleanup()
 
 	cfg := testutils.DefaultConf()

@@ -11,6 +11,7 @@ import (
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/rtr"
+	"github.com/dracory/test"
 )
 
 func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
@@ -134,7 +135,7 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
@@ -299,7 +300,7 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	adminUser, err := testutils.SeedUser(registry.GetUserStore(), testutils.ADMIN_01)
+	adminUser, err := testutils.SeedUser(registry.GetUserStore(), test.ADMIN_01)
 	if err != nil {
 		t.Fatalf("Failed to create admin user: %v", err)
 	}

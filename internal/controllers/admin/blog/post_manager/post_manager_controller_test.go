@@ -29,7 +29,7 @@ func TestManagerController_RequiresAuthentication(t *testing.T) {
 	assert.Contains(t, response, "See Other", "Should show redirect response")
 
 	// Test with authentication
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
@@ -64,7 +64,7 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 		t.Fatalf("failed to create test post2: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
@@ -102,7 +102,7 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 		t.Fatalf("failed to create test post2: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Test status filter
@@ -137,7 +137,7 @@ func TestManagerController_HandlesPagination(t *testing.T) {
 		}
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	assert.NoError(t, err, "Should create test user")
 
 	// Test pagination by requesting page 2

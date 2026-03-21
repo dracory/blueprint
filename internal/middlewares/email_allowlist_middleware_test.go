@@ -138,7 +138,7 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.USER_01,
+		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)

@@ -62,62 +62,114 @@ Embedded file system operations are common across many Go applications and shoul
 
 ---
 
-### 3. URL Building Utilities (Medium Priority)
+### 3. URL Building Utilities (Medium Priority) ✅
 
 #### Files to Move:
-- `internal/links/links.go` - Core URL building functions
-- `internal/links/url.go` - URL construction helper
-- `internal/links/constants.go` - URL constants (if generic)
+- ~~`internal/links/links.go`~~ - Core URL building functions (moved to base)
+- ~~`internal/links/url.go`~~ - URL construction helper (refactored to use base)
+
+#### Status:
+- ~~Moved to `github.com/dracory/base/url`~~ ✅
+- **Dependency Injection**: URLBuilder struct with configurable root URL
+- **Clean Architecture**: No environment variable dependencies in base package
+- **Functions Migrated**: `RootURL()`, `BuildURL()`, `BuildQuery()`, `HttpBuildQuery()`
+- **Comprehensive Tests**: Full test coverage with dependency injection patterns
+- **Blueprint Integration**: Updated to use base utilities with backward compatibility
 
 #### Reasoning:
 URL building is a common need, but the application-specific link files should remain in Blueprint.
 
 #### Proposed Location:
-`github.com/dracory/base/url`
+~~`github.com/dracory/base/url`~~ ✅
 
 #### Keep in Blueprint:
 - `admin_links.go`, `auth_links.go`, `user_links.go`, `website_links.go` (application-specific)
+- `constants.go` (application-specific route constants)
 
 ---
 
-### 4. Generic Types (Medium Priority)
+### 4. Generic Types (Medium Priority) ✅
 
 #### Files to Move:
-- `internal/types/flash_message.go` - Flash message structure
+- ~~`internal/types/flash_message.go`~~ - Flash message structure
+
+#### Status:
+- ~~Moved to `github.com/dracory/base/types`~~ ✅
+- **FlashMessage Structure**: Standard flash message type for web applications
+- **Comprehensive Tests**: Full test coverage including zero values and common types
+- **Documentation**: Complete README with usage examples for authentication and forms
+- **Blueprint Integration**: Updated testutils to use base FlashMessage type
+- **Clean Separation**: Generic type now available for all Dracory projects
 
 #### Reasoning:
 Flash messaging is a common web pattern and the type definition is generic.
 
 #### Proposed Location:
-`github.com/dracory/base/types`
+~~`github.com/dracory/base/types`~~ ✅
 
 ---
 
-### 5. Security Middleware (High Priority)
+### 5. Security Middleware (High Priority) ✅
 
 #### Files to Move:
-- `internal/middlewares/https_redirect_middleware.go`
-- `internal/middlewares/security_headers_middleware.go`
+- ~~`internal/middlewares/https_redirect_middleware.go`~~ - Moved to RTR with customization
+- ~~`internal/middlewares/security_headers_middleware.go`~~ - Moved to RTR with customization
 
-#### Reasoning:
-These security-focused middlewares are framework-agnostic and provide essential security functionality for any web application.
+#### Status:
+- ~~Moved to `github.com/dracory/rtr/middleware/security`~~ ✅
+- **Highly Configurable**: Both middlewares support extensive customization per project
+- **HTTPS Redirect**: Configurable localhost skipping, custom skip functions, trusted proxies
+- **Security Headers**: Full CSP, HSTS, frame options, XSS protection, permissions policy
+- **Blueprint Integration**: Updated to use RTR middlewares with project-specific configs
+- **Comprehensive Tests**: Full test coverage for all configuration options
+- **Documentation**: Complete README with examples for different use cases
+
+#### Analysis:
+**Location: RTR Package (not Base)**
+- Both middlewares return `rtr.MiddlewareInterface` and use `rtr.NewMiddleware()`
+- Designed specifically for RTR router framework integration
+- HTTP middleware layer is a router concern, not base package concern
+- Base package should remain framework-agnostic
 
 #### Proposed Location:
-`github.com/dracory/base/middleware/security`
+~~`github.com/dracory/rtr/middleware/security`~~ ✅
+
+#### Reasoning:
+These security-focused middlewares are framework-agnostic in concept but RTR-specific in implementation, providing essential security functionality for any web application using the RTR router.
+
+#### Customization Features:
+- **HTTPS Redirect**: SkipLocalhost, TrustedProxies, CustomSkipFunc
+- **Security Headers**: Full CSP configuration, HSTS settings, frame options, custom headers
+- **Project-Specific**: Each project can override defaults while maintaining secure baseline
 
 ---
 
-### 6. Test Utilities (Medium Priority)
+### 6. Test Utilities (Medium Priority) ✅
 
 #### Files to Move:
-- `internal/testutils/testutils.go` - Mock SMTP server setup
-- `internal/testutils/constants.go` - Test constants
+- ~~`internal/testutils/testutils.go`~~ - Mock SMTP server setup
+- ~~`internal/testutils/constants.go`~~ - Test constants
+
+#### Status:
+- ~~Moved to `github.com/dracory/test`~~ ✅
+- **Mock SMTP Server**: `SetupMailServer()` function for email testing
+- **Test Constants**: Generic test identifiers (ADMIN_01, USER_01, ORDER_01, etc.)
+- **Comprehensive Tests**: Full test coverage for SMTP mock functionality
+- **Blueprint Integration**: Updated to use test package constants
+- **Clean Separation**: Test utilities now available across Dracory ecosystem
+
+#### Analysis:
+**Location: Test Package (not Base)**
+- Mock SMTP server is a testing utility, not runtime application logic
+- Test constants are specifically for testing scenarios
+- Existing `github.com/dracory/test` package already has comprehensive testing infrastructure
+- Base package should contain runtime utilities, not test helpers
+
+#### Proposed Location:
+~~`github.com/dracory/test`~~ ✅
 
 #### Reasoning:
 Generic test utilities that can be used across projects. The setup.go file should remain as it's Blueprint-specific.
-
-#### Proposed Location:
-`github.com/dracory/base/test`
 
 #### Keep in Blueprint:
 - `setup.go` (Blueprint-specific test setup)

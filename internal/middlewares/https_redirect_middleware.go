@@ -2,44 +2,41 @@ package middlewares
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/dracory/rtr"
+	"github.com/dracory/rtr/middlewares"
 )
 
 // NewHTTPSRedirectMiddleware creates middleware that redirects HTTP requests to HTTPS
+// Uses RTR security middleware with project-specific configuration
 func NewHTTPSRedirectMiddleware() rtr.MiddlewareInterface {
-	return rtr.NewMiddleware().
-		SetName("HTTPS Redirect Middleware").
-		SetHandler(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// Skip redirection for localhost and in development
-				host := r.Host
-				isLocal := host == "localhost" ||
-					host == "127.0.0.1" ||
-					host == "0.0.0.0" ||
-					len(host) > 6 && host[len(host)-6:] == ".local" || // Ends with .local
-					len(host) > 9 && host[:9] == "127.0.0." || // Starts with 127.0.0.
-					len(host) > 10 && host[:10] == "192.168." || // Starts with 192.168.
-					len(host) > 7 && host[:7] == "10.0.0." || // Starts with 10.0.0.
-					r.TLS != nil
+	config := &middlewares.HTTPSRedirectConfig{
+		SkipLocalhost: os.Getenv("APP_ENV") == "development",
+		TrustedProxies: []string{
+			"127.0.0.1",
+			"::1",
+		},
+		CustomSkipFunc: func(r *http.Request) bool {
+			// Project-specific skip logic
+			// Skip HTTPS redirect for health checks in development
+			if os.Getenv("APP_ENV") == "development" && r.URL.Path == "/health" {
+				return true
+			}
 
-				if isLocal {
-					next.ServeHTTP(w, r)
-					return
-				}
-				
-				// Check if already HTTPS
-				if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
-					next.ServeHTTP(w, r)
-					return
-				}
+			// Skip for API endpoints that might be called internally
+			if r.URL.Path == "/api/internal/webhook" {
+				return true
+			}
 
-				// Redirect to HTTPS version of same URL
-				httpsURL := "https://" + r.Host + r.URL.Path
-				if r.URL.RawQuery != "" {
-					httpsURL += "?" + r.URL.RawQuery
-				}
-				http.Redirect(w, r, httpsURL, http.StatusMovedPermanently)
-			})
-		})
+			return false
+		},
+	}
+
+	return middlewares.NewHTTPSRedirectMiddleware(config)
+}
+
+// NewCustomHTTPSRedirectMiddleware allows full customization
+func NewCustomHTTPSRedirectMiddleware(config *middlewares.HTTPSRedirectConfig) rtr.MiddlewareInterface {
+	return middlewares.NewHTTPSRedirectMiddleware(config)
 }

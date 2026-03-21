@@ -20,7 +20,7 @@ func TestSubscriptionOnlyMiddleware_AdminUserPassesThrough(t *testing.T) {
 	user, session, err := testutils.SeedUserAndSession(
 		registry.GetUserStore(),
 		registry.GetSessionStore(),
-		testutils.ADMIN_01,
+		test.ADMIN_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
 	)

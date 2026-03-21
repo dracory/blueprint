@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/dracory/auth"
+	"github.com/dracory/test"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -94,7 +95,7 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 		t.Fatal("sessionStore should not be nil")
 	}
 
-	user, err := testutils.SeedUser(userStore, testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -155,7 +156,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 		t.Fatal("sessionStore should not be nil")
 	}
 
-	user, err := testutils.SeedUser(userStore, testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -223,7 +224,7 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 		t.Fatal("sessionStore should not be nil")
 	}
 
-	user, err := testutils.SeedUser(userStore, testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)

@@ -71,7 +71,7 @@ func TestProfileController_ShowsProfileForm(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatal(err)
 	}

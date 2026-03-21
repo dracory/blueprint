@@ -8,6 +8,8 @@ import (
 
 	"project/internal/emails"
 	"project/internal/testutils"
+
+	"github.com/dracory/test"
 )
 
 func TestNewEmailToAdminOnNewUserRegisteredTaskHandler_InitializesFields(t *testing.T) {
@@ -47,7 +49,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Enqueue_AppOrConfigNil(t *te
 	// handler with nil app should fail
 	handler := &emailToAdminOnNewUserRegisteredTaskHandler{}
 
-	if _, err := handler.Enqueue(testutils.USER_01); err == nil {
+	if _, err := handler.Enqueue(test.USER_01); err == nil {
 		t.Fatalf("expected error when app/config is nil, got nil")
 	}
 }
@@ -60,7 +62,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Enqueue_TaskStoreNil(t *test
 
 	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
 
-	if _, err := handler.Enqueue(testutils.USER_01); err == nil {
+	if _, err := handler.Enqueue(test.USER_01); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
 	}
 }
@@ -77,7 +79,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_MissingUserID(t *test
 
 func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.T) {
 	// configure mock SMTP server
-	server, cleanup := testutils.SetupMailServer(t)
+	server, _, cleanup := test.SetupMailServer(t)
 	defer cleanup()
 
 	cfg := testutils.DefaultConf()
@@ -102,7 +104,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 	}
 
 	// Seed a user for the happy path
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("SeedUser() expected nil error, got %q", err)
 	}

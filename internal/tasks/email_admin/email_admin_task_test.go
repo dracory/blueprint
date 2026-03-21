@@ -8,6 +8,8 @@ import (
 
 	"project/internal/emails"
 	"project/internal/testutils"
+
+	"github.com/dracory/test"
 )
 
 func TestNewEmailToAdminTask_InitializesFields(t *testing.T) {
@@ -88,7 +90,7 @@ func TestEmailToAdminTask_Handle_MissingHtml(t *testing.T) {
 
 func TestEmailToAdminTask_Handle_SendEmail(t *testing.T) {
 	// configure mock SMTP server
-	server, cleanup := testutils.SetupMailServer(t)
+	server, _, cleanup := test.SetupMailServer(t)
 	defer cleanup()
 
 	cfg := testutils.DefaultConf()

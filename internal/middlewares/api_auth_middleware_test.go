@@ -12,6 +12,7 @@ import (
 
 	"github.com/dracory/api"
 	"github.com/dracory/sessionstore"
+	"github.com/dracory/test"
 	"github.com/dracory/userstore"
 	"github.com/stretchr/testify/assert"
 )
@@ -65,7 +66,7 @@ func TestAPIAuthMiddleware_ExpiredSession(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
@@ -131,7 +132,7 @@ func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
 	)
 
 	userStore := registry.GetUserStore()
-	user, err := testutils.SeedUser(userStore, testutils.USER_01)
+	user, err := testutils.SeedUser(userStore, test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
@@ -167,7 +168,7 @@ func TestAPIAuthMiddleware_Success(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), testutils.USER_01)
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}

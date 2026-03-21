@@ -1,77 +1,130 @@
 package middlewares
 
 import (
-	"fmt"
-	"net/http"
+	"os"
 	"strings"
 
 	"github.com/dracory/rtr"
+	"github.com/dracory/rtr/middlewares"
 )
 
 // NewSecurityHeadersMiddleware creates middleware that sets security headers
+// Uses RTR security middleware with project-specific configuration
 func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
-	return rtr.NewMiddleware().
-		SetName("Security Headers Middleware").
-		SetHandler(func(next http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// Allowed domains for scripts, styles, fonts, and images
-				scriptDomains := []string{
-					"'self'",
-					"'unsafe-inline'",
-					"https://cdn.jsdelivr.net",
-					"https://unpkg.com",
-					"https://code.jquery.com",
-					"https://cdnjs.cloudflare.com",
-					"https://www.googletagmanager.com",
-					"https://www.statcounter.com",
-				}
-				styleDomains := []string{
-					"'self'",
-					"'unsafe-inline'",
-					"https://cdn.jsdelivr.net",
-					"https://maxcdn.bootstrapcdn.com",
-					"https://cdnjs.cloudflare.com",
-					"https://fonts.googleapis.com",
-					"https://unpkg.com",
-				}
-				fontDomains := []string{
-					"'self'",
-					"https://cdn.jsdelivr.net",
-					"https://fonts.googleapis.com",
-					"https://fonts.gstatic.com",
-					"https://cdnjs.cloudflare.com",
-					"https://maxcdn.bootstrapcdn.com",
-				}
-				imgDomains := []string{
-					"'self'",
-					"data:",
-					"https://sfs.ams3.digitaloceanspaces.com",
-					"https://lesichkov.ams3.digitaloceanspaces.com",
-				}
+	isDevelopment := os.Getenv("APP_ENV") == "development"
 
-				// Join arrays into CSP strings
-				scriptSrc := strings.Join(scriptDomains, " ")
-				styleSrc := strings.Join(styleDomains, " ")
-				fontSrc := strings.Join(fontDomains, " ")
-				imgSrc := strings.Join(imgDomains, " ")
+	config := &middlewares.SecurityHeadersConfig{
+		CSP: &middlewares.CSPConfig{
+			Enabled:    true,
+			DefaultSrc: []string{"'self'"},
+			ScriptSrc:  getScriptSources(isDevelopment),
+			StyleSrc:   getStyleSources(isDevelopment),
+			FontSrc: []string{
+				"'self'",
+				"https://cdn.jsdelivr.net",
+				"https://fonts.googleapis.com",
+				"https://fonts.gstatic.com",
+				"https://cdnjs.cloudflare.com",
+				"https://maxcdn.bootstrapcdn.com",
+			},
+			ImgSrc: []string{
+				"'self'",
+				"data:",
+				"https://sfs.ams3.digitaloceanspaces.com",
+				"https://lesichkov.ams3.digitaloceanspaces.com",
+			},
+			UpgradeInsecureRequests: !isDevelopment,
+		},
+		HSTS: &middlewares.HSTSConfig{
+			Enabled:           !isDevelopment,
+			MaxAge:            31536000,
+			IncludeSubDomains: !isDevelopment,
+			Preload:           !isDevelopment,
+		},
+		FrameOptions: &middlewares.FrameOptionsConfig{
+			Enabled: true,
+			Option:  "DENY",
+		},
+		ContentTypeNosniff: true,
+		XSSProtection: &middlewares.XSSProtectionConfig{
+			Enabled: true,
+			Mode:    "block",
+		},
+		ReferrerPolicy: "strict-origin-when-cross-origin",
+		PermissionsPolicy: map[string][]string{
+			"geolocation": {},
+			"microphone":  {},
+			"camera":      {},
+		},
+		CustomHeaders: getCustomHeaders(isDevelopment),
+	}
 
-				// Set security headers
-				w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
-				w.Header().Set("X-Frame-Options", "DENY")
-				w.Header().Set("X-Content-Type-Options", "nosniff")
+	return middlewares.NewSecurityHeadersMiddleware(config)
+}
 
-				// X-XSS-Protection
-				w.Header().Set("X-XSS-Protection", "1; mode=block")
+// NewCustomSecurityHeadersMiddleware allows full customization
+func NewCustomSecurityHeadersMiddleware(config *middlewares.SecurityHeadersConfig) rtr.MiddlewareInterface {
+	return middlewares.NewSecurityHeadersMiddleware(config)
+}
 
-				// Referrer-Policy
-				w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+// getScriptSources returns script sources based on environment
+func getScriptSources(isDevelopment bool) []string {
+	sources := []string{
+		"'self'",
+		"https://cdn.jsdelivr.net",
+		"https://unpkg.com",
+		"https://code.jquery.com",
+		"https://cdnjs.cloudflare.com",
+		"https://www.googletagmanager.com",
+		"https://www.statcounter.com",
+	}
 
-				// Permissions-Policy
-				w.Header().Set("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+	if isDevelopment {
+		// Allow unsafe-inline and eval in development
+		sources = append([]string{"'unsafe-inline'", "'unsafe-eval'"}, sources...)
+	}
 
-				w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src 'self'; script-src %s; style-src %s; font-src %s; img-src %s", scriptSrc, styleSrc, fontSrc, imgSrc))
+	return sources
+}
 
-				next.ServeHTTP(w, r)
-			})
-		})
+// getStyleSources returns style sources based on environment
+func getStyleSources(isDevelopment bool) []string {
+	sources := []string{
+		"'self'",
+		"https://cdn.jsdelivr.net",
+		"https://maxcdn.bootstrapcdn.com",
+		"https://cdnjs.cloudflare.com",
+		"https://fonts.googleapis.com",
+		"https://unpkg.com",
+	}
+
+	if isDevelopment {
+		// Allow unsafe-inline in development
+		sources = append([]string{"'unsafe-inline'"}, sources...)
+	}
+
+	return sources
+}
+
+// getCustomHeaders returns custom headers based on environment
+func getCustomHeaders(isDevelopment bool) map[string]string {
+	headers := make(map[string]string)
+
+	if !isDevelopment {
+		// Production-only headers
+		headers["X-Content-Type-Options"] = "nosniff"
+		headers["X-Frame-Options"] = "DENY"
+	}
+
+	// Add project-specific custom headers from environment
+	if customHeaders := os.Getenv("CUSTOM_SECURITY_HEADERS"); customHeaders != "" {
+		for _, header := range strings.Split(customHeaders, ",") {
+			parts := strings.SplitN(header, ":", 2)
+			if len(parts) == 2 {
+				headers[strings.TrimSpace(parts[0])] = strings.TrimSpace(parts[1])
+			}
+		}
+	}
+
+	return headers
 }
