@@ -3,31 +3,28 @@ package links
 import (
 	"net/url"
 	"os"
+
+	baseurl "github.com/dracory/base/url"
 )
+
+// Initialize the URL builder with environment variable
+func init() {
+	appURL := os.Getenv("APP_URL")
+	if os.Getenv("APP_ENV") == "testing" {
+		appURL = ""
+	}
+	baseurl.SetDefaultURL(appURL)
+}
 
 // RootURL returns a URL to the current website
 func RootURL() string {
-	appURL := os.Getenv("APP_URL")
-	if os.Getenv("APP_ENV") == "testing" {
-		return ""
-	}
-	return appURL
+	return baseurl.RootURL()
 }
 
 func query(queryData map[string]string) string {
-	queryString := ""
-
-	if len(queryData) > 0 {
-		v := url.Values{}
-		for key, value := range queryData {
-			v.Set(key, value)
-		}
-		queryString += "?" + httpBuildQuery(v)
-	}
-
-	return queryString
+	return baseurl.BuildQuery(queryData)
 }
 
 func httpBuildQuery(queryData url.Values) string {
-	return queryData.Encode()
+	return baseurl.HttpBuildQuery(queryData)
 }
