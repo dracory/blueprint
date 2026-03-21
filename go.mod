@@ -2,7 +2,7 @@ module project
 
 go 1.26.1
 
-replace github.com/dracory/base => ../../_modules_dracory/base
+// replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
 
@@ -17,7 +17,7 @@ require (
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v0.3.0
 	github.com/dracory/auth v0.29.0
-	github.com/dracory/base v0.31.0
+	github.com/dracory/base v0.33.0
 	github.com/dracory/blindindexstore v1.8.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogstore v1.6.0
@@ -60,7 +60,7 @@ require (
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
 	github.com/dracory/userstore v1.6.0
-	github.com/dracory/vaultstore v0.34.0
+	github.com/dracory/vaultstore v0.36.0
 	github.com/dracory/versionstore v0.6.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dracory/wf v0.6.0
@@ -134,7 +134,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.8.0 // indirect
+	github.com/jackc/pgx/v5 v5.9.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.7.8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

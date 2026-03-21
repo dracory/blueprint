@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"project/internal/helpers"
 	"project/internal/registry"
 
 	"github.com/dracory/userstore"
@@ -68,7 +67,11 @@ func UserUntokenize(
 		return "", "", "", "", "", nil
 	}
 
-	untokenized, err := helpers.Untokenize(ctx, registry.GetVaultStore(), vaultKey, keyTokenMap) // use Untokenize as more resource optimized
+	untokenized, err := registry.GetVaultStore().TokensReadToResolvedMap(
+		ctx,
+		keyTokenMap,
+		vaultKey,
+	) // use TokensReadToResolvedMap as more resource optimized
 
 	if err != nil {
 		registry.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))

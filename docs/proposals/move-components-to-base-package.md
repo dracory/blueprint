@@ -20,7 +20,7 @@ These functions provide a higher-level API over the `vaultstore` package for com
 
 ---
 
-### 4. Config Encryption Loader (Medium Priority)
+### 2. Config Encryption Loader (Medium Priority)
 
 #### Logic to Move:
 - `internal/config/load.go` - `initializeEnvEncVariables` logic for hydrating environment variables from `.vault` files using `envenc`.
@@ -33,7 +33,7 @@ The logic for locating, reading, and decrypting environment secrets from vault f
 
 ---
 
-### 5. Block Editor Renderer (Low Priority)
+### 3. Block Editor Renderer (Low Priority)
 
 #### Files to Move:
 - `internal/helpers/blog_post_blocks_to_string.go` - Logic for converting JSON blocks to HTML.
@@ -46,7 +46,7 @@ If the same block editor format is used across multiple Dracory projects (e.g., 
 
 ---
 
-### 6. Shared UI & Domain Packages (High Priority)
+### 4. Shared UI & Domain Packages (High Priority)
 
 #### Directories to Move:
 - `pkg/blogai`
@@ -60,6 +60,63 @@ These packages in `pkg/` are already structured as libraries but are currently l
 
 #### Proposed Location:
 `github.com/dracory/*` (Independent repositories)
+
+---
+
+### 5. Standardized Configuration & Context Keys (High Priority)
+
+#### Logic to Move:
+- `internal/config/constants.go` - Universal environment variable keys (APP_*, DB_*, MAIL_*, LLM_*, STRIPE_*)
+- `internal/config/constants.go` - `AuthenticatedUserContextKey`, `AuthenticatedSessionContextKey`, etc.
+
+#### Reasoning:
+These constants and context keys are identical across all Dracory projects. Centralizing them ensures that middlewares and helpers from different packages can interoperate seamlessly.
+
+#### Proposed Location:
+`github.com/dracory/base/config` and `github.com/dracory/base/context` (or `github.com/dracory/auth`)
+
+---
+
+### 6. Registry Base & Store Manager (Medium Priority)
+
+#### Logic to Move:
+- `internal/registry/registry_implementation.go` - `cacheDirectory`, `New`, and `Close` boilerplate.
+- `internal/registry/stores_*.go` - The `Initialize`, `Migrate`, and `NewStore` pattern for all database stores.
+
+#### Reasoning:
+All projects use the same orchestration logic for caches, loggers, and database connections. A generic Store Manager could handle conditional initialization and auto-migration of all standard stores (Audit, Blog, etc.) using a simple configuration map.
+
+#### Proposed Location:
+`github.com/dracory/base/registry` or `github.com/dracory/registry`
+
+---
+
+### 7. Generic Session & User Helpers (Medium Priority)
+
+#### Files to Move:
+- `internal/helpers/extend_session.go`
+- `internal/helpers/get_auth_sesson.go`
+- `internal/helpers/user_settings.go`
+- `internal/ext/user.go` - `DisplayNameFull`, `IsClient`, etc.
+
+#### Reasoning:
+Once the context keys are standardized, these helpers become framework-agnostic utilities that work with any `sessionstore` or `userstore` implementation.
+
+#### Proposed Location:
+`github.com/dracory/base/session` and `github.com/dracory/base/user`
+
+---
+
+### 8. Email Styling Constants (Low Priority)
+
+#### Files to Move:
+- `internal/emails/consts.go` - Standardized inline CSS for email templates.
+
+#### Reasoning:
+Generic styles for headings, paragraphs, and buttons in emails should be shared to maintain a consistent look across all transactional emails.
+
+#### Proposed Location:
+`github.com/dracory/base/email`
 
 ---
 

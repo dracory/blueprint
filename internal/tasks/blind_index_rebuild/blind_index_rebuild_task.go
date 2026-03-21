@@ -3,7 +3,6 @@ package blind_index_rebuild
 import (
 	"context"
 	"errors"
-	"project/internal/helpers"
 	"project/internal/registry"
 	"slices"
 	"strconv"
@@ -280,7 +279,11 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		return true // empty email, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.registry.GetVaultStore(), task.registry.GetConfig().GetVaultStoreKey(), map[string]string{"email": emailToken})
+	m, err := task.registry.GetVaultStore().TokensReadToResolvedMap(
+		ctx,
+		map[string]string{"email": emailToken},
+		task.registry.GetConfig().GetVaultStoreKey(),
+	)
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + emailToken + " - " + err.Error())
@@ -348,9 +351,11 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return true // empty first name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.registry.GetVaultStore(), task.registry.GetConfig().GetVaultStoreKey(), map[string]string{
-		"first_name": firstNameToken,
-	})
+	m, err := task.registry.GetVaultStore().TokensReadToResolvedMap(
+		ctx,
+		map[string]string{"first_name": firstNameToken},
+		task.registry.GetConfig().GetVaultStoreKey(),
+	)
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + firstNameToken + " - " + err.Error())
@@ -418,7 +423,11 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		return true // empty last name, nothing to do
 	}
 
-	m, err := helpers.Untokenize(ctx, task.registry.GetVaultStore(), task.registry.GetConfig().GetVaultStoreKey(), map[string]string{"last_name": lastNameToken})
+	m, err := task.registry.GetVaultStore().TokensReadToResolvedMap(
+		ctx,
+		map[string]string{"last_name": lastNameToken},
+		task.registry.GetConfig().GetVaultStoreKey(),
+	)
 
 	if err != nil {
 		task.LogError("Error untokenizing user token: " + lastNameToken + " - " + err.Error())
