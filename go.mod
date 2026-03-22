@@ -2,7 +2,7 @@ module project
 
 go 1.26.1
 
-// replace github.com/dracory/base => ../../_modules_dracory/base
+replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
 

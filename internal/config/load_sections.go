@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	baseCfg "github.com/dracory/base/config"
 	"github.com/dracory/env"
 	"github.com/spf13/cast"
 )
@@ -19,15 +20,15 @@ type appConfig struct {
 	cmsMcpApiKey string
 }
 
-func loadAppConfig(acc *loadAccumulator) appConfig {
+func loadAppConfig(acc *baseCfg.LoadAccumulator) appConfig {
 	mcpApiKey := strings.TrimSpace(env.GetString(KEY_MCP_API_KEY))
 
 	return appConfig{
 		name:         env.GetString(KEY_APP_NAME),
 		url:          env.GetString(KEY_APP_URL),
-		host:         acc.mustString(KEY_APP_HOST, "set the application host address"),
-		port:         acc.mustString(KEY_APP_PORT, "set the application port"),
-		env:          acc.mustString(KEY_APP_ENVIRONMENT, "set the application environment"),
+		host:         acc.MustString(KEY_APP_HOST, "set the application host address"),
+		port:         acc.MustString(KEY_APP_PORT, "set the application port"),
+		env:          acc.MustString(KEY_APP_ENVIRONMENT, "set the application environment"),
 		debug:        env.GetBool(KEY_APP_DEBUG),
 		cmsMcpApiKey: mcpApiKey,
 	}
@@ -39,7 +40,7 @@ type envEncryptionConfig struct {
 	used       bool
 }
 
-func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
+func loadEnvEncryptionConfig(acc *baseCfg.LoadAccumulator) envEncryptionConfig {
 	used := env.GetBool(KEY_ENVENC_USED)
 
 	if !used {
@@ -48,13 +49,13 @@ func loadEnvEncryptionConfig(acc *loadAccumulator) envEncryptionConfig {
 
 	privateKey := strings.TrimSpace(env.GetString(KEY_ENVENC_KEY_PRIVATE))
 
-	if err := ensureRequired(privateKey, KEY_ENVENC_KEY_PRIVATE, "required when ENVENC_USED is yes"); err != nil {
-		acc.add(err)
+	if err := baseCfg.EnsureRequired(privateKey, KEY_ENVENC_KEY_PRIVATE, "required when ENVENC_USED is yes"); err != nil {
+		acc.Add(err)
 		return envEncryptionConfig{used: used}
 	}
 
 	if privateKey == "" {
-		acc.add(fmt.Errorf("private key is required when env encryption is enabled"))
+		acc.Add(fmt.Errorf("private key is required when env encryption is enabled"))
 		return envEncryptionConfig{used: used, privateKey: privateKey}
 	}
 
@@ -72,19 +73,19 @@ type databaseConfig struct {
 	sslMode  string
 }
 
-func loadDatabaseConfig(acc *loadAccumulator) databaseConfig {
-	driver := acc.mustString(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
+func loadDatabaseConfig(acc *baseCfg.LoadAccumulator) databaseConfig {
+	driver := acc.MustString(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
 	host := strings.TrimSpace(env.GetString(KEY_DB_HOST))
 	port := strings.TrimSpace(env.GetString(KEY_DB_PORT))
-	name := acc.mustString(KEY_DB_DATABASE, "set the database name")
+	name := acc.MustString(KEY_DB_DATABASE, "set the database name")
 	user := strings.TrimSpace(env.GetString(KEY_DB_USERNAME))
 	pass := strings.TrimSpace(env.GetString(KEY_DB_PASSWORD))
 
 	if driver != driverSQLite {
-		acc.mustWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
-		acc.mustWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
-		acc.mustWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", user)
-		acc.mustWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
+		acc.MustWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
+		acc.MustWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
+		acc.MustWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", user)
+		acc.MustWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
 	}
 
 	return databaseConfig{
@@ -158,15 +159,15 @@ type storesConfig struct {
 	vaultStoreKey         string
 }
 
-func loadStoresConfig(acc *loadAccumulator) storesConfig {
+func loadStoresConfig(acc *baseCfg.LoadAccumulator) storesConfig {
 	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
 	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
 
 	if userStoreVaultEnabled && !vaultStoreUsed {
-		acc.add(fmt.Errorf("%v requires %v to be true", userStoreVaultEnabled, vaultStoreUsed))
+		acc.Add(fmt.Errorf("%v requires %v to be true", userStoreVaultEnabled, vaultStoreUsed))
 	}
 
-	acc.mustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID, "required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
+	acc.MustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID, "required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
 	return storesConfig{
 		auditStoreUsed:        auditStoreUsed,
@@ -238,7 +239,7 @@ type llmConfig struct {
 	vertexAiDefaultModel string
 }
 
-func loadLLMConfig(acc *loadAccumulator) llmConfig {
+func loadLLMConfig(acc *baseCfg.LoadAccumulator) llmConfig {
 	anthropicUsed := env.GetBool(KEY_ANTHROPIC_API_USED)
 	anthropicKey := env.GetString(KEY_ANTHROPIC_API_KEY)
 	anthropicDefaultModel := env.GetString(KEY_ANTHROPIC_API_DEFAULT_MODEL)
@@ -261,22 +262,22 @@ func loadLLMConfig(acc *loadAccumulator) llmConfig {
 	vertexAiRegionID := env.GetString(KEY_VERTEX_AI_API_REGION_ID)
 	vertexAiDefaultModel := env.GetString(KEY_VERTEX_AI_API_DEFAULT_MODEL)
 
-	acc.mustWhen(anthropicUsed, KEY_ANTHROPIC_API_KEY, "required when `ANTHROPIC_API_USED` is true", anthropicKey)
-	acc.mustWhen(anthropicUsed, KEY_ANTHROPIC_API_DEFAULT_MODEL, "required when `ANTHROPIC_API_USED` is true", anthropicDefaultModel)
+	acc.MustWhen(anthropicUsed, KEY_ANTHROPIC_API_KEY, "required when `ANTHROPIC_API_USED` is true", anthropicKey)
+	acc.MustWhen(anthropicUsed, KEY_ANTHROPIC_API_DEFAULT_MODEL, "required when `ANTHROPIC_API_USED` is true", anthropicDefaultModel)
 
-	acc.mustWhen(googleGeminiUsed, KEY_GEMINI_API_KEY, "required when `GEMINI_API_USED` is true", googleGeminiKey)
-	acc.mustWhen(googleGeminiUsed, KEY_GEMINI_API_DEFAULT_MODEL, "required when `GEMINI_API_USED` is true", googleGeminiDefaultModel)
+	acc.MustWhen(googleGeminiUsed, KEY_GEMINI_API_KEY, "required when `GEMINI_API_USED` is true", googleGeminiKey)
+	acc.MustWhen(googleGeminiUsed, KEY_GEMINI_API_DEFAULT_MODEL, "required when `GEMINI_API_USED` is true", googleGeminiDefaultModel)
 
-	acc.mustWhen(openAiUsed, KEY_OPENAI_API_KEY, "required when `OPENAI_API_USED` is true", openAiKey)
-	acc.mustWhen(openAiUsed, KEY_OPENAI_API_DEFAULT_MODEL, "required when `OPENAI_API_USED` is true", openAiDefaultModel)
+	acc.MustWhen(openAiUsed, KEY_OPENAI_API_KEY, "required when `OPENAI_API_USED` is true", openAiKey)
+	acc.MustWhen(openAiUsed, KEY_OPENAI_API_DEFAULT_MODEL, "required when `OPENAI_API_USED` is true", openAiDefaultModel)
 
-	acc.mustWhen(openRouterUsed, KEY_OPENROUTER_API_KEY, "required when `OPENROUTER_API_USED` is true", openRouterKey)
-	acc.mustWhen(openRouterUsed, KEY_OPENROUTER_API_DEFAULT_MODEL, "required when `OPENROUTER_API_USED` is true", openRouterDefaultModel)
+	acc.MustWhen(openRouterUsed, KEY_OPENROUTER_API_KEY, "required when `OPENROUTER_API_USED` is true", openRouterKey)
+	acc.MustWhen(openRouterUsed, KEY_OPENROUTER_API_DEFAULT_MODEL, "required when `OPENROUTER_API_USED` is true", openRouterDefaultModel)
 
-	acc.mustWhen(vertexAiUsed, KEY_VERTEX_AI_API_MODEL_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiModelID)
-	acc.mustWhen(vertexAiUsed, KEY_VERTEX_AI_API_PROJECT_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiProjectID)
-	acc.mustWhen(vertexAiUsed, KEY_VERTEX_AI_API_REGION_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiRegionID)
-	acc.mustWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL, "required when `VERTEX_AI_API_USED` is true", vertexAiDefaultModel)
+	acc.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_MODEL_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiModelID)
+	acc.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_PROJECT_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiProjectID)
+	acc.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_REGION_ID, "required when `VERTEX_AI_API_USED` is true", vertexAiRegionID)
+	acc.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL, "required when `VERTEX_AI_API_USED` is true", vertexAiDefaultModel)
 
 	return llmConfig{
 		anthropicUsed:            anthropicUsed,

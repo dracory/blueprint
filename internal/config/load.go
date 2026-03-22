@@ -24,7 +24,7 @@ import (
 func Load() (ConfigInterface, error) {
 	env.Load(".env")
 
-	acc := &loadAccumulator{}
+	acc := &baseCfg.LoadAccumulator{}
 
 	app := loadAppConfig(acc)
 	envEnc := loadEnvEncryptionConfig(acc)
@@ -39,13 +39,13 @@ func Load() (ConfigInterface, error) {
 	if envEnc.used {
 		// Use base package config loader with embedded resources support
 		if err := baseCfg.InitializeEnvEncVariablesFromResources(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey, resources.Resource); err != nil {
-			acc.add(err)
+			acc.Add(err)
 		} else {
 			envEnc.privateKey = "removed" // reset the private key
 		}
 	}
 
-	if err := acc.err(); err != nil {
+	if err := acc.Err(); err != nil {
 		return nil, err
 	}
 
