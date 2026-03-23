@@ -19,6 +19,7 @@ If the same block editor format is used across multiple Dracory projects (e.g., 
 
 ---
 
+
 ### 6. Registry Base & Store Manager (Medium Priority)
 
 #### Logic to Move:
@@ -30,19 +31,6 @@ All projects use the same orchestration logic for caches, loggers, and database 
 
 #### Proposed Location:
 `github.com/dracory/base/registry` or `github.com/dracory/registry`
-
----
-
-### 8. Email Styling Constants (Low Priority)
-
-#### Files to Move:
-- `internal/emails/consts.go` - Standardized inline CSS for email templates.
-
-#### Reasoning:
-Generic styles for headings, paragraphs, and buttons in emails should be shared to maintain a consistent look across all transactional emails.
-
-#### Proposed Location:
-`github.com/dracory/base/email`
 
 ---
 
