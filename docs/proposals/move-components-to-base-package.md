@@ -19,20 +19,6 @@ If the same block editor format is used across multiple Dracory projects (e.g., 
 
 ---
 
-### 5. Standardized Configuration & Context Keys (High Priority)
-
-#### Logic to Move:
-- `internal/config/constants.go` - Universal environment variable keys (APP_*, DB_*, MAIL_*, LLM_*, STRIPE_*)
-- `internal/config/constants.go` - `AuthenticatedUserContextKey`, `AuthenticatedSessionContextKey`, etc.
-
-#### Reasoning:
-These constants and context keys are identical across all Dracory projects. Centralizing them ensures that middlewares and helpers from different packages can interoperate seamlessly.
-
-#### Proposed Location:
-`github.com/dracory/base/config` and `github.com/dracory/base/context` (or `github.com/dracory/auth`)
-
----
-
 ### 6. Registry Base & Store Manager (Medium Priority)
 
 #### Logic to Move:
