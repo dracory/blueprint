@@ -24,7 +24,7 @@ This is a quick start blueprint for an MVC web applications
 ## Installation
 
 ```bash
-git clone https://github.com/gouniverse/blueprint
+git clone https://github.com/dracory/blueprint
 ```
 
 ## Environment Variables
