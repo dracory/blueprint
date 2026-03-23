@@ -6,7 +6,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/base/email"
+	baseEmail "github.com/dracory/email"
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
 	"github.com/samber/lo"

@@ -3,7 +3,7 @@ package emails
 import (
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/base/email"
+	baseEmail "github.com/dracory/email"
 	"github.com/samber/lo"
 )
 

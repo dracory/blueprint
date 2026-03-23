@@ -137,6 +137,8 @@ github.com/dracory/database v0.7.0 h1:7pZbNKOhaMOwQ9WDU4AKgqvqmmKU/x5lNGliLH4aH0
 github.com/dracory/database v0.7.0/go.mod h1:SySNVnsfJSo2OQOMKrnVM4D98F5h9w2xoBVKjKLUl2E=
 github.com/dracory/dataobject v1.6.0 h1:k9kVYthGqK3giZvG/HMF9wGjwY9sRLv8XJ543nsUTiE=
 github.com/dracory/dataobject v1.6.0/go.mod h1:eo0pRMmHAEpWKQo29F6TTs43Cpp7J5QRj9wiJ0eQrJ0=
+github.com/dracory/email v0.1.0 h1:FvfBXWtGFXs+PIYm4V38FZ4C22SQtmdoeSDhbMUlg7g=
+github.com/dracory/email v0.1.0/go.mod h1:f3mtW3pkf5AzPIQJtX4bkt/bsVEaS9nwppMdMd8BLvE=
 github.com/dracory/entitystore v1.3.0 h1:RQwQXwCXMy0X+zWsFNKoSJoREazRWoidr92dpfFTnoU=
 github.com/dracory/entitystore v1.3.0/go.mod h1:QYF46dQgMKORB5RSR1cBe2zvw315HzQznTJ1n63DnOM=
 github.com/dracory/env v1.0.0 h1:/Lw9MoXA9+5YDWKVmMF9l9f47OMjcLHe1olAAvfQpfk=

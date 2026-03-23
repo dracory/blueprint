@@ -10,6 +10,8 @@ go 1.26.1
 
 // replace github.com/dracory/database => ../../_modules_dracory/database
 
+// replace github.com/dracory/email => ../../_modules_dracory/email
+
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/aws/smithy-go v1.24.2
@@ -33,6 +35,7 @@ require (
 	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/database v0.7.0
 	github.com/dracory/dataobject v1.6.0
+	github.com/dracory/email v0.1.0
 	github.com/dracory/entitystore v1.3.0
 	github.com/dracory/env v1.0.0
 	github.com/dracory/envenc v1.2.0

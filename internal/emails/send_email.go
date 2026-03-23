@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/base/email"
+	baseEmail "github.com/dracory/email"
 	"github.com/spf13/cast"
 )
 
