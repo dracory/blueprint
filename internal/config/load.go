@@ -26,16 +26,11 @@ func Load() (ConfigInterface, error) {
 
 	acc := &baseCfg.LoadAccumulator{}
 
+	// Load basic config sections first to get app.env and envEnc.privateKey
 	app := loadAppConfig(acc)
 	envEnc := loadEnvEncryptionConfig(acc)
-	db := loadDatabaseConfig(acc)
-	mail := loadMailConfig()
-	reg := loadRegistrationConfig()
-	stores := loadStoresConfig(acc)
-	stripe := loadStripeConfig()
-	llms := loadLLMConfig(acc)
-	trans := loadTranslationConfig()
 
+	// Initialize encrypted environment variables BEFORE other config loaders read them
 	if envEnc.used {
 		// Use base package config loader with embedded resources support
 		if err := baseCfg.InitializeEnvEncVariablesFromResources(app.env, ENVENC_KEY_PUBLIC, envEnc.privateKey, resources.Resource); err != nil {
@@ -43,7 +38,19 @@ func Load() (ConfigInterface, error) {
 		} else {
 			envEnc.privateKey = "removed" // reset the private key
 		}
+
+		// Reload app config to pick up any encrypted app variables (APP_NAME, APP_URL, etc.)
+		app = loadAppConfig(acc)
 	}
+
+	// Now load remaining config sections - they will have access to encrypted variables
+	db := loadDatabaseConfig(acc)
+	mail := loadMailConfig()
+	reg := loadRegistrationConfig()
+	stores := loadStoresConfig(acc)
+	stripe := loadStripeConfig()
+	llms := loadLLMConfig(acc)
+	trans := loadTranslationConfig()
 
 	if err := acc.Err(); err != nil {
 		return nil, err
