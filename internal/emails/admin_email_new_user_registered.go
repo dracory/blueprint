@@ -4,7 +4,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/email"
+	"github.com/dracory/email"
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
 )
@@ -65,15 +65,15 @@ func (e *emailToAdminOnNewUserRegistered) template(appName string, userID string
 
 	h1 := hb.Heading1().
 		HTML(`New User Registsred`).
-		Style(baseEmail.StyleHeading1)
+		Style(email.StyleHeading1)
 
 	p1 := hb.Paragraph().
 		HTML(`There is a new user ID ` + userID + `	that registsred into ` + appName + `.`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p2 := hb.Paragraph().
 		HTML(`Please login to admin panel to check the new user.`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p6 := hb.Paragraph().
 		Children([]hb.TagInterface{
@@ -81,7 +81,7 @@ func (e *emailToAdminOnNewUserRegistered) template(appName string, userID string
 			hb.BR(),
 			hb.Text(`The new way to learn`),
 		}).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	return hb.Div().Children([]hb.TagInterface{
 		h1,

@@ -6,7 +6,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/email"
+	"github.com/dracory/email"
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
 	"github.com/samber/lo"
@@ -90,37 +90,37 @@ func (e *inviteFriendEmail) template(appName string, userName string, userNote s
 
 	h1 := hb.Heading1().
 		HTML(`You have an awesome friend`).
-		Style(baseEmail.StyleHeading1)
+		Style(email.StyleHeading1)
 
 	p1 := hb.Paragraph().
 		HTML(`Hi ` + recipientName + `,`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p2 := hb.Paragraph().
 		HTML(`You have been invited by a friend who thinks you will like ` + appName + `.`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p3 := hb.Paragraph().
 		HTML(`A note from your friend ` + userName + `:`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p4 := hb.Paragraph().
 		HTML(`"` + userNote + `"`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p5 := hb.Paragraph().
 		HTML(urlJoin).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p6 := hb.Paragraph().
 		HTML(``). // Add description
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p7 := hb.Paragraph().
 		Children([]hb.TagInterface{
 			hb.Raw(`Thank you for choosing ` + urlHome + `.`),
 		}).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	return hb.Div().Children([]hb.TagInterface{
 		h1,

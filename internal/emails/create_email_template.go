@@ -3,7 +3,7 @@ package emails
 import (
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/email"
+	"github.com/dracory/email"
 	"github.com/samber/lo"
 )
 
@@ -21,7 +21,7 @@ func CreateEmailTemplate(registry registry.RegistryInterface, title string, html
 	}).Else("")
 
 	// Use the base email template
-	return baseEmail.DefaultTemplate(baseEmail.TemplateOptions{
+	return email.DefaultTemplate(email.TemplateOptions{
 		Title:       title,
 		Content:     htmlContent,
 		AppName:     appName,

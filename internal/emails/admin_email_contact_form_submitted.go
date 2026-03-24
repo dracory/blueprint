@@ -4,7 +4,7 @@ import (
 	"project/internal/links"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/email"
+	"github.com/dracory/email"
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
 )
@@ -67,15 +67,15 @@ func (e *emailToAdminOnNewContactFormSubmitted) template(appName string) string 
 
 	h1 := hb.Heading1().
 		HTML(`New Contact Form Submitted`).
-		Style(baseEmail.StyleHeading1)
+		Style(email.StyleHeading1)
 
 	p1 := hb.Paragraph().
 		HTML(`There is a new contact form request submitted into ` + appName + `.`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p2 := hb.Paragraph().
 		HTML(`Please login to admin panel to check the new contact request.`).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	p6 := hb.Paragraph().
 		Children([]hb.TagInterface{
@@ -83,7 +83,7 @@ func (e *emailToAdminOnNewContactFormSubmitted) template(appName string) string 
 			hb.BR(),
 			hb.Text(`The new way to learn`),
 		}).
-		Style(baseEmail.StyleParagraph)
+		Style(email.StyleParagraph)
 
 	return hb.Div().Children([]hb.TagInterface{
 		h1,

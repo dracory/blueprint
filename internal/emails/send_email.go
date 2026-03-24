@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"project/internal/registry"
 
-	baseEmail "github.com/dracory/email"
+	"github.com/dracory/email"
 	"github.com/spf13/cast"
 )
 
@@ -28,7 +28,7 @@ type SendOptions struct {
 	TextBody string
 }
 
-var emailSender baseEmail.Sender
+var emailSender email.Sender
 
 // InitEmailSender initializes the email sender
 func InitEmailSender(registry registry.RegistryInterface) {
@@ -40,7 +40,7 @@ func InitEmailSender(registry registry.RegistryInterface) {
 		return
 	}
 
-	emailSender = baseEmail.NewSMTPSender(baseEmail.Config{
+	emailSender = email.NewSMTPSender(email.Config{
 		Host:     registry.GetConfig().GetMailHost(),
 		Port:     cast.ToString(registry.GetConfig().GetMailPort()),
 		Username: registry.GetConfig().GetMailUsername(),
@@ -58,7 +58,7 @@ func SendEmail(options SendOptions) error {
 	}
 
 	// Convert SendOptions to base email.SendOptions
-	baseOptions := baseEmail.SendOptions{
+	baseOptions := email.SendOptions{
 		From:     options.From,
 		FromName: options.FromName,
 		To:       options.To,
