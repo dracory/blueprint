@@ -83,9 +83,14 @@ tasks:
   # ======================================================================== #
 
   dev-init:
-    desc: Initialize development environment (copies the .env_example to .env)
+    desc: Initialize development environment (copies the .env.example to .env)
     cmds:
-      - cp .env_example .env
+      - |
+        if [ -f .env ]; then
+          echo "Error: .env file already exists. Remove it first or use a different approach."
+          exit 1
+        fi
+      - cp .env.example .env
       - echo "Done!"
     silent: true
 

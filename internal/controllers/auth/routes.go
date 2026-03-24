@@ -51,11 +51,11 @@ func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
 	routes := append(authRoutes, logoutRoute)
 
 	if application.GetConfig().GetRegistrationEnabled() {
-		// Apply even stricter rate limiting for registration
+		// Apply moderate rate limiting for registration
 		registerRoute.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
-			// Stricter rate limiting for registration endpoint
-			// 3 requests per minute to prevent spam registration
-			rtrMiddleware.RateLimitByIPMiddleware(3, 60),
+			// Moderate rate limiting for registration endpoint
+			// 10 requests per minute to allow for legitimate interactions (country/timezone selection)
+			rtrMiddleware.RateLimitByIPMiddleware(10, 60),
 		})
 
 		routes = append(routes, registerRoute)

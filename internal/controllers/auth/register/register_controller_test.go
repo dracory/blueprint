@@ -819,6 +819,224 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 	}
 }
 
+func TestRegisterController_SelectTimezoneByCountry_WithValidCountry(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if user == nil {
+		t.Fatal("user should not be nil")
+	}
+
+	// Test the timezone selection AJAX endpoint
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+		PostValues: url.Values{
+			"action":  {"on-country-selected-timezone-options"},
+			"country": {"US"}, // United States
+		},
+		Context: map[any]any{
+			auth.AuthenticatedUserID{}:           user.ID(),
+			config.AuthenticatedUserContextKey{}: user,
+		},
+	})
+
+	if err != nil {
+		t.Fatal("Response MUST NOT trigger error, but was:", err)
+	}
+
+	if response == nil {
+		t.Fatal(`Response MUST not be nil`)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
+	}
+
+	// Should return a timezone select element with actual timezone options
+	expecteds := []string{
+		`id="SelectTimezones"`,
+		`name="timezone"`,
+		`<select`,
+		`</select>`,
+		// Test for specific US timezone options
+		`America/New_York`,
+		`America/Los_Angeles`,
+		`America/Chicago`,
+		`America/Denver`,
+		`Pacific/Honolulu`,
+	}
+
+	for _, expected := range expecteds {
+		if !strings.Contains(responseHTML, expected) {
+			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
+		}
+	}
+
+	// Should NOT contain timezones from other countries
+	notExpected := []string{
+		`Europe/London`,    // UK timezone
+		`Asia/Tokyo`,       // Japan timezone
+		`Australia/Sydney`, // Australia timezone
+		`Africa/Cairo`,     // Egypt timezone
+		`America/Toronto`,  // Canada timezone (different country)
+	}
+
+	for _, unexpected := range notExpected {
+		if strings.Contains(responseHTML, unexpected) {
+			t.Fatal(`Response MUST NOT contain`, unexpected, ` but was found in: `, responseHTML)
+		}
+	}
+}
+
+func TestRegisterController_SelectTimezoneByCountry_WithEmptyCountry(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if user == nil {
+		t.Fatal("user should not be nil")
+	}
+
+	// Test with empty country - should return all timezones
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+		PostValues: url.Values{
+			"action":  {"on-country-selected-timezone-options"},
+			"country": {""},
+		},
+		Context: map[any]any{
+			auth.AuthenticatedUserID{}:           user.ID(),
+			config.AuthenticatedUserContextKey{}: user,
+		},
+	})
+
+	if err != nil {
+		t.Fatal("Response MUST NOT trigger error, but was:", err)
+	}
+
+	if response == nil {
+		t.Fatal(`Response MUST not be nil`)
+	}
+
+	if response.StatusCode != http.StatusOK {
+		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
+	}
+
+	// Should still return a timezone select element
+	expecteds := []string{
+		`id="SelectTimezones"`,
+		`name="timezone"`,
+		`<select`,
+		`</select>`,
+	}
+
+	for _, expected := range expecteds {
+		if !strings.Contains(responseHTML, expected) {
+			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
+		}
+	}
+}
+
+func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+		// Note: No GeoStore - should return error
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if user == nil {
+		t.Fatal("user should not be nil")
+	}
+
+	// Test without GeoStore configured
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+		PostValues: url.Values{
+			"action":  {"on-country-selected-timezone-options"},
+			"country": {"US"},
+		},
+		Context: map[any]any{
+			auth.AuthenticatedUserID{}:           user.ID(),
+			config.AuthenticatedUserContextKey{}: user,
+		},
+	})
+
+	if err != nil {
+		t.Fatal("Response MUST NOT trigger error, but was:", err)
+	}
+
+	if response == nil {
+		t.Fatal(`Response MUST not be nil`)
+	}
+
+	// Should redirect to error page
+	if response.StatusCode != http.StatusSeeOther {
+		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
+	}
+
+	if !strings.Contains(responseHTML, `/flash?message_id=`) {
+		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
+	}
+}
+
+func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithGeoStore(true),
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	// Test without authentication
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+		PostValues: url.Values{
+			"action":  {"on-country-selected-timezone-options"},
+			"country": {"US"},
+		},
+		Context: map[any]any{}, // No authenticated user
+	})
+
+	if err != nil {
+		t.Fatal("Response MUST NOT trigger error, but was:", err)
+	}
+
+	if response == nil {
+		t.Fatal(`Response MUST not be nil`)
+	}
+
+	// Should redirect to login
+	if response.StatusCode != http.StatusSeeOther {
+		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
+	}
+
+	if !strings.Contains(responseHTML, `/flash?message_id=`) {
+		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
+	}
+}
+
 func TestRegisterController_Success_WithVaultStore(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)

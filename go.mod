@@ -42,7 +42,7 @@ require (
 	github.com/dracory/feedstore v0.7.0
 	github.com/dracory/filesystem v1.1.0
 	github.com/dracory/form v0.21.0
-	github.com/dracory/geostore v1.0.0
+	github.com/dracory/geostore v1.1.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.25.0
 	github.com/dracory/llm v1.3.0
@@ -50,7 +50,7 @@ require (
 	github.com/dracory/metastore v1.4.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
-	github.com/dracory/sb v0.20.0
+	github.com/dracory/sb v0.22.0
 	github.com/dracory/sessionstore v1.6.0
 	github.com/dracory/settingstore v1.5.0
 	github.com/dracory/shopstore v1.7.0

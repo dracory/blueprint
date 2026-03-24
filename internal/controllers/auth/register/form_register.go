@@ -88,7 +88,8 @@ func (controller *registerController) formRegister(ctx context.Context, data reg
 			"action": "on-country-selected-timezone-options",
 		})).
 		Hx("target", "#SelectTimezones").
-		Hx("swap", "outerHTML")
+		Hx("swap", "outerHTML").
+		Hx("include", "#SelectCountries")
 
 	countryGroup := hb.Div().
 		Class("form-group").
