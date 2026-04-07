@@ -25,7 +25,7 @@ type postDetailsComponent struct {
 	registry registry.RegistryInterface
 
 	PostID string
-	Post   *blogstore.Post
+	Post   blogstore.PostInterface
 
 	FormStatus      string
 	FormImageUrl    string
@@ -87,12 +87,12 @@ func (c *postDetailsComponent) Mount(ctx context.Context, params map[string]stri
 	}
 
 	c.Post = post
-	c.FormStatus = post.Status()
-	c.FormImageUrl = post.ImageUrl()
-	c.FormFeatured = post.Featured()
-	c.FormPublishedAt = lo.Ternary(post.PublishedAtCarbon() != nil, post.PublishedAtCarbon().ToDateTimeString(), "")
-	c.FormEditor = post.Editor()
-	c.FormMemo = post.Memo()
+	c.FormStatus = post.GetStatus()
+	c.FormImageUrl = post.GetImageUrl()
+	c.FormFeatured = post.GetFeatured()
+	c.FormPublishedAt = lo.Ternary(post.GetPublishedAtCarbon() != nil, post.GetPublishedAtCarbon().ToDateTimeString(), "")
+	c.FormEditor = post.GetEditor()
+	c.FormMemo = post.GetMemo()
 
 	return nil
 }
@@ -189,7 +189,7 @@ func (c *postDetailsComponent) Handle(ctx context.Context, action string, data u
 			return nil
 		}
 
-		imageURL, err := agent.GenerateImage(llmEngine, post.Title(), post.Summary())
+		imageURL, err := agent.GenerateImage(llmEngine, post.GetTitle(), post.GetSummary())
 		if err != nil {
 			c.registry.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage", "error", err.Error())
 			c.FormErrorMessage = "Failed to generate image"

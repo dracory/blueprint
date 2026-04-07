@@ -43,10 +43,10 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 						HTML("Actions"),
 				}),
 			}),
-			hb.Tbody().Children(lo.Map(data.blogList, func(blog blogstore.Post, _ int) hb.TagInterface {
+			hb.Tbody().Children(lo.Map(data.blogList, func(blog blogstore.PostInterface, _ int) hb.TagInterface {
 				blogLink := hb.Hyperlink().
-					HTML(blog.Title()).
-					Href(links.Website().BlogPost(blog.ID(), blog.Slug())).
+					HTML(blog.GetTitle()).
+					Href(links.Website().BlogPost(blog.GetID(), blog.GetSlug())).
 					Target("_blank")
 
 				status := hb.Span().
@@ -55,27 +55,27 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 					ClassIf(blog.IsTrashed(), "text-secondary").
 					ClassIf(blog.IsDraft(), "text-primary").
 					ClassIf(blog.IsUnpublished(), "text-danger").
-					HTML(blog.Status())
+					HTML(blog.GetStatus())
 
 				buttonAiContent := hb.Hyperlink().
 					Class("btn btn-warning me-2").
 					Child(hb.I().Class("bi bi-magic")).
 					Title("AI Content Editor").
-					Href(shared.NewLinks().AiPostContentUpdate(map[string]string{"post_id": blog.ID()})).
+					Href(shared.NewLinks().AiPostContentUpdate(map[string]string{"post_id": blog.GetID()})).
 					Target("_blank")
 
 				buttonEdit := hb.Hyperlink().
 					Class("btn btn-primary me-2").
 					Child(hb.I().Class("bi bi-pencil-square")).
 					Title("Edit").
-					Href(shared.NewLinks().PostUpdate(map[string]string{"post_id": blog.ID()})).
+					Href(shared.NewLinks().PostUpdate(map[string]string{"post_id": blog.GetID()})).
 					Target("_blank")
 
 				buttonDelete := hb.Hyperlink().
 					Class("btn btn-danger").
 					Child(hb.I().Class("bi bi-trash")).
 					Title("Delete").
-					HxGet(shared.NewLinks().PostDelete(map[string]string{"post_id": blog.ID()})).
+					HxGet(shared.NewLinks().PostDelete(map[string]string{"post_id": blog.GetID()})).
 					HxTarget("body").
 					HxSwap("beforeend")
 
@@ -85,23 +85,23 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 						Child(hb.Div().
 							Class("text-muted small").
 							HTML("Ref: ").
-							HTML(blog.ID())),
+							HTML(blog.GetID())),
 					hb.TD().
 						Child(status),
 					hb.TD().
-						Child(hb.Span().Class("text-muted text-uppercase").HTML(blog.Featured())),
+						Child(hb.Span().Class("text-muted text-uppercase").HTML(blog.GetFeatured())),
 					hb.TD().
 						Child(hb.Div().
 							Class("small text-muted text-nowrap").
-							HTML(blog.PublishedAtCarbon().Format("d M Y"))),
+							HTML(blog.GetPublishedAtCarbon().Format("d M Y"))),
 					hb.TD().
 						Child(hb.Div().
 							Class("small text-muted text-nowrap").
-							HTML(blog.CreatedAtCarbon().Format("d M Y"))),
+							HTML(blog.GetCreatedAtCarbon().Format("d M Y"))),
 					hb.TD().
 						Child(hb.Div().
 							Class("small text-muted text-nowrap").
-							HTML(blog.UpdatedAtCarbon().Format("d M Y"))),
+							HTML(blog.GetUpdatedAtCarbon().Format("d M Y"))),
 					hb.TD().
 						Child(buttonAiContent).
 						Child(buttonEdit).
@@ -280,4 +280,3 @@ func tablePagination(data postManagerControllerData, count int, page int, perPag
 		Class(`d-flex justify-content-left mt-5 pagination-primary-soft rounded mb-0`).
 		HTML(pagination)
 }
-

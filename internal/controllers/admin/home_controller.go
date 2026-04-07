@@ -26,8 +26,17 @@ type homeController struct {
 
 // == CONSTRUCTOR ==============================================================
 
+// NewHomeController creates a new homeController
+//
+// Parameters:
+// - registry: the registry interface for accessing stores and services
+//
+// Returns:
+// - *homeController: a pointer to the homeController struct.
 func NewHomeController(registry registry.RegistryInterface) *homeController {
-	return &homeController{registry: registry}
+	return &homeController{
+		registry: registry,
+	}
 }
 
 // == PUBLIC METHODS ===========================================================

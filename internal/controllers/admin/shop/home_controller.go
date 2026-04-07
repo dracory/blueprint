@@ -82,6 +82,11 @@ func (controller *homeController) tiles() []hb.TagInterface {
 			"link":  shared.NewLinks().Products(map[string]string{}),
 		},
 		{
+			"title": "Category Manager",
+			"icon":  "bi-tags",
+			"link":  shared.NewLinks().Categories(map[string]string{}),
+		},
+		{
 			"title": "Discount Manager",
 			"icon":  "bi-percent",
 			"link":  shared.NewLinks().Discounts(map[string]string{}),

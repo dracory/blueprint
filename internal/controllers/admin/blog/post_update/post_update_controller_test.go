@@ -59,7 +59,7 @@ func TestPostUpdateController_ShowsPage(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostUpdateController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
-			"post_id": {post.ID()},
+			"post_id": {post.GetID()},
 			"view":    {"content"},
 		},
 	})
@@ -68,10 +68,10 @@ func TestPostUpdateController_ShowsPage(t *testing.T) {
 	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
 	assert.Contains(t, responseHTML, "Edit Post", "Should show page heading")
 	assert.Contains(t, responseHTML, "Post:", "Should show post label")
-	assert.Contains(t, responseHTML, post.Title(), "Should show post title")
+	assert.Contains(t, responseHTML, post.GetTitle(), "Should show post title")
 }
 
-func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
+func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
 	// Note: we reuse the same pattern as v1 tests but only for GET behavior.
 	t.Helper()
 

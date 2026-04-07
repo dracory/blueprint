@@ -95,8 +95,8 @@ func (c sitemapXmlController) blogPostLocations() []string {
 	}
 
 	postLocations := make([]string, 0, len(postList))
-	lo.ForEach(postList, func(post blogstore.Post, index int) {
-		postLocations = append(postLocations, links.Website().BlogPost(post.ID(), post.Slug()))
+	lo.ForEach(postList, func(post blogstore.PostInterface, index int) {
+		postLocations = append(postLocations, links.Website().BlogPost(post.GetID(), post.GetSlug()))
 	})
 
 	return postLocations

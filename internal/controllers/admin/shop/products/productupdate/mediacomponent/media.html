@@ -1,0 +1,136 @@
+<div id="media-app" class="media-container">
+	<style>
+		.sortable-item {
+			cursor: grab;
+			transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+		}
+		.sortable-item:active {
+			cursor: grabbing;
+		}
+		.sortable-item.dragging {
+			opacity: 0.5;
+			transform: scale(1.02);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
+		.sortable-item.drag-over {
+			border: 2px dashed #0d6efd;
+			transform: scale(1.02);
+		}
+		.sortable-grid .col-md-4,
+		.sortable-grid .col-lg-3 {
+			transition: transform 0.2s;
+		}
+		.drag-handle {
+			opacity: 0;
+			transition: opacity 0.2s;
+			background: rgba(255,255,255,0.9);
+			border-radius: 4px;
+			padding: 4px;
+			cursor: grab;
+		}
+		.sortable-item:hover .drag-handle {
+			opacity: 1;
+		}
+		.drag-handle:active {
+			cursor: grabbing;
+		}
+	</style>
+
+	<!-- Loading state -->
+	<div v-if="loading" class="text-center py-4">
+		<div class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<!-- Error message -->
+	<div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+		{{ errorMessage }}
+		<button type="button" class="btn-close" @click="errorMessage = ''"></button>
+	</div>
+
+	<!-- Success message -->
+	<div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+		{{ successMessage }}
+		<button type="button" class="btn-close" @click="successMessage = ''"></button>
+	</div>
+
+	<template v-if="!errorMessage">
+		<!-- Media Grid - Sortable -->
+		<div v-if="mediaItems.length > 0" class="row g-3 mb-4 sortable-grid">
+			<div v-for="(item, index) in mediaItems" :key="item.id" class="col-md-4 col-lg-3">
+				<div 
+					class="card h-100 sortable-item" 
+					draggable="true"
+					@dragstart="dragStart($event, index)"
+					@dragover="dragOver($event, index)"
+					@drop="drop($event, index)"
+					@dragenter="dragEnter($event, index)"
+					@dragleave="dragLeave($event, index)"
+					:class="{ 'dragging': draggedIndex === index, 'drag-over': dragOverIndex === index }"
+				>
+					<div class="position-relative">
+						<img :src="item.url" class="card-img-top" alt="Media" style="height: 150px; object-fit: cover;">
+						<!-- Drag handle - visible on hover -->
+						<div class="drag-handle position-absolute top-0 start-0 m-2" title="Drag to reorder">
+							<i class="bi bi-grip-vertical fs-5"></i>
+						</div>
+						<a 
+							:href="item.url" 
+							target="_blank" 
+							class="btn btn-sm btn-secondary position-absolute bottom-0 end-0 m-2" 
+							title="Open in new tab"
+						>
+							<i class="bi bi-box-arrow-up-right"></i>
+						</a>
+						<button 
+							type="button" 
+							class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" 
+							@click="removeMedia(index)"
+							title="Remove"
+							:disabled="loading"
+						>
+							<i class="bi bi-trash"></i>
+						</button>
+					</div>
+					<div class="card-body p-2">
+						<p class="card-text small text-truncate mb-0" :title="item.fileName">{{ item.fileName || 'Unnamed' }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Empty State -->
+		<div v-else class="p-4 text-center text-muted border rounded mb-4">
+			<i class="bi bi-images fs-1"></i>
+			<p class="mb-0">No media yet. Add one below.</p>
+		</div>
+
+		<!-- Add New Media Section -->
+		<div class="p-3 border rounded bg-light">
+			<div class="row g-2 align-items-end">
+				<div class="col-md-8">
+					<label class="form-label small fw-bold">Media URL</label>
+					<input 
+						type="url" 
+						class="form-control" 
+						v-model="newMediaUrl"
+						placeholder="Enter image or video URL..."
+						:disabled="loading"
+					>
+				</div>
+				<div class="col-md-4">
+					<button 
+						type="button" 
+						class="btn btn-success w-100" 
+						@click="addMedia"
+						:disabled="!newMediaUrl.trim() || loading"
+					>
+						<i class="bi bi-plus-lg me-1"></i>
+						Add Media
+					</button>
+				</div>
+			</div>
+		</div>
+	</template>
+</div>

@@ -15,4 +15,15 @@ const (
 	CONTROLLER_AI_TITLE_GENERATOR     = "ai-title-generator"
 	CONTROLLER_AI_POST_EDITOR         = "ai-post-editor"
 	CONTROLLER_AI_TEST                = "ai-test"
+
+	// Taxonomy controllers
+	CONTROLLER_DASHBOARD        = "dashboard"
+	CONTROLLER_CATEGORY_MANAGER = "category-manager"
+	CONTROLLER_CATEGORY_CREATE  = "category-create"
+	CONTROLLER_CATEGORY_UPDATE  = "category-update"
+	CONTROLLER_CATEGORY_DELETE  = "category-delete"
+	CONTROLLER_TAG_MANAGER      = "tag-manager"
+	CONTROLLER_TAG_CREATE       = "tag-create"
+	CONTROLLER_TAG_UPDATE       = "tag-update"
+	CONTROLLER_TAG_DELETE       = "tag-delete"
 )

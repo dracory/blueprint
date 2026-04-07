@@ -170,6 +170,6 @@ type postManagerControllerData struct {
 	customerID string
 	dateFrom   string
 	dateTo     string
-	blogList   []blogstore.Post
+	blogList   []blogstore.PostInterface
 	blogCount  int64
 }

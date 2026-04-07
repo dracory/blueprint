@@ -1000,6 +1000,11 @@ func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T
 	if !strings.Contains(responseHTML, `/flash?message_id=`) {
 		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
 	}
+	
+	location := response.Header.Get("Location")
+	if !strings.Contains(location, `/flash?message_id=`) {
+		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
+	}
 }
 
 func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *testing.T) {
@@ -1034,6 +1039,11 @@ func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *te
 
 	if !strings.Contains(responseHTML, `/flash?message_id=`) {
 		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
+	}
+	
+	location := response.Header.Get("Location")
+	if !strings.Contains(location, `/flash?message_id=`) {
+		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
 	}
 }
 

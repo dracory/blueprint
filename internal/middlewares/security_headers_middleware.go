@@ -19,12 +19,18 @@ func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
 			DefaultSrc: []string{"'self'"},
 			ScriptSrc:  getScriptSources(isDevelopment),
 			StyleSrc:   getStyleSources(isDevelopment),
+			ConnectSrc: []string{
+				"'self'",
+				"https://cdnjs.cloudflare.com",
+				"http://cdnjs.cloudflare.com",
+			},
 			FontSrc: []string{
 				"'self'",
 				"https://cdn.jsdelivr.net",
 				"https://fonts.googleapis.com",
 				"https://fonts.gstatic.com",
 				"https://cdnjs.cloudflare.com",
+				"http://cdnjs.cloudflare.com",
 				"https://maxcdn.bootstrapcdn.com",
 			},
 			ImgSrc: []string{
@@ -75,6 +81,7 @@ func getScriptSources(isDevelopment bool) []string {
 		"https://unpkg.com",
 		"https://code.jquery.com",
 		"https://cdnjs.cloudflare.com",
+		"http://cdnjs.cloudflare.com",
 		"https://www.googletagmanager.com",
 		"https://www.statcounter.com",
 	}
@@ -94,8 +101,10 @@ func getStyleSources(isDevelopment bool) []string {
 		"https://cdn.jsdelivr.net",
 		"https://maxcdn.bootstrapcdn.com",
 		"https://cdnjs.cloudflare.com",
+		"http://cdnjs.cloudflare.com",
 		"https://fonts.googleapis.com",
 		"https://unpkg.com",
+		"https://code.jquery.com",
 	}
 
 	if isDevelopment {

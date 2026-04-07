@@ -93,7 +93,7 @@ type fakeBlogStore struct {
 	postCountError           error
 }
 
-func (f *fakeBlogStore) PostList(ctx context.Context, options blogstore.PostQueryOptions) ([]blogstore.Post, error) {
+func (f *fakeBlogStore) PostList(ctx context.Context, options blogstore.PostQueryOptions) ([]blogstore.PostInterface, error) {
 	if f.postListError != nil {
 		return nil, f.postListError
 	}
@@ -233,8 +233,8 @@ func TestBlogController_PageRendering(t *testing.T) {
 	controller := NewBlogController(registry)
 
 	data := blogControllerData{
-		postList: []blogstore.Post{
-			*blogstore.NewPost().SetID("1").SetTitle("My First Post").SetSummary("A summary.").SetImageUrl("http://example.com/img.png"),
+		postList: []blogstore.PostInterface{
+			blogstore.NewPost().SetID("1").SetTitle("My First Post").SetSummary("A summary.").SetImageUrl("http://example.com/img.png"),
 		},
 		postCount: 10,
 		page:      0,

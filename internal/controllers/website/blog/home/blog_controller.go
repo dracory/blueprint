@@ -23,7 +23,7 @@ type blogController struct {
 }
 
 type blogControllerData struct {
-	postList  []blogstore.Post
+	postList  []blogstore.PostInterface
 	postCount int64
 	page      int
 	perPage   int
@@ -77,7 +77,7 @@ func (controller *blogController) page(data blogControllerData) string {
 		URL:               url,
 	})
 
-	columnCards := lo.Map(data.postList, func(post blogstore.Post, index int) hb.TagInterface {
+	columnCards := lo.Map(data.postList, func(post blogstore.PostInterface, index int) hb.TagInterface {
 		return cardPost(post)
 	})
 
@@ -99,7 +99,7 @@ func (controller *blogController) page(data blogControllerData) string {
 }
 
 func (controller blogController) prepareData(r *http.Request) (data blogControllerData, errorMessage string) {
-	perPage := 12 // 3 rows x 4 postss
+	perPage := 12 // 3 rows x 4 posts
 	pageStr := req.GetStringTrimmed(r, "page")
 	page := cast.ToInt(pageStr)
 

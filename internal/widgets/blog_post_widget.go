@@ -109,8 +109,8 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
-	if postSlug == "" || postSlug != str.Slugify(post.Title(), '-') {
-		blogPostURL := links.Website().BlogPost(post.ID(), post.Title())
+	if postSlug == "" || postSlug != str.Slugify(post.GetTitle(), '-') {
+		blogPostURL := links.Website().BlogPost(post.GetID(), post.GetTitle())
 		if w.registry.GetLogger() != nil {
 			w.registry.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
 		}
@@ -118,12 +118,12 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}
 
-	return w.page(r, *post)
+	return w.page(r, post)
 }
 
 // == PRIVATE METHODS ========================================================
 
-func (w *blogPostWidget) page(_ *http.Request, post blogstore.Post) string {
+func (w *blogPostWidget) page(_ *http.Request, post blogstore.PostInterface) string {
 	return hb.Wrap().
 		Children([]hb.TagInterface{
 			hb.Style(w.css()),
@@ -164,7 +164,7 @@ func (w *blogPostWidget) processContent(content string, editor string) string {
 	return content
 }
 
-func (w *blogPostWidget) sectionBreadcrumbs(_ blogstore.Post) *hb.Tag {
+func (w *blogPostWidget) sectionBreadcrumbs(_ blogstore.PostInterface) *hb.Tag {
 	// breadcrumbs := []bs.Breadcrumb{
 	// 	{
 	// 		Name: "Blog",
@@ -184,7 +184,7 @@ func (w *blogPostWidget) sectionBreadcrumbs(_ blogstore.Post) *hb.Tag {
 	// return breadcrumbSection
 }
 
-func (w *blogPostWidget) sectionPost(post blogstore.Post) *hb.Tag {
+func (w *blogPostWidget) sectionPost(post blogstore.PostInterface) *hb.Tag {
 	sectionPost := hb.Section().
 		ID("SectionNewsItem").
 		Style(`background:#fff;`).
@@ -193,7 +193,7 @@ func (w *blogPostWidget) sectionPost(post blogstore.Post) *hb.Tag {
 				bs.Row().Children([]hb.TagInterface{
 					bs.Column(12).Children([]hb.TagInterface{
 						hb.Div().Class("BlogTitle").Children([]hb.TagInterface{
-							hb.Heading1().Style("color:#794FC6;").HTML(post.Title()),
+							hb.Heading1().Style("color:#794FC6;").HTML(post.GetTitle()),
 						}),
 					}),
 				}),
@@ -203,12 +203,12 @@ func (w *blogPostWidget) sectionPost(post blogstore.Post) *hb.Tag {
 							Class("BlogImage float-end d-sm-block d-md-inline float-end pt-md-3 pt-lg-3 pb-md-3 pb-lg-3 ps-md-3 ps-lg-3").
 							// Style("padding-top:30px; padding-left:30px; padding-bottom:30px;").
 							Children([]hb.TagInterface{
-								hb.Image(post.ImageUrlOrDefault()).
+								hb.Image(post.GetImageUrlOrDefault()).
 									Class("img img-responsive img-thumbnail").
 									Style("max-width:500px;"),
 							}),
 						hb.Div().Class("BlogContent").Children([]hb.TagInterface{
-							hb.Raw(w.processContent(post.Content(), post.Editor())),
+							hb.Raw(w.processContent(post.GetContent(), post.GetEditor())),
 						}),
 					}),
 				}),

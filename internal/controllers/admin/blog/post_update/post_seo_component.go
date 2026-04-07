@@ -21,7 +21,7 @@ type postSEOComponent struct {
 	registry registry.RegistryInterface
 
 	PostID string
-	Post   *blogstore.Post
+	Post   blogstore.PostInterface
 
 	FormCanonicalURL    string
 	FormMetaDescription string
@@ -81,10 +81,10 @@ func (c *postSEOComponent) Mount(ctx context.Context, params map[string]string) 
 	}
 
 	c.Post = post
-	c.FormCanonicalURL = post.CanonicalURL()
-	c.FormMetaDescription = post.MetaDescription()
-	c.FormMetaKeywords = post.MetaKeywords()
-	c.FormMetaRobots = post.MetaRobots()
+	c.FormCanonicalURL = post.GetCanonicalURL()
+	c.FormMetaDescription = post.GetMetaDescription()
+	c.FormMetaKeywords = post.GetMetaKeywords()
+	c.FormMetaRobots = post.GetMetaRobots()
 
 	return nil
 }

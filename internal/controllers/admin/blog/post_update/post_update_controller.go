@@ -75,7 +75,7 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 	}).ToHTML()
 }
 
-func (controller *postUpdateController) page(r *http.Request, post *blogstore.Post, view string) hb.TagInterface {
+func (controller *postUpdateController) page(r *http.Request, post blogstore.PostInterface, view string) hb.TagInterface {
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
 		{
 			Name: "Home",
@@ -91,7 +91,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 		},
 		{
 			Name: "Edit Post",
-			URL:  shared.NewLinks().PostUpdate(map[string]string{"post_id": post.ID()}),
+			URL:  shared.NewLinks().PostUpdate(map[string]string{"post_id": post.GetID()}),
 		},
 	})
 
@@ -111,7 +111,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 			Child(bs.NavLink().
 				ClassIf(view == "details", "active").
 				Href(shared.NewLinks().PostUpdate(map[string]string{
-					"post_id": post.ID(),
+					"post_id": post.GetID(),
 					"view":    "details",
 				})).
 				HTML("Details"))).
@@ -119,7 +119,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 			Child(bs.NavLink().
 				ClassIf(view == "content", "active").
 				Href(shared.NewLinks().PostUpdate(map[string]string{
-					"post_id": post.ID(),
+					"post_id": post.GetID(),
 					"view":    "content",
 				})).
 				HTML("Content"))).
@@ -127,7 +127,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 			Child(bs.NavLink().
 				ClassIf(view == "seo", "active").
 				Href(shared.NewLinks().PostUpdate(map[string]string{
-					"post_id": post.ID(),
+					"post_id": post.GetID(),
 					"view":    "seo",
 				})).
 				HTML("SEO"))).
@@ -135,7 +135,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 			Child(bs.NavLink().
 				ClassIf(view == "versions", "active").
 				Href(shared.NewLinks().PostUpdate(map[string]string{
-					"post_id": post.ID(),
+					"post_id": post.GetID(),
 					"view":    "versions",
 				})).
 				HTML("Versions")))
@@ -143,7 +143,7 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 	postTitle := hb.Heading2().
 		Class("mb-3").
 		HTML("Post: ").
-		HTML(post.Title())
+		HTML(post.GetTitle())
 
 	var body hb.TagInterface
 
@@ -151,22 +151,22 @@ func (controller *postUpdateController) page(r *http.Request, post *blogstore.Po
 	case "details":
 		component := NewPostDetailsComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
-			"post_id": post.ID(),
+			"post_id": post.GetID(),
 		})
 	case "content":
 		component := NewPostContentComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
-			"post_id": post.ID(),
+			"post_id": post.GetID(),
 		})
 	case "seo":
 		component := NewPostSEOComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
-			"post_id": post.ID(),
+			"post_id": post.GetID(),
 		})
 	case "versions":
 		component := NewPostVersioningComponent(controller.registry)
 		body = liveflux.Placeholder(component, map[string]string{
-			"post_id": post.ID(),
+			"post_id": post.GetID(),
 		})
 	default:
 		body = hb.Div().Text("Not implemented yet")

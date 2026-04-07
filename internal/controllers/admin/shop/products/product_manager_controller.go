@@ -299,27 +299,27 @@ func (controller *productManagerController) tableProducts(data productManagerCon
 				}))),
 			hb.Tbody().Children(lo.Map(data.productList, func(product shopstore.ProductInterface, _ int) hb.TagInterface {
 				productLink := hb.Hyperlink().
-					Text(product.Title()).
-					Href(links.Admin().Tasks(map[string]string{"product_id": product.ID()}))
+					Text(product.GetTitle()).
+					Href(links.Admin().Tasks(map[string]string{"product_id": product.GetID()}))
 
 				status := hb.Span().
 					Style(`font-weight: bold;`).
-					StyleIf(product.Status() == shopstore.PRODUCT_STATUS_ACTIVE, `color:green;`).
-					StyleIf(product.Status() == shopstore.PRODUCT_STATUS_DISABLED, `color:silver;`).
-					StyleIf(product.Status() == shopstore.PRODUCT_STATUS_DRAFT, `color:blue;`).
-					HTML(product.Status())
+					StyleIf(product.GetStatus() == shopstore.PRODUCT_STATUS_ACTIVE, `color:green;`).
+					StyleIf(product.GetStatus() == shopstore.PRODUCT_STATUS_DISABLED, `color:silver;`).
+					StyleIf(product.GetStatus() == shopstore.PRODUCT_STATUS_DRAFT, `color:blue;`).
+					HTML(product.GetStatus())
 
 				buttonEdit := hb.Hyperlink().
 					Class("btn btn-primary me-2").
 					Child(hb.I().Class("bi bi-pencil-square")).
 					Title("Edit").
-					Href(shared.NewLinks().ProductUpdate(map[string]string{"product_id": product.ID()}))
+					Href(shared.NewLinks().ProductUpdate(map[string]string{"product_id": product.GetID()}))
 
 				buttonDelete := hb.Hyperlink().
 					Class("btn btn-danger").
 					Child(hb.I().Class("bi bi-trash")).
 					Title("Delete").
-					HxGet(shared.NewLinks().ProductDelete(map[string]string{"product_id": product.ID()})).
+					HxGet(shared.NewLinks().ProductDelete(map[string]string{"product_id": product.GetID()})).
 					HxTarget("body").
 					HxSwap("beforeend")
 
@@ -329,17 +329,17 @@ func (controller *productManagerController) tableProducts(data productManagerCon
 						Child(hb.Div().
 							Style("font-size: 11px;").
 							HTML("Ref: ").
-							HTML(product.ID())),
+							HTML(product.GetID())),
 					hb.TD().
 						Child(status),
 					hb.TD().
 						Child(hb.Div().
 							Style("font-size: 13px;white-space: nowrap;").
-							HTML(product.CreatedAtCarbon().Format("d M Y"))),
+							HTML(product.GetCreatedAtCarbon().Format("d M Y"))),
 					hb.TD().
 						Child(hb.Div().
 							Style("font-size: 13px;white-space: nowrap;").
-							HTML(product.UpdatedAtCarbon().Format("d M Y"))),
+							HTML(product.GetUpdatedAtCarbon().Format("d M Y"))),
 					hb.TD().
 						Child(buttonEdit).
 						Child(buttonDelete),

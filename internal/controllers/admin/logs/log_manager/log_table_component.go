@@ -379,15 +379,17 @@ func (c *logTableComponent) renderTableBody() hb.TagInterface {
 			Value(l.GetID())
 
 		actionsCell := hb.Td().Class("text-end").
-			Child(contextButton).
-			Child(deleteButton).
+			Child(hb.Div().Class("d-flex justify-content-end gap-1").
+				Child(contextButton).
+				Child(deleteButton),
+			).
 			Child(hiddenSubmitButton)
 
 		row := hb.Tr().
 			Child(hb.Td().Class("text-center").Child(selectCheckbox)).
 			Child(hb.Td().Text(l.GetTimeCarbon().ToDateTimeString())).
 			Child(hb.Td().Text(l.GetLevel())).
-			Child(hb.Td().Text(l.GetMessage())).
+			Child(hb.Td().Class("text-break").Text(l.GetMessage())).
 			Child(actionsCell)
 
 		tbody = tbody.Child(row)

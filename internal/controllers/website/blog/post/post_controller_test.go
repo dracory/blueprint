@@ -92,9 +92,9 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 	controller := NewPostController(registry)
 
 	w := httptest.NewRecorder()
-	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
-		"id":    post.ID(),
-		"title": post.Slug(),
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
+		"id":    post.GetID(),
+		"title": post.GetSlug(),
 	})
 
 	html := controller.Handler(w, r)
@@ -143,9 +143,9 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 	controller := NewPostController(registry)
 
 	w := httptest.NewRecorder()
-	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
-		"id":    post.ID(),
-		"title": post.Slug(),
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
+		"id":    post.GetID(),
+		"title": post.GetSlug(),
 	})
 
 	r, err = testutils.LoginAs(registry, r, user)
@@ -199,9 +199,9 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	controller := NewPostController(registry)
 
 	w := httptest.NewRecorder()
-	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
-		"id":    post.ID(),
-		"title": post.Slug(),
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
+		"id":    post.GetID(),
+		"title": post.GetSlug(),
 	})
 
 	html := controller.Handler(w, r)
@@ -238,8 +238,8 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 	controller := NewPostController(registry)
 
 	w := httptest.NewRecorder()
-	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/wrong-slug", map[string]string{
-		"id":    post.ID(),
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/wrong-slug", map[string]string{
+		"id":    post.GetID(),
 		"title": "wrong-slug",
 	})
 
@@ -308,9 +308,9 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	controller := NewPostController(registry)
 
 	w := httptest.NewRecorder()
-	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.ID()+"/"+post.Slug(), map[string]string{
-		"id":    post.ID(),
-		"title": post.Slug(),
+	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
+		"id":    post.GetID(),
+		"title": post.GetSlug(),
 	})
 
 	r, err = testutils.LoginAs(registry, r, adminUser)

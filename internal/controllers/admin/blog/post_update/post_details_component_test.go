@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
+func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
 	t.Helper()
 
 	registry := testutils.Setup(
@@ -53,23 +53,23 @@ func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
 	c := &postDetailsComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{
-		"post_id": post.ID(),
+		"post_id": post.GetID(),
 	})
 
 	assert.NoError(t, err)
-	assert.Equal(t, post.ID(), c.PostID)
-	assert.Equal(t, post.Status(), c.FormStatus)
-	assert.Equal(t, post.ImageUrl(), c.FormImageUrl)
-	assert.Equal(t, post.Featured(), c.FormFeatured)
-	assert.Equal(t, post.Editor(), c.FormEditor)
-	assert.Equal(t, post.Memo(), c.FormMemo)
+	assert.Equal(t, post.GetID(), c.PostID)
+	assert.Equal(t, post.GetStatus(), c.FormStatus)
+	assert.Equal(t, post.GetImageUrl(), c.FormImageUrl)
+	assert.Equal(t, post.GetFeatured(), c.FormFeatured)
+	assert.Equal(t, post.GetEditor(), c.FormEditor)
+	assert.Equal(t, post.GetMemo(), c.FormMemo)
 	assert.Equal(t, "", c.FormErrorMessage)
 }
 
 func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 	registry, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: registry, PostID: post.ID()}
+	c := &postDetailsComponent{registry: registry, PostID: post.GetID()}
 
 	values := url.Values{
 		"post_status":       {""},
@@ -90,7 +90,7 @@ func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	registry, post := setupDetailsTestAppAndPost(t)
 
-	c := &postDetailsComponent{registry: registry, PostID: post.ID()}
+	c := &postDetailsComponent{registry: registry, PostID: post.GetID()}
 
 	values := url.Values{
 		"post_status":       {blogstore.POST_STATUS_PUBLISHED},
@@ -107,16 +107,16 @@ func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
-		assert.Equal(t, blogstore.POST_STATUS_PUBLISHED, updated.Status())
-		assert.Equal(t, "https://example.com/updated.jpg", updated.ImageUrl())
-		assert.Equal(t, "yes", updated.Featured())
-		assert.Equal(t, blogstore.POST_EDITOR_MARKDOWN, updated.Editor())
-		assert.Equal(t, "Updated memo", updated.Memo())
+		assert.Equal(t, blogstore.POST_STATUS_PUBLISHED, updated.GetStatus())
+		assert.Equal(t, "https://example.com/updated.jpg", updated.GetImageUrl())
+		assert.Equal(t, "yes", updated.GetFeatured())
+		assert.Equal(t, blogstore.POST_EDITOR_MARKDOWN, updated.GetEditor())
+		assert.Equal(t, "Updated memo", updated.GetMemo())
 		// PublishedAt is normalized inside the component; just ensure it's non-empty
-		assert.NotEmpty(t, updated.PublishedAtCarbon())
+		assert.NotEmpty(t, updated.GetPublishedAtCarbon())
 	}
 }
 

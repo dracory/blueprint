@@ -8,7 +8,7 @@ import (
 
 func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
 	result, err := store.EntityList(context.Background(), entitystore.EntityQueryOptions{
-		EntityType: "testimonial",
+		EntityType: ENTITY_TYPE,
 	})
 
 	if err != nil {
@@ -18,7 +18,7 @@ func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
 	testimonials := []Testimonial{}
 
 	for _, entry := range result {
-		testimonial, err := NewTestimonialFromEntity(entry)
+		testimonial, err := NewTestimonialFromEntity(store, entry)
 
 		if err != nil {
 			continue

@@ -110,7 +110,7 @@ func TestPostRecommendationsComponent_Mount_Success(t *testing.T) {
 		t.Fatal("Failed to get a test post ID")
 	}
 
-	err = component.Mount(context.Background(), map[string]string{"post_id": posts[0].ID()})
+	err = component.Mount(context.Background(), map[string]string{"post_id": posts[0].GetID()})
 	if err != nil {
 		t.Errorf("Expected no error from Mount, got: %v", err)
 	}
@@ -176,7 +176,7 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 	registry := testutils.Setup(testutils.WithBlogStore(true))
 
 	// Create test posts
-	posts := make([]blogstore.Post, 3)
+	posts := make([]blogstore.PostInterface, 3)
 	for i := 0; i < 3; i++ {
 		post := blogstore.NewPost()
 		post.SetTitle("Test Post " + string(rune('A'+i)))
@@ -187,13 +187,13 @@ func TestPostRecommendationsComponent_Render_WithPosts(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Failed to create test post: %v", err)
 		}
-		posts[i] = *post
+		posts[i] = post
 	}
 
 	component := NewPostRecommendationsComponent(registry).(*postRecommendationsComponent)
 
 	// Mount with first post as current
-	err := component.Mount(context.Background(), map[string]string{"post_id": posts[0].ID()})
+	err := component.Mount(context.Background(), map[string]string{"post_id": posts[0].GetID()})
 	if err != nil {
 		t.Errorf("Expected no error from Mount, got: %v", err)
 	}
@@ -263,7 +263,7 @@ func TestPostRecommendationsComponent_PostCard(t *testing.T) {
 	// Test with image
 	post.SetImageUrl("test-image.jpg")
 	componentTyped := component
-	card := componentTyped.postCard(*post)
+	card := componentTyped.postCard(post)
 	htmlStr := card.ToHTML()
 
 	if !strings.Contains(htmlStr, "<img") {
@@ -289,7 +289,7 @@ func TestPostRecommendationsComponent_PostCard(t *testing.T) {
 	// Test without image
 	post.SetImageUrl("")
 	componentTyped = component
-	card = componentTyped.postCard(*post)
+	card = componentTyped.postCard(post)
 	htmlStr = card.ToHTML()
 
 	if strings.Contains(htmlStr, "test-image.jpg") {

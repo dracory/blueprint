@@ -14,7 +14,6 @@ import (
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAPIAuthMiddleware_MissingAuthorizationHeader(t *testing.T) {
@@ -34,8 +33,13 @@ func TestAPIAuthMiddleware_MissingAuthorizationHeader(t *testing.T) {
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.False(t, nextCalled, "next handler should not be called when token is missing")
-	assert.Equal(t, api.Error("Authorization token required").ToString(), res.Body.String())
+	if nextCalled {
+		t.Error("next handler should not be called when token is missing")
+	}
+	expected := api.Error("Authorization token required").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
 }
 
 func TestAPIAuthMiddleware_InvalidToken(t *testing.T) {
@@ -56,8 +60,13 @@ func TestAPIAuthMiddleware_InvalidToken(t *testing.T) {
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.False(t, nextCalled, "next handler should not be called for invalid token")
-	assert.Equal(t, api.Error("Invalid or expired token").ToString(), res.Body.String())
+	if nextCalled {
+		t.Error("next handler should not be called for invalid token")
+	}
+	expected := api.Error("Invalid or expired token").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
 }
 
 func TestAPIAuthMiddleware_ExpiredSession(t *testing.T) {
@@ -88,8 +97,13 @@ func TestAPIAuthMiddleware_ExpiredSession(t *testing.T) {
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.False(t, nextCalled, "next handler should not be called for expired session")
-	assert.Equal(t, api.Error("Invalid or expired token").ToString(), res.Body.String())
+	if nextCalled {
+		t.Error("next handler should not be called for expired session")
+	}
+	expected := api.Error("Invalid or expired token").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
 }
 
 func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
@@ -121,8 +135,13 @@ func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.False(t, nextCalled, "next handler should not be called when session is missing user")
-	assert.Equal(t, api.Error("Session missing user").ToString(), res.Body.String())
+	if nextCalled {
+		t.Error("next handler should not be called when session is missing user")
+	}
+	expected := api.Error("Session missing user").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
 }
 
 func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
@@ -158,8 +177,13 @@ func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.False(t, nextCalled, "next handler should not be called when user is missing")
-	assert.Equal(t, api.Error("User not found").ToString(), res.Body.String())
+	if nextCalled {
+		t.Error("next handler should not be called when user is missing")
+	}
+	expected := api.Error("User not found").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
 }
 
 func TestAPIAuthMiddleware_Success(t *testing.T) {
@@ -190,20 +214,32 @@ func TestAPIAuthMiddleware_Success(t *testing.T) {
 		nextCalled = true
 		var ok bool
 		ctxSession, ok = r.Context().Value(config.APIAuthenticatedSessionContextKey{}).(sessionstore.SessionInterface)
-		assert.True(t, ok, "session should be in request context")
+		if !ok {
+			t.Error("session should be in request context")
+		}
 		ctxUser, ok = r.Context().Value(config.APIAuthenticatedUserContextKey{}).(userstore.UserInterface)
-		assert.True(t, ok, "user should be in request context")
+		if !ok {
+			t.Error("user should be in request context")
+		}
 		w.WriteHeader(http.StatusOK)
 	})
 
 	middleware(next).ServeHTTP(res, req)
 
-	assert.True(t, nextCalled, "next handler should be called when authentication succeeds")
+	if !nextCalled {
+		t.Error("next handler should be called when authentication succeeds")
+	}
 	if ctxSession != nil {
-		assert.Equal(t, session.GetKey(), ctxSession.GetKey(), "context session key should match")
+		if session.GetKey() != ctxSession.GetKey() {
+			t.Errorf("context session key should match: expected %s, got %s", session.GetKey(), ctxSession.GetKey())
+		}
 	}
 	if ctxUser != nil {
-		assert.Equal(t, user.ID(), ctxUser.ID(), "context user id should match")
+		if user.ID() != ctxUser.ID() {
+			t.Errorf("context user id should match: expected %s, got %s", user.ID(), ctxUser.ID())
+		}
 	}
-	assert.Equal(t, http.StatusOK, res.Result().StatusCode)
+	if res.Result().StatusCode != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, res.Result().StatusCode)
+	}
 }

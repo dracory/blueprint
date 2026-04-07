@@ -87,7 +87,7 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
-			"post_id": {post.ID()},
+			"post_id": {post.GetID()},
 		},
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
@@ -95,7 +95,7 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 	})
 	assert.NoError(t, err, "Handler should not return error")
 	assert.Contains(t, responseHTML, "ModalPostDelete", "Should show delete modal")
-	assert.Contains(t, responseHTML, post.ID(), "Should include post ID in modal")
+	assert.Contains(t, responseHTML, post.GetID(), "Should include post ID in modal")
 }
 
 func TestPostDeleteController_DeletesPost(t *testing.T) {
@@ -119,7 +119,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	// Send POST request to delete
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"post_id": {post.ID()},
+			"post_id": {post.GetID()},
 		},
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
@@ -129,7 +129,7 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	assert.Contains(t, responseHTML, "post deleted successfully", "Should show success message")
 
 	// Verify post was marked as trash
-	deletedPost, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	deletedPost, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
 	assert.NoError(t, err, "Should not return error when checking post")
-	assert.Equal(t, blogstore.POST_STATUS_TRASH, deletedPost.Status(), "Post should be marked as trash")
+	assert.Equal(t, blogstore.POST_STATUS_TRASH, deletedPost.GetStatus(), "Post should be marked as trash")
 }

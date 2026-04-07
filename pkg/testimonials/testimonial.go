@@ -1,6 +1,7 @@
 package testimonials
 
 import (
+	"context"
 	"errors"
 
 	"github.com/dracory/dataobject"
@@ -8,6 +9,18 @@ import (
 )
 
 const ENTITY_TYPE = "testimonial"
+
+// Field constants for testimonial attributes
+const (
+	FIELD_DATE       = "date"
+	FIELD_FIRST_NAME = "first_name"
+	FIELD_ID         = "id"
+	FIELD_IMAGE_URL  = "image_url"
+	FIELD_JOB_TITLE  = "job_title"
+	FIELD_LAST_NAME  = "last_name"
+	FIELD_QUOTE      = "quote"
+	FIELD_STATUS     = "status"
+)
 
 type Testimonial struct {
 	dataobject.DataObject
@@ -17,21 +30,26 @@ func NewTestimonial() *Testimonial {
 	return &Testimonial{}
 }
 
-func NewTestimonialFromEntity(entity entitystore.Entity) (*Testimonial, error) {
-	if entity.Type() != ENTITY_TYPE {
+func NewTestimonialFromEntity(store entitystore.StoreInterface, entity entitystore.EntityInterface) (*Testimonial, error) {
+	if entity.GetType() != ENTITY_TYPE {
 		return nil, errors.New("invalid entity type")
 	}
 
-	attributes, err := entity.GetAttributes()
-
+	// Fetch attributes from store
+	attributes, err := store.EntityAttributeList(context.Background(), entity.GetID())
 	if err != nil {
 		return nil, err
 	}
 
 	testimonial := NewTestimonial()
 
-	for _, attribute := range attributes {
-		testimonial.Set(attribute.AttributeKey(), attribute.AttributeValue())
+	// Copy core entity fields
+	testimonial.SetID(entity.GetID())
+	testimonial.Set(entitystore.COLUMN_CREATED_AT, entity.GetCreatedAt())
+	testimonial.Set(entitystore.COLUMN_UPDATED_AT, entity.GetUpdatedAt())
+
+	for _, attr := range attributes {
+		testimonial.Set(attr.GetKey(), attr.GetValue())
 	}
 
 	return testimonial, nil
@@ -40,81 +58,81 @@ func NewTestimonialFromEntity(entity entitystore.Entity) (*Testimonial, error) {
 // == SETTERS AND GETTERS =====================================================
 
 func (t *Testimonial) Date() string {
-	return t.Get("date")
+	return t.Get(FIELD_DATE)
 }
 
 func (t *Testimonial) SetDate(date string) {
-	t.Set("date", date)
+	t.Set(FIELD_DATE, date)
 }
 
 func (t *Testimonial) FirstName() string {
-	return t.Get("first_name")
+	return t.Get(FIELD_FIRST_NAME)
 }
 
 func (t *Testimonial) SetFirstName(firstName string) {
-	t.Set("first_name", firstName)
+	t.Set(FIELD_FIRST_NAME, firstName)
 }
 
 func (t *Testimonial) ID() string {
-	return t.Get("id")
+	return t.Get(FIELD_ID)
 }
 
 func (t *Testimonial) SetID(id string) {
-	t.Set("id", id)
+	t.Set(FIELD_ID, id)
 }
 
 func (t *Testimonial) ImageUrl() string {
-	return t.Get("image_url")
+	return t.Get(FIELD_IMAGE_URL)
 }
 
 func (t *Testimonial) SetImageUrl(imageUrl string) {
-	t.Set("image_url", imageUrl)
+	t.Set(FIELD_IMAGE_URL, imageUrl)
 }
 
 func (t *Testimonial) JobTitle() string {
-	return t.Get("job_title")
+	return t.Get(FIELD_JOB_TITLE)
 }
 
 func (t *Testimonial) SetJobTitle(jobTitle string) {
-	t.Set("job_title", jobTitle)
+	t.Set(FIELD_JOB_TITLE, jobTitle)
 }
 
 func (t *Testimonial) LastName() string {
-	return t.Get("last_name")
+	return t.Get(FIELD_LAST_NAME)
 }
 
 func (t *Testimonial) SetLastName(lastName string) {
-	t.Set("last_name", lastName)
+	t.Set(FIELD_LAST_NAME, lastName)
 }
 
 func (t *Testimonial) Quote() string {
-	return t.Get("quote")
+	return t.Get(FIELD_QUOTE)
 }
 
 func (t *Testimonial) SetQuote(quote string) {
-	t.Set("quote", quote)
+	t.Set(FIELD_QUOTE, quote)
 }
 
 func (t *Testimonial) Status() string {
-	return t.Get("status")
+	return t.Get(FIELD_STATUS)
 }
 
 func (t *Testimonial) SetStatus(status string) {
-	t.Set("status", status)
+	t.Set(FIELD_STATUS, status)
 }
 
 func (t *Testimonial) CreatedAt() string {
-	return t.Get("created_at")
+	return t.Get(entitystore.COLUMN_CREATED_AT)
 }
 
 func (t *Testimonial) SetCreatedAt(createdAt string) {
-	t.Set("created_at", createdAt)
+	t.Set(entitystore.COLUMN_CREATED_AT, createdAt)
 }
 
 func (t *Testimonial) UpdatedAt() string {
-	return t.Get("updated_at")
+	return t.Get(entitystore.COLUMN_UPDATED_AT)
 }
 
 func (t *Testimonial) SetUpdatedAt(updatedAt string) {
-	t.Set("updated_at", updatedAt)
+	t.Set(entitystore.COLUMN_UPDATED_AT, updatedAt)
 }

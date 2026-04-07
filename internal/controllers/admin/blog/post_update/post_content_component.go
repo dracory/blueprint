@@ -25,7 +25,7 @@ type postContentComponent struct {
 	registry registry.RegistryInterface
 
 	PostID string
-	Post   *blogstore.Post
+	Post   blogstore.PostInterface
 
 	FormTitle   string
 	FormSummary string
@@ -35,6 +35,11 @@ type postContentComponent struct {
 
 	FormErrorMessage   string
 	FormSuccessMessage string
+	FormStatus         string
+	FormImageUrl       string
+	FormFeatured       string
+	FormEditor         string
+	FormMemo           string
 }
 
 func NewPostContentComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
@@ -86,10 +91,15 @@ func (c *postContentComponent) Mount(ctx context.Context, params map[string]stri
 	}
 
 	c.Post = post
-	c.Editor = post.Editor()
-	c.FormTitle = post.Title()
-	c.FormSummary = post.Summary()
-	c.FormContent = post.Content()
+	c.Editor = post.GetEditor()
+	c.FormTitle = post.GetTitle()
+	c.FormSummary = post.GetSummary()
+	c.FormContent = post.GetContent()
+	c.FormStatus = post.GetStatus()
+	c.FormImageUrl = post.GetImageUrl()
+	c.FormFeatured = post.GetFeatured()
+	c.FormEditor = post.GetEditor()
+	c.FormMemo = post.GetMemo()
 
 	return nil
 }
@@ -149,7 +159,7 @@ func (c *postContentComponent) Handle(ctx context.Context, action string, data u
 func (c *postContentComponent) Render(ctx context.Context) hb.TagInterface {
 
 	// Determine editor type from loaded post
-	editor := lo.IfF(c.Post != nil, func() string { return c.Post.Editor() }).Else("")
+	editor := lo.IfF(c.Post != nil, func() string { return c.Post.GetEditor() }).Else("")
 
 	fieldTitle := form.NewField(form.FieldOptions{
 		Label: "Title",
@@ -236,12 +246,6 @@ func (c *postContentComponent) Render(ctx context.Context) hb.TagInterface {
 		Child(hb.Div().Class("mt-3 text-end").Child(saveBtn))
 
 	return c.Root(content)
-}
-
-func init() {
-	if err := liveflux.Register(&postContentComponent{}); err != nil {
-		log.Printf("Failed to register postContentComponent: %v", err)
-	}
 }
 
 func (c *postContentComponent) fieldContent(editor string) []form.FieldInterface {

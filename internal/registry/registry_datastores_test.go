@@ -10,8 +10,6 @@ import (
 
 	"project/internal/config"
 	"project/internal/registry"
-
-	"github.com/stretchr/testify/require"
 )
 
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
@@ -49,7 +47,9 @@ func newTestApp(t *testing.T) registry.RegistryInterface {
 	cfg.SetVaultStoreUsed(true)
 
 	a, err := registry.New(cfg)
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 	return a
 }
 
@@ -58,27 +58,67 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	ctx := context.Background()
 
 	// Verify all stores are wired (non-nil)
-	require.NotNil(t, a.GetAuditStore())
-	require.NotNil(t, a.GetBlogStore())
-	require.NotNil(t, a.GetChatStore())
-	require.NotNil(t, a.GetCacheStore())
-	require.NotNil(t, a.GetCmsStore())
-	require.NotNil(t, a.GetCustomStore())
-	require.NotNil(t, a.GetEntityStore())
-	require.NotNil(t, a.GetFeedStore())
-	require.NotNil(t, a.GetGeoStore())
+	if a.GetAuditStore() == nil {
+		t.Fatal("AuditStore should not be nil")
+	}
+	if a.GetBlogStore() == nil {
+		t.Fatal("BlogStore should not be nil")
+	}
+	if a.GetChatStore() == nil {
+		t.Fatal("ChatStore should not be nil")
+	}
+	if a.GetCacheStore() == nil {
+		t.Fatal("CacheStore should not be nil")
+	}
+	if a.GetCmsStore() == nil {
+		t.Fatal("CmsStore should not be nil")
+	}
+	if a.GetCustomStore() == nil {
+		t.Fatal("CustomStore should not be nil")
+	}
+	if a.GetEntityStore() == nil {
+		t.Fatal("EntityStore should not be nil")
+	}
+	if a.GetFeedStore() == nil {
+		t.Fatal("FeedStore should not be nil")
+	}
+	if a.GetGeoStore() == nil {
+		t.Fatal("GeoStore should not be nil")
+	}
 	// MetaStore getter isn't exposed on AppInterface; table check below covers it
-	require.NotNil(t, a.GetSessionStore())
-	require.NotNil(t, a.GetShopStore())
-	require.NotNil(t, a.GetSqlFileStorage())
-	require.NotNil(t, a.GetStatsStore())
-	require.NotNil(t, a.GetTaskStore())
-	require.NotNil(t, a.GetUserStore())
-	require.NotNil(t, a.GetVaultStore())
-	require.NotNil(t, a.GetSubscriptionStore())
-	require.NotNil(t, a.GetBlindIndexStoreEmail())
-	require.NotNil(t, a.GetBlindIndexStoreFirstName())
-	require.NotNil(t, a.GetBlindIndexStoreLastName())
+	if a.GetSessionStore() == nil {
+		t.Fatal("SessionStore should not be nil")
+	}
+	if a.GetShopStore() == nil {
+		t.Fatal("ShopStore should not be nil")
+	}
+	if a.GetSqlFileStorage() == nil {
+		t.Fatal("SqlFileStorage should not be nil")
+	}
+	if a.GetStatsStore() == nil {
+		t.Fatal("StatsStore should not be nil")
+	}
+	if a.GetTaskStore() == nil {
+		t.Fatal("TaskStore should not be nil")
+	}
+	if a.GetUserStore() == nil {
+		t.Fatal("UserStore should not be nil")
+	}
+	if a.GetVaultStore() == nil {
+		t.Fatal("VaultStore should not be nil")
+	}
+	if a.GetSubscriptionStore() == nil {
+		t.Fatal("SubscriptionStore should not be nil")
+	}
+	if a.GetBlindIndexStoreEmail() == nil {
+		t.Fatal("BlindIndexStoreEmail should not be nil")
+	}
+	if a.GetBlindIndexStoreFirstName() == nil {
+		t.Fatal("BlindIndexStoreFirstName should not be nil")
+	}
+	if a.GetBlindIndexStoreLastName() == nil {
+		t.Fatal("BlindIndexStoreLastName should not be nil")
+	}
 
 	// Verify some key tables exist
 	mustHaveTables := []string{
@@ -105,13 +145,19 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	}
 
 	db := a.GetDatabase()
-	require.NotNil(t, db)
+	if db == nil {
+		t.Fatal("Database should not be nil")
+	}
 	for _, tbl := range mustHaveTables {
 		t.Run("has_"+tbl, func(t *testing.T) {
 			var name string
 			err := db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", tbl).Scan(&name)
-			require.NoError(t, err, "expected table %s to exist", tbl)
-			require.Equal(t, tbl, name)
+			if err != nil {
+				t.Fatalf("expected table %s to exist, got error: %v", tbl, err)
+			}
+			if name != tbl {
+				t.Fatalf("expected table name %s, got %s", tbl, name)
+			}
 		})
 	}
 }
@@ -121,5 +167,7 @@ func TestAppNew_IsIdempotent(t *testing.T) {
 
 	// Second call should also succeed
 	_, err := registry.New(a.GetConfig())
-	require.NoError(t, err)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
 }

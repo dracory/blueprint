@@ -101,7 +101,7 @@ func (c *AiTitleGeneratorController) stepHandlerFindExistingTitles(ctx context.C
 	}
 
 	for _, post := range postList {
-		existingTitles = append(existingTitles, post.Title())
+		existingTitles = append(existingTitles, post.GetTitle())
 	}
 
 	data[dataKeyExistingTitles] = existingTitles

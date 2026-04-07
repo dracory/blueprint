@@ -10,23 +10,21 @@ import (
 	"net/http"
 	neturl "net/url"
 	"os"
-	"project/internal/links"
 	"project/internal/registry"
 	"project/internal/resources"
 	"strings"
 	"time"
 
 	"github.com/disintegration/imaging"
+	"github.com/dracory/base/cfmt"
 	"github.com/dracory/base/img"
 	"github.com/dracory/rtr"
 	"github.com/dracory/str"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
-
-	"github.com/dracory/base/cfmt"
 )
 
-// == CONSTRUCTOR =============================================================
+// == CONSTRUCTOR ==============================================================
 
 // NewThumbController creates a new thumbnail controller instance with the provided registry.
 // The registry provides access to application services like logging, caching, and configuration.
@@ -257,8 +255,8 @@ func (controller *thumbnailController) prepareData(r *http.Request) (data thumbn
 	}
 
 	if strings.HasPrefix(data.path, "files/") {
-		data.path = links.URL(data.path, nil)
-		data.isURL = true
+		data.isFiles = true
+		data.path = strings.TrimPrefix(data.path, "files/")
 	}
 
 	widthStr := ""
@@ -391,6 +389,28 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 
 		if err != nil {
 			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			return "", err.Error()
+		}
+	} else if data.isFiles {
+		storage := controller.registry.GetSqlFileStorage()
+		if storage == nil {
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file storage not initialized")
+			return "", "file storage not initialized"
+		}
+
+		exists, err := storage.Exists(data.path)
+		if err != nil {
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
+			return "", err.Error()
+		}
+		if !exists {
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file not found")
+			return "", "file not found"
+		}
+
+		imgBytes, err = storage.ReadFile(data.path)
+		if err != nil {
+			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
 			return "", err.Error()
 		}
 	} else {
@@ -694,4 +714,5 @@ type thumbnailControllerData struct {
 	path      string
 	isURL     bool
 	isCache   bool
+	isFiles   bool
 }

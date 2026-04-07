@@ -26,7 +26,7 @@ import (
 type formAiPostContentUpdate struct {
 	liveflux.Base
 	registry   registry.RegistryInterface
-	Post       *blogstore.Post
+	Post       blogstore.PostInterface
 	Blocks     []Block
 	Error      string
 	Success    string
@@ -94,7 +94,7 @@ func (c *formAiPostContentUpdate) Mount(ctx context.Context, params map[string]s
 	}
 
 	c.Post = post
-	c.Blocks = MarkdownToBlocks(post.Content())
+	c.Blocks = MarkdownToBlocks(post.GetContent())
 	c.Error = ""
 
 	return nil
@@ -250,7 +250,7 @@ Return ONLY the rewritten text for that block as markdown, with no additional ex
 	// userPrompt := fmt.Sprintf("Post title: %s\nBlock type: %s\n\nFull post markdown with marker:\n%s\n\nOriginal block content (for meaning only; DO NOT copy it verbatim):\n%s", c.Post.Title(), block.Type, contextMarkdown, block.Text)
 
 	userPrompt := []string{}
-	userPrompt = append(userPrompt, "Post title: "+c.Post.Title())
+	userPrompt = append(userPrompt, "Post title: "+c.Post.GetTitle())
 	userPrompt = append(userPrompt, "Block type: "+string(block.Type))
 	userPrompt = append(userPrompt, "Full post markdown with marker:\n"+contextMarkdown)
 	userPrompt = append(userPrompt, "Original block content to be regenerated (for meaning only; MUST BE REPHRASED SIGNIFICANTLY; DO NOT copy it verbatim):\n"+block.Text)
@@ -349,14 +349,14 @@ func (c *formAiPostContentUpdate) Render(ctx context.Context) hb.TagInterface {
 	titleInput := hb.Input().
 		Class("form-control").
 		Name("title").
-		Value(c.Post.Title())
+		Value(c.Post.GetTitle())
 
 	summaryTextarea := hb.TextArea().
 		Class("form-control auto-resize-textarea").
 		Name("summary").
 		Attr("rows", "3").
 		Attr("oninput", "this.style.height='auto';this.style.height=this.scrollHeight+'px';").
-		Text(c.Post.Summary())
+		Text(c.Post.GetSummary())
 
 	titleGroup := hb.Div().
 		Class("mb-3").
@@ -649,7 +649,7 @@ func (c *formAiPostContentUpdate) PostID() string {
 	if c.Post == nil {
 		return ""
 	}
-	return c.Post.ID()
+	return c.Post.GetID()
 }
 
 func (c *formAiPostContentUpdate) wrapPage(breadcrumbs hb.TagInterface, header hb.TagInterface, backButton hb.TagInterface, content hb.TagInterface) hb.TagInterface {

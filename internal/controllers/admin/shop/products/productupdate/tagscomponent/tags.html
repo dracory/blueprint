@@ -1,0 +1,83 @@
+<div id="tags-app" class="tags-container">
+	<!-- Loading state -->
+	<div v-if="loading" class="text-center py-4">
+		<div class="spinner-border text-primary" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+
+	<!-- Error message -->
+	<div v-if="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+		{{ errorMessage }}
+		<button type="button" class="btn-close" @click="errorMessage = ''"></button>
+	</div>
+
+	<!-- Success message -->
+	<div v-if="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+		{{ successMessage }}
+		<button type="button" class="btn-close" @click="successMessage = ''"></button>
+	</div>
+
+	<template v-if="!errorMessage">
+		<!-- Tags Display -->
+		<div v-if="tagItems.length > 0" class="mb-3">
+			<div class="d-flex flex-wrap gap-2">
+				<span v-for="(item, index) in tagItems" :key="item.id" class="badge bg-primary d-flex align-items-center gap-2 px-3 py-2">
+					<span>{{ item.tag }}</span>
+					<button 
+						type="button" 
+						class="btn btn-sm btn-link text-white p-0" 
+						@click="removeTag(index)"
+						title="Remove tag"
+						:disabled="loading"
+						style="font-size: 0.75em;"
+					>
+						<i class="bi bi-x"></i>
+					</button>
+				</span>
+			</div>
+		</div>
+
+		<!-- Empty State -->
+		<div v-else class="p-4 text-center text-muted border rounded mb-3">
+			<i class="bi bi-tags fs-1"></i>
+			<p class="mb-0">No tags yet. Add one below.</p>
+		</div>
+
+		<!-- Add New Tag Section -->
+		<div class="p-3 border rounded bg-light">
+			<div class="row g-2 align-items-end">
+				<div class="col-md-6">
+					<label class="form-label small fw-bold">New Tag</label>
+					<div class="input-group">
+						<input 
+							type="text" 
+							class="form-control" 
+							v-model="newTag"
+							placeholder="Enter tag..."
+							@keyup.enter="addTag"
+							:disabled="loading"
+						>
+						<button 
+							type="button" 
+							class="btn btn-outline-secondary" 
+							@click="addTag"
+							:disabled="!newTag.trim() || loading"
+						>
+							<i class="bi bi-plus-lg"></i>
+						</button>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<label class="form-label small fw-bold">Quick Add</label>
+					<div class="d-flex flex-wrap gap-1">
+						<button type="button" class="btn btn-sm btn-outline-primary" @click="addQuickTag('featured')" :disabled="loading">featured</button>
+						<button type="button" class="btn btn-sm btn-outline-success" @click="addQuickTag('new')" :disabled="loading">new</button>
+						<button type="button" class="btn btn-sm btn-outline-info" @click="addQuickTag('sale')" :disabled="loading">sale</button>
+						<button type="button" class="btn btn-sm btn-outline-warning" @click="addQuickTag('popular')" :disabled="loading">popular</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</template>
+</div>

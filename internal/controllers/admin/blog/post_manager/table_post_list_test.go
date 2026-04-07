@@ -10,9 +10,9 @@ import (
 func TestTablePostList(t *testing.T) {
 	// Create test data
 	data := postManagerControllerData{
-		blogList: []blogstore.Post{
-			*createTestPost("post1", "Test Post 1", blogstore.POST_STATUS_PUBLISHED, "yes"),
-			*createTestPost("post2", "Test Post 2", blogstore.POST_STATUS_DRAFT, "no"),
+		blogList: []blogstore.PostInterface{
+			createTestPost("post1", "Test Post 1", blogstore.POST_STATUS_PUBLISHED, "yes"),
+			createTestPost("post2", "Test Post 2", blogstore.POST_STATUS_DRAFT, "no"),
 		},
 		blogCount: 2,
 		pageInt:   1,
@@ -89,7 +89,7 @@ func TestTablePagination(t *testing.T) {
 	assert.Contains(t, html, "page=2", "Should show current page")
 }
 
-func createTestPost(id, title, status, featured string) *blogstore.Post {
+func createTestPost(id, title, status, featured string) blogstore.PostInterface {
 	post := blogstore.NewPost()
 	post.SetID(id)
 	post.SetTitle(title)

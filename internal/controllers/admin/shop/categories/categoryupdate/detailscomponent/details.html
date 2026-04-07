@@ -1,0 +1,25 @@
+<div id="category-details-form">
+  <div class="mb-3">
+    <label for="category-title" class="form-label">Title</label>
+    <input type="text" class="form-control" id="category-title" v-model="details.title" />
+  </div>
+  <div class="mb-3">
+    <label for="category-description" class="form-label">Description</label>
+    <textarea class="form-control" id="category-description" v-model="details.description" rows="3"></textarea>
+  </div>
+  <div class="mb-3">
+    <label for="category-status" class="form-label">Status</label>
+    <select class="form-select" id="category-status" v-model="details.status">
+      <option value="draft">Draft</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="category-parent" class="form-label">Parent Category</label>
+    <select class="form-select" id="category-parent" v-model="details.parent_id">
+      <option value="">No parent (root category)</option>
+      <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.title }}</option>
+    </select>
+  </div>
+</div>

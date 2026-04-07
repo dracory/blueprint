@@ -7,8 +7,8 @@ import (
 	"github.com/dracory/blogstore"
 )
 
-func SizedThumbnailURL(registry registry.RegistryInterface, post blogstore.Post, width, height, quality string) string {
-	postImageURL := post.ImageUrlOrDefault()
+func SizedThumbnailURL(registry registry.RegistryInterface, post blogstore.PostInterface, width, height, quality string) string {
+	postImageURL := post.GetImageUrlOrDefault()
 	extension := ImageExtension(postImageURL)
 
 	if registry == nil {

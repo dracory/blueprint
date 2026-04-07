@@ -79,7 +79,7 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 	posts, err := registry.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{})
 	assert.NoError(t, err, "Should list posts without error")
 	assert.NotEmpty(t, posts, "Should have created a post")
-	assert.Equal(t, postTitle, posts[0].Title(), "Post title should match")
+	assert.Equal(t, postTitle, posts[0].GetTitle(), "Post title should match")
 }
 
 func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {

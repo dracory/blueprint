@@ -17,7 +17,7 @@ type postDeleteController struct {
 
 type postDeleteControllerData struct {
 	postID         string
-	post           *blogstore.Post
+	post           blogstore.PostInterface
 	successMessage string
 }
 

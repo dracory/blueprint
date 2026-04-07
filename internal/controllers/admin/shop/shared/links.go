@@ -13,6 +13,21 @@ func (*Links) Home(params map[string]string) string {
 	return links.Admin().Shop(params)
 }
 
+func (*Links) Categories(params map[string]string) string {
+	params["controller"] = CONTROLLER_CATEGORIES
+	return links.Admin().Shop(params)
+}
+
+func (*Links) CategoryCreate(params map[string]string) string {
+	params["controller"] = CONTROLLER_CATEGORY_CREATE
+	return links.Admin().Shop(params)
+}
+
+func (*Links) CategoryUpdate(params map[string]string) string {
+	params["controller"] = CONTROLLER_CATEGORY_UPDATE
+	return links.Admin().Shop(params)
+}
+
 func (*Links) Discounts(params map[string]string) string {
 	params["controller"] = CONTROLLER_DISCOUNTS
 	return links.Admin().Shop(params)

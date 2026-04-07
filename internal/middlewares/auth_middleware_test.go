@@ -10,7 +10,6 @@ import (
 
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAuthHandler_NoSessionKey(t *testing.T) {
@@ -40,7 +39,9 @@ func TestAuthHandler_NoSessionKey(t *testing.T) {
 	handler.ServeHTTP(responseRecorder, req)
 
 	// Assert that the next handler was called
-	assert.Equal(t, http.StatusOK, responseRecorder.Code)
+	if responseRecorder.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, responseRecorder.Code)
+	}
 }
 
 func TestAuthHandler_SessionNotFoundError(t *testing.T) {
@@ -73,7 +74,9 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 	handler.ServeHTTP(responseRecorder, req)
 
 	// Assert that the next handler was called
-	assert.Equal(t, http.StatusOK, responseRecorder.Code)
+	if responseRecorder.Code != http.StatusOK {
+		t.Errorf("Expected status %d, got %d", http.StatusOK, responseRecorder.Code)
+	}
 }
 
 func TestAuthHandler_SessionExpired(t *testing.T) {
@@ -283,8 +286,12 @@ func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
 	handler := authHandler(registry, next)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-	assert.Equal(t, "session store not enabled", rr.Body.String())
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
+	}
+	if rr.Body.String() != "session store not enabled" {
+		t.Errorf("Expected body 'session store not enabled', got '%s'", rr.Body.String())
+	}
 }
 
 func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
@@ -306,8 +313,12 @@ func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
 	handler := authHandler(registry, next)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-	assert.Equal(t, "session store not initialized", rr.Body.String())
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
+	}
+	if rr.Body.String() != "session store not initialized" {
+		t.Errorf("Expected body 'session store not initialized', got '%s'", rr.Body.String())
+	}
 }
 
 func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T) {
@@ -330,8 +341,12 @@ func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T)
 	handler := authHandler(registry, next)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-	assert.Equal(t, "user store not enabled", rr.Body.String())
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
+	}
+	if rr.Body.String() != "user store not enabled" {
+		t.Errorf("Expected body 'user store not enabled', got '%s'", rr.Body.String())
+	}
 }
 
 func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
@@ -357,6 +372,10 @@ func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
 	handler := authHandler(registry, next)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
-	assert.Equal(t, "user store not initialized", rr.Body.String())
+	if rr.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
+	}
+	if rr.Body.String() != "user store not initialized" {
+		t.Errorf("Expected body 'user store not initialized', got '%s'", rr.Body.String())
+	}
 }

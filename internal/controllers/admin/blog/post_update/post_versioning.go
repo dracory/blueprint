@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func createPostVersioning(ctx context.Context, registry registry.RegistryInterface, post *blogstore.Post) error {
+func createPostVersioning(ctx context.Context, registry registry.RegistryInterface, post blogstore.PostInterface) error {
 	if registry == nil || registry.GetBlogStore() == nil {
 		return errors.New("blog store not available")
 	}
@@ -27,7 +27,7 @@ func createPostVersioning(ctx context.Context, registry registry.RegistryInterfa
 
 	lastVersioningList, err := registry.GetBlogStore().VersioningList(ctx, blogstore.NewVersioningQuery().
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
-		SetEntityID(post.ID()).
+		SetEntityID(post.GetID()).
 		SetOrderBy(versionstore.COLUMN_CREATED_AT).
 		SetSortOrder(sb.DESC).
 		SetLimit(1))
@@ -52,7 +52,7 @@ func createPostVersioning(ctx context.Context, registry registry.RegistryInterfa
 	}
 
 	return registry.GetBlogStore().VersioningCreate(ctx, blogstore.NewVersioning().
-		SetEntityID(post.ID()).
+		SetEntityID(post.GetID()).
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
 		SetContent(content))
 }

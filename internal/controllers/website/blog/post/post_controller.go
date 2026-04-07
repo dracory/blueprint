@@ -61,27 +61,27 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return ""
 	}
 
-	if !c.accessAllowed(r, *post) {
+	if !c.accessAllowed(r, post) {
 		c.registry.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
 		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
-	if postSlug == "" || postSlug != post.Slug() {
-		url := links.Website().BlogPost(post.ID(), post.Slug())
+	if postSlug == "" || postSlug != post.GetSlug() {
+		url := links.Website().BlogPost(post.GetID(), post.GetSlug())
 		c.registry.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
 		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
 	}
 
-	canonicalURL := strings.TrimSpace(post.CanonicalURL())
+	canonicalURL := strings.TrimSpace(post.GetCanonicalURL())
 	if canonicalURL == "" {
-		canonicalURL = links.Website().BlogPost(post.ID(), post.Slug())
+		canonicalURL = links.Website().BlogPost(post.GetID(), post.GetSlug())
 	}
 
 	options := layouts.Options{
 		WebsiteSection: "Blog",
-		Title:          post.Title(),
+		Title:          post.GetTitle(),
 		StyleURLs: []string{
 			"https://fonts.googleapis.com/css2?family=Roboto&display=swap",
 		},
@@ -89,7 +89,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 			"/liveflux",
 			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
 		},
-		Content:      hb.Wrap().HTML(c.page(*post)),
+		Content:      hb.Wrap().HTML(c.page(post)),
 		CanonicalURL: canonicalURL,
 	}
 
@@ -106,7 +106,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 	}
 }
 
-func (controller *postController) accessAllowed(r *http.Request, post blogstore.Post) bool {
+func (controller *postController) accessAllowed(r *http.Request, post blogstore.PostInterface) bool {
 	if post.IsPublished() {
 		return true // everyone can access published posts
 	}
@@ -126,7 +126,7 @@ func (controller *postController) accessAllowed(r *http.Request, post blogstore.
 	return false // default to false
 }
 
-func (c *postController) page(post blogstore.Post) string {
+func (c *postController) page(post blogstore.PostInterface) string {
 	sectionBanner := shared.SectionBanner()
 	return hb.Wrap().Children([]hb.TagInterface{
 		// hb.Style(c.cssSectionIntro()),
@@ -227,13 +227,13 @@ func (controller *postController) processContent(content string, editor string, 
 	return content, ""
 }
 
-func (c *postController) sectionPost(post blogstore.Post) *hb.Tag {
-	postHtml, themeStyle := c.processContent(post.Content(), post.Editor(), post.ContentType())
+func (c *postController) sectionPost(post blogstore.PostInterface) *hb.Tag {
+	postHtml, themeStyle := c.processContent(post.GetContent(), post.GetEditor(), post.GetContentType())
 
 	rowTitle := hb.Div().
 		Class("BlogTitle").
 		Child(hb.Heading1().
-			HTML(post.Title()))
+			HTML(post.GetTitle()))
 
 	rowContent := hb.Div().
 		Child(hb.Div().
@@ -256,13 +256,12 @@ func (c *postController) sectionPost(post blogstore.Post) *hb.Tag {
 	return sectionPost
 }
 
-func (c *postController) recommendationsSection(post blogstore.Post) hb.TagInterface {
+func (c *postController) recommendationsSection(post blogstore.PostInterface) hb.TagInterface {
 	component := NewPostRecommendationsComponent(c.registry)
 	rendered := liveflux.Placeholder(component, map[string]string{
-		"post_id": post.ID(),
+		"post_id": post.GetID(),
 	})
 
-	// if rendered == nil {
 	// 	if c.registry != nil && c.registry.GetLogger() != nil {
 	// 		c.registry.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
 	// 	}
@@ -272,7 +271,7 @@ func (c *postController) recommendationsSection(post blogstore.Post) hb.TagInter
 	return rendered
 }
 
-func (c *postController) postImage(post blogstore.Post) *hb.Tag {
+func (c *postController) postImage(post blogstore.PostInterface) *hb.Tag {
 	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
 
 	return hb.Image(``).

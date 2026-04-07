@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, *blogstore.Post) {
+func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
 	t.Helper()
 
 	registry := testutils.Setup(
@@ -50,21 +50,21 @@ func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
 	c := &postContentComponent{registry: registry}
 
 	err := c.Mount(context.Background(), map[string]string{
-		"post_id": post.ID(),
+		"post_id": post.GetID(),
 	})
 
 	assert.NoError(t, err)
-	assert.Equal(t, post.ID(), c.PostID)
-	assert.Equal(t, post.Title(), c.FormTitle)
-	assert.Equal(t, post.Summary(), c.FormSummary)
-	assert.Equal(t, post.Content(), c.FormContent)
+	assert.Equal(t, post.GetID(), c.PostID)
+	assert.Equal(t, post.GetTitle(), c.FormTitle)
+	assert.Equal(t, post.GetSummary(), c.FormSummary)
+	assert.Equal(t, post.GetContent(), c.FormContent)
 	assert.Equal(t, "", c.FormErrorMessage)
 }
 
 func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 	registry, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: registry, PostID: post.ID()}
+	c := &postContentComponent{registry: registry, PostID: post.GetID()}
 
 	values := url.Values{
 		"post_title":   {""},
@@ -82,7 +82,7 @@ func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 	registry, post := setupContentTestAppAndPost(t)
 
-	c := &postContentComponent{registry: registry, PostID: post.ID()}
+	c := &postContentComponent{registry: registry, PostID: post.GetID()}
 
 	values := url.Values{
 		"post_title":   {"Updated Title"},
@@ -96,11 +96,11 @@ func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 	assert.Equal(t, "", c.FormErrorMessage)
 	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
-	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.ID())
+	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
 	assert.NoError(t, err)
 	if assert.NotNil(t, updated) {
-		assert.Equal(t, "Updated Title", updated.Title())
-		assert.Equal(t, "Updated summary", updated.Summary())
-		assert.Equal(t, "Updated content", updated.Content())
+		assert.Equal(t, "Updated Title", updated.GetTitle())
+		assert.Equal(t, "Updated summary", updated.GetSummary())
+		assert.Equal(t, "Updated content", updated.GetContent())
 	}
 }

@@ -25,7 +25,7 @@ type postVersioningComponent struct {
 	registry registry.RegistryInterface
 
 	PostID   string
-	Post     *blogstore.Post
+	Post     blogstore.PostInterface
 	Versions []blogstore.VersioningInterface
 
 	FormErrorMessage   string

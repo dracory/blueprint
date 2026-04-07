@@ -45,7 +45,7 @@ type blogPostListWidget struct {
 	registry registry.RegistryInterface
 }
 type blogPostListWidgetData struct {
-	postList  []blogstore.Post
+	postList  []blogstore.PostInterface
 	page      int
 	perPage   int
 	postCount int64
@@ -89,12 +89,12 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 		URL:               url,
 	})
 
-	columnCards := lo.Map(data.postList, func(post blogstore.Post, index int) hb.TagInterface {
-		postImageURL := post.ImageUrlOrDefault()
+	columnCards := lo.Map(data.postList, func(post blogstore.PostInterface, index int) hb.TagInterface {
+		postImageURL := post.GetImageUrlOrDefault()
 
-		publishedAt := lo.Ternary(post.PublishedAt() == "", "", post.PublishedAtCarbon().Format("d M, Y"))
+		publishedAt := lo.Ternary(post.GetPublishedAt() == "", "", post.GetPublishedAtCarbon().Format("d M, Y"))
 
-		postURL := links.Website().BlogPost(post.ID(), post.Slug())
+		postURL := links.Website().BlogPost(post.GetID(), post.GetSlug())
 
 		postImage := hb.Image(postImageURL).
 			Class("card-img-top rounded-3").
@@ -106,7 +106,7 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 		postTitle := hb.Heading5().
 			Class("card-title").
 			Style("font-size: 16px; margin-bottom: 10px; text-align: left; font-weight: 800;").
-			Text(post.Title())
+			Text(post.GetTitle())
 
 		postPublished := hb.Paragraph().
 			Style("font-size: 12px;	color: #6c757d;	margin-bottom: 20px; text-align: right;").
@@ -114,7 +114,7 @@ func (widget *blogPostListWidget) postTiles(data blogPostListWidgetData) *hb.Tag
 
 		postSummary := hb.Paragraph().
 			Class("card-text").
-			Text(post.Summary()).
+			Text(post.GetSummary()).
 			Style(`text-align: left;`).
 			Style(`font-size: 14px;`).
 			Style(`font-weight: 400;`).

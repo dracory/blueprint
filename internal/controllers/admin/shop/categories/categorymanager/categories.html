@@ -1,0 +1,67 @@
+<div id="categories-wrapper">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <button @click="openCreateModal()" class="btn btn-primary mb-3">
+      <i class="bi bi-plus me-1"></i> Add Category
+    </button>
+
+    <div v-if="categories.length === 0" class="text-center py-5 text-muted">
+      No categories found. Click "Add Category" to create one.
+    </div>
+
+    <div v-else class="category-tree">
+      <category-tree-item 
+        v-for="category in categories" 
+        :key="category.id" 
+        :category="category"
+        @edit="editCategory"
+        @delete="deleteCategory"
+        @add-child="openCreateModal">
+      </category-tree-item>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div v-if="showCreateModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1040; background: rgba(0,0,0,0.5);"></div>
+  
+  <!-- Create Category Modal -->
+  <div v-if="showCreateModal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050; width: 500px; max-width: 90%;">
+    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+      <div style="padding: 16px; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;">
+        <h5 style="margin: 0;">Create Category</h5>
+        <button type="button" style="background: none; border: none; font-size: 20px; cursor: pointer;" @click="closeCreateModal()">&times;</button>
+      </div>
+      <div style="padding: 16px;">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Title</label>
+          <input type="text" class="form-control" v-model="newCategory.title" required />
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Description</label>
+          <textarea class="form-control" v-model="newCategory.description" rows="3"></textarea>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Status</label>
+          <select class="form-select" v-model="newCategory.status">
+            <option value="draft">Draft</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 16px;" v-if="newCategory.parent_id">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500;">Parent Category</label>
+          <input type="text" class="form-control" :value="newCategory.parent_id" readonly />
+        </div>
+      </div>
+      <div style="padding: 16px; border-top: 1px solid #dee2e6; display: flex; justify-content: flex-end; gap: 8px;">
+        <button type="button" class="btn btn-secondary" @click="closeCreateModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" @click="createCategory()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>

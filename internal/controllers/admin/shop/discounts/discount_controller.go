@@ -170,15 +170,15 @@ func (discountController *discountController) FuncRows(r *http.Request) ([]crud.
 
 	rows := lo.Map(discounts, func(discount shopstore.DiscountInterface, _ int) crud.Row {
 		return crud.Row{
-			ID: discount.ID(),
+			ID: discount.GetID(),
 			Data: []string{
-				discount.Title(),
-				discount.Status(),
-				discount.Type(),
-				cast.ToString(discount.Amount()),
-				discount.StartsAtCarbon().Format("d M Y") + " - " + discount.EndsAtCarbon().Format("d M Y"),
-				discount.Code(),
-				discount.CreatedAtCarbon().Format("d M Y"),
+				discount.GetTitle(),
+				discount.GetStatus(),
+				discount.GetType(),
+				cast.ToString(discount.GetAmount()),
+				discount.GetStartsAtCarbon().Format("d M Y") + " - " + discount.GetEndsAtCarbon().Format("d M Y"),
+				discount.GetCode(),
+				discount.GetCreatedAtCarbon().Format("d M Y"),
 			},
 		}
 	})
@@ -275,15 +275,15 @@ func (discountController *discountController) FuncFetchReadData(r *http.Request,
 	}
 
 	data := []crud.KeyValue{
-		{Key: "Title", Value: discount.Title()},
-		{Key: "Status", Value: discount.Status()},
-		{Key: "Description", Value: discount.Description()},
-		{Key: "Type", Value: discount.Type()},
-		{Key: "Amount", Value: cast.ToString(discount.Amount())},
-		{Key: "Starts At", Value: discount.StartsAtCarbon().Format("d M Y")},
-		{Key: "Ends At", Value: discount.EndsAtCarbon().Format("d M Y")},
-		{Key: "Created", Value: discount.CreatedAtCarbon().Format("d M Y")},
-		{Key: "Updated", Value: discount.UpdatedAtCarbon().Format("d M Y")},
+		{Key: "Title", Value: discount.GetTitle()},
+		{Key: "Status", Value: discount.GetStatus()},
+		{Key: "Description", Value: discount.GetDescription()},
+		{Key: "Type", Value: discount.GetType()},
+		{Key: "Amount", Value: cast.ToString(discount.GetAmount())},
+		{Key: "Starts At", Value: discount.GetStartsAtCarbon().Format("d M Y")},
+		{Key: "Ends At", Value: discount.GetEndsAtCarbon().Format("d M Y")},
+		{Key: "Created", Value: discount.GetCreatedAtCarbon().Format("d M Y")},
+		{Key: "Updated", Value: discount.GetUpdatedAtCarbon().Format("d M Y")},
 	}
 
 	return data, nil
@@ -305,16 +305,16 @@ func (discountController *discountController) FuncFetchUpdateData(r *http.Reques
 	}
 
 	return map[string]string{
-		"title":       discount.Title(),
-		"status":      discount.Status(),
-		"amount":      cast.ToString(discount.Amount()),
-		"description": discount.Description(),
-		"type":        discount.Type(),
-		"code":        discount.Code(),
-		"starts_at":   discount.StartsAtCarbon().ToDateTimeString(),
-		"ends_at":     discount.EndsAtCarbon().ToDateTimeString(),
-		"created_at":  discount.CreatedAtCarbon().ToDateTimeString(),
-		"updated_at":  discount.CreatedAtCarbon().ToDateTimeString(),
+		"title":       discount.GetTitle(),
+		"status":      discount.GetStatus(),
+		"amount":      cast.ToString(discount.GetAmount()),
+		"description": discount.GetDescription(),
+		"type":        discount.GetType(),
+		"code":        discount.GetCode(),
+		"starts_at":   discount.GetStartsAtCarbon().ToDateTimeString(),
+		"ends_at":     discount.GetEndsAtCarbon().ToDateTimeString(),
+		"created_at":  discount.GetCreatedAtCarbon().ToDateTimeString(),
+		"updated_at":  discount.GetUpdatedAtCarbon().ToDateTimeString(),
 	}, nil
 }
 
@@ -334,7 +334,7 @@ func (discountController *discountController) FuncCreate(r *http.Request, data m
 		return "", err
 	}
 
-	return discount.ID(), nil
+	return discount.GetID(), nil
 }
 
 func (discountController *discountController) FuncTrash(r *http.Request, discountID string) error {

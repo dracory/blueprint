@@ -29,7 +29,7 @@ type postRecommendationsComponent struct {
 	liveflux.Base
 	registry      registry.RegistryInterface
 	CurrentPostID string
-	Posts         []blogstore.Post
+	Posts         []blogstore.PostInterface
 	errorMessage  string
 }
 
@@ -87,9 +87,9 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 		return nil
 	}
 
-	filtered := make([]blogstore.Post, 0, len(postList))
+	filtered := make([]blogstore.PostInterface, 0, len(postList))
 	for _, post := range postList {
-		if post.ID() == c.CurrentPostID {
+		if post.GetID() == c.CurrentPostID {
 			continue
 		}
 
@@ -168,16 +168,16 @@ func (c *postRecommendationsComponent) Render(ctx context.Context) hb.TagInterfa
 	return c.Root(section)
 }
 
-func (c *postRecommendationsComponent) postCard(post blogstore.Post) hb.TagInterface {
-	postURL := links.Website().BlogPost(post.ID(), post.Slug())
+func (c *postRecommendationsComponent) postCard(post blogstore.PostInterface) hb.TagInterface {
+	postURL := links.Website().BlogPost(post.GetID(), post.GetSlug())
 
 	title := hb.Heading5().
 		Class("card-title fw-semibold").
-		Text(post.Title())
+		Text(post.GetTitle())
 
 	summary := hb.Paragraph().
 		Class("card-text text-muted mb-4").
-		Text(c.truncatedSummary(post.Summary()))
+		Text(c.truncatedSummary(post.GetSummary()))
 
 	button := hb.Hyperlink().
 		Class("btn btn-outline-primary mt-auto w-100").
@@ -195,7 +195,7 @@ func (c *postRecommendationsComponent) postCard(post blogstore.Post) hb.TagInter
 	card := hb.Div().
 		Class("card shadow-sm border-0 h-100 overflow-hidden")
 
-	if post.ImageUrlOrDefault() != "" {
+	if post.GetImageUrlOrDefault() != "" {
 		card = card.Child(c.postImage(post))
 	}
 
@@ -226,7 +226,7 @@ func (c *postRecommendationsComponent) truncatedSummary(text string) string {
 	return strings.TrimSpace(string(runes[:maxLength])) + "..."
 }
 
-func (c *postRecommendationsComponent) postImage(post blogstore.Post) *hb.Tag {
+func (c *postRecommendationsComponent) postImage(post blogstore.PostInterface) *hb.Tag {
 	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
 
 	return hb.Image(``).
