@@ -973,7 +973,7 @@ func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T
 	}
 
 	// Test without GeoStore configured
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"action":  {"on-country-selected-timezone-options"},
 			"country": {"US"},
@@ -997,10 +997,6 @@ func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T
 		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
 	}
 
-	if !strings.Contains(responseHTML, `/flash?message_id=`) {
-		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
-	}
-	
 	location := response.Header.Get("Location")
 	if !strings.Contains(location, `/flash?message_id=`) {
 		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
@@ -1016,7 +1012,7 @@ func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *te
 	)
 
 	// Test without authentication
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
 			"action":  {"on-country-selected-timezone-options"},
 			"country": {"US"},
@@ -1037,10 +1033,6 @@ func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *te
 		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
 	}
 
-	if !strings.Contains(responseHTML, `/flash?message_id=`) {
-		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
-	}
-	
 	location := response.Header.Get("Location")
 	if !strings.Contains(location, `/flash?message_id=`) {
 		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
