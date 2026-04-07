@@ -1,10 +1,10 @@
 package post_manager
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/dracory/blogstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTablePostList(t *testing.T) {
@@ -24,17 +24,31 @@ func TestTablePostList(t *testing.T) {
 	html := table.ToHTML()
 
 	// Verify basic structure
-	assert.Contains(t, html, "<table", "Should contain table element")
-	assert.Contains(t, html, "Test Post 1", "Should show first post")
-	assert.Contains(t, html, "Test Post 2", "Should show second post")
+	if !strings.Contains(html, "<table") {
+		t.Error("Should contain table element")
+	}
+	if !strings.Contains(html, "Test Post 1") {
+		t.Error("Should show first post")
+	}
+	if !strings.Contains(html, "Test Post 2") {
+		t.Error("Should show second post")
+	}
 
 	// Verify status styling
-	assert.Contains(t, html, "text-success", "Published post should use success text styling")
-	assert.Contains(t, html, "text-primary", "Draft post should use primary text styling")
+	if !strings.Contains(html, "text-success") {
+		t.Error("Published post should use success text styling")
+	}
+	if !strings.Contains(html, "text-primary") {
+		t.Error("Draft post should use primary text styling")
+	}
 
 	// Verify action buttons
-	assert.Contains(t, html, "bi-pencil-square", "Should have edit button")
-	assert.Contains(t, html, "bi-trash", "Should have delete button")
+	if !strings.Contains(html, "bi-pencil-square") {
+		t.Error("Should have edit button")
+	}
+	if !strings.Contains(html, "bi-trash") {
+		t.Error("Should have delete button")
+	}
 }
 
 func TestSortableColumnLabel(t *testing.T) {
@@ -46,12 +60,16 @@ func TestSortableColumnLabel(t *testing.T) {
 	// Test selected column
 	label := sortableColumnLabel(data, "Post", "title")
 	html := label.ToHTML()
-	assert.Contains(t, html, "&#8593;", "Should show up arrow for ascending sort")
+	if !strings.Contains(html, "&#8593;") {
+		t.Error("Should show up arrow for ascending sort")
+	}
 
 	// Test non-selected column
 	label = sortableColumnLabel(data, "Status", "status")
 	html = label.ToHTML()
-	assert.NotContains(t, html, "&#8593;", "Should not show arrow for non-sorted column")
+	if strings.Contains(html, "&#8593;") {
+		t.Error("Should not show arrow for non-sorted column")
+	}
 }
 
 func TestTableFilter(t *testing.T) {
@@ -66,11 +84,21 @@ func TestTableFilter(t *testing.T) {
 	html := filter.ToHTML()
 
 	// Verify filter controls
-	assert.Contains(t, html, "FORM_TRANSACTIONS", "Should contain filter form")
-	assert.Contains(t, html, "date_from", "Should have date from input")
-	assert.Contains(t, html, "date_to", "Should have date to input")
-	assert.Contains(t, html, "Published", "Should show published status selected")
-	assert.Contains(t, html, "test", "Should show search term")
+	if !strings.Contains(html, "FORM_TRANSACTIONS") {
+		t.Error("Should contain filter form")
+	}
+	if !strings.Contains(html, "date_from") {
+		t.Error("Should have date from input")
+	}
+	if !strings.Contains(html, "date_to") {
+		t.Error("Should have date to input")
+	}
+	if !strings.Contains(html, "Published") {
+		t.Error("Should show published status selected")
+	}
+	if !strings.Contains(html, "test") {
+		t.Error("Should show search term")
+	}
 }
 
 func TestTablePagination(t *testing.T) {
@@ -84,9 +112,15 @@ func TestTablePagination(t *testing.T) {
 	html := pagination.ToHTML()
 
 	// Verify pagination controls
-	assert.Contains(t, html, "pagination", "Should contain pagination")
-	assert.Contains(t, html, "page=1", "Should link to previous page")
-	assert.Contains(t, html, "page=2", "Should show current page")
+	if !strings.Contains(html, "pagination") {
+		t.Error("Should contain pagination")
+	}
+	if !strings.Contains(html, "page=1") {
+		t.Error("Should link to previous page")
+	}
+	if !strings.Contains(html, "page=2") {
+		t.Error("Should show current page")
+	}
 }
 
 func createTestPost(id, title, status, featured string) blogstore.PostInterface {

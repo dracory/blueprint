@@ -1,9 +1,8 @@
 package post_delete
 
 import (
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestModalPostDelete(t *testing.T) {
@@ -17,16 +16,32 @@ func TestModalPostDelete(t *testing.T) {
 	html := modal.ToHTML()
 
 	// Verify basic structure
-	assert.Contains(t, html, "ModalPostDelete", "Should contain modal element")
-	assert.Contains(t, html, "Are you sure you want to delete this post?", "Should show confirmation message")
-	assert.Contains(t, html, "This action cannot be undone", "Should show warning")
-	assert.Contains(t, html, data.postID, "Should contain post ID")
+	if !strings.Contains(html, "ModalPostDelete") {
+		t.Error("Should contain modal element")
+	}
+	if !strings.Contains(html, "Are you sure you want to delete this post?") {
+		t.Error("Should show confirmation message")
+	}
+	if !strings.Contains(html, "This action cannot be undone") {
+		t.Error("Should show warning")
+	}
+	if !strings.Contains(html, data.postID) {
+		t.Error("Should contain post ID")
+	}
 
 	// Verify buttons
-	assert.Contains(t, html, "Delete", "Should have delete button")
-	assert.Contains(t, html, "Close", "Should have close button")
+	if !strings.Contains(html, "Delete") {
+		t.Error("Should have delete button")
+	}
+	if !strings.Contains(html, "Close") {
+		t.Error("Should have close button")
+	}
 
 	// Verify form submission
-	assert.Contains(t, html, "hx-post=\"", "Should have post URL")
-	assert.Contains(t, html, "post_id", "Should have post ID field")
+	if !strings.Contains(html, "hx-post=\"") {
+		t.Error("Should have post URL")
+	}
+	if !strings.Contains(html, "post_id") {
+		t.Error("Should have post ID field")
+	}
 }

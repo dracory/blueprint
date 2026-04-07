@@ -3,12 +3,11 @@ package blog_settings
 import (
 	"context"
 	"html"
+	"strings"
 	"testing"
 
 	"project/internal/controllers/admin/blog/shared"
 	"project/internal/testutils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestBlogSettingsForm_RenderStructure(t *testing.T) {
@@ -34,18 +33,34 @@ func TestBlogSettingsForm_RenderStructure(t *testing.T) {
 	decoded := htmlDecode(html)
 	t.Log(decoded)
 
-	assert.Contains(t, html, `id="BlogSettingsFormWrapper"`)
-	assert.Contains(t, html, `name="blog_topic"`)
-	assert.Contains(t, html, "AI insights")
+	if !strings.Contains(html, `id="BlogSettingsFormWrapper"`) {
+		t.Error("expected BlogSettingsFormWrapper id in HTML")
+	}
+	if !strings.Contains(html, `name="blog_topic"`) {
+		t.Error("expected blog_topic name in HTML")
+	}
+	if !strings.Contains(html, "AI insights") {
+		t.Error("expected AI insights in HTML")
+	}
 	cancelURL := shared.NewLinks().PostManager()
-	assert.Contains(t, html, cancelURL)
+	if !strings.Contains(html, cancelURL) {
+		t.Error("expected cancel URL in HTML")
+	}
 
-	assert.Contains(t, html, `data-flux-action="apply"`)
-	assert.Contains(t, html, `data-flux-action="save_close"`)
+	if !strings.Contains(html, `data-flux-action="apply"`) {
+		t.Error("expected apply action in HTML")
+	}
+	if !strings.Contains(html, `data-flux-action="save_close"`) {
+		t.Error("expected save_close action in HTML")
+	}
 
 	// Verify the action attributes are present in the HTML
-	assert.Contains(t, decoded, "data-flux-action=\"apply\"")
-	assert.Contains(t, decoded, "data-flux-action=\"save_close\"")
+	if !strings.Contains(decoded, "data-flux-action=\"apply\"") {
+		t.Error("expected apply action in decoded HTML")
+	}
+	if !strings.Contains(decoded, "data-flux-action=\"save_close\"") {
+		t.Error("expected save_close action in decoded HTML")
+	}
 }
 
 func TestBlogSettingsForm_RenderStructure_WithEnvOverride(t *testing.T) {
@@ -72,16 +87,30 @@ func TestBlogSettingsForm_RenderStructure_WithEnvOverride(t *testing.T) {
 
 	html := component.Render(context.TODO()).ToHTML()
 
-	assert.Contains(t, html, "Env controlled topic")
-	assert.Contains(t, html, infoMessage)
-	assert.Contains(t, html, `readonly="true"`)
-	assert.Contains(t, html, `disabled="true"`)
+	if !strings.Contains(html, "Env controlled topic") {
+		t.Error("expected Env controlled topic in HTML")
+	}
+	if !strings.Contains(html, infoMessage) {
+		t.Error("expected info message in HTML")
+	}
+	if !strings.Contains(html, `readonly="true"`) {
+		t.Error("expected readonly attribute in HTML")
+	}
+	if !strings.Contains(html, `disabled="true"`) {
+		t.Error("expected disabled attribute in HTML")
+	}
 
 	// Buttons should still have data-flux-action attributes but be disabled
-	assert.Contains(t, html, `data-flux-action="apply"`)
-	assert.Contains(t, html, `data-flux-action="save_close"`)
+	if !strings.Contains(html, `data-flux-action="apply"`) {
+		t.Error("expected apply action in HTML")
+	}
+	if !strings.Contains(html, `data-flux-action="save_close"`) {
+		t.Error("expected save_close action in HTML")
+	}
 	// Verify buttons are disabled
-	assert.Contains(t, html, `disabled="true"`)
+	if !strings.Contains(html, `disabled="true"`) {
+		t.Error("expected disabled attribute in HTML")
+	}
 }
 
 func TestBlogSettingsForm_FlashMessages(t *testing.T) {
@@ -108,9 +137,15 @@ func TestBlogSettingsForm_FlashMessages(t *testing.T) {
 
 	html := component.Render(context.TODO()).ToHTML()
 
-	assert.Contains(t, html, "Blog topic is required")
-	assert.Contains(t, html, "Blog settings saved successfully")
-	assert.Contains(t, html, "/admin/blog?controller=post-manager")
+	if !strings.Contains(html, "Blog topic is required") {
+		t.Error("expected error message in HTML")
+	}
+	if !strings.Contains(html, "Blog settings saved successfully") {
+		t.Error("expected success message in HTML")
+	}
+	if !strings.Contains(html, "/admin/blog?controller=post-manager") {
+		t.Error("expected redirect URL in HTML")
+	}
 }
 
 func htmlDecode(s string) string {

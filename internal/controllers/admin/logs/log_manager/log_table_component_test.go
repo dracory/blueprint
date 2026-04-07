@@ -8,7 +8,6 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/logstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
@@ -18,11 +17,21 @@ func TestLogTableComponent_Mount_SetsDefaultsAndCallsLoadLogs(t *testing.T) {
 
 	err := c.Mount(context.Background(), map[string]string{})
 
-	assert.NoError(t, err)
-	assert.Equal(t, 0, c.Page)
-	assert.Equal(t, 100, c.PerPage)
-	assert.Equal(t, logstore.COLUMN_TIME, c.SortBy)
-	assert.Equal(t, "desc", c.SortDirection)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if c.Page != 0 {
+		t.Errorf("expected page 0, got %d", c.Page)
+	}
+	if c.PerPage != 100 {
+		t.Errorf("expected perPage 100, got %d", c.PerPage)
+	}
+	if c.SortBy != logstore.COLUMN_TIME {
+		t.Errorf("expected sortBy %s, got %s", logstore.COLUMN_TIME, c.SortBy)
+	}
+	if c.SortDirection != "desc" {
+		t.Errorf("expected sortDirection desc, got %s", c.SortDirection)
+	}
 }
 
 func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *testing.T) {
@@ -31,14 +40,26 @@ func TestLogTableComponent_HandleSort_TogglesDirectionAndUsesDefaultColumn(t *te
 	ctx := context.Background()
 
 	err := c.Handle(ctx, "sort", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, logstore.COLUMN_TIME, c.SortBy)
-	assert.Equal(t, "asc", c.SortDirection)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if c.SortBy != logstore.COLUMN_TIME {
+		t.Errorf("expected sortBy %s, got %s", logstore.COLUMN_TIME, c.SortBy)
+	}
+	if c.SortDirection != "asc" {
+		t.Errorf("expected sortDirection asc, got %s", c.SortDirection)
+	}
 
 	err = c.Handle(ctx, "sort", url.Values{})
-	assert.NoError(t, err)
-	assert.Equal(t, logstore.COLUMN_TIME, c.SortBy)
-	assert.Equal(t, "desc", c.SortDirection)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if c.SortBy != logstore.COLUMN_TIME {
+		t.Errorf("expected sortBy %s, got %s", logstore.COLUMN_TIME, c.SortBy)
+	}
+	if c.SortDirection != "desc" {
+		t.Errorf("expected sortDirection desc, got %s", c.SortDirection)
+	}
 }
 
 func TestLogTableComponent_LoadLogs_PopulatesFieldsFromListLogs(t *testing.T) {
@@ -64,8 +85,16 @@ func TestLogTableComponent_LoadLogs_PopulatesFieldsFromListLogs(t *testing.T) {
 
 	err := c.loadLogs()
 
-	assert.NoError(t, err)
-	assert.Len(t, c.Logs, 2)
-	assert.Equal(t, 2, c.Total)
-	assert.False(t, c.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(c.Logs) != 2 {
+		t.Errorf("expected 2 logs, got %d", len(c.Logs))
+	}
+	if c.Total != 2 {
+		t.Errorf("expected total 2, got %d", c.Total)
+	}
+	if c.HasMore {
+		t.Error("expected HasMore to be false")
+	}
 }

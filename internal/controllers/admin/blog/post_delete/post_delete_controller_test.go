@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"project/internal/config"
@@ -11,7 +12,6 @@ import (
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPostDeleteController_RequiresAuthentication(t *testing.T) {
@@ -22,8 +22,12 @@ func TestPostDeleteController_RequiresAuthentication(t *testing.T) {
 	)
 
 	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, response, "not logged in", "Should require authentication")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(response, "not logged in") {
+		t.Error("Should require authentication")
+	}
 }
 
 func TestPostDeleteController_RequiresPostID(t *testing.T) {
@@ -34,15 +38,21 @@ func TestPostDeleteController_RequiresPostID(t *testing.T) {
 	)
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, response, "post id is required", "Should require post ID")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(response, "post id is required") {
+		t.Error("Should require post ID")
+	}
 }
 
 func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
@@ -53,7 +63,9 @@ func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
 	)
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	response, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
@@ -63,8 +75,12 @@ func TestPostDeleteController_HandlesInvalidPostID(t *testing.T) {
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, response, "Post not found", "Should handle invalid post ID")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(response, "Post not found") {
+		t.Error("Should handle invalid post ID")
+	}
 }
 
 func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
@@ -83,7 +99,9 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
@@ -93,9 +111,15 @@ func TestPostDeleteController_ShowsDeleteModal(t *testing.T) {
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "ModalPostDelete", "Should show delete modal")
-	assert.Contains(t, responseHTML, post.GetID(), "Should include post ID in modal")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "ModalPostDelete") {
+		t.Error("Should show delete modal")
+	}
+	if !strings.Contains(responseHTML, post.GetID()) {
+		t.Error("Should include post ID in modal")
+	}
 }
 
 func TestPostDeleteController_DeletesPost(t *testing.T) {
@@ -114,7 +138,9 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	// Send POST request to delete
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodPost, NewPostDeleteController(registry).Handler, test.NewRequestOptions{
@@ -125,11 +151,19 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "post deleted successfully", "Should show success message")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "post deleted successfully") {
+		t.Error("Should show success message")
+	}
 
 	// Verify post was marked as trash
 	deletedPost, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
-	assert.NoError(t, err, "Should not return error when checking post")
-	assert.Equal(t, blogstore.POST_STATUS_TRASH, deletedPost.GetStatus(), "Post should be marked as trash")
+	if err != nil {
+		t.Errorf("Should not return error when checking post: %v", err)
+	}
+	if deletedPost.GetStatus() != blogstore.POST_STATUS_TRASH {
+		t.Errorf("Post should be marked as trash, got %s", deletedPost.GetStatus())
+	}
 }

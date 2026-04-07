@@ -5,8 +5,6 @@ import (
 	"testing"
 
 	"project/pkg/blogai"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTableGeneratedTitles_EmptyData(t *testing.T) {
@@ -17,8 +15,12 @@ func TestTableGeneratedTitles_EmptyData(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "No titles generated yet.", "Should show empty message")
-	assert.Contains(t, html, "text-muted", "Should have muted text class")
+	if !strings.Contains(html, "No titles generated yet.") {
+		t.Error("Should show empty message")
+	}
+	if !strings.Contains(html, "text-muted") {
+		t.Error("Should have muted text class")
+	}
 }
 
 func TestTableGeneratedTitles_WithPublishedRecords(t *testing.T) {
@@ -32,23 +34,43 @@ func TestTableGeneratedTitles_WithPublishedRecords(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should include generated titles section")
-	assert.Contains(t, html, "Published Titles (Reference)", "Should include published titles section")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should include generated titles section")
+	}
+	if !strings.Contains(html, "Published Titles (Reference)") {
+		t.Error("Should include published titles section")
+	}
 
 	generatedIdx := strings.Index(html, "Generated Titles")
 	publishedIdx := strings.Index(html, "Published Titles (Reference)")
 
-	assert.NotEqual(t, -1, generatedIdx, "Generated titles heading should exist")
-	assert.NotEqual(t, -1, publishedIdx, "Published titles heading should exist")
-	assert.Greater(t, publishedIdx, generatedIdx, "Published titles section should appear after generated titles")
+	if generatedIdx == -1 {
+		t.Error("Generated titles heading should exist")
+	}
+	if publishedIdx == -1 {
+		t.Error("Published titles heading should exist")
+	}
+	if !(publishedIdx > generatedIdx) {
+		t.Error("Published titles section should appear after generated titles")
+	}
 
 	publishedSection := html[publishedIdx:]
 
-	assert.Contains(t, html, "Published Title", "Should render published title content")
-	assert.Contains(t, html, "bg-primary", "Should render published badge with primary color")
-	assert.Contains(t, html, "Delete", "Published titles should still allow delete action")
-	assert.NotContains(t, publishedSection, "action=approve_title", "Published titles should not include approve button")
-	assert.NotContains(t, publishedSection, "action=reject_title", "Published titles should not include reject button")
+	if !strings.Contains(html, "Published Title") {
+		t.Error("Should render published title content")
+	}
+	if !strings.Contains(html, "bg-primary") {
+		t.Error("Should render published badge with primary color")
+	}
+	if !strings.Contains(html, "Delete") {
+		t.Error("Published titles should still allow delete action")
+	}
+	if strings.Contains(publishedSection, "action=approve_title") {
+		t.Error("Published titles should not include approve button")
+	}
+	if strings.Contains(publishedSection, "action=reject_title") {
+		t.Error("Published titles should not include reject button")
+	}
 }
 
 func TestTableGeneratedTitles_PublishedOnly(t *testing.T) {
@@ -61,10 +83,18 @@ func TestTableGeneratedTitles_PublishedOnly(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.NotContains(t, html, "Generated Titles", "Should not include generated section when only published titles exist")
-	assert.Contains(t, html, "Published Titles (Reference)", "Should render published section heading")
-	assert.Contains(t, html, "Published Title", "Should render published title content")
-	assert.Contains(t, html, "bg-primary", "Should render published badge with primary color")
+	if strings.Contains(html, "Generated Titles") {
+		t.Error("Should not include generated section when only published titles exist")
+	}
+	if !strings.Contains(html, "Published Titles (Reference)") {
+		t.Error("Should render published section heading")
+	}
+	if !strings.Contains(html, "Published Title") {
+		t.Error("Should render published title content")
+	}
+	if !strings.Contains(html, "bg-primary") {
+		t.Error("Should render published badge with primary color")
+	}
 }
 
 func TestTableGeneratedTitles_WithPendingRecords(t *testing.T) {
@@ -78,46 +108,98 @@ func TestTableGeneratedTitles_WithPendingRecords(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should render generated titles section heading")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should render generated titles section heading")
+	}
 
 	// Verify table structure
-	assert.Contains(t, html, "<table", "Should contain table element")
-	assert.Contains(t, html, "table-striped", "Should have table classes")
-	assert.Contains(t, html, "table-hover", "Should have table classes")
+	if !strings.Contains(html, "<table") {
+		t.Error("Should contain table element")
+	}
+	if !strings.Contains(html, "table-striped") {
+		t.Error("Should have table classes")
+	}
+	if !strings.Contains(html, "table-hover") {
+		t.Error("Should have table classes")
+	}
 
 	// Verify headers
-	assert.Contains(t, html, "Title", "Should have Title header")
-	assert.Contains(t, html, "Status", "Should have Status header")
-	assert.Contains(t, html, "Actions", "Should have Actions header")
+	if !strings.Contains(html, "Title") {
+		t.Error("Should have Title header")
+	}
+	if !strings.Contains(html, "Status") {
+		t.Error("Should have Status header")
+	}
+	if !strings.Contains(html, "Actions") {
+		t.Error("Should have Actions header")
+	}
 
 	// Verify content
-	assert.Contains(t, html, "Test Title 1", "Should show first title")
-	assert.Contains(t, html, "Test Title 2", "Should show second title")
+	if !strings.Contains(html, "Test Title 1") {
+		t.Error("Should show first title")
+	}
+	if !strings.Contains(html, "Test Title 2") {
+		t.Error("Should show second title")
+	}
 
 	// Verify status badges
-	assert.Contains(t, html, "bg-warning", "Should have warning badge for pending")
-	assert.Contains(t, html, "pending", "Should show pending status text")
+	if !strings.Contains(html, "bg-warning") {
+		t.Error("Should have warning badge for pending")
+	}
+	if !strings.Contains(html, "pending") {
+		t.Error("Should show pending status text")
+	}
 
 	// Verify action buttons for pending status
-	assert.Contains(t, html, "btn-success", "Should have approve button")
-	assert.Contains(t, html, "btn-warning", "Should have reject button")
-	assert.Contains(t, html, "btn-outline-danger", "Should have delete button")
-	assert.Contains(t, html, "Approve", "Should have approve button text")
-	assert.Contains(t, html, "Reject", "Should have reject button text")
-	assert.Contains(t, html, "Delete", "Should have delete button text")
+	if !strings.Contains(html, "btn-success") {
+		t.Error("Should have approve button")
+	}
+	if !strings.Contains(html, "btn-warning") {
+		t.Error("Should have reject button")
+	}
+	if !strings.Contains(html, "btn-outline-danger") {
+		t.Error("Should have delete button")
+	}
+	if !strings.Contains(html, "Approve") {
+		t.Error("Should have approve button text")
+	}
+	if !strings.Contains(html, "Reject") {
+		t.Error("Should have reject button text")
+	}
+	if !strings.Contains(html, "Delete") {
+		t.Error("Should have delete button text")
+	}
 
 	// Verify HTMX attributes
-	assert.Contains(t, html, "hx-post", "Should have HTMX post")
-	assert.Contains(t, html, "hx-target=\"body\"", "Should target body")
-	assert.Contains(t, html, "hx-swap=\"beforeend\"", "Should swap beforeend")
-	assert.Contains(t, html, "hx-indicator", "Should have HTMX indicator")
-	assert.Contains(t, html, "action=approve_title", "Should have approve action")
-	assert.Contains(t, html, "action=reject_title", "Should have reject action")
-	assert.Contains(t, html, "record_post_id=record1", "Should have first record ID")
-	assert.Contains(t, html, "record_post_id=record2", "Should have second record ID")
+	if !strings.Contains(html, "hx-post") {
+		t.Error("Should have HTMX post")
+	}
+	if !strings.Contains(html, "hx-target=\"body\"") {
+		t.Error("Should target body")
+	}
+	if !strings.Contains(html, "hx-swap=\"beforeend\"") {
+		t.Error("Should swap beforeend")
+	}
+	if !strings.Contains(html, "hx-indicator") {
+		t.Error("Should have HTMX indicator")
+	}
+	if !strings.Contains(html, "action=approve_title") {
+		t.Error("Should have approve action")
+	}
+	if !strings.Contains(html, "action=reject_title") {
+		t.Error("Should have reject action")
+	}
+	if !strings.Contains(html, "record_post_id=record1") {
+		t.Error("Should have first record ID")
+	}
+	if !strings.Contains(html, "record_post_id=record2") {
+		t.Error("Should have second record ID")
+	}
 
 	// Verify spinners
-	assert.Contains(t, html, "spinner-border", "Should have spinner indicators")
+	if !strings.Contains(html, "spinner-border") {
+		t.Error("Should have spinner indicators")
+	}
 }
 
 func TestTableGeneratedTitles_WithApprovedRecords(t *testing.T) {
@@ -130,25 +212,47 @@ func TestTableGeneratedTitles_WithApprovedRecords(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should render generated titles section heading")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should render generated titles section heading")
+	}
 
 	// Verify status badge
-	assert.Contains(t, html, "bg-success", "Should have success badge for approved")
-	assert.Contains(t, html, "approved", "Should show approved status text")
+	if !strings.Contains(html, "bg-success") {
+		t.Error("Should have success badge for approved")
+	}
+	if !strings.Contains(html, "approved") {
+		t.Error("Should show approved status text")
+	}
 
 	// Verify generate post button
-	assert.Contains(t, html, "btn-primary", "Should have primary button")
-	assert.Contains(t, html, "Generate Post", "Should have generate post button text")
-	assert.Contains(t, html, "action=generate_post", "Should have generate post action")
+	if !strings.Contains(html, "btn-primary") {
+		t.Error("Should have primary button")
+	}
+	if !strings.Contains(html, "Generate Post") {
+		t.Error("Should have generate post button text")
+	}
+	if !strings.Contains(html, "action=generate_post") {
+		t.Error("Should have generate post action")
+	}
 
 	// Verify delete button is present
-	assert.Contains(t, html, "btn-outline-danger", "Should have delete button")
-	assert.Contains(t, html, "Delete", "Should have delete button text")
-	assert.Contains(t, html, "action=delete_title", "Should have delete action")
+	if !strings.Contains(html, "btn-outline-danger") {
+		t.Error("Should have delete button")
+	}
+	if !strings.Contains(html, "Delete") {
+		t.Error("Should have delete button text")
+	}
+	if !strings.Contains(html, "action=delete_title") {
+		t.Error("Should have delete action")
+	}
 
 	// Should not have approve/reject buttons
-	assert.NotContains(t, html, ">Approve<", "Should not have approve button for approved records")
-	assert.NotContains(t, html, ">Reject<", "Should not have reject button for approved records")
+	if strings.Contains(html, ">Approve<") {
+		t.Error("Should not have approve button for approved records")
+	}
+	if strings.Contains(html, ">Reject<") {
+		t.Error("Should not have reject button for approved records")
+	}
 }
 
 func TestTableGeneratedTitles_WithMixedStatuses(t *testing.T) {
@@ -163,18 +267,34 @@ func TestTableGeneratedTitles_WithMixedStatuses(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should render generated titles section heading")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should render generated titles section heading")
+	}
 
 	// Verify all status badges
-	assert.Contains(t, html, "bg-warning", "Should have warning badge for pending")
-	assert.Contains(t, html, "bg-success", "Should have success badge for approved")
-	assert.Contains(t, html, "bg-danger", "Should have danger badge for rejected")
+	if !strings.Contains(html, "bg-warning") {
+		t.Error("Should have warning badge for pending")
+	}
+	if !strings.Contains(html, "bg-success") {
+		t.Error("Should have success badge for approved")
+	}
+	if !strings.Contains(html, "bg-danger") {
+		t.Error("Should have danger badge for rejected")
+	}
 
 	// Verify action buttons
-	assert.Contains(t, html, "Approve", "Should have approve button")
-	assert.Contains(t, html, "Reject", "Should have reject button")
-	assert.Contains(t, html, "Generate Post", "Should have generate post button")
-	assert.Contains(t, html, "Delete", "Should have delete button")
+	if !strings.Contains(html, "Approve") {
+		t.Error("Should have approve button")
+	}
+	if !strings.Contains(html, "Reject") {
+		t.Error("Should have reject button")
+	}
+	if !strings.Contains(html, "Generate Post") {
+		t.Error("Should have generate post button")
+	}
+	if !strings.Contains(html, "Delete") {
+		t.Error("Should have delete button")
+	}
 }
 
 func TestTableGeneratedTitles_WithEmptyStatus(t *testing.T) {
@@ -187,11 +307,17 @@ func TestTableGeneratedTitles_WithEmptyStatus(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should render generated titles section heading")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should render generated titles section heading")
+	}
 
 	// Should show N/A for empty status
-	assert.Contains(t, html, "N/A", "Should show N/A for empty status")
-	assert.Contains(t, html, "bg-secondary", "Should have secondary badge for default/empty status")
+	if !strings.Contains(html, "N/A") {
+		t.Error("Should show N/A for empty status")
+	}
+	if !strings.Contains(html, "bg-secondary") {
+		t.Error("Should have secondary badge for default/empty status")
+	}
 }
 
 func TestGetStatusBadgeClass(t *testing.T) {
@@ -211,7 +337,9 @@ func TestGetStatusBadgeClass(t *testing.T) {
 	for _, test := range tests {
 		t.Run("Status_"+test.status, func(t *testing.T) {
 			result := getStatusBadgeClass(test.status)
-			assert.Equal(t, test.expected, result, "Should return correct badge class for status: %s", test.status)
+			if result != test.expected {
+				t.Errorf("Should return correct badge class for status %s: expected %s, got %s", test.status, test.expected, result)
+			}
 		})
 	}
 }
@@ -226,24 +354,48 @@ func TestTableGeneratedTitles_Structure(t *testing.T) {
 	result := tableGeneratedTitles(data)
 	html := result.ToHTML()
 
-	assert.Contains(t, html, "Generated Titles", "Should render generated titles section heading")
-	assert.NotContains(t, html, "Published Titles (Reference)", "Should not render published section when there are no published titles")
+	if !strings.Contains(html, "Generated Titles") {
+		t.Error("Should render generated titles section heading")
+	}
+	if strings.Contains(html, "Published Titles (Reference)") {
+		t.Error("Should not render published section when there are no published titles")
+	}
 
 	// Verify table structure elements
-	assert.Contains(t, html, "<thead>", "Should have table head")
-	assert.Contains(t, html, "<tbody>", "Should have table body")
-	assert.Contains(t, html, "<tr>", "Should have table rows")
-	assert.Contains(t, html, "<td>", "Should have table cells")
-	assert.Contains(t, html, "<th", "Should have table headers")
+	if !strings.Contains(html, "<thead>") {
+		t.Error("Should have table head")
+	}
+	if !strings.Contains(html, "<tbody>") {
+		t.Error("Should have table body")
+	}
+	if !strings.Contains(html, "<tr>") {
+		t.Error("Should have table rows")
+	}
+	if !strings.Contains(html, "<td>") {
+		t.Error("Should have table cells")
+	}
+	if !strings.Contains(html, "<th") {
+		t.Error("Should have table headers")
+	}
 
 	// Verify badge structure
-	assert.Contains(t, html, "badge rounded-pill", "Should have badge classes")
-	assert.Contains(t, html, "px-3", "Should have badge padding")
+	if !strings.Contains(html, "badge rounded-pill") {
+		t.Error("Should have badge classes")
+	}
+	if !strings.Contains(html, "px-3") {
+		t.Error("Should have badge padding")
+	}
 
 	// Verify button structure
-	assert.Contains(t, html, "btn btn-success", "Should have success button classes")
-	assert.Contains(t, html, "btn btn-warning", "Should have warning button classes")
-	assert.Contains(t, html, "btn btn-outline-danger", "Should have outline danger button classes")
+	if !strings.Contains(html, "btn btn-success") {
+		t.Error("Should have success button classes")
+	}
+	if !strings.Contains(html, "btn btn-warning") {
+		t.Error("Should have warning button classes")
+	}
+	if !strings.Contains(html, "btn btn-outline-danger") {
+		t.Error("Should have outline danger button classes")
+	}
 }
 
 // Helper function to create test RecordPost

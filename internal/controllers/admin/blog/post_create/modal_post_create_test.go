@@ -1,9 +1,8 @@
 package post_create
 
 import (
+	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestModalPostCreate(t *testing.T) {
@@ -41,14 +40,20 @@ func TestModalPostCreate(t *testing.T) {
 
 			// Verify the output contains expected elements
 			for _, s := range tt.contains {
-				assert.Contains(t, html, s, "HTML output should contain "+s)
+				if !strings.Contains(html, s) {
+					t.Errorf("HTML output should contain %s", s)
+				}
 			}
 
 			// Verify the modal ID is present
-			assert.Contains(t, html, "ModalPostCreate", "Modal should have correct ID")
+			if !strings.Contains(html, "ModalPostCreate") {
+				t.Error("Modal should have correct ID")
+			}
 
 			// Verify the close function script is present
-			assert.Contains(t, html, "function closeModal", "Modal should have close function")
+			if !strings.Contains(html, "function closeModal") {
+				t.Error("Modal should have close function")
+			}
 		})
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"project/internal/config"
@@ -12,7 +13,6 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
 	"github.com/spf13/cast"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestManagerController_RequiresAuthentication(t *testing.T) {
@@ -24,22 +24,36 @@ func TestManagerController_RequiresAuthentication(t *testing.T) {
 
 	// Test without authentication
 	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusSeeOther, responseObj.StatusCode, "Should redirect when unauthenticated")
-	assert.Contains(t, response, "See Other", "Should show redirect response")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if responseObj.StatusCode != http.StatusSeeOther {
+		t.Errorf("Should redirect when unauthenticated, expected %d, got %d", http.StatusSeeOther, responseObj.StatusCode)
+	}
+	if !strings.Contains(response, "See Other") {
+		t.Error("Should show redirect response")
+	}
 
 	// Test with authentication
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, authResponseObj.StatusCode, "Should return 200 when authenticated")
-	assert.NotContains(t, authResponse, "See Other", "Should not redirect when authenticated")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if authResponseObj.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 when authenticated, got %d", authResponseObj.StatusCode)
+	}
+	if strings.Contains(authResponse, "See Other") {
+		t.Error("Should not redirect when authenticated")
+	}
 }
 
 func TestManagerController_ShowsPostList(t *testing.T) {
@@ -65,7 +79,9 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
@@ -73,11 +89,21 @@ func TestManagerController_ShowsPostList(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "Test Post 1", "Should show first post")
-	assert.Contains(t, responseHTML, "Test Post 2", "Should show second post")
-	assert.Contains(t, responseHTML, "New Post", "Should show create button")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 status, got %d", response.StatusCode)
+	}
+	if !strings.Contains(responseHTML, "Test Post 1") {
+		t.Error("Should show first post")
+	}
+	if !strings.Contains(responseHTML, "Test Post 2") {
+		t.Error("Should show second post")
+	}
+	if !strings.Contains(responseHTML, "New Post") {
+		t.Error("Should show create button")
+	}
 }
 
 func TestManagerController_HandlesFilters(t *testing.T) {
@@ -103,7 +129,9 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	// Test status filter
 	responseHTML, _, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
@@ -115,9 +143,15 @@ func TestManagerController_HandlesFilters(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "Published Post", "Should show published post")
-	assert.NotContains(t, responseHTML, "Draft Post", "Should not show draft post with filter")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "Published Post") {
+		t.Error("Should show published post")
+	}
+	if strings.Contains(responseHTML, "Draft Post") {
+		t.Error("Should not show draft post with filter")
+	}
 }
 
 func TestManagerController_HandlesPagination(t *testing.T) {
@@ -138,7 +172,9 @@ func TestManagerController_HandlesPagination(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	// Test pagination by requesting page 2
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewPostManagerController(registry).Handler, test.NewRequestOptions{
@@ -151,7 +187,13 @@ func TestManagerController_HandlesPagination(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "pagination", "Should show pagination controls")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 status, got %d", response.StatusCode)
+	}
+	if !strings.Contains(responseHTML, "pagination") {
+		t.Error("Should show pagination controls")
+	}
 }

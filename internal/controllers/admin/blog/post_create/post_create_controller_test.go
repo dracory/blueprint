@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"project/internal/config"
@@ -13,7 +14,6 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPostCreateController_RequiresAuthentication(t *testing.T) {
@@ -27,8 +27,12 @@ func TestPostCreateController_RequiresAuthentication(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "You are not logged in", "Should show login required message")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "You are not logged in") {
+		t.Error("Should show login required message")
+	}
 }
 
 func TestPostCreateController_RequiresPostTitle(t *testing.T) {
@@ -41,8 +45,12 @@ func TestPostCreateController_RequiresPostTitle(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "post title is required", "Should show title required message")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "post title is required") {
+		t.Error("Should show title required message")
+	}
 }
 
 func TestPostCreateController_ShowsFormOnGet(t *testing.T) {
@@ -54,9 +62,15 @@ func TestPostCreateController_ShowsFormOnGet(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "name=\"post_title\"", "Should show post title input")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 status, got %d", response.StatusCode)
+	}
+	if !strings.Contains(responseHTML, "name=\"post_title\"") {
+		t.Error("Should show post title input")
+	}
 }
 
 func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
@@ -72,14 +86,24 @@ func TestPostCreateController_CreatesPostSuccessfully(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Contains(t, responseHTML, "post created successfully", "Should show success message")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if !strings.Contains(responseHTML, "post created successfully") {
+		t.Error("Should show success message")
+	}
 
 	// Verify post was created
 	posts, err := registry.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{})
-	assert.NoError(t, err, "Should list posts without error")
-	assert.NotEmpty(t, posts, "Should have created a post")
-	assert.Equal(t, postTitle, posts[0].GetTitle(), "Post title should match")
+	if err != nil {
+		t.Errorf("Should list posts without error: %v", err)
+	}
+	if len(posts) == 0 {
+		t.Error("Should have created a post")
+	}
+	if posts[0].GetTitle() != postTitle {
+		t.Errorf("Post title should match, expected %s, got %s", postTitle, posts[0].GetTitle())
+	}
 }
 
 func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {

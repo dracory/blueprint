@@ -8,7 +8,6 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/logstore"
-	"github.com/stretchr/testify/assert"
 )
 
 type fakeLogStore struct {
@@ -39,10 +38,18 @@ func TestListLogs_NilApp_ReturnsEmptyNoError(t *testing.T) {
 
 	result, err := listLogs(nil, logListFilters{})
 
-	assert.NoError(t, err)
-	assert.Empty(t, result.Logs)
-	assert.Equal(t, 0, result.Total)
-	assert.False(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 0 {
+		t.Error("expected empty logs")
+	}
+	if result.Total != 0 {
+		t.Errorf("expected total 0, got %d", result.Total)
+	}
+	if result.HasMore {
+		t.Error("expected HasMore to be false")
+	}
 	_ = appNil
 }
 
@@ -51,10 +58,18 @@ func TestListLogs_NilLogStore_ReturnsEmptyNoError(t *testing.T) {
 
 	result, err := listLogs(registry, logListFilters{})
 
-	assert.NoError(t, err)
-	assert.Empty(t, result.Logs)
-	assert.Equal(t, 0, result.Total)
-	assert.False(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 0 {
+		t.Error("expected empty logs")
+	}
+	if result.Total != 0 {
+		t.Errorf("expected total 0, got %d", result.Total)
+	}
+	if result.HasMore {
+		t.Error("expected HasMore to be false")
+	}
 }
 
 func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
@@ -72,10 +87,18 @@ func TestListLogs_UsesDefaultsAndHasMoreTrimming(t *testing.T) {
 
 	result, err := listLogs(registry, filters)
 
-	assert.NoError(t, err)
-	assert.Equal(t, 100, len(result.Logs))
-	assert.Equal(t, 101, result.Total)
-	assert.True(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 100 {
+		t.Errorf("expected 100 logs, got %d", len(result.Logs))
+	}
+	if result.Total != 101 {
+		t.Errorf("expected total 101, got %d", result.Total)
+	}
+	if !result.HasMore {
+		t.Error("expected HasMore to be true")
+	}
 }
 
 func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
@@ -94,10 +117,18 @@ func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 
 	result, err := listLogs(registry, filtersPage0)
 
-	assert.NoError(t, err)
-	assert.Equal(t, 50, len(result.Logs))
-	assert.Equal(t, 100, result.Total)
-	assert.True(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 50 {
+		t.Errorf("expected 50 logs, got %d", len(result.Logs))
+	}
+	if result.Total != 100 {
+		t.Errorf("expected total 100, got %d", result.Total)
+	}
+	if !result.HasMore {
+		t.Error("expected HasMore to be true for first page")
+	}
 
 	// Second page: also 50 results but no further pages available.
 	filtersPage1 := logListFilters{
@@ -107,10 +138,18 @@ func TestListLogs_NoMorePagesWhenAtOrBelowPerPage(t *testing.T) {
 
 	result, err = listLogs(registry, filtersPage1)
 
-	assert.NoError(t, err)
-	assert.Equal(t, 50, len(result.Logs))
-	assert.Equal(t, 100, result.Total)
-	assert.False(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 50 {
+		t.Errorf("expected 50 logs, got %d", len(result.Logs))
+	}
+	if result.Total != 100 {
+		t.Errorf("expected total 100, got %d", result.Total)
+	}
+	if result.HasMore {
+		t.Error("expected HasMore to be false for last page")
+	}
 }
 
 func TestListLogs_LogCountErrorDoesNotFailListing(t *testing.T) {
@@ -132,10 +171,18 @@ func TestListLogs_LogCountErrorDoesNotFailListing(t *testing.T) {
 
 	result, err := listLogs(registry, filters)
 
-	assert.NoError(t, err)
-	assert.Equal(t, 3, len(result.Logs))
-	assert.Equal(t, 0, result.Total)
-	assert.False(t, result.HasMore)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if len(result.Logs) != 3 {
+		t.Errorf("expected 3 logs, got %d", len(result.Logs))
+	}
+	if result.Total != 0 {
+		t.Errorf("expected total 0, got %d", result.Total)
+	}
+	if result.HasMore {
+		t.Error("expected HasMore to be false")
+	}
 }
 
 func TestListLogs_LogListErrorIsReturned(t *testing.T) {
@@ -154,6 +201,10 @@ func TestListLogs_LogListErrorIsReturned(t *testing.T) {
 
 	result, err := listLogs(registry, filters)
 
-	assert.Error(t, err)
-	assert.Empty(t, result.Logs)
+	if err == nil {
+		t.Error("expected error")
+	}
+	if len(result.Logs) != 0 {
+		t.Error("expected empty logs on error")
+	}
 }

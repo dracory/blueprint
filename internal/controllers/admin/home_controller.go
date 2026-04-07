@@ -181,11 +181,11 @@ func (c *homeController) tiles() []hb.TagInterface {
 	// }
 
 	fileManagerTile := map[string]string{
-		"title": "File Manager (New, DB)",
+		"title": "File Manager (DB)",
 		"icon":  "bi-box",
 		"link":  links.Admin().FileManager(map[string]string{}),
 	}
-	
+
 	logsTile := map[string]string{
 		"title": "Log Manager",
 		"icon":  "bi-clipboard-data",
