@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	baseCfg "github.com/dracory/base/config"
+	"github.com/dracory/env"
 )
 
 func TestLoad_Success(t *testing.T) {
@@ -49,9 +49,9 @@ func TestLoad_MissingRequiredFields(t *testing.T) {
 		t.Fatal("Load() should fail with missing required fields")
 	}
 
-	verr, ok := err.(baseCfg.ValidationError)
+	verr, ok := err.(env.ValidationError)
 	if !ok {
-		t.Fatalf("expected baseCfg.ValidationError, got %T", err)
+		t.Fatalf("expected env.ValidationError, got %T", err)
 	}
 
 	if len(verr.Errors()) == 0 {
@@ -73,9 +73,9 @@ func TestLoad_DatabasePostgresRequirements(t *testing.T) {
 		t.Fatal("Load() should fail when postgres driver missing connection details")
 	}
 
-	verr, ok := err.(baseCfg.ValidationError)
+	verr, ok := err.(env.ValidationError)
 	if !ok {
-		t.Fatalf("expected baseCfg.ValidationError, got %T", err)
+		t.Fatalf("expected env.ValidationError, got %T", err)
 	}
 
 	// Should have errors for host, port, username, password
@@ -124,14 +124,14 @@ func TestLoad_CMSStoreRequiresTemplateID(t *testing.T) {
 		t.Fatal("Load() should fail when CMS store enabled without template ID")
 	}
 
-	verr, ok := err.(baseCfg.ValidationError)
+	verr, ok := err.(env.ValidationError)
 	if !ok {
-		t.Fatalf("expected baseCfg.ValidationError, got %T", err)
+		t.Fatalf("expected env.ValidationError, got %T", err)
 	}
 
 	found := false
 	for _, e := range verr.Errors() {
-		if merr, ok := e.(baseCfg.MissingEnvError); ok && merr.Key == KEY_CMS_STORE_TEMPLATE_ID {
+		if merr, ok := e.(env.MissingEnvError); ok && merr.Key == KEY_CMS_STORE_TEMPLATE_ID {
 			found = true
 			break
 		}
@@ -157,15 +157,15 @@ func TestLoad_LLMProviderRequirements(t *testing.T) {
 		t.Fatal("Load() should fail when OpenAI enabled without credentials")
 	}
 
-	verr, ok := err.(baseCfg.ValidationError)
+	verr, ok := err.(env.ValidationError)
 	if !ok {
-		t.Fatalf("expected baseCfg.ValidationError, got %T", err)
+		t.Fatalf("expected env.ValidationError, got %T", err)
 	}
 
 	foundKey := false
 	foundModel := false
 	for _, e := range verr.Errors() {
-		if merr, ok := e.(baseCfg.MissingEnvError); ok {
+		if merr, ok := e.(env.MissingEnvError); ok {
 			if merr.Key == KEY_OPENAI_API_KEY {
 				foundKey = true
 			}
@@ -282,9 +282,9 @@ func TestLoad_VaultStoreRequirements(t *testing.T) {
 		t.Fatal("Load() should fail when user vault enabled but vault store not used")
 	}
 
-	verr, ok := err.(baseCfg.ValidationError)
+	verr, ok := err.(env.ValidationError)
 	if !ok {
-		t.Fatalf("expected baseCfg.ValidationError, got %T", err)
+		t.Fatalf("expected env.ValidationError, got %T", err)
 	}
 
 	found := false

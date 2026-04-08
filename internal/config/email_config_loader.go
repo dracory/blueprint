@@ -5,26 +5,13 @@ import (
 	"github.com/spf13/cast"
 )
 
-// mailConfig captures email delivery settings.
-type mailConfig struct {
-	driver      string // Mail driver/service provider (smtp, sendgrid, mailgun, etc.)
-	fromAddress string // Default sender email address
-	fromName    string // Default sender name
-	host        string // SMTP server hostname
-	password    string // SMTP or service provider password
-	port        int    // SMTP server port number
-	username    string // SMTP or service provider username
-}
-
-// loadMailConfig loads mail configuration from environment variables.
-func loadMailConfig() mailConfig {
-	return mailConfig{
-		driver:      env.GetString(KEY_MAIL_DRIVER),
-		fromAddress: env.GetString(KEY_MAIL_FROM_ADDRESS),
-		fromName:    env.GetString(KEY_MAIL_FROM_NAME),
-		host:        env.GetString(KEY_MAIL_HOST),
-		password:    env.GetString(KEY_MAIL_PASSWORD),
-		port:        cast.ToInt(env.GetString(KEY_MAIL_PORT)),
-		username:    env.GetString(KEY_MAIL_USERNAME),
-	}
+// loadMailConfig loads mail configuration directly into the config.
+func loadMailConfig(cfg ConfigInterface) {
+	cfg.SetMailDriver(env.GetString(KEY_MAIL_DRIVER))
+	cfg.SetMailFromAddress(env.GetString(KEY_MAIL_FROM_ADDRESS))
+	cfg.SetMailFromName(env.GetString(KEY_MAIL_FROM_NAME))
+	cfg.SetMailHost(env.GetString(KEY_MAIL_HOST))
+	cfg.SetMailPassword(env.GetString(KEY_MAIL_PASSWORD))
+	cfg.SetMailPort(cast.ToInt(env.GetString(KEY_MAIL_PORT)))
+	cfg.SetMailUsername(env.GetString(KEY_MAIL_USERNAME))
 }

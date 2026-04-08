@@ -105,6 +105,11 @@ type configImplementation struct {
 	vaultStoreKey         string
 }
 
+// New constructs a new configuration instance.
+func New() ConfigInterface {
+	return &configImplementation{}
+}
+
 // Ensure configImplementation satisfies ConfigInterface
 var _ ConfigInterface = (*configImplementation)(nil)
 

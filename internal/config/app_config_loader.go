@@ -1,34 +1,14 @@
 package config
 
-import (
-	"strings"
+import "strings"
 
-	baseCfg "github.com/dracory/base/config"
-	"github.com/dracory/env"
-)
-
-// appConfig captures application-level settings.
-type appConfig struct {
-	name         string // Application name identifier
-	url          string // Base URL for the application
-	host         string // Host address for the server
-	port         string // Port number for the server
-	env          string // Environment (development, staging, production)
-	debug        bool   // Debug mode flag
-	cmsMcpApiKey string // CMS MCP API key for integration
-}
-
-// loadAppConfig loads application configuration from environment variables.
-func loadAppConfig(acc *baseCfg.LoadAccumulator) appConfig {
-	mcpApiKey := strings.TrimSpace(env.GetString(KEY_MCP_API_KEY))
-
-	return appConfig{
-		name:         env.GetString(KEY_APP_NAME),
-		url:          env.GetString(KEY_APP_URL),
-		host:         acc.MustString(KEY_APP_HOST, "set the application host address"),
-		port:         acc.MustString(KEY_APP_PORT, "set the application port"),
-		env:          acc.MustString(KEY_APP_ENVIRONMENT, "set the application environment"),
-		debug:        env.GetBool(KEY_APP_DEBUG),
-		cmsMcpApiKey: mcpApiKey,
-	}
+// loadAppConfig loads application configuration directly into the config.
+func loadAppConfig(cfg ConfigInterface, v *envValidator) {
+	cfg.SetAppName(v.GetString(KEY_APP_NAME))
+	cfg.SetAppUrl(v.GetString(KEY_APP_URL))
+	cfg.SetAppHost(v.MustString(KEY_APP_HOST, "set the application host address"))
+	cfg.SetAppPort(v.MustString(KEY_APP_PORT, "set the application port"))
+	cfg.SetAppEnv(v.MustString(KEY_APP_ENVIRONMENT, "set the application environment"))
+	cfg.SetAppDebug(v.GetBool(KEY_APP_DEBUG))
+	cfg.SetCmsMcpApiKey(strings.TrimSpace(v.GetString(KEY_MCP_API_KEY)))
 }

@@ -1,75 +1,41 @@
 package config
 
-import (
-	"fmt"
+import "fmt"
 
-	baseCfg "github.com/dracory/base/config"
-	"github.com/dracory/env"
-)
-
-// storesConfig captures feature store toggles.
-type storesConfig struct {
-	auditStoreUsed        bool
-	blogStoreUsed         bool
-	cacheStoreUsed        bool
-	chatStoreUsed         bool
-	cmsStoreUsed          bool
-	cmsStoreTemplateID    string
-	customStoreUsed       bool
-	entityStoreUsed       bool
-	feedStoreUsed         bool
-	geoStoreUsed          bool
-	logStoreUsed          bool
-	metaStoreUsed         bool
-	sessionStoreUsed      bool
-	settingStoreUsed      bool
-	shopStoreUsed         bool
-	sqlFileStoreUsed      bool
-	statsStoreUsed        bool
-	subscriptionStoreUsed bool
-	taskStoreUsed         bool
-	userStoreUsed         bool
-	userStoreVaultEnabled bool
-	vaultStoreUsed        bool
-	vaultStoreKey         string
-}
-
-// loadStoresConfig loads stores configuration from environment variables.
-func loadStoresConfig(acc *baseCfg.LoadAccumulator) storesConfig {
-	cmsStoreTemplateID := env.GetString(KEY_CMS_STORE_TEMPLATE_ID)
-	vaultStoreKey := env.GetString(KEY_VAULT_STORE_KEY)
+// loadStoresConfig loads stores configuration directly into the config.
+func loadStoresConfig(cfg ConfigInterface, v *envValidator) {
+	cmsStoreTemplateID := v.GetString(KEY_CMS_STORE_TEMPLATE_ID)
+	vaultStoreKey := v.GetString(KEY_VAULT_STORE_KEY)
 
 	if userStoreVaultEnabled && !vaultStoreUsed {
-		acc.Add(fmt.Errorf("%v requires %v to be true",
+		v.Add(fmt.Errorf("%v requires %v to be true",
 			userStoreVaultEnabled, vaultStoreUsed))
 	}
 
-	acc.MustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
+	v.MustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
 		"required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
-	return storesConfig{
-		auditStoreUsed:        auditStoreUsed,
-		blogStoreUsed:         blogStoreUsed,
-		cacheStoreUsed:        cacheStoreUsed,
-		chatStoreUsed:         chatStoreUsed,
-		cmsStoreUsed:          cmsStoreUsed,
-		cmsStoreTemplateID:    cmsStoreTemplateID,
-		customStoreUsed:       customStoreUsed,
-		entityStoreUsed:       entityStoreUsed,
-		feedStoreUsed:         feedStoreUsed,
-		geoStoreUsed:          geoStoreUsed,
-		logStoreUsed:          logStoreUsed,
-		metaStoreUsed:         metaStoreUsed,
-		sessionStoreUsed:      sessionStoreUsed,
-		settingStoreUsed:      settingStoreUsed,
-		shopStoreUsed:         shopStoreUsed,
-		sqlFileStoreUsed:      sqlFileStoreUsed,
-		statsStoreUsed:        statsStoreUsed,
-		subscriptionStoreUsed: subscriptionStoreUsed,
-		taskStoreUsed:         taskStoreUsed,
-		userStoreUsed:         userStoreUsed,
-		userStoreVaultEnabled: userStoreVaultEnabled,
-		vaultStoreUsed:        vaultStoreUsed,
-		vaultStoreKey:         vaultStoreKey,
-	}
+	cfg.SetAuditStoreUsed(auditStoreUsed)
+	cfg.SetBlogStoreUsed(blogStoreUsed)
+	cfg.SetCacheStoreUsed(cacheStoreUsed)
+	cfg.SetChatStoreUsed(chatStoreUsed)
+	cfg.SetCmsStoreUsed(cmsStoreUsed)
+	cfg.SetCmsStoreTemplateID(cmsStoreTemplateID)
+	cfg.SetCustomStoreUsed(customStoreUsed)
+	cfg.SetEntityStoreUsed(entityStoreUsed)
+	cfg.SetFeedStoreUsed(feedStoreUsed)
+	cfg.SetGeoStoreUsed(geoStoreUsed)
+	cfg.SetLogStoreUsed(logStoreUsed)
+	cfg.SetMetaStoreUsed(metaStoreUsed)
+	cfg.SetSessionStoreUsed(sessionStoreUsed)
+	cfg.SetSettingStoreUsed(settingStoreUsed)
+	cfg.SetShopStoreUsed(shopStoreUsed)
+	cfg.SetSqlFileStoreUsed(sqlFileStoreUsed)
+	cfg.SetStatsStoreUsed(statsStoreUsed)
+	cfg.SetSubscriptionStoreUsed(subscriptionStoreUsed)
+	cfg.SetTaskStoreUsed(taskStoreUsed)
+	cfg.SetUserStoreUsed(userStoreUsed)
+	cfg.SetUserStoreVaultEnabled(userStoreVaultEnabled)
+	cfg.SetVaultStoreUsed(vaultStoreUsed)
+	cfg.SetVaultStoreKey(vaultStoreKey)
 }
