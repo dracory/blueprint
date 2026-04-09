@@ -130,6 +130,12 @@ type DatabaseConfigInterface interface {
 
 	SetDatabaseConnMaxIdleTimeSeconds(int)
 	GetDatabaseConnMaxIdleTimeSeconds() int
+
+	SetDatabaseCharset(string)
+	GetDatabaseCharset() string
+
+	SetDatabaseTimezone(string)
+	GetDatabaseTimezone() string
 }
 
 // ============================================================================

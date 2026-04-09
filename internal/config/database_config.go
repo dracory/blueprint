@@ -77,6 +77,18 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Unit: seconds. Default: 5
 	connMaxIdleTime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_IDLE_TIME_SECONDS, 5)) * time.Second
 
+	// Database Charset
+	//
+	// Character set for the database connection. Only used for MySQL.
+	// Example: utf8mb4, utf8
+	charset := env.GetStringOrDefault(KEY_DB_CHARSET, "utf8mb4")
+
+	// Database Timezone
+	//
+	// Timezone for the database connection.
+	// Example: UTC, America/New_York, Europe/London
+	timezone := env.GetStringOrDefault(KEY_DB_TIMEZONE, "UTC")
+
 	if driver != driverSQLite {
 		env.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
 		env.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
@@ -95,6 +107,8 @@ func databaseConfig(env *envValidator) databaseSettings {
 		maxIdleConns:    maxIdleConns,
 		connMaxLifetime: connMaxLifetime,
 		connMaxIdleTime: connMaxIdleTime,
+		charset:         charset,
+		timezone:        timezone,
 	}
 }
 
@@ -109,4 +123,6 @@ type databaseSettings struct {
 	maxIdleConns    int
 	connMaxLifetime time.Duration
 	connMaxIdleTime time.Duration
+	charset         string
+	timezone        string
 }

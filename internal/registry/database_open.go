@@ -26,8 +26,8 @@ func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 		SetDatabaseHost(cfg.GetDatabaseHost()).
 		SetDatabasePort(cfg.GetDatabasePort()).
 		SetDatabaseName(cfg.GetDatabaseName()).
-		SetCharset(`utf8mb4`).
-		SetTimeZone("UTC").
+		SetCharset(cfg.GetDatabaseCharset()).
+		SetTimeZone(cfg.GetDatabaseTimezone()).
 		SetUserName(cfg.GetDatabaseUsername()).
 		SetPassword(cfg.GetDatabasePassword())
 

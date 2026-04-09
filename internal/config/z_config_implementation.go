@@ -31,6 +31,8 @@ type configImplementation struct {
 	databaseUsername               string
 	databasePassword               string
 	databaseSSLMode                string
+	databaseCharset                string
+	databaseTimezone               string
 	databaseMaxOpenConns           int
 	databaseMaxIdleConns           int
 	databaseConnMaxLifetimeSeconds int
@@ -308,6 +310,8 @@ func (c *configImplementation) setDatabaseConfig(s databaseSettings) {
 	c.databaseUsername = s.user
 	c.databasePassword = s.pass
 	c.databaseSSLMode = "require"
+	c.databaseCharset = s.charset
+	c.databaseTimezone = s.timezone
 	c.databaseMaxOpenConns = int(s.maxOpenConns)
 	c.databaseMaxIdleConns = int(s.maxIdleConns)
 	c.databaseConnMaxLifetimeSeconds = int(s.connMaxLifetime.Seconds())
@@ -400,6 +404,22 @@ func (c *configImplementation) SetDatabaseConnMaxIdleTimeSeconds(v int) {
 
 func (c *configImplementation) GetDatabaseConnMaxIdleTimeSeconds() int {
 	return c.databaseConnMaxIdleTimeSeconds
+}
+
+func (c *configImplementation) SetDatabaseCharset(v string) {
+	c.databaseCharset = v
+}
+
+func (c *configImplementation) GetDatabaseCharset() string {
+	return c.databaseCharset
+}
+
+func (c *configImplementation) SetDatabaseTimezone(v string) {
+	c.databaseTimezone = v
+}
+
+func (c *configImplementation) GetDatabaseTimezone() string {
+	return c.databaseTimezone
 }
 
 // ============================================================================
