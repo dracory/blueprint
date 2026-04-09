@@ -2,8 +2,8 @@ package config
 
 import "strings"
 
-// loadDatabaseConfig loads database configuration directly into the config.
-func loadDatabaseConfig(cfg ConfigInterface, v *envValidator) {
+// readDatabaseConfig reads database configuration from environment variables.
+func readDatabaseConfig(cfg *configImplementation, v *envValidator) {
 	// Database Driver
 	//
 	// The database driver to use for the application.
@@ -48,11 +48,5 @@ func loadDatabaseConfig(cfg ConfigInterface, v *envValidator) {
 		v.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
 	}
 
-	cfg.SetDatabaseDriver(driver)
-	cfg.SetDatabaseHost(host)
-	cfg.SetDatabasePort(port)
-	cfg.SetDatabaseName(name)
-	cfg.SetDatabaseUsername(user)
-	cfg.SetDatabasePassword(pass)
-	cfg.SetDatabaseSSLMode("require")
+	cfg.setDatabaseConfig(driver, host, port, name, user, pass)
 }

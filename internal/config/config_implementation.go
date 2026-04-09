@@ -129,6 +129,16 @@ func (c *configImplementation) GetCmsMcpApiKey() string {
 // App Config Implementation
 // ============================================================================
 
+func (c *configImplementation) setAppConfig(name, url, host, port, env string, debug bool, cmsMcpApiKey string) {
+	c.appName = name
+	c.appUrl = url
+	c.appHost = host
+	c.appPort = port
+	c.appEnv = env
+	c.appDebug = debug
+	c.cmsMcpApiKey = cmsMcpApiKey
+}
+
 func (c *configImplementation) SetAppName(appName string) {
 	c.appName = appName
 }
@@ -209,6 +219,10 @@ func (c *configImplementation) IsEnvTesting() bool {
 // Auth Config Implementation
 // ============================================================================
 
+func (c *configImplementation) setAuthConfig(registrationEnabled bool) {
+	c.registrationEnabled = registrationEnabled
+}
+
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
 	c.registrationEnabled = v
 }
@@ -220,6 +234,16 @@ func (c *configImplementation) GetRegistrationEnabled() bool {
 // ============================================================================
 // Database Config Implementation
 // ============================================================================
+
+func (c *configImplementation) setDatabaseConfig(driver, host, port, name, user, pass string) {
+	c.databaseDriver = driver
+	c.databaseHost = host
+	c.databasePort = port
+	c.databaseName = name
+	c.databaseUsername = user
+	c.databasePassword = pass
+	c.databaseSSLMode = "require"
+}
 
 func (c *configImplementation) SetDatabaseDriver(v string) {
 	c.databaseDriver = v
@@ -280,6 +304,16 @@ func (c *configImplementation) GetDatabaseSSLMode() string {
 // ============================================================================
 // Email Config Implementation
 // ============================================================================
+
+func (c *configImplementation) setMailConfig(driver, fromAddress, fromName, host, password string, port int, username string) {
+	c.emailDriver = driver
+	c.emailFromAddress = fromAddress
+	c.emailFromName = fromName
+	c.emailHost = host
+	c.emailPassword = password
+	c.emailPort = port
+	c.emailUsername = username
+}
 
 func (c *configImplementation) SetMailDriver(v string) {
 	c.emailDriver = v
@@ -353,6 +387,11 @@ func (c *configImplementation) GetEnvEncryptionKey() string {
 // i18n Config Implementation
 // ============================================================================
 
+func (c *configImplementation) setTranslationConfig(defaultLanguage string, languageList map[string]string) {
+	c.translationLanguageDefault = defaultLanguage
+	c.translationLanguageList = languageList
+}
+
 func (c *configImplementation) SetTranslationLanguageDefault(v string) {
 	c.translationLanguageDefault = v
 }
@@ -372,6 +411,36 @@ func (c *configImplementation) GetTranslationLanguageList() map[string]string {
 // ============================================================================
 // LLM Config Implementation
 // ============================================================================
+
+// ============================================================================
+// LLM Config Implementation
+// ============================================================================
+
+func (c *configImplementation) setLLMConfig(
+	anthropicUsed bool, anthropicKey, anthropicDefaultModel string,
+	googleGeminiUsed bool, googleGeminiKey, googleGeminiDefaultModel string,
+	openAiUsed bool, openAiKey, openAiDefaultModel string,
+	openRouterUsed bool, openRouterKey, openRouterDefaultModel string,
+	vertexAiUsed bool, vertexAiModelID, vertexAiProjectID, vertexAiRegionID, vertexAiDefaultModel string,
+) {
+	c.anthropicApiUsed = anthropicUsed
+	c.anthropicApiKey = anthropicKey
+	c.anthropicApiDefaultModel = anthropicDefaultModel
+	c.googleGeminiApiUsed = googleGeminiUsed
+	c.googleGeminiApiKey = googleGeminiKey
+	c.googleGeminiApiDefaultModel = googleGeminiDefaultModel
+	c.openAiApiUsed = openAiUsed
+	c.openAiApiKey = openAiKey
+	c.openAiApiDefaultModel = openAiDefaultModel
+	c.openRouterApiUsed = openRouterUsed
+	c.openRouterApiKey = openRouterKey
+	c.openRouterApiDefaultModel = openRouterDefaultModel
+	c.vertexAiApiUsed = vertexAiUsed
+	c.vertexAiApiModelID = vertexAiModelID
+	c.vertexAiApiProjectID = vertexAiProjectID
+	c.vertexAiApiRegionID = vertexAiRegionID
+	c.vertexAiApiDefaultModel = vertexAiDefaultModel
+}
 
 // Anthropic
 func (c *configImplementation) SetAnthropicApiUsed(v bool) {
@@ -586,6 +655,12 @@ func (c *configImplementation) GetMediaUrl() string {
 // Payment Config Implementation
 // ============================================================================
 
+func (c *configImplementation) setStripeConfig(keyPrivate, keyPublic string, used bool) {
+	c.stripeKeyPrivate = keyPrivate
+	c.stripeKeyPublic = keyPublic
+	c.stripeUsed = used
+}
+
 func (c *configImplementation) SetStripeKeyPrivate(v string) {
 	c.stripeKeyPrivate = v
 }
@@ -625,6 +700,36 @@ func (c *configImplementation) GetIndexNowKey() string {
 // ============================================================================
 // Stores Config Implementation
 // ============================================================================
+
+// ============================================================================
+// Stores Config Implementation
+// ============================================================================
+
+func (c *configImplementation) setStoresConfig(cmsStoreTemplateID, vaultStoreKey string) {
+	c.auditStoreUsed = auditStoreUsed
+	c.blogStoreUsed = blogStoreUsed
+	c.cacheStoreUsed = cacheStoreUsed
+	c.chatStoreUsed = chatStoreUsed
+	c.cmsStoreUsed = cmsStoreUsed
+	c.cmsStoreTemplateID = cmsStoreTemplateID
+	c.customStoreUsed = customStoreUsed
+	c.entityStoreUsed = entityStoreUsed
+	c.feedStoreUsed = feedStoreUsed
+	c.geoStoreUsed = geoStoreUsed
+	c.logStoreUsed = logStoreUsed
+	c.metaStoreUsed = metaStoreUsed
+	c.sessionStoreUsed = sessionStoreUsed
+	c.settingStoreUsed = settingStoreUsed
+	c.shopStoreUsed = shopStoreUsed
+	c.sqlFileStoreUsed = sqlFileStoreUsed
+	c.statsStoreUsed = statsStoreUsed
+	c.subscriptionStoreUsed = subscriptionStoreUsed
+	c.taskStoreUsed = taskStoreUsed
+	c.userStoreUsed = userStoreUsed
+	c.userStoreVaultEnabled = userStoreVaultEnabled
+	c.vaultStoreUsed = vaultStoreUsed
+	c.vaultStoreKey = vaultStoreKey
+}
 
 // Audit Store
 func (c *configImplementation) SetAuditStoreUsed(v bool) {

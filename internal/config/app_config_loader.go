@@ -2,8 +2,8 @@ package config
 
 import "strings"
 
-// loadAppConfig loads application configuration directly into the config.
-func loadAppConfig(cfg ConfigInterface, v *envValidator) {
+// readAppConfig reads application configuration from environment variables.
+func readAppConfig(cfg *configImplementation, v *envValidator) {
 	// Application Name
 	//
 	// This value is the name of your application, used in notifications
@@ -32,7 +32,7 @@ func loadAppConfig(cfg ConfigInterface, v *envValidator) {
 	//
 	// Determines the environment your application is running in.
 	// Supported values: local, development, staging, testing, production
-	env := v.GetStringOrError(KEY_APP_ENVIRONMENT, "set the application environment")
+	appEnv := v.GetStringOrError(KEY_APP_ENVIRONMENT, "set the application environment")
 
 	// Application Debug Mode
 	//
@@ -45,11 +45,5 @@ func loadAppConfig(cfg ConfigInterface, v *envValidator) {
 	// Leave empty to disable CMS MCP integration.
 	cmsMcpApiKey := strings.TrimSpace(v.GetString(KEY_MCP_API_KEY))
 
-	cfg.SetAppName(name)
-	cfg.SetAppUrl(url)
-	cfg.SetAppHost(host)
-	cfg.SetAppPort(port)
-	cfg.SetAppEnv(env)
-	cfg.SetAppDebug(debug)
-	cfg.SetCmsMcpApiKey(cmsMcpApiKey)
+	cfg.setAppConfig(name, url, host, port, appEnv, debug, cmsMcpApiKey)
 }

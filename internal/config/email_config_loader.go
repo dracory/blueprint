@@ -5,8 +5,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-// loadMailConfig loads mail configuration directly into the config.
-func loadMailConfig(cfg ConfigInterface) {
+// readMailConfig reads mail configuration from environment variables.
+func readMailConfig(cfg *configImplementation) {
 	// Mail Driver
 	//
 	// The mail driver to use for sending emails.
@@ -47,11 +47,5 @@ func loadMailConfig(cfg ConfigInterface) {
 	// The username for authenticating with the mail server.
 	username := env.GetString(KEY_MAIL_USERNAME)
 
-	cfg.SetMailDriver(driver)
-	cfg.SetMailFromAddress(fromAddress)
-	cfg.SetMailFromName(fromName)
-	cfg.SetMailHost(host)
-	cfg.SetMailPassword(password)
-	cfg.SetMailPort(port)
-	cfg.SetMailUsername(username)
+	cfg.setMailConfig(driver, fromAddress, fromName, host, password, port, username)
 }

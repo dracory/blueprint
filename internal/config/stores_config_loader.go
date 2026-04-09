@@ -2,9 +2,9 @@ package config
 
 import "fmt"
 
-// loadStoresConfig loads datastore feature flags directly into the config.
+// readStoresConfig reads datastore feature flags from environment variables.
 // Each store is opt-in via configuration_stores.go - set the flag to true to enable it.
-func loadStoresConfig(cfg ConfigInterface, v *envValidator) {
+func readStoresConfig(cfg *configImplementation, v *envValidator) {
 	// CMS Store Template ID
 	//
 	// The template ID used by the CMS store for rendering content.
@@ -24,27 +24,5 @@ func loadStoresConfig(cfg ConfigInterface, v *envValidator) {
 	v.RequireWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
 		"required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
-	cfg.SetAuditStoreUsed(auditStoreUsed)
-	cfg.SetBlogStoreUsed(blogStoreUsed)
-	cfg.SetCacheStoreUsed(cacheStoreUsed)
-	cfg.SetChatStoreUsed(chatStoreUsed)
-	cfg.SetCmsStoreUsed(cmsStoreUsed)
-	cfg.SetCmsStoreTemplateID(cmsStoreTemplateID)
-	cfg.SetCustomStoreUsed(customStoreUsed)
-	cfg.SetEntityStoreUsed(entityStoreUsed)
-	cfg.SetFeedStoreUsed(feedStoreUsed)
-	cfg.SetGeoStoreUsed(geoStoreUsed)
-	cfg.SetLogStoreUsed(logStoreUsed)
-	cfg.SetMetaStoreUsed(metaStoreUsed)
-	cfg.SetSessionStoreUsed(sessionStoreUsed)
-	cfg.SetSettingStoreUsed(settingStoreUsed)
-	cfg.SetShopStoreUsed(shopStoreUsed)
-	cfg.SetSqlFileStoreUsed(sqlFileStoreUsed)
-	cfg.SetStatsStoreUsed(statsStoreUsed)
-	cfg.SetSubscriptionStoreUsed(subscriptionStoreUsed)
-	cfg.SetTaskStoreUsed(taskStoreUsed)
-	cfg.SetUserStoreUsed(userStoreUsed)
-	cfg.SetUserStoreVaultEnabled(userStoreVaultEnabled)
-	cfg.SetVaultStoreUsed(vaultStoreUsed)
-	cfg.SetVaultStoreKey(vaultStoreKey)
+	cfg.setStoresConfig(cmsStoreTemplateID, vaultStoreKey)
 }

@@ -1,8 +1,8 @@
 package config
 
-// loadLLMConfig loads LLM provider configuration directly into the config.
+// readLLMConfig reads LLM provider configuration from environment variables.
 // Each provider is opt-in: set the *_USED flag to true and provide the required keys.
-func loadLLMConfig(cfg ConfigInterface, v *envValidator) {
+func readLLMConfig(cfg *configImplementation, v *envValidator) {
 	// -------------------------------------------------------------------------
 	// Anthropic (Claude)
 	// https://console.anthropic.com/settings/keys
@@ -114,25 +114,11 @@ func loadLLMConfig(cfg ConfigInterface, v *envValidator) {
 	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiDefaultModel)
 
-	cfg.SetAnthropicApiUsed(anthropicUsed)
-	cfg.SetAnthropicApiKey(anthropicKey)
-	cfg.SetAnthropicApiDefaultModel(anthropicDefaultModel)
-
-	cfg.SetGoogleGeminiApiUsed(googleGeminiUsed)
-	cfg.SetGoogleGeminiApiKey(googleGeminiKey)
-	cfg.SetGoogleGeminiApiDefaultModel(googleGeminiDefaultModel)
-
-	cfg.SetOpenAiApiUsed(openAiUsed)
-	cfg.SetOpenAiApiKey(openAiKey)
-	cfg.SetOpenAiApiDefaultModel(openAiDefaultModel)
-
-	cfg.SetOpenRouterApiUsed(openRouterUsed)
-	cfg.SetOpenRouterApiKey(openRouterKey)
-	cfg.SetOpenRouterApiDefaultModel(openRouterDefaultModel)
-
-	cfg.SetVertexAiApiUsed(vertexAiUsed)
-	cfg.SetVertexAiApiModelID(vertexAiModelID)
-	cfg.SetVertexAiApiProjectID(vertexAiProjectID)
-	cfg.SetVertexAiApiRegionID(vertexAiRegionID)
-	cfg.SetVertexAiApiDefaultModel(vertexAiDefaultModel)
+	cfg.setLLMConfig(
+		anthropicUsed, anthropicKey, anthropicDefaultModel,
+		googleGeminiUsed, googleGeminiKey, googleGeminiDefaultModel,
+		openAiUsed, openAiKey, openAiDefaultModel,
+		openRouterUsed, openRouterKey, openRouterDefaultModel,
+		vertexAiUsed, vertexAiModelID, vertexAiProjectID, vertexAiRegionID, vertexAiDefaultModel,
+	)
 }

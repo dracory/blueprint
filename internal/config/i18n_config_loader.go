@@ -2,8 +2,8 @@ package config
 
 import "github.com/dracory/env"
 
-// loadTranslationConfig loads i18n configuration directly into the config.
-func loadTranslationConfig(cfg ConfigInterface) {
+// readTranslationConfig reads i18n configuration from environment variables.
+func readTranslationConfig(cfg *configImplementation) {
 	// Default Language
 	//
 	// The default locale used when no language is specified.
@@ -18,6 +18,5 @@ func loadTranslationConfig(cfg ConfigInterface) {
 	// Example: {"en": "English", "fr": "French"}
 	languageList := translationLanguageListDefault()
 
-	cfg.SetTranslationLanguageDefault(defaultLanguage)
-	cfg.SetTranslationLanguageList(languageList)
+	cfg.setTranslationConfig(defaultLanguage, languageList)
 }
