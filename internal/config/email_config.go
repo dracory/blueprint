@@ -5,8 +5,8 @@ import (
 	"github.com/spf13/cast"
 )
 
-// readMailConfig reads mail configuration from environment variables.
-func emailConfig(cfg *configImplementation) {
+// emailConfig reads mail configuration from environment variables.
+func emailConfig() emailSettings {
 	// Mail Driver
 	//
 	// The mail driver to use for sending emails.
@@ -47,8 +47,23 @@ func emailConfig(cfg *configImplementation) {
 	// The username for authenticating with the mail server.
 	username := env.GetString(KEY_MAIL_USERNAME)
 
-	// -------------------------------------------------------------------------
-	// Do not edit below this line
-	// -------------------------------------------------------------------------
-	cfg.setMailConfig(driver, fromAddress, fromName, host, password, port, username)
+	return emailSettings{
+		driver:      driver,
+		fromAddress: fromAddress,
+		fromName:    fromName,
+		host:        host,
+		password:    password,
+		port:        port,
+		username:    username,
+	}
+}
+
+type emailSettings struct {
+	driver      string
+	fromAddress string
+	fromName    string
+	host        string
+	password    string
+	port        int
+	username    string
 }

@@ -51,7 +51,7 @@ func main() {
 	// Set log flags to include file name and line number
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	cfg, err := config.Load()
+	cfg, err := config.NewFromEnv()
 	if err != nil {
 		fmt.Printf("Failed to load config: %v\n", err)
 		return
@@ -155,7 +155,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 	if registry == nil {
 		return errors.New("startBackgroundProcesses called with nil registry")
 	}
-	
+
 	if registry.GetConfig() == nil {
 		return errors.New("startBackgroundProcesses called with nil config")
 	}

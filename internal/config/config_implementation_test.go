@@ -19,13 +19,13 @@ func TestLoad_Success(t *testing.T) {
 	}
 	defer cleanupEnv()
 
-	cfg, err := Load()
+	cfg, err := NewFromEnv()
 	if err != nil {
-		t.Fatalf("Load() failed: %v", err)
+		t.Fatalf("NewFromEnv() failed: %v", err)
 	}
 
 	if cfg == nil {
-		t.Fatal("Load() returned nil config")
+		t.Fatal("NewFromEnv() returned nil config")
 	}
 
 	if cfg.GetAppHost() != "localhost" {
@@ -44,9 +44,9 @@ func TestLoad_Success(t *testing.T) {
 func TestLoad_MissingRequiredFields(t *testing.T) {
 	cleanupEnv()
 
-	_, err := Load()
+	_, err := NewFromEnv()
 	if err == nil {
-		t.Fatal("Load() should fail with missing required fields")
+		t.Fatal("NewFromEnv() should fail with missing required fields")
 	}
 
 	verr, ok := err.(env.ValidationError)
@@ -68,9 +68,9 @@ func TestLoad_DatabasePostgresRequirements(t *testing.T) {
 	// Missing host, port, username, password
 	defer cleanupEnv()
 
-	_, err := Load()
+	_, err := NewFromEnv()
 	if err == nil {
-		t.Fatal("Load() should fail when postgres driver missing connection details")
+		t.Fatal("NewFromEnv() should fail when postgres driver missing connection details")
 	}
 
 	verr, ok := err.(env.ValidationError)
@@ -96,9 +96,9 @@ func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
 	// No ENVENC_KEY_PRIVATE set
 	defer cleanupEnv()
 
-	cfg, err := Load()
+	cfg, err := NewFromEnv()
 	if err != nil {
-		t.Fatalf("Load() should succeed without env encryption key: %v", err)
+		t.Fatalf("NewFromEnv() should succeed without env encryption key: %v", err)
 	}
 
 	if cfg.GetEnvEncryptionKey() != "" {
@@ -119,9 +119,9 @@ func TestLoad_CMSStoreRequiresTemplateID(t *testing.T) {
 		return // CMS store not enabled
 	}
 
-	_, err := Load()
+	_, err := NewFromEnv()
 	if err == nil {
-		t.Fatal("Load() should fail when CMS store enabled without template ID")
+		t.Fatal("NewFromEnv() should fail when CMS store enabled without template ID")
 	}
 
 	verr, ok := err.(env.ValidationError)
@@ -152,9 +152,9 @@ func TestLoad_LLMProviderRequirements(t *testing.T) {
 	// Missing OPENAI_API_KEY and OPENAI_API_DEFAULT_MODEL
 	defer cleanupEnv()
 
-	_, err := Load()
+	_, err := NewFromEnv()
 	if err == nil {
-		t.Fatal("Load() should fail when OpenAI enabled without credentials")
+		t.Fatal("NewFromEnv() should fail when OpenAI enabled without credentials")
 	}
 
 	verr, ok := err.(env.ValidationError)
@@ -196,9 +196,9 @@ func TestLoad_StripeConfiguration(t *testing.T) {
 	}
 	defer cleanupEnv()
 
-	cfg, err := Load()
+	cfg, err := NewFromEnv()
 	if err != nil {
-		t.Fatalf("Load() failed: %v", err)
+		t.Fatalf("NewFromEnv() failed: %v", err)
 	}
 
 	if !cfg.GetStripeUsed() {
@@ -226,9 +226,9 @@ func TestLoad_MailConfiguration(t *testing.T) {
 	}
 	defer cleanupEnv()
 
-	cfg, err := Load()
+	cfg, err := NewFromEnv()
 	if err != nil {
-		t.Fatalf("Load() failed: %v", err)
+		t.Fatalf("NewFromEnv() failed: %v", err)
 	}
 
 	if cfg.GetMailDriver() != "smtp" {
@@ -251,9 +251,9 @@ func TestLoad_TranslationDefaults(t *testing.T) {
 	}
 	defer cleanupEnv()
 
-	cfg, err := Load()
+	cfg, err := NewFromEnv()
 	if err != nil {
-		t.Fatalf("Load() failed: %v", err)
+		t.Fatalf("NewFromEnv() failed: %v", err)
 	}
 
 	if cfg.GetTranslationLanguageDefault() == "" {
@@ -277,9 +277,9 @@ func TestLoad_VaultStoreRequirements(t *testing.T) {
 		return // User vault not enabled
 	}
 
-	_, err := Load()
+	_, err := NewFromEnv()
 	if err == nil {
-		t.Fatal("Load() should fail when user vault enabled but vault store not used")
+		t.Fatal("NewFromEnv() should fail when user vault enabled but vault store not used")
 	}
 
 	verr, ok := err.(env.ValidationError)

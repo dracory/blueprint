@@ -1,5 +1,15 @@
 package config
 
+import (
+	"project/internal/resources"
+
+	baseCfg "github.com/dracory/base/config"
+	"github.com/dracory/env"
+)
+
+// envValidator is a local alias for env.Validator for use in config loaders.
+type envValidator = env.Validator
+
 // configImplementation holds all configuration values.
 type configImplementation struct {
 	// App configuration
@@ -110,6 +120,55 @@ func New() ConfigInterface {
 	return &configImplementation{}
 }
 
+// NewFromEnv constructs a configuration instance populated from environment variables.
+func NewFromEnv() (ConfigInterface, error) {
+	env.Load(".env")
+
+	v := &envValidator{}
+	cfg := &configImplementation{}
+
+	// Load app config first to get app.env
+	cfg.setAppConfig(appConfig(v))
+
+	// Load encryption config and check if encryption is used
+	privateKey := env.GetString(KEY_ENVENC_KEY_PRIVATE)
+	encryptionUsed := privateKey != ""
+
+	if encryptionUsed {
+		v.RequireWhen(true, KEY_ENVENC_KEY_PRIVATE,
+			"required when encryption is enabled", privateKey)
+	}
+
+	cfg.SetEnvEncryptionKey(privateKey)
+
+	// Initialize encrypted environment variables BEFORE other config loaders read them
+	if encryptionUsed {
+		if err := baseCfg.InitializeEnvEncVariablesFromResources(cfg.GetAppEnv(), ENVENC_KEY_PUBLIC, privateKey, resources.Resource); err != nil {
+			v.Add(err)
+		} else {
+			cfg.SetEnvEncryptionKey("removed") // reset the private key
+		}
+
+		// Reload app config to pick up any encrypted app variables
+		cfg.setAppConfig(appConfig(v))
+	}
+
+	// Now load remaining config sections - they will have access to encrypted variables
+	cfg.setDatabaseConfig(databaseConfig(v))
+	cfg.setMailConfig(emailConfig())
+	cfg.setAuthConfig(authConfig())
+	cfg.setStoresConfig(storesConfig(v))
+	cfg.setStripeConfig(paymentConfig())
+	cfg.setLLMConfig(llmConfig(v))
+	cfg.setTranslationConfig(i18nConfig())
+
+	if err := v.Err(); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
 // Ensure configImplementation satisfies ConfigInterface
 var _ ConfigInterface = (*configImplementation)(nil)
 
@@ -129,14 +188,14 @@ func (c *configImplementation) GetCmsMcpApiKey() string {
 // App Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setAppConfig(name, url, host, port, env string, debug bool, cmsMcpApiKey string) {
-	c.appName = name
-	c.appUrl = url
-	c.appHost = host
-	c.appPort = port
-	c.appEnv = env
-	c.appDebug = debug
-	c.cmsMcpApiKey = cmsMcpApiKey
+func (c *configImplementation) setAppConfig(s appSettings) {
+	c.appName = s.name
+	c.appUrl = s.url
+	c.appHost = s.host
+	c.appPort = s.port
+	c.appEnv = s.env
+	c.appDebug = s.debug
+	c.cmsMcpApiKey = s.cmsMcpApiKey
 }
 
 func (c *configImplementation) SetAppName(appName string) {
@@ -219,8 +278,8 @@ func (c *configImplementation) IsEnvTesting() bool {
 // Auth Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setAuthConfig(registrationEnabled bool) {
-	c.registrationEnabled = registrationEnabled
+func (c *configImplementation) setAuthConfig(s authSettings) {
+	c.registrationEnabled = s.registrationEnabled
 }
 
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
@@ -235,13 +294,13 @@ func (c *configImplementation) GetRegistrationEnabled() bool {
 // Database Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setDatabaseConfig(driver, host, port, name, user, pass string) {
-	c.databaseDriver = driver
-	c.databaseHost = host
-	c.databasePort = port
-	c.databaseName = name
-	c.databaseUsername = user
-	c.databasePassword = pass
+func (c *configImplementation) setDatabaseConfig(s databaseSettings) {
+	c.databaseDriver = s.driver
+	c.databaseHost = s.host
+	c.databasePort = s.port
+	c.databaseName = s.name
+	c.databaseUsername = s.user
+	c.databasePassword = s.pass
 	c.databaseSSLMode = "require"
 }
 
@@ -305,14 +364,14 @@ func (c *configImplementation) GetDatabaseSSLMode() string {
 // Email Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setMailConfig(driver, fromAddress, fromName, host, password string, port int, username string) {
-	c.emailDriver = driver
-	c.emailFromAddress = fromAddress
-	c.emailFromName = fromName
-	c.emailHost = host
-	c.emailPassword = password
-	c.emailPort = port
-	c.emailUsername = username
+func (c *configImplementation) setMailConfig(s emailSettings) {
+	c.emailDriver = s.driver
+	c.emailFromAddress = s.fromAddress
+	c.emailFromName = s.fromName
+	c.emailHost = s.host
+	c.emailPassword = s.password
+	c.emailPort = s.port
+	c.emailUsername = s.username
 }
 
 func (c *configImplementation) SetMailDriver(v string) {
@@ -387,9 +446,9 @@ func (c *configImplementation) GetEnvEncryptionKey() string {
 // i18n Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setTranslationConfig(defaultLanguage string, languageList map[string]string) {
-	c.translationLanguageDefault = defaultLanguage
-	c.translationLanguageList = languageList
+func (c *configImplementation) setTranslationConfig(s i18nSettings) {
+	c.translationLanguageDefault = s.defaultLanguage
+	c.translationLanguageList = s.languageList
 }
 
 func (c *configImplementation) SetTranslationLanguageDefault(v string) {
@@ -416,30 +475,24 @@ func (c *configImplementation) GetTranslationLanguageList() map[string]string {
 // LLM Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setLLMConfig(
-	anthropicUsed bool, anthropicKey, anthropicDefaultModel string,
-	googleGeminiUsed bool, googleGeminiKey, googleGeminiDefaultModel string,
-	openAiUsed bool, openAiKey, openAiDefaultModel string,
-	openRouterUsed bool, openRouterKey, openRouterDefaultModel string,
-	vertexAiUsed bool, vertexAiModelID, vertexAiProjectID, vertexAiRegionID, vertexAiDefaultModel string,
-) {
-	c.anthropicApiUsed = anthropicUsed
-	c.anthropicApiKey = anthropicKey
-	c.anthropicApiDefaultModel = anthropicDefaultModel
-	c.googleGeminiApiUsed = googleGeminiUsed
-	c.googleGeminiApiKey = googleGeminiKey
-	c.googleGeminiApiDefaultModel = googleGeminiDefaultModel
-	c.openAiApiUsed = openAiUsed
-	c.openAiApiKey = openAiKey
-	c.openAiApiDefaultModel = openAiDefaultModel
-	c.openRouterApiUsed = openRouterUsed
-	c.openRouterApiKey = openRouterKey
-	c.openRouterApiDefaultModel = openRouterDefaultModel
-	c.vertexAiApiUsed = vertexAiUsed
-	c.vertexAiApiModelID = vertexAiModelID
-	c.vertexAiApiProjectID = vertexAiProjectID
-	c.vertexAiApiRegionID = vertexAiRegionID
-	c.vertexAiApiDefaultModel = vertexAiDefaultModel
+func (c *configImplementation) setLLMConfig(s llmSettings) {
+	c.anthropicApiUsed = s.anthropicUsed
+	c.anthropicApiKey = s.anthropicKey
+	c.anthropicApiDefaultModel = s.anthropicDefaultModel
+	c.googleGeminiApiUsed = s.googleGeminiUsed
+	c.googleGeminiApiKey = s.googleGeminiKey
+	c.googleGeminiApiDefaultModel = s.googleGeminiDefaultModel
+	c.openAiApiUsed = s.openAiUsed
+	c.openAiApiKey = s.openAiKey
+	c.openAiApiDefaultModel = s.openAiDefaultModel
+	c.openRouterApiUsed = s.openRouterUsed
+	c.openRouterApiKey = s.openRouterKey
+	c.openRouterApiDefaultModel = s.openRouterDefaultModel
+	c.vertexAiApiUsed = s.vertexAiUsed
+	c.vertexAiApiModelID = s.vertexAiModelID
+	c.vertexAiApiProjectID = s.vertexAiProjectID
+	c.vertexAiApiRegionID = s.vertexAiRegionID
+	c.vertexAiApiDefaultModel = s.vertexAiDefaultModel
 }
 
 // Anthropic
@@ -655,10 +708,10 @@ func (c *configImplementation) GetMediaUrl() string {
 // Payment Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setStripeConfig(keyPrivate, keyPublic string, used bool) {
-	c.stripeKeyPrivate = keyPrivate
-	c.stripeKeyPublic = keyPublic
-	c.stripeUsed = used
+func (c *configImplementation) setStripeConfig(s paymentSettings) {
+	c.stripeKeyPrivate = s.keyPrivate
+	c.stripeKeyPublic = s.keyPublic
+	c.stripeUsed = s.used
 }
 
 func (c *configImplementation) SetStripeKeyPrivate(v string) {
@@ -705,13 +758,13 @@ func (c *configImplementation) GetIndexNowKey() string {
 // Stores Config Implementation
 // ============================================================================
 
-func (c *configImplementation) setStoresConfig(cmsStoreTemplateID, vaultStoreKey string) {
+func (c *configImplementation) setStoresConfig(s storesSettings) {
 	c.auditStoreUsed = auditStoreUsed
 	c.blogStoreUsed = blogStoreUsed
 	c.cacheStoreUsed = cacheStoreUsed
 	c.chatStoreUsed = chatStoreUsed
 	c.cmsStoreUsed = cmsStoreUsed
-	c.cmsStoreTemplateID = cmsStoreTemplateID
+	c.cmsStoreTemplateID = s.cmsStoreTemplateID
 	c.customStoreUsed = customStoreUsed
 	c.entityStoreUsed = entityStoreUsed
 	c.feedStoreUsed = feedStoreUsed
@@ -728,7 +781,7 @@ func (c *configImplementation) setStoresConfig(cmsStoreTemplateID, vaultStoreKey
 	c.userStoreUsed = userStoreUsed
 	c.userStoreVaultEnabled = userStoreVaultEnabled
 	c.vaultStoreUsed = vaultStoreUsed
-	c.vaultStoreKey = vaultStoreKey
+	c.vaultStoreKey = s.vaultStoreKey
 }
 
 // Audit Store
