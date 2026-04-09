@@ -6,11 +6,11 @@ The project is located at:
 
 The project is a web application that uses Blueprint to manage its components and features.
 
-You may compare the project files with the upgrade guide for Blueprint v0.18.0 to understand the changes that need to be made.
+You may compare the project files with the upgrade guides for Blueprint to understand the changes that need to be made.
 
-The upgrade guides can be found at pattern: 
+The upgrade guides can be found at pattern:
 
-D:\PROJECTs\dracory.com\blueprint\docs\upgrade_guides\upgrade-v0.10.0-to-v0.11.0.md
+D:\PROJECTs\dracory.com\blueprint\docs\upgrade_guides\upgrade-[FROM_VERSION]-to-[TO_VERSION].md
 
 You should make the necessary changes to the project files to upgrade it to the latest version.
 
