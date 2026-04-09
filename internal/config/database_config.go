@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 // databaseConfig reads database configuration from environment variables.
 func databaseConfig(env *envValidator) databaseSettings {
 	// Database Driver
@@ -39,6 +41,42 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Not required when using sqlite.
 	pass := env.GetString(KEY_DB_PASSWORD)
 
+	// Connection Pool - Max Open Connections
+	//
+	// Maximum number of open connections to the database.
+	// SQLite should stay at 1 to avoid concurrent write issues.
+	// For postgres/mysql, 25 is a reasonable default for most apps.
+	maxOpenConns := env.GetIntOrDefault(KEY_DB_MAX_OPEN_CONNS, 25)
+	if driver == driverSQLite {
+		maxOpenConns = 1
+	}
+
+	// Connection Pool - Max Idle Connections
+	//
+	// Maximum number of idle connections kept in the pool.
+	// Should be less than or equal to MaxOpenConns.
+	maxIdleConns := env.GetIntOrDefault(KEY_DB_MAX_IDLE_CONNS, 5)
+	if driver == driverSQLite {
+		maxIdleConns = 1
+	}
+
+	// Connection Pool - Max Connection Lifetime
+	//
+	// Maximum time a connection may be reused. Connections older than this
+	// are closed and replaced. 0 means no limit.
+	// Unit: seconds. Default: 300 (5 minutes)
+	connMaxLifetime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_LIFETIME_SECONDS, 300)) * time.Second
+	if driver == driverSQLite {
+		connMaxLifetime = 30 * time.Second
+	}
+
+	// Connection Pool - Max Connection Idle Time
+	//
+	// Maximum time a connection may be idle before being closed.
+	// 0 means no limit.
+	// Unit: seconds. Default: 5
+	connMaxIdleTime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_IDLE_TIME_SECONDS, 5)) * time.Second
+
 	if driver != driverSQLite {
 		env.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
 		env.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
@@ -46,14 +84,29 @@ func databaseConfig(env *envValidator) databaseSettings {
 		env.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
 	}
 
-	return databaseSettings{driver: driver, host: host, port: port, name: name, user: user, pass: pass}
+	return databaseSettings{
+		driver:          driver,
+		host:            host,
+		port:            port,
+		name:            name,
+		user:            user,
+		pass:            pass,
+		maxOpenConns:    maxOpenConns,
+		maxIdleConns:    maxIdleConns,
+		connMaxLifetime: connMaxLifetime,
+		connMaxIdleTime: connMaxIdleTime,
+	}
 }
 
 type databaseSettings struct {
-	driver string
-	host   string
-	port   string
-	name   string
-	user   string
-	pass   string
+	driver          string
+	host            string
+	port            string
+	name            string
+	user            string
+	pass            string
+	maxOpenConns    int
+	maxIdleConns    int
+	connMaxLifetime time.Duration
+	connMaxIdleTime time.Duration
 }

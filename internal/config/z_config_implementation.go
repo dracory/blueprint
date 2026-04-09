@@ -24,13 +24,17 @@ type configImplementation struct {
 	appDebug bool
 
 	// Database configuration
-	databaseDriver   string
-	databaseHost     string
-	databasePort     string
-	databaseName     string
-	databaseUsername string
-	databasePassword string
-	databaseSSLMode  string
+	databaseDriver                 string
+	databaseHost                   string
+	databasePort                   string
+	databaseName                   string
+	databaseUsername               string
+	databasePassword               string
+	databaseSSLMode                string
+	databaseMaxOpenConns           int
+	databaseMaxIdleConns           int
+	databaseConnMaxLifetimeSeconds int
+	databaseConnMaxIdleTimeSeconds int
 
 	// Email configuration
 	emailDriver      string
@@ -304,6 +308,10 @@ func (c *configImplementation) setDatabaseConfig(s databaseSettings) {
 	c.databaseUsername = s.user
 	c.databasePassword = s.pass
 	c.databaseSSLMode = "require"
+	c.databaseMaxOpenConns = int(s.maxOpenConns)
+	c.databaseMaxIdleConns = int(s.maxIdleConns)
+	c.databaseConnMaxLifetimeSeconds = int(s.connMaxLifetime.Seconds())
+	c.databaseConnMaxIdleTimeSeconds = int(s.connMaxIdleTime.Seconds())
 }
 
 func (c *configImplementation) SetDatabaseDriver(v string) {
@@ -360,6 +368,38 @@ func (c *configImplementation) SetDatabaseSSLMode(v string) {
 
 func (c *configImplementation) GetDatabaseSSLMode() string {
 	return c.databaseSSLMode
+}
+
+func (c *configImplementation) SetDatabaseMaxOpenConns(v int) {
+	c.databaseMaxOpenConns = v
+}
+
+func (c *configImplementation) GetDatabaseMaxOpenConns() int {
+	return c.databaseMaxOpenConns
+}
+
+func (c *configImplementation) SetDatabaseMaxIdleConns(v int) {
+	c.databaseMaxIdleConns = v
+}
+
+func (c *configImplementation) GetDatabaseMaxIdleConns() int {
+	return c.databaseMaxIdleConns
+}
+
+func (c *configImplementation) SetDatabaseConnMaxLifetimeSeconds(v int) {
+	c.databaseConnMaxLifetimeSeconds = v
+}
+
+func (c *configImplementation) GetDatabaseConnMaxLifetimeSeconds() int {
+	return c.databaseConnMaxLifetimeSeconds
+}
+
+func (c *configImplementation) SetDatabaseConnMaxIdleTimeSeconds(v int) {
+	c.databaseConnMaxIdleTimeSeconds = v
+}
+
+func (c *configImplementation) GetDatabaseConnMaxIdleTimeSeconds() int {
+	return c.databaseConnMaxIdleTimeSeconds
 }
 
 // ============================================================================

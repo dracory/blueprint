@@ -118,6 +118,18 @@ type DatabaseConfigInterface interface {
 
 	SetDatabaseSSLMode(string)
 	GetDatabaseSSLMode() string
+
+	SetDatabaseMaxOpenConns(int)
+	GetDatabaseMaxOpenConns() int
+
+	SetDatabaseMaxIdleConns(int)
+	GetDatabaseMaxIdleConns() int
+
+	SetDatabaseConnMaxLifetimeSeconds(int)
+	GetDatabaseConnMaxLifetimeSeconds() int
+
+	SetDatabaseConnMaxIdleTimeSeconds(int)
+	GetDatabaseConnMaxIdleTimeSeconds() int
 }
 
 // ============================================================================

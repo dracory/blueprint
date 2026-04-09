@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"strings"
+	"time"
 
 	"project/internal/config"
 
@@ -28,7 +29,11 @@ func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
 		SetCharset(`utf8mb4`).
 		SetTimeZone("UTC").
 		SetUserName(cfg.GetDatabaseUsername()).
-		SetPassword(cfg.GetDatabasePassword())
+		SetPassword(cfg.GetDatabasePassword()).
+		SetMaxOpenConns(cfg.GetDatabaseMaxOpenConns()).
+		SetMaxIdleConns(cfg.GetDatabaseMaxIdleConns()).
+		SetConnMaxLifetime(time.Duration(cfg.GetDatabaseConnMaxLifetimeSeconds()) * time.Second).
+		SetConnMaxIdleTime(time.Duration(cfg.GetDatabaseConnMaxIdleTimeSeconds()) * time.Second)
 
 	// Set SSL mode for non-SQLite databases
 	isSQLite := strings.Contains(strings.ToLower(cfg.GetDatabaseDriver()), "sqlite")

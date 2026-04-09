@@ -133,8 +133,8 @@ github.com/dracory/customstore v1.7.0 h1:rkFKLimqX5mk62wi+1Ub+YH3KeozNmQkyeOvIGg
 github.com/dracory/customstore v1.7.0/go.mod h1:EcKeANboU4G7Ua7bYA2EM2FWAIgHaMoJ2/6WR4MMLXY=
 github.com/dracory/dashboard v1.11.0 h1:BJXfEG9litaSdDpJJ9IUBoHukh9Q3Lrif1phPkqd04M=
 github.com/dracory/dashboard v1.11.0/go.mod h1:KJYOeO8aAkXK6pHiGPyhV0siqgTghX+CBj6h3qZZ2HY=
-github.com/dracory/database v0.7.0 h1:7pZbNKOhaMOwQ9WDU4AKgqvqmmKU/x5lNGliLH4aH0k=
-github.com/dracory/database v0.7.0/go.mod h1:SySNVnsfJSo2OQOMKrnVM4D98F5h9w2xoBVKjKLUl2E=
+github.com/dracory/database v0.8.0 h1:j4MANJAmhFM7N0zCYcNg0ZD4RzIKQw7rdXy36T2JTq4=
+github.com/dracory/database v0.8.0/go.mod h1:Ye8Osgz1U0kES6alk1nkcRVFDJ+kOG9ZtHTmSm07edU=
 github.com/dracory/dataobject v1.6.0 h1:k9kVYthGqK3giZvG/HMF9wGjwY9sRLv8XJ543nsUTiE=
 github.com/dracory/dataobject v1.6.0/go.mod h1:eo0pRMmHAEpWKQo29F6TTs43Cpp7J5QRj9wiJ0eQrJ0=
 github.com/dracory/email v0.1.0 h1:FvfBXWtGFXs+PIYm4V38FZ4C22SQtmdoeSDhbMUlg7g=

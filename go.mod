@@ -33,7 +33,7 @@ require (
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.7.0
 	github.com/dracory/dashboard v1.11.0
-	github.com/dracory/database v0.7.0
+	github.com/dracory/database v0.8.0
 	github.com/dracory/dataobject v1.6.0
 	github.com/dracory/email v0.1.0
 	github.com/dracory/entitystore v1.7.0
