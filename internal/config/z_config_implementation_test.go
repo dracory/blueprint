@@ -1,3 +1,5 @@
+// The z_ prefix keeps this file sorted after user-configurable files in the directory listing.
+
 package config
 
 import (
