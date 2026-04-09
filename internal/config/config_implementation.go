@@ -1,7 +1,6 @@
 package config
 
-var _ ConfigInterface = (*configImplementation)(nil)
-
+// configImplementation holds all configuration values.
 type configImplementation struct {
 	// App configuration
 	appName  string
@@ -12,15 +11,6 @@ type configImplementation struct {
 	appUrl   string
 	appDebug bool
 
-	// Email configuration
-	emailDriver      string
-	emailHost        string
-	emailPort        int
-	emailUsername    string
-	emailPassword    string
-	emailFromName    string
-	emailFromAddress string
-
 	// Database configuration
 	databaseDriver   string
 	databaseHost     string
@@ -30,35 +20,64 @@ type configImplementation struct {
 	databasePassword string
 	databaseSSLMode  string
 
+	// Email configuration
+	emailDriver      string
+	emailHost        string
+	emailPort        int
+	emailUsername    string
+	emailPassword    string
+	emailFromName    string
+	emailFromAddress string
+
 	// LLM configuration
-	openRouterApiKey          string
-	openRouterApiUsed         bool
-	openRouterApiDefaultModel string
-
-	// OpenAI
-	openAiApiKey          string
-	openAiApiUsed         bool
-	openAiApiDefaultModel string
-
-	// Anthropic
-	anthropicApiUsed         bool
-	anthropicApiKey          string
-	anthropicApiDefaultModel string
-
-	// Google Gemini
+	openRouterApiKey            string
+	openRouterApiUsed           bool
+	openRouterApiDefaultModel   string
+	openAiApiKey                string
+	openAiApiUsed               bool
+	openAiApiDefaultModel       string
+	anthropicApiUsed            bool
+	anthropicApiKey             string
+	anthropicApiDefaultModel    string
 	googleGeminiApiUsed         bool
 	googleGeminiApiKey          string
 	googleGeminiApiDefaultModel string
+	vertexAiApiUsed             bool
+	vertexAiApiDefaultModel     string
+	vertexAiApiProjectID        string
+	vertexAiApiRegionID         string
+	vertexAiApiModelID          string
 
-	// Vertex AI
-	vertexAiApiUsed         bool
-	vertexAiApiDefaultModel string
-	vertexAiApiProjectID    string
-	vertexAiApiRegionID     string
-	vertexAiApiModelID      string
+	// Media configuration
+	mediaBucket   string
+	mediaDriver   string
+	mediaKey      string
+	mediaEndpoint string
+	mediaRegion   string
+	mediaRoot     string
+	mediaSecret   string
+	mediaUrl      string
+
+	// Payment configuration
+	stripeKeyPrivate string
+	stripeKeyPublic  string
+	stripeUsed       bool
+
+	// Authentication
+	registrationEnabled bool
+
+	// i18n / Translation
+	translationLanguageDefault string
+	translationLanguageList    map[string]string
+
+	// SEO configuration
+	indexNowKey string
 
 	// Encryption
 	envEncryptionKey string
+
+	// CMS MCP
+	cmsMcpApiKey string
 
 	// Store flags
 	auditStoreUsed        bool
@@ -67,7 +86,6 @@ type configImplementation struct {
 	cacheStoreUsed        bool
 	cmsStoreUsed          bool
 	cmsStoreTemplateID    string
-	cmsMcpApiKey          string
 	customStoreUsed       bool
 	entityStoreUsed       bool
 	feedStoreUsed         bool
@@ -85,36 +103,31 @@ type configImplementation struct {
 	userStoreVaultEnabled bool
 	vaultStoreUsed        bool
 	vaultStoreKey         string
-
-	// i18n / Translation
-	translationLanguageDefault string
-	translationLanguageList    map[string]string
-
-	// App-specific settings
-	stripeKeyPrivate string
-	stripeKeyPublic  string
-	stripeUsed       bool
-
-	// Authentication
-	registrationEnabled bool
-
-	// Media configuration
-	mediaBucket   string
-	mediaDriver   string
-	mediaKey      string
-	mediaEndpoint string
-	mediaRegion   string
-	mediaRoot     string
-	mediaSecret   string
-	mediaUrl      string
-
-	// SEO configuration
-	indexNowKey string
 }
 
+// New constructs a new configuration instance.
 func New() ConfigInterface {
 	return &configImplementation{}
 }
+
+// Ensure configImplementation satisfies ConfigInterface
+var _ ConfigInterface = (*configImplementation)(nil)
+
+// ============================================================================
+// CMS MCP Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetCmsMcpApiKey(v string) {
+	c.cmsMcpApiKey = v
+}
+
+func (c *configImplementation) GetCmsMcpApiKey() string {
+	return c.cmsMcpApiKey
+}
+
+// ============================================================================
+// App Config Implementation
+// ============================================================================
 
 func (c *configImplementation) SetAppName(appName string) {
 	c.appName = appName
@@ -172,17 +185,6 @@ func (c *configImplementation) GetAppDebug() bool {
 	return c.appDebug
 }
 
-func (c *configImplementation) SetCmsMcpApiKey(v string) {
-	c.cmsMcpApiKey = v
-}
-
-func (c *configImplementation) GetCmsMcpApiKey() string {
-	return c.cmsMcpApiKey
-}
-
-// == Environment Helpers ==
-// These methods provide convenient checks for the current app environment.
-// They compare the configured environment string to known values.
 func (c *configImplementation) IsEnvDevelopment() bool {
 	return c.appEnv == "development"
 }
@@ -203,65 +205,22 @@ func (c *configImplementation) IsEnvTesting() bool {
 	return c.appEnv == "testing"
 }
 
-// == Email Getters/Setters ==
-func (c *configImplementation) SetMailDriver(v string) {
-	c.emailDriver = v
+// ============================================================================
+// Auth Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetRegistrationEnabled(v bool) {
+	c.registrationEnabled = v
 }
 
-func (c *configImplementation) GetMailDriver() string {
-	return c.emailDriver
+func (c *configImplementation) GetRegistrationEnabled() bool {
+	return c.registrationEnabled
 }
 
-func (c *configImplementation) SetMailHost(v string) {
-	c.emailHost = v
-}
+// ============================================================================
+// Database Config Implementation
+// ============================================================================
 
-func (c *configImplementation) GetMailHost() string {
-	return c.emailHost
-}
-
-func (c *configImplementation) SetMailPort(v int) {
-	c.emailPort = v
-}
-
-func (c *configImplementation) GetMailPort() int {
-	return c.emailPort
-}
-
-func (c *configImplementation) SetMailUsername(v string) {
-	c.emailUsername = v
-}
-
-func (c *configImplementation) GetMailUsername() string {
-	return c.emailUsername
-}
-
-func (c *configImplementation) SetMailPassword(v string) {
-	c.emailPassword = v
-}
-
-func (c *configImplementation) GetMailPassword() string {
-	return c.emailPassword
-}
-
-func (c *configImplementation) SetMailFromName(v string) {
-	c.emailFromName = v
-}
-
-func (c *configImplementation) GetMailFromName() string {
-	return c.emailFromName
-}
-
-// == Email From Address Getters/Setters ==
-func (c *configImplementation) SetMailFromAddress(v string) {
-	c.emailFromAddress = v
-}
-
-func (c *configImplementation) GetMailFromAddress() string {
-	return c.emailFromAddress
-}
-
-// == Database Getters/Setters ==
 func (c *configImplementation) SetDatabaseDriver(v string) {
 	c.databaseDriver = v
 }
@@ -318,12 +277,107 @@ func (c *configImplementation) GetDatabaseSSLMode() string {
 	return c.databaseSSLMode
 }
 
-// == LLM Getters/Setters ==
+// ============================================================================
+// Email Config Implementation
+// ============================================================================
 
-// LLM: Anthropic
+func (c *configImplementation) SetMailDriver(v string) {
+	c.emailDriver = v
+}
+
+func (c *configImplementation) GetMailDriver() string {
+	return c.emailDriver
+}
+
+func (c *configImplementation) SetMailHost(v string) {
+	c.emailHost = v
+}
+
+func (c *configImplementation) GetMailHost() string {
+	return c.emailHost
+}
+
+func (c *configImplementation) SetMailPort(v int) {
+	c.emailPort = v
+}
+
+func (c *configImplementation) GetMailPort() int {
+	return c.emailPort
+}
+
+func (c *configImplementation) SetMailUsername(v string) {
+	c.emailUsername = v
+}
+
+func (c *configImplementation) GetMailUsername() string {
+	return c.emailUsername
+}
+
+func (c *configImplementation) SetMailPassword(v string) {
+	c.emailPassword = v
+}
+
+func (c *configImplementation) GetMailPassword() string {
+	return c.emailPassword
+}
+
+func (c *configImplementation) SetMailFromName(v string) {
+	c.emailFromName = v
+}
+
+func (c *configImplementation) GetMailFromName() string {
+	return c.emailFromName
+}
+
+func (c *configImplementation) SetMailFromAddress(v string) {
+	c.emailFromAddress = v
+}
+
+func (c *configImplementation) GetMailFromAddress() string {
+	return c.emailFromAddress
+}
+
+// ============================================================================
+// Encryption Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetEnvEncryptionKey(v string) {
+	c.envEncryptionKey = v
+}
+
+func (c *configImplementation) GetEnvEncryptionKey() string {
+	return c.envEncryptionKey
+}
+
+// ============================================================================
+// i18n Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetTranslationLanguageDefault(v string) {
+	c.translationLanguageDefault = v
+}
+
+func (c *configImplementation) GetTranslationLanguageDefault() string {
+	return c.translationLanguageDefault
+}
+
+func (c *configImplementation) SetTranslationLanguageList(v map[string]string) {
+	c.translationLanguageList = v
+}
+
+func (c *configImplementation) GetTranslationLanguageList() map[string]string {
+	return c.translationLanguageList
+}
+
+// ============================================================================
+// LLM Config Implementation
+// ============================================================================
+
+// Anthropic
 func (c *configImplementation) SetAnthropicApiUsed(v bool) {
 	c.anthropicApiUsed = v
 }
+
 func (c *configImplementation) GetAnthropicApiUsed() bool {
 	return c.anthropicApiUsed
 }
@@ -331,6 +385,7 @@ func (c *configImplementation) GetAnthropicApiUsed() bool {
 func (c *configImplementation) SetAnthropicApiKey(v string) {
 	c.anthropicApiKey = v
 }
+
 func (c *configImplementation) GetAnthropicApiKey() string {
 	return c.anthropicApiKey
 }
@@ -338,14 +393,16 @@ func (c *configImplementation) GetAnthropicApiKey() string {
 func (c *configImplementation) SetAnthropicApiDefaultModel(v string) {
 	c.anthropicApiDefaultModel = v
 }
+
 func (c *configImplementation) GetAnthropicApiDefaultModel() string {
 	return c.anthropicApiDefaultModel
 }
 
-// LLM: Google Gemini
+// Google Gemini
 func (c *configImplementation) SetGoogleGeminiApiUsed(v bool) {
 	c.googleGeminiApiUsed = v
 }
+
 func (c *configImplementation) GetGoogleGeminiApiUsed() bool {
 	return c.googleGeminiApiUsed
 }
@@ -353,6 +410,7 @@ func (c *configImplementation) GetGoogleGeminiApiUsed() bool {
 func (c *configImplementation) SetGoogleGeminiApiKey(v string) {
 	c.googleGeminiApiKey = v
 }
+
 func (c *configImplementation) GetGoogleGeminiApiKey() string {
 	return c.googleGeminiApiKey
 }
@@ -360,11 +418,12 @@ func (c *configImplementation) GetGoogleGeminiApiKey() string {
 func (c *configImplementation) SetGoogleGeminiApiDefaultModel(v string) {
 	c.googleGeminiApiDefaultModel = v
 }
+
 func (c *configImplementation) GetGoogleGeminiApiDefaultModel() string {
 	return c.googleGeminiApiDefaultModel
 }
 
-// LLM: OpenAI (mapped to existing openAIKey field for key storage)
+// OpenAI
 func (c *configImplementation) SetOpenAiApiUsed(v bool) {
 	c.openAiApiUsed = v
 }
@@ -376,6 +435,7 @@ func (c *configImplementation) GetOpenAiApiUsed() bool {
 func (c *configImplementation) SetOpenAiApiKey(v string) {
 	c.openAiApiKey = v
 }
+
 func (c *configImplementation) GetOpenAiApiKey() string {
 	return c.openAiApiKey
 }
@@ -383,10 +443,12 @@ func (c *configImplementation) GetOpenAiApiKey() string {
 func (c *configImplementation) SetOpenAiApiDefaultModel(v string) {
 	c.openAiApiDefaultModel = v
 }
+
 func (c *configImplementation) GetOpenAiApiDefaultModel() string {
 	return c.openAiApiDefaultModel
 }
 
+// OpenRouter
 func (c *configImplementation) SetOpenRouterApiKey(v string) {
 	c.openRouterApiKey = v
 }
@@ -411,10 +473,11 @@ func (c *configImplementation) GetOpenRouterApiDefaultModel() string {
 	return c.openRouterApiDefaultModel
 }
 
-// LLM: Vertex AI
+// Vertex AI
 func (c *configImplementation) SetVertexAiApiUsed(v bool) {
 	c.vertexAiApiUsed = v
 }
+
 func (c *configImplementation) GetVertexAiApiUsed() bool {
 	return c.vertexAiApiUsed
 }
@@ -422,6 +485,7 @@ func (c *configImplementation) GetVertexAiApiUsed() bool {
 func (c *configImplementation) SetVertexAiApiDefaultModel(v string) {
 	c.vertexAiApiDefaultModel = v
 }
+
 func (c *configImplementation) GetVertexAiApiDefaultModel() string {
 	return c.vertexAiApiDefaultModel
 }
@@ -429,6 +493,7 @@ func (c *configImplementation) GetVertexAiApiDefaultModel() string {
 func (c *configImplementation) SetVertexAiApiProjectID(v string) {
 	c.vertexAiApiProjectID = v
 }
+
 func (c *configImplementation) GetVertexAiApiProjectID() string {
 	return c.vertexAiApiProjectID
 }
@@ -436,6 +501,7 @@ func (c *configImplementation) GetVertexAiApiProjectID() string {
 func (c *configImplementation) SetVertexAiApiRegionID(v string) {
 	c.vertexAiApiRegionID = v
 }
+
 func (c *configImplementation) GetVertexAiApiRegionID() string {
 	return c.vertexAiApiRegionID
 }
@@ -443,20 +509,133 @@ func (c *configImplementation) GetVertexAiApiRegionID() string {
 func (c *configImplementation) SetVertexAiApiModelID(v string) {
 	c.vertexAiApiModelID = v
 }
+
 func (c *configImplementation) GetVertexAiApiModelID() string {
 	return c.vertexAiApiModelID
 }
 
-// == Encryption Getters/Setters ==
-func (c *configImplementation) SetEnvEncryptionKey(v string) {
-	c.envEncryptionKey = v
+// ============================================================================
+// Media Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetMediaBucket(v string) {
+	c.mediaBucket = v
 }
 
-func (c *configImplementation) GetEnvEncryptionKey() string {
-	return c.envEncryptionKey
+func (c *configImplementation) GetMediaBucket() string {
+	return c.mediaBucket
 }
 
-// == Blog Store Getters/Setters ==
+func (c *configImplementation) SetMediaDriver(v string) {
+	c.mediaDriver = v
+}
+
+func (c *configImplementation) GetMediaDriver() string {
+	return c.mediaDriver
+}
+
+func (c *configImplementation) SetMediaKey(v string) {
+	c.mediaKey = v
+}
+
+func (c *configImplementation) GetMediaKey() string {
+	return c.mediaKey
+}
+
+func (c *configImplementation) SetMediaEndpoint(v string) {
+	c.mediaEndpoint = v
+}
+
+func (c *configImplementation) GetMediaEndpoint() string {
+	return c.mediaEndpoint
+}
+
+func (c *configImplementation) SetMediaRegion(v string) {
+	c.mediaRegion = v
+}
+
+func (c *configImplementation) GetMediaRegion() string {
+	return c.mediaRegion
+}
+
+func (c *configImplementation) SetMediaRoot(v string) {
+	c.mediaRoot = v
+}
+
+func (c *configImplementation) GetMediaRoot() string {
+	return c.mediaRoot
+}
+
+func (c *configImplementation) SetMediaSecret(v string) {
+	c.mediaSecret = v
+}
+
+func (c *configImplementation) GetMediaSecret() string {
+	return c.mediaSecret
+}
+
+func (c *configImplementation) SetMediaUrl(v string) {
+	c.mediaUrl = v
+}
+
+func (c *configImplementation) GetMediaUrl() string {
+	return c.mediaUrl
+}
+
+// ============================================================================
+// Payment Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetStripeKeyPrivate(v string) {
+	c.stripeKeyPrivate = v
+}
+
+func (c *configImplementation) GetStripeKeyPrivate() string {
+	return c.stripeKeyPrivate
+}
+
+func (c *configImplementation) SetStripeKeyPublic(v string) {
+	c.stripeKeyPublic = v
+}
+
+func (c *configImplementation) GetStripeKeyPublic() string {
+	return c.stripeKeyPublic
+}
+
+func (c *configImplementation) SetStripeUsed(v bool) {
+	c.stripeUsed = v
+}
+
+func (c *configImplementation) GetStripeUsed() bool {
+	return c.stripeUsed
+}
+
+// ============================================================================
+// SEO Config Implementation
+// ============================================================================
+
+func (c *configImplementation) SetIndexNowKey(v string) {
+	c.indexNowKey = v
+}
+
+func (c *configImplementation) GetIndexNowKey() string {
+	return c.indexNowKey
+}
+
+// ============================================================================
+// Stores Config Implementation
+// ============================================================================
+
+// Audit Store
+func (c *configImplementation) SetAuditStoreUsed(v bool) {
+	c.auditStoreUsed = v
+}
+
+func (c *configImplementation) GetAuditStoreUsed() bool {
+	return c.auditStoreUsed
+}
+
+// Blog Store
 func (c *configImplementation) SetBlogStoreUsed(v bool) {
 	c.blogStoreUsed = v
 }
@@ -465,16 +644,7 @@ func (c *configImplementation) GetBlogStoreUsed() bool {
 	return c.blogStoreUsed
 }
 
-// == Chat Store Getters/Setters ==
-func (c *configImplementation) SetChatStoreUsed(v bool) {
-	c.chatStoreUsed = v
-}
-
-func (c *configImplementation) GetChatStoreUsed() bool {
-	return c.chatStoreUsed
-}
-
-// == Cache Store Getters/Setters ==
+// Cache Store
 func (c *configImplementation) SetCacheStoreUsed(v bool) {
 	c.cacheStoreUsed = v
 }
@@ -483,7 +653,16 @@ func (c *configImplementation) GetCacheStoreUsed() bool {
 	return c.cacheStoreUsed
 }
 
-// == CMS Store Getters/Setters ==
+// Chat Store
+func (c *configImplementation) SetChatStoreUsed(v bool) {
+	c.chatStoreUsed = v
+}
+
+func (c *configImplementation) GetChatStoreUsed() bool {
+	return c.chatStoreUsed
+}
+
+// CMS Store
 func (c *configImplementation) SetCmsStoreUsed(v bool) {
 	c.cmsStoreUsed = v
 }
@@ -500,7 +679,7 @@ func (c *configImplementation) GetCmsStoreTemplateID() string {
 	return c.cmsStoreTemplateID
 }
 
-// == Custom Store Getters/Setters ==
+// Custom Store
 func (c *configImplementation) SetCustomStoreUsed(v bool) {
 	c.customStoreUsed = v
 }
@@ -509,7 +688,7 @@ func (c *configImplementation) GetCustomStoreUsed() bool {
 	return c.customStoreUsed
 }
 
-// == Entity Store Getters/Setters ==
+// Entity Store
 func (c *configImplementation) SetEntityStoreUsed(v bool) {
 	c.entityStoreUsed = v
 }
@@ -518,7 +697,7 @@ func (c *configImplementation) GetEntityStoreUsed() bool {
 	return c.entityStoreUsed
 }
 
-// == Feed Store Getters/Setters ==
+// Feed Store
 func (c *configImplementation) SetFeedStoreUsed(v bool) {
 	c.feedStoreUsed = v
 }
@@ -527,7 +706,7 @@ func (c *configImplementation) GetFeedStoreUsed() bool {
 	return c.feedStoreUsed
 }
 
-// == Geo Store Getters/Setters ==
+// Geo Store
 func (c *configImplementation) SetGeoStoreUsed(v bool) {
 	c.geoStoreUsed = v
 }
@@ -536,7 +715,7 @@ func (c *configImplementation) GetGeoStoreUsed() bool {
 	return c.geoStoreUsed
 }
 
-// == Log Store Getters/Setters ==
+// Log Store
 func (c *configImplementation) SetLogStoreUsed(v bool) {
 	c.logStoreUsed = v
 }
@@ -545,7 +724,7 @@ func (c *configImplementation) GetLogStoreUsed() bool {
 	return c.logStoreUsed
 }
 
-// == Meta Store Getters/Setters ==
+// Meta Store
 func (c *configImplementation) SetMetaStoreUsed(v bool) {
 	c.metaStoreUsed = v
 }
@@ -554,7 +733,7 @@ func (c *configImplementation) GetMetaStoreUsed() bool {
 	return c.metaStoreUsed
 }
 
-// == Session Store Getters/Setters ==
+// Session Store
 func (c *configImplementation) SetSessionStoreUsed(v bool) {
 	c.sessionStoreUsed = v
 }
@@ -563,16 +742,7 @@ func (c *configImplementation) GetSessionStoreUsed() bool {
 	return c.sessionStoreUsed
 }
 
-// == Sql File Store Getters/Setters ==
-func (c *configImplementation) SetSqlFileStoreUsed(v bool) {
-	c.sqlFileStoreUsed = v
-}
-
-func (c *configImplementation) GetSqlFileStoreUsed() bool {
-	return c.sqlFileStoreUsed
-}
-
-// == Setting Store Getters/Setters ==
+// Setting Store
 func (c *configImplementation) SetSettingStoreUsed(v bool) {
 	c.settingStoreUsed = v
 }
@@ -581,7 +751,7 @@ func (c *configImplementation) GetSettingStoreUsed() bool {
 	return c.settingStoreUsed
 }
 
-// == Shop Store Getters/Setters ==
+// Shop Store
 func (c *configImplementation) SetShopStoreUsed(v bool) {
 	c.shopStoreUsed = v
 }
@@ -590,7 +760,25 @@ func (c *configImplementation) GetShopStoreUsed() bool {
 	return c.shopStoreUsed
 }
 
-// == Subscription Store Getters/Setters ==
+// SQL File Store
+func (c *configImplementation) SetSqlFileStoreUsed(v bool) {
+	c.sqlFileStoreUsed = v
+}
+
+func (c *configImplementation) GetSqlFileStoreUsed() bool {
+	return c.sqlFileStoreUsed
+}
+
+// Stats Store
+func (c *configImplementation) SetStatsStoreUsed(v bool) {
+	c.statsStoreUsed = v
+}
+
+func (c *configImplementation) GetStatsStoreUsed() bool {
+	return c.statsStoreUsed
+}
+
+// Subscription Store
 func (c *configImplementation) SetSubscriptionStoreUsed(v bool) {
 	c.subscriptionStoreUsed = v
 }
@@ -599,7 +787,7 @@ func (c *configImplementation) GetSubscriptionStoreUsed() bool {
 	return c.subscriptionStoreUsed
 }
 
-// == Task Store Getters/Setters ==
+// Task Store
 func (c *configImplementation) SetTaskStoreUsed(v bool) {
 	c.taskStoreUsed = v
 }
@@ -608,7 +796,7 @@ func (c *configImplementation) GetTaskStoreUsed() bool {
 	return c.taskStoreUsed
 }
 
-// == User Store Getters/Setters ==
+// User Store
 func (c *configImplementation) SetUserStoreUsed(v bool) {
 	c.userStoreUsed = v
 }
@@ -625,71 +813,7 @@ func (c *configImplementation) GetUserStoreVaultEnabled() bool {
 	return c.userStoreVaultEnabled
 }
 
-// == Stats Getters/Setters ==
-func (c *configImplementation) SetStatsStoreUsed(v bool) {
-	c.statsStoreUsed = v
-}
-
-func (c *configImplementation) GetStatsStoreUsed() bool {
-	return c.statsStoreUsed
-}
-
-// == i18n Getters/Setters ==
-func (c *configImplementation) SetTranslationLanguageDefault(v string) {
-	c.translationLanguageDefault = v
-}
-
-func (c *configImplementation) GetTranslationLanguageDefault() string {
-	return c.translationLanguageDefault
-}
-
-func (c *configImplementation) SetTranslationLanguageList(v map[string]string) {
-	c.translationLanguageList = v
-}
-
-func (c *configImplementation) GetTranslationLanguageList() map[string]string {
-	return c.translationLanguageList
-}
-
-// == App-specific Getters/Setters ==
-func (c *configImplementation) SetStripeKeyPrivate(v string) {
-	c.stripeKeyPrivate = v
-}
-
-func (c *configImplementation) GetStripeKeyPrivate() string {
-	return c.stripeKeyPrivate
-}
-
-func (c *configImplementation) SetStripeKeyPublic(v string) {
-	c.stripeKeyPublic = v
-}
-func (c *configImplementation) GetStripeKeyPublic() string {
-	return c.stripeKeyPublic
-}
-
-func (c *configImplementation) SetStripeUsed(v bool) {
-	c.stripeUsed = v
-}
-func (c *configImplementation) GetStripeUsed() bool { return c.stripeUsed }
-
-func (c *configImplementation) SetRegistrationEnabled(v bool) {
-	c.registrationEnabled = v
-}
-
-func (c *configImplementation) GetRegistrationEnabled() bool {
-	return c.registrationEnabled
-}
-
-// == Audit Store Getters/Setters ==
-func (c *configImplementation) SetAuditStoreUsed(v bool) {
-	c.auditStoreUsed = v
-}
-
-func (c *configImplementation) GetAuditStoreUsed() bool {
-	return c.auditStoreUsed
-}
-
-// == Vault Store Getters/Setters ==
+// Vault Store
 func (c *configImplementation) SetVaultStoreUsed(v bool) {
 	c.vaultStoreUsed = v
 }
@@ -705,25 +829,3 @@ func (c *configImplementation) SetVaultStoreKey(v string) {
 func (c *configImplementation) GetVaultStoreKey() string {
 	return c.vaultStoreKey
 }
-
-// == Media Getters/Setters ==
-func (c *configImplementation) SetMediaBucket(v string)   { c.mediaBucket = v }
-func (c *configImplementation) GetMediaBucket() string    { return c.mediaBucket }
-func (c *configImplementation) SetMediaDriver(v string)   { c.mediaDriver = v }
-func (c *configImplementation) GetMediaDriver() string    { return c.mediaDriver }
-func (c *configImplementation) SetMediaKey(v string)      { c.mediaKey = v }
-func (c *configImplementation) GetMediaKey() string       { return c.mediaKey }
-func (c *configImplementation) SetMediaEndpoint(v string) { c.mediaEndpoint = v }
-func (c *configImplementation) GetMediaEndpoint() string  { return c.mediaEndpoint }
-func (c *configImplementation) SetMediaRegion(v string)   { c.mediaRegion = v }
-func (c *configImplementation) GetMediaRegion() string    { return c.mediaRegion }
-func (c *configImplementation) SetMediaRoot(v string)     { c.mediaRoot = v }
-func (c *configImplementation) GetMediaRoot() string      { return c.mediaRoot }
-func (c *configImplementation) SetMediaSecret(v string)   { c.mediaSecret = v }
-func (c *configImplementation) GetMediaSecret() string    { return c.mediaSecret }
-func (c *configImplementation) SetMediaUrl(v string)      { c.mediaUrl = v }
-func (c *configImplementation) GetMediaUrl() string       { return c.mediaUrl }
-
-// == SEO Getters/Setters ==
-func (c *configImplementation) SetIndexNowKey(v string) { c.indexNowKey = v }
-func (c *configImplementation) GetIndexNowKey() string  { return c.indexNowKey }
