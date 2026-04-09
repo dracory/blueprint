@@ -4,7 +4,7 @@ import "github.com/dracory/env"
 
 // readStripeConfig reads Stripe payment configuration from environment variables.
 // Stripe is automatically enabled when both keys are provided.
-func readStripeConfig(cfg *configImplementation) {
+func paymentConfig(cfg *configImplementation) {
 	// Stripe Private Key
 	//
 	// Your Stripe secret key, used for server-side API calls.
@@ -22,5 +22,8 @@ func readStripeConfig(cfg *configImplementation) {
 	// Stripe is automatically enabled when both keys are present.
 	used := keyPrivate != "" && keyPublic != ""
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setStripeConfig(keyPrivate, keyPublic, used)
 }

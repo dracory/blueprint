@@ -3,7 +3,7 @@ package config
 import "github.com/dracory/env"
 
 // readTranslationConfig reads i18n configuration from environment variables.
-func readTranslationConfig(cfg *configImplementation) {
+func i18nConfig(cfg *configImplementation) {
 	// Default Language
 	//
 	// The default locale used when no language is specified.
@@ -18,5 +18,8 @@ func readTranslationConfig(cfg *configImplementation) {
 	// Example: {"en": "English", "fr": "French"}
 	languageList := translationLanguageListDefault()
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setTranslationConfig(defaultLanguage, languageList)
 }

@@ -6,7 +6,7 @@ import (
 )
 
 // readMailConfig reads mail configuration from environment variables.
-func readMailConfig(cfg *configImplementation) {
+func emailConfig(cfg *configImplementation) {
 	// Mail Driver
 	//
 	// The mail driver to use for sending emails.
@@ -47,5 +47,8 @@ func readMailConfig(cfg *configImplementation) {
 	// The username for authenticating with the mail server.
 	username := env.GetString(KEY_MAIL_USERNAME)
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setMailConfig(driver, fromAddress, fromName, host, password, port, username)
 }

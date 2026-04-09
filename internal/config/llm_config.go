@@ -2,7 +2,7 @@ package config
 
 // readLLMConfig reads LLM provider configuration from environment variables.
 // Each provider is opt-in: set the *_USED flag to true and provide the required keys.
-func readLLMConfig(cfg *configImplementation, v *envValidator) {
+func llmConfig(cfg *configImplementation, v *envValidator) {
 	// -------------------------------------------------------------------------
 	// Anthropic (Claude)
 	// https://console.anthropic.com/settings/keys
@@ -114,6 +114,9 @@ func readLLMConfig(cfg *configImplementation, v *envValidator) {
 	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiDefaultModel)
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setLLMConfig(
 		anthropicUsed, anthropicKey, anthropicDefaultModel,
 		googleGeminiUsed, googleGeminiKey, googleGeminiDefaultModel,

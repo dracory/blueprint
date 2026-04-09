@@ -4,7 +4,7 @@ import "fmt"
 
 // readStoresConfig reads datastore feature flags from environment variables.
 // Each store is opt-in via configuration_stores.go - set the flag to true to enable it.
-func readStoresConfig(cfg *configImplementation, v *envValidator) {
+func storesConfig(cfg *configImplementation, v *envValidator) {
 	// CMS Store Template ID
 	//
 	// The template ID used by the CMS store for rendering content.
@@ -24,5 +24,8 @@ func readStoresConfig(cfg *configImplementation, v *envValidator) {
 	v.RequireWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
 		"required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setStoresConfig(cmsStoreTemplateID, vaultStoreKey)
 }

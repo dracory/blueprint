@@ -17,7 +17,7 @@ func Load() (ConfigInterface, error) {
 	cfg := &configImplementation{}
 
 	// Load app config first to get app.env
-	readAppConfig(cfg, v)
+	appConfig(cfg, v)
 
 	// Load encryption config and check if encryption is used
 	privateKey := env.GetString(KEY_ENVENC_KEY_PRIVATE)
@@ -39,17 +39,17 @@ func Load() (ConfigInterface, error) {
 		}
 
 		// Reload app config to pick up any encrypted app variables
-		readAppConfig(cfg, v)
+		appConfig(cfg, v)
 	}
 
 	// Now load remaining config sections - they will have access to encrypted variables
-	readDatabaseConfig(cfg, v)
-	readMailConfig(cfg)
-	readRegistrationConfig(cfg)
-	readStoresConfig(cfg, v)
-	readStripeConfig(cfg)
-	readLLMConfig(cfg, v)
-	readTranslationConfig(cfg)
+	databaseConfig(cfg, v)
+	emailConfig(cfg)
+	authConfig(cfg)
+	storesConfig(cfg, v)
+	paymentConfig(cfg)
+	llmConfig(cfg, v)
+	i18nConfig(cfg)
 	if err := v.Err(); err != nil {
 		return nil, err
 	}

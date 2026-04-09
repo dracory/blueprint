@@ -3,7 +3,7 @@ package config
 import "strings"
 
 // readAppConfig reads application configuration from environment variables.
-func readAppConfig(cfg *configImplementation, v *envValidator) {
+func appConfig(cfg *configImplementation, v *envValidator) {
 	// Application Name
 	//
 	// This value is the name of your application, used in notifications
@@ -45,5 +45,8 @@ func readAppConfig(cfg *configImplementation, v *envValidator) {
 	// Leave empty to disable CMS MCP integration.
 	cmsMcpApiKey := strings.TrimSpace(v.GetString(KEY_MCP_API_KEY))
 
+	// -------------------------------------------------------------------------
+	// Do not edit below this line
+	// -------------------------------------------------------------------------
 	cfg.setAppConfig(name, url, host, port, appEnv, debug, cmsMcpApiKey)
 }
