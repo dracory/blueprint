@@ -19,7 +19,7 @@ func loadStripeConfig(cfg ConfigInterface) {
 	// Example: pk_live_... (production) or pk_test_... (testing)
 	keyPublic := env.GetString(KEY_STRIPE_KEY_PUBLIC)
 
-	// Stripe is considered enabled when both keys are present.
+	// Stripe is automatically enabled when both keys are present.
 	used := keyPrivate != "" && keyPublic != ""
 
 	cfg.SetStripeKeyPrivate(keyPrivate)

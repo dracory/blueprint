@@ -21,7 +21,7 @@ func loadStoresConfig(cfg ConfigInterface, v *envValidator) {
 		v.Add(fmt.Errorf("userStoreVaultEnabled requires vaultStoreUsed to be true"))
 	}
 
-	v.MustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
+	v.RequireWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
 		"required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
 	cfg.SetAuditStoreUsed(auditStoreUsed)

@@ -24,7 +24,7 @@ func Load() (ConfigInterface, error) {
 	encryptionUsed := privateKey != ""
 
 	if encryptionUsed {
-		v.MustWhen(true, KEY_ENVENC_KEY_PRIVATE,
+		v.RequireWhen(true, KEY_ENVENC_KEY_PRIVATE,
 			"required when encryption is enabled", privateKey)
 	}
 

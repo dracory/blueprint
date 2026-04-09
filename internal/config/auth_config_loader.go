@@ -8,5 +8,7 @@ func loadRegistrationConfig(cfg ConfigInterface) {
 	//
 	// Controls whether new users can register for an account.
 	// Set to false to disable public registration (invite-only or closed systems).
-	cfg.SetRegistrationEnabled(env.GetBool(KEY_AUTH_REGISTRATION_ENABLED))
+	registrationEnabled := env.GetBool(KEY_AUTH_REGISTRATION_ENABLED)
+
+	cfg.SetRegistrationEnabled(registrationEnabled)
 }

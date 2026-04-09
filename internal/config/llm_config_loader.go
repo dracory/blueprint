@@ -85,33 +85,33 @@ func loadLLMConfig(cfg ConfigInterface, v *envValidator) {
 	// Default Vertex AI model. Required when VERTEX_AI_API_USED=true.
 	vertexAiDefaultModel := v.GetString(KEY_VERTEX_AI_API_DEFAULT_MODEL)
 
-	v.MustWhen(anthropicUsed, KEY_ANTHROPIC_API_KEY,
+	v.RequireWhen(anthropicUsed, KEY_ANTHROPIC_API_KEY,
 		"required when `ANTHROPIC_API_USED` is true", anthropicKey)
-	v.MustWhen(anthropicUsed, KEY_ANTHROPIC_API_DEFAULT_MODEL,
+	v.RequireWhen(anthropicUsed, KEY_ANTHROPIC_API_DEFAULT_MODEL,
 		"required when `ANTHROPIC_API_USED` is true", anthropicDefaultModel)
 
-	v.MustWhen(googleGeminiUsed, KEY_GEMINI_API_KEY,
+	v.RequireWhen(googleGeminiUsed, KEY_GEMINI_API_KEY,
 		"required when `GEMINI_API_USED` is true", googleGeminiKey)
-	v.MustWhen(googleGeminiUsed, KEY_GEMINI_API_DEFAULT_MODEL,
+	v.RequireWhen(googleGeminiUsed, KEY_GEMINI_API_DEFAULT_MODEL,
 		"required when `GEMINI_API_USED` is true", googleGeminiDefaultModel)
 
-	v.MustWhen(openAiUsed, KEY_OPENAI_API_KEY,
+	v.RequireWhen(openAiUsed, KEY_OPENAI_API_KEY,
 		"required when `OPENAI_API_USED` is true", openAiKey)
-	v.MustWhen(openAiUsed, KEY_OPENAI_API_DEFAULT_MODEL,
+	v.RequireWhen(openAiUsed, KEY_OPENAI_API_DEFAULT_MODEL,
 		"required when `OPENAI_API_USED` is true", openAiDefaultModel)
 
-	v.MustWhen(openRouterUsed, KEY_OPENROUTER_API_KEY,
+	v.RequireWhen(openRouterUsed, KEY_OPENROUTER_API_KEY,
 		"required when `OPENROUTER_API_USED` is true", openRouterKey)
-	v.MustWhen(openRouterUsed, KEY_OPENROUTER_API_DEFAULT_MODEL,
+	v.RequireWhen(openRouterUsed, KEY_OPENROUTER_API_DEFAULT_MODEL,
 		"required when `OPENROUTER_API_USED` is true", openRouterDefaultModel)
 
-	v.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_MODEL_ID,
+	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_MODEL_ID,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiModelID)
-	v.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_PROJECT_ID,
+	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_PROJECT_ID,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiProjectID)
-	v.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_REGION_ID,
+	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_REGION_ID,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiRegionID)
-	v.MustWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL,
+	v.RequireWhen(vertexAiUsed, KEY_VERTEX_AI_API_DEFAULT_MODEL,
 		"required when `VERTEX_AI_API_USED` is true", vertexAiDefaultModel)
 
 	cfg.SetAnthropicApiUsed(anthropicUsed)

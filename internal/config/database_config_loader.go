@@ -8,7 +8,7 @@ func loadDatabaseConfig(cfg ConfigInterface, v *envValidator) {
 	//
 	// The database driver to use for the application.
 	// Supported values: sqlite, postgres, mysql
-	driver := v.MustString(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
+	driver := v.GetStringOrError(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
 
 	// Database Host
 	//
@@ -27,7 +27,7 @@ func loadDatabaseConfig(cfg ConfigInterface, v *envValidator) {
 	//
 	// The name of the database to connect to.
 	// For sqlite, this is the file path (e.g., ./database.db or :memory:)
-	name := v.MustString(KEY_DB_DATABASE, "set the database name")
+	name := v.GetStringOrError(KEY_DB_DATABASE, "set the database name")
 
 	// Database Username
 	//
@@ -42,10 +42,10 @@ func loadDatabaseConfig(cfg ConfigInterface, v *envValidator) {
 	pass := strings.TrimSpace(v.GetString(KEY_DB_PASSWORD))
 
 	if driver != driverSQLite {
-		v.MustWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
-		v.MustWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
-		v.MustWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", user)
-		v.MustWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
+		v.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
+		v.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
+		v.RequireWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", user)
+		v.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
 	}
 
 	cfg.SetDatabaseDriver(driver)
