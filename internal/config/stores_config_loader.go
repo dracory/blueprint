@@ -2,14 +2,23 @@ package config
 
 import "fmt"
 
-// loadStoresConfig loads stores configuration directly into the config.
+// loadStoresConfig loads datastore feature flags directly into the config.
+// Each store is opt-in via configuration_stores.go - set the flag to true to enable it.
 func loadStoresConfig(cfg ConfigInterface, v *envValidator) {
+	// CMS Store Template ID
+	//
+	// The template ID used by the CMS store for rendering content.
+	// Required when CMS_STORE_USED is true.
 	cmsStoreTemplateID := v.GetString(KEY_CMS_STORE_TEMPLATE_ID)
+
+	// Vault Store Key
+	//
+	// Encryption key used by the vault store to encrypt sensitive data.
+	// Required when VAULT_STORE_USED is true.
 	vaultStoreKey := v.GetString(KEY_VAULT_STORE_KEY)
 
 	if userStoreVaultEnabled && !vaultStoreUsed {
-		v.Add(fmt.Errorf("%v requires %v to be true",
-			userStoreVaultEnabled, vaultStoreUsed))
+		v.Add(fmt.Errorf("userStoreVaultEnabled requires vaultStoreUsed to be true"))
 	}
 
 	v.MustWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
