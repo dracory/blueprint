@@ -38,7 +38,7 @@ func TestCategoryManagerControllerHandler(t *testing.T) {
 		t.Fatal("NewCategoryManagerController() returned nil")
 	}
 
-	// Test with a request without auth (will panic due to missing cache store)
+	// Test with a request without auth (will panic due to missing auth context)
 	req := httptest.NewRequest("GET", "/admin/blog/categories", nil)
 	w := httptest.NewRecorder()
 
