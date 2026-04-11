@@ -8,17 +8,20 @@ import (
 
 func TestUserRoutes(t *testing.T) {
 	// Test with nil registry
-	routes := UserRoutes(nil)
-	if routes == nil {
-		t.Error("UserRoutes() should not return nil")
+	routes, err := UserRoutes(nil)
+	if err == nil {
+		t.Error("UserRoutes(nil) should return an error")
 	}
-	if len(routes) != 7 {
-		t.Errorf("UserRoutes(nil) should return 7 routes, got %d", len(routes))
+	if routes != nil {
+		t.Error("UserRoutes(nil) should return nil routes")
 	}
 
 	// Test with valid registry
 	registry := testutils.Setup()
-	routes = UserRoutes(registry)
+	routes, err = UserRoutes(registry)
+	if err != nil {
+		t.Errorf("UserRoutes(registry) should not return an error, got: %v", err)
+	}
 	if routes == nil {
 		t.Error("UserRoutes() should not return nil")
 	}
