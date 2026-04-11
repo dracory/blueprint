@@ -3,23 +3,23 @@ package links
 import (
 	"net/url"
 	"os"
+	"sync"
 
 	baseurl "github.com/dracory/base/url"
 )
 
-var initialized bool
+var initOnce sync.Once
 
 // initializeURLBuilder initializes the base URL builder with environment variable
 // This should be called before any URL building operations
 func initializeURLBuilder() {
-	if !initialized {
+	initOnce.Do(func() {
 		appURL := os.Getenv("APP_URL")
 		if os.Getenv("APP_ENV") == "testing" {
 			appURL = "http://localhost:8080" // Set a default URL for testing
 		}
 		baseurl.SetDefaultURL(appURL)
-		initialized = true
-	}
+	})
 }
 
 // RootURL returns a URL to the current website

@@ -18,7 +18,7 @@ The desired coverage at stage 3 for this project is **> 70%**.
 | Stage 2 | > 60% | 25+ packages ⚠️ |
 | Stage 3 | > 70% | 15+ packages ❌ |
 
-**Last Updated:** April 11, 2026, 12:45 UTC+01:00
+**Last Updated:** April 11, 2026, 13:00 UTC+01:00
 
 ## Executive Summary
 
@@ -34,6 +34,7 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `auth/authentication`: 48.6% → 50.0% (Stage 1 achieved!)
 - ✅ `internal/config`: 52.4% → 55.8% (Stage 1 achieved!)
 - ✅ `shared/thumb`: 30.6% → 38.2% (incremental improvement)
+- ✅ `internal/links`: 0% → 23.1% (new test file added)
 
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
@@ -118,6 +119,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/auth/authentication` | 50.0% | ✅ (Stage 1!) |
 | `internal/config` | 55.8% | ✅ (Stage 1!) |
 | `internal/controllers/shared/thumb` | 38.2% | ❌ |
+| `internal/links` | 23.1% | ❌ |
 | `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
 | `cmd/server` | 45.7% | ✅ OK (infrastructure) |
 | `cmd/deploy` | 12.1% | ✅ OK (infrastructure) |
@@ -131,31 +133,25 @@ The following packages have no test coverage:
 - `internal/controllers/admin/blog/ai_post_generator`
 - `internal/controllers/admin/blog/ai_test`
 - `internal/controllers/admin/blog/shared`
-- `internal/controllers/admin/blog/tag_manager`
-- `internal/controllers/admin/cms`
-- `internal/controllers/admin/media`
-- `internal/controllers/admin/shop/*` (categories, discounts, etc.)
-- `internal/controllers/admin/stats`
 - `internal/controllers/admin/tasks`
-- `internal/controllers/admin/users` (except user_impersonate and user_update)
+- `internal/controllers/admin/users`
 - `internal/controllers/admin/users/user_create`
 - `internal/controllers/admin/users/user_delete`
-- `internal/controllers/admin/users/user_manager`
 - `internal/controllers/liveflux`
-- `internal/controllers/shared/cdn`
 - `internal/controllers/user/partials`
+- `internal/controllers/website`
+- `internal/controllers/website/blog/shared`
 - `internal/controllers/website/contact`
 - `internal/controllers/website/swagger`
 - `internal/emails`
 - `internal/layouts`
-- `internal/links`
 - `internal/resources`
 - `internal/schedules`
+- `internal/tasks`
 - `internal/tasks/stats`
 - `internal/widgets`
-- `pkg/blogai` (2.3% - constants only)
-- `pkg/testimonials` (2.3% - constants only)
-- `cmd/envenc`
+- `pkg/blogai`
+- `pkg/testimonials`
 
 ## Changes Made to Fix Build Failures
 
