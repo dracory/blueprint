@@ -188,3 +188,60 @@ func TestBreadcrumb(t *testing.T) {
 		t.Errorf("URL = %q, want %q", bc.URL, "/")
 	}
 }
+
+func TestNewAdminLayout(t *testing.T) {
+	registry := testutils.Setup()
+	r := &http.Request{}
+	opts := Options{
+		Title:   "Admin Test",
+		Content: hb.Div().Text("Admin content"),
+	}
+
+	layout := NewAdminLayout(registry, r, opts)
+	if layout == nil {
+		t.Fatal("NewAdminLayout() should return non-nil")
+	}
+
+	html := layout.ToHTML()
+	if html == "" {
+		t.Error("NewAdminLayout().ToHTML() should return non-empty HTML")
+	}
+	if !strings.Contains(html, "Admin Test") {
+		t.Error("NewAdminLayout() should contain the title")
+	}
+}
+
+func TestNewUserLayout(t *testing.T) {
+	registry := testutils.Setup()
+	r := &http.Request{}
+	opts := Options{
+		Title:   "User Test",
+		Content: hb.Div().Text("User content"),
+	}
+
+	layout := NewUserLayout(registry, r, opts)
+	if layout == nil {
+		t.Fatal("NewUserLayout() should return non-nil")
+	}
+
+	html := layout.ToHTML()
+	if html == "" {
+		t.Error("NewUserLayout().ToHTML() should return non-empty HTML")
+	}
+	if !strings.Contains(html, "User Test") {
+		t.Error("NewUserLayout() should contain the title")
+	}
+}
+
+func TestNewAdminCrudLayout(t *testing.T) {
+	registry := testutils.Setup()
+	r := &http.Request{}
+
+	html := NewAdminCrudLayout(registry, r, "Admin CRUD Test", "<p>Admin CRUD content</p>", []string{}, "", []string{}, "")
+	if html == "" {
+		t.Error("NewAdminCrudLayout() should return non-empty HTML")
+	}
+	if !strings.Contains(html, "Admin CRUD Test") {
+		t.Error("NewAdminCrudLayout() should contain the title")
+	}
+}

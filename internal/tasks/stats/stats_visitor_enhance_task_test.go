@@ -1,6 +1,7 @@
 package stats
 
 import (
+	"context"
 	"testing"
 
 	"project/internal/testutils"
@@ -99,5 +100,42 @@ func TestStatsVisitorEnhanceTask_Handle_NilStatsStore(t *testing.T) {
 	result := task.Handle()
 	if result != false {
 		t.Error("Handle() with nil stats store should return false")
+	}
+}
+
+func TestStatsVisitorEnhanceTask_FindCountryByIp_EmptyIP(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+
+	country := task.findCountryByIp(context.TODO(), "")
+	if country != "UN" {
+		t.Errorf("findCountryByIp() with empty IP = %q, want %q", country, "UN")
+	}
+}
+
+func TestStatsVisitorEnhanceTask_FindCountryByIp_LocalhostIP(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+
+	country := task.findCountryByIp(context.TODO(), "127.0.0.1")
+	if country != "UN" {
+		t.Errorf("findCountryByIp() with localhost IP = %q, want %q", country, "UN")
+	}
+}
+
+func TestStatsVisitorEnhanceTask_ProcessVisitor_NilRegistry(t *testing.T) {
+	task := &statsVisitorEnhanceTask{registry: nil}
+	result := task.processVisitor(context.TODO(), nil)
+	if result != false {
+		t.Error("processVisitor() with nil registry should return false")
+	}
+}
+
+func TestStatsVisitorEnhanceTask_ProcessVisitor_NilStatsStore(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+	result := task.processVisitor(context.TODO(), nil)
+	if result != false {
+		t.Error("processVisitor() with nil stats store should return false")
 	}
 }
