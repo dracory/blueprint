@@ -156,7 +156,6 @@ var BlockAreaText = {
 };
 
 function BlockArea(blockAreaId) {
-  var self = this;
   var blockAreaId = blockAreaId;
   var blocks = [];
   var blockDefinitions = [];
