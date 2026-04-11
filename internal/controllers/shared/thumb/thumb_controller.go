@@ -214,9 +214,13 @@ func (controller *thumbnailController) setHeaders(w http.ResponseWriter, fileExt
 //	// Use data for thumbnail generation
 func (controller *thumbnailController) prepareData(r *http.Request) (data thumbnailControllerData, errorMessage string) {
 	data.extension, _ = rtr.GetParam(r, "extension")
+	data.extension = strings.TrimSpace(strings.ToLower(data.extension))
 	size, _ := rtr.GetParam(r, "size")
+	size = strings.TrimSpace(size)
 	quality, _ := rtr.GetParam(r, "quality")
+	quality = strings.TrimSpace(quality)
 	data.path, _ = rtr.GetParam(r, "path")
+	data.path = strings.TrimSpace(data.path)
 	data.isURL = false
 	data.isCache = false
 
