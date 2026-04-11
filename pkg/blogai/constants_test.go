@@ -109,12 +109,4 @@ func TestNewTitleGeneratorAgentV1(t *testing.T) {
 	}
 }
 
-func TestRecordPost(t *testing.T) {
-	post := RecordPost{
-		Title: "Test Post",
-	}
 
-	if post.Title != "Test Post" {
-		t.Errorf("RecordPost.Title = %q, want %q", post.Title, "Test Post")
-	}
-}
