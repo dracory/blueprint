@@ -176,13 +176,15 @@ func (c cdnController) findRequiredAndExtension(req *http.Request) (required []s
 func (c cdnController) writeGzipJSResponse(w http.ResponseWriter, _ *http.Request, content string) {
 	w.Header().Set("Content-Type", "application/javascript")
 	w.Header().Set("Content-Encoding", "gzip")
-	// For simplicity, just write the content without gzip compression
-	w.Write([]byte(content))
+	gz := gzip.NewWriter(w)
+	defer gz.Close()
+	gz.Write([]byte(content))
 }
 
 func (c cdnController) writeGzipCSSResponse(w http.ResponseWriter, _ *http.Request, content string) {
 	w.Header().Set("Content-Type", "text/css")
 	w.Header().Set("Content-Encoding", "gzip")
-	// For simplicity, just write the content without gzip compression
-	w.Write([]byte(content))
+	gz := gzip.NewWriter(w)
+	defer gz.Close()
+	gz.Write([]byte(content))
 }
