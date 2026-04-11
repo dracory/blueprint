@@ -48,7 +48,6 @@ const postEditorApp = {
         async regenerateSection(section) {
             // Set loading state for this section
             if (section.startsWith('section_')) {
-                const index = section.split('_')[1];
                 this.loadingSections[section] = true;
             } else {
                 this.loadingSections[section] = true;
