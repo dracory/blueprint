@@ -434,8 +434,8 @@ function BlockArea(blockAreaId) {
   };
 
   this.blockAttributes = function () {
-    var arguments = arguments[1];
-    var blockId = arguments.Id;
+    var eventData = arguments[1];
+    var blockId = eventData.Id;
     var block = blocks[_findBlockIndexById(blockId)];
     var blockType = block.Type;
     var blockAttributes = block.Attributes;
