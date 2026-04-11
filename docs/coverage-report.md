@@ -18,7 +18,7 @@ The desired coverage at stage 3 for this project is **> 70%**.
 | Stage 2 | > 60% | 25+ packages ⚠️ |
 | Stage 3 | > 70% | 15+ packages ❌ |
 
-**Last Updated:** April 11, 2026, 13:00 UTC+01:00
+**Last Updated:** April 11, 2026, 13:30 UTC+01:00
 
 ## Executive Summary
 
@@ -35,6 +35,8 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/config`: 52.4% → 55.8% (Stage 1 achieved!)
 - ✅ `shared/thumb`: 30.6% → 38.2% (incremental improvement)
 - ✅ `internal/links`: 0% → 23.1% (new test file added)
+- ✅ `internal/resources`: 0% → 74.4% (Stage 3 achieved!)
+- ✅ `pkg/testimonials`: 2.3% → 51.2% (Stage 1 achieved!)
 
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
@@ -59,6 +61,8 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/shared/flash` | 90.3% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/tagscomponent` | 78.7% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/descriptioncomponent` | 79.6% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate/mediacomponent` | 81.0% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate/metadatacomponent` | 79.6% | ✅ |
 | `internal/ext` | 73.8% | ✅ |
 | `internal/registry` | 71.4% | ✅ |
 | `internal/website/seo` | 76.3% | ✅ |
@@ -84,6 +88,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/tasks/email_admin_new_user_registered` | 60.0% | ⚠️ |
 | `internal/tasks/email_test` | 60.5% | ⚠️ |
 | `internal/controllers/auth/register` | 53.7% | ✅ |
+| `pkg/testimonials` | 51.2% | ✅ |
 
 ### High Coverage (70%+)
 
@@ -109,6 +114,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/registry` | 71.4% | ✅ |
 | `internal/website/seo` | 76.3% | ✅ |
 | `internal/tasks/hello_world` | 70.6% | ✅ |
+| `internal/resources` | 74.4% | ✅ (Stage 3!) |
 
 ### Low Coverage (<50%)
 
@@ -145,13 +151,11 @@ The following packages have no test coverage:
 - `internal/controllers/website/swagger`
 - `internal/emails`
 - `internal/layouts`
-- `internal/resources`
 - `internal/schedules`
 - `internal/tasks`
 - `internal/tasks/stats`
 - `internal/widgets`
 - `pkg/blogai`
-- `pkg/testimonials`
 
 ## Changes Made to Fix Build Failures
 

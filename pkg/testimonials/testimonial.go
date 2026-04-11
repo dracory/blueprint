@@ -31,6 +31,12 @@ func NewTestimonial() *Testimonial {
 }
 
 func NewTestimonialFromEntity(store entitystore.StoreInterface, entity entitystore.EntityInterface) (*Testimonial, error) {
+	if store == nil {
+		return nil, errors.New("store cannot be nil")
+	}
+	if entity == nil {
+		return nil, errors.New("entity cannot be nil")
+	}
 	if entity.GetType() != ENTITY_TYPE {
 		return nil, errors.New("invalid entity type")
 	}

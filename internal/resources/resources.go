@@ -53,7 +53,11 @@ func ResourceWithParams(path string, params map[string]string) string {
 }
 
 func ImageToBase64String(path string) string {
-	data, _ := files.ReadFile(path)
+	data, err := files.ReadFile(path)
+	if err != nil {
+		log.Println("ImageToBase64String: " + path + " NOT FOUND")
+		return ""
+	}
 
 	// Check if it's an SVG file based on extension
 	isSvg := filepath.Ext(path) == ".svg"

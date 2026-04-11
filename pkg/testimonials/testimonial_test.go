@@ -1,8 +1,6 @@
 package testimonials
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewTestimonial(t *testing.T) {
 	testimonial := NewTestimonial()
@@ -46,5 +44,80 @@ func TestConstants(t *testing.T) {
 
 	if FIELD_STATUS != "status" {
 		t.Errorf("FIELD_STATUS = %q, want %q", FIELD_STATUS, "status")
+	}
+}
+
+func TestTestimonialSettersAndGetters(t *testing.T) {
+	testimonial := NewTestimonial()
+
+	// Test Date
+	testimonial.SetDate("2024-01-01")
+	if testimonial.Date() != "2024-01-01" {
+		t.Errorf("Date() = %q, want %q", testimonial.Date(), "2024-01-01")
+	}
+
+	// Test FirstName
+	testimonial.SetFirstName("John")
+	if testimonial.FirstName() != "John" {
+		t.Errorf("FirstName() = %q, want %q", testimonial.FirstName(), "John")
+	}
+
+	// Test ID
+	testimonial.SetID("123")
+	if testimonial.ID() != "123" {
+		t.Errorf("ID() = %q, want %q", testimonial.ID(), "123")
+	}
+
+	// Test ImageUrl
+	testimonial.SetImageUrl("https://example.com/image.jpg")
+	if testimonial.ImageUrl() != "https://example.com/image.jpg" {
+		t.Errorf("ImageUrl() = %q, want %q", testimonial.ImageUrl(), "https://example.com/image.jpg")
+	}
+
+	// Test JobTitle
+	testimonial.SetJobTitle("Developer")
+	if testimonial.JobTitle() != "Developer" {
+		t.Errorf("JobTitle() = %q, want %q", testimonial.JobTitle(), "Developer")
+	}
+
+	// Test LastName
+	testimonial.SetLastName("Doe")
+	if testimonial.LastName() != "Doe" {
+		t.Errorf("LastName() = %q, want %q", testimonial.LastName(), "Doe")
+	}
+
+	// Test Quote
+	testimonial.SetQuote("This is a testimonial")
+	if testimonial.Quote() != "This is a testimonial" {
+		t.Errorf("Quote() = %q, want %q", testimonial.Quote(), "This is a testimonial")
+	}
+
+	// Test Status
+	testimonial.SetStatus("approved")
+	if testimonial.Status() != "approved" {
+		t.Errorf("Status() = %q, want %q", testimonial.Status(), "approved")
+	}
+
+	// Test CreatedAt
+	testimonial.SetCreatedAt("2024-01-01T00:00:00Z")
+	if testimonial.CreatedAt() != "2024-01-01T00:00:00Z" {
+		t.Errorf("CreatedAt() = %q, want %q", testimonial.CreatedAt(), "2024-01-01T00:00:00Z")
+	}
+
+	// Test UpdatedAt
+	testimonial.SetUpdatedAt("2024-01-02T00:00:00Z")
+	if testimonial.UpdatedAt() != "2024-01-02T00:00:00Z" {
+		t.Errorf("UpdatedAt() = %q, want %q", testimonial.UpdatedAt(), "2024-01-02T00:00:00Z")
+	}
+}
+
+func TestNewTestimonialFromEntity(t *testing.T) {
+	// Test with nil store and nil entity
+	_, err := NewTestimonialFromEntity(nil, nil)
+	if err == nil {
+		t.Error("NewTestimonialFromEntity() with nil store should return error")
+	}
+	if err.Error() != "store cannot be nil" {
+		t.Errorf("NewTestimonialFromEntity() with nil store returned wrong error: %v", err)
 	}
 }

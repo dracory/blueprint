@@ -94,14 +94,19 @@ func TestResource(t *testing.T) {
 
 func TestResourceWithParams(t *testing.T) {
 	// ResourceWithParams uses template.Must which panics on non-existent files
+	panicOccurred := false
 	defer func() {
-		if r := recover(); r == nil {
-			t.Error("ResourceWithParams() should panic for non-existent template")
+		if r := recover(); r != nil {
+			panicOccurred = true
 		}
 	}()
 
 	// Test with non-existent template - this will panic
 	ResourceWithParams("/nonexistent/template.html", map[string]string{"key": "value"})
+
+	if !panicOccurred {
+		t.Error("ResourceWithParams() should panic for non-existent template")
+	}
 }
 
 func TestImageToBase64String(t *testing.T) {
