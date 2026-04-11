@@ -20,9 +20,9 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 
 | Stage | Target | Packages in Range |
 |-------|--------|-------------------|
-| Stage 0 | 0% | 14 packages ⏳ |
-| Stage 1 | >0% to ≤10% | 8 packages ⏳ |
-| Stage 2 | >10% to ≤20% | 6 packages ⏳ |
+| Stage 0 | 0% | 7 packages ⏳ |
+| Stage 1 | >0% to ≤10% | 14 packages ⏳ |
+| Stage 2 | >10% to ≤20% | 7 packages ⏳ |
 | Stage 3 | >20% to ≤30% | 8 packages ⏳ |
 | Stage 4 | >30% to ≤40% | 5 packages ⏳ |
 | Stage 5 | >40% to ≤50% | 4 packages ⏳ |
@@ -30,7 +30,7 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 | Stage 7 | >60% to ≤70% | 11 packages ⏳ |
 | Stage 8 | >70% | 28 packages ✅ |
 
-**Last Updated:** April 11, 2026, 20:30 UTC+01:00
+**Last Updated:** April 11, 2026, 21:30 UTC+01:00
 
 ## Executive Summary
 
@@ -41,6 +41,13 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ All 50+ packages tested with coverage analysis
 
 **Recent Coverage Improvements:**
+- ✅ `internal/controllers/admin/shop`: 0% → 14.3% (Stage 2 achieved!)
+- ✅ `internal/controllers/admin/shop/categories`: 0% → 3.0% (Stage 1 achieved!)
+- ✅ `internal/controllers/admin/shop/categories/categorymanager`: 0% → 2.4% (Stage 1 achieved!)
+- ✅ `internal/controllers/admin/shop/categories/categoryupdate`: 0% → 3.7% (Stage 1 achieved!)
+- ✅ `internal/controllers/admin/shop/discounts`: 0% → 1.1% (Stage 1 achieved!)
+- ✅ `internal/controllers/admin/shop/products`: 0% → 1.6% (Stage 1 achieved!)
+- ✅ `internal/controllers/admin/users/user_manager`: 0% → 0.7% (Stage 1 achieved!)
 - ✅ `internal/controllers/admin`: 0% → 31.2% (Stage 4 achieved!)
 - ✅ `internal/controllers/admin/blog`: 0% → 25.0% (Stage 3 achieved!)
 - ✅ `internal/controllers/admin/cms`: 0% → 31.2% (Stage 4 achieved!)
@@ -98,15 +105,8 @@ Based on the latest test run, the following packages have coverage data:
 |----------|----------|--------|
 | `cmd/envenc` | 0.0% | ⏳ |
 | `internal/controllers/admin/blog/ai_post_editor/templates` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop/categories` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop/categories/categorymanager` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop/categories/categoryupdate` | 0.0% | ⏳ |
 | `internal/controllers/admin/shop/categories/categoryupdate/detailscomponent` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop/discounts` | 0.0% | ⏳ |
-| `internal/controllers/admin/shop/products` | 0.0% | ⏳ |
 | `internal/controllers/admin/shop/shared` | 0.0% | ⏳ |
-| `internal/controllers/admin/users/user_manager` | 0.0% | ⏳ |
 | `internal/cache` | [no test files] | ⏳ |
 | `internal/controllers/admin/faq` | [no test files] | ⏳ |
 | `internal/controllers/admin/logs/shared` | [no test files] | ⏳ |
@@ -117,10 +117,16 @@ Based on the latest test run, the following packages have coverage data:
 |----------|----------|--------|
 | `internal/testutils` | 0.4% | ⏳ |
 | `internal/controllers/admin/blog/tag_manager` | 0.6% | ⏳ |
+| `internal/controllers/admin/users/user_manager` | 0.7% | ⏳ |
+| `internal/controllers/admin/shop/discounts` | 1.1% | ⏳ |
+| `internal/controllers/admin/shop/products` | 1.6% | ⏳ |
+| `internal/controllers/admin/shop/categories/categorymanager` | 2.4% | ⏳ |
 | `internal/controllers/admin/users/user_create` | 2.0% | ⏳ |
 | `pkg/blogai` | 2.0% | ⏳ |
 | `internal/widgets` | 2.3% | ⏳ |
 | `internal/controllers/admin/users/user_delete` | 2.3% | ⏳ |
+| `internal/controllers/admin/shop/categories` | 3.0% | ⏳ |
+| `internal/controllers/admin/shop/categories/categoryupdate` | 3.7% | ⏳ |
 | `internal/controllers/admin/blog/ai_tools` | 3.8% | ⏳ |
 | `internal/controllers/admin/media` | 4.4% | ⏳ |
 
@@ -130,6 +136,7 @@ Based on the latest test run, the following packages have coverage data:
 |----------|----------|--------|
 | `internal/controllers/admin/files` | 12.1% | ⏳ |
 | `internal/tasks/stats` | 12.6% | ⏳ |
+| `internal/controllers/admin/shop` | 14.3% | ⏳ |
 | `internal/layouts` | 15.0% | ⏳ |
 | `internal/controllers/admin/blog/ai_title_generator` | 15.6% | ⏳ |
 | `internal/controllers/admin/blog/ai_post_editor` | 17.0% | ⏳ |
@@ -264,8 +271,8 @@ Based on the latest test run, the following packages have coverage data:
 ## Test Execution Summary
 
 **Total Packages Analyzed:** 100+  
-**Packages with Coverage:** 85+  
-**Packages at 0%:** 11 packages + 3 with [no test files]  
+**Packages with Coverage:** 90+  
+**Packages at 0%:** 4 packages + 3 with [no test files]  
 **Build Status:** ✅ All tests passing
 
 ## Coverage Statistics
@@ -273,22 +280,20 @@ Based on the latest test run, the following packages have coverage data:
 - **100% Coverage:** 9 packages (auth, auth/login, auth/logout, cli, liveflux, user, page_not_found, admin/users)
 - **90%+ Coverage:** 11 packages
 - **70%+ Coverage:** 30 packages
-- **50%+ Coverage:** 50 packages
-- **0% Coverage:** 11 packages + 3 with [no test files]
+- **50%+ Coverage:** 51 packages
+- **0% Coverage:** 4 packages + 3 with [no test files]
 
 ## Recommendations
 
 ### Priority 1: Add Tests to 0% Coverage Packages
 
-11 packages have 0% coverage, 3 have no test files:
+4 packages have 0% coverage, 3 have no test files:
 
-1. **Shop Controllers** (0%)
-   - `admin/shop`, `admin/shop/products`, `admin/shop/shared`
-   - `admin/shop/categories` (and sub-packages)
-   - `admin/shop/discounts`
+1. **Shop Components** (0%)
+   - `admin/shop/shared`
+   - `admin/shop/categories/categoryupdate/detailscomponent`
 
 2. **Admin Components** (0%)
-   - `admin/users/user_manager`
    - `admin/blog/ai_post_editor/templates`
 
 3. **Other** (0%)
