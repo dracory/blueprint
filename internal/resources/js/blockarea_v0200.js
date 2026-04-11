@@ -10,6 +10,15 @@
  * All rights reserved.
  */
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 var BlockAreaCode = {
   type: "Code",
   name: "Code",
@@ -85,7 +94,7 @@ var BlockAreaHeading = {
       "<h" +
       block.Attributes.Level +
       ">" +
-      block.Attributes.Text +
+      escapeHtml(block.Attributes.Text) +
       "</h" +
       block.Attributes.Level +
       ">";
@@ -127,7 +136,6 @@ var BlockAreaImage = {
   },
   template: function () {
     var html = "";
-    html += '<div class="form-group">';
     html += '<div class="form-group">';
     html += "<label>Url</label>";
     html +=
