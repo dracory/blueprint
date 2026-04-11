@@ -253,7 +253,6 @@ function BlockArea(blockAreaId) {
       if (!$ctrl) {
         return; // Not found
       }
-      var type = $ctrl.attr("type");
       var tag = $ctrl.prop("tagName").toLowerCase();
       //console.log(name_key + ":" + value);
       //console.log(tag);
