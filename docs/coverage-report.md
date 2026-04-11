@@ -145,20 +145,20 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/tasks/stats` | 12.6% | ❌ |
+| `internal/tasks/stats` | 12.6% | ✅ |
 | `internal/controllers/admin/tasks` | 13.3% | ✅ |
 | `cmd/deploy` | 12.1% | ✅ OK (infrastructure) |
+| `internal/emails` | 76.4% | ✅ |
+| `internal/layouts` | 15.0% | ✅ |
+| `internal/widgets` | 14.4% | ✅ |
+| `internal/controllers/admin/blog/category_manager` | 17.7% | ✅ |
 
 ### Stage 1 Coverage (5-10%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/emails` | 8.9% | ❌ |
-| `internal/layouts` | 4.7% | ❌ |
-| `internal/widgets` | 2.3% | ❌ |
-| `internal/controllers/website/contact` | 5.6% | ✅ |
-| `internal/controllers/liveflux` | 7.7% | ✅ |
-| `internal/controllers/admin/blog/category_manager` | 4.4% | ✅ |
+| `internal/controllers/website/contact` | 34.7% | ✅ |
+| `internal/controllers/liveflux` | 100.0% | ✅ |
 | `internal/controllers/admin/blog/ai_test` | 3.2% | ❌ |
 | `internal/controllers/admin/blog/ai_post_generator` | 0.8% | ❌ |
 | `internal/controllers/admin/blog/ai_post_editor` | 0.4% | ❌ |
