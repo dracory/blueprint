@@ -128,7 +128,6 @@ var BlockAreaImage = {
   template: function () {
     var html = "";
     html += '<div class="form-group">';
-    html += '<div class="form-group">';
     html += "<label>Url</label>";
     html +=
       '<textarea class="form-control" name="Url" placeholder="Please enter URL for image here"></textarea>';
