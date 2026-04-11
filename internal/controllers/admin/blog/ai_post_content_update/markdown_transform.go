@@ -308,6 +308,7 @@ func parseMarkdown(markdown string) (title string, preamble []string, sections [
 				codeFence = fence
 			} else if fence == codeFence {
 				inCodeBlock = false
+				codeFence = ""
 			}
 			appendLine(current, &preamble, line)
 			continue
