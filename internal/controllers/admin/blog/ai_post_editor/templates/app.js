@@ -14,8 +14,11 @@ const postEditorApp = {
         }
     },
     async mounted() {
-        this.loading = false;
-        await this.loadPost();
+        try {
+            await this.loadPost();
+        } finally {
+            this.loading = false;
+        }
     },
     methods: {
         /**
