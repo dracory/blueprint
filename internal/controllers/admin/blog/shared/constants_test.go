@@ -46,39 +46,34 @@ func TestNewLinks(t *testing.T) {
 func TestLinksMethods(t *testing.T) {
 	links := NewLinks()
 
-	// Test Home method
-	result := links.Home()
-	if result == "" {
-		t.Error("Links.Home() should not return empty string")
+	tests := []struct {
+		name   string
+		method func() string
+	}{
+		{"Home", func() string { return links.Home() }},
+		{"PostCreate", func() string { return links.PostCreate() }},
+		{"PostDelete", func() string { return links.PostDelete() }},
+		{"PostManager", func() string { return links.PostManager() }},
+		{"PostUpdate", func() string { return links.PostUpdate() }},
+		{"PostUpdateV1", func() string { return links.PostUpdateV1() }},
+		{"BlogSettings", func() string { return links.BlogSettings() }},
+		{"AiTools", func() string { return links.AiTools() }},
+		{"AiPostContentUpdate", func() string { return links.AiPostContentUpdate() }},
+		{"AiPostGenerator", func() string { return links.AiPostGenerator() }},
+		{"AiTitleGenerator", func() string { return links.AiTitleGenerator() }},
+		{"AiPostEditor", func() string { return links.AiPostEditor() }},
+		{"AiTest", func() string { return links.AiTest() }},
+		{"Dashboard", func() string { return links.Dashboard() }},
+		{"CategoryManager", func() string { return links.CategoryManager() }},
+		{"TagManager", func() string { return links.TagManager() }},
 	}
 
-	// Test PostCreate method
-	result = links.PostCreate()
-	if result == "" {
-		t.Error("Links.PostCreate() should not return empty string")
-	}
-
-	// Test PostDelete method
-	result = links.PostDelete()
-	if result == "" {
-		t.Error("Links.PostDelete() should not return empty string")
-	}
-
-	// Test PostManager method
-	result = links.PostManager()
-	if result == "" {
-		t.Error("Links.PostManager() should not return empty string")
-	}
-
-	// Test PostUpdate method
-	result = links.PostUpdate()
-	if result == "" {
-		t.Error("Links.PostUpdate() should not return empty string")
-	}
-
-	// Test PostUpdateV1 method
-	result = links.PostUpdateV1()
-	if result == "" {
-		t.Error("Links.PostUpdateV1() should not return empty string")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.method()
+			if result == "" {
+				t.Errorf("Links.%s() should not return empty string", tt.name)
+			}
+		})
 	}
 }

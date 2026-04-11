@@ -37,7 +37,10 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	adminRoutes = append(adminRoutes, adminMedia.Routes(registry)...)
 	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(registry)...)
 	adminRoutes = append(adminRoutes, adminStats.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminTasks.TaskRoutes(registry)...)
+	taskRoutes, err := adminTasks.TaskRoutes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, taskRoutes...)
+	}
 	adminRoutes = append(adminRoutes, adminUsers.UserRoutes(registry)...)
 	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)
 	adminRoutes = append(adminRoutes, []rtr.RouteInterface{home, homeCatchAll}...)
