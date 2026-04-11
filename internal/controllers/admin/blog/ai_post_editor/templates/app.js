@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function apiPost(body) {
     body.id = '{{ id }}'
 
-    params = new URLSearchParams(body);
+    const params = new URLSearchParams(body);
     const response = await fetch('{{ url }}', {
         method: 'POST',
         headers: {
