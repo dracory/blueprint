@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"project/internal/links"
 	"project/internal/registry"
 
@@ -13,7 +14,10 @@ import (
 	userUpdate "project/internal/controllers/admin/users/user_update"
 )
 
-func UserRoutes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func UserRoutes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+	if registry == nil {
+		return nil, errors.New("registry cannot be nil")
+	}
 	userCreate := rtr.NewRoute().
 		SetName("Admin > Users > User Create").
 		SetPath(links.ADMIN_USERS_USER_CREATE).
@@ -57,5 +61,5 @@ func UserRoutes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		userUpdate,
 		usersHome,
 		usersCatchAll,
-	}
+	}, nil
 }

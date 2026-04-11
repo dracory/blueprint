@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"net/http"
 	"project/internal/links"
 	"project/internal/registry"
@@ -17,7 +18,10 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 )
 
-func ShopRoutes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func ShopRoutes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+	if registry == nil {
+		return nil, errors.New("registry cannot be nil")
+	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
@@ -73,5 +77,5 @@ func ShopRoutes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		shopOrders,
 		shopCatchAll,
-	}
+	}, nil
 }

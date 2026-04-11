@@ -1,13 +1,17 @@
 package stats
 
 import (
+	"errors"
 	"project/internal/links"
 	"project/internal/registry"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+	if registry == nil {
+		return nil, errors.New("registry cannot be nil")
+	}
 	ctrl := NewStatsController(registry)
 	statsHome := rtr.NewRoute().
 		SetName("Admin > Visitor Analytics > Home").
@@ -22,5 +26,5 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		statsHome,
 		statsCatchAll,
-	}
+	}, nil
 }

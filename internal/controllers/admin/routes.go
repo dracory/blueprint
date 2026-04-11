@@ -30,18 +30,51 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		SetHTMLHandler(NewHomeController(registry).Handler)
 
 	adminRoutes := []rtr.RouteInterface{}
-	adminRoutes = append(adminRoutes, adminBlog.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminCms.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminFiles.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminLogs.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminMedia.Routes(registry)...)
-	adminRoutes = append(adminRoutes, adminShop.ShopRoutes(registry)...)
-	adminRoutes = append(adminRoutes, adminStats.Routes(registry)...)
+
+	blogRoutes, err := adminBlog.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, blogRoutes...)
+	}
+
+	cmsRoutes, err := adminCms.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, cmsRoutes...)
+	}
+
+	fileRoutes, err := adminFiles.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, fileRoutes...)
+	}
+
+	logRoutes, err := adminLogs.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, logRoutes...)
+	}
+
+	mediaRoutes, err := adminMedia.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, mediaRoutes...)
+	}
+
+	shopRoutes, err := adminShop.ShopRoutes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, shopRoutes...)
+	}
+
+	statsRoutes, err := adminStats.Routes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, statsRoutes...)
+	}
+
 	taskRoutes, err := adminTasks.TaskRoutes(registry)
 	if err == nil {
 		adminRoutes = append(adminRoutes, taskRoutes...)
 	}
-	adminRoutes = append(adminRoutes, adminUsers.UserRoutes(registry)...)
+
+	userRoutes, err := adminUsers.UserRoutes(registry)
+	if err == nil {
+		adminRoutes = append(adminRoutes, userRoutes...)
+	}
 	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)
 	adminRoutes = append(adminRoutes, []rtr.RouteInterface{home, homeCatchAll}...)
 

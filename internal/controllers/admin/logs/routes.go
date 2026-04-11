@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"net/http"
 	"project/internal/controllers/admin/logs/log_manager"
 	"project/internal/controllers/admin/logs/shared"
@@ -11,7 +12,10 @@ import (
 	"github.com/dracory/rtr"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+	if registry == nil {
+		return nil, errors.New("registry cannot be nil")
+	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
@@ -37,5 +41,5 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		blog,
 		blogCatchAll,
-	}
+	}, nil
 }

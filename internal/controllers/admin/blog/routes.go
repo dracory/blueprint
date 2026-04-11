@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"errors"
 	"net/http"
 	"project/internal/links"
 	"project/internal/registry"
@@ -25,7 +26,10 @@ import (
 	"project/internal/controllers/admin/blog/tag_manager"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+	if registry == nil {
+		return nil, errors.New("registry cannot be nil")
+	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
@@ -79,5 +83,5 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		blog,
 		blogCatchAll,
-	}
+	}, nil
 }
