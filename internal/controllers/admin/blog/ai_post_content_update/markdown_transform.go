@@ -278,11 +278,7 @@ func writeSection(builder *strings.Builder, title string, paragraphs []string) {
 		sectionTitle = "Section"
 	}
 
-	if builder.Len() > 0 {
-		builder.WriteString("## ")
-	} else {
-		builder.WriteString("## ")
-	}
+	builder.WriteString("## ")
 	builder.WriteString(sectionTitle)
 	builder.WriteString("\n\n")
 

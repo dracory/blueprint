@@ -253,7 +253,6 @@ function BlockArea(blockAreaId) {
       if (!$ctrl) {
         return; // Not found
       }
-      var type = $ctrl.attr("type");
       var tag = $ctrl.prop("tagName").toLowerCase();
       //console.log(name_key + ":" + value);
       //console.log(tag);
@@ -434,8 +433,8 @@ function BlockArea(blockAreaId) {
   };
 
   this.blockAttributes = function () {
-    var arguments = arguments[1];
-    var blockId = arguments.Id;
+    var eventData = arguments[1];
+    var blockId = eventData.Id;
     var block = blocks[_findBlockIndexById(blockId)];
     var blockType = block.Type;
     var blockAttributes = block.Attributes;
