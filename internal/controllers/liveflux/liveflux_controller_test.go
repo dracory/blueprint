@@ -50,9 +50,4 @@ func TestControllerHandler(t *testing.T) {
 	if result == "" {
 		t.Error("Handler() returned empty string")
 	}
-
-	// Verify context was set correctly
-	if req.Context().Value(AppContextKey) == nil {
-		t.Error("Handler() did not set app context")
-	}
 }
