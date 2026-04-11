@@ -3,6 +3,7 @@ package emails
 import (
 	"context"
 	"errors"
+	"html"
 	"project/internal/links"
 	"project/internal/registry"
 
@@ -105,7 +106,7 @@ func (e *inviteFriendEmail) template(appName string, userName string, userNote s
 		Style(email.StyleParagraph)
 
 	p4 := hb.Paragraph().
-		HTML(`"` + userNote + `"`).
+		HTML(`"` + html.EscapeString(userNote) + `"`).
 		Style(email.StyleParagraph)
 
 	p5 := hb.Paragraph().

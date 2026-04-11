@@ -6,15 +6,15 @@
 
 ## Desired Coverage
 
-The desired coverage at stage 0 for this project is **> 0%**.
-The desired coverage at stage 1 for this project is **> 5%**.
-The desired coverage at stage 2 for this project is **> 10%**.
-The desired coverage at stage 3 for this project is **> 20%**.
-The desired coverage at stage 4 for this project is **> 30%**.
-The desired coverage at stage 5 for this project is **> 40%**.
-The desired coverage at stage 6 for this project is **> 50%**.
-The desired coverage at stage 7 for this project is **> 60%**.
-The desired coverage at stage 8 for this project is **> 70%**.
+The desired coverage at stage 0 for this project is **> 0%**. [COMPLETED]
+The desired coverage at stage 1 for this project is **> 5%**. [IN PROGRESS]
+The desired coverage at stage 2 for this project is **> 10%**. [PENDING]
+The desired coverage at stage 3 for this project is **> 20%**. [PENDING]
+The desired coverage at stage 4 for this project is **> 30%**. [PENDING]
+The desired coverage at stage 5 for this project is **> 40%**. [PENDING]
+The desired coverage at stage 6 for this project is **> 50%**. [PENDING]
+The desired coverage at stage 7 for this project is **> 60%**. [PENDING]
+The desired coverage at stage 8 for this project is **> 70%**. [PENDING]
 
 ## Current Coverage Summary
 

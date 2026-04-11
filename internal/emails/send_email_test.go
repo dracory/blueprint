@@ -8,31 +8,53 @@ import (
 
 func TestInitEmailSender(t *testing.T) {
 	// Save and restore global state to avoid test pollution
+	senderMu.Lock()
 	originalSender := emailSender
-	defer func() { emailSender = originalSender }()
+	emailSender = nil
+	senderMu.Unlock()
+	defer func() {
+		senderMu.Lock()
+		emailSender = originalSender
+		senderMu.Unlock()
+	}()
 
 	// Test with nil registry
-	emailSender = nil
 	InitEmailSender(nil)
+
+	senderMu.RLock()
 	if emailSender != nil {
+		senderMu.RUnlock()
 		t.Error("emailSender should remain nil after InitEmailSender(nil)")
+	} else {
+		senderMu.RUnlock()
 	}
 
 	// Test with valid registry
 	registry := testutils.Setup()
 	InitEmailSender(registry)
+
+	senderMu.RLock()
 	if emailSender == nil {
+		senderMu.RUnlock()
 		t.Error("emailSender should be initialized after InitEmailSender with valid registry")
+	} else {
+		senderMu.RUnlock()
 	}
 }
 
 func TestSendEmail(t *testing.T) {
 	// Save and restore global state
+	senderMu.Lock()
 	originalSender := emailSender
-	defer func() { emailSender = originalSender }()
+	emailSender = nil
+	senderMu.Unlock()
+	defer func() {
+		senderMu.Lock()
+		emailSender = originalSender
+		senderMu.Unlock()
+	}()
 
 	// Test with uninitialized sender
-	emailSender = nil
 	err := SendEmail(SendOptions{To: []string{"test@example.com"}})
 	if err == nil {
 		t.Error("SendEmail should return error when sender is not initialized")

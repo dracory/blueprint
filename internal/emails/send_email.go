@@ -3,6 +3,7 @@ package emails
 import (
 	"fmt"
 	"project/internal/registry"
+	"sync"
 
 	"github.com/dracory/email"
 	"github.com/spf13/cast"
@@ -28,7 +29,10 @@ type SendOptions struct {
 	TextBody string
 }
 
-var emailSender email.Sender
+var (
+	emailSender email.Sender
+	senderMu    sync.RWMutex
+)
 
 // InitEmailSender initializes the email sender
 func InitEmailSender(registry registry.RegistryInterface) {
@@ -40,20 +44,28 @@ func InitEmailSender(registry registry.RegistryInterface) {
 		return
 	}
 
-	emailSender = email.NewSMTPSender(email.Config{
+	sender := email.NewSMTPSender(email.Config{
 		Host:     registry.GetConfig().GetMailHost(),
 		Port:     cast.ToString(registry.GetConfig().GetMailPort()),
 		Username: registry.GetConfig().GetMailUsername(),
 		Password: registry.GetConfig().GetMailPassword(),
 		// Skip logger for now as it's causing type compatibility issues
 	})
+
+	senderMu.Lock()
+	defer senderMu.Unlock()
+	emailSender = sender
 }
 
 // SendEmail sends an email using the base email package
 // This is a new function to avoid conflicts with the original Send function
 func SendEmail(options SendOptions) error {
 	// Guard against nil sender
-	if emailSender == nil {
+	senderMu.RLock()
+	sender := emailSender
+	senderMu.RUnlock()
+
+	if sender == nil {
 		return fmt.Errorf("email sender is not initialized")
 	}
 
@@ -69,5 +81,5 @@ func SendEmail(options SendOptions) error {
 		TextBody: options.TextBody,
 	}
 
-	return emailSender.Send(baseOptions)
+	return sender.Send(baseOptions)
 }

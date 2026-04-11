@@ -64,11 +64,11 @@ func (e *emailToAdminOnNewUserRegistered) template(appName string, userID string
 		ToHTML()
 
 	h1 := hb.Heading1().
-		HTML(`New User Registsred`).
+		HTML(`New User Registered`).
 		Style(email.StyleHeading1)
 
 	p1 := hb.Paragraph().
-		HTML(`There is a new user ID ` + userID + `	that registsred into ` + appName + `.`).
+		HTML(`There is a new user ID ` + userID + ` that registered into ` + appName + `.`).
 		Style(email.StyleParagraph)
 
 	p2 := hb.Paragraph().
