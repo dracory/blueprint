@@ -308,6 +308,7 @@ func parseMarkdown(markdown string) (title string, preamble []string, sections [
 				codeFence = fence
 			} else if fence == codeFence {
 				inCodeBlock = false
+				codeFence = ""
 			}
 			appendLine(current, &preamble, line)
 			continue
@@ -373,6 +374,7 @@ func paragraphsFromLines(lines []string) []string {
 				codeFence = fence
 			} else if fence == codeFence {
 				inCode = false
+				codeFence = ""
 			}
 			buffer = append(buffer, line)
 			continue
@@ -432,14 +434,14 @@ func isCodeFence(line string) (string, bool) {
 
 func headingLevel(line string) int {
 	count := 0
-	for i := 0; i < len(line); i++ {
-		if line[i] == '#' {
-			count++
-		} else if line[i] == ' ' {
-			return count
-		} else {
-			break
-		}
+	for count < len(line) && line[count] == '#' {
+		count++
+	}
+	if count == 0 {
+		return 0
+	}
+	if count < len(line) && line[count] == ' ' {
+		return count
 	}
 	return 0
 }
