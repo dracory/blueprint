@@ -49,36 +49,30 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/links`: 0% → 22.5% (Stage 3 achieved!)
 - ✅ `internal/resources`: 0% → 52.4% (Stage 6 achieved!)
 - ✅ `pkg/testimonials`: 2.3% → 48.9% (Stage 5 achieved!)
-- ✅ `internal/emails`: 0% → 8.9% (Stage 2 achieved!)
-- ✅ `internal/layouts`: 0% → 4.7% (Stage 1 achieved!)
+- ✅ `internal/emails`: 8.9% → 76.4% (Stage 6 achieved!)
+- ✅ `internal/layouts`: 4.7% → 15.0% (Stage 2 achieved!)
 - ✅ `internal/schedules`: 0% → 77.1% (Stage 8 achieved!)
 - ✅ `internal/tasks`: 0% → 85.7% (Stage 8 achieved!)
 - ✅ `internal/tasks/stats`: 0% → 12.6% (Stage 2 achieved!)
-- ✅ `internal/widgets`: 0% → 2.3% (Stage 1 achieved!)
-- ✅ `internal/controllers/website/contact`: 0% → 5.6% (Stage 1 achieved!)
+- ✅ `internal/widgets`: 2.3% → 14.4% (Stage 2 achieved!)
+- ✅ `internal/controllers/website/contact`: 5.6% → 34.7% (Stage 4 achieved!)
 - ✅ `internal/controllers/website/swagger`: 0% → 53.3% (Stage 6 achieved!)
-- ✅ `internal/controllers/liveflux`: 0% → 7.7% (Stage 1 achieved!)
+- ✅ `internal/controllers/liveflux`: 7.7% → 100.0% (Stage 8 achieved!)
 - ✅ `internal/controllers/website`: 0% → 82.4% (Stage 8 achieved!)
 - ✅ `internal/controllers/website/blog/shared`: 0% → 47.1% (Stage 5 achieved!)
+- ✅ `pkg/blogai`: 1.0% → 26.3% (Stage 3 achieved!)
+- ✅ `internal/controllers/admin/blog/ai_test`: 3.2% → 58.1% (Stage 6 achieved!)
+- ✅ `internal/controllers/admin/blog/ai_post_generator`: 0.8% → 56.2% (Stage 6 achieved!)
+- ✅ `internal/controllers/admin/blog/ai_post_editor`: 0.4% → 17.0% (Stage 2 achieved!)
 - ✅ `internal/controllers/user/partials`: 0% → 47.8% (Stage 5 achieved!)
 - ✅ `internal/controllers/admin/users`: 0% → 100.0% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/tasks`: 0% → 13.3% (Stage 2 achieved!)
 - ✅ `internal/controllers/admin/blog/shared`: 0% → 34.5% (Stage 4 achieved!)
-- ✅ `internal/controllers/admin/blog/category_manager`: 0% → 4.4% (Stage 1 achieved!)
-- ✅ `internal/controllers/admin/blog/ai_post_editor`: 0% → 0.4% (below Stage 1 - AI integration)
-- ✅ `internal/controllers/admin/blog/ai_post_generator`: 0% → 0.8% (below Stage 1 - AI integration)
-- ✅ `internal/controllers/admin/blog/ai_test`: 0% → 3.2% (below Stage 1 - AI integration)
-- ✅ `pkg/blogai`: 0% → 1.0% (below Stage 1 - AI integration)
-
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
 - `shared/thumb`: Complex image processing logic (requires actual image files for full coverage) - **OK at current level**
 - `blind_index_rebuild`: 23.5% (complex task with external dependencies) - **OK at current level**
 - `cmd/deploy`: 12.1% (deployment tool with shell/SSH operations) - **OK at current level** (infrastructure package)
-- `internal/controllers/admin/blog/ai_post_editor`: 0.4% (complex AI integration requiring LLM mocking) - **OK at current level** (AI feature)
-- `internal/controllers/admin/blog/ai_post_generator`: 0.8% (complex AI integration requiring LLM mocking) - **OK at current level** (AI feature)
-- `internal/controllers/admin/blog/ai_test`: 3.2% (complex AI integration requiring LLM mocking) - **OK at current level** (AI feature)
-- `pkg/blogai`: 1.0% (complex AI integration requiring LLM mocking) - **OK at current level** (AI feature)
 
 ## Coverage Results
 
@@ -152,17 +146,17 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/layouts` | 15.0% | ✅ |
 | `internal/widgets` | 14.4% | ✅ |
 | `internal/controllers/admin/blog/category_manager` | 17.7% | ✅ |
+| `internal/controllers/website/contact` | 34.7% | ✅ |
+| `internal/controllers/admin/blog/ai_post_editor` | 17.0% | ✅ |
 
 ### Stage 1 Coverage (5-10%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/controllers/website/contact` | 34.7% | ✅ |
 | `internal/controllers/liveflux` | 100.0% | ✅ |
-| `internal/controllers/admin/blog/ai_test` | 3.2% | ❌ |
-| `internal/controllers/admin/blog/ai_post_generator` | 0.8% | ❌ |
-| `internal/controllers/admin/blog/ai_post_editor` | 0.4% | ❌ |
-| `pkg/blogai` | 1.0% | ❌ |
+| `internal/controllers/admin/blog/ai_test` | 58.1% | ✅ |
+| `internal/controllers/admin/blog/ai_post_generator` | 56.2% | ✅ |
+| `pkg/blogai` | 26.3% | ✅ |
 
 ### Stage 0 Coverage (0%)
 
