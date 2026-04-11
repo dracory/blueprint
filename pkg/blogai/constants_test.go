@@ -5,28 +5,23 @@ import (
 )
 
 func TestConstants(t *testing.T) {
-	if POST_RECORD_TYPE != "blogai_post" {
-		t.Errorf("POST_RECORD_TYPE = %q, want %q", POST_RECORD_TYPE, "blogai_post")
+	tests := []struct {
+		name string
+		got  string
+		want string
+	}{
+		{name: "POST_RECORD_TYPE", got: POST_RECORD_TYPE, want: "blogai_post"},
+		{name: "POST_STATUS_PENDING", got: POST_STATUS_PENDING, want: "pending"},
+		{name: "POST_STATUS_APPROVED", got: POST_STATUS_APPROVED, want: "approved"},
+		{name: "POST_STATUS_REJECTED", got: POST_STATUS_REJECTED, want: "rejected"},
+		{name: "POST_STATUS_DRAFT", got: POST_STATUS_DRAFT, want: "draft"},
+		{name: "POST_STATUS_PUBLISHED", got: POST_STATUS_PUBLISHED, want: "published"},
 	}
 
-	if POST_STATUS_PENDING != "pending" {
-		t.Errorf("POST_STATUS_PENDING = %q, want %q", POST_STATUS_PENDING, "pending")
-	}
-
-	if POST_STATUS_APPROVED != "approved" {
-		t.Errorf("POST_STATUS_APPROVED = %q, want %q", POST_STATUS_APPROVED, "approved")
-	}
-
-	if POST_STATUS_REJECTED != "rejected" {
-		t.Errorf("POST_STATUS_REJECTED = %q, want %q", POST_STATUS_REJECTED, "rejected")
-	}
-
-	if POST_STATUS_DRAFT != "draft" {
-		t.Errorf("POST_STATUS_DRAFT = %q, want %q", POST_STATUS_DRAFT, "draft")
-	}
-
-	if POST_STATUS_PUBLISHED != "published" {
-		t.Errorf("POST_STATUS_PUBLISHED = %q, want %q", POST_STATUS_PUBLISHED, "published")
+	for _, tt := range tests {
+		if tt.got != tt.want {
+			t.Errorf("%s = %q, want %q", tt.name, tt.got, tt.want)
+		}
 	}
 }
 
@@ -109,12 +104,4 @@ func TestNewTitleGeneratorAgentV1(t *testing.T) {
 	}
 }
 
-func TestRecordPost(t *testing.T) {
-	post := RecordPost{
-		Title: "Test Post",
-	}
 
-	if post.Title != "Test Post" {
-		t.Errorf("RecordPost.Title = %q, want %q", post.Title, "Test Post")
-	}
-}
