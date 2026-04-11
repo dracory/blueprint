@@ -373,6 +373,7 @@ func paragraphsFromLines(lines []string) []string {
 				codeFence = fence
 			} else if fence == codeFence {
 				inCode = false
+				codeFence = ""
 			}
 			buffer = append(buffer, line)
 			continue
