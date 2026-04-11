@@ -12,11 +12,8 @@ import (
 
 	"github.com/dracory/statsstore"
 	"github.com/dracory/taskstore"
-	"github.com/spf13/cast"
-
-	"github.com/dracory/base/cfmt"
-
 	"github.com/mileusna/useragent"
+	"github.com/spf13/cast"
 )
 
 const (
@@ -110,7 +107,7 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 		t.processVisitor(ctx, entry)
 	}
 
-	return false
+	return true
 }
 
 // == PRIVATE METHODS =========================================================
@@ -155,10 +152,11 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 	errUpdated := t.registry.GetStatsStore().VisitorUpdate(ctx, visitor)
 
 	if errUpdated != nil {
-		cfmt.Errorln(errUpdated.Error())
+		t.LogError("Task StatsVisitorEnhance. Error updating visitor: " + errUpdated.Error())
+		return false
 	}
 
-	return false
+	return true
 }
 
 func (t *statsVisitorEnhanceTask) findCountryByIp(ctx context.Context, ip string) string {

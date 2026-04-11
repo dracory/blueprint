@@ -19,6 +19,6 @@ func WidgetRegistry(registry registry.RegistryInterface) []Widget {
 		NewUnauthenticatedWidget(registry),
 		NewVisibleWidget(registry),
 		NewPrintWidget(registry),
-		NewBlockeditotWidget(registry),
+		NewBlockeditorWidget(registry),
 	}
 }

@@ -18,15 +18,15 @@ var _ Widget = (*blockeditorWidget)(nil) // verify it extends the interface
 
 // == CONSTUCTOR ==============================================================
 
-// NewBlockeditotWidget creates a new instance of the blockeditor widget
+// NewBlockeditorWidget creates a new instance of the blockeditor widget
 //
 // Parameters:
 //   - registry: Registry interface for accessing services
 //
 // Returns:
-//   - *visibleWidget - A pointer to the show widget
-func NewBlockeditotWidget(registry registry.RegistryInterface) *blockeditorWidget {
-	return &blockeditorWidget{}
+//   - *blockeditorWidget - A pointer to the blockeditor widget
+func NewBlockeditorWidget(registry registry.RegistryInterface) *blockeditorWidget {
+	return &blockeditorWidget{registry: registry}
 }
 
 // == WIDGET ================================================================

@@ -18,7 +18,7 @@ The desired coverage at stage 3 for this project is **> 70%**.
 | Stage 2 | > 60% | 25+ packages ⚠️ |
 | Stage 3 | > 70% | 15+ packages ❌ |
 
-**Last Updated:** April 11, 2026, 14:30 UTC+01:00
+**Last Updated:** April 11, 2026, 15:00 UTC+01:00
 
 ## Executive Summary
 
@@ -41,6 +41,8 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/layouts`: 0% → 4.7% (new test file added)
 - ✅ `internal/schedules`: 0% → 76.1% (Stage 3 achieved!)
 - ✅ `internal/tasks`: 0% → 85.7% (Stage 3 achieved!)
+- ✅ `internal/tasks/stats`: 0% → 12.8% (new test file added)
+- ✅ `internal/widgets`: 0% → 2.3% (new test file added)
 
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
@@ -116,6 +118,8 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/links` | 23.1% | ❌ |
 | `internal/emails` | 8.9% | ❌ |
 | `internal/layouts` | 4.7% | ❌ |
+| `internal/widgets` | 2.3% | ❌ |
+| `internal/tasks/stats` | 12.8% | ❌ |
 | `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
 | `cmd/server` | 45.7% | ✅ OK (infrastructure) |
 | `cmd/deploy` | 12.1% | ✅ OK (infrastructure) |
@@ -139,8 +143,6 @@ The following packages have no test coverage:
 - `internal/controllers/website/blog/shared`
 - `internal/controllers/website/contact`
 - `internal/controllers/website/swagger`
-- `internal/tasks/stats`
-- `internal/widgets`
 - `pkg/blogai`
 
 ## Changes Made to Fix Build Failures
