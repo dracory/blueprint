@@ -87,3 +87,100 @@ func TestFindExtensionNoDot(t *testing.T) {
 		t.Fatalf("expected '', got: %q", got)
 	}
 }
+
+// TestFindMIMETypeAllFormats ensures all supported MIME types are correctly detected
+func TestFindMIMETypeAllFormats(t *testing.T) {
+	c := fileController{}
+
+	tests := []struct {
+		ext      string
+		expected string
+	}{
+		{"html", "text/html"},
+		{"css", "text/css"},
+		{"js", "application/javascript"},
+		{"json", "application/json"},
+		{"png", "image/png"},
+		{"jpg", "image/jpeg"},
+		{"jpeg", "image/jpeg"},
+		{"gif", "image/gif"},
+		{"svg", "image/svg+xml"},
+		{"ico", "image/x-icon"},
+		{"pdf", "application/pdf"},
+		{"zip", "application/zip"},
+		{"mp3", "audio/mpeg"},
+		{"webm", "video/webm"},
+		{"unknown", "application/octet-stream"},
+		{"", "application/octet-stream"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.ext, func(t *testing.T) {
+			got := c.findMIMEType(tt.ext)
+			if got != tt.expected {
+				t.Errorf("findMIMEType(%q) = %q, want %q", tt.ext, got, tt.expected)
+			}
+		})
+	}
+}
+
+// TestNewFileController verifies the constructor properly initializes the controller
+func TestNewFileController(t *testing.T) {
+	// Test with nil storage
+	c := NewFileController(nil)
+	if c == nil {
+		t.Fatal("NewFileController(nil) should not return nil")
+	}
+	if c.storage != nil {
+		t.Error("expected storage to be nil")
+	}
+}
+
+// TestFindFileNameWithSpecialCharacters tests edge cases in filename extraction
+func TestFindFileNameWithSpecialCharacters(t *testing.T) {
+	c := fileController{}
+
+	tests := []struct {
+		path     string
+		expected string
+	}{
+		{"/path/to/file-with-dashes.txt", "file-with-dashes.txt"},
+		{"/path/to/file_with_underscores.txt", "file_with_underscores.txt"},
+		{"/path/to/file.multiple.dots.txt", "file.multiple.dots.txt"},
+		{"filename.txt", "filename.txt"},
+		{"/trailing/slash/", "slash"}, // Implementation returns last segment
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			got := c.findFileName(tt.path)
+			if got != tt.expected {
+				t.Errorf("findFileName(%q) = %q, want %q", tt.path, got, tt.expected)
+			}
+		})
+	}
+}
+
+// TestFindExtensionWithMultipleDots tests extension extraction with multiple dots
+// Note: Implementation returns nameParts[1] (first extension after dot)
+func TestFindExtensionWithMultipleDots(t *testing.T) {
+	c := fileController{}
+
+	tests := []struct {
+		path     string
+		expected string
+	}{
+		{"/path/to/file.tar.gz", "tar"},     // Implementation returns first part after dot
+		{"/path/to/archive.tar.bz2", "tar"}, // Implementation returns first part after dot
+		{"/path/.hiddenfile", "hiddenfile"}, // Hidden file starting with dot
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			got := c.findExtension(tt.path)
+			if got != tt.expected {
+				t.Errorf("findExtension(%q) = %q, want %q", tt.path, got, tt.expected)
+			}
+		})
+	}
+}
