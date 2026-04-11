@@ -62,7 +62,7 @@ func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterf
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
 			PageNotFoundHandler: func(w http.ResponseWriter, r *http.Request, alias string) (bool, string) {
-				return "Not found"
+				return true, "Not found"
 			},
 		})
 
