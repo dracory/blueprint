@@ -172,3 +172,52 @@ func TestCmsMcpEndpoint_RequiresApiKey(t *testing.T) {
 		t.Fatalf("expected %d, got %d", http.StatusOK, resOk.Code)
 	}
 }
+
+// Widget Controller Tests
+
+func TestNewWidgetController(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	controller := NewWidgetController(registry)
+
+	if controller == nil {
+		t.Fatal("Expected controller to not be nil")
+	}
+	if controller.registry == nil {
+		t.Fatal("Expected controller.registry to not be nil")
+	}
+}
+
+func TestWidgetController_Handler_NoAlias(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	controller := NewWidgetController(registry)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+
+	result := controller.Handler(w, r)
+
+	if result != "Widget type not specified" {
+		t.Errorf("Expected 'Widget type not specified', got: %q", result)
+	}
+}
+
+func TestWidgetController_Handler_WithAlias(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	controller := NewWidgetController(registry)
+
+	w := httptest.NewRecorder()
+	r := httptest.NewRequest(http.MethodGet, "/?alias=nonexistent", nil)
+
+	result := controller.Handler(w, r)
+
+	// Should return the alias when widget is not found
+	if result != "nonexistent" {
+		t.Errorf("Expected 'nonexistent', got: %q", result)
+	}
+}

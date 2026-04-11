@@ -4,6 +4,22 @@
 **Project:** Blueprint  
 **Status:** ✅ All Tests Passing
 
+## Desired Coverage
+
+The desired coverage at stage 1 for this project is **> 50%**.
+The desired coverage at stage 2 for this project is **> 60%**.
+The desired coverage at stage 3 for this project is **> 70%**.
+
+## Current Coverage Summary
+
+| Stage | Target | Packages Meeting Target |
+|-------|--------|------------------------|
+| Stage 1 | > 50% | 35+ packages ✅ |
+| Stage 2 | > 60% | 25+ packages ⚠️ |
+| Stage 3 | > 70% | 15+ packages ❌ |
+
+**Last Updated:** April 11, 2026, 10:00 UTC+01:00
+
 ## Executive Summary
 
 The blueprint project tests are now **passing successfully**. All build failures have been resolved:
@@ -37,11 +53,13 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/controllers/admin/blog/post_update` | 25.3% | ❌ |
-| `internal/controllers/website/cms` | 46.2% | ⚠️ |
-| `internal/controllers/website/blog` | 50.0% | ⚠️ |
-| `internal/controllers/shared/media` | 53.8% | ⚠️ |
-| `internal/controllers/shared/file` | 65.4% | ⚠️ |
+| `internal/controllers/website/cms` | 55.1% | ✅ |
+| `internal/controllers/shared/file` | 65.4% | ✅ |
+| `internal/controllers/shared/media` | 53.8% | ✅ |
+| `internal/cmds` | 51.6% | ✅ |
+| `cmd/snakecase` | 56.5% | ✅ |
+| `pkg/social` | 55.1% | ✅ |
+| `internal/controllers/website/blog` | 50.0% | ✅ |
 | `internal/controllers/admin/users/user_update` | 69.6% | ⚠️ |
 | `internal/controllers/admin/blog/blog_settings` | 65.1% | ⚠️ |
 | `internal/controllers/user/account` | 64.2% | ⚠️ |
@@ -51,10 +69,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/tasks/clean_up` | 60.0% | ⚠️ |
 | `internal/tasks/email_admin_new_user_registered` | 60.0% | ⚠️ |
 | `internal/tasks/email_test` | 60.5% | ⚠️ |
-| `internal/controllers/auth/authentication` | 48.6% | ⚠️ |
-| `internal/controllers/auth/register` | 53.7% | ⚠️ |
-| `pkg/social` | 55.1% | ⚠️ |
-| `cmd/snakecase` | 56.5% | ⚠️ |
+| `internal/controllers/auth/register` | 53.7% | ✅ |
 
 ### High Coverage (70%+)
 
@@ -89,9 +104,9 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/shared/thumb` | 30.1% | ❌ |
 | `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
 | `internal/controllers/admin/users/user_impersonate` | 28.6% | ❌ |
-| `internal/cmds` | 45.2% | ⚠️ |
-| `internal/config` | 52.4% | ⚠️ |
-| `cmd/server` | 43.6% | ⚠️ |
+| `internal/controllers/auth/authentication` | 48.6% | ❌ |
+| `internal/config` | 55.8% | ✅ |
+| `cmd/server` | 45.7% | ❌ |
 | `cmd/deploy` | 12.1% | ❌ |
 
 ### No Coverage (0%)

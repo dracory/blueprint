@@ -314,3 +314,194 @@ func mustSetenv(t *testing.T, key, value string) {
 		t.Fatalf("failed to set env %s: %v", key, err)
 	}
 }
+
+func TestConfigGetters(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_APP_NAME, "TestApp")
+	mustSetenv(t, KEY_APP_URL, "http://test.example.com")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	// Test app settings getters
+	if cfg.GetAppHost() != "localhost" {
+		t.Errorf("GetAppHost() = %q, want localhost", cfg.GetAppHost())
+	}
+	if cfg.GetAppPort() != "8080" {
+		t.Errorf("GetAppPort() = %q, want 8080", cfg.GetAppPort())
+	}
+	if cfg.GetAppEnv() != "testing" {
+		t.Errorf("GetAppEnv() = %q, want testing", cfg.GetAppEnv())
+	}
+	if cfg.GetAppName() != "TestApp" {
+		t.Errorf("GetAppName() = %q, want TestApp", cfg.GetAppName())
+	}
+	if cfg.GetAppUrl() != "http://test.example.com" {
+		t.Errorf("GetAppUrl() = %q, want http://test.example.com", cfg.GetAppUrl())
+	}
+}
+
+func TestDatabaseGetters(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, "test.db")
+	mustSetenv(t, KEY_DB_MAX_OPEN_CONNS, "10")
+	mustSetenv(t, KEY_DB_MAX_IDLE_CONNS, "5")
+	mustSetenv(t, KEY_DB_CONN_MAX_LIFETIME_SECONDS, "600")
+	mustSetenv(t, KEY_DB_CONN_MAX_IDLE_TIME_SECONDS, "60")
+	mustSetenv(t, KEY_DB_CHARSET, "utf8")
+	mustSetenv(t, KEY_DB_TIMEZONE, "America/New_York")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if cfg.GetDatabaseDriver() != "sqlite" {
+		t.Errorf("GetDatabaseDriver() = %q, want sqlite", cfg.GetDatabaseDriver())
+	}
+	if cfg.GetDatabaseName() != "test.db" {
+		t.Errorf("GetDatabaseName() = %q, want test.db", cfg.GetDatabaseName())
+	}
+}
+
+func TestAuthRegistrationEnabled(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_AUTH_REGISTRATION_ENABLED, "true")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if !cfg.GetRegistrationEnabled() {
+		t.Error("GetRegistrationEnabled() = false, want true")
+	}
+}
+
+func TestAppDebugMode(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_APP_DEBUG, "true")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if !cfg.GetAppDebug() {
+		t.Error("GetAppDebug() = false, want true")
+	}
+}
+
+func TestLoad_GeminiConfiguration(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_GEMINI_API_USED, "true")
+	mustSetenv(t, KEY_GEMINI_API_KEY, "test-gemini-key")
+	mustSetenv(t, KEY_GEMINI_API_DEFAULT_MODEL, "gemini-1.5-pro")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if !cfg.GetGoogleGeminiApiUsed() {
+		t.Error("GetGoogleGeminiApiUsed() = false, want true")
+	}
+	if cfg.GetGoogleGeminiApiKey() != "test-gemini-key" {
+		t.Errorf("GetGoogleGeminiApiKey() = %q, want test-gemini-key", cfg.GetGoogleGeminiApiKey())
+	}
+}
+
+func TestLoad_AnthropicConfiguration(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_ANTHROPIC_API_USED, "true")
+	mustSetenv(t, KEY_ANTHROPIC_API_KEY, "test-anthropic-key")
+	mustSetenv(t, KEY_ANTHROPIC_API_DEFAULT_MODEL, "claude-3-sonnet")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if !cfg.GetAnthropicApiUsed() {
+		t.Error("GetAnthropicApiUsed() = false, want true")
+	}
+	if cfg.GetAnthropicApiKey() != "test-anthropic-key" {
+		t.Errorf("GetAnthropicApiKey() = %q, want test-anthropic-key", cfg.GetAnthropicApiKey())
+	}
+}
+
+func TestLoad_OpenRouterConfiguration(t *testing.T) {
+	mustSetenv(t, KEY_APP_HOST, "localhost")
+	mustSetenv(t, KEY_APP_PORT, "8080")
+	mustSetenv(t, KEY_APP_ENVIRONMENT, "testing")
+	mustSetenv(t, KEY_DB_DRIVER, "sqlite")
+	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
+	mustSetenv(t, KEY_OPENROUTER_API_USED, "true")
+	mustSetenv(t, KEY_OPENROUTER_API_KEY, "test-openrouter-key")
+	mustSetenv(t, KEY_OPENROUTER_API_DEFAULT_MODEL, "openai/gpt-4o")
+	if cmsStoreUsed {
+		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	defer cleanupEnv()
+
+	cfg, err := NewFromEnv()
+	if err != nil {
+		t.Fatalf("NewFromEnv() failed: %v", err)
+	}
+
+	if !cfg.GetOpenRouterApiUsed() {
+		t.Error("GetOpenRouterApiUsed() = false, want true")
+	}
+	if cfg.GetOpenRouterApiKey() != "test-openrouter-key" {
+		t.Errorf("GetOpenRouterApiKey() = %q, want test-openrouter-key", cfg.GetOpenRouterApiKey())
+	}
+}

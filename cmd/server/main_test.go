@@ -47,3 +47,32 @@ func TestStartBackgroundProcesses(t *testing.T) {
 		t.Errorf("Session store should not be nil after starting background processes")
 	}
 }
+
+func TestStartBackgroundProcesses_NilRegistry(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	group := newBackgroundGroup(ctx)
+	defer group.stop()
+
+	err := startBackgroundProcesses(ctx, group, nil)
+	if err == nil {
+		t.Error("startBackgroundProcesses with nil registry should return error")
+	}
+}
+
+func TestBackgroundGroup(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	group := newBackgroundGroup(ctx)
+	defer group.stop()
+
+	// Test that Done() channel works
+	select {
+	case <-group.Done():
+		t.Error("Background group should not be done immediately")
+	default:
+		// Expected
+	}
+}
