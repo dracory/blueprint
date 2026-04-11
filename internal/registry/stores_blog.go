@@ -45,7 +45,7 @@ func newBlogStore(db *sql.DB) (blogstore.StoreInterface, error) {
 	st, err := blogstore.NewStore(blogstore.NewStoreOptions{
 		DB:                  db,
 		PostTableName:       "snv_blogs_post",
-		TaxonomyEnabled:     false,
+		TaxonomyEnabled:     true,
 		TaxonomyTableName:   "snv_blogs_taxonomy",
 		TermTableName:       "snv_blogs_term",
 		VersioningEnabled:   true,
