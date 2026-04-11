@@ -14,8 +14,11 @@ const postEditorApp = {
         }
     },
     async mounted() {
-        this.loading = false;
-        await this.loadPost();
+        try {
+            await this.loadPost();
+        } finally {
+            this.loading = false;
+        }
     },
     methods: {
         /**
@@ -47,11 +50,7 @@ const postEditorApp = {
          */
         async regenerateSection(section) {
             // Set loading state for this section
-            if (section.startsWith('section_')) {
-                this.loadingSections[section] = true;
-            } else {
-                this.loadingSections[section] = true;
-            }
+            this.loadingSections[section] = true;
 
             try {
                 const data = await apiPost({
@@ -162,7 +161,7 @@ const postEditorApp = {
                     return;
                 }
                 if (response.data && response.data.redirect) {
-                    window.location = response.data.redirect;
+                    window.location.href = response.data.redirect;
                 } else {
                     this.showSuccess('Draft saved successfully!');
                 }
@@ -320,7 +319,7 @@ const postEditorApp = {
         /**
          * Regenerates the meta title, description, and keywords for the post using the backend.
          * Updates the meta fields on success.
-         * @returns {Promise<void>}
+         * @returns {Promise<boolean>}
          */
         async regenerateMetas() {
             this.loadingSections.metas = true;
@@ -331,7 +330,7 @@ const postEditorApp = {
                 });
                 if (data.status !== 'success') {
                     this.showError(data.message || data.error || 'Failed to regenerate meta information');
-                    return;
+                    return false;
                 }
                 if (data.data) {
                     this.post.metaTitle = data.data.metaTitle || '';
@@ -341,8 +340,10 @@ const postEditorApp = {
                         ? data.data.metaKeywords.split(',').map(k => k.trim()).filter(Boolean)
                         : [];
                 }
+                return true;
             } catch (error) {
                 this.showError('Failed to regenerate meta information: ' + error);
+                return false;
             } finally {
                 this.loadingSections.metas = false;
             }
@@ -362,8 +363,10 @@ const postEditorApp = {
          * @returns {Promise<void>}
          */
         async onRegenerateMetas() {
-            await this.regenerateMetas();
-            this.showSuccess('Meta information regenerated successfully!');
+            const success = await this.regenerateMetas();
+            if (success) {
+                this.showSuccess('Meta information regenerated successfully!');
+            }
         },
     },
     computed: {
