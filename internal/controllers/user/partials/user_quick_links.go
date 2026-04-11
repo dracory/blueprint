@@ -15,11 +15,6 @@ type UserQuickLinksOptions struct {
 
 func UserQuickLinks(req *http.Request, opts ...UserQuickLinksOptions) *hb.Tag {
 	opt := lo.FirstOr(opts, UserQuickLinksOptions{})
-	errorMessage := ""
-
-	if errorMessage != "" {
-		return hb.Section().Text(errorMessage)
-	}
 
 	cardsData := []struct {
 		Title              string
