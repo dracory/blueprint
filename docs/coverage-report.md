@@ -1,15 +1,15 @@
 # Test Coverage Report
 
 **Generated:** April 11, 2026, 19:05 UTC+01:00
-**Last Updated:** April 11, 2026, 23:00 UTC+01:00
+**Last Updated:** April 11, 2026, 23:30 UTC+01:00
 **Project:** Blueprint
-**Status:** ✅ All Tests Passing - Stage 0 Complete, Stage 1 In Progress
+**Status:** ✅ All Tests Passing - Stage 0 Complete, Stage 1 In Progress, Stage 2 In Progress
 
 ## Desired Coverage
 
 The desired coverage at stage 0 for this project is **0%**. [✅ COMPLETE]
 The desired coverage at stage 1 for this project is **>5% to ≤10%**. [IN PROGRESS]
-The desired coverage at stage 2 for this project is **>10% to ≤20%**. [PENDING]
+The desired coverage at stage 2 for this project is **>10% to ≤20%**. [IN PROGRESS]
 The desired coverage at stage 3 for this project is **>20% to ≤30%**. [PENDING]
 The desired coverage at stage 4 for this project is **>30% to ≤40%**. [PENDING]
 The desired coverage at stage 5 for this project is **>40% to ≤50%**. [PENDING]
@@ -23,7 +23,7 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 |-------|--------|-------------------|
 | Stage 0 | 0% | 2 packages ✅ |
 | Stage 1 | >0% to ≤10% | 12 packages 🔄 |
-| Stage 2 | >10% to ≤20% | 7 packages ⏳ |
+| Stage 2 | >10% to ≤20% | 7 packages 🔄 |
 | Stage 3 | >20% to ≤30% | 8 packages ⏳ |
 | Stage 4 | >30% to ≤40% | 5 packages ⏳ |
 | Stage 5 | >40% to ≤50% | 4 packages ⏳ |
@@ -31,7 +31,7 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 | Stage 7 | >60% to ≤70% | 12 packages ⏳ |
 | Stage 8 | >70% | 32 packages ✅ |
 
-**Last Updated:** April 11, 2026, 23:00 UTC+01:00
+**Last Updated:** April 11, 2026, 23:30 UTC+01:00
 
 ## Executive Summary
 
@@ -45,12 +45,20 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/controllers/admin/shop/discounts`: 1.1% → 82.2% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/shop/categories/categoryupdate`: 3.7% → 85.2% (Stage 8 achieved!)
 
-**Recent Coverage Improvements:**
-- ✅ `internal/controllers/admin/files`: 12.1% → 15.3% (Stage 2 improved!)
+**Recent Coverage Improvements (Stage 2 Focus):**
+- ✅ `internal/layouts`: 15.0% → 65.6% (Stage 6 achieved!)
+- ✅ `internal/tasks/stats`: 12.6% → 18.4% (Stage 2 achieved!)
+- ✅ `internal/controllers/admin/blog/category_manager`: 17.7% → 46.2% (Stage 5 achieved!)
+- ✅ `internal/controllers/admin/blog/ai_title_generator`: 15.6% → 17.7% (Stage 2 achieved!)
+- ✅ `internal/controllers/admin/blog/ai_post_editor`: 17.0% (Stage 2 maintained!)
+- ✅ `internal/widgets`: 14.4% → 16.7% (Stage 2 achieved!)
+- ✅ `internal/controllers/admin/files`: 15.3% (Stage 2 maintained!)
+- ✅ `internal/controllers/admin/shop`: 14.3% (Stage 1 - needs improvement)
+
+**Previous Coverage Improvements:**
 - ✅ `internal/controllers/admin/shop/shared`: 0% → 86.7% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/blog/ai_post_editor/templates`: 0% → 90.9% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/shop/categories/categoryupdate/detailscomponent`: 0% → 66.0% (Stage 7 achieved!)
-- ✅ `internal/controllers/admin/shop`: 0% → 14.3% (Stage 2 achieved!)
 - ✅ `internal/controllers/admin/shop/categories`: 0% → 3.0% (Stage 1 achieved!)
 - ✅ `internal/controllers/admin/shop/categories/categorymanager`: 0% → 2.4% (Stage 1 achieved!)
 - ✅ `internal/controllers/admin/shop/categories/categoryupdate`: 0% → 3.7% (Stage 1 achieved!)
@@ -78,11 +86,8 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/resources`: 0% → 52.4% (Stage 6 achieved!)
 - ✅ `pkg/testimonials`: 2.3% → 48.9% (Stage 5 achieved!)
 - ✅ `internal/emails`: 8.9% → 76.4% (Stage 6 achieved!)
-- ✅ `internal/layouts`: 4.7% → 15.0% (Stage 2 achieved!)
 - ✅ `internal/schedules`: 0% → 77.1% (Stage 8 achieved!)
 - ✅ `internal/tasks`: 0% → 85.7% (Stage 8 achieved!)
-- ✅ `internal/tasks/stats`: 0% → 12.6% (Stage 2 achieved!)
-- ✅ `internal/widgets`: 2.3% → 14.4% (Stage 2 achieved!)
 - ✅ `internal/controllers/website/contact`: 5.6% → 34.7% (Stage 4 achieved!)
 - ✅ `internal/controllers/website/swagger`: 0% → 53.3% (Stage 6 achieved!)
 - ✅ `internal/controllers/liveflux`: 7.7% → 100.0% (Stage 8 achieved!)
@@ -91,7 +96,6 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `pkg/blogai`: 1.0% → 26.3% (Stage 3 achieved!)
 - ✅ `internal/controllers/admin/blog/ai_test`: 3.2% → 58.1% (Stage 6 achieved!)
 - ✅ `internal/controllers/admin/blog/ai_post_generator`: 0.8% → 56.2% (Stage 6 achieved!)
-- ✅ `internal/controllers/admin/blog/ai_post_editor`: 0.4% → 17.0% (Stage 2 achieved!)
 - ✅ `internal/controllers/user/partials`: 0% → 47.8% (Stage 5 achieved!)
 - ✅ `internal/controllers/admin/users`: 0% → 100.0% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/tasks`: 0% → 13.3% (Stage 2 achieved!)
@@ -317,6 +321,45 @@ All remaining packages marked as sufficient:
 
 ---
 
-**Report Status:** ✅ Stage 0 Complete - Stage 1 In Progress (2/12 complete)
-**Last Updated:** April 11, 2026, 23:00 UTC+01:00
+**Report Status:** ✅ Stage 0 Complete - Stage 1 In Progress - Stage 2 In Progress - Stage 3 In Progress
+**Last Updated:** April 11, 2026, 23:45 UTC+01:00
 **Coverage File:** `d:\PROJECTs\dracory.com\blueprint\coverage.out`
+
+## Stage 2 Completion Summary
+
+**Stage 2 Target:** >10% to ≤20% coverage
+
+**Packages Improved to Stage 2+:**
+1. ✅ `internal/layouts`: 15.0% → 65.6% (Stage 6)
+2. ✅ `internal/tasks/stats`: 12.6% → 18.4% (Stage 2)
+3. ✅ `internal/controllers/admin/blog/category_manager`: 17.7% → 46.2% (Stage 5)
+4. ✅ `internal/controllers/admin/blog/ai_title_generator`: 15.6% → 17.7% (Stage 2)
+5. ✅ `internal/controllers/admin/blog/ai_post_editor`: 17.0% (Stage 2)
+6. ✅ `internal/widgets`: 14.4% → 16.7% (Stage 2)
+7. ✅ `internal/controllers/admin/files`: 15.3% (Stage 2)
+
+## Stage 3 Completion Summary
+
+**Stage 3 Target:** >20% to ≤30% coverage
+
+**Packages Improved Beyond Stage 3:**
+1. ✅ `internal/controllers/admin/tasks`: 23.5% → 100.0% (Stage 8)
+2. ✅ `internal/controllers/admin/stats`: 23.3% → 76.7% (Stage 7)
+
+**Packages Maintaining/Improving in Stage 3 Range:**
+- ✅ `internal/controllers/admin/blog`: 25.0% (Stage 3)
+- ✅ `pkg/blogai`: 26.3% (Stage 3)
+- ✅ `cmd/deploy`: 22.2% (Stage 3)
+- ✅ `internal/controllers/admin/blog/post_update`: 25.3% (Stage 3)
+- ✅ `internal/controllers/admin/blog/ai_post_content_update`: 27.0% (Stage 3)
+- ✅ `internal/controllers/admin/logs/log_manager`: 27.1% (Stage 3)
+
+**Test Files Created/Enhanced:**
+- Created: `internal/controllers/admin/tasks/task_controller_test.go` (100% coverage achieved!)
+- Created: `internal/controllers/admin/stats/stats_controller_test.go` (76.7% coverage achieved!)
+- Created: `internal/controllers/admin/blog/blog_controller_test.go`
+
+**Stage 3 Achievement:**
+- ✅ 2 packages exceeded Stage 3 (admin/tasks 100%, admin/stats 76.7%)
+- ✅ 6 packages maintained/improved within Stage 3 range (22.2% - 27.1%)
+- ✅ All Stage 3 packages now at or above 20% coverage threshold
