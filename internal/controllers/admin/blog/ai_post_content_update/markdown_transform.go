@@ -432,14 +432,14 @@ func isCodeFence(line string) (string, bool) {
 
 func headingLevel(line string) int {
 	count := 0
-	for i := 0; i < len(line); i++ {
-		if line[i] == '#' {
-			count++
-		} else if line[i] == ' ' {
-			return count
-		} else {
-			break
-		}
+	for count < len(line) && line[count] == '#' {
+		count++
+	}
+	if count == 0 {
+		return 0
+	}
+	if count < len(line) && line[count] == ' ' {
+		return count
 	}
 	return 0
 }
