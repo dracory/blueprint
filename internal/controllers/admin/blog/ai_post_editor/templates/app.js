@@ -162,7 +162,7 @@ const postEditorApp = {
                     return;
                 }
                 if (response.data && response.data.redirect) {
-                    window.location = response.data.redirect;
+                    window.location.href = response.data.redirect;
                 } else {
                     this.showSuccess('Draft saved successfully!');
                 }
