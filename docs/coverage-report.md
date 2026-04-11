@@ -20,7 +20,7 @@ The desired coverage at stage 8 for this project is **> 70%**.
 
 | Stage | Target | Packages Meeting Target |
 |-------|--------|------------------------|
-| Stage 0 | > 0% | 13 packages at 0% ❌ |
+| Stage 0 | > 0% | 9 packages at 0% ❌ |
 | Stage 1 | > 5% | 50+ packages ✅ |
 | Stage 2 | > 10% | 45+ packages ✅ |
 | Stage 3 | > 20% | 40+ packages ✅ |
@@ -28,9 +28,9 @@ The desired coverage at stage 8 for this project is **> 70%**.
 | Stage 5 | > 40% | 30+ packages ✅ |
 | Stage 6 | > 50% | 25+ packages ✅ |
 | Stage 7 | > 60% | 20+ packages ✅ |
-| Stage 8 | > 70% | 19+ packages ✅ |
+| Stage 8 | > 70% | 20+ packages ✅ |
 
-**Last Updated:** April 11, 2026, 16:30 UTC+01:00
+**Last Updated:** April 11, 2026, 17:15 UTC+01:00
 
 ## Executive Summary
 
@@ -58,6 +58,9 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ `internal/controllers/website/contact`: 0% → 5.6% (Stage 1 achieved!)
 - ✅ `internal/controllers/website/swagger`: 0% → 53.3% (Stage 6 achieved!)
 - ✅ `internal/controllers/liveflux`: 0% → 7.7% (Stage 1 achieved!)
+- ✅ `internal/controllers/website`: 0% → 82.4% (Stage 8 achieved!)
+- ✅ `internal/controllers/website/blog/shared`: 0% → 47.1% (Stage 5 achieved!)
+- ✅ `internal/controllers/user/partials`: 0% → 47.8% (Stage 5 achieved!)
 
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
@@ -109,6 +112,8 @@ Based on the latest test run, the following packages have coverage data:
 | Package | Coverage | Status |
 |----------|----------|--------|
 | `cmd/server` | 45.7% | ✅ OK (infrastructure) |
+| `internal/controllers/website/blog/shared` | 47.1% | ✅ |
+| `internal/controllers/user/partials` | 47.8% | ✅ |
 
 ### Stage 4 Coverage (30-40%)
 
@@ -144,7 +149,7 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| See No Coverage section below for 13 packages with 0% coverage |
+| See No Coverage section below for 9 packages with 0% coverage |
 
 ### Stage 8 Coverage (70%+)
 
@@ -169,6 +174,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/user` | 100.0% | ✅ |
 | `internal/controllers/website/home` | 95.0% | ✅ |
 | `internal/controllers/website/pages/indexnow` | 95.8% | ✅ |
+| `internal/controllers/website` | 82.4% | ✅ |
 | `internal/ext` | 73.8% | ✅ |
 | `internal/registry` | 71.4% | ✅ |
 | `internal/website/seo` | 76.3% | ✅ |
@@ -189,9 +195,6 @@ The following packages have no test coverage:
 - `internal/controllers/admin/users`
 - `internal/controllers/admin/users/user_create`
 - `internal/controllers/admin/users/user_delete`
-- `internal/controllers/user/partials`
-- `internal/controllers/website`
-- `internal/controllers/website/blog/shared`
 - `pkg/blogai`
 
 ## Changes Made to Fix Build Failures

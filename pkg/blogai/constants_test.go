@@ -101,3 +101,10 @@ func TestNewBlogWriterAgent(t *testing.T) {
 		t.Error("NewBlogWriterAgent() should not return nil")
 	}
 }
+
+func TestNewTitleGeneratorAgentV1(t *testing.T) {
+	agent := NewTitleGeneratorAgentV1()
+	if agent == nil {
+		t.Error("NewTitleGeneratorAgentV1() should not return nil")
+	}
+}

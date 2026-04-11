@@ -10,6 +10,8 @@ func ImageExtension(postImageURL string) string {
 		return "jpg"
 	} else if strings.HasSuffix(lowerURL, ".webp") {
 		return "webp"
+	} else if strings.HasSuffix(lowerURL, ".png") {
+		return "png"
 	}
 
 	return "png"
