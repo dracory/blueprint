@@ -9,6 +9,11 @@ import (
 
 // scheduleBlindIndexRebuildTask schedules the blind index rebuild task
 func scheduleBlindIndexRebuildTask(registry registry.RegistryInterface) {
+	if registry == nil {
+		cfmt.Errorln("BlindIndexRebuild scheduling skipped; registry is nil")
+		return
+	}
+
 	_, err := blind_index_rebuild.NewBlindIndexRebuildTask(registry).
 		Enqueue(blind_index_rebuild.BlindIndexAll)
 
