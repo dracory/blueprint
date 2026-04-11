@@ -380,9 +380,9 @@ func widget(s *ShareLinks, opts WidgetOptions) string {
 			title = platform
 		}
 
-		// For javascript: URLs, build the entire href attribute to avoid URL encoding
+		// For executable-scheme URLs, build the entire href attribute to avoid URL encoding
 		var hrefAttr template.HTMLAttr
-		if strings.HasPrefix(href, "javascript:") {
+		if strings.HasPrefix(href, "javascript:") || strings.HasPrefix(href, "data:") || strings.HasPrefix(href, "vbscript:") {
 			hrefAttr = template.HTMLAttr(`href="` + href + `"`)
 		}
 
