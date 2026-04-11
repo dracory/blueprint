@@ -712,7 +712,7 @@ func TestPrepareDataExtensionHandling(t *testing.T) {
 		{"JPEG extension", "jpg", "jpg"},
 		{"PNG extension", "png", "png"},
 		{"GIF extension", "gif", "gif"},
-		{"Uppercase extension", "JPG", "JPG"},
+		{"Uppercase extension", "JPG", "jpg"},
 		{"WebP extension", "webp", "webp"},
 	}
 
