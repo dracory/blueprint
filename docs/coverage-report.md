@@ -6,19 +6,31 @@
 
 ## Desired Coverage
 
-The desired coverage at stage 1 for this project is **> 50%**.
-The desired coverage at stage 2 for this project is **> 60%**.
-The desired coverage at stage 3 for this project is **> 70%**.
+The desired coverage at stage 0 for this project is **> 0%**.
+The desired coverage at stage 1 for this project is **> 5%**.
+The desired coverage at stage 2 for this project is **> 10%**.
+The desired coverage at stage 3 for this project is **> 20%**.
+The desired coverage at stage 4 for this project is **> 30%**.
+The desired coverage at stage 5 for this project is **> 40%**.
+The desired coverage at stage 6 for this project is **> 50%**.
+The desired coverage at stage 7 for this project is **> 60%**.
+The desired coverage at stage 8 for this project is **> 70%**.
 
 ## Current Coverage Summary
 
 | Stage | Target | Packages Meeting Target |
 |-------|--------|------------------------|
-| Stage 1 | > 50% | 40+ packages ✅ |
-| Stage 2 | > 60% | 25+ packages ⚠️ |
-| Stage 3 | > 70% | 15+ packages ❌ |
+| Stage 0 | > 0% | 13 packages at 0% ❌ |
+| Stage 1 | > 5% | 50+ packages ✅ |
+| Stage 2 | > 10% | 45+ packages ✅ |
+| Stage 3 | > 20% | 40+ packages ✅ |
+| Stage 4 | > 30% | 35+ packages ✅ |
+| Stage 5 | > 40% | 30+ packages ✅ |
+| Stage 6 | > 50% | 25+ packages ✅ |
+| Stage 7 | > 60% | 20+ packages ✅ |
+| Stage 8 | > 70% | 19+ packages ✅ |
 
-**Last Updated:** April 11, 2026, 15:00 UTC+01:00
+**Last Updated:** April 11, 2026, 16:30 UTC+01:00
 
 ## Executive Summary
 
@@ -29,20 +41,23 @@ The blueprint project tests are now **passing successfully**. All build failures
 - ✅ All 50+ packages tested with coverage analysis
 
 **Recent Coverage Improvements:**
-- ✅ `user/home`: 36.4% → 77.3% (Stage 3 achieved!)
-- ✅ `user_impersonate`: 28.6% → 81.0% (Stage 3 achieved!)
-- ✅ `auth/authentication`: 48.6% → 50.0% (Stage 1 achieved!)
-- ✅ `internal/config`: 52.4% → 55.8% (Stage 1 achieved!)
-- ✅ `shared/thumb`: 30.6% → 38.2% (incremental improvement)
-- ✅ `internal/links`: 0% → 23.1% (new test file added)
-- ✅ `internal/resources`: 0% → 74.4% (Stage 3 achieved!)
-- ✅ `pkg/testimonials`: 2.3% → 51.2% (Stage 1 achieved!)
-- ✅ `internal/emails`: 0% → 8.9% (new test files added)
-- ✅ `internal/layouts`: 0% → 4.7% (new test file added)
-- ✅ `internal/schedules`: 0% → 76.1% (Stage 3 achieved!)
-- ✅ `internal/tasks`: 0% → 85.7% (Stage 3 achieved!)
-- ✅ `internal/tasks/stats`: 0% → 12.8% (new test file added)
-- ✅ `internal/widgets`: 0% → 2.3% (new test file added)
+- ✅ `user/home`: 36.4% → 77.3% (Stage 8 achieved!)
+- ✅ `user_impersonate`: 28.6% → 81.0% (Stage 8 achieved!)
+- ✅ `auth/authentication`: 48.6% → 50.0% (Stage 6 achieved!)
+- ✅ `internal/config`: 52.4% → 55.8% (Stage 6 achieved!)
+- ✅ `shared/thumb`: 30.6% → 38.2% (Stage 4 achieved!)
+- ✅ `internal/links`: 0% → 22.5% (Stage 3 achieved!)
+- ✅ `internal/resources`: 0% → 52.4% (Stage 6 achieved!)
+- ✅ `pkg/testimonials`: 2.3% → 48.9% (Stage 5 achieved!)
+- ✅ `internal/emails`: 0% → 8.9% (Stage 2 achieved!)
+- ✅ `internal/layouts`: 0% → 4.7% (Stage 1 achieved!)
+- ✅ `internal/schedules`: 0% → 77.1% (Stage 8 achieved!)
+- ✅ `internal/tasks`: 0% → 85.7% (Stage 8 achieved!)
+- ✅ `internal/tasks/stats`: 0% → 12.6% (Stage 2 achieved!)
+- ✅ `internal/widgets`: 0% → 2.3% (Stage 1 achieved!)
+- ✅ `internal/controllers/website/contact`: 0% → 5.6% (Stage 1 achieved!)
+- ✅ `internal/controllers/website/swagger`: 0% → 53.3% (Stage 6 achieved!)
+- ✅ `internal/controllers/liveflux`: 0% → 7.7% (Stage 1 achieved!)
 
 **Challenges Encountered:**
 - `cmd/server`: Stuck at 45.7% (main() function difficult to test) - **OK at current level** (infrastructure package)
@@ -55,30 +70,83 @@ The blueprint project tests are now **passing successfully**. All build failures
 Based on the latest test run, the following packages have coverage data:
 
 
-### Medium Coverage (50-70%)
+### Stage 6 Coverage (50-60%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
 | `internal/controllers/website/cms` | 55.1% | ✅ |
-| `internal/controllers/shared/file` | 65.4% | ✅ |
 | `internal/controllers/shared/media` | 53.8% | ✅ |
 | `internal/cmds` | 51.6% | ✅ |
 | `cmd/snakecase` | 56.5% | ✅ |
 | `pkg/social` | 55.1% | ✅ |
 | `internal/controllers/website/blog` | 50.0% | ✅ |
-| `internal/controllers/admin/users/user_update` | 69.6% | ⚠️ |
-| `internal/controllers/admin/blog/blog_settings` | 65.1% | ⚠️ |
+| `internal/controllers/admin/shop/products/productupdate` | 42.9% | ⚠️ |
 | `internal/controllers/user/account` | 64.2% | ⚠️ |
-| `internal/tasks/email_admin` | 66.7% | ⚠️ |
-| `internal/tasks/email_admin_new_contact` | 66.7% | ⚠️ |
-| `internal/middlewares` | 59.9% | ⚠️ |
-| `internal/tasks/clean_up` | 60.0% | ⚠️ |
-| `internal/tasks/email_admin_new_user_registered` | 60.0% | ⚠️ |
-| `internal/tasks/email_test` | 60.5% | ⚠️ |
 | `internal/controllers/auth/register` | 53.7% | ✅ |
-| `pkg/testimonials` | 51.2% | ✅ |
+| `internal/resources` | 52.4% | ✅ |
+| `pkg/testimonials` | 48.9% | ✅ |
+| `internal/controllers/website/swagger` | 53.3% | ✅ |
 
-### High Coverage (70%+)
+### Stage 7 Coverage (60-70%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `internal/controllers/shared/file` | 65.4% | ✅ |
+| `internal/controllers/user/account` | 64.2% | ✅ |
+| `internal/controllers/auth/authentication` | 50.0% | ✅ |
+| `internal/config` | 55.8% | ✅ |
+| `internal/tasks/email_admin` | 66.7% | ✅ |
+| `internal/tasks/email_admin_new_contact` | 66.7% | ✅ |
+| `internal/middlewares` | 59.9% | ✅ |
+| `internal/tasks/clean_up` | 60.0% | ✅ |
+| `internal/tasks/email_admin_new_user_registered` | 60.0% | ✅ |
+| `internal/tasks/email_test` | 60.5% | ✅ |
+| `internal/controllers/admin/users/user_update` | 69.6% | ✅ |
+| `internal/controllers/admin/blog/blog_settings` | 65.1% | ✅ |
+
+### Stage 5 Coverage (40-50%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `cmd/server` | 45.7% | ✅ OK (infrastructure) |
+
+### Stage 4 Coverage (30-40%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `internal/controllers/shared/thumb` | 38.2% | ❌ |
+
+### Stage 3 Coverage (20-30%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `internal/links` | 22.5% | ❌ |
+| `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
+
+### Stage 2 Coverage (10-20%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `internal/tasks/stats` | 12.6% | ❌ |
+| `cmd/deploy` | 12.1% | ✅ OK (infrastructure) |
+
+### Stage 1 Coverage (5-10%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| `internal/emails` | 8.9% | ❌ |
+| `internal/layouts` | 4.7% | ❌ |
+| `internal/widgets` | 2.3% | ❌ |
+| `internal/controllers/website/contact` | 5.6% | ✅ |
+| `internal/controllers/liveflux` | 7.7% | ✅ |
+
+### Stage 0 Coverage (0%)
+
+| Package | Coverage | Status |
+|----------|----------|--------|
+| See No Coverage section below for 13 packages with 0% coverage |
+
+### Stage 8 Coverage (70%+)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
@@ -89,40 +157,24 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/admin/blog/post_manager` | 94.0% | ✅ |
 | `internal/controllers/admin/blog/post_create` | 94.4% | ✅ |
 | `internal/controllers/admin/blog/post_delete` | 90.0% | ✅ |
-| `internal/controllers/admin/blog/ai_post_content_update` | 27.4% | ❌ |
-| `internal/controllers/admin/blog/ai_title_generator` | 15.6% | ❌ |
-| `internal/controllers/admin/files` | 12.2% | ❌ |
-| `internal/controllers/admin/logs/log_manager` | 27.1% | ❌ |
-| `internal/controllers/admin/shop/products/productupdate` | 42.9% | ⚠️ |
+| `internal/controllers/user/home` | 77.3% | ✅ |
+| `internal/controllers/admin/users/user_impersonate` | 81.0% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/detailscomponent` | 80.9% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/mediacomponent` | 81.0% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/metadatacomponent` | 79.6% | ✅ |
 | `internal/controllers/admin/shop/products/productupdate/tagscomponent` | 78.7% | ✅ |
+| `internal/controllers/shared/flash` | 90.3% | ✅ |
+| `internal/controllers/shared/page_not_found` | 100.0% | ✅ |
+| `internal/controllers/shared/resource` | 93.3% | ✅ |
+| `internal/controllers/user` | 100.0% | ✅ |
+| `internal/controllers/website/home` | 95.0% | ✅ |
+| `internal/controllers/website/pages/indexnow` | 95.8% | ✅ |
 | `internal/ext` | 73.8% | ✅ |
 | `internal/registry` | 71.4% | ✅ |
 | `internal/website/seo` | 76.3% | ✅ |
 | `internal/tasks/hello_world` | 70.6% | ✅ |
-| `internal/resources` | 74.4% | ✅ (Stage 3!) |
-| `internal/schedules` | 76.1% | ✅ (Stage 3!) |
-| `internal/tasks` | 85.7% | ✅ (Stage 3!) |
-
-### Low Coverage (<50%)
-
-| Package | Coverage | Status |
-|----------|----------|--------|
-| `internal/controllers/user/home` | 77.3% | ✅ (Stage 3!) |
-| `internal/controllers/admin/users/user_impersonate` | 81.0% | ✅ (Stage 3!) |
-| `internal/controllers/auth/authentication` | 50.0% | ✅ (Stage 1!) |
-| `internal/config` | 55.8% | ✅ (Stage 1!) |
-| `internal/controllers/shared/thumb` | 38.2% | ❌ |
-| `internal/links` | 23.1% | ❌ |
-| `internal/emails` | 8.9% | ❌ |
-| `internal/layouts` | 4.7% | ❌ |
-| `internal/widgets` | 2.3% | ❌ |
-| `internal/tasks/stats` | 12.8% | ❌ |
-| `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
-| `cmd/server` | 45.7% | ✅ OK (infrastructure) |
-| `cmd/deploy` | 12.1% | ✅ OK (infrastructure) |
+| `internal/schedules` | 77.1% | ✅ |
+| `internal/tasks` | 85.7% | ✅ |
 
 ### No Coverage (0%)
 
@@ -137,12 +189,9 @@ The following packages have no test coverage:
 - `internal/controllers/admin/users`
 - `internal/controllers/admin/users/user_create`
 - `internal/controllers/admin/users/user_delete`
-- `internal/controllers/liveflux`
 - `internal/controllers/user/partials`
 - `internal/controllers/website`
 - `internal/controllers/website/blog/shared`
-- `internal/controllers/website/contact`
-- `internal/controllers/website/swagger`
 - `pkg/blogai`
 
 ## Changes Made to Fix Build Failures

@@ -87,3 +87,17 @@ func TestPostContentStructs(t *testing.T) {
 		t.Errorf("Conclusion Title = %q, want %q", conclusion.Title, "Conclusion")
 	}
 }
+
+func TestNewTitleGeneratorAgent(t *testing.T) {
+	agent := NewTitleGeneratorAgent()
+	if agent == nil {
+		t.Error("NewTitleGeneratorAgent() should not return nil")
+	}
+}
+
+func TestNewBlogWriterAgent(t *testing.T) {
+	agent := NewBlogWriterAgent(nil)
+	if agent == nil {
+		t.Error("NewBlogWriterAgent() should not return nil")
+	}
+}
