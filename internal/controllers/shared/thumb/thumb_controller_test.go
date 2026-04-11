@@ -324,3 +324,42 @@ func TestPrepareDataFilesLink(t *testing.T) {
 		}
 	})
 }
+
+// TestNewThumbController verifies the constructor creates a valid controller
+func TestNewThumbController(t *testing.T) {
+	// Since we don't have easy access to a registry in this test package,
+	// we'll just verify the constructor doesn't panic with nil
+	c := NewThumbController(nil)
+	if c == nil {
+		t.Fatal("NewThumbController should not return nil even with nil registry")
+	}
+}
+
+// TestValidateURL tests various URL validation scenarios
+func TestValidateURL(t *testing.T) {
+	c := &thumbnailController{}
+
+	tests := []struct {
+		name        string
+		url         string
+		shouldError bool
+	}{
+		{"Valid HTTP URL", "http://example.com/image.jpg", false},
+		{"Valid HTTPS URL", "https://example.com/image.jpg", false},
+		{"Invalid scheme", "ftp://example.com/image.jpg", true},
+		{"Empty URL", "", true},
+		{"Invalid format", "not-a-url", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := c.validateURL(tt.url)
+			if tt.shouldError && err == nil {
+				t.Errorf("Expected error for URL %s", tt.url)
+			}
+			if !tt.shouldError && err != nil {
+				t.Errorf("Unexpected error for URL %s: %v", tt.url, err)
+			}
+		})
+	}
+}

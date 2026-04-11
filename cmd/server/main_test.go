@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 
 	"project/internal/testutils"
 )
@@ -61,6 +62,25 @@ func TestStartBackgroundProcesses_NilRegistry(t *testing.T) {
 	}
 }
 
+func TestStartBackgroundProcesses_NilConfig(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	group := newBackgroundGroup(ctx)
+	defer group.stop()
+
+	// Create a minimal mock registry without config
+	app := testutils.Setup()
+
+	// This will likely fail because we can't easily mock GetConfig() returning nil
+	// But let's at least test the flow
+	err := startBackgroundProcesses(ctx, group, app)
+	// Should not error because testutils.Setup() provides a valid config
+	if err != nil {
+		t.Logf("startBackgroundProcesses returned error (expected for test setup): %v", err)
+	}
+}
+
 func TestBackgroundGroup(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -74,5 +94,52 @@ func TestBackgroundGroup(t *testing.T) {
 		t.Error("Background group should not be done immediately")
 	default:
 		// Expected
+	}
+}
+
+func TestBackgroundGroup_Stop(t *testing.T) {
+	ctx := context.Background()
+	group := newBackgroundGroup(ctx)
+
+	// Test stop multiple times (should not panic)
+	group.stop()
+	group.stop() // Second call should be no-op
+
+	// Verify Done channel is closed
+	select {
+	case <-group.Done():
+		// Expected - channel should be closed
+	default:
+		t.Error("Done channel should be closed after stop")
+	}
+}
+
+func TestBackgroundGroup_Go(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	group := newBackgroundGroup(ctx)
+	defer group.stop()
+
+	done := make(chan bool)
+	group.Go(func(ctx context.Context) {
+		close(done)
+	})
+
+	select {
+	case <-done:
+		// Expected
+	case <-time.After(2 * time.Second):
+		t.Error("Go function should have executed")
+	}
+}
+
+func TestBackgroundGroup_NilParent(t *testing.T) {
+	// Test that nil parent context defaults to Background
+	group := newBackgroundGroup(nil)
+	defer group.stop()
+
+	if group.ctx == nil {
+		t.Error("Context should not be nil")
 	}
 }

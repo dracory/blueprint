@@ -14,11 +14,11 @@ The desired coverage at stage 3 for this project is **> 70%**.
 
 | Stage | Target | Packages Meeting Target |
 |-------|--------|------------------------|
-| Stage 1 | > 50% | 35+ packages ✅ |
+| Stage 1 | > 50% | 40+ packages ✅ |
 | Stage 2 | > 60% | 25+ packages ⚠️ |
 | Stage 3 | > 70% | 15+ packages ❌ |
 
-**Last Updated:** April 11, 2026, 10:00 UTC+01:00
+**Last Updated:** April 11, 2026, 11:45 UTC+01:00
 
 ## Executive Summary
 
@@ -100,7 +100,7 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/controllers/user/home` | 36.4% | ❌ |
+| `internal/controllers/user/home` | 77.3% | ✅ (Stage 3!) |
 | `internal/controllers/shared/thumb` | 30.1% | ❌ |
 | `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
 | `internal/controllers/admin/users/user_impersonate` | 28.6% | ❌ |

@@ -225,3 +225,56 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal(`Response MUST contain '`+expected+`', but got: `, flashMessage.Message)
 	}
 }
+
+func TestAuthController_NilUserStore(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(false) // No session store
+	cfg.SetUserStoreUsed(false)    // No user store
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	recorder := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(registry).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusSeeOther {
+		t.Fatalf(`Expected status 303, got %d`, recorder.Code)
+	}
+}
+
+func TestAuthController_NilSessionStore(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(false) // No session store
+	cfg.SetUserStoreUsed(true)     // Has user store
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	recorder := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = NewAuthenticationController(registry).Handler(w, r)
+	})
+	handler.ServeHTTP(recorder, req)
+
+	if recorder.Code != http.StatusSeeOther {
+		t.Fatalf(`Expected status 303, got %d`, recorder.Code)
+	}
+}
+
+func TestAuthController_NewController(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewAuthenticationController(registry)
+
+	if controller == nil {
+		t.Fatal("Controller should not be nil")
+	}
+
+	if controller.registry == nil {
+		t.Fatal("Controller registry should not be nil")
+	}
+}
