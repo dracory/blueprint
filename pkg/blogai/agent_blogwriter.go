@@ -79,7 +79,7 @@ Do not include any text outside of this JSON structure. The response must be par
 		return RecordPost{}, fmt.Errorf("failed to generate blog post: %w", err)
 	}
 
-	fmt.Printf("Raw LLM response:\n%s\n", content)
+	b.logger.Debug("Raw LLM response", slog.String("content", content))
 
 	cleanContent := sanitizeJSONContent(content)
 
@@ -87,8 +87,9 @@ Do not include any text outside of this JSON structure. The response must be par
 	var post RecordPost
 	err = json.Unmarshal([]byte(cleanContent), &post)
 	if err != nil {
-		fmt.Printf("JSON parsing error: %v\n", err)
-		fmt.Printf("Attempted to parse (sanitized):\n%s\n", cleanContent)
+		b.logger.Error("Failed to parse blog post JSON",
+			slog.String("error", err.Error()),
+			slog.String("content", cleanContent))
 		return RecordPost{}, fmt.Errorf("failed to parse blog post JSON: %w", err)
 	}
 
@@ -112,7 +113,7 @@ Do not include any text outside of this JSON structure. The response must be par
 		return RecordPost{}, fmt.Errorf("missing conclusion fields in response")
 	}
 
-	fmt.Printf("Successfully parsed post: %+v\n", post)
+	b.logger.Debug("Successfully parsed post", slog.Any("post", post))
 
 	return post, nil
 }

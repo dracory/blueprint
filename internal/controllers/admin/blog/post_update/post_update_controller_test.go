@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strings"
 	"testing"
 
 	"project/internal/registry"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPostUpdateController_RequiresPostID(t *testing.T) {
@@ -24,21 +24,13 @@ func TestPostUpdateController_RequiresPostID(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	if err != nil {
-		t.Errorf("Handler should not return error: %v", err)
-	}
-	if response.StatusCode != http.StatusSeeOther {
-		t.Errorf("Should redirect with error, expected %d, got %d", http.StatusSeeOther, response.StatusCode)
-	}
+	assert.NoError(t, err, "Handler should not return error")
+	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
-	if err != nil {
-		t.Errorf("Should find flash message: %v", err)
-	}
-	if flash.Message != "Post ID is required" {
-		t.Errorf("Should show correct error message, got %s", flash.Message)
-	}
+	assert.NoError(t, err, "Should find flash message")
+	assert.Equal(t, "Post ID is required", flash.Message, "Should show correct error message")
 }
 
 func TestPostUpdateController_InvalidPostID(t *testing.T) {
@@ -53,21 +45,13 @@ func TestPostUpdateController_InvalidPostID(t *testing.T) {
 		},
 	})
 
-	if err != nil {
-		t.Errorf("Handler should not return error: %v", err)
-	}
-	if response.StatusCode != http.StatusSeeOther {
-		t.Errorf("Should redirect with error, expected %d, got %d", http.StatusSeeOther, response.StatusCode)
-	}
+	assert.NoError(t, err, "Handler should not return error")
+	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
-	if err != nil {
-		t.Errorf("Should find flash message: %v", err)
-	}
-	if flash.Message != "Post not found" {
-		t.Errorf("Should show correct error message, got %s", flash.Message)
-	}
+	assert.NoError(t, err, "Should find flash message")
+	assert.Equal(t, "Post not found", flash.Message, "Should show correct error message")
 }
 
 func TestPostUpdateController_ShowsPage(t *testing.T) {
@@ -80,21 +64,11 @@ func TestPostUpdateController_ShowsPage(t *testing.T) {
 		},
 	})
 
-	if err != nil {
-		t.Errorf("Handler should not return error: %v", err)
-	}
-	if response.StatusCode != http.StatusOK {
-		t.Errorf("Should return 200 status, got %d", response.StatusCode)
-	}
-	if !strings.Contains(responseHTML, "Edit Post") {
-		t.Error("Should show page heading")
-	}
-	if !strings.Contains(responseHTML, "Post:") {
-		t.Error("Should show post label")
-	}
-	if !strings.Contains(responseHTML, post.GetTitle()) {
-		t.Error("Should show post title")
-	}
+	assert.NoError(t, err, "Handler should not return error")
+	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
+	assert.Contains(t, responseHTML, "Edit Post", "Should show page heading")
+	assert.Contains(t, responseHTML, "Post:", "Should show post label")
+	assert.Contains(t, responseHTML, post.GetTitle(), "Should show post title")
 }
 
 func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {

@@ -1,0 +1,141 @@
+<style>
+  .sortable-ghost {
+    opacity: 0.4;
+    background-color: #f8f9fa;
+  }
+  .sortable-chosen {
+    background-color: #e9ecef;
+  }
+  .sortable-fallback {
+    cursor: grabbing !important;
+    opacity: 0.9;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: fixed !important;
+    z-index: 9999;
+    pointer-events: none;
+  }
+  .drag-handle {
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+  }
+  .drag-handle:active, .drag-handle:hover {
+    cursor: grabbing;
+  }
+  .sortable-list .list-group-item {
+    position: relative;
+  }
+</style>
+
+<div id="blog-categories-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Categories</h5>
+      <button @click="openCreateModal()" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus me-1"></i> Add Category
+      </button>
+    </div>
+
+    <div v-if="categories.length === 0" class="text-center py-4 text-muted border rounded">
+      No categories found. Click "Add Category" to create one.
+    </div>
+
+    <div v-else class="list-group sortable-list">
+      <div 
+        v-for="(category, index) in categories" 
+        :key="category.id"
+        class="list-group-item d-flex justify-content-between align-items-center"
+        :data-id="category.id"
+        :data-index="index"
+      >
+        <div class="d-flex align-items-center">
+          <span class="drag-handle me-3 text-muted">
+            <i class="bi bi-grip-vertical"></i>
+          </span>
+          <div>
+            <div class="fw-semibold">{{ category.name }}</div>
+            <div class="text-muted small">
+              <span class="font-monospace">/{{ category.slug }}</span>
+              <span v-if="category.description" class="ms-2">- {{ category.description }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <span class="badge bg-secondary me-2">{{ category.count || 0 }} posts</span>
+          <button @click="editCategory(category)" class="btn btn-outline-primary" title="Edit">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button @click="deleteCategory(category)" class="btn btn-outline-danger" title="Delete">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div v-if="showModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+  
+  <!-- Create/Edit Modal -->
+  <div v-if="showModal" class="modal fade show" style="display: block; z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingCategory ? 'Edit Category' : 'Create Category' }}</h5>
+          <button type="button" class="btn-close" @click="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              v-model="form.name" 
+              @input="autoGenerateSlug"
+              placeholder="Category name"
+              required 
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Slug</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              v-model="form.slug" 
+              placeholder="url-friendly-slug"
+            />
+            <div class="form-text">URL-friendly identifier. Auto-generated from name.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea 
+              class="form-control" 
+              v-model="form.description" 
+              rows="3"
+              placeholder="Optional description"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeModal()">Cancel</button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            @click="saveCategory()"
+            :disabled="!form.name || saving"
+          >
+            <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ editingCategory ? 'Save Changes' : 'Create' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

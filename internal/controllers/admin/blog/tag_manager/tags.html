@@ -1,0 +1,144 @@
+<div id="blog-tags-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Tags</h5>
+      <button @click="openCreateModal()" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus me-1"></i> Add Tag
+      </button>
+    </div>
+
+    <div v-if="tags.length === 0" class="text-center py-4 text-muted border rounded">
+      No tags found. Click "Add Tag" to create one.
+    </div>
+
+    <div v-else class="list-group">
+      <div 
+        v-for="tag in tags" 
+        :key="tag.id"
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <div>
+          <div class="fw-semibold">{{ tag.name }}</div>
+          <div class="text-muted small">
+            <span class="font-monospace">/{{ tag.slug }}</span>
+          </div>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <span 
+            class="badge bg-secondary me-2" 
+            style="cursor: pointer;"
+            @click="viewTagPosts(tag)"
+            title="View posts"
+          >{{ tag.count || 0 }} posts</span>
+          <button @click="editTag(tag)" class="btn btn-outline-primary" title="Edit">
+            <i class="bi bi-pencil-square"></i>
+          </button>
+          <button @click="deleteTag(tag)" class="btn btn-outline-danger" title="Delete">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Backdrop -->
+  <div v-if="showModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+  
+  <!-- Create/Edit Modal -->
+  <div v-if="showModal" class="modal fade show" style="display: block; z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ editingTag ? 'Edit Tag' : 'Create Tag' }}</h5>
+          <button type="button" class="btn-close" @click="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Name *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              v-model="form.name" 
+              @input="autoGenerateSlug"
+              placeholder="Tag name"
+              required 
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Slug</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              v-model="form.slug" 
+              placeholder="url-friendly-slug"
+            />
+            <div class="form-text">URL-friendly identifier. Auto-generated from name.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closeModal()">Cancel</button>
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            @click="saveTag()"
+            :disabled="!form.name || saving"
+          >
+            <span v-if="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ editingTag ? 'Save Changes' : 'Create' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Posts Modal Backdrop -->
+  <div v-if="showPostsModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+  
+  <!-- Posts Modal -->
+  <div v-if="showPostsModal" class="modal fade show" style="display: block; z-index: 1050;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Posts for "{{ currentTag?.name }}"</h5>
+          <button type="button" class="btn-close" @click="closePostsModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div v-if="loadingPosts" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <div v-else>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              {{ postsMessage || 'This tag is associated with ' + (currentTag?.count || 0) + ' post(s).' }}
+            </div>
+            <div v-if="posts.length > 0" class="list-group">
+              <a 
+                v-for="post in posts" 
+                :key="post.id"
+                :href="'/admin/blog/post-update?post_id=' + post.id"
+                class="list-group-item list-group-item-action"
+              >
+                <div class="fw-semibold">{{ post.title }}</div>
+                <div class="text-muted small">
+                  <span class="badge bg-secondary">{{ post.status }}</span>
+                  <span v-if="post.published_at" class="ms-2">{{ post.published_at }}</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="closePostsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

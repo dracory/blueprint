@@ -65,7 +65,7 @@ type mediaManagerController struct {
 
 func (controller *mediaManagerController) init(r *http.Request) string {
 	var err error
-	
+
 	controller.storage, err = filesystem.NewStorage(filesystem.Disk{
 		DiskName:             "S3",
 		Driver:               filesystem.DRIVER_S3,

@@ -9,6 +9,7 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
+	"github.com/stretchr/testify/assert"
 )
 
 func setupSEOTestAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
@@ -41,12 +42,8 @@ func TestPostSEOComponent_MountRequiresPostID(t *testing.T) {
 
 	err := c.Mount(context.Background(), map[string]string{})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Post ID is required" {
-		t.Errorf("expected FormErrorMessage 'Post ID is required', got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Post ID is required", c.FormErrorMessage)
 }
 
 func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
@@ -58,27 +55,13 @@ func TestPostSEOComponent_MountLoadsPostFields(t *testing.T) {
 		"post_id": post.GetID(),
 	})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.PostID != post.GetID() {
-		t.Errorf("expected PostID %s, got %s", post.GetID(), c.PostID)
-	}
-	if c.FormCanonicalURL != post.GetCanonicalURL() {
-		t.Errorf("expected FormCanonicalURL %s, got %s", post.GetCanonicalURL(), c.FormCanonicalURL)
-	}
-	if c.FormMetaDescription != post.GetMetaDescription() {
-		t.Errorf("expected FormMetaDescription %s, got %s", post.GetMetaDescription(), c.FormMetaDescription)
-	}
-	if c.FormMetaKeywords != post.GetMetaKeywords() {
-		t.Errorf("expected FormMetaKeywords %s, got %s", post.GetMetaKeywords(), c.FormMetaKeywords)
-	}
-	if c.FormMetaRobots != post.GetMetaRobots() {
-		t.Errorf("expected FormMetaRobots %s, got %s", post.GetMetaRobots(), c.FormMetaRobots)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, post.GetID(), c.PostID)
+	assert.Equal(t, post.GetCanonicalURL(), c.FormCanonicalURL)
+	assert.Equal(t, post.GetMetaDescription(), c.FormMetaDescription)
+	assert.Equal(t, post.GetMetaKeywords(), c.FormMetaKeywords)
+	assert.Equal(t, post.GetMetaRobots(), c.FormMetaRobots)
+	assert.Equal(t, "", c.FormErrorMessage)
 }
 
 func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
@@ -95,34 +78,17 @@ func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 
 	err := c.Handle(context.Background(), "save", values)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "Post saved successfully" {
-		t.Errorf("expected FormSuccessMessage 'Post saved successfully', got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "", c.FormErrorMessage)
+	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
 	// Reload post from store and verify fields were updated
 	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if updated == nil {
-		t.Fatal("expected updated to not be nil")
-	}
-	if updated.GetCanonicalURL() != "https://example.com/updated" {
-		t.Errorf("expected canonical URL 'https://example.com/updated', got %s", updated.GetCanonicalURL())
-	}
-	if updated.GetMetaDescription() != "Updated meta" {
-		t.Errorf("expected meta description 'Updated meta', got %s", updated.GetMetaDescription())
-	}
-	if updated.GetMetaKeywords() != "one,two" {
-		t.Errorf("expected meta keywords 'one,two', got %s", updated.GetMetaKeywords())
-	}
-	if updated.GetMetaRobots() != "NOINDEX, FOLLOW" {
-		t.Errorf("expected meta robots 'NOINDEX, FOLLOW', got %s", updated.GetMetaRobots())
+	assert.NoError(t, err)
+	if assert.NotNil(t, updated) {
+		assert.Equal(t, "https://example.com/updated", updated.GetCanonicalURL())
+		assert.Equal(t, "Updated meta", updated.GetMetaDescription())
+		assert.Equal(t, "one,two", updated.GetMetaKeywords())
+		assert.Equal(t, "NOINDEX, FOLLOW", updated.GetMetaRobots())
 	}
 }

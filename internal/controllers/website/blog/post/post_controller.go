@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	"github.com/dracory/base/blogtheme"
-
 	"github.com/dracory/blogstore"
+	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
 	"github.com/dracory/rtr"
@@ -87,7 +87,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		},
 		ScriptURLs: []string{
 			"/liveflux",
-			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
+			cdn.Slazy_0_5_0(),
 		},
 		Content:      hb.Wrap().HTML(c.page(post)),
 		CanonicalURL: canonicalURL,

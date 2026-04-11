@@ -17,7 +17,7 @@ func TestToSnakeCase(t *testing.T) {
 		{"MyXMLParser.go", "my_xml_parser.go"},
 		{"file2Go.go", "file2_go.go"},
 		{"already_snake.go", "already_snake.go"},
-		{"IDs.go", "ids.go"},           // Updated expectation
+		{"IDs.go", "ids.go"},          // Updated expectation
 		{"UserIDs.go", "user_ids.go"}, // Updated expectation
 		{"Server123.go", "server123.go"},
 		{"JSONToXML.go", "json_to_xml.go"},

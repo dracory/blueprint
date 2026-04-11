@@ -61,6 +61,9 @@ func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterf
 			Logger:             registry.GetLogger(),
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
+			PageNotFoundHandler: func(w http.ResponseWriter, r *http.Request, alias string) (bool, string) {
+				return "Not found"
+			},
 		})
 
 		instance = frontend

@@ -14,12 +14,15 @@ import (
 	aiTest "project/internal/controllers/admin/blog/ai_test"
 	aiTitleGenerator "project/internal/controllers/admin/blog/ai_title_generator"
 	aiTools "project/internal/controllers/admin/blog/ai_tools"
-	blog_settings "project/internal/controllers/admin/blog/blog_settings"
+	blogSettings "project/internal/controllers/admin/blog/blog_settings"
+	"project/internal/controllers/admin/blog/category_manager"
+	"project/internal/controllers/admin/blog/dashboard"
 	"project/internal/controllers/admin/blog/post_create"
 	"project/internal/controllers/admin/blog/post_delete"
 	"project/internal/controllers/admin/blog/post_manager"
 	"project/internal/controllers/admin/blog/post_update"
 	"project/internal/controllers/admin/blog/shared"
+	"project/internal/controllers/admin/blog/tag_manager"
 )
 
 func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
@@ -40,7 +43,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		case shared.CONTROLLER_AI_TOOLS:
 			return aiTools.NewAiToolsController(registry).Handler(w, r)
 		case shared.CONTROLLER_BLOG_SETTINGS:
-			return blog_settings.NewBlogSettingsController(registry).Handler(w, r)
+			return blogSettings.NewBlogSettingsController(registry).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_CONTENT_UPDATE:
 			return aiPostContentUpdate.NewController(registry).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_GENERATOR:
@@ -51,10 +54,16 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 			return aiPostEditor.NewAiPostEditorController(registry).Handler(w, r)
 		case shared.CONTROLLER_AI_TEST:
 			return aiTest.NewAiTestController(registry).Handler(w, r)
+		case shared.CONTROLLER_DASHBOARD:
+			return dashboard.NewDashboardController(registry).Handler(w, r)
+		case shared.CONTROLLER_CATEGORY_MANAGER:
+			return category_manager.NewCategoryManagerController(registry).Handler(w, r)
+		case shared.CONTROLLER_TAG_MANAGER:
+			return tag_manager.NewTagManagerController(registry).Handler(w, r)
 		}
 
-		// Default to post manager
-		return post_manager.NewPostManagerController(registry).Handler(w, r)
+		// Default to dashboard
+		return dashboard.NewDashboardController(registry).Handler(w, r)
 	}
 
 	blog := rtr.NewRoute().

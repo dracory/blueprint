@@ -447,3 +447,9 @@ setTimeout(() => {
 }, 500)
 	`
 }
+
+func init() {
+	if err := liveflux.Register(&postContentComponent{}); err != nil {
+		log.Printf("Failed to register postContentComponent: %v", err)
+	}
+}

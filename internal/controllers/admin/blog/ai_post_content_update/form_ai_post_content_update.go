@@ -255,9 +255,6 @@ Return ONLY the rewritten text for that block as markdown, with no additional ex
 	userPrompt = append(userPrompt, "Full post markdown with marker:\n"+contextMarkdown)
 	userPrompt = append(userPrompt, "Original block content to be regenerated (for meaning only; MUST BE REPHRASED SIGNIFICANTLY; DO NOT copy it verbatim):\n"+block.Text)
 
-	fmt.Println("System Prompt:", systemPrompt)
-	fmt.Println("User Prompt:", strings.Join(userPrompt, "\n\n"))
-
 	engine, err := shared.LlmEngine(c.registry)
 	if err != nil || engine == nil {
 		c.Error = "Failed to initialize LLM engine. Please try again later."

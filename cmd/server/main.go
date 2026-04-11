@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"project/internal/cli"
+	// "project/internal/cmsblocks"
 	"project/internal/config"
 	"project/internal/emails"
 	"project/internal/middlewares"
@@ -149,8 +150,7 @@ func isCliMode() bool {
 // Returns:
 // - error: the error if any
 func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
-	// TODO: Use ctx parameter when needed for cancellation or context propagation
-	_ = ctx // Suppress unused parameter warning for now
+	_ = ctx // Suppress unused parameter warning, use it when needed for context cancellation or propagation
 
 	if registry == nil {
 		return errors.New("startBackgroundProcesses called with nil registry")
@@ -221,6 +221,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 	emails.InitEmailSender(registry)
 	middlewares.CmsAddMiddlewares(registry) // Add CMS middlewares
 	widgets.CmsAddShortcodes(registry)      // Add CMS shortcodes
+	// cmsblocks.CmsAddBlockTypes(registry)    // Add CMS block types
 
 	return nil
 }

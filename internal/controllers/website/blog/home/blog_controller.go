@@ -11,6 +11,7 @@ import (
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
+	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dracory/req"
 	"github.com/spf13/cast"
@@ -47,7 +48,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 		Title:          "Recent Posts",
 		Content:        hb.Wrap().HTML(controller.page(data)),
 		ScriptURLs: []string{
-			"https://cdn.jsdelivr.net/gh/lesichkovm/slazy@latest/dist/slazy.min.js",
+			cdn.Slazy_0_5_0(),
 		},
 	}
 

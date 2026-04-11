@@ -9,6 +9,7 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
+	"github.com/stretchr/testify/assert"
 )
 
 func setupContentTestAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
@@ -39,12 +40,8 @@ func TestPostContentComponent_MountRequiresPostID(t *testing.T) {
 
 	err := c.Mount(context.Background(), map[string]string{})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Post ID is required" {
-		t.Errorf("expected FormErrorMessage 'Post ID is required', got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Post ID is required", c.FormErrorMessage)
 }
 
 func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
@@ -56,24 +53,12 @@ func TestPostContentComponent_MountLoadsPostFields(t *testing.T) {
 		"post_id": post.GetID(),
 	})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.PostID != post.GetID() {
-		t.Errorf("expected PostID %s, got %s", post.GetID(), c.PostID)
-	}
-	if c.FormTitle != post.GetTitle() {
-		t.Errorf("expected FormTitle %s, got %s", post.GetTitle(), c.FormTitle)
-	}
-	if c.FormSummary != post.GetSummary() {
-		t.Errorf("expected FormSummary %s, got %s", post.GetSummary(), c.FormSummary)
-	}
-	if c.FormContent != post.GetContent() {
-		t.Errorf("expected FormContent %s, got %s", post.GetContent(), c.FormContent)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, post.GetID(), c.PostID)
+	assert.Equal(t, post.GetTitle(), c.FormTitle)
+	assert.Equal(t, post.GetSummary(), c.FormSummary)
+	assert.Equal(t, post.GetContent(), c.FormContent)
+	assert.Equal(t, "", c.FormErrorMessage)
 }
 
 func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
@@ -89,15 +74,9 @@ func TestPostContentComponent_HandleSave_ValidatesTitleRequired(t *testing.T) {
 
 	err := c.Handle(context.Background(), "save", values)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Title is required" {
-		t.Errorf("expected FormErrorMessage 'Title is required', got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "" {
-		t.Errorf("expected empty FormSuccessMessage, got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Title is required", c.FormErrorMessage)
+	assert.Equal(t, "", c.FormSuccessMessage)
 }
 
 func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
@@ -113,30 +92,15 @@ func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 
 	err := c.Handle(context.Background(), "save", values)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "Post saved successfully" {
-		t.Errorf("expected FormSuccessMessage 'Post saved successfully', got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "", c.FormErrorMessage)
+	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
 	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if updated == nil {
-		t.Fatal("expected updated to not be nil")
-	}
-	if updated.GetTitle() != "Updated Title" {
-		t.Errorf("expected title 'Updated Title', got %s", updated.GetTitle())
-	}
-	if updated.GetSummary() != "Updated summary" {
-		t.Errorf("expected summary 'Updated summary', got %s", updated.GetSummary())
-	}
-	if updated.GetContent() != "Updated content" {
-		t.Errorf("expected content 'Updated content', got %s", updated.GetContent())
+	assert.NoError(t, err)
+	if assert.NotNil(t, updated) {
+		assert.Equal(t, "Updated Title", updated.GetTitle())
+		assert.Equal(t, "Updated summary", updated.GetSummary())
+		assert.Equal(t, "Updated content", updated.GetContent())
 	}
 }

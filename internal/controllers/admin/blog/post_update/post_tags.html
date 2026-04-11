@@ -1,0 +1,74 @@
+<style>
+  .tag-item {
+    transition: all 0.2s ease;
+  }
+  .tag-item:hover {
+    background-color: #f8f9fa;
+  }
+  .tag-item.assigned {
+    background-color: #e7f3ff;
+    border-color: #0d6efd;
+  }
+</style>
+
+<div id="post-tags-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Post Tags</h5>
+      <small class="text-muted">Click to assign/unassign tags</small>
+    </div>
+
+    <div v-if="tags.length === 0" class="text-center py-4 text-muted border rounded">
+      No tags found. Create tags in the Tag Manager first.
+    </div>
+
+    <div v-else>
+      <div class="mb-3">
+        <input 
+          type="text" 
+          class="form-control" 
+          v-model="searchQuery" 
+          placeholder="Search tags..."
+          @input="filterTags"
+        />
+      </div>
+
+      <div class="list-group">
+        <div 
+          v-for="tag in filteredTags" 
+          :key="tag.id"
+          class="list-group-item tag-item d-flex justify-content-between align-items-center"
+          :class="{ 'assigned': tag.assigned }"
+          @click="toggleTag(tag)"
+          style="cursor: pointer;"
+        >
+          <div class="d-flex align-items-center">
+            <span class="me-3">
+              <i class="bi" :class="tag.assigned ? 'bi-check-circle-fill text-primary' : 'bi-circle text-muted'"></i>
+            </span>
+            <div>
+              <div class="fw-semibold">{{ tag.name }}</div>
+              <div class="text-muted small">
+                <span class="font-monospace">/{{ tag.slug }}</span>
+              </div>
+            </div>
+          </div>
+          <span class="badge" :class="tag.assigned ? 'bg-primary' : 'bg-secondary'">
+            {{ tag.assigned ? 'Assigned' : 'Unassigned' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3 text-muted small">
+      <i class="bi bi-info-circle me-1"></i>
+      Click on a tag to assign or unassign it to this post.
+    </div>
+  </div>
+</div>

@@ -26,7 +26,6 @@ func auditStoreInitialize(registry RegistryInterface) error {
 	return nil
 }
 
-
 func auditStoreMigrate(registry RegistryInterface) error {
 	if registry.GetConfig() == nil {
 		return errors.New("config is not initialized")
@@ -63,7 +62,7 @@ func newAuditStore(db *sql.DB) (auditstore.StoreInterface, error) {
 	if err != nil {
 		return nil, errors.New("error creating audit store: " + err.Error())
 	}
-	
+
 	if store == nil {
 		return nil, errors.New("auditstore.NewStore returned a nil store")
 	}

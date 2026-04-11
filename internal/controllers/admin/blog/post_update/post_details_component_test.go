@@ -9,6 +9,7 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
+	"github.com/stretchr/testify/assert"
 )
 
 func setupDetailsTestAppAndPost(t *testing.T) (registry.RegistryInterface, blogstore.PostInterface) {
@@ -42,12 +43,8 @@ func TestPostDetailsComponent_MountRequiresPostID(t *testing.T) {
 
 	err := c.Mount(context.Background(), map[string]string{})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Post ID is required" {
-		t.Errorf("expected FormErrorMessage 'Post ID is required', got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Post ID is required", c.FormErrorMessage)
 }
 
 func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
@@ -59,30 +56,14 @@ func TestPostDetailsComponent_MountLoadsPostFields(t *testing.T) {
 		"post_id": post.GetID(),
 	})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.PostID != post.GetID() {
-		t.Errorf("expected PostID %s, got %s", post.GetID(), c.PostID)
-	}
-	if c.FormStatus != post.GetStatus() {
-		t.Errorf("expected FormStatus %s, got %s", post.GetStatus(), c.FormStatus)
-	}
-	if c.FormImageUrl != post.GetImageUrl() {
-		t.Errorf("expected FormImageUrl %s, got %s", post.GetImageUrl(), c.FormImageUrl)
-	}
-	if c.FormFeatured != post.GetFeatured() {
-		t.Errorf("expected FormFeatured %s, got %s", post.GetFeatured(), c.FormFeatured)
-	}
-	if c.FormEditor != post.GetEditor() {
-		t.Errorf("expected FormEditor %s, got %s", post.GetEditor(), c.FormEditor)
-	}
-	if c.FormMemo != post.GetMemo() {
-		t.Errorf("expected FormMemo %s, got %s", post.GetMemo(), c.FormMemo)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, post.GetID(), c.PostID)
+	assert.Equal(t, post.GetStatus(), c.FormStatus)
+	assert.Equal(t, post.GetImageUrl(), c.FormImageUrl)
+	assert.Equal(t, post.GetFeatured(), c.FormFeatured)
+	assert.Equal(t, post.GetEditor(), c.FormEditor)
+	assert.Equal(t, post.GetMemo(), c.FormMemo)
+	assert.Equal(t, "", c.FormErrorMessage)
 }
 
 func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
@@ -101,15 +82,9 @@ func TestPostDetailsComponent_HandleSave_ValidatesStatusRequired(t *testing.T) {
 
 	err := c.Handle(context.Background(), "save", values)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Status is required" {
-		t.Errorf("expected FormErrorMessage 'Status is required', got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "" {
-		t.Errorf("expected empty FormSuccessMessage, got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Status is required", c.FormErrorMessage)
+	assert.Equal(t, "", c.FormSuccessMessage)
 }
 
 func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
@@ -128,40 +103,20 @@ func TestPostDetailsComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 
 	err := c.Handle(context.Background(), "save", values)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "" {
-		t.Errorf("expected empty FormErrorMessage, got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "Post saved successfully" {
-		t.Errorf("expected FormSuccessMessage 'Post saved successfully', got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "", c.FormErrorMessage)
+	assert.Equal(t, "Post saved successfully", c.FormSuccessMessage)
 
 	updated, err := registry.GetBlogStore().PostFindByID(context.Background(), post.GetID())
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if updated == nil {
-		t.Fatal("expected updated to not be nil")
-	}
-	if updated.GetStatus() != blogstore.POST_STATUS_PUBLISHED {
-		t.Errorf("expected status %s, got %s", blogstore.POST_STATUS_PUBLISHED, updated.GetStatus())
-	}
-	if updated.GetImageUrl() != "https://example.com/updated.jpg" {
-		t.Errorf("expected image URL 'https://example.com/updated.jpg', got %s", updated.GetImageUrl())
-	}
-	if updated.GetFeatured() != "yes" {
-		t.Errorf("expected featured 'yes', got %s", updated.GetFeatured())
-	}
-	if updated.GetEditor() != blogstore.POST_EDITOR_MARKDOWN {
-		t.Errorf("expected editor %s, got %s", blogstore.POST_EDITOR_MARKDOWN, updated.GetEditor())
-	}
-	if updated.GetMemo() != "Updated memo" {
-		t.Errorf("expected memo 'Updated memo', got %s", updated.GetMemo())
-	}
-	if updated.GetPublishedAtCarbon() == nil {
-		t.Error("expected non-nil PublishedAtCarbon")
+	assert.NoError(t, err)
+	if assert.NotNil(t, updated) {
+		assert.Equal(t, blogstore.POST_STATUS_PUBLISHED, updated.GetStatus())
+		assert.Equal(t, "https://example.com/updated.jpg", updated.GetImageUrl())
+		assert.Equal(t, "yes", updated.GetFeatured())
+		assert.Equal(t, blogstore.POST_EDITOR_MARKDOWN, updated.GetEditor())
+		assert.Equal(t, "Updated memo", updated.GetMemo())
+		// PublishedAt is normalized inside the component; just ensure it's non-empty
+		assert.NotEmpty(t, updated.GetPublishedAtCarbon())
 	}
 }
 
@@ -173,13 +128,7 @@ func TestPostDetailsComponent_HandleRegenerateImage_BlogStoreNotAvailable(t *tes
 
 	err := c.Handle(context.Background(), "regenerate_image", nil)
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if c.FormErrorMessage != "Blog store not available" {
-		t.Errorf("expected FormErrorMessage 'Blog store not available', got %s", c.FormErrorMessage)
-	}
-	if c.FormSuccessMessage != "" {
-		t.Errorf("expected empty FormSuccessMessage, got %s", c.FormSuccessMessage)
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, "Blog store not available", c.FormErrorMessage)
+	assert.Equal(t, "", c.FormSuccessMessage)
 }

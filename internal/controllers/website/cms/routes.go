@@ -3,7 +3,6 @@ package cms
 import (
 	"bytes"
 	"crypto/subtle"
-	"fmt"
 	"io"
 	"net/http"
 	"project/internal/links"
@@ -40,55 +39,6 @@ func (t *teeResponseWriter) Flush() {
 	if f, ok := t.w.(http.Flusher); ok {
 		f.Flush()
 	}
-}
-
-func redactHeader(name string) bool {
-	switch strings.ToLower(name) {
-	case "authorization", "x-mcp-api-key", "cookie", "set-cookie":
-		return true
-	default:
-		return false
-	}
-}
-
-func logRequest(method string, path string, headers http.Header, body []byte) {
-	const maxBody = 4096
-	if len(body) > maxBody {
-		body = body[:maxBody]
-	}
-	var sb strings.Builder
-	sb.WriteString("[MCP DEBUG] request ")
-	sb.WriteString(method)
-	sb.WriteString(" ")
-	sb.WriteString(path)
-	sb.WriteString("\n")
-	for k, vv := range headers {
-		if redactHeader(k) {
-			sb.WriteString(k)
-			sb.WriteString(": [REDACTED]\n")
-			continue
-		}
-		for _, v := range vv {
-			sb.WriteString(k)
-			sb.WriteString(": ")
-			sb.WriteString(v)
-			sb.WriteString("\n")
-		}
-	}
-	if len(body) > 0 {
-		sb.WriteString("body: ")
-		sb.Write(body)
-		sb.WriteString("\n")
-	}
-	fmt.Println(sb.String())
-}
-
-func logResponse(status int, body []byte) {
-	const maxBody = 4096
-	if len(body) > maxBody {
-		body = body[:maxBody]
-	}
-	fmt.Printf("[MCP DEBUG] response status=%d body=%s", status, string(body))
 }
 
 func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
@@ -137,7 +87,6 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 				bodyBytes, _ := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 				_ = r.Body.Close()
 				r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-				logRequest(r.Method, r.URL.Path, r.Header, bodyBytes)
 
 				apiKey := r.Header.Get("X-MCP-API-Key")
 				expectedKey := ""
@@ -167,7 +116,6 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 				tw := &teeResponseWriter{w: w, status: http.StatusOK}
 				m := cmsstoreMcp.NewMCP(registry.GetCmsStore())
 				m.Handler(tw, r)
-				logResponse(tw.status, tw.buf.Bytes())
 			}),
 
 		rtr.NewRoute().

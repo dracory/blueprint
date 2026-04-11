@@ -102,44 +102,8 @@ func (*Links) CategoryManager(params ...map[string]string) string {
 	return links.Admin().Blog(p)
 }
 
-func (*Links) CategoryCreate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_CATEGORY_CREATE
-	return links.Admin().Blog(p)
-}
-
-func (*Links) CategoryUpdate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_CATEGORY_UPDATE
-	return links.Admin().Blog(p)
-}
-
-func (*Links) CategoryDelete(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_CATEGORY_DELETE
-	return links.Admin().Blog(p)
-}
-
 func (*Links) TagManager(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	p["controller"] = CONTROLLER_TAG_MANAGER
-	return links.Admin().Blog(p)
-}
-
-func (*Links) TagCreate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_TAG_CREATE
-	return links.Admin().Blog(p)
-}
-
-func (*Links) TagUpdate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_TAG_UPDATE
-	return links.Admin().Blog(p)
-}
-
-func (*Links) TagDelete(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	p["controller"] = CONTROLLER_TAG_DELETE
 	return links.Admin().Blog(p)
 }
