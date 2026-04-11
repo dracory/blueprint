@@ -40,6 +40,8 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/admin/blog/post_update` | 25.3% | ❌ |
 | `internal/controllers/website/cms` | 46.2% | ⚠️ |
 | `internal/controllers/website/blog` | 50.0% | ⚠️ |
+| `internal/controllers/shared/media` | 53.8% | ⚠️ |
+| `internal/controllers/shared/file` | 65.4% | ⚠️ |
 | `internal/controllers/admin/users/user_update` | 69.6% | ⚠️ |
 | `internal/controllers/admin/blog/blog_settings` | 65.1% | ⚠️ |
 | `internal/controllers/user/account` | 64.2% | ⚠️ |
@@ -52,6 +54,7 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/auth/authentication` | 48.6% | ⚠️ |
 | `internal/controllers/auth/register` | 53.7% | ⚠️ |
 | `pkg/social` | 55.1% | ⚠️ |
+| `cmd/snakecase` | 56.5% | ⚠️ |
 
 ### High Coverage (70%+)
 
@@ -84,16 +87,12 @@ Based on the latest test run, the following packages have coverage data:
 |----------|----------|--------|
 | `internal/controllers/user/home` | 36.4% | ❌ |
 | `internal/controllers/shared/thumb` | 30.1% | ❌ |
-| `internal/controllers/shared/media` | 23.1% | ❌ |
-| `internal/controllers/shared/file` | 23.1% | ❌ |
 | `internal/tasks/blind_index_rebuild` | 23.5% | ❌ |
 | `internal/controllers/admin/users/user_impersonate` | 28.6% | ❌ |
-| `internal/helpers` | 28.7% | ❌ |
 | `internal/cmds` | 45.2% | ⚠️ |
 | `internal/config` | 52.4% | ⚠️ |
 | `cmd/server` | 43.6% | ⚠️ |
 | `cmd/deploy` | 12.1% | ❌ |
-| `cmd/snakecase` | 9.7% | ❌ |
 
 ### No Coverage (0%)
 
@@ -126,8 +125,8 @@ The following packages have no test coverage:
 - `internal/schedules`
 - `internal/tasks/stats`
 - `internal/widgets`
-- `pkg/blogai`
-- `pkg/testimonials`
+- `pkg/blogai` (2.3% - constants only)
+- `pkg/testimonials` (2.3% - constants only)
 - `cmd/envenc`
 
 ## Changes Made to Fix Build Failures
@@ -202,13 +201,17 @@ The following packages have no test coverage:
 
 1. ✅ Fix build failures (COMPLETED)
 2. ✅ Run full test suite (COMPLETED)
-3. Generate HTML coverage report: `go tool cover -html=coverage.out -o coverage.html`
-4. Create targeted test plans for 0% coverage packages
-5. Establish CI/CD pipeline to track coverage over time
-6. Set up pre-commit hooks to enforce minimum coverage thresholds
+3. ✅ Added tests for `internal/helpers` (28.7% → 73.4%)
+4. ✅ Added tests for `cmd/snakecase` (9.7% → 56.5%)
+5. ✅ Added tests for `shared/file` (23.1% → 65.4%)
+6. ✅ Added tests for `shared/media` (23.1% → 53.8%)
+7. Generate HTML coverage report: `go tool cover -html=coverage.out -o coverage.html`
+8. Create targeted test plans for remaining low-coverage packages
+9. Establish CI/CD pipeline to track coverage over time
+10. Set up pre-commit hooks to enforce minimum coverage thresholds
 
 ---
 
 **Report Status:** ✅ Complete - All tests passing with coverage analysis  
-**Last Updated:** April 11, 2026, 8:56 UTC+01:00  
+**Last Updated:** April 11, 2026, 9:49 UTC+01:00  
 **Coverage File:** `d:\PROJECTs\dracory.com\blueprint\coverage`

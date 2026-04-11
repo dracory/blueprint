@@ -3,7 +3,10 @@ package file
 import (
 	"net/http"
 	"net/http/httptest"
+	"project/internal/testutils"
 	"testing"
+
+	"github.com/dracory/filesystem"
 )
 
 // TestHandlerWithNilStorage verifies that Handler returns the proper error message
@@ -180,6 +183,134 @@ func TestFindExtensionWithMultipleDots(t *testing.T) {
 			got := c.findExtension(tt.path)
 			if got != tt.expected {
 				t.Errorf("findExtension(%q) = %q, want %q", tt.path, got, tt.expected)
+			}
+		})
+	}
+}
+
+// TestHandlerPathVariations tests different path prefixes
+func TestHandlerPathVariations(t *testing.T) {
+	c := &fileController{storage: nil}
+
+	tests := []struct {
+		name string
+		path string
+	}{
+		{"files prefix", "/files/test.txt"},
+		{"file prefix", "/file/test.txt"},
+		{"media prefix", "/media/test.txt"},
+		{"no prefix", "/test.txt"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
+			rec := httptest.NewRecorder()
+			res := c.Handler(rec, req)
+			// With nil storage, should always return "File storage not configured"
+			if res != "File storage not configured" {
+				t.Errorf("Handler(%s) = %q, want 'File storage not configured'", tt.path, res)
+			}
+		})
+	}
+}
+
+// TestHandlerWithRealStorage tests the Handler with real SQL file storage
+func TestHandlerWithRealStorage(t *testing.T) {
+	registry := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
+	defer registry.GetDatabase().Close()
+
+	// Create SQL file storage
+	db := registry.GetDatabase()
+	if db == nil {
+		t.Fatal("Database not initialized")
+	}
+
+	storage, err := filesystem.NewStorage(filesystem.Disk{
+		DiskName:  filesystem.DRIVER_SQL,
+		Driver:    filesystem.DRIVER_SQL,
+		Url:       "/files",
+		DB:        db,
+		TableName: "snv_files_file",
+	})
+	if err != nil {
+		t.Fatalf("Failed to create storage: %v", err)
+	}
+
+	controller := NewFileController(storage)
+
+	// Test with non-existent file
+	req := httptest.NewRequest(http.MethodGet, "/files/nonexistent.txt", nil)
+	rec := httptest.NewRecorder()
+	res := controller.Handler(rec, req)
+	if res != "File not found" {
+		t.Errorf("Handler(nonexistent) = %q, want 'File not found'", res)
+	}
+}
+
+// TestHandlerFileNotFound tests file not found scenario
+func TestHandlerFileNotFound(t *testing.T) {
+	// Create a mock storage that returns exists=false
+	controller := NewFileController(nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/files/missing.txt", nil)
+	rec := httptest.NewRecorder()
+	res := controller.Handler(rec, req)
+	if res != "File storage not configured" {
+		t.Errorf("Handler = %q, want 'File storage not configured'", res)
+	}
+}
+
+// TestHandlerWithEmptyExtension tests file with no extension
+func TestHandlerWithEmptyExtension(t *testing.T) {
+	registry := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
+	defer registry.GetDatabase().Close()
+
+	db := registry.GetDatabase()
+	if db == nil {
+		t.Fatal("Database not initialized")
+	}
+
+	storage, err := filesystem.NewStorage(filesystem.Disk{
+		DiskName:  filesystem.DRIVER_SQL,
+		Driver:    filesystem.DRIVER_SQL,
+		Url:       "/files",
+		DB:        db,
+		TableName: "snv_files_file",
+	})
+	if err != nil {
+		t.Fatalf("Failed to create storage: %v", err)
+	}
+
+	controller := NewFileController(storage)
+
+	// Test with file that has no extension (should return "File not found")
+	req := httptest.NewRequest(http.MethodGet, "/files/noextension", nil)
+	rec := httptest.NewRecorder()
+	res := controller.Handler(rec, req)
+	if res != "File not found" {
+		t.Errorf("Handler(noextension) = %q, want 'File not found'", res)
+	}
+}
+
+// TestFindMIMETypeEdgeCases tests additional MIME type scenarios
+func TestFindMIMETypeEdgeCases(t *testing.T) {
+	c := fileController{}
+
+	tests := []struct {
+		ext      string
+		expected string
+	}{
+		{"HTML", "application/octet-stream"}, // Case sensitive
+		{"Css", "application/octet-stream"},  // Case sensitive
+		{"PNG", "application/octet-stream"},  // Case sensitive
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.ext, func(t *testing.T) {
+			got := c.findMIMEType(tt.ext)
+			if got != tt.expected {
+				t.Errorf("findMIMEType(%q) = %q, want %q", tt.ext, got, tt.expected)
 			}
 		})
 	}
