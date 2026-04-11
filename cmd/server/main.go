@@ -2,29 +2,22 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"log/slog"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
 	"project/internal/cli"
 	// "project/internal/cmsblocks"
 	"project/internal/config"
-	"project/internal/emails"
-	"project/internal/middlewares"
 	"project/internal/registry"
 	"project/internal/routes"
-	"project/internal/schedules"
 	"project/internal/tasks"
-	"project/internal/widgets"
 
 	"github.com/dracory/base/cfmt"
-	"github.com/dracory/taskstore"
 	"github.com/dracory/websrv"
 )
 
@@ -127,137 +120,4 @@ func main() {
 			slog.Error("Server shutdown failed", "error", err)
 		}
 	}
-}
-
-// isCliMode checks if the application is running in CLI mode.
-//
-// Parameters:
-// - none
-//
-// Returns:
-// - bool: true if the application is running in CLI mode, false otherwise.
-func isCliMode() bool {
-	return len(os.Args) > 1
-}
-
-// startBackgroundProcesses starts the background processes.
-//
-// Parameters:
-// - ctx: the context
-// - group: the background group
-// - registry: the registry
-//
-// Returns:
-// - error: the error if any
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
-	_ = ctx // Suppress unused parameter warning, use it when needed for context cancellation or propagation
-
-	if registry == nil {
-		return errors.New("startBackgroundProcesses called with nil registry")
-	}
-
-	if registry.GetConfig() == nil {
-		return errors.New("startBackgroundProcesses called with nil config")
-	}
-
-	if registry.GetDatabase() == nil {
-		return errors.New("startBackgroundProcesses called with nil db")
-	}
-
-	if registry.GetConfig().GetTaskStoreUsed() && registry.GetTaskStore() == nil {
-		return errors.New("startBackgroundProcesses task store is enabled but not initialized")
-	}
-
-	if registry.GetConfig().GetCacheStoreUsed() && registry.GetCacheStore() == nil {
-		return errors.New("startBackgroundProcesses cache store is enabled but not initialized")
-	}
-
-	if registry.GetConfig().GetSessionStoreUsed() && registry.GetSessionStore() == nil {
-		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
-	}
-
-	if registry.GetConfig().GetTaskStoreUsed() {
-		ts := registry.GetTaskStore()
-		if ts != nil {
-			group.Go(func(ctx context.Context) {
-				// Run the default task queue worker loop using the updated TaskQueue API
-				// 10 workers, 2-second polling interval
-				runner := taskstore.NewTaskQueueRunner(ts, taskstore.TaskQueueRunnerOptions{
-					IntervalSeconds: 2,
-					UnstuckMinutes:  2,
-					MaxConcurrency:  10,
-					Logger:          log.Default(),
-				})
-				runner.Start(ctx)
-			})
-		}
-	}
-	if registry.GetConfig().GetCacheStoreUsed() {
-		cs := registry.GetCacheStore()
-		if cs != nil {
-			group.Go(func(ctx context.Context) {
-				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
-					slog.Error("Cache expiration goroutine failed", "error", err)
-				}
-			})
-		}
-	}
-	if registry.GetConfig().GetSessionStoreUsed() {
-		ss := registry.GetSessionStore()
-		if ss != nil {
-			group.Go(func(ctx context.Context) {
-				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
-					slog.Error("Session expiry goroutine failed", "error", err)
-				}
-			})
-		}
-	}
-
-	group.Go(func(ctx context.Context) {
-		schedules.StartAsync(ctx, registry)
-	})
-
-	// Initialize email sender
-	emails.InitEmailSender(registry)
-	middlewares.CmsAddMiddlewares(registry) // Add CMS middlewares
-	widgets.CmsAddShortcodes(registry)      // Add CMS shortcodes
-	// cmsblocks.CmsAddBlockTypes(registry)    // Add CMS block types
-
-	return nil
-}
-
-type backgroundGroup struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
-	doneCh chan struct{}
-	once   sync.Once
-}
-
-func newBackgroundGroup(parent context.Context) *backgroundGroup {
-	if parent == nil {
-		parent = context.Background()
-	}
-	ctx, cancel := context.WithCancel(parent)
-	return &backgroundGroup{ctx: ctx, cancel: cancel, doneCh: make(chan struct{})}
-}
-
-func (g *backgroundGroup) Go(fn func(ctx context.Context)) {
-	g.wg.Add(1)
-	go func() {
-		defer g.wg.Done()
-		fn(g.ctx)
-	}()
-}
-
-func (g *backgroundGroup) stop() {
-	g.once.Do(func() {
-		g.cancel()
-		g.wg.Wait()
-		close(g.doneCh)
-	})
-}
-
-func (g *backgroundGroup) Done() <-chan struct{} {
-	return g.doneCh
 }

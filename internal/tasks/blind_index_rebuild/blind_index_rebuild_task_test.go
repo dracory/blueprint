@@ -110,3 +110,78 @@ func TestBlindIndexRebuildTask_Handle(t *testing.T) {
 		t.Fatalf("Details() should contain 'Index rebuilt successfully' but got %q", details)
 	}
 }
+
+func TestBlindIndexRebuildTask_Enqueue_EmailIndex(t *testing.T) {
+	registry := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(registry)
+
+	// Register task first
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
+	}
+
+	_, err = task.Enqueue(BlindIndexEmail)
+	if err != nil {
+		t.Fatalf("Enqueue() with email index expected nil error, got %v", err)
+	}
+}
+
+func TestBlindIndexRebuildTask_Enqueue_FirstNameIndex(t *testing.T) {
+	registry := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(registry)
+
+	// Register task first
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
+	}
+
+	_, err = task.Enqueue(BlindIndexFirstName)
+	if err != nil {
+		t.Fatalf("Enqueue() with first_name index expected nil error, got %v", err)
+	}
+}
+
+func TestBlindIndexRebuildTask_Enqueue_LastNameIndex(t *testing.T) {
+	registry := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(registry)
+
+	// Register task first
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
+	}
+
+	_, err = task.Enqueue(BlindIndexLastName)
+	if err != nil {
+		t.Fatalf("Enqueue() with last_name index expected nil error, got %v", err)
+	}
+}
+
+func TestBlindIndexRebuildTask_SetQueuedTask(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewBlindIndexRebuildTask(registry)
+
+	// SetQueuedTask should not panic even with nil
+	task.SetQueuedTask(nil)
+
+	if task.QueuedTask() != nil {
+		t.Error("QueuedTask() should return nil after setting nil")
+	}
+}
+
+func TestBlindIndexRebuildTask_Constants(t *testing.T) {
+	if BlindIndexAll != "all" {
+		t.Errorf("BlindIndexAll should be 'all', got %q", BlindIndexAll)
+	}
+	if BlindIndexEmail != "email" {
+		t.Errorf("BlindIndexEmail should be 'email', got %q", BlindIndexEmail)
+	}
+	if BlindIndexFirstName != "first_name" {
+		t.Errorf("BlindIndexFirstName should be 'first_name', got %q", BlindIndexFirstName)
+	}
+	if BlindIndexLastName != "last_name" {
+		t.Errorf("BlindIndexLastName should be 'last_name', got %q", BlindIndexLastName)
+	}
+}
