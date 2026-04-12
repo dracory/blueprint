@@ -155,3 +155,40 @@ func TestLinksMethodsWithParams(t *testing.T) {
 		t.Errorf("Expected URL to contain controller and post_id, got: %s", result)
 	}
 }
+
+// TestErrorPopup tests ErrorPopup function
+func TestErrorPopup(t *testing.T) {
+	t.Parallel()
+
+	popup := ErrorPopup("Test error message")
+	if popup == nil {
+		t.Error("Expected popup to be non-nil")
+	}
+}
+
+// TestSuccessPopup tests SuccessPopup function
+func TestSuccessPopup(t *testing.T) {
+	t.Parallel()
+
+	popup := SuccessPopup("Test success message")
+	if popup == nil {
+		t.Error("Expected popup to be non-nil")
+	}
+}
+
+// TestSuccessPopupWithRedirect tests SuccessPopupWithRedirect function
+func TestSuccessPopupWithRedirect(t *testing.T) {
+	t.Parallel()
+
+	// Test with redirect
+	popup := SuccessPopupWithRedirect("Test success", "/admin/blog", 10)
+	if popup == nil {
+		t.Error("Expected popup to be non-nil")
+	}
+
+	// Test without redirect
+	popup = SuccessPopupWithRedirect("Test success", "", 10)
+	if popup == nil {
+		t.Error("Expected popup to be non-nil")
+	}
+}

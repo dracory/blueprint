@@ -18,6 +18,7 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/str"
 )
 
 //go:embed *.html
@@ -187,7 +188,7 @@ func (controller *categoryManagerController) handleCreateCategory(w http.Respons
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = shared.Slugify(reqData.Name)
+		slug = str.Slugify(reqData.Name, '-')
 	}
 
 	term := blogstore.NewTerm()
@@ -246,7 +247,7 @@ func (controller *categoryManagerController) handleUpdateCategory(w http.Respons
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = shared.Slugify(reqData.Name)
+		slug = str.Slugify(reqData.Name, '-')
 	}
 
 	term.SetName(reqData.Name)

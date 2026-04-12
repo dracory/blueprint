@@ -18,6 +18,7 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/str"
 	"github.com/dracory/uid"
 )
 
@@ -239,7 +240,7 @@ func (controller *tagManagerController) handleCreateTag(w http.ResponseWriter, r
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = shared.Slugify(reqData.Name)
+		slug = str.Slugify(reqData.Name, '-')
 	}
 
 	term := blogstore.NewTerm()
@@ -297,7 +298,7 @@ func (controller *tagManagerController) handleUpdateTag(w http.ResponseWriter, r
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = shared.Slugify(reqData.Name)
+		slug = str.Slugify(reqData.Name, '-')
 	}
 
 	term.SetName(reqData.Name)

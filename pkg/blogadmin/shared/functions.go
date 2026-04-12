@@ -59,18 +59,3 @@ func SuccessPopupWithRedirect(successMessage string, redirectUrl string, redirec
 		TimerProgressBar: true,
 	})
 }
-
-// Slugify converts a string to a URL-friendly slug
-func Slugify(text string) string {
-	result := []rune{}
-	for _, r := range text {
-		if r >= 'A' && r <= 'Z' {
-			result = append(result, r+32)
-		} else if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
-			result = append(result, r)
-		} else if r == ' ' || r == '-' || r == '_' {
-			result = append(result, '-')
-		}
-	}
-	return string(result)
-}

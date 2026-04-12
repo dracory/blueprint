@@ -2,6 +2,8 @@ package tag_manager
 
 import (
 	"testing"
+
+	"github.com/dracory/str"
 )
 
 // TestNewTagManagerController tests the constructor
@@ -32,13 +34,13 @@ func TestSlugify(t *testing.T) {
 		{"123 Numbers", "123-numbers"},
 		{"", ""},
 		{"Already-Slugified", "already-slugified"},
-		{"Multiple   Spaces", "multiple---spaces"},
+		{"Multiple   Spaces", "multiple-spaces"},
 	}
 
 	for _, tt := range tests {
-		result := slugify(tt.input)
+		result := str.Slugify(tt.input, '-')
 		if result != tt.expected {
-			t.Errorf("slugify(%q) = %q, want %q", tt.input, result, tt.expected)
+			t.Errorf("str.Slugify(%q) = %q, want %q", tt.input, result, tt.expected)
 		}
 	}
 }
