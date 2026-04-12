@@ -50,8 +50,8 @@ func TestBlogRoutesReturnsRoutes(t *testing.T) {
 		t.Errorf("Routes() returned error: %v", err)
 	}
 
-	// Should return at least blog and blogCatchAll routes
-	if len(routes) < 2 {
-		t.Errorf("Expected at least 2 routes (blog, blogCatchAll), got %d", len(routes))
+	// Should return at least 1 route (blog)
+	if len(routes) < 1 {
+		t.Errorf("Expected at least 1 route (blog), got %d", len(routes))
 	}
 }

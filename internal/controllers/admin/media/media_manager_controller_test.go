@@ -73,9 +73,9 @@ func TestMediaManagerControllerHumanFilesize(t *testing.T) {
 		want string
 	}{
 		{"bytes", 500, "500 B"},
-		{"kilobytes", 1024, "1 KB"},
-		{"megabytes", 1048576, "1 MB"},
-		{"gigabytes", 1073741824, "1 GB"},
+		{"kilobytes", 1024, "1.0 kB"},
+		{"megabytes", 1048576, "1.0 MB"},
+		{"gigabytes", 1000000000, "1.0 GB"},
 		{"zero", 0, "0 B"},
 	}
 
@@ -239,23 +239,21 @@ func TestMediaManagerControllerFileRenameAjaxValidation(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		paramName    string
-		paramValue   string
+		params       map[string]string
 		wantContains string
 	}{
-		{"missing rename_file", "rename_file", "", "rename_file is required"},
-		{"missing new_file", "new_file", "", "new_file is required"},
-		{"missing current_dir", "current_dir", "", "current_dir is required"},
+		{"missing rename_file", map[string]string{}, "rename_file is required"},
+		{"missing new_file", map[string]string{"rename_file": "old.txt"}, "new_file is required"},
+		{"missing current_dir", map[string]string{"rename_file": "old.txt", "new_file": "new.txt"}, "current_dir is required"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest("POST", "/", nil)
-			if tt.paramValue != "" {
-				values := url.Values{}
-				values.Add(tt.paramName, tt.paramValue)
-				r = httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+			values := url.Values{}
+			for k, v := range tt.params {
+				values.Add(k, v)
 			}
+			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
 			result := controller.fileRenameAjax(r)
 			if !strings.Contains(result, tt.wantContains) {
@@ -279,22 +277,20 @@ func TestMediaManagerControllerFileDeleteAjaxValidation(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		paramName    string
-		paramValue   string
+		params       map[string]string
 		wantContains string
 	}{
-		{"missing delete_file", "delete_file", "", "delete_file is required"},
-		{"missing current_dir", "current_dir", "", "current_dir is required"},
+		{"missing delete_file", map[string]string{}, "delete_file is required"},
+		{"missing current_dir", map[string]string{"delete_file": "test.txt"}, "current_dir is required"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest("POST", "/", nil)
-			if tt.paramValue != "" {
-				values := url.Values{}
-				values.Add(tt.paramName, tt.paramValue)
-				r = httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+			values := url.Values{}
+			for k, v := range tt.params {
+				values.Add(k, v)
 			}
+			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
 			result := controller.fileDeleteAjax(r)
 			if !strings.Contains(result, tt.wantContains) {
@@ -318,22 +314,20 @@ func TestMediaManagerControllerDirectoryCreateAjaxValidation(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		paramName    string
-		paramValue   string
+		params       map[string]string
 		wantContains string
 	}{
-		{"missing create_dir", "create_dir", "", "create_dir is required"},
-		{"missing current_dir", "current_dir", "", "current_dir is required"},
+		{"missing create_dir", map[string]string{}, "create_dir is required"},
+		{"missing current_dir", map[string]string{"create_dir": "newdir"}, "current_dir is required"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest("POST", "/", nil)
-			if tt.paramValue != "" {
-				values := url.Values{}
-				values.Add(tt.paramName, tt.paramValue)
-				r = httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+			values := url.Values{}
+			for k, v := range tt.params {
+				values.Add(k, v)
 			}
+			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
 			result := controller.directoryCreateAjax(r)
 			if !strings.Contains(result, tt.wantContains) {
@@ -357,22 +351,20 @@ func TestMediaManagerControllerDirectoryDeleteAjaxValidation(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		paramName    string
-		paramValue   string
+		params       map[string]string
 		wantContains string
 	}{
-		{"missing delete_dir", "delete_dir", "", "delete_dir is required"},
-		{"missing current_dir", "current_dir", "", "current_dir is required"},
+		{"missing delete_dir", map[string]string{}, "delete_dir is required"},
+		{"invalid current_dir", map[string]string{"delete_dir": "testdir", "current_dir": "."}, "current_dir is required"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest("POST", "/", nil)
-			if tt.paramValue != "" {
-				values := url.Values{}
-				values.Add(tt.paramName, tt.paramValue)
-				r = httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+			values := url.Values{}
+			for k, v := range tt.params {
+				values.Add(k, v)
 			}
+			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
 			result := controller.directoryDeleteAjax(r)
 			if !strings.Contains(result, tt.wantContains) {

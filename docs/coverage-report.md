@@ -1,9 +1,9 @@
 # Test Coverage Report
 
-**Generated:** April 11, 2026, 19:05 UTC+01:00
-**Last Updated:** April 11, 2026, 23:30 UTC+01:00
+**Generated:** April 12, 2026, 12:15 UTC+01:00
+**Last Updated:** April 12, 2026, 12:20 UTC+01:00
 **Project:** Blueprint
-**Status:** ✅ All Tests Passing - Stage 0 Complete, Stage 1 In Progress, Stage 2 In Progress
+**Status:** ⚠️ Some Test Failures - Stage 0 Complete, Stage 1 In Progress, Stage 2 In Progress
 
 ## Desired Coverage
 
@@ -21,29 +21,32 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 
 | Stage | Target | Packages in Range |
 |-------|--------|-------------------|
-| Stage 0 | 0% | 2 packages ✅ |
-| Stage 1 | >0% to ≤10% | 12 packages 🔄 |
-| Stage 2 | >10% to ≤20% | 7 packages 🔄 |
-| Stage 3 | >20% to ≤30% | 8 packages ⏳ |
-| Stage 4 | >30% to ≤40% | 5 packages ⏳ |
+| Stage 0 | 0% | 11 packages ✅ |
+| Stage 1 | >0% to ≤10% | 7 packages 🔄 |
+| Stage 2 | >10% to ≤20% | 4 packages 🔄 |
+| Stage 3 | >20% to ≤30% | 9 packages ⏳ |
+| Stage 4 | >30% to ≤40% | 4 packages ⏳ |
 | Stage 5 | >40% to ≤50% | 4 packages ⏳ |
-| Stage 6 | >50% to ≤60% | 18 packages ⏳ |
-| Stage 7 | >60% to ≤70% | 12 packages ⏳ |
-| Stage 8 | >70% | 32 packages ✅ |
+| Stage 6 | >50% to ≤60% | 9 packages ⏳ |
+| Stage 7 | >60% to ≤70% | 11 packages ⏳ |
+| Stage 8 | >70% | 26 packages ✅ |
+| Failed | - | 10 packages ⚠️ |
+| No Tests | - | 8 packages ⏸️ |
 
-**Last Updated:** April 11, 2026, 23:30 UTC+01:00
+**Last Updated:** April 12, 2026, 12:20 UTC+01:01
 
 ## Executive Summary
 
-The blueprint project tests are now **passing successfully**. All build failures have been resolved:
-- ✅ CMS controller return value fixed
-- ✅ Dependencies updated (blogstore v1.12.0, cdn v1.11.0, cmsstore v1.29.0)
-- ✅ Blogstore taxonomy enabled in configuration
-- ✅ All 50+ packages tested with coverage analysis
-- ✅ **Stage 0 coverage complete** - All remaining packages marked as sufficient (structural limitations)
-- 🔄 **Stage 1 in progress** - Working on 12 packages with >0% to ≤10% coverage
-- ✅ `internal/controllers/admin/shop/discounts`: 1.1% → 82.2% (Stage 8 achieved!)
-- ✅ `internal/controllers/admin/shop/categories/categoryupdate`: 3.7% → 85.2% (Stage 8 achieved!)
+The blueprint project has **some test failures** that need attention. Build issues in several packages are preventing full test execution:
+- ⚠️ Setup failures in: `cmd/server`, `internal/cli`, `internal/controllers/shared`, `internal/controllers/website`, `internal/routes`
+- ⚠️ Test failures in: `cmd/loadtest`, `internal/controllers/admin/blog`, `internal/controllers/admin/media`
+- ⚠️ Missing test files in: `pkg/blogadmin` and subpackages
+- ✅ 80+ packages tested successfully with coverage analysis
+- ✅ **Stage 0 coverage complete** - 11 packages at 0% (acceptable for CLI/tools)
+- 🔄 **Stage 1 in progress** - 7 packages with >0% to ≤10% coverage
+- 🔄 **Stage 2 in progress** - 4 packages with >10% to ≤20% coverage
+- ⏳ **Stage 3-7 in progress** - Working on improving mid-range coverage
+- ✅ **32 packages at >70% coverage** (Stage 8)
 
 **Recent Coverage Improvements (Stage 2 Focus):**
 - ✅ `internal/layouts`: 15.0% → 65.6% (Stage 6 achieved!)
@@ -116,139 +119,141 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `cmd/envenc` | 0.0% | ✅ |
-| `internal/cache` | [no test files] | ✅ |
+| `cmd/envenc` | 0.0% | ✅ CLI tool |
+| `pkg/blogadmin` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/ai_post_editor` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/ai_post_editor/templates` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/ai_post_generator` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/ai_test` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/ai_tools` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/category_manager` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/shared` | 0.0% | ⏸️ no test files |
+| `pkg/blogadmin/tag_manager` | 0.0% | ⏸️ no test files |
 
 ### Stage 1 Coverage (>0% to ≤10%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
 | `internal/testutils` | 0.4% | 🔄 |
-| `internal/controllers/admin/blog/tag_manager` | 0.6% | 🔄 |
 | `internal/controllers/admin/users/user_manager` | 0.7% | 🔄 |
 | `internal/controllers/admin/shop/products` | 1.6% | 🔄 |
-| `internal/controllers/admin/shop/categories/categorymanager` | 2.4% | 🔄 |
 | `internal/controllers/admin/users/user_create` | 2.0% | 🔄 |
-| `pkg/blogai` | 2.0% | 🔄 |
-| `internal/widgets` | 2.3% | 🔄 |
+| `internal/controllers/admin/shop/categories/categorymanager` | 2.4% | 🔄 |
 | `internal/controllers/admin/users/user_delete` | 2.3% | 🔄 |
 | `internal/controllers/admin/shop/categories` | 3.0% | 🔄 |
-| `internal/controllers/admin/blog/ai_tools` | 3.8% | 🔄 |
-| `internal/controllers/admin/media` | 4.4% | 🔄 |
 
 ### Stage 2 Coverage (>10% to ≤20%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/tasks/stats` | 12.6% | ⏳ |
-| `internal/controllers/admin/files` | 15.3% | ⏳ |
-| `internal/controllers/admin/shop` | 14.3% | ⏳ |
-| `internal/layouts` | 15.0% | ⏳ |
-| `internal/controllers/admin/blog/ai_title_generator` | 15.6% | ⏳ |
-| `internal/controllers/admin/blog/ai_post_editor` | 17.0% | ⏳ |
-| `internal/controllers/admin/blog/category_manager` | 17.7% | ⏳ |
+| `pkg/blogadmin/ai_title_generator` | 15.6% | ⏳ |
+| `internal/widgets` | 16.7% | ⏳ |
+| `internal/controllers/admin/files` | 19.6% | ⏳ |
+| `internal/tasks/stats` | 18.4% | ⏳ |
 
 ### Stage 3 Coverage (>20% to ≤30%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
 | `cmd/deploy` | 22.2% | ⏳ |
-| `internal/controllers/admin/tasks` | 23.5% | ⏳ |
-| `internal/controllers/admin/stats` | 23.3% | ⏳ |
-| `internal/controllers/admin/blog/post_update` | 25.3% | ⏳ |
+| `pkg/blogadmin/ai_post_content_update` | 27.4% | ⏳ |
 | `pkg/blogai` | 26.3% | ⏳ |
-| `internal/controllers/admin/blog/ai_post_content_update` | 27.0% | ⏳ |
+| `pkg/blogadmin/post_update` | 25.3% | ⏳ |
 | `internal/controllers/admin/logs/log_manager` | 27.1% | ⏳ |
-| `internal/controllers/admin/blog` | 25.0% | ⏳ |
+| `internal/controllers/admin/shop/products/productupdate` | 42.9% | ⏫ |
+| `pkg/testimonials` | 48.9% | ⏫ |
 
 ### Stage 4 Coverage (>30% to ≤40%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/tasks/blind_index_rebuild` | 33.6% | ⏳ |
-| `internal/controllers/website/contact` | 34.7% | ⏳ |
-| `internal/controllers/shared/thumb` | 39.5% | ⏳ |
 | `internal/controllers/admin` | 31.2% | ⏳ |
 | `internal/controllers/admin/cms` | 31.2% | ⏳ |
+| `internal/tasks/blind_index_rebuild` | 33.6% | ⏳ |
+| `internal/controllers/website/contact` | 34.7% | ⏳ |
 
 ### Stage 5 Coverage (>40% to ≤50%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/controllers/admin/shop/products/productupdate` | 42.9% | ⏳ |
-| `cmd/server` | 45.7% | ⏳ |
-| `pkg/testimonials` | 48.9% | ⏳ |
-| `internal/controllers/website/blog` | 50.0% | ⏳ |
+| `cmd/snakecase` | 56.5% | ⏳ |
+| `internal/cmds` | 51.6% | ⏳ |
+| `internal/resources` | 52.4% | ⏳ |
+| `internal/controllers/website/blog/shared` | 52.6% | ⏳ |
 
 ### Stage 6 Coverage (>50% to ≤60%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
 | `internal/controllers/auth/authentication` | 50.0% | ⏳ |
-| `internal/cmds` | 51.6% | ⏳ |
-| `internal/resources` | 52.4% | ⏳ |
-| `internal/controllers/website/blog/shared` | 52.6% | ⏳ |
-| `internal/controllers/website/swagger` | 53.3% | ⏳ |
 | `internal/controllers/auth/register` | 53.7% | ⏳ |
 | `internal/controllers/shared/media` | 53.8% | ⏳ |
 | `internal/controllers/user/partials` | 55.0% | ⏳ |
 | `pkg/social` | 55.1% | ⏳ |
 | `internal/controllers/website/cms` | 55.1% | ⏳ |
 | `internal/config` | 55.8% | ⏳ |
-| `internal/controllers/admin/blog/ai_post_generator` | 56.2% | ⏳ |
-| `cmd/snakecase` | 56.5% | ⏳ |
-| `internal/controllers/admin/blog/ai_test` | 58.1% | ⏳ |
 | `internal/middlewares` | 59.9% | ⏳ |
-| `internal/controllers/shared/cdn` | 65.8% | ⏳ |
 
 ### Stage 7 Coverage (>60% to ≤70%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `internal/controllers/admin/shop/categories/categoryupdate/detailscomponent` | 66.0% | ⏳ |
+| `internal/controllers/admin/logs` | 60.0% | ⏳ |
 | `internal/controllers/user/account` | 64.2% | ⏳ |
 | `internal/controllers/shared/file` | 65.4% | ⏳ |
-| `internal/controllers/admin/logs` | 60.0% | ⏳ |
-| `internal/tasks/email_admin_new_contact` | 66.7% | ⏳ |
+| `internal/controllers/admin/shop/categories/categoryupdate/detailscomponent` | 66.0% | ⏳ |
 | `internal/tasks/email_admin` | 66.7% | ⏳ |
+| `internal/tasks/email_admin_new_contact` | 66.7% | ⏳ |
+| `internal/emails` | 77.5% | ⏫ |
 | `internal/controllers/admin/users/user_update` | 69.6% | ⏳ |
 
 ### Stage 8 Coverage (>70%)
 
 | Package | Coverage | Status |
 |----------|----------|--------|
+| `internal/controllers/auth` | 100.0% | ✅ |
 | `internal/controllers/auth/login` | 100.0% | ✅ |
 | `internal/controllers/auth/logout` | 100.0% | ✅ |
-| `internal/registry` | 100.0% | ✅ |
-| `internal/controllers/auth` | 100.0% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/mediacomponent` | 91.7% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/metadatacomponent` | 91.0% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/tagscomponent` | 90.2% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/templates` | 90.9% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/detailscomponent` | 88.9% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/render_page_handler` | 88.0% | ✅ |
-| `internal/controllers/admin/users` | 100.0% | ✅ |
 | `internal/cli` | 100.0% | ✅ |
-| `internal/liveflux` | 100.0% | ✅ |
+| `internal/controllers/admin/users` | 100.0% | ✅ |
 | `internal/controllers/user` | 100.0% | ✅ |
+| `internal/controllers/liveflux` | 100.0% | ✅ |
 | `internal/controllers/page_not_found` | 100.0% | ✅ |
+| `internal/controllers/admin/tasks` | 100.0% | ✅ |
+| `internal/registry` | 71.4% | ⏳ |
+| `internal/controllers/user/home` | 77.3% | ✅ |
+| `internal/controllers/admin/shop/discounts` | 82.2% | ✅ |
+| `internal/controllers/admin/blog/ai_title_generator` | 85.7% | ⏫ |
+| `internal/controllers/admin/shop/categories/categoryupdate` | 85.2% | ✅ |
 | `internal/controllers/admin/blog/ai_post_editor` | 86.4% | ✅ |
 | `internal/controllers/admin/shop/shared` | 86.7% | ✅ |
-| `internal/controllers/admin/blog/ai_title_generator` | 85.7% | ✅ |
-| `internal/controllers/admin/blog/category_manager` | 84.6% | ✅ |
-| `internal/controllers/shared/cdn` | 82.0% | ✅ |
-| `internal/controllers/admin/shop/discounts` | 82.2% | ✅ |
-| `internal/controllers/admin/shop/categories/categoryupdate` | 85.2% | ✅ |
+| `internal/controllers/admin/blog/category_manager` | 84.6% | ⏫ |
 | `internal/controllers/admin/blog/post_manager` | 80.0% | ✅ |
-| `internal/controllers/admin/blog/ai_post_editor/render_page` | 78.8% | ✅ |
-| `internal/controllers/admin/shop/products/productupdate` | 77.4% | ✅ |
-| `internal/controllers/admin/shop/products/productupdate/mediacomponent` | 78.9% | ✅ |
-| `internal/controllers/admin/shop/products/productupdate/metadatacomponent` | 77.2% | ✅ |
-| `internal/controllers/admin/shop/products/productupdate/tagscomponent` | 76.9% | ✅ |
-| `internal/controllers/admin/shop/products/productupdate/detailscomponent` | 75.4% | ✅ |
-| `internal/controllers/admin/cms` | 75.0% | ✅ |
+| `internal/controllers/admin/users/user_impersonate` | 81.0% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate` | 42.9% | ⏬ |
+| `internal/controllers/admin/shop/products/productupdate/detailscomponent` | 80.9% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate/mediacomponent` | 81.0% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate/metadatacomponent` | 79.6% | ✅ |
+| `internal/controllers/admin/shop/products/productupdate/tagscomponent` | 78.7% | ✅ |
+| `internal/controllers/admin/stats` | 76.7% | ⏫ |
+| `internal/controllers/admin/cms` | 75.0% | ⏫ |
 | `internal/controllers/admin/files` | 73.3% | ✅ |
 | `internal/controllers/admin` | 72.7% | ✅ |
+
+### Packages with Test Failures
+
+| Package | Issue | Status |
+|----------|-------|--------|
+| `cmd/server` | Setup failed - build issue | ⚠️ |
+| `internal/cli` | Setup failed - build issue | ⚠️ |
+| `internal/controllers/shared` | Setup failed - build issue | ⚠️ |
+| `internal/controllers/website` | Setup failed - build issue | ⚠️ |
+| `internal/controllers/website/blog` | Setup failed - build issue | ⚠️ |
+| `internal/controllers/website/blog/post` | Setup failed - build issue | ⚠️ |
+| `internal/routes` | Setup failed - build issue | ⚠️ |
+| `cmd/loadtest` | Test failures | ⚠️ |
+| `internal/controllers/admin/blog` | Test failures | ⚠️ |
+| `internal/controllers/admin/media` | Test failures | ⚠️ |
 
 ## Changes Made to Fix Build Failures
 
@@ -269,97 +274,149 @@ Based on the latest test run, the following packages have coverage data:
 ## Test Execution Summary
 
 **Total Packages Analyzed:** 100+  
-**Packages with Coverage:** 90+  
-**Packages at 0%:** 1 package + 1 with [no test files]  
-**Build Status:** ✅ All tests passing
+**Packages with Coverage:** 80+  
+**Packages at 0%:** 11 packages (10 with no test files + 1 CLI tool)  
+**Packages with Test Failures:** 10 packages  
+**Build Status:** ⚠️ Some tests failing - requires attention
 
 ## Coverage Statistics
 
-- **100% Coverage:** 9 packages (auth, auth/login, auth/logout, cli, liveflux, user, page_not_found, admin/users)
-- **90%+ Coverage:** 13 packages
-- **70%+ Coverage:** 32 packages
-- **50%+ Coverage:** 51 packages
-- **0% Coverage:** 1 package + 1 with [no test files]
+- **100% Coverage:** 9 packages (auth, auth/login, auth/logout, cli, liveflux, user, page_not_found, admin/users, admin/tasks)
+- **90%+ Coverage:** 4 packages (post_create, post_delete, post_manager, flash)
+- **70%+ Coverage:** 26 packages
+- **50%+ Coverage:** 35 packages
+- **0% Coverage:** 11 packages (10 with no test files + 1 CLI tool)
+- **Failed Tests:** 10 packages require attention
 
 ## Recommendations
 
-### Priority 1: Add Tests to 0% Coverage Packages
+### Priority 1: Fix Test Failures
 
-All remaining packages marked as sufficient:
+10 packages have test failures that need immediate attention:
 
-1. **Other** (0%)
-   - `cmd/envenc` - ✅ **SUFFICIENT** - CLI entry point with only main() function; 0% coverage is acceptable for CLI tools as they are typically integration tested
+1. **Setup Failures (Build Issues)** - Likely dependency or import issues:
+   - `cmd/server`, `internal/cli`, `internal/controllers/shared`
+   - `internal/controllers/website`, `internal/controllers/website/blog`
+   - `internal/routes`
 
-2. **No Test Files**
-   - `internal/cache` - ✅ **SUFFICIENT** - Has test file but only variable declarations (no executable statements to cover); this is acceptable for a constants/variables package
+2. **Test Logic Failures** - Actual test assertions failing:
+   - `cmd/loadtest` - TestResponseTimeTracking failing
+   - `internal/controllers/admin/blog` - BlogRoutes test failing
+   - `internal/controllers/admin/media` - Multiple validation tests failing
 
-### Priority 2: Raise Low Coverage Packages to >50%
+### Priority 2: Add Tests to 0% Coverage Packages
 
-10 packages below 20% need attention:
+10 packages have no test files and need test coverage:
 
-1. **Very Low (<5%)**: testutils (0.4%), user_create (2.0%), blogai (2.0%), widgets (2.3%), user_delete (2.3%)
-2. **Low (10-20%)**: stats (12.6%), files (15.3%), layouts (15.0%), ai_title_generator (15.6%), ai_post_editor (17.0%), category_manager (17.7%)
+1. **pkg/blogadmin packages:**
+   - `pkg/blogadmin` - Main blogadmin package
+   - `pkg/blogadmin/ai_post_editor` - AI post editor
+   - `pkg/blogadmin/ai_post_editor/templates` - Templates
+   - `pkg/blogadmin/ai_post_generator` - AI post generator
+   - `pkg/blogadmin/ai_test` - AI testing utilities
+   - `pkg/blogadmin/ai_tools` - AI tools
+   - `pkg/blogadmin/category_manager` - Category manager
+   - `pkg/blogadmin/shared` - Shared utilities
+   - `pkg/blogadmin/tag_manager` - Tag manager
 
-### Priority 3: Maintain High Coverage
+2. **CLI Tools (Acceptable at 0%):**
+   - `cmd/envenc` - ✅ **SUFFICIENT** - CLI tool with main() only
 
-- **30 packages at >70%** - Keep tests current when adding features
-- **8 packages at 100%** - Maintain comprehensive coverage
+### Priority 3: Raise Low Coverage Packages to >50%
+
+7 packages in Stage 1 (0-10%) need attention:
+
+| Package | Coverage | Target |
+|---------|----------|--------|
+| `internal/testutils` | 0.4% | >50% |
+| `internal/controllers/admin/users/user_manager` | 0.7% | >50% |
+| `internal/controllers/admin/shop/products` | 1.6% | >50% |
+| `internal/controllers/admin/users/user_create` | 2.0% | >50% |
+| `internal/controllers/admin/shop/categories/categorymanager` | 2.4% | >50% |
+| `internal/controllers/admin/users/user_delete` | 2.3% | >50% |
+| `internal/controllers/admin/shop/categories` | 3.0% | >50% |
+
+4 packages in Stage 2 (10-20%) need improvement:
+
+| Package | Coverage | Target |
+|---------|----------|--------|
+| `pkg/blogadmin/ai_title_generator` | 15.6% | >50% |
+| `internal/widgets` | 16.7% | >50% |
+| `internal/controllers/admin/files` | 19.6% | >50% |
+| `internal/tasks/stats` | 18.4% | >50% |
+
+### Priority 4: Maintain High Coverage
+
+- **26 packages at >70%** - Keep tests current when adding features
+- **9 packages at 100%** - Maintain comprehensive coverage
 - **Stage 8 target:** Move more packages from Stage 6-7 to >70%
 
 ## Next Steps
 
-1. ✅ Fix build failures (COMPLETED)
-2. ✅ Run full test suite (COMPLETED)
-3. ✅ Added tests for `internal/helpers` (28.7% → 73.4%)
-4. ✅ Added tests for `cmd/snakecase` (9.7% → 56.5%)
-5. ✅ Added tests for `shared/file` (23.1% → 65.4%)
-6. ✅ Added tests for `shared/media` (23.1% → 53.8%)
-7. Generate HTML coverage report: `go tool cover -html=coverage.out -o coverage.html`
-8. Create targeted test plans for remaining low-coverage packages
-9. Establish CI/CD pipeline to track coverage over time
-10. Set up pre-commit hooks to enforce minimum coverage thresholds
+1. ⚠️ **URGENT**: Fix test failures in 10 packages
+   - Debug build issues in setup-failed packages
+   - Fix test logic in failing test cases
+2. 🔄 Add test files to 10 packages with no tests
+3. 🎯 Create targeted test plans for Stage 1 & 2 packages
+4. 📊 Generate HTML coverage report: `go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out`
+5. 🔧 Establish CI/CD pipeline to track coverage over time
+6. 📝 Set up pre-commit hooks to enforce minimum coverage thresholds
 
 ---
 
-**Report Status:** ✅ Stage 0 Complete - Stage 1 In Progress - Stage 2 In Progress - Stage 3 In Progress
-**Last Updated:** April 11, 2026, 23:45 UTC+01:00
+**Report Status:** ⚠️ Stage 0 Complete - Stage 1 In Progress - Stage 2 In Progress - Test Failures Present
+**Last Updated:** April 12, 2026, 12:20 UTC+01:00
 **Coverage File:** `d:\PROJECTs\dracory.com\blueprint\coverage.out`
+
+## Stage 1 Completion Summary
+
+**Stage 1 Target:** >0% to ≤10% coverage
+
+**Current Stage 1 Packages (7 total):**
+- ✅ `internal/testutils`: 0.4% (Stage 1)
+- ✅ `internal/controllers/admin/users/user_manager`: 0.7% (Stage 1)
+- ✅ `internal/controllers/admin/shop/products`: 1.6% (Stage 1)
+- ✅ `internal/controllers/admin/users/user_create`: 2.0% (Stage 1)
+- ✅ `internal/controllers/admin/shop/categories/categorymanager`: 2.4% (Stage 1)
+- ✅ `internal/controllers/admin/users/user_delete`: 2.3% (Stage 1)
+- ✅ `internal/controllers/admin/shop/categories`: 3.0% (Stage 1)
+
+**Note:** `pkg/blogadmin` subpackages have no test files (excluded from coverage)
+
+**Stage 1 Achievement:**
+- ✅ All 7 Stage 1 packages meet the >0% to ≤10% target
+- ⏳ Need to add tests to progress toward Stage 2+
 
 ## Stage 2 Completion Summary
 
 **Stage 2 Target:** >10% to ≤20% coverage
 
-**Packages Improved to Stage 2+:**
-1. ✅ `internal/layouts`: 15.0% → 65.6% (Stage 6)
-2. ✅ `internal/tasks/stats`: 12.6% → 18.4% (Stage 2)
-3. ✅ `internal/controllers/admin/blog/category_manager`: 17.7% → 46.2% (Stage 5)
-4. ✅ `internal/controllers/admin/blog/ai_title_generator`: 15.6% → 17.7% (Stage 2)
-5. ✅ `internal/controllers/admin/blog/ai_post_editor`: 17.0% (Stage 2)
-6. ✅ `internal/widgets`: 14.4% → 16.7% (Stage 2)
-7. ✅ `internal/controllers/admin/files`: 15.3% (Stage 2)
+**Current Stage 2 Packages (4 total):**
+- ✅ `pkg/blogadmin/ai_title_generator`: 15.6% (Stage 2)
+- ✅ `internal/widgets`: 16.7% (Stage 2)
+- ✅ `internal/controllers/admin/files`: 19.6% (Stage 2)
+- ✅ `internal/tasks/stats`: 18.4% (Stage 2)
+
+**Stage 2 Achievement:**
+- ✅ All 4 Stage 2 packages meet the >10% to ≤20% target
+- 🔄 Next goal: Progress to Stage 3 (20%+ coverage)
 
 ## Stage 3 Completion Summary
 
 **Stage 3 Target:** >20% to ≤30% coverage
 
-**Packages Improved Beyond Stage 3:**
-1. ✅ `internal/controllers/admin/tasks`: 23.5% → 100.0% (Stage 8)
-2. ✅ `internal/controllers/admin/stats`: 23.3% → 76.7% (Stage 7)
-
-**Packages Maintaining/Improving in Stage 3 Range:**
-- ✅ `internal/controllers/admin/blog`: 25.0% (Stage 3)
-- ✅ `pkg/blogai`: 26.3% (Stage 3)
+**Current Stage 3 Packages (5 total):**
 - ✅ `cmd/deploy`: 22.2% (Stage 3)
-- ✅ `internal/controllers/admin/blog/post_update`: 25.3% (Stage 3)
-- ✅ `internal/controllers/admin/blog/ai_post_content_update`: 27.0% (Stage 3)
+- ✅ `pkg/blogadmin/post_update`: 25.3% (Stage 3)
+- ✅ `pkg/blogai`: 26.3% (Stage 3)
+- ✅ `pkg/blogadmin/ai_post_content_update`: 27.4% (Stage 3)
 - ✅ `internal/controllers/admin/logs/log_manager`: 27.1% (Stage 3)
 
-**Test Files Created/Enhanced:**
-- Created: `internal/controllers/admin/tasks/task_controller_test.go` (100% coverage achieved!)
-- Created: `internal/controllers/admin/stats/stats_controller_test.go` (76.7% coverage achieved!)
-- Created: `internal/controllers/admin/blog/blog_controller_test.go`
+**Packages Beyond Stage 3:**
+- ⏫ `internal/controllers/admin/shop/products/productupdate`: 42.9% (Stage 5)
+- ⏫ `pkg/testimonials`: 48.9% (Stage 5)
 
 **Stage 3 Achievement:**
-- ✅ 2 packages exceeded Stage 3 (admin/tasks 100%, admin/stats 76.7%)
-- ✅ 6 packages maintained/improved within Stage 3 range (22.2% - 27.1%)
-- ✅ All Stage 3 packages now at or above 20% coverage threshold
+- ✅ 5 packages meet Stage 3 target (>20% to ≤30%)
+- ✅ 2 packages progressed to Stage 5
+- 🔄 Next goal: Progress more packages to Stage 4+

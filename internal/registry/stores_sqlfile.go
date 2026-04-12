@@ -39,7 +39,7 @@ func sqlFileStorageMigrate(registry RegistryInterface) error {
 		return errors.New("sql file storage is not initialized")
 	}
 
-    // SQL file storage doesn't need migration
+	// SQL file storage doesn't need migration
 	// if err := registry.GetSqlFileStorage().AutoMigrate(); err != nil {
 	// 	return err
 	// }

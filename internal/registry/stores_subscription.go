@@ -59,14 +59,14 @@ func newSubscriptionStore(db *sql.DB) (subscriptionstore.StoreInterface, error) 
 		PlanTableName:         "snv_subscriptions_plan",
 		SubscriptionTableName: "snv_subscriptions_subscription",
 	})
-	
+
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if st == nil {
 		return nil, errors.New("subscriptionstore.NewStore returned a nil store")
 	}
-	
+
 	return st, nil
 }

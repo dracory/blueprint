@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"log/slog"
 	"net/http"
-	"project/internal/controllers/admin/blog/post_update"
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/post_update"
 	"strings"
 
 	"github.com/dracory/base/blogtheme"
