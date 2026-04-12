@@ -35,7 +35,8 @@ var ipLookupHTTPClient = &http.Client{
 // =================================================================
 type statsVisitorEnhanceTask struct {
 	taskstore.TaskHandlerBase
-	registry registry.RegistryInterface
+	registry   registry.RegistryInterface
+	httpClient *http.Client // Injectable for testing
 }
 
 // == CONSTRUCTOR =============================================================
@@ -173,7 +174,13 @@ func (t *statsVisitorEnhanceTask) findCountryByIp(ctx context.Context, ip string
 		return "ER"
 	}
 
-	resp, err := ipLookupHTTPClient.Do(req)
+	// Use injected client for testing, otherwise use global client
+	client := t.httpClient
+	if client == nil {
+		client = ipLookupHTTPClient
+	}
+
+	resp, err := client.Do(req)
 
 	if err != nil {
 		log.Printf("Request Failed: %s", err)

@@ -1,8 +1,12 @@
 package stats
 
 import (
+	"bytes"
 	"context"
+	"io"
+	"net/http"
 	"testing"
+	"time"
 
 	"project/internal/testutils"
 )
@@ -137,5 +141,116 @@ func TestStatsVisitorEnhanceTask_ProcessVisitor_NilStatsStore(t *testing.T) {
 	result := task.processVisitor(context.TODO(), nil)
 	if result != false {
 		t.Error("processVisitor() with nil stats store should return false")
+	}
+}
+
+// TestConstants tests the package constants
+func TestConstants(t *testing.T) {
+	if ipLookupEndpoint != "https://ip2c.org/" {
+		t.Errorf("ipLookupEndpoint = %q, want %q", ipLookupEndpoint, "https://ip2c.org/")
+	}
+	if ipLookupTimeout != 5*time.Second {
+		t.Errorf("ipLookupTimeout = %v, want 5 seconds", ipLookupTimeout)
+	}
+}
+
+// TestIPLookupHTTPClient tests the HTTP client configuration
+func TestIPLookupHTTPClient(t *testing.T) {
+	// Note: Tests run in parallel, so we only verify the client exists
+	// and has correct configuration without mutating global state
+	if ipLookupHTTPClient == nil {
+		t.Error("ipLookupHTTPClient should not be nil")
+		return
+	}
+	// Verify timeout is configured (read-only check, no race condition)
+	if ipLookupHTTPClient.Timeout != 5*time.Second {
+		t.Errorf("ipLookupHTTPClient.Timeout = %v, want 5 seconds", ipLookupHTTPClient.Timeout)
+	}
+}
+
+// mockRoundTripper is a test HTTP transport that returns canned responses
+type mockRoundTripper struct {
+	response *http.Response
+	err      error
+}
+
+func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	return m.response, m.err
+}
+
+// TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock tests IP lookup with mock HTTP client
+func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+
+	tests := []struct {
+		name       string
+		response   *http.Response
+		err        error
+		wantResult string
+	}{
+		{
+			name:       "successful lookup",
+			response:   &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;US;USA;United States"))},
+			wantResult: "US",
+		},
+		{
+			name:       "empty country code",
+			response:   &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;;USA;"))},
+			wantResult: "UN",
+		},
+		{
+			name:       "error response",
+			response:   &http.Response{StatusCode: http.StatusInternalServerError, Body: io.NopCloser(bytes.NewBufferString(""))},
+			wantResult: "ER",
+		},
+		{
+			name:       "network error",
+			err:        http.ErrHandlerTimeout,
+			wantResult: "ER",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			task.httpClient = &http.Client{
+				Transport: &mockRoundTripper{response: tt.response, err: tt.err},
+			}
+			result := task.findCountryByIp(context.TODO(), "1.2.3.4")
+			if result != tt.wantResult {
+				t.Errorf("findCountryByIp() = %q, want %q", result, tt.wantResult)
+			}
+		})
+	}
+}
+
+// TestStatsVisitorEnhanceTask_MultipleInstances tests creating multiple task instances
+func TestStatsVisitorEnhanceTask_MultipleInstances(t *testing.T) {
+	registry1 := testutils.Setup()
+	registry2 := testutils.Setup()
+
+	task1 := NewStatsVisitorEnhanceTask(registry1)
+	task2 := NewStatsVisitorEnhanceTask(registry2)
+
+	if task1 == task2 {
+		t.Error("Multiple instances should be independent")
+	}
+
+	if task1.registry != registry1 {
+		t.Error("Task1 should have registry1")
+	}
+
+	if task2.registry != registry2 {
+		t.Error("Task2 should have registry2")
+	}
+}
+
+// TestStatsVisitorEnhanceTask_StructFields tests the task struct fields
+func TestStatsVisitorEnhanceTask_StructFields(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+
+	if task.registry != registry {
+		t.Error("Task registry field should match provided registry")
 	}
 }
