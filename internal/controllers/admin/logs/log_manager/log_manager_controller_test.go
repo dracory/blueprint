@@ -63,3 +63,33 @@ func TestLogManagerController_RendersPlaceholders(t *testing.T) {
 // Additional scenarios (e.g. specific filter combinations) can be covered by
 // component-level tests if needed; for the controller we only ensure that the
 // page renders and embeds the expected Liveflux placeholders.
+
+// TestLogManagerController_NilRegistry tests with nil registry
+func TestLogManagerController_NilRegistry(t *testing.T) {
+	c := NewLogManagerController(nil)
+	if c == nil {
+		t.Error("NewLogManagerController(nil) should still return a controller")
+	}
+}
+
+// TestLogManagerController_MultipleInstances tests multiple instances are independent
+func TestLogManagerController_MultipleInstances(t *testing.T) {
+	registry := testutils.Setup()
+	c1 := NewLogManagerController(registry)
+	c2 := NewLogManagerController(registry)
+
+	if c1 == c2 {
+		t.Error("Multiple instances should be independent")
+	}
+}
+
+// TestLogManagerController_StructFields tests controller struct fields
+func TestLogManagerController_StructFields(t *testing.T) {
+	registry := testutils.Setup()
+	c := NewLogManagerController(registry)
+
+	// Verify the controller has the registry field set
+	if c.registry != registry {
+		t.Error("Controller registry field should match input")
+	}
+}

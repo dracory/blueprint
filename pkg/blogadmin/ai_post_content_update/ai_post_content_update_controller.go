@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/liveflux"
@@ -23,6 +23,9 @@ func NewController(registry registry.RegistryInterface) *Controller {
 }
 
 func (c *Controller) Handler(w http.ResponseWriter, r *http.Request) string {
+	if c.registry == nil {
+		return "Registry not available"
+	}
 	postID := req.GetStringTrimmed(r, "post_id")
 	if strings.TrimSpace(postID) == "" {
 		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Post ID is required", shared.NewLinks("/admin/blog").PostManager(), 10)
@@ -52,4 +55,3 @@ func (c *Controller) Handler(w http.ResponseWriter, r *http.Request) string {
 		},
 	}).ToHTML()
 }
-

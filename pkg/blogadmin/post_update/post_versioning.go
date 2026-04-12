@@ -13,7 +13,10 @@ import (
 )
 
 func createPostVersioning(ctx context.Context, registry registry.RegistryInterface, post blogstore.PostInterface) error {
-	if registry == nil || registry.GetBlogStore() == nil {
+	if registry == nil {
+		return errors.New("blog store not available")
+	}
+	if registry.GetBlogStore() == nil {
 		return errors.New("blog store not available")
 	}
 
@@ -56,4 +59,3 @@ func createPostVersioning(ctx context.Context, registry registry.RegistryInterfa
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
 		SetContent(content))
 }
-

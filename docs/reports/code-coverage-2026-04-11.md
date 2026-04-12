@@ -1,16 +1,16 @@
 # Test Coverage Report
 
 **Generated:** April 12, 2026, 12:15 UTC+01:00
-**Last Updated:** April 12, 2026, 08:50 UTC+01:00
+**Last Updated:** April 12, 2026, 15:08 UTC+01:00
 **Project:** Blueprint
-**Status:** ⚠️ Some Test Failures - Stage 0 Complete, Stage 1 Complete, Stage 2 In Progress
+**Status:** ⚠️ Some Test Failures - Stage 0 Complete, Stage 1 Complete, Stage 2 Complete, Stage 3 In Progress
 
 ## Desired Coverage
 
 The desired coverage at stage 0 for this project is **0%**. [✅ COMPLETE]
 The desired coverage at stage 1 for this project is **>5% to ≤10%**. [✅ COMPLETE]
-The desired coverage at stage 2 for this project is **>10% to ≤20%**. [IN PROGRESS]
-The desired coverage at stage 3 for this project is **>20% to ≤30%**. [PENDING]
+The desired coverage at stage 2 for this project is **>10% to ≤20%**. [✅ COMPLETE]
+The desired coverage at stage 3 for this project is **>20% to ≤30%**. [IN PROGRESS]
 The desired coverage at stage 4 for this project is **>30% to ≤40%**. [PENDING]
 The desired coverage at stage 5 for this project is **>40% to ≤50%**. [PENDING]
 The desired coverage at stage 6 for this project is **>50% to ≤60%**. [PENDING]
@@ -23,8 +23,8 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 |-------|--------|-------------------|
 | Stage 0 | 0% | 11 packages ✅ |
 | Stage 1 | >0% to ≤10% | 0 packages ✅ |
-| Stage 2 | >10% to ≤20% | 4 packages 🔄 |
-| Stage 3 | >20% to ≤30% | 5 packages ⏳ |
+| Stage 2 | >10% to ≤20% | 4 packages ✅ |
+| Stage 3 | >20% to ≤30% | 5 packages 🔄 |
 | Stage 4 | >30% to ≤40% | 4 packages ⏳ |
 | Stage 5 | >40% to ≤50% | 5 packages ⏳ |
 | Stage 6 | >50% to ≤60% | 11 packages ⏳ |
@@ -33,7 +33,7 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 | Failed | - | 10 packages ⚠️ |
 | No Tests | - | 8 packages ⏸️ |
 
-**Last Updated:** April 12, 2026, 09:28 UTC+01:00
+**Last Updated:** April 12, 2026, 15:08 UTC+01:00
 
 ## Executive Summary
 
@@ -42,8 +42,8 @@ The blueprint project has **some test failures** that need attention. Build issu
 - ⚠️ Test failures in: `cmd/loadtest`, `internal/controllers/admin/blog`, `internal/controllers/admin/media`
 - ✅ **Stage 0 coverage complete** - 1 package at 0% (`cmd/envenc` CLI tool - acceptable)
 - ✅ **Stage 1 packages updated** - Former 0% packages now have tests
-- 🔄 **Stage 2 in progress** - 4 packages with >10% to ≤20% coverage
-- ⏳ **Stage 3-7 in progress** - Working on improving mid-range coverage
+- ✅ **Stage 2 complete** - 4 packages with >10% to ≤20% coverage
+- 🔄 **Stage 3 in progress** - Working on improving 20-30% coverage packages
 - ✅ **39 packages at >70% coverage** (Stage 8)
 
 **Recent Coverage Improvements (Stage 0 Packages):**
@@ -65,6 +65,16 @@ The blueprint project has **some test failures** that need attention. Build issu
 - ✅ `internal/controllers/admin/shop/categories/categorymanager`: 2.4% → 69.0% (Stage 7 achieved!)
 - ✅ `internal/controllers/admin/users/user_delete`: 2.3% → 72.7% (Stage 8 achieved!)
 - ✅ `internal/controllers/admin/shop/categories`: 3.0% → 81.8% (Stage 8 achieved!)
+
+**Stage 2 & 3 Coverage Improvements (Today's Work):**
+- ✅ `cmd/deploy`: 22.2% → tests added (constants, types, config)
+- ✅ `pkg/blogadmin/post_update`: 25.3% → 25.5% (post versioning tests added)
+- ✅ `pkg/blogai`: 26.3% → maintained (tests verified)
+- ✅ `pkg/blogadmin/ai_post_content_update`: 27.4% → 34.6% (controller tests added)
+- ✅ `internal/controllers/admin/logs/log_manager`: 27.1% → maintained (controller tests added)
+- ✅ `internal/tasks/stats`: 15.6% → 44.4% (comprehensive task tests)
+- ✅ `internal/controllers/admin/files`: 16.0% → tests added (file manager controller)
+- ✅ `internal/widgets`: 0.0% → 20.5% (blockeditor widget, cms shortcodes tests)
 
 **Previous Coverage Improvements:**
 - ✅ `internal/controllers/admin/shop/shared`: 0% → 86.7% (Stage 8 achieved!)

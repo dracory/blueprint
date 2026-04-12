@@ -57,21 +57,35 @@ func TestBlockeditorWidget_Render(t *testing.T) {
 	t.Parallel()
 
 	widget := NewBlockeditorWidget(nil)
-	testURL, _ := url.Parse("/test")
+	testURL, _ := url.Parse("/test?example=test")
 	req := &http.Request{
-		URL: testURL,
+		Method: http.MethodGet,
+		URL:    testURL,
+		Header: make(http.Header),
+	}
+
+	// Test with unknown example from URL param
+	result := widget.Render(req, "content", map[string]string{})
+	if result != "Example not found" {
+		t.Errorf("Render() with unknown example from URL = %q, want 'Example not found'", result)
 	}
 
 	// Test with no example param
-	result := widget.Render(req, "content", map[string]string{})
+	emptyURL, _ := url.Parse("/test")
+	emptyReq := &http.Request{
+		Method: http.MethodGet,
+		URL:    emptyURL,
+		Header: make(http.Header),
+	}
+	result = widget.Render(emptyReq, "content", map[string]string{})
 	if result != "Example not found" {
 		t.Errorf("Render() with no example = %q, want 'Example not found'", result)
 	}
 
-	// Test with unknown example
-	result = widget.Render(req, "content", map[string]string{"example": "unknown"})
+	// Test with unknown example from params
+	result = widget.Render(emptyReq, "content", map[string]string{"example": "unknown"})
 	if result != "Example not found" {
-		t.Errorf("Render() with unknown example = %q, want 'Example not found'", result)
+		t.Errorf("Render() with unknown example param = %q, want 'Example not found'", result)
 	}
 }
 
