@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/blogstore"
@@ -239,7 +239,7 @@ func (controller *tagManagerController) handleCreateTag(w http.ResponseWriter, r
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = slugify(reqData.Name)
+		slug = shared.Slugify(reqData.Name)
 	}
 
 	term := blogstore.NewTerm()
@@ -297,7 +297,7 @@ func (controller *tagManagerController) handleUpdateTag(w http.ResponseWriter, r
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = slugify(reqData.Name)
+		slug = shared.Slugify(reqData.Name)
 	}
 
 	term.SetName(reqData.Name)
@@ -373,20 +373,6 @@ func (controller *tagManagerController) ensureTaxonomy(ctx context.Context, stor
 	return tagTaxonomy, nil
 }
 
-func slugify(text string) string {
-	result := []rune{}
-	for _, r := range text {
-		if r >= 'A' && r <= 'Z' {
-			result = append(result, r+32)
-		} else if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
-			result = append(result, r)
-		} else if r == ' ' || r == '-' || r == '_' {
-			result = append(result, '-')
-		}
-	}
-	return string(result)
-}
-
 // Deprecated: kept for backwards compatibility
 type tagManagerControllerData struct {
 	page       string
@@ -396,4 +382,3 @@ type tagManagerControllerData struct {
 	tagCount   int64
 	tagList    []blogstore.TermInterface
 }
-

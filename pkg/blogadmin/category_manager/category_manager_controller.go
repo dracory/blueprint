@@ -8,11 +8,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/blogstore"
@@ -187,7 +187,7 @@ func (controller *categoryManagerController) handleCreateCategory(w http.Respons
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = slugify(reqData.Name)
+		slug = shared.Slugify(reqData.Name)
 	}
 
 	term := blogstore.NewTerm()
@@ -246,7 +246,7 @@ func (controller *categoryManagerController) handleUpdateCategory(w http.Respons
 
 	slug := reqData.Slug
 	if slug == "" {
-		slug = slugify(reqData.Name)
+		slug = shared.Slugify(reqData.Name)
 	}
 
 	term.SetName(reqData.Name)
@@ -361,20 +361,6 @@ func (controller *categoryManagerController) ensureTaxonomy(ctx context.Context,
 	return categoryTaxonomy, nil
 }
 
-func slugify(text string) string {
-	result := []rune{}
-	for _, r := range text {
-		if r >= 'A' && r <= 'Z' {
-			result = append(result, r+32)
-		} else if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
-			result = append(result, r)
-		} else if r == ' ' || r == '-' || r == '_' {
-			result = append(result, '-')
-		}
-	}
-	return string(result)
-}
-
 // Deprecated: kept for backwards compatibility
 type categoryManagerControllerData struct {
 	page          string
@@ -384,4 +370,3 @@ type categoryManagerControllerData struct {
 	categoryCount int64
 	categoryList  []blogstore.TermInterface
 }
-
