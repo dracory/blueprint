@@ -23,8 +23,8 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 |-------|--------|-------------------|
 | Stage 0 | 0% | 2 packages ✅ |
 | Stage 1 | >0% to ≤10% | 0 packages ✅ |
-| Stage 2 | >10% to ≤20% | 4 packages ✅ |
-| Stage 3 | >20% to ≤30% | 5 packages 🔄 |
+| Stage 2 | >10% to ≤20% | 0 packages ✅ |
+| Stage 3 | >20% to ≤30% | 8 packages 🔄 |
 | Stage 4 | >30% to ≤40% | 4 packages ⏳ |
 | Stage 5 | >40% to ≤50% | 5 packages ⏳ |
 | Stage 6 | >50% to ≤60% | 11 packages ⏳ |
@@ -33,4 +33,13 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 | Failed | - | 10 packages ⚠️ |
 | No Tests | - | 0 packages ✅ |
 
-**Last Updated:** April 12, 2026, 15:08 UTC+01:00
+## Stage 0 Packages (0% Coverage)
+
+| Package | Reason for 0% Coverage |
+|---------|----------------------|
+| `cmd/envenc` | Main file is a thin CLI wrapper (119 bytes) calling external `github.com/dracory/envenc` library. Tests exist but test library functions, not local code. |
+| `cmd/loadtest` | Main file contains CLI entry point. Tests exist but use mock HTTP servers to test generic HTTP client behavior, not the actual load testing logic in main.go. |
+
+**Note:** Both packages have test files but coverage is reported as 0% because the tests don't exercise the local package code - they test external libraries or generic patterns.
+
+**Last Updated:** April 12, 2026, 15:35 UTC+01:00
