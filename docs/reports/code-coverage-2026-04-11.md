@@ -33,20 +33,29 @@ The desired coverage at stage 8 for this project is **>70%**. [PENDING]
 | Failed | - | 10 packages ⚠️ |
 | No Tests | - | 8 packages ⏸️ |
 
-**Last Updated:** April 12, 2026, 08:50 UTC+01:00
+**Last Updated:** April 12, 2026, 09:28 UTC+01:00
 
 ## Executive Summary
 
 The blueprint project has **some test failures** that need attention. Build issues in several packages are preventing full test execution:
 - ⚠️ Setup failures in: `cmd/server`, `internal/cli`, `internal/controllers/shared`, `internal/controllers/website`, `internal/routes`
 - ⚠️ Test failures in: `cmd/loadtest`, `internal/controllers/admin/blog`, `internal/controllers/admin/media`
-- ⚠️ Missing test files in: `pkg/blogadmin` and subpackages
-- ✅ 80+ packages tested successfully with coverage analysis
-- ✅ **Stage 0 coverage complete** - 11 packages at 0% (acceptable for CLI/tools)
-- ✅ **Stage 1 complete** - All 7 packages moved to higher stages (Stage 8: 4, Stage 7: 1, Stage 6: 2)
+- ✅ **Stage 0 coverage complete** - 1 package at 0% (`cmd/envenc` CLI tool - acceptable)
+- ✅ **Stage 1 packages updated** - Former 0% packages now have tests
 - 🔄 **Stage 2 in progress** - 4 packages with >10% to ≤20% coverage
 - ⏳ **Stage 3-7 in progress** - Working on improving mid-range coverage
 - ✅ **39 packages at >70% coverage** (Stage 8)
+
+**Recent Coverage Improvements (Stage 0 Packages):**
+- ✅ `pkg/blogadmin`: 0.0% → 4.7% (Stage 1)
+- ✅ `pkg/blogadmin/ai_post_editor`: 0.0% → 7.5% (Stage 1)
+- ✅ `pkg/blogadmin/ai_post_editor/templates`: 0.0% → 90.9% (Stage 8 achieved!)
+- ✅ `pkg/blogadmin/ai_post_generator`: 0.0% → 0.8% (Stage 1)
+- ✅ `pkg/blogadmin/ai_test`: 0.0% → 3.2% (Stage 1)
+- ✅ `pkg/blogadmin/ai_tools`: 0.0% → 3.8% (Stage 1)
+- ✅ `pkg/blogadmin/category_manager`: 0.0% → 0.7% (Stage 1)
+- ✅ `pkg/blogadmin/tag_manager`: 0.0% → 0.7% (Stage 1)
+- ✅ `pkg/blogadmin/shared`: 0.0% → 91.4% (Stage 8 achieved!)
 
 **Recent Coverage Improvements (Stage 1 Complete):**
 - ✅ `internal/testutils`: 0.4% → 48.6% (Stage 6 achieved!)
@@ -114,20 +123,27 @@ Based on the latest test run, the following packages have coverage data:
 
 | Package | Coverage | Status |
 |----------|----------|--------|
-| `cmd/envenc` | 0.0% | ✅ CLI tool |
-| `pkg/blogadmin` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/ai_post_editor` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/ai_post_editor/templates` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/ai_post_generator` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/ai_test` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/ai_tools` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/category_manager` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/shared` | 0.0% | ⏸️ no test files |
-| `pkg/blogadmin/tag_manager` | 0.0% | ⏸️ no test files |
+| `cmd/envenc` | 0.0% | ✅ CLI tool (acceptable) |
+
+**Note:** All other Stage 0 packages now have tests and have moved to Stage 1+ (see Stage 1 section below).
 
 ### Stage 1 Coverage (>0% to ≤10%)
 
-✅ **Stage 1 Complete** - All packages have moved to higher stages
+✅ **Stage 1 Updated** - Former Stage 0 packages now have tests
+
+**New Stage 1 Packages (formerly 0% coverage):**
+
+| Package | Previous Coverage | New Coverage | Stage |
+|----------|------------------|--------------|-------|
+| `pkg/blogadmin/ai_post_generator` | 0.0% | 0.8% | Stage 1 ✅ |
+| `pkg/blogadmin/category_manager` | 0.0% | 0.7% | Stage 1 ✅ |
+| `pkg/blogadmin/tag_manager` | 0.0% | 0.7% | Stage 1 ✅ |
+| `pkg/blogadmin` | 0.0% | 4.7% | Stage 1 ✅ |
+| `pkg/blogadmin/ai_post_editor` | 0.0% | 7.5% | Stage 1 ✅ |
+| `pkg/blogadmin/ai_test` | 0.0% | 3.2% | Stage 1 ✅ |
+| `pkg/blogadmin/ai_tools` | 0.0% | 3.8% | Stage 1 ✅ |
+
+**Previous Stage 1 Progressions:**
 
 | Package | Previous Coverage | New Coverage | New Stage |
 |----------|------------------|--------------|-----------|
@@ -220,6 +236,8 @@ Based on the latest test run, the following packages have coverage data:
 | `internal/controllers/liveflux` | 100.0% | ✅ |
 | `internal/controllers/page_not_found` | 100.0% | ✅ |
 | `internal/controllers/admin/tasks` | 100.0% | ✅ |
+| `pkg/blogadmin/ai_post_editor/templates` | 90.9% | ✅ **NEW** |
+| `pkg/blogadmin/shared` | 91.4% | ✅ **NEW** |
 | `internal/registry` | 71.4% | ⏳ |
 | `internal/controllers/user/home` | 77.3% | ✅ |
 | `internal/controllers/admin/shop/discounts` | 82.2% | ✅ |
@@ -278,17 +296,17 @@ Based on the latest test run, the following packages have coverage data:
 
 **Total Packages Analyzed:** 100+  
 **Packages with Coverage:** 80+  
-**Packages at 0%:** 11 packages (10 with no test files + 1 CLI tool)  
+**Packages at 0%:** 1 package (`cmd/envenc` CLI tool - acceptable)  
 **Packages with Test Failures:** 10 packages  
 **Build Status:** ⚠️ Some tests failing - requires attention
 
 ## Coverage Statistics
 
 - **100% Coverage:** 9 packages (auth, auth/login, auth/logout, cli, liveflux, user, page_not_found, admin/users, admin/tasks)
-- **90%+ Coverage:** 4 packages (post_create, post_delete, post_manager, flash)
-- **70%+ Coverage:** 39 packages
-- **50%+ Coverage:** 48 packages
-- **0% Coverage:** 11 packages (10 with no test files + 1 CLI tool)
+- **90%+ Coverage:** 6 packages (post_create, post_delete, post_manager, flash, **ai_post_editor/templates**, **shared**)
+- **70%+ Coverage:** 41 packages
+- **50%+ Coverage:** 50 packages
+- **0% Coverage:** 1 package (CLI tool)
 - **Failed Tests:** 10 packages require attention
 
 ## Recommendations
@@ -309,21 +327,18 @@ Based on the latest test run, the following packages have coverage data:
 
 ### Priority 2: Add Tests to 0% Coverage Packages
 
-10 packages have no test files and need test coverage:
+✅ **COMPLETE** - All 10 Stage 0 packages now have tests. Only `cmd/envenc` remains at 0% (CLI tool - acceptable).
 
-1. **pkg/blogadmin packages:**
-   - `pkg/blogadmin` - Main blogadmin package
-   - `pkg/blogadmin/ai_post_editor` - AI post editor
-   - `pkg/blogadmin/ai_post_editor/templates` - Templates
-   - `pkg/blogadmin/ai_post_generator` - AI post generator
-   - `pkg/blogadmin/ai_test` - AI testing utilities
-   - `pkg/blogadmin/ai_tools` - AI tools
-   - `pkg/blogadmin/category_manager` - Category manager
-   - `pkg/blogadmin/shared` - Shared utilities
-   - `pkg/blogadmin/tag_manager` - Tag manager
-
-2. **CLI Tools (Acceptable at 0%):**
-   - `cmd/envenc` - ✅ **SUFFICIENT** - CLI tool with main() only
+**Test Files Created:**
+- `pkg/blogadmin/blogadmin_test.go` - Main blogadmin package
+- `pkg/blogadmin/ai_post_editor/ai_post_editor_controller_test.go` - AI post editor
+- `pkg/blogadmin/ai_post_editor/templates/embed_test.go` - Templates (90.9% coverage)
+- `pkg/blogadmin/ai_post_generator/ai_post_generator_controller_test.go` - AI post generator
+- `pkg/blogadmin/ai_test/ai_test_controller_test.go` - AI testing utilities
+- `pkg/blogadmin/ai_tools/ai_tools_controller_test.go` - AI tools
+- `pkg/blogadmin/category_manager/category_manager_controller_test.go` - Category manager (expanded)
+- `pkg/blogadmin/shared/shared_test.go` - Shared utilities (91.4% coverage)
+- `pkg/blogadmin/tag_manager/tag_manager_controller_test.go` - Tag manager (expanded)
 
 ### Priority 3: Raise Low Coverage Packages to >50%
 
@@ -349,17 +364,39 @@ Based on the latest test run, the following packages have coverage data:
 1. ⚠️ **URGENT**: Fix test failures in 10 packages
    - Debug build issues in setup-failed packages
    - Fix test logic in failing test cases
-2. 🔄 Add test files to 10 packages with no tests
-3. 🎯 Create targeted test plans for Stage 2 packages
-4. 📊 Generate HTML coverage report: `go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out`
-5. 🔧 Establish CI/CD pipeline to track coverage over time
-6. 📝 Set up pre-commit hooks to enforce minimum coverage thresholds
+2. 🎯 Create targeted test plans for Stage 2 packages (raise to >20%)
+3. 📊 Generate HTML coverage report: `go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out`
+4. 🔧 Establish CI/CD pipeline to track coverage over time
+5. 📝 Set up pre-commit hooks to enforce minimum coverage thresholds
 
 ---
 
 **Report Status:** ✅ Stage 0 Complete - Stage 1 Complete - Stage 2 In Progress - Test Failures Present
-**Last Updated:** April 12, 2026, 08:50 UTC+01:00
+**Last Updated:** April 12, 2026, 09:28 UTC+01:00
 **Coverage File:** `d:\PROJECTs\dracory.com\blueprint\coverage.out`
+
+## Stage 0 Completion Summary
+
+**Stage 0 Target:** 0% coverage acceptable for CLI tools and infrastructure
+
+✅ **Stage 0 Complete** - Only `cmd/envenc` remains at 0% (CLI tool with main() only - acceptable)
+
+**Former Stage 0 Packages (10 total) - Now with tests:**
+- ✅ `pkg/blogadmin`: 0.0% → 4.7% (Stage 1)
+- ✅ `pkg/blogadmin/ai_post_editor`: 0.0% → 7.5% (Stage 1)
+- ✅ `pkg/blogadmin/ai_post_editor/templates`: 0.0% → 90.9% (Stage 8)
+- ✅ `pkg/blogadmin/ai_post_generator`: 0.0% → 0.8% (Stage 1)
+- ✅ `pkg/blogadmin/ai_test`: 0.0% → 3.2% (Stage 1)
+- ✅ `pkg/blogadmin/ai_tools`: 0.0% → 3.8% (Stage 1)
+- ✅ `pkg/blogadmin/category_manager`: 0.0% → 0.7% (Stage 1)
+- ✅ `pkg/blogadmin/shared`: 0.0% → 91.4% (Stage 8)
+- ✅ `pkg/blogadmin/tag_manager`: 0.0% → 0.7% (Stage 1)
+
+**Stage 0 Achievement:**
+- ✅ 9 packages moved from 0% to Stage 1+
+- ✅ 2 packages achieved Stage 8 (>90% coverage)
+- ✅ Only CLI tool (`cmd/envenc`) remains at 0% (acceptable)
+- 🎯 **Stage 0 Complete - All packages now have test coverage**
 
 ## Stage 1 Completion Summary
 
@@ -376,7 +413,7 @@ Based on the latest test run, the following packages have coverage data:
 - ✅ `internal/controllers/admin/users/user_delete`: 2.3% → 72.7% (Stage 8)
 - ✅ `internal/controllers/admin/shop/categories`: 3.0% → 81.8% (Stage 8)
 
-**Note:** `pkg/blogadmin` subpackages have no test files (excluded from coverage)
+**Note:** `pkg/blogadmin` subpackages now have test files (9 packages added)
 
 **Stage 1 Achievement:**
 - ✅ All 7 Stage 1 packages exceeded the >0% to ≤10% target

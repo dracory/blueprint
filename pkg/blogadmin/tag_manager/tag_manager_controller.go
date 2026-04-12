@@ -56,7 +56,10 @@ func (controller *tagManagerController) Handler(w http.ResponseWriter, r *http.R
 func (controller *tagManagerController) renderPage(r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
+		if controller.registry != nil && controller.registry.GetCacheStore() != nil {
+			return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
+		}
+		return hb.Div().HTML("Error: You are not logged in. Please login to continue.").ToHTML()
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{

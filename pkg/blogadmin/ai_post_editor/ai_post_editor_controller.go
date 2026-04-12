@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"project/pkg/blogadmin/ai_post_editor/templates"
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/ai_post_editor/templates"
+	"project/pkg/blogadmin/shared"
 	"project/pkg/blogai"
 
 	"github.com/dracory/base/req"
@@ -137,13 +137,13 @@ func (c *AiPostEditorController) view(data pageData) *hb.Tag {
 		Href(shared.NewLinks("/admin/blog").AiPostGenerator(map[string]string{})).
 		HTML("← Back to Post Generator")
 
-	vueApp := hb.Raw(templates.Tpl("registry.html", map[string]any{}))
-	vueScript := hb.Script(templates.Tpl("registry.js", map[string]any{
+	vueApp := hb.Raw(templates.Tpl("app.html", map[string]any{}))
+	vueScript := hb.Script(templates.Tpl("app.js", map[string]any{
 		"postJSON": data.BlogAiPost.ToJSON(),
 		"id":       data.BlogAiPost.ID,
 		"url":      shared.NewLinks("/admin/blog").AiPostEditor(map[string]string{}),
 	}))
-	vueStyles := hb.Style(templates.Tpl("registry.css", nil))
+	vueStyles := hb.Style(templates.Tpl("app.css", nil))
 
 	return hb.Div().
 		Class("container min-vh-100 py-4 bg-light").
@@ -233,4 +233,3 @@ func RecordFromJSON(jsonStr string) (*blogai.RecordPost, error) {
 
 	return &recordPost, nil
 }
-
