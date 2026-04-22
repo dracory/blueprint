@@ -1,0 +1,312 @@
+<div id="logs-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <!-- Filter Bar -->
+    <div class="card bg-body-tertiary mb-3">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <button @click="openFilterModal()" class="btn btn-primary me-3">
+            <i class="bi bi-funnel me-1"></i> Filters
+          </button>
+          <span class="text-body">{{ filterStatus }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <select v-model="perPage" @change="changePerPage()" class="form-select form-select-sm" style="width: auto;">
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="300">300</option>
+            <option value="500">500</option>
+            <option value="1000">1000</option>
+            <option value="3000">3000</option>
+            <option value="5000">5000</option>
+            <option value="10000">10000</option>
+          </select>
+          <button 
+            @click="clearFilters()" 
+            class="btn btn-sm btn-outline-secondary" 
+            title="Clear all filters"
+            v-if="hasActiveFilters"
+          >
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div v-if="selectedLogs.length > 0" class="card bg-body-tertiary mb-3">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <span class="text-body">{{ selectedLogs.length }} log(s) selected</span>
+        <div class="d-flex gap-2">
+          <button 
+            v-if="selectAll"
+            @click="deleteAll()" 
+            class="btn btn-danger btn-sm"
+          >
+            <i class="bi bi-trash me-1"></i> Delete All ({{ totalLogs }})
+          </button>
+          <button 
+            @click="deleteSelected()" 
+            class="btn btn-danger btn-sm"
+            :disabled="deleting"
+          >
+            <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+            <i v-else class="bi bi-trash me-1"></i>
+            {{ deleting ? 'Deleting...' : 'Delete Selected' }} ({{ selectedLogs.length }})
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs Table -->
+    <div v-if="logs.length === 0" class="text-center py-4 text-muted border rounded">
+      No logs found matching your criteria.
+    </div>
+
+    <div v-else class="table-responsive">
+      <table class="table table-striped table-hover table-bordered align-middle">
+        <thead>
+          <tr>
+            <th style="width: 1px;">
+              <input type="checkbox" v-model="selectAll" @change="toggleSelectAll">
+            </th>
+            <th @click="sortBy('time')" style="cursor: pointer; width: 1px;">
+              Time
+              <span v-if="sortByColumn === 'time'">
+                {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
+              </span>
+            </th>
+            <th @click="sortBy('level')" style="cursor: pointer; width: 1px;">
+              Level
+              <span v-if="sortByColumn === 'level'">
+                {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
+              </span>
+            </th>
+            <th>Message</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="log in logs" :key="log.id">
+            <td class="text-center">
+              <input type="checkbox" v-model="selectedLogs" :value="log.id">
+            </td>
+            <td>
+              <div class="small" v-html="formatTime(log.time)"></div>
+            </td>
+            <td>
+              <span 
+                class="fw-semibold text-uppercase"
+                :class="{
+                  'text-danger': log.level === 'error',
+                  'text-warning': log.level === 'warning',
+                  'text-info': log.level === 'info',
+                  'text-success': log.level === 'debug',
+                  'text-secondary': log.level === 'trace'
+                }"
+              >
+                {{ log.level }}
+              </span>
+            </td>
+            <td>
+              <div class="small" style="max-width: 500px; word-break: break-word;">{{ log.message }}</div>
+            </td>
+            <td>
+              <button 
+                @click="showContext(log)" 
+                class="btn btn-info btn-sm me-2" 
+                title="View Context"
+              >
+                <i class="bi bi-eye"></i>
+              </button>
+              <button 
+                @click="deleteLog(log)" 
+                class="btn btn-danger btn-sm" 
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="totalLogs > 0" class="d-flex justify-content-between align-items-center mt-3">
+      <div class="text-muted small">
+        Showing {{ (currentPage * perPage) + 1 }}-{{ Math.min((currentPage + 1) * perPage, totalLogs) }} of {{ totalLogs }} logs
+      </div>
+      <div class="d-flex align-items-center justify-content-center flex-grow-1">
+        <div class="d-flex align-items-center gap-2">
+          <span class="small text-muted">Page</span>
+          <div class="btn-group" role="group">
+            <button 
+              @click="goToPage(currentPage - 1)" 
+              class="btn btn-sm btn-outline-secondary"
+              :disabled="currentPage === 0"
+              title="Previous page"
+            >
+              &laquo;
+            </button>
+            <select v-model.number="jumpToPage" @change="goToPage(jumpToPage - 1)" class="form-select form-select-sm bg-primary text-white border-primary" style="width: auto; border-radius: 0;">
+              <option v-for="page in totalPages" :key="page" :value="page">{{ page }}</option>
+            </select>
+            <button 
+              @click="goToPage(currentPage + 1)" 
+              class="btn btn-sm btn-outline-secondary"
+              :disabled="currentPage >= totalPages - 1"
+              title="Next page"
+            >
+              &raquo;
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="small">Per page</span>
+        <select v-model="perPage" @change="changePerPage()" class="form-select form-select-sm" style="width: auto;">
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+          <option value="500">500</option>
+          <option value="1000">1000</option>
+          <option value="3000">3000</option>
+          <option value="5000">5000</option>
+          <option value="10000">10000</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div v-if="showFilterModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="showFilterModal" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Filter Logs</h5>
+            <button type="button" class="btn-close" @click="closeFilterModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Level</label>
+              <select v-model="filters.level" class="form-select">
+                <option value="">All Levels</option>
+                <option value="trace">Trace</option>
+                <option value="debug">Debug</option>
+                <option value="info">Info</option>
+                <option value="warning">Warning</option>
+                <option value="error">Error</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message Contains</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.searchMessage" 
+                placeholder="Search in message"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message Does Not Contain</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.searchMessageNot" 
+                placeholder="Exclude from message"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Context Contains</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.searchContext" 
+                placeholder="Search in context"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Context Does Not Contain</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.searchContextNot" 
+                placeholder="Exclude from context"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Date Range</label>
+              <div class="input-group">
+                <input 
+                  type="datetime-local" 
+                  v-model="filters.from" 
+                  class="form-control" 
+                  placeholder="From"
+                />
+                <span class="input-group-text">to</span>
+                <input 
+                  type="datetime-local" 
+                  v-model="filters.to" 
+                  class="form-control" 
+                  placeholder="To"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" @click="clearFilters()">Clear Filters</button>
+            <button type="button" class="btn btn-primary" @click="applyFilters()">Apply Filters</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Modal -->
+    <div v-if="showContextModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="showContextModal" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Log Context</h5>
+            <button type="button" class="btn-close" @click="closeContextModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div v-if="contextLog">
+              <table class="table table-bordered">
+                <tr>
+                  <th style="width: 150px;">ID</th>
+                  <td>{{ contextLog.id }}</td>
+                </tr>
+                <tr>
+                  <th>Time</th>
+                  <td v-html="formatTime(contextLog.time)"></td>
+                </tr>
+                <tr>
+                  <th>Level</th>
+                  <td>{{ contextLog.level }}</td>
+                </tr>
+                <tr>
+                  <th>Message</th>
+                  <td>{{ contextLog.message }}</td>
+                </tr>
+                <tr>
+                  <th>Context</th>
+                  <td><pre style="white-space: pre-wrap; word-break: break-word;">{{ contextLog.context || '-' }}</pre></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="closeContextModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
