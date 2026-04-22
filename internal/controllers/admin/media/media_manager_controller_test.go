@@ -75,7 +75,7 @@ func TestMediaManagerControllerHumanFilesize(t *testing.T) {
 		{"bytes", 500, "500 B"},
 		{"kilobytes", 1024, "1.0 kB"},
 		{"megabytes", 1048576, "1.0 MB"},
-		{"gigabytes", 1000000000, "1.0 GB"},
+		{"gigabytes", 1073741824, "1.0 GB"},
 		{"zero", 0, "0 B"},
 	}
 

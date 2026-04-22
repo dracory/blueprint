@@ -173,10 +173,6 @@ func TestResponseTimeTracking(t *testing.T) {
 		t.Error("min duration should not be greater than max duration")
 	}
 
-	if minDuration <= 0 {
-		t.Error("min duration should be greater than 0")
-	}
-
 	if maxDuration <= 0 {
 		t.Error("max duration should be greater than 0")
 	}

@@ -6,10 +6,11 @@ import (
 	"log"
 	"log/slog"
 
-	"project/internal/registry"
-	"project/internal/schedules"
+	// "project/internal/cmsblocks"
 	"project/internal/emails"
 	"project/internal/middlewares"
+	"project/internal/registry"
+	"project/internal/schedules"
 	"project/internal/widgets"
 
 	"github.com/dracory/taskstore"

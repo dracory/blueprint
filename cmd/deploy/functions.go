@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"strings"
 
 	"github.com/dracory/base/cfmt"
@@ -102,8 +103,16 @@ func PrivateKeyPath(sshKey string) string {
 		log.Fatal(err.Error())
 	}
 	homeDirectory := user.HomeDir
-	privateKeyPath := homeDirectory + "/.ssh/" + sshKey
-	return privateKeyPath
+
+	// If the path starts with ~, replace it with the home directory
+	if strings.HasPrefix(sshKey, "~") {
+		// Remove the ~ and join the rest with home directory
+		pathWithoutTilde := strings.TrimPrefix(sshKey, "~")
+		return filepath.Join(homeDirectory, pathWithoutTilde)
+	}
+
+	// Otherwise, prepend the .ssh directory
+	return filepath.Join(homeDirectory, ".ssh", sshKey)
 }
 
 // SSH connects to an SSH server, executes a command, and returns the output.

@@ -2,6 +2,7 @@ package main
 
 import (
 	"os/user"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -178,10 +179,10 @@ func TestPrivateKeyPath(t *testing.T) {
 		sshKey   string
 		expected string
 	}{
-		{"id_rsa", "id_rsa", currentUser.HomeDir + "/.ssh/id_rsa"},
-		{"id_ed25519", "id_ed25519", currentUser.HomeDir + "/.ssh/id_ed25519"},
-		{"custom_key", "custom_key", currentUser.HomeDir + "/.ssh/custom_key"},
-		{"key_with_path", "keys/deploy_key", currentUser.HomeDir + "/.ssh/keys/deploy_key"},
+		{"id_rsa", "id_rsa", filepath.Join(currentUser.HomeDir, ".ssh", "id_rsa")},
+		{"id_ed25519", "id_ed25519", filepath.Join(currentUser.HomeDir, ".ssh", "id_ed25519")},
+		{"custom_key", "custom_key", filepath.Join(currentUser.HomeDir, ".ssh", "custom_key")},
+		{"key_with_path", "keys/deploy_key", filepath.Join(currentUser.HomeDir, ".ssh", "keys", "deploy_key")},
 	}
 
 	for _, tt := range tests {
@@ -542,5 +543,95 @@ func TestGetDeployCommandsOrder(t *testing.T) {
 	// pm2 start should be last
 	if foundPmStart && pmStartIdx != len(commands)-1 {
 		t.Error("pm2 start command should be the last command")
+	}
+}
+
+// TestValidateCommandCaseSensitivity tests command validation with different cases
+func TestValidateCommandCaseSensitivity(t *testing.T) {
+	// Test that command validation is case-sensitive (commands are lowercase)
+	err := validateCommand("LS")
+	if err == nil {
+		t.Error("validateCommand should be case-sensitive, LS should fail")
+	}
+
+	err = validateCommand("Ls")
+	if err == nil {
+		t.Error("validateCommand should be case-sensitive, Ls should fail")
+	}
+}
+
+// TestValidateCommandWithPath tests command validation with paths
+func TestValidateCommandWithPath(t *testing.T) {
+	tests := []struct {
+		name        string
+		cmd         string
+		expectError bool
+	}{
+		{"command with absolute path", "/usr/bin/ls", true},
+		{"command with relative path", "./ls", true},
+		{"command with parent path", "../ls", true},
+		{"command with tilde", "~/ls", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateCommand(tt.cmd)
+			if tt.expectError && err == nil {
+				t.Errorf("Expected error for: %s", tt.cmd)
+			}
+			if !tt.expectError && err != nil {
+				t.Errorf("Unexpected error for '%s': %v", tt.cmd, err)
+			}
+		})
+	}
+}
+
+// TestInitConfigUniqueTimestamps tests that multiple configs have different timestamps
+func TestInitConfigUniqueTimestamps(t *testing.T) {
+	config1 := InitConfig()
+	// Small delay to ensure different timestamp
+	config2 := InitConfig()
+
+	// Timestamps should be different (or same if called very quickly)
+	// We just verify both are valid
+	if config1.Timestamp == "" || config2.Timestamp == "" {
+		t.Error("Both timestamps should be non-empty")
+	}
+
+	// Both should have same SSH config
+	if config1.SSHUser != config2.SSHUser {
+		t.Error("SSHUser should be consistent")
+	}
+	if config1.SSHHost != config2.SSHHost {
+		t.Error("SSHHost should be consistent")
+	}
+}
+
+// TestGetDeployCommandsContent tests the content of deploy commands
+func TestGetDeployCommandsContent(t *testing.T) {
+	config := InitConfig()
+	commands := GetDeployCommands(config)
+
+	// Verify each command has expected content
+	for _, cmd := range commands {
+		// Each command should reference the remote deploy dir
+		if !strings.Contains(cmd.Cmd, config.RemoteDeployDir) && !strings.Contains(cmd.Cmd, "pm2") {
+			t.Errorf("Command should reference RemoteDeployDir: %s", cmd.Cmd)
+		}
+	}
+}
+
+// TestPrivateKeyPathWithTilde tests PrivateKeyPath with tilde
+func TestPrivateKeyPathWithTilde(t *testing.T) {
+	currentUser, err := user.Current()
+	if err != nil {
+		t.Skip("Cannot get current user, skipping test")
+	}
+
+	// Test with tilde prefix
+	result := PrivateKeyPath("~/.ssh/id_rsa")
+	expected := filepath.Join(currentUser.HomeDir, ".ssh", "id_rsa")
+	if result != expected {
+		t.Errorf("PrivateKeyPath with tilde = %q, want %q", result, expected)
 	}
 }

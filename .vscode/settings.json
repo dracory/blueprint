@@ -1,5 +1,7 @@
 {
     "cSpell.words": [
         "geostore"
-    ]
+    ],
+    "liveServer.settings.port": 5501,
+    "kiroAgent.configureMCP": "Disabled"
 }

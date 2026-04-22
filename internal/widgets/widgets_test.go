@@ -188,6 +188,60 @@ func TestPrintWidget_Render(t *testing.T) {
 	}
 }
 
+func TestPrintWidget_RenderWithNilRegistry(t *testing.T) {
+	widget := NewPrintWidget(nil)
+
+	testURL, _ := url.Parse("/test")
+	req := &http.Request{
+		URL: testURL,
+	}
+
+	// Should handle nil registry gracefully
+	result := widget.Render(req, "'test'", map[string]string{})
+	if result == "" {
+		t.Error("Render() with nil registry should return non-empty result")
+	}
+}
+
+func TestPrintWidget_RenderWithEmptyContent(t *testing.T) {
+	registry := testutils.Setup()
+	widget := NewPrintWidget(registry)
+
+	testURL, _ := url.Parse("/test")
+	req := &http.Request{
+		URL: testURL,
+	}
+
+	result := widget.Render(req, "", map[string]string{})
+	// Empty content should still return a result (empty or evaluated)
+	_ = result
+}
+
+func TestPrintWidget_RenderWithDifferentParams(t *testing.T) {
+	registry := testutils.Setup()
+	widget := NewPrintWidget(registry)
+
+	testURL, _ := url.Parse("/test?param=value")
+	req := &http.Request{
+		URL:    testURL,
+		Method: http.MethodGet,
+		Header: make(http.Header),
+	}
+
+	// Test with various content strings
+	contents := []string{
+		"'hello'",
+		"123",
+		"true",
+		"'/path'",
+	}
+
+	for _, content := range contents {
+		result := widget.Render(req, content, map[string]string{})
+		_ = result
+	}
+}
+
 func TestNewVisibleWidget(t *testing.T) {
 	// Test with nil registry
 	widget := NewVisibleWidget(nil)
@@ -240,6 +294,44 @@ func TestVisibleWidget_Render(t *testing.T) {
 	req := &http.Request{}
 	result := widget.Render(req, "Test content", map[string]string{})
 	// Result depends on environment matching, but should not panic
+	_ = result
+}
+
+func TestVisibleWidget_RenderWithParams(t *testing.T) {
+	registry := testutils.Setup()
+	widget := NewVisibleWidget(registry)
+
+	testURL, _ := url.Parse("/test")
+	req := &http.Request{
+		URL:    testURL,
+		Method: http.MethodGet,
+		Header: make(http.Header),
+	}
+
+	// Test with different params
+	params := []map[string]string{
+		{},
+		{"environment": "production"},
+		{"environment": "development"},
+		{"page": "home"},
+	}
+
+	for _, param := range params {
+		result := widget.Render(req, "Test content", param)
+		_ = result
+	}
+}
+
+func TestVisibleWidget_RenderWithNilRegistry(t *testing.T) {
+	widget := NewVisibleWidget(nil)
+
+	testURL, _ := url.Parse("/test")
+	req := &http.Request{
+		URL: testURL,
+	}
+
+	// Should handle nil registry gracefully without panic
+	result := widget.Render(req, "Test content", map[string]string{})
 	_ = result
 }
 
