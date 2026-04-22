@@ -6,7 +6,7 @@ import (
 	"log"
 	"log/slog"
 
-	// "project/internal/cmsblocks"
+	"project/internal/cmsblocks"
 	"project/internal/emails"
 	"project/internal/middlewares"
 	"project/internal/registry"
@@ -88,7 +88,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 	emails.InitEmailSender(registry)
 	middlewares.CmsAddMiddlewares(registry) // Add CMS middlewares
 	widgets.CmsAddShortcodes(registry)      // Add CMS shortcodes
-	// cmsblocks.CmsAddBlockTypes(registry)    // Add CMS block types
+	cmsblocks.CmsAddBlockTypes(registry)    // Add CMS block types
 
 	return nil
 }
