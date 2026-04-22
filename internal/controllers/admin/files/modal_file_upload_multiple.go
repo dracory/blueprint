@@ -120,11 +120,16 @@ function handleDrop(e) {
 }
 
 function handleFiles(files) {
-    if (files.length > 0) {
-        displayFiles(files);
-        uploadBtn.disabled = false;
-        clearBtn.style.display = 'inline-block';
-    }
+	if (files.length > 0) {
+		// Use DataTransfer to set files on the input element
+		const dt = new DataTransfer();
+		Array.from(files).forEach(file => dt.items.add(file));
+		fileInput.files = dt.files;
+
+		displayFiles(files);
+		uploadBtn.disabled = false;
+		clearBtn.style.display = 'inline-block';
+	}
 }
 
 // File input change handler

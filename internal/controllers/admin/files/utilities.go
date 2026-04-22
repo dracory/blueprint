@@ -14,9 +14,6 @@ func (c *FileManagerController) HumanFilesize(size int64) string {
 	for n := size / unit; n >= unit; n /= unit {
 		div *= unit
 		exp++
-		if exp >= 5 { // Prevent index out of bounds for "kMGTPE"[exp]
-			break
-		}
 	}
 	return fmt.Sprintf("%.1f %cB",
 		float64(size)/float64(div), "kMGTPE"[exp])
