@@ -3,6 +3,7 @@ package post_update
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/url"
@@ -98,13 +99,18 @@ func (c *postVersioningComponent) loadVersions() error {
 		return nil
 	}
 
-	versions, err := c.registry.GetBlogStore().VersioningList(context.Background(), blogstore.NewVersioningQuery().
-		SetEntityType(blogstore.VERSIONING_TYPE_POST).
-		SetEntityID(c.PostID).
-		SetOrderBy(versionstore.COLUMN_CREATED_AT).
-		SetSortOrder(sb.DESC).
-		SetLimit(50)) // Limit to last 50 versions
+	if c.PostID == "" {
+		return errors.New("post ID is required to load versions")
+	}
 
+	query := blogstore.NewVersioningQuery()
+	query.SetEntityType(blogstore.VERSIONING_TYPE_POST)
+	query.SetEntityID(c.PostID)
+	query.SetOrderBy(versionstore.COLUMN_CREATED_AT)
+	query.SetSortOrder(sb.DESC)
+	query.SetLimit(50)
+
+	versions, err := c.registry.GetBlogStore().VersioningList(context.Background(), query)
 	if err != nil {
 		return err
 	}
@@ -542,4 +548,3 @@ func getVersionChanges(currentVersion, previousVersion map[string]interface{}) [
 
 	return changes
 }
-

@@ -33,5 +33,7 @@ func TestWidgetInterface(t *testing.T) {
 	// An interface is nil only when both type and value are nil
 	var widget Widget
 	// widget is nil at this point which is expected
-	_ = widget
+	if widget != nil {
+		t.Error("Widget interface should be nil by default")
+	}
 }

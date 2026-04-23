@@ -43,7 +43,8 @@ func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Reque
 				Styles:     options.Styles,
 			}).ToHTML()
 		},
-		AdminHomeURL: links.Admin().Home(),
+		AdminHomeURL:    links.Admin().Home(),
+		MediaManagerURL: links.Admin().FileManager(),
 	})
 
 	if err != nil {

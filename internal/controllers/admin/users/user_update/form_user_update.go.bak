@@ -15,32 +15,26 @@ import (
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
 	"github.com/dracory/sb"
-	"github.com/dracory/taskstore"
 	"github.com/dracory/userstore"
 )
 
 type formUserUpdate struct {
 	liveflux.Base
-	registry                registry.RegistryInterface
-	UserID                  string
-	ReturnURL               string
-	FormStatus              string
-	FormFirstName           string
-	FormLastName            string
-	FormEmail               string
-	FormMemo                string
-	FormBusiness            string
-	FormPhone               string
-	FormCountry             string
-	FormTimezone            string
-	FormError               string
-	FormSuccess             string
-	FormRedirectTo          string
-	FieldStatusFirstName    bool
-	FieldStatusLastName     bool
-	FieldStatusEmail        bool
-	FieldStatusBusinessName bool
-	FieldStatusPhone        bool
+	registry       registry.RegistryInterface
+	UserID         string
+	ReturnURL      string
+	FormStatus     string
+	FormFirstName  string
+	FormLastName   string
+	FormEmail      string
+	FormMemo       string
+	FormBusiness   string
+	FormPhone      string
+	FormCountry    string
+	FormTimezone   string
+	FormError      string
+	FormSuccess    string
+	FormRedirectTo string
 
 	StatusOptions []userStatusOption
 	DisplayName   string
@@ -96,12 +90,6 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 		c.ReturnURL = links.Admin().UsersUserManager()
 	}
 
-	c.FieldStatusFirstName = params["field_status_first_name"] == "true"
-	c.FieldStatusLastName = params["field_status_last_name"] == "true"
-	c.FieldStatusEmail = params["field_status_email"] == "true"
-	c.FieldStatusBusinessName = params["field_status_business_name"] == "true"
-	c.FieldStatusPhone = params["field_status_phone"] == "true"
-
 	if c.registry.GetUserStore() == nil {
 		c.FormError = "User store is not configured"
 		return nil
@@ -127,10 +115,15 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 	businessName := user.BusinessName()
 	phone := user.Phone()
 
-	// Use untokenize to decrypt user fields
 	if c.registry.GetConfig().GetVaultStoreUsed() && c.registry.GetVaultStore() != nil {
-		firstName, lastName, email, businessName, phone, _ = ext.UserUntokenize(ctx, c.registry, c.registry.GetConfig().GetVaultStoreKey(), user)
-		// Field status is already passed from controller, no need to re-check here
+		firstName, lastName, email, businessName, phone, err = ext.UserUntokenize(ctx, c.registry, c.registry.GetConfig().GetVaultStoreKey(), user)
+		if err != nil {
+			if c.registry.GetLogger() != nil {
+				c.registry.GetLogger().Error("Error untokenizing user", "error", err.Error())
+			}
+			c.FormError = "Error reading user details"
+			return nil
+		}
 	}
 
 	c.FormStatus = user.Status()
@@ -191,14 +184,6 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		data = url.Values{}
 	}
 
-	// Prevent updates when any field tokens are unreadable
-	hasUnreadableFields := !c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail || !c.FieldStatusBusinessName || !c.FieldStatusPhone
-	if hasUnreadableFields {
-		c.FormError = "Cannot update user: some field tokens are unreadable. Please resolve the vault key issue first."
-		c.FormSuccess = ""
-		return nil
-	}
-
 	userID := strings.TrimSpace(firstNonEmpty(data.Get("user_id"), c.UserID))
 	if userID == "" {
 		c.FormError = "User ID is required"
@@ -227,9 +212,6 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		c.FormSuccess = ""
 		return nil
 	}
-
-	// Store original email for comparison
-	originalEmailToken := user.Email()
 
 	c.FormStatus = strings.TrimSpace(data.Get("user_status"))
 	c.FormFirstName = strings.TrimSpace(data.Get("user_first_name"))
@@ -332,29 +314,6 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		return nil
 	}
 
-	// If email changed and vault is enabled, enqueue blind index rebuild for email
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetVaultStore() != nil {
-		newEmailToken := user.Email()
-		if originalEmailToken != newEmailToken {
-			if c.registry.GetTaskStore() != nil {
-				_, err := c.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
-					ctx,
-					taskstore.DefaultQueueName,
-					"BlindIndexUpdate",
-					map[string]any{
-						"index":    "email",
-						"truncate": "no",
-					},
-				)
-				if err != nil {
-					if c.registry.GetLogger() != nil {
-						c.registry.GetLogger().Error("Error enqueuing blind index rebuild", "error", err.Error())
-					}
-				}
-			}
-		}
-	}
-
 	c.FormError = ""
 	c.FormSuccess = "User saved successfully"
 	c.DisplayName = strings.TrimSpace(strings.Join([]string{c.FormFirstName, c.FormLastName}, " "))
@@ -398,36 +357,9 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 		}
 	}
 
-	// Warning when specific field tokens are unreadable
-	var unreadableFields []string
-	if !c.FieldStatusFirstName {
-		unreadableFields = append(unreadableFields, "first name")
-	}
-	if !c.FieldStatusLastName {
-		unreadableFields = append(unreadableFields, "last name")
-	}
-	if !c.FieldStatusEmail {
-		unreadableFields = append(unreadableFields, "email")
-	}
-	if !c.FieldStatusBusinessName {
-		unreadableFields = append(unreadableFields, "business name")
-	}
-	if !c.FieldStatusPhone {
-		unreadableFields = append(unreadableFields, "phone")
-	}
-
-	if len(unreadableFields) > 0 {
-		fieldsList := strings.Join(unreadableFields, ", ")
-		alerts = alerts.Child(hb.Div().
-			Class("alert alert-warning").
-			Child(hb.I().Class("bi bi-exclamation-triangle-fill me-2")).
-			Text("The following field tokens could not be decrypted: " + fieldsList + ". This may be due to a vault key mismatch. These fields show encrypted data and are disabled until the tokens can be read."))
-	}
-
 	statusSelect := hb.Select().
 		Class("form-select").
-		Name("user_status").
-		AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail, "disabled", "disabled")
+		Name("user_status")
 	for _, option := range c.StatusOptions {
 		statusSelect = statusSelect.Child(
 			hb.Option().
@@ -441,7 +373,6 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 		Type("submit").
 		Class("btn btn-primary").
 		Attr("data-flux-action", "apply").
-		AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail || !c.FieldStatusBusinessName || !c.FieldStatusPhone, "disabled", "disabled").
 		Child(hb.I().Class("bi bi-check2 me-2")).
 		Text("Apply")
 
@@ -449,7 +380,6 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 		Type("submit").
 		Class("btn btn-success").
 		Attr("data-flux-action", "save").
-		AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail || !c.FieldStatusBusinessName || !c.FieldStatusPhone, "disabled", "disabled").
 		Child(hb.I().Class("bi bi-check2-all me-2")).
 		Text("Save & Close")
 
@@ -471,8 +401,7 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 	countrySelect := hb.Select().
 		Class("form-select").
 		Name("user_country").
-		Attr("onchange", `document.getElementById('btnCountryChange').click();`).
-		AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail, "disabled", "disabled")
+		Attr("onchange", `document.getElementById('btnCountryChange').click();`)
 	countrySelect = countrySelect.Child(
 		hb.Option().
 			Value("").
@@ -490,8 +419,7 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 
 	timezoneSelect := hb.Select().
 		Class("form-select").
-		Name("user_timezone").
-		AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail, "disabled", "disabled")
+		Name("user_timezone")
 	timezoneSelect = timezoneSelect.Child(
 		hb.Option().
 			Value("").
@@ -524,19 +452,19 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 			Child(statusSelect)).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("First Name")).
-			Child(hb.Input().Class("form-control").Name("user_first_name").Value(c.FormFirstName).AttrIf(!c.FieldStatusFirstName, "disabled", "disabled"))).
+			Child(hb.Input().Class("form-control").Name("user_first_name").Value(c.FormFirstName))).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Last Name")).
-			Child(hb.Input().Class("form-control").Name("user_last_name").Value(c.FormLastName).AttrIf(!c.FieldStatusLastName, "disabled", "disabled"))).
+			Child(hb.Input().Class("form-control").Name("user_last_name").Value(c.FormLastName))).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Email")).
-			Child(hb.Input().Class("form-control").Name("user_email").Value(c.FormEmail).AttrIf(!c.FieldStatusEmail, "disabled", "disabled"))).
+			Child(hb.Input().Class("form-control").Name("user_email").Value(c.FormEmail))).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Business Name")).
-			Child(hb.Input().Class("form-control").Name("user_business_name").Value(c.FormBusiness).AttrIf(!c.FieldStatusBusinessName, "disabled", "disabled"))).
+			Child(hb.Input().Class("form-control").Name("user_business_name").Value(c.FormBusiness))).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Phone")).
-			Child(hb.Input().Class("form-control").Name("user_phone").Value(c.FormPhone).AttrIf(!c.FieldStatusPhone, "disabled", "disabled"))).
+			Child(hb.Input().Class("form-control").Name("user_phone").Value(c.FormPhone))).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Country")).
 			Child(countrySelect)).
@@ -545,7 +473,7 @@ func (c *formUserUpdate) Render(ctx context.Context) hb.TagInterface {
 			Child(timezoneSelect)).
 		Child(hb.Div().Class("mb-3").
 			Child(hb.Label().Class("form-label").Text("Admin Notes")).
-			Child(hb.Textarea().Class("form-control").Name("user_memo").Text(c.FormMemo).AttrIf(!c.FieldStatusFirstName || !c.FieldStatusLastName || !c.FieldStatusEmail || !c.FieldStatusBusinessName || !c.FieldStatusPhone, "disabled", "disabled"))).
+			Child(hb.Textarea().Class("form-control").Name("user_memo").Text(c.FormMemo))).
 		Child(buildActions("mt-4"))
 
 	content := hb.Div().

@@ -2,8 +2,8 @@ package post_manager
 
 import (
 	"net/http"
-	"project/pkg/blogadmin/shared"
 	"project/internal/links"
+	"project/pkg/blogadmin/shared"
 	"strings"
 
 	"github.com/dracory/blogstore"
@@ -12,6 +12,7 @@ import (
 	"github.com/samber/lo"
 )
 
+// Deprecated: Used only by deprecated server-side rendering. Use Vue.js posts.html instead.
 // tablePostList returns a table of posts
 func tablePostList(data postManagerControllerData) hb.TagInterface {
 	table := hb.Table().
@@ -119,6 +120,7 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 	})
 }
 
+// Deprecated: Used only by deprecated server-side rendering. Use Vue.js instead.
 func sortableColumnLabel(data postManagerControllerData, tableLabel string, columnName string) hb.TagInterface {
 	isSelected := strings.EqualFold(data.sortBy, columnName)
 
@@ -144,6 +146,7 @@ func sortableColumnLabel(data postManagerControllerData, tableLabel string, colu
 		Href(link)
 }
 
+// Deprecated: Used only by deprecated server-side rendering. Use Vue.js instead.
 func sortingIndicator(columnName string, sortByColumnName string, sortOrder string) hb.TagInterface {
 	isSelected := strings.EqualFold(sortByColumnName, columnName)
 
@@ -160,6 +163,7 @@ func sortingIndicator(columnName string, sortByColumnName string, sortOrder stri
 	return sortingIndicator
 }
 
+// Deprecated: Used only by deprecated server-side rendering. Use Vue.js instead.
 func tableFilter(data postManagerControllerData) hb.TagInterface {
 	statusList := []map[string]string{
 		{"id": "", "name": "All Statuses"},
@@ -256,6 +260,7 @@ func tableFilter(data postManagerControllerData) hb.TagInterface {
 		})
 }
 
+// Deprecated: Used only by deprecated server-side rendering. Use Vue.js instead.
 func tablePagination(data postManagerControllerData, count int, page int, perPage int) hb.TagInterface {
 	url := shared.NewLinks("/admin/blog").PostManager(map[string]string{
 		"search":    data.search,
@@ -280,4 +285,3 @@ func tablePagination(data postManagerControllerData, count int, page int, perPag
 		Class(`d-flex justify-content-left mt-5 pagination-primary-soft rounded mb-0`).
 		HTML(pagination)
 }
-

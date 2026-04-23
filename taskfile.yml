@@ -175,6 +175,78 @@ tasks:
   # ======================================================================== #
 
   # ======================================================================== #
+  # START: Load Testing                                                      #
+  # ======================================================================== #
+
+  loadtest:
+    desc: Run load test with default settings (10 concurrent, 30s duration)
+    cmds:
+      - echo "Running load test..."
+      - go run ./cmd/loadtest
+      - echo "Done!"
+    silent: true
+
+  loadtest:small:
+    desc: Realistic small website load (5 concurrent, 10 req/sec, 1m) - ~600 requests
+    cmds:
+      - echo "Running small website load test..."
+      - go run ./cmd/loadtest -c=5 -r=10 -d=1m
+      - echo "Done!"
+    silent: true
+
+  loadtest:medium:
+    desc: Realistic medium website load (10 concurrent, 50 req/sec, 1m) - ~3,000 requests
+    cmds:
+      - echo "Running medium website load test..."
+      - go run ./cmd/loadtest -c=10 -r=50 -d=1m
+      - echo "Done!"
+    silent: true
+
+  loadtest:large:
+    desc: Realistic large website load (20 concurrent, 200 req/sec, 1m) - ~12,000 requests
+    cmds:
+      - echo "Running large website load test..."
+      - go run ./cmd/loadtest -c=20 -r=200 -d=1m
+      - echo "Done!"
+    silent: true
+
+  loadtest:stress:
+    desc: Stress test - find breaking point (50 concurrent, no rate limit, 1m)
+    cmds:
+      - echo "Running stress test..."
+      - go run ./cmd/loadtest -c=50 -d=1m
+      - echo "Done!"
+    silent: true
+
+  loadtest:spike:
+    desc: Spike test - sudden traffic burst (100 concurrent, 30s)
+    cmds:
+      - echo "Running spike test..."
+      - go run ./cmd/loadtest -c=100 -d=30s
+      - echo "Done!"
+    silent: true
+
+  loadtest:blog:
+    desc: Load test blog endpoint (50 concurrent, 1m duration)
+    cmds:
+      - echo "Running load test on /blog..."
+      - go run ./cmd/loadtest -url=http://pressplugs.local/blog -c=50 -d=1m
+      - echo "Done!"
+    silent: true
+
+  loadtest:api:
+    desc: Load test API endpoint (50 concurrent, 1m duration)
+    cmds:
+      - echo "Running load test on /api/posts..."
+      - go run ./cmd/loadtest -url=http://pressplugs.local/api/posts -c=50 -d=1m
+      - echo "Done!"
+    silent: true
+
+  # ======================================================================== #
+  # END: Load Testing                                                        #
+  # ======================================================================== #
+
+  # ======================================================================== #
   # START: Swagger                                                           #
   # ======================================================================== #
 
