@@ -1,12 +1,15 @@
 package routes
 
 import (
-	"project/internal/middlewares"
-	"project/internal/registry"
+	"net/http"
 	"time"
 
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
+
+	"project/internal/middlewares"
+	"project/internal/middlewares/httpsredirect"
+	"project/internal/registry"
 )
 
 // Rate limit constants
@@ -80,7 +83,11 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 		!registry.GetConfig().IsEnvTesting() &&
 		!registry.GetConfig().IsEnvDevelopment() {
 		globalMiddlewares = append(globalMiddlewares,
-			middlewares.NewHTTPSRedirectMiddleware(),
+			httpsredirect.NewHTTPSRedirectMiddlewareWithConfig(httpsredirect.Config{
+				SkipFunc: func(r *http.Request) bool {
+					return r.URL.Path == "/api/internal/webhook"
+				},
+			}),
 		)
 	}
 

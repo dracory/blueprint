@@ -9,14 +9,6 @@ import (
 	"github.com/dracory/rtr"
 )
 
-// allowedEmails is a map of allowed emails
-// if the email is not in the map, the user is not allowed to access the page
-// this is a simple way to restrict access to certain pages to certain emails
-// if the map is empty, all emails are allowed
-var allowedEmails = map[string]struct{}{
-	"info@sinevia.com": {},
-}
-
 func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Email Allowlist Middleware").
@@ -30,16 +22,42 @@ func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.Middle
 					return
 				}
 
-				// if the map is empty, all emails are allowed
+				allowedEmails := registry.GetConfig().GetEmailsAllowedAccess()
+
+				// if the list is empty, all emails are allowed
 				if len(allowedEmails) == 0 {
 					next.ServeHTTP(w, r)
 					return
 				}
 
 				email := user.Email()
-				_, found := allowedEmails[email]
+				// Untokenize email if vault is enabled (with caching to reduce vault hits)
+				if registry.GetConfig().GetUserStoreVaultEnabled() && email != "" {
+					cacheKey := "email_untokenize:" + email
+					// Try to get from cache first
+					cachedEmail, err := registry.GetCacheStore().GetJSON(cacheKey, "")
+					if err == nil && cachedEmail != "" {
+						email = cachedEmail.(string)
+					} else {
+						// Cache miss - decrypt from vault
+						untokenizedEmail, err := registry.GetVaultStore().TokenRead(r.Context(), email, registry.GetConfig().GetVaultStoreKey())
+						if err == nil {
+							email = untokenizedEmail
+							// Cache for 5 minutes
+							registry.GetCacheStore().SetJSON(cacheKey, email, 5*60)
+						}
+					}
+				}
 
-				// if the email is not in the map, the user is not allowed to access the page
+				found := false
+				for _, allowed := range allowedEmails {
+					if allowed == email {
+						found = true
+						break
+					}
+				}
+
+				// if the email is not in the list, the user is not allowed to access the page
 				if found {
 					next.ServeHTTP(w, r)
 					return

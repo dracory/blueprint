@@ -90,6 +90,9 @@ type AppConfigInterface interface {
 type AuthConfigInterface interface {
 	SetRegistrationEnabled(bool)
 	GetRegistrationEnabled() bool
+
+	SetEmailsAllowedAccess([]string)
+	GetEmailsAllowedAccess() []string
 }
 
 // ============================================================================

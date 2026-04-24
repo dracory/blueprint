@@ -93,6 +93,7 @@ const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 // ============================================================================
 
 const KEY_AUTH_REGISTRATION_ENABLED = "AUTH_REGISTRATION_ENABLED"
+const KEY_AUTH_EMAILS_ALLOWED_ACCESS = "AUTH_EMAILS_ALLOWED_ACCESS"
 
 // ============================================================================
 // == END: Auth Configurations

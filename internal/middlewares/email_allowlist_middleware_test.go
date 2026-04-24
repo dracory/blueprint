@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/config"
+	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/testutils"
+	"strings"
 	"testing"
 
 	"github.com/dracory/test"
@@ -60,16 +62,11 @@ func TestEmailAllowlistMiddleware_UnauthenticatedRedirectsToLogin(t *testing.T) 
 }
 
 func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
-	original := allowedEmails
-	allowedEmails = map[string]struct{}{
-		"allowed@example.com": {},
-	}
-	defer func() { allowedEmails = original }()
-
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
+	cfg.SetEmailsAllowedAccess([]string{"allowed@example.com"})
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
@@ -126,13 +123,13 @@ func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
 }
 
 func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
-	original := allowedEmails
-	defer func() { allowedEmails = original }()
+	allowedEmail := "allowed@example.com"
 
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
+	cfg.SetEmailsAllowedAccess([]string{allowedEmail})
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
@@ -147,8 +144,6 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	allowedEmail := "allowed@example.com"
-	allowedEmails = map[string]struct{}{allowedEmail: {}}
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 	user.SetEmail(allowedEmail)
 	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
@@ -156,8 +151,7 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 	}
 
 	called := false
-
-	_, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		called = true
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -171,24 +165,21 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if response.StatusCode != http.StatusOK {
-		t.Fatalf("expected OK, got %d", response.StatusCode)
+	if !called {
+		t.Fatalf("expected next handler to be called, got body: %s", body)
 	}
 
-	if !called {
-		t.Fatal("next handler should be called")
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.StatusCode)
 	}
 }
 
 func TestEmailAllowlistMiddleware_AllEmailsAllowedWhenMapEmpty(t *testing.T) {
-	original := allowedEmails
-	allowedEmails = map[string]struct{}{}
-	defer func() { allowedEmails = original }()
-
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
+	cfg.SetEmailsAllowedAccess([]string{})
 	registry := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
@@ -231,5 +222,105 @@ func TestEmailAllowlistMiddleware_AllEmailsAllowedWhenMapEmpty(t *testing.T) {
 
 	if !called {
 		t.Fatal("next handler should be called")
+	}
+}
+
+func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
+	allowedEmail := "vault@example.com"
+
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	cfg.SetUserStoreVaultEnabled(true)
+	cfg.SetVaultStoreUsed(true)
+	cfg.SetVaultStoreKey("test-vault-key")
+	cfg.SetEmailsAllowedAccess([]string{allowedEmail})
+	registry := testutils.Setup(testutils.WithCfg(cfg))
+
+	user, session, err := testutils.SeedUserAndSession(
+		registry.GetUserStore(),
+		registry.GetSessionStore(),
+		"vault-user",
+		httptest.NewRequest("GET", "/", nil),
+		1,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Tokenize the email so the vault is used
+	email := allowedEmail
+	_, _, emailToken, _, _, err := ext.UserTokenize(
+		context.Background(),
+		registry.GetVaultStore(),
+		registry.GetConfig().GetVaultStoreKey(),
+		user,
+		"Test", "User", email, "", "",
+	)
+	if err != nil {
+		t.Fatalf("Failed to tokenize email: %v", err)
+	}
+
+	user.SetEmail(emailToken)
+	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+		t.Fatal(err)
+	}
+
+	// First call should hit the vault and cache
+	user.SetStatus(userstore.USER_STATUS_ACTIVE)
+
+	// Verify tokenization succeeded
+	if !strings.HasPrefix(user.Email(), "tk_") {
+		t.Fatalf("Expected tokenized email, got: %s", user.Email())
+	}
+
+	// First middleware call
+	called1 := false
+	body1, response1, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+		called1 = true
+		w.WriteHeader(http.StatusOK)
+	}, test.NewRequestOptions{
+		Context: map[any]any{
+			config.AuthenticatedUserContextKey{}:    user,
+			config.AuthenticatedSessionContextKey{}: session,
+		},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !called1 {
+		t.Fatalf("expected next handler to be called on first call, got body: %s", body1)
+	}
+
+	if response1.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d on first call, got %d", http.StatusOK, response1.StatusCode)
+	}
+
+	// Second call should hit the cache
+	called2 := false
+	body2, response2, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+		called2 = true
+		w.WriteHeader(http.StatusOK)
+	}, test.NewRequestOptions{
+		Context: map[any]any{
+			config.AuthenticatedUserContextKey{}:    user,
+			config.AuthenticatedSessionContextKey{}: session,
+		},
+	})
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !called2 {
+		t.Fatalf("expected next handler to be called on second call, got body: %s", body2)
+	}
+
+	if response2.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d on second call, got %d", http.StatusOK, response2.StatusCode)
 	}
 }

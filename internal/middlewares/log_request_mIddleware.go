@@ -61,7 +61,8 @@ func shouldSkipLogForPath(rawPath string) bool {
 	path := strings.TrimLeft(rawPath, "/")
 
 	skipPrefixes := []string{
-		"th/",
+		"mcp/", // MCP endpoints
+		"th/",  // thumbnails
 	}
 
 	skipSuffixes := []string{
