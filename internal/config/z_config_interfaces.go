@@ -174,6 +174,10 @@ type EmailConfigInterface interface {
 type EncryptionConfigInterface interface {
 	SetEnvEncryptionKey(string)
 	GetEnvEncryptionKey() string
+	SetEnvEncUsed(bool)
+	GetEnvEncUsed() bool
+	SetEnvEncPublicKey(string)
+	GetEnvEncPublicKey() string
 }
 
 // ============================================================================

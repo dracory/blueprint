@@ -86,8 +86,13 @@ func newMountedForm(t *testing.T, registry registry.RegistryInterface, user user
 	}
 
 	if err := form.Mount(context.Background(), map[string]string{
-		"user_id":    user.ID(),
-		"return_url": returnURL,
+		"user_id":                    user.ID(),
+		"return_url":                 returnURL,
+		"field_status_first_name":    "true",
+		"field_status_last_name":     "true",
+		"field_status_email":         "true",
+		"field_status_business_name": "true",
+		"field_status_phone":         "true",
 	}); err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}

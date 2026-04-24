@@ -9,6 +9,15 @@ import (
 	"github.com/dracory/userstore"
 )
 
+// UserUntokenizeFieldStatus tracks which fields were successfully untokenized
+type UserUntokenizeFieldStatus struct {
+	FirstName    bool
+	LastName     bool
+	Email        bool
+	BusinessName bool
+	Phone        bool
+}
+
 func UserUntokenize(
 	ctx context.Context,
 	registry registry.RegistryInterface,
@@ -85,6 +94,65 @@ func UserUntokenize(
 	phone = untokenized[keyPhone]
 
 	return firstName, lastName, email, businessName, phone, nil
+}
+
+// UserUntokenizeFieldByField untokenizes each field individually and returns
+// the decrypted values along with a status map indicating which fields failed.
+// This allows for granular handling of corrupted tokens.
+func UserUntokenizeFieldByField(
+	ctx context.Context,
+	registry registry.RegistryInterface,
+	vaultKey string,
+	user userstore.UserInterface,
+) (
+	firstName string,
+	lastName string,
+	email string,
+	businessName string,
+	phone string,
+	status UserUntokenizeFieldStatus,
+) {
+	if registry.GetVaultStore() == nil {
+		return user.FirstName(), user.LastName(), user.Email(), user.BusinessName(), user.Phone(), UserUntokenizeFieldStatus{}
+	}
+
+	if user == nil {
+		return "", "", "", "", "", UserUntokenizeFieldStatus{}
+	}
+
+	status = UserUntokenizeFieldStatus{
+		FirstName:    true,
+		LastName:     true,
+		Email:        true,
+		BusinessName: true,
+		Phone:        true,
+	}
+
+	// Helper function to untokenize a single field
+	// Returns the decrypted value on success, or the original token on failure
+	untokenizeField := func(token, key string) (string, bool) {
+		if token == "" {
+			return "", true // Empty token is not an error
+		}
+		result, err := registry.GetVaultStore().TokensReadToResolvedMap(
+			ctx,
+			map[string]string{key: token},
+			vaultKey,
+		)
+		if err != nil {
+			registry.GetLogger().Error("Error untokenizing field", slog.String("field", key), slog.String("error", err.Error()))
+			return token, false // Return original token on error, mark as failed
+		}
+		return result[key], true
+	}
+
+	firstName, status.FirstName = untokenizeField(user.FirstName(), "first_name")
+	lastName, status.LastName = untokenizeField(user.LastName(), "last_name")
+	email, status.Email = untokenizeField(user.Email(), "email")
+	businessName, status.BusinessName = untokenizeField(user.BusinessName(), "business_name")
+	phone, status.Phone = untokenizeField(user.Phone(), "phone")
+
+	return firstName, lastName, email, businessName, phone, status
 }
 
 // UserUntokenizeTransparently returns user fields as plaintext regardless of

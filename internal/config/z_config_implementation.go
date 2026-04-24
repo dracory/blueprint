@@ -93,6 +93,8 @@ type configImplementation struct {
 
 	// Encryption
 	envEncryptionKey string
+	envEncUsed       bool
+	envEncPublicKey  string
 
 	// CMS MCP
 	cmsMcpApiKey string
@@ -139,19 +141,17 @@ func NewFromEnv() (ConfigInterface, error) {
 	cfg.setAppConfig(appConfig(v))
 
 	// Load encryption config and check if encryption is used
-	privateKey := env.GetString(KEY_ENVENC_KEY_PRIVATE)
-	encryptionUsed := privateKey != ""
+	cfg.setEnvConfig(envConfig())
+	encryptionUsed := cfg.GetEnvEncUsed() && cfg.GetEnvEncryptionKey() != ""
 
 	if encryptionUsed {
 		v.RequireWhen(true, KEY_ENVENC_KEY_PRIVATE,
-			"required when encryption is enabled", privateKey)
+			"required when encryption is enabled", cfg.GetEnvEncryptionKey())
 	}
-
-	cfg.SetEnvEncryptionKey(privateKey)
 
 	// Initialize encrypted environment variables BEFORE other config loaders read them
 	if encryptionUsed {
-		if err := baseCfg.InitializeEnvEncVariablesFromResources(cfg.GetAppEnv(), ENVENC_KEY_PUBLIC, privateKey, resources.Resource); err != nil {
+		if err := baseCfg.InitializeEnvEncVariablesFromResources(cfg.GetAppEnv(), cfg.GetEnvEncPublicKey(), cfg.GetEnvEncryptionKey(), resources.Resource); err != nil {
 			v.Add(err)
 		} else {
 			cfg.SetEnvEncryptionKey("removed") // reset the private key
@@ -502,6 +502,28 @@ func (c *configImplementation) SetEnvEncryptionKey(v string) {
 
 func (c *configImplementation) GetEnvEncryptionKey() string {
 	return c.envEncryptionKey
+}
+
+func (c *configImplementation) SetEnvEncUsed(v bool) {
+	c.envEncUsed = v
+}
+
+func (c *configImplementation) GetEnvEncUsed() bool {
+	return c.envEncUsed
+}
+
+func (c *configImplementation) SetEnvEncPublicKey(v string) {
+	c.envEncPublicKey = v
+}
+
+func (c *configImplementation) GetEnvEncPublicKey() string {
+	return c.envEncPublicKey
+}
+
+func (c *configImplementation) setEnvConfig(s envSettings) {
+	c.envEncUsed = s.used
+	c.envEncPublicKey = s.keyPublic
+	c.envEncryptionKey = s.keyPrivate
 }
 
 // ============================================================================

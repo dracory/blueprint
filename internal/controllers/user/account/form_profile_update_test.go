@@ -21,26 +21,52 @@ func userTokenize(registry registry.RegistryInterface, user userstore.UserInterf
 	vaultStore := registry.GetVaultStore()
 	vaultKey := registry.GetConfig().GetVaultStoreKey()
 
-	firstNameToken, lastNameToken, emailToken, phoneToken, businessToken, err := ext.UserTokenize(
-		ctx,
-		vaultStore,
-		vaultKey,
-		user,
-		"John",
-		"Doe",
-		"john@example.com",
-		"+44111222333",
-		"JD Consulting",
-	)
+	ensureToken := func(existingToken string, value string, field string) (string, error) {
+		if existingToken == "" {
+			token, err := vaultStore.TokenCreate(ctx, value, vaultKey, 20)
+			if err != nil {
+				return "", errors.New("TokenCreate (" + field + ") returned error: " + err.Error())
+			}
+			return token, nil
+		}
+
+		if err := vaultStore.TokenUpdate(ctx, existingToken, value, vaultKey); err != nil {
+			return "", errors.New("TokenUpdate (" + field + ") returned error: " + err.Error())
+		}
+
+		return existingToken, nil
+	}
+
+	emailToken, err := ensureToken(user.Email(), "john@example.com", "email")
 	if err != nil {
 		return err
 	}
 
+	firstNameToken, err := ensureToken(user.FirstName(), "John", "first name")
+	if err != nil {
+		return err
+	}
+
+	lastNameToken, err := ensureToken(user.LastName(), "Doe", "last name")
+	if err != nil {
+		return err
+	}
+
+	businessNameToken, err := ensureToken(user.BusinessName(), "JD Consulting", "business name")
+	if err != nil {
+		return err
+	}
+
+	phoneToken, err := ensureToken(user.Phone(), "+44111222333", "phone")
+	if err != nil {
+		return err
+	}
+
+	user.SetEmail(emailToken)
 	user.SetFirstName(firstNameToken)
 	user.SetLastName(lastNameToken)
-	user.SetEmail(emailToken)
+	user.SetBusinessName(businessNameToken)
 	user.SetPhone(phoneToken)
-	user.SetBusinessName(businessToken)
 	user.SetCountry("GB")
 	user.SetTimezone("Europe/London")
 

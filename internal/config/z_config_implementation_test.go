@@ -19,6 +19,9 @@ func TestLoad_Success(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -94,6 +97,9 @@ func TestLoad_EnvEncryptionKeyOptional(t *testing.T) {
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
 	}
 	// No ENVENC_KEY_PRIVATE set
 	defer cleanupEnv()
@@ -196,6 +202,9 @@ func TestLoad_StripeConfiguration(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -226,6 +235,9 @@ func TestLoad_MailConfiguration(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -250,6 +262,9 @@ func TestLoad_TranslationDefaults(t *testing.T) {
 	mustSetenv(t, KEY_DB_DATABASE, ":memory:")
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
 	}
 	defer cleanupEnv()
 
@@ -326,6 +341,9 @@ func TestConfigGetters(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -366,6 +384,9 @@ func TestDatabaseGetters(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -391,6 +412,9 @@ func TestAuthRegistrationEnabled(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -412,6 +436,9 @@ func TestAppDebugMode(t *testing.T) {
 	mustSetenv(t, KEY_APP_DEBUG, "true")
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
 	}
 	defer cleanupEnv()
 
@@ -436,6 +463,9 @@ func TestLoad_GeminiConfiguration(t *testing.T) {
 	mustSetenv(t, KEY_GEMINI_API_DEFAULT_MODEL, "gemini-1.5-pro")
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
 	}
 	defer cleanupEnv()
 
@@ -464,6 +494,9 @@ func TestLoad_AnthropicConfiguration(t *testing.T) {
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
 	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
+	}
 	defer cleanupEnv()
 
 	cfg, err := NewFromEnv()
@@ -490,6 +523,9 @@ func TestLoad_OpenRouterConfiguration(t *testing.T) {
 	mustSetenv(t, KEY_OPENROUTER_API_DEFAULT_MODEL, "openai/gpt-4o")
 	if cmsStoreUsed {
 		mustSetenv(t, KEY_CMS_STORE_TEMPLATE_ID, "test-template")
+	}
+	if vaultStoreUsed {
+		mustSetenv(t, KEY_VAULT_STORE_KEY, "test-vault-key")
 	}
 	defer cleanupEnv()
 

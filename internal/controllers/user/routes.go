@@ -45,6 +45,7 @@ func applyUserMiddleware(registry registry.RegistryInterface, routes []rtr.Route
 	for _, route := range routes {
 		middlewaresToAdd := []rtr.MiddlewareInterface{
 			middlewares.NewUserMiddleware(registry),
+			middlewares.NewEmailAllowlistMiddleware(registry),
 		}
 
 		route.AddBeforeMiddlewares(middlewaresToAdd)

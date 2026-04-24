@@ -12,6 +12,7 @@ func TestInitializeURLBuilder(t *testing.T) {
 }
 
 func TestRootURL(t *testing.T) {
+	// In testing mode, RootURL always returns empty string
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
 

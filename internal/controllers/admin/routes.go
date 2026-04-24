@@ -82,6 +82,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	for _, route := range adminRoutes {
 		route.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 			middlewares.NewAdminMiddleware(registry),
+			middlewares.NewEmailAllowlistMiddleware(registry),
 		})
 	}
 

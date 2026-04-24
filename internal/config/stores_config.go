@@ -120,6 +120,9 @@ func storesConfig(env *envValidator) storesSettings {
 	env.RequireWhen(cmsStoreUsed, KEY_CMS_STORE_TEMPLATE_ID,
 		"required when `CMS_STORE_USED` is true", cmsStoreTemplateID)
 
+	env.RequireWhen(vaultStoreUsed, KEY_VAULT_STORE_KEY,
+		"required when `VAULT_STORE_USED` is true", vaultStoreKey)
+
 	return storesSettings{cmsStoreTemplateID: cmsStoreTemplateID, vaultStoreKey: vaultStoreKey}
 }
 

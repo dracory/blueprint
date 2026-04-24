@@ -64,7 +64,11 @@ func (a *admin) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get routes and find matching one
-	routes := Routes(a.opts.Registry)
+	routes, err := Routes(a.opts.Registry)
+	if err != nil {
+		http.Error(w, "Failed to load routes", http.StatusInternalServerError)
+		return
+	}
 
 	// Find matching route by path
 	for _, route := range routes {
