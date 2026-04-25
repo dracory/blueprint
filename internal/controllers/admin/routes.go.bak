@@ -71,7 +71,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		adminRoutes = append(adminRoutes, taskRoutes...)
 	}
 
-	userRoutes, err := adminUsers.Routes(registry)
+	userRoutes, err := adminUsers.UserRoutes(registry)
 	if err == nil {
 		adminRoutes = append(adminRoutes, userRoutes...)
 	}

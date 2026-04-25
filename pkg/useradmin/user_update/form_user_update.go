@@ -1,4 +1,4 @@
-package admin
+package user_update
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"project/internal/ext"
-	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/useradmin/shared"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/geostore"
@@ -93,7 +93,7 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 
 	c.ReturnURL = strings.TrimSpace(params["return_url"])
 	if c.ReturnURL == "" {
-		c.ReturnURL = links.Admin().UsersUserManager()
+		c.ReturnURL = shared.NewLinks("/admin/users").UserManager()
 	}
 
 	c.FieldStatusFirstName = params["field_status_first_name"] == "true"
@@ -228,8 +228,8 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 		return nil
 	}
 
-	// Store original email for comparison
-	originalEmailToken := user.Email()
+	// Store original email for comparison (plaintext before tokenizing)
+	originalEmail := user.Email()
 
 	c.FormStatus = strings.TrimSpace(data.Get("user_status"))
 	c.FormFirstName = strings.TrimSpace(data.Get("user_first_name"))
@@ -290,7 +290,7 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 	user.SetCountry(c.FormCountry)
 	user.SetTimezone(c.FormTimezone)
 
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetVaultStore() != nil {
+	if c.registry.GetConfig().GetVaultStoreUsed() && c.registry.GetVaultStore() != nil {
 		firstToken, lastToken, emailToken, phoneToken, businessToken, err := ext.UserTokenize(
 			ctx,
 			c.registry.GetVaultStore(),
@@ -333,9 +333,8 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 	}
 
 	// If email changed and vault is enabled, enqueue blind index rebuild for email
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetVaultStore() != nil {
-		newEmailToken := user.Email()
-		if originalEmailToken != newEmailToken {
+	if c.registry.GetConfig().GetVaultStoreUsed() && c.registry.GetVaultStore() != nil {
+		if originalEmail != c.FormEmail {
 			if c.registry.GetTaskStore() != nil {
 				_, err := c.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
 					ctx,

@@ -6,26 +6,54 @@ import (
 	"project/internal/testutils"
 )
 
-func TestUserRoutes(t *testing.T) {
-	// Test with nil registry
-	routes, err := UserRoutes(nil)
-	if err == nil {
-		t.Error("UserRoutes(nil) should return an error")
+// TestUsersRoutesFunctionExists verifies Routes function is defined
+func TestUsersRoutesFunctionExists(t *testing.T) {
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
 	}
-	if routes != nil {
-		t.Error("UserRoutes(nil) should return nil routes")
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	routes, err := Routes(app)
+
+	if err != nil {
+		t.Errorf("Routes() returned error: %v", err)
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	routes, err = UserRoutes(registry)
-	if err != nil {
-		t.Errorf("UserRoutes(registry) should not return an error, got: %v", err)
-	}
 	if routes == nil {
-		t.Error("UserRoutes() should not return nil")
+		t.Error("Routes() returned nil routes")
 	}
-	if len(routes) != 7 {
-		t.Errorf("UserRoutes(registry) should return 7 routes, got %d", len(routes))
+}
+
+// TestUsersRoutesNilRegistry verifies Routes handles nil registry
+func TestUsersRoutesNilRegistry(t *testing.T) {
+	routes, err := Routes(nil)
+
+	if err == nil {
+		t.Error("Routes(nil) should return error")
+	}
+
+	if routes != nil {
+		t.Error("Routes(nil) should return nil routes")
+	}
+}
+
+// TestUsersRoutesReturnsRoutes verifies Routes returns route slice
+func TestUsersRoutesReturnsRoutes(t *testing.T) {
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	routes, err := Routes(app)
+
+	if err != nil {
+		t.Errorf("Routes() returned error: %v", err)
+	}
+
+	// Should return users and users catchall routes
+	if len(routes) != 2 {
+		t.Errorf("Expected 2 routes (users, users catchall), got %d", len(routes))
 	}
 }

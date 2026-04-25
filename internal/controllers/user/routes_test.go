@@ -318,7 +318,11 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 // }
 
 func TestUserHomePage(t *testing.T) {
+	cfg := testutils.DefaultConf()
+	cfg.SetEmailsAllowedAccess([]string{})
+
 	registry := testutils.Setup(
+		testutils.WithCfg(cfg),
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),

@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/useradmin/shared"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
@@ -21,7 +21,6 @@ type userDeleteControllerData struct {
 	userID         string
 	user           userstore.UserInterface
 	successMessage string
-	//errorMessage   string
 }
 
 func NewUserDeleteController(registry registry.RegistryInterface) *userDeleteController {
@@ -54,7 +53,7 @@ func (controller userDeleteController) Handler(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *userDeleteController) modal(data userDeleteControllerData) hb.TagInterface {
-	submitUrl := links.Admin().UsersUserDelete(map[string]string{
+	submitUrl := shared.NewLinks("/admin/users").UserDelete(map[string]string{
 		"user_id": data.userID,
 	})
 
@@ -69,7 +68,7 @@ func (controller *userDeleteController) modal(data userDeleteControllerData) hb.
 	buttonDelete := hb.Button().
 		HTML("Delete").
 		Class("btn btn-primary float-end").
-		HxInclude("#Modal" + modalID).
+		HxInclude("#" + modalID).
 		HxPost(submitUrl).
 		HxSelectOob("#ModalUserDelete").
 		HxTarget("body").

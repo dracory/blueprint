@@ -1,12 +1,11 @@
 package user_create
 
 import (
-	"context"
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/useradmin/shared"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -24,7 +23,6 @@ type userCreateControllerData struct {
 	lastName       string
 	email          string
 	successMessage string
-	//errorMessage   string
 }
 
 func NewUserCreateController(registry registry.RegistryInterface) *userCreateController {
@@ -57,7 +55,7 @@ func (controller userCreateController) Handler(w http.ResponseWriter, r *http.Re
 }
 
 func (controller *userCreateController) modal(data userCreateControllerData) hb.TagInterface {
-	submitUrl := links.Admin().UsersUserCreate()
+	submitUrl := shared.NewLinks("/admin/users").UserCreate()
 
 	formGroupFirstName := bs.FormGroup().
 		Class("mb-3").
@@ -173,7 +171,7 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 	user.SetLastName(data.lastName)
 	user.SetEmail(data.email)
 
-	err := controller.registry.GetUserStore().UserCreate(context.Background(), user)
+	err := controller.registry.GetUserStore().UserCreate(r.Context(), user)
 
 	if err != nil {
 		if controller.registry.GetLogger() != nil {
