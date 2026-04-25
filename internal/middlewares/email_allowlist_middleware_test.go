@@ -272,8 +272,8 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 
 	// Verify tokenization succeeded
-	if !strings.HasPrefix(user.Email(), "tk_") {
-		t.Fatalf("Expected tokenized email, got: %s", user.Email())
+	if !strings.HasPrefix(user.GetEmail(), "tk_") {
+		t.Fatalf("Expected tokenized email, got: %s", user.GetEmail())
 	}
 
 	// First middleware call

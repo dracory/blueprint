@@ -58,11 +58,11 @@ func UserTokenize(
 		return "", "", "", "", "", errors.New("user is nil")
 	}
 
-	firstNameToken := user.FirstName()
-	lastNameToken := user.LastName()
-	emailToken := user.Email()
-	phoneToken := user.Phone()
-	businessNameToken := user.BusinessName()
+	firstNameToken := user.GetFirstName()
+	lastNameToken := user.GetLastName()
+	emailToken := user.GetEmail()
+	phoneToken := user.GetPhone()
+	businessNameToken := user.GetBusinessName()
 
 	if firstNameTokenUpserted, err = vaultStore.TokenUpsert(ctx, firstNameToken, firstNameValue, vaultKey); err != nil {
 		return "", "", "", "", "", errors.Join(err, errors.New("error updating first name"))

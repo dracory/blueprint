@@ -54,7 +54,7 @@ func subscriptionOnlyMiddlewareHandler(registry registry.RegistryInterface) func
 
 			activeSubscriptions, errSubscriptions := registry.GetSubscriptionStore().
 				SubscriptionList(context.Background(), subscriptionstore.NewSubscriptionQuery().
-					SetSubscriberID(authenticatedUser.ID()).
+					SetSubscriberID(authenticatedUser.GetID()).
 					SetStatus(subscriptionstore.SUBSCRIPTION_STATUS_ACTIVE))
 
 			if errSubscriptions != nil {

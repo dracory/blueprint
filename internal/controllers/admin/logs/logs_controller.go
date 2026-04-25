@@ -30,7 +30,7 @@ func (controller *logsAdminController) Handler(w http.ResponseWriter, r *http.Re
 			if user == nil {
 				return ""
 			}
-			return user.ID()
+			return user.GetID()
 		},
 	})
 

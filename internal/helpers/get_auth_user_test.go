@@ -56,8 +56,8 @@ func TestGetAuthUser_WithValidUser(t *testing.T) {
 		t.Fatal("GetAuthUser returned nil for valid user in context")
 	}
 
-	if result.ID() != user.ID() {
-		t.Errorf("GetAuthUser ID = %v, want %v", result.ID(), user.ID())
+	if result.GetID() != user.GetID() {
+		t.Errorf("GetAuthUser ID = %v, want %v", result.GetID(), user.GetID())
 	}
 }
 
@@ -106,7 +106,7 @@ func TestGetAPIAuthUser_WithValidUser(t *testing.T) {
 		t.Fatal("GetAPIAuthUser returned nil for valid user in context")
 	}
 
-	if result.ID() != user.ID() {
-		t.Errorf("GetAPIAuthUser ID = %v, want %v", result.ID(), user.ID())
+	if result.GetID() != user.GetID() {
+		t.Errorf("GetAPIAuthUser ID = %v, want %v", result.GetID(), user.GetID())
 	}
 }

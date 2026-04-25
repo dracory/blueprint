@@ -105,7 +105,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {
 		return false
 	}
 
-	err := emails.NewEmailToAdminOnNewUserRegistered(handler.registry).Send(user.ID())
+	err := emails.NewEmailToAdminOnNewUserRegistered(handler.registry).Send(user.GetID())
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

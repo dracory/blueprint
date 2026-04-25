@@ -41,9 +41,9 @@ func userDisplayNames(
 		return "n/a", "", errors.New("user is nil")
 	}
 
-	firstName = authUser.FirstName()
-	lastName = authUser.LastName()
-	email := authUser.Email()
+	firstName = authUser.GetFirstName()
+	lastName = authUser.GetLastName()
+	email := authUser.GetEmail()
 
 	if registry.GetConfig().GetUserStoreVaultEnabled() {
 		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), registry, vaultKey, authUser)

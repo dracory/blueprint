@@ -51,19 +51,20 @@ func BlogPostBlocksToString(blocksString string) string {
 }
 
 func processBlock(block Block) string {
-	if block.Type == "code" || block.Type == "Code" {
+	switch block.Type {
+	case "code", "Code":
 		return blockEditorBlockCodeToHtml(block)
-	} else if block.Type == "heading" || block.Type == "Heading" {
+	case "heading", "Heading":
 		return blockEditorBlockHeadingToHtml(block)
-	} else if block.Type == "image" || block.Type == "Image" {
+	case "image", "Image":
 		return blockEditorBlockImageToHtml(block)
-	} else if block.Type == "text" || block.Type == "Text" {
+	case "text", "Text":
 		return blockEditorBlockTextToHtml(block)
-	} else if block.Type == "raw-html" || block.Type == "RawHtml" {
+	case "raw-html", "RawHtml":
 		return blockEditorBlockRawHtmlToHtml(block)
+	default:
+		return "Block " + block.Type + " renderer does not exist"
 	}
-
-	return "Block " + block.Type + " renderer does not exist"
 }
 
 func blockEditorBlockCodeToHtml(block Block) string {

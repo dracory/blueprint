@@ -109,7 +109,7 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 	}
 
 	session := sessionstore.NewSession().
-		SetUserID(user.ID()).
+		SetUserID(user.GetID()).
 		SetUserAgent(r.UserAgent()).
 		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
@@ -422,7 +422,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 	}
 
 	searchValue := blindindexstore.NewSearchValue().
-		SetSourceReferenceID(user.ID()).
+		SetSourceReferenceID(user.GetID()).
 		SetSearchValue(email)
 
 	err = c.registry.GetBlindIndexStoreEmail().SearchValueCreate(ctx, searchValue)

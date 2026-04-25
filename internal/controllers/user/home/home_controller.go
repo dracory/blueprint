@@ -60,9 +60,9 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 		return data, "User not found"
 	}
 
-	userFirstName := authUser.FirstName()
-	userLastName := authUser.LastName()
-	userEmail := authUser.Email()
+	userFirstName := authUser.GetFirstName()
+	userLastName := authUser.GetLastName()
+	userEmail := authUser.GetEmail()
 
 	if controller.registry.GetConfig().GetUserStoreVaultEnabled() {
 		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), authUser)

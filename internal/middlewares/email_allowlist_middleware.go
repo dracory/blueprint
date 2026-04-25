@@ -30,7 +30,7 @@ func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.Middle
 					return
 				}
 
-				email := user.Email()
+				email := user.GetEmail()
 				// Untokenize email if vault is enabled (with caching to reduce vault hits)
 				if registry.GetConfig().GetUserStoreVaultEnabled() && email != "" {
 					cacheKey := "email_untokenize:" + email

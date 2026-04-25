@@ -18,7 +18,7 @@ func TimezoneFromRequest(r *http.Request) string {
 		return defaultTimezone
 	}
 
-	userTimezone := user.Timezone()
+	userTimezone := user.GetTimezone()
 
 	if userTimezone != "" {
 		return userTimezone

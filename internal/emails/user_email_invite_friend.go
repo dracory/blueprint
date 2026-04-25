@@ -59,10 +59,10 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 		return errors.New("user not found")
 	}
 
-	userName := user.FirstName()
+	userName := user.GetFirstName()
 
 	if userName == "" {
-		userName = user.Email()
+		userName = user.GetEmail()
 	}
 
 	emailSubject := appName + ". Invitation by a Friend"

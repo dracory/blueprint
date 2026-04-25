@@ -62,7 +62,7 @@ require (
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/userstore v1.6.0
+	github.com/dracory/userstore v1.8.0
 	github.com/dracory/vaultstore v0.38.0
 	github.com/dracory/versionstore v0.9.0
 	github.com/dracory/websrv v0.1.0

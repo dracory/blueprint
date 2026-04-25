@@ -62,7 +62,7 @@ func TestExtendSession_IPMismatch(t *testing.T) {
 
 	// Create a session with different IP
 	session := sessionstore.NewSession().
-		SetUserID(user.ID()).
+		SetUserID(user.GetID()).
 		SetUserAgent(req.UserAgent()).
 		SetIPAddress("192.168.1.1"). // Different IP
 		SetExpiresAt("2099-12-31 23:59:59")
@@ -109,7 +109,7 @@ func TestExtendSession_UserAgentMismatch(t *testing.T) {
 
 	// Create a session with different UserAgent
 	session := sessionstore.NewSession().
-		SetUserID(user.ID()).
+		SetUserID(user.GetID()).
 		SetUserAgent("different-agent"). // Different UserAgent
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt("2099-12-31 23:59:59")

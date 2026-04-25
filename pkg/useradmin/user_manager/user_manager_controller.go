@@ -225,9 +225,9 @@ func (controller *userManagerController) handleLoadUsers(w http.ResponseWriter, 
 
 	users := make([]map[string]interface{}, 0, len(userList))
 	for _, user := range userList {
-		firstNameVal := user.FirstName()
-		lastNameVal := user.LastName()
-		emailVal := user.Email()
+		firstNameVal := user.GetFirstName()
+		lastNameVal := user.GetLastName()
+		emailVal := user.GetEmail()
 
 		if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
 			var err error
@@ -241,13 +241,13 @@ func (controller *userManagerController) handleLoadUsers(w http.ResponseWriter, 
 		}
 
 		users = append(users, map[string]interface{}{
-			"id":         user.ID(),
+			"id":         user.GetID(),
 			"first_name": firstNameVal,
 			"last_name":  lastNameVal,
 			"email":      emailVal,
-			"status":     user.Status(),
-			"created_at": user.CreatedAtCarbon().Format("d M Y"),
-			"updated_at": user.UpdatedAtCarbon().Format("d M Y"),
+			"status":     user.GetStatus(),
+			"created_at": user.GetCreatedAtCarbon().Format("d M Y"),
+			"updated_at": user.GetUpdatedAtCarbon().Format("d M Y"),
 		})
 	}
 
@@ -332,7 +332,7 @@ func (controller *userManagerController) handleCreateUser(w http.ResponseWriter,
 		return controller.jsonResponse(w, false, "Failed to create user", nil)
 	}
 
-	return controller.jsonResponse(w, true, "User created successfully", map[string]interface{}{"user_id": user.ID()})
+	return controller.jsonResponse(w, true, "User created successfully", map[string]interface{}{"user_id": user.GetID()})
 }
 
 func (controller *userManagerController) jsonResponse(w http.ResponseWriter, success bool, message string, data interface{}) string {

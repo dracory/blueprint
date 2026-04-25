@@ -55,7 +55,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 	}
 
 	params := map[string]string{
-		"user_id": data.authUser.ID(),
+		"user_id": data.authUser.GetID(),
 	}
 
 	rendered := liveflux.SSR(
@@ -159,8 +159,8 @@ func (controller *profileController) prepareData(r *http.Request) (data profileC
 		data.lastName = lastName
 		data.buinessName = buinessName
 		data.phone = phone
-		data.timezone = authUser.Timezone()
-		data.country = authUser.Country()
+		data.timezone = authUser.GetTimezone()
+		data.country = authUser.GetCountry()
 	}
 
 	if r.Method == http.MethodPost {

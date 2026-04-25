@@ -232,11 +232,11 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		return "", "", "", "", "", errors.New("user is nil")
 	}
 
-	email = user.Email()
-	firstName = user.FirstName()
-	lastName = user.LastName()
-	businessName = user.BusinessName()
-	phone = user.Phone()
+	email = user.GetEmail()
+	firstName = user.GetFirstName()
+	lastName = user.GetLastName()
+	businessName = user.GetBusinessName()
+	phone = user.GetPhone()
 
 	if !controller.registry.GetConfig().GetUserStoreVaultEnabled() {
 		return email, firstName, lastName, businessName, phone, nil
@@ -343,8 +343,8 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 			lastName:    lastName,
 			buinessName: businessName,
 			phone:       phone,
-			timezone:    authUser.Timezone(),
-			country:     authUser.Country(),
+			timezone:    authUser.GetTimezone(),
+			country:     authUser.GetCountry(),
 			countryList: countries,
 		}
 	}

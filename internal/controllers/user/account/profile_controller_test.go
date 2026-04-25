@@ -82,7 +82,7 @@ func TestProfileController_ShowsProfileForm(t *testing.T) {
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewProfileController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})

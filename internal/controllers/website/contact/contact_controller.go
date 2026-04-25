@@ -27,7 +27,7 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 	authUser := helpers.GetAuthUser(r)
 	userID := ""
 	if authUser != nil {
-		userID = authUser.ID()
+		userID = authUser.GetID()
 	}
 
 	component := NewFormContact(controller.registry)

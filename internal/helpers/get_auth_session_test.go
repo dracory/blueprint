@@ -52,7 +52,7 @@ func TestGetAuthSession_WithValidSession(t *testing.T) {
 
 	// Create a session
 	session := sessionstore.NewSession().
-		SetUserID(user.ID()).
+		SetUserID(user.GetID()).
 		SetUserAgent(req.UserAgent()).
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt("2099-12-31 23:59:59")
@@ -72,7 +72,7 @@ func TestGetAuthSession_WithValidSession(t *testing.T) {
 		t.Fatal("GetAuthSession returned nil for valid session in context")
 	}
 
-	if result.GetUserID() != user.ID() {
-		t.Errorf("GetAuthSession user ID = %v, want %v", result.GetUserID(), user.ID())
+	if result.GetUserID() != user.GetID() {
+		t.Errorf("GetAuthSession user ID = %v, want %v", result.GetUserID(), user.GetID())
 	}
 }

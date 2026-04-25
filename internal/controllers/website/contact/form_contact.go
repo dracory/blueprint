@@ -89,13 +89,13 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	}
 
 	// Mirror previous contact_controller.AnyIndex behavior: use plain user fields
-	c.Email = user.Email()
-	c.FirstName = user.FirstName()
-	c.LastName = user.LastName()
+	c.Email = user.GetEmail()
+	c.FirstName = user.GetFirstName()
+	c.LastName = user.GetLastName()
 
-	c.CanUpdateFirst = user.FirstName() == ""
-	c.CanUpdateLast = user.LastName() == ""
-	c.CanUpdateEmail = user.Email() == ""
+	c.CanUpdateFirst = user.GetFirstName() == ""
+	c.CanUpdateLast = user.GetLastName() == ""
+	c.CanUpdateEmail = user.GetEmail() == ""
 
 	return nil
 }

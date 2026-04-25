@@ -164,11 +164,11 @@ func TestSeedUser_NewUser(t *testing.T) {
 	if user == nil {
 		t.Fatal("Expected non-nil user")
 	}
-	if user.ID() != "new-user-id" {
-		t.Errorf("Expected user ID to be 'new-user-id', got '%s'", user.ID())
+	if user.GetID() != "new-user-id" {
+		t.Errorf("Expected user ID to be 'new-user-id', got '%s'", user.GetID())
 	}
-	if user.Status() != "active" {
-		t.Errorf("Expected user status to be 'active', got '%s'", user.Status())
+	if user.GetStatus() != "active" {
+		t.Errorf("Expected user status to be 'active', got '%s'", user.GetStatus())
 	}
 }
 
@@ -188,7 +188,7 @@ func TestSeedUser_ExistingUser(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to seed existing user: %v", err)
 	}
-	if user2.ID() != user1.ID() {
+	if user2.GetID() != user1.GetID() {
 		t.Error("Expected same user ID")
 	}
 }
@@ -203,8 +203,8 @@ func TestSeedUser_UserRole(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to seed user: %v", err)
 	}
-	if user1.Role() != "user" {
-		t.Errorf("Expected USER_01 to have role 'user', got '%s'", user1.Role())
+	if user1.GetRole() != "user" {
+		t.Errorf("Expected USER_01 to have role 'user', got '%s'", user1.GetRole())
 	}
 
 	// Test ADMIN_01 role
@@ -212,8 +212,8 @@ func TestSeedUser_UserRole(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to seed user: %v", err)
 	}
-	if user2.Role() != "administrator" {
-		t.Errorf("Expected ADMIN_01 to have role 'administrator', got '%s'", user2.Role())
+	if user2.GetRole() != "administrator" {
+		t.Errorf("Expected ADMIN_01 to have role 'administrator', got '%s'", user2.GetRole())
 	}
 }
 
@@ -249,8 +249,8 @@ func TestSeedSession_Success(t *testing.T) {
 	if session == nil {
 		t.Fatal("Expected non-nil session")
 	}
-	if session.GetUserID() != user.ID() {
-		t.Errorf("Expected session user ID to be '%s', got '%s'", user.ID(), session.GetUserID())
+	if session.GetUserID() != user.GetID() {
+		t.Errorf("Expected session user ID to be '%s', got '%s'", user.GetID(), session.GetUserID())
 	}
 }
 
@@ -284,7 +284,7 @@ func TestSeedUserAndSession_Success(t *testing.T) {
 	if session == nil {
 		t.Fatal("Expected non-nil session")
 	}
-	if session.GetUserID() != user.ID() {
+	if session.GetUserID() != user.GetID() {
 		t.Errorf("Expected session user ID to match user ID")
 	}
 }

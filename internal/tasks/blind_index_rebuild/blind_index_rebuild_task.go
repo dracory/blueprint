@@ -158,7 +158,7 @@ func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 	task.LogInfo(" - Rebuilding index...")
 	for _, user := range users {
 		if !task.insertEmailForUser(ctx, user) {
-			task.LogError("- Failed to insert email for user: " + user.ID() + ". Skipped.")
+			task.LogError("- Failed to insert email for user: " + user.GetID() + ". Skipped.")
 		}
 	}
 
@@ -202,7 +202,7 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 	task.LogInfo(" - Rebuilding index")
 	for _, user := range users {
 		if !task.insertFirstNameForUser(ctx, user) {
-			task.LogError("- Failed to insert first name for user: " + user.ID() + ". Skipped.")
+			task.LogError("- Failed to insert first name for user: " + user.GetID() + ". Skipped.")
 		}
 	}
 
@@ -243,7 +243,7 @@ func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) boo
 	task.LogInfo(" - Rebuilding index")
 	for _, user := range users {
 		if !task.insertLastNameForUser(ctx, user) {
-			task.LogError("- Failed to insert last name for user: " + user.ID() + ". Skipped.")
+			task.LogError("- Failed to insert last name for user: " + user.GetID() + ". Skipped.")
 		}
 	}
 
@@ -257,23 +257,23 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		return false
 	}
 
-	searchValue, err := task.registry.GetBlindIndexStoreEmail().SearchValueFindBySourceReferenceID(ctx, user.ID())
+	searchValue, err := task.registry.GetBlindIndexStoreEmail().SearchValueFindBySourceReferenceID(ctx, user.GetID())
 
 	if err != nil {
-		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
+		task.LogError("Error searching for blind index by source reference ID: " + user.GetID() + " - " + err.Error())
 		return false
 	}
 
 	isIndexed := searchValue != nil
 
-	emailToken := user.Email()
+	emailToken := user.GetEmail()
 
 	// No need to index an empty email
 	if emailToken == "" {
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreEmail().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty email, nothing to do
@@ -296,7 +296,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreEmail().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty email, nothing to do
@@ -307,15 +307,15 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		searchValue.SetSearchValue(email)
 		err = task.registry.GetBlindIndexStoreEmail().SearchValueUpdate(ctx, searchValue)
 		if err != nil {
-			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error updating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	} else {
 		err = task.registry.GetBlindIndexStoreEmail().SearchValueCreate(ctx, blindindexstore.NewSearchValue().
-			SetSourceReferenceID(user.ID()).
+			SetSourceReferenceID(user.GetID()).
 			SetSearchValue(email))
 		if err != nil {
-			task.LogError("Error creating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error creating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	}
@@ -329,23 +329,23 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return false
 	}
 
-	searchValue, err := task.registry.GetBlindIndexStoreFirstName().SearchValueFindBySourceReferenceID(ctx, user.ID())
+	searchValue, err := task.registry.GetBlindIndexStoreFirstName().SearchValueFindBySourceReferenceID(ctx, user.GetID())
 
 	if err != nil {
-		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
+		task.LogError("Error searching for blind index by source reference ID: " + user.GetID() + " - " + err.Error())
 		return false
 	}
 
 	isIndexed := searchValue != nil
 
-	firstNameToken := user.FirstName()
+	firstNameToken := user.GetFirstName()
 
 	// No need to index an empty first name
 	if firstNameToken == "" {
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreFirstName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty first name, nothing to do
@@ -369,7 +369,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreFirstName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty first name, nothing to do
@@ -380,15 +380,15 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		searchValue.SetSearchValue(firstName)
 		err = task.registry.GetBlindIndexStoreFirstName().SearchValueUpdate(ctx, searchValue)
 		if err != nil {
-			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error updating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	} else {
 		err = task.registry.GetBlindIndexStoreFirstName().SearchValueCreate(ctx, blindindexstore.NewSearchValue().
-			SetSourceReferenceID(user.ID()).
+			SetSourceReferenceID(user.GetID()).
 			SetSearchValue(firstName))
 		if err != nil {
-			task.LogError("Error creating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error creating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	}
@@ -401,23 +401,23 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		task.LogError("BlindIndexStoreLastName is nil. Aborted.")
 		return false
 	}
-	searchValue, err := task.registry.GetBlindIndexStoreLastName().SearchValueFindBySourceReferenceID(ctx, user.ID())
+	searchValue, err := task.registry.GetBlindIndexStoreLastName().SearchValueFindBySourceReferenceID(ctx, user.GetID())
 
 	if err != nil {
-		task.LogError("Error searching for blind index by source reference ID: " + user.ID() + " - " + err.Error())
+		task.LogError("Error searching for blind index by source reference ID: " + user.GetID() + " - " + err.Error())
 		return false
 	}
 
 	isIndexed := searchValue != nil
 
-	lastNameToken := user.LastName()
+	lastNameToken := user.GetLastName()
 
 	// No need to index an empty last name
 	if lastNameToken == "" {
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreLastName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty last name, nothing to do
@@ -441,7 +441,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		if isIndexed {
 			err = task.registry.GetBlindIndexStoreLastName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
-				task.LogError("Error deleting blind index for user: " + user.ID() + " - " + err.Error())
+				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
 			}
 		}
 		return true // empty last name, nothing to do
@@ -452,15 +452,15 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		searchValue.SetSearchValue(lastName)
 		err = task.registry.GetBlindIndexStoreLastName().SearchValueUpdate(ctx, searchValue)
 		if err != nil {
-			task.LogError("Error updating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error updating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	} else {
 		err = task.registry.GetBlindIndexStoreLastName().SearchValueCreate(ctx, blindindexstore.NewSearchValue().
-			SetSourceReferenceID(user.ID()).
+			SetSourceReferenceID(user.GetID()).
 			SetSearchValue(lastName))
 		if err != nil {
-			task.LogError("Error creating blind index for user: " + user.ID() + " - " + err.Error())
+			task.LogError("Error creating blind index for user: " + user.GetID() + " - " + err.Error())
 			return false
 		}
 	}

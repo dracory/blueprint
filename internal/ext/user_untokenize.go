@@ -39,11 +39,11 @@ func UserUntokenize(
 		return "", "", "", "", "", errors.New("user_untokenized: user is nil")
 	}
 
-	firstNameToken := user.FirstName()
-	lastNameToken := user.LastName()
-	emailToken := user.Email()
-	businessNameToken := user.BusinessName()
-	phoneToken := user.Phone()
+	firstNameToken := user.GetFirstName()
+	lastNameToken := user.GetLastName()
+	emailToken := user.GetEmail()
+	businessNameToken := user.GetBusinessName()
+	phoneToken := user.GetPhone()
 
 	keyFirstName := "first_name"
 	keyLastName := "last_name"
@@ -113,7 +113,7 @@ func UserUntokenizeFieldByField(
 	status UserUntokenizeFieldStatus,
 ) {
 	if registry.GetVaultStore() == nil {
-		return user.FirstName(), user.LastName(), user.Email(), user.BusinessName(), user.Phone(), UserUntokenizeFieldStatus{}
+		return user.GetFirstName(), user.GetLastName(), user.GetEmail(), user.GetBusinessName(), user.GetPhone(), UserUntokenizeFieldStatus{}
 	}
 
 	if user == nil {
@@ -146,11 +146,11 @@ func UserUntokenizeFieldByField(
 		return result[key], true
 	}
 
-	firstName, status.FirstName = untokenizeField(user.FirstName(), "first_name")
-	lastName, status.LastName = untokenizeField(user.LastName(), "last_name")
-	email, status.Email = untokenizeField(user.Email(), "email")
-	businessName, status.BusinessName = untokenizeField(user.BusinessName(), "business_name")
-	phone, status.Phone = untokenizeField(user.Phone(), "phone")
+	firstName, status.FirstName = untokenizeField(user.GetFirstName(), "first_name")
+	lastName, status.LastName = untokenizeField(user.GetLastName(), "last_name")
+	email, status.Email = untokenizeField(user.GetEmail(), "email")
+	businessName, status.BusinessName = untokenizeField(user.GetBusinessName(), "business_name")
+	phone, status.Phone = untokenizeField(user.GetPhone(), "phone")
 
 	return firstName, lastName, email, businessName, phone, status
 }
@@ -177,7 +177,7 @@ func UserUntokenizeTransparently(
 
 	// Vault disabled: treat fields as plain text
 	if !registry.GetConfig().GetUserStoreVaultEnabled() {
-		return user.Email(), user.FirstName(), user.LastName(), user.BusinessName(), user.Phone(), nil
+		return user.GetEmail(), user.GetFirstName(), user.GetLastName(), user.GetBusinessName(), user.GetPhone(), nil
 	}
 
 	// Vault enabled: ensure vault store is available and untokenize

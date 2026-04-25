@@ -30,7 +30,7 @@ func (controller *blogAdminController) Handler(w http.ResponseWriter, r *http.Re
 			if user == nil {
 				return ""
 			}
-			return user.ID()
+			return user.GetID()
 		},
 		LLMEngine: nil, // TODO: Set up LLM engine if available
 		BlogTopic: "",  // TODO: Get from settings

@@ -235,8 +235,8 @@ func TestAPIAuthMiddleware_Success(t *testing.T) {
 		}
 	}
 	if ctxUser != nil {
-		if user.ID() != ctxUser.ID() {
-			t.Errorf("context user id should match: expected %s, got %s", user.ID(), ctxUser.ID())
+		if user.GetID() != ctxUser.GetID() {
+			t.Errorf("context user id should match: expected %s, got %s", user.GetID(), ctxUser.GetID())
 		}
 	}
 	if res.Result().StatusCode != http.StatusOK {

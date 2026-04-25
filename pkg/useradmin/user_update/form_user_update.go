@@ -121,11 +121,11 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 		return nil
 	}
 
-	firstName := user.FirstName()
-	lastName := user.LastName()
-	email := user.Email()
-	businessName := user.BusinessName()
-	phone := user.Phone()
+	firstName := user.GetFirstName()
+	lastName := user.GetLastName()
+	email := user.GetEmail()
+	businessName := user.GetBusinessName()
+	phone := user.GetPhone()
 
 	// Use untokenize to decrypt user fields
 	if c.registry.GetConfig().GetVaultStoreUsed() && c.registry.GetVaultStore() != nil {
@@ -133,15 +133,15 @@ func (c *formUserUpdate) Mount(ctx context.Context, params map[string]string) er
 		// Field status is already passed from controller, no need to re-check here
 	}
 
-	c.FormStatus = user.Status()
+	c.FormStatus = user.GetStatus()
 	c.FormFirstName = firstName
 	c.FormLastName = lastName
 	c.FormEmail = email
-	c.FormMemo = user.Memo()
+	c.FormMemo = user.GetMemo()
 	c.FormBusiness = businessName
 	c.FormPhone = phone
-	c.FormCountry = user.Country()
-	c.FormTimezone = user.Timezone()
+	c.FormCountry = user.GetCountry()
+	c.FormTimezone = user.GetTimezone()
 	c.DisplayName = strings.TrimSpace(strings.Join([]string{firstName, lastName}, " "))
 	c.StatusOptions = newUserStatusOptions()
 
@@ -229,7 +229,7 @@ func (c *formUserUpdate) handleUpdate(ctx context.Context, action string, data u
 	}
 
 	// Store original email for comparison (plaintext before tokenizing)
-	originalEmail := user.Email()
+	originalEmail := user.GetEmail()
 
 	c.FormStatus = strings.TrimSpace(data.Get("user_status"))
 	c.FormFirstName = strings.TrimSpace(data.Get("user_first_name"))

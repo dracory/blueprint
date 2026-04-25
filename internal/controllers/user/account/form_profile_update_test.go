@@ -37,27 +37,27 @@ func userTokenize(registry registry.RegistryInterface, user userstore.UserInterf
 		return existingToken, nil
 	}
 
-	emailToken, err := ensureToken(user.Email(), "john@example.com", "email")
+	emailToken, err := ensureToken(user.GetEmail(), "john@example.com", "email")
 	if err != nil {
 		return err
 	}
 
-	firstNameToken, err := ensureToken(user.FirstName(), "John", "first name")
+	firstNameToken, err := ensureToken(user.GetFirstName(), "John", "first name")
 	if err != nil {
 		return err
 	}
 
-	lastNameToken, err := ensureToken(user.LastName(), "Doe", "last name")
+	lastNameToken, err := ensureToken(user.GetLastName(), "Doe", "last name")
 	if err != nil {
 		return err
 	}
 
-	businessNameToken, err := ensureToken(user.BusinessName(), "JD Consulting", "business name")
+	businessNameToken, err := ensureToken(user.GetBusinessName(), "JD Consulting", "business name")
 	if err != nil {
 		return err
 	}
 
-	phoneToken, err := ensureToken(user.Phone(), "+44111222333", "phone")
+	phoneToken, err := ensureToken(user.GetPhone(), "+44111222333", "phone")
 	if err != nil {
 		return err
 	}
@@ -97,7 +97,7 @@ func TestFormProfileUpdate_Mount(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
@@ -140,15 +140,15 @@ func TestFormProfileUpdate_Handle_RequiresFirstName(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":    {user.ID()},
-		"email":      {user.Email()},
+		"user_id":    {user.GetID()},
+		"email":      {user.GetEmail()},
 		"first_name": {""},
 		"last_name":  {"LastName"},
 		"country":    {"Country"},
@@ -189,14 +189,14 @@ func TestFormProfileUpdate_Handle_RequiresCountry(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":    {user.ID()},
+		"user_id":    {user.GetID()},
 		"email":      {"user@example.com"},
 		"first_name": {"FirstName"},
 		"last_name":  {"LastName"},
@@ -238,14 +238,14 @@ func TestFormProfileUpdate_Handle_RequiresTimezone(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":    {user.ID()},
+		"user_id":    {user.GetID()},
 		"email":      {"user@example.com"},
 		"first_name": {"FirstName"},
 		"last_name":  {"LastName"},
@@ -287,15 +287,15 @@ func TestFormProfileUpdate_Handle_RequiresLastName(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":    {user.ID()},
-		"email":      {user.Email()},
+		"user_id":    {user.GetID()},
+		"email":      {user.GetEmail()},
 		"first_name": {"FirstName"},
 		"last_name":  {""},
 		"country":    {"Country"},
@@ -336,14 +336,14 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":    {user.ID()},
+		"user_id":    {user.GetID()},
 		"email":      {""},
 		"first_name": {"FirstName"},
 		"last_name":  {"LastName"},
@@ -385,7 +385,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
@@ -410,7 +410,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		{
 			name: "missing first name",
 			formData: url.Values{
-				"user_id":    {user.ID()},
+				"user_id":    {user.GetID()},
 				"email":      {"jane@example.com"},
 				"first_name": {""},
 				"last_name":  {"Smith"},
@@ -422,7 +422,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		{
 			name: "missing last name",
 			formData: url.Values{
-				"user_id":    {user.ID()},
+				"user_id":    {user.GetID()},
 				"email":      {"jane@example.com"},
 				"first_name": {"Jane"},
 				"last_name":  {""},
@@ -434,7 +434,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		{
 			name: "missing email",
 			formData: url.Values{
-				"user_id":    {user.ID()},
+				"user_id":    {user.GetID()},
 				"email":      {""},
 				"first_name": {"Jane"},
 				"last_name":  {"Smith"},
@@ -446,7 +446,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		{
 			name: "missing country",
 			formData: url.Values{
-				"user_id":    {user.ID()},
+				"user_id":    {user.GetID()},
 				"email":      {"jane@example.com"},
 				"first_name": {"Jane"},
 				"last_name":  {"Smith"},
@@ -458,7 +458,7 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		{
 			name: "missing timezone",
 			formData: url.Values{
-				"user_id":    {user.ID()},
+				"user_id":    {user.GetID()},
 				"email":      {"jane@example.com"},
 				"first_name": {"Jane"},
 				"last_name":  {"Smith"},
@@ -507,14 +507,14 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
 	formData := url.Values{
-		"user_id":       {user.ID()},
+		"user_id":       {user.GetID()},
 		"email":         {"john@example.com"},
 		"first_name":    {"Johnny"},
 		"last_name":     {"D"},
@@ -542,7 +542,7 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 	}
 
 	// Verify the user was updated in the store
-	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -560,12 +560,12 @@ func TestFormProfileUpdate_Handle_Apply(t *testing.T) {
 		t.Fatalf("Expected first name to be 'Johnny', got: %s", firstName)
 	}
 
-	if updatedUser.Country() != "US" {
-		t.Fatalf("Expected country to be 'US', got: %s", updatedUser.Country())
+	if updatedUser.GetCountry() != "US" {
+		t.Fatalf("Expected country to be 'US', got: %s", updatedUser.GetCountry())
 	}
 
-	if updatedUser.Timezone() != "America/New_York" {
-		t.Fatalf("Expected timezone to be 'America/New_York', got: %s", updatedUser.Timezone())
+	if updatedUser.GetTimezone() != "America/New_York" {
+		t.Fatalf("Expected timezone to be 'America/New_York', got: %s", updatedUser.GetTimezone())
 	}
 }
 
@@ -590,7 +590,7 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id":    user.ID(),
+		"user_id":    user.GetID(),
 		"return_url": links.User().Profile(),
 	})
 	if err != nil {
@@ -598,8 +598,8 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 	}
 
 	formData := url.Values{
-		"user_id":       {user.ID()},
-		"email":         {user.Email()},
+		"user_id":       {user.GetID()},
+		"email":         {user.GetEmail()},
 		"first_name":    {"FirstName"},
 		"last_name":     {"LastName"},
 		"business_name": {"Biz"},
@@ -625,7 +625,7 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 		t.Fatalf("Expected redirect to %s, got: %s", links.User().Home(), form.FormRedirectTo)
 	}
 
-	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -634,12 +634,12 @@ func TestFormProfileUpdate_Handle_Save_NoVault(t *testing.T) {
 		t.Fatalf("Expected user to be found")
 	}
 
-	if updatedUser.Country() != "Country" {
-		t.Fatalf("Expected country to be 'Country', got: %s", updatedUser.Country())
+	if updatedUser.GetCountry() != "Country" {
+		t.Fatalf("Expected country to be 'Country', got: %s", updatedUser.GetCountry())
 	}
 
-	if updatedUser.Timezone() != "Timezone" {
-		t.Fatalf("Expected timezone to be 'Timezone', got: %s", updatedUser.Timezone())
+	if updatedUser.GetTimezone() != "Timezone" {
+		t.Fatalf("Expected timezone to be 'Timezone', got: %s", updatedUser.GetTimezone())
 	}
 }
 
@@ -664,7 +664,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id":    user.ID(),
+		"user_id":    user.GetID(),
 		"return_url": links.User().Profile(),
 	})
 	if err != nil {
@@ -672,7 +672,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 	}
 
 	formData := url.Values{
-		"user_id":       {user.ID()},
+		"user_id":       {user.GetID()},
 		"email":         {"user@example.com"},
 		"first_name":    {"FirstName"},
 		"last_name":     {"LastName"},
@@ -699,7 +699,7 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 		t.Fatalf("Expected redirect to %s, got: %s", links.User().Home(), form.FormRedirectTo)
 	}
 
-	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -708,12 +708,12 @@ func TestFormProfileUpdate_Handle_Save_WithVault(t *testing.T) {
 		t.Fatalf("Expected user to be found")
 	}
 
-	if updatedUser.Country() != "Country" {
-		t.Fatalf("Expected country to be 'Country', got: %s", updatedUser.Country())
+	if updatedUser.GetCountry() != "Country" {
+		t.Fatalf("Expected country to be 'Country', got: %s", updatedUser.GetCountry())
 	}
 
-	if updatedUser.Timezone() != "Timezone" {
-		t.Fatalf("Expected timezone to be 'Timezone', got: %s", updatedUser.Timezone())
+	if updatedUser.GetTimezone() != "Timezone" {
+		t.Fatalf("Expected timezone to be 'Timezone', got: %s", updatedUser.GetTimezone())
 	}
 
 	firstName, _, _, _, _, err := ext.UserUntokenize(context.Background(), registry, registry.GetConfig().GetVaultStoreKey(), updatedUser)
@@ -747,7 +747,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
@@ -756,7 +756,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 	form.ReturnURL = "/user/home"
 
 	formData := url.Values{
-		"user_id":       {user.ID()},
+		"user_id":       {user.GetID()},
 		"email":         {"info@example.com"},
 		"first_name":    {"Updated"},
 		"last_name":     {"User"},
@@ -784,7 +784,7 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 	}
 
 	// Verify the user was updated in the store
-	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.ID())
+	updatedUser, err := registry.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
 		t.Fatalf("UserFindByID returned error: %v", err)
 	}
@@ -802,12 +802,12 @@ func TestFormProfileUpdate_Handle_Save(t *testing.T) {
 		t.Fatalf("Expected first name to be 'Updated', got: %s", firstName)
 	}
 
-	if updatedUser.Country() != "US" {
-		t.Fatalf("Expected country to be 'US', got: %s", updatedUser.Country())
+	if updatedUser.GetCountry() != "US" {
+		t.Fatalf("Expected country to be 'US', got: %s", updatedUser.GetCountry())
 	}
 
-	if updatedUser.Timezone() != "America/New_York" {
-		t.Fatalf("Expected timezone to be 'America/New_York', got: %s", updatedUser.Timezone())
+	if updatedUser.GetTimezone() != "America/New_York" {
+		t.Fatalf("Expected timezone to be 'America/New_York', got: %s", updatedUser.GetTimezone())
 	}
 }
 
@@ -830,7 +830,7 @@ func TestFormProfileUpdate_Render(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)
@@ -890,7 +890,7 @@ func TestFormProfileUpdate_Handle_CountryChange(t *testing.T) {
 	form := component.(*formProfileUpdate)
 
 	err = form.Mount(context.Background(), map[string]string{
-		"user_id": user.ID(),
+		"user_id": user.GetID(),
 	})
 	if err != nil {
 		t.Fatalf("Mount returned error: %v", err)

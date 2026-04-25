@@ -120,7 +120,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 
 	// Enqueue task with user ID
 	enqueueHandler := NewEmailToAdminOnNewUserRegisteredTaskHandler(registry)
-	queuedTask, err := enqueueHandler.Enqueue(user.ID())
+	queuedTask, err := enqueueHandler.Enqueue(user.GetID())
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}

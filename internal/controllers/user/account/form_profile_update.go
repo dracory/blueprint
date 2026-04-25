@@ -127,14 +127,14 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 		c.FormBusinessName = businessName
 		c.FormPhone = phone
 	} else {
-		c.FormEmail = user.Email()
-		c.FormFirstName = user.FirstName()
-		c.FormLastName = user.LastName()
-		c.FormBusinessName = user.BusinessName()
-		c.FormPhone = user.Phone()
+		c.FormEmail = user.GetEmail()
+		c.FormFirstName = user.GetFirstName()
+		c.FormLastName = user.GetLastName()
+		c.FormBusinessName = user.GetBusinessName()
+		c.FormPhone = user.GetPhone()
 	}
-	c.FormCountry = user.Country()
-	c.FormTimezone = user.Timezone()
+	c.FormCountry = user.GetCountry()
+	c.FormTimezone = user.GetTimezone()
 	c.refreshTimezones(ctx)
 
 	return nil
@@ -235,25 +235,25 @@ func (c *formProfileUpdate) handleUpdate(ctx context.Context, action string, dat
 		user.SetBusinessName(c.FormBusinessName)
 		user.SetPhone(c.FormPhone)
 	} else {
-		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.FirstName(), c.FormFirstName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
+		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.GetFirstName(), c.FormFirstName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
 			c.registry.GetLogger().Error("Error saving first name", "error", err.Error())
 			c.FormError = "Saving profile failed. Please try again later."
 			c.FormSuccess = ""
 			return nil
 		}
-		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.LastName(), c.FormLastName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
+		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.GetLastName(), c.FormLastName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
 			c.registry.GetLogger().Error("Error saving last name", "error", err.Error())
 			c.FormError = "Saving profile failed. Please try again later."
 			c.FormSuccess = ""
 			return nil
 		}
-		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.BusinessName(), c.FormBusinessName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
+		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.GetBusinessName(), c.FormBusinessName, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
 			c.registry.GetLogger().Error("Error saving business name", "error", err.Error())
 			c.FormError = "Saving profile failed. Please try again later."
 			c.FormSuccess = ""
 			return nil
 		}
-		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.Phone(), c.FormPhone, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
+		if err := c.registry.GetVaultStore().TokenUpdate(ctx, user.GetPhone(), c.FormPhone, c.registry.GetConfig().GetVaultStoreKey()); err != nil {
 			c.registry.GetLogger().Error("Error saving phone", "error", err.Error())
 			c.FormError = "Saving profile failed. Please try again later."
 			c.FormSuccess = ""

@@ -197,7 +197,7 @@ func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -252,7 +252,7 @@ func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -305,10 +305,10 @@ func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email": {user.Email()},
+			"email": {user.GetEmail()},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -363,10 +363,10 @@ func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email": {user.Email()},
+			"email": {user.GetEmail()},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -420,11 +420,11 @@ func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -479,11 +479,11 @@ func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -537,12 +537,12 @@ func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -597,12 +597,12 @@ func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -656,13 +656,13 @@ func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 			"country":    {"Country"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -717,13 +717,13 @@ func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 			"country":    {"Country"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -777,14 +777,14 @@ func TestRegisterController_Success_WithoutVault(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 			"country":    {"Country"},
 			"timezone":   {"Timezone"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -844,7 +844,7 @@ func TestRegisterController_SelectTimezoneByCountry_WithValidCountry(t *testing.
 			"country": {"US"}, // United States
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -922,7 +922,7 @@ func TestRegisterController_SelectTimezoneByCountry_WithEmptyCountry(t *testing.
 			"country": {""},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -979,7 +979,7 @@ func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T
 			"country": {"US"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
@@ -1060,14 +1060,14 @@ func TestRegisterController_Success_WithVaultStore(t *testing.T) {
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(registry).Handler, test.NewRequestOptions{
 		PostValues: url.Values{
-			"email":      {user.Email()},
+			"email":      {user.GetEmail()},
 			"first_name": {"FirstName"},
 			"last_name":  {"LastName"},
 			"country":    {"Country"},
 			"timezone":   {"Timezone"},
 		},
 		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.ID(),
+			auth.AuthenticatedUserID{}:           user.GetID(),
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})

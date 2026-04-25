@@ -16,7 +16,7 @@ func SeedSession(sessionStore sessionstore.StoreInterface, r *http.Request, user
 	}
 
 	session := sessionstore.NewSession().
-		SetUserID(user.ID()).
+		SetUserID(user.GetID()).
 		SetUserAgent(r.UserAgent()).
 		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddSeconds(expiresSeconds).ToDateTimeString(carbon.UTC))

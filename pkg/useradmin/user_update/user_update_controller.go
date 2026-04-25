@@ -73,8 +73,8 @@ func (controller *userUpdateController) renderPage(w http.ResponseWriter, r *htt
 		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "User not found", shared.NewLinks("/admin/users").UserManager(), 10)
 	}
 
-	firstName := user.FirstName()
-	lastName := user.LastName()
+	firstName := user.GetFirstName()
+	lastName := user.GetLastName()
 	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
 		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
 		if err != nil {
@@ -86,7 +86,7 @@ func (controller *userUpdateController) renderPage(w http.ResponseWriter, r *htt
 
 	displayName := strings.TrimSpace(firstName + " " + lastName)
 	if displayName == "" {
-		displayName = user.ID()
+		displayName = user.GetID()
 	}
 
 	returnURL := shared.NewLinks("/admin/users").UserManager()
@@ -166,15 +166,15 @@ func (controller *userUpdateController) handleGetUser(w http.ResponseWriter, r *
 		return
 	}
 
-	firstName := user.FirstName()
-	lastName := user.LastName()
-	email := user.Email()
-	phone := user.Phone()
-	business := user.BusinessName()
-	memo := user.Memo()
-	status := user.Status()
-	country := user.Country()
-	timezone := user.Timezone()
+	firstName := user.GetFirstName()
+	lastName := user.GetLastName()
+	email := user.GetEmail()
+	phone := user.GetPhone()
+	business := user.GetBusinessName()
+	memo := user.GetMemo()
+	status := user.GetStatus()
+	country := user.GetCountry()
+	timezone := user.GetTimezone()
 
 	fieldStatus := map[string]bool{
 		"first_name":    true,
@@ -330,7 +330,7 @@ func (controller *userUpdateController) handleUpdateUser(w http.ResponseWriter, 
 		return
 	}
 
-	originalEmail := user.Email()
+	originalEmail := user.GetEmail()
 	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
 		_, _, originalEmail, _, _, _ = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
 	}

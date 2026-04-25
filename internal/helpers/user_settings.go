@@ -30,7 +30,7 @@ func UserSettingGet(sessionStore sessionstore.StoreInterface, r *http.Request, k
 		return defaultValue
 	}
 
-	if session.GetUserID() != authUser.ID() {
+	if session.GetUserID() != authUser.GetID() {
 		return defaultValue
 	}
 
@@ -66,7 +66,7 @@ func UserSettingSet(sessionStore sessionstore.StoreInterface, r *http.Request, k
 		return errors.New("session is nil")
 	}
 
-	if session.GetUserID() != authUser.ID() {
+	if session.GetUserID() != authUser.GetID() {
 		return errors.New("session user id does not match auth user id")
 	}
 
