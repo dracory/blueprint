@@ -82,7 +82,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
 	github.com/yuin/goldmark v1.8.2
-	modernc.org/sqlite v1.49.1
+	modernc.org/sqlite v1.50.0
 )
 
 require (
