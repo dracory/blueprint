@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 	"project/pkg/blogai"
 
 	"github.com/dracory/cdn"
@@ -143,4 +143,3 @@ func (c *AiPostGeneratorController) prepareData(r *http.Request) (data pageData,
 
 	return data, ""
 }
-

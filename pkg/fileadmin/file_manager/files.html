@@ -1,0 +1,488 @@
+<div id="files-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <!-- Toolbar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="m-0">File Manager</h3>
+      <div>
+        <button class="btn btn-secondary me-2" @click="openModal('uploadFile')">
+          <i class="bi bi-upload me-1"></i> Upload File
+        </button>
+        <button class="btn btn-primary me-2" @click="openModal('uploadMultiple')">
+          <i class="bi bi-cloud-upload me-1"></i> Upload Multiple
+        </button>
+        <button class="btn btn-info" @click="openModal('createDirectory')">
+          <i class="bi bi-plus-circle me-1"></i> New Directory
+        </button>
+      </div>
+    </div>
+
+    <!-- Current Directory Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb m-0 p-2 bg-light rounded">
+        <li class="breadcrumb-item">
+          <a href="#" @click.prevent="navigateTo('')" style="cursor:pointer;">
+            <i class="bi bi-house-door me-1"></i> Root
+          </a>
+        </li>
+        <li v-for="(part, index) in currentDirectory.split('/').filter(p => p)" :key="index"
+            class="breadcrumb-item"
+            :class="{ active: index === currentDirectory.split('/').filter(p => p).length - 1 }">
+          <a v-if="index < currentDirectory.split('/').filter(p => p).length - 1"
+             href="#"
+             @click.prevent="navigateTo(currentDirectory.split('/').filter(p => p).slice(0, index + 1).join('/'))"
+             style="cursor:pointer;">
+            {{ part }}
+          </a>
+          <span v-else>{{ part }}</span>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Bulk Actions -->
+    <div v-if="selectedItems.length > 0" class="mb-2">
+      <div class="dropdown d-inline-block">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          <i class="bi bi-check-square me-1"></i> Bulk Actions ({{ selectedItems.length }})
+        </button>
+        <ul class="dropdown-menu">
+          <li><button class="dropdown-item" @click="selectAllItems()"><i class="bi bi-check-square me-2"></i> Select All</button></li>
+          <li><button class="dropdown-item" @click="unselectAllItems()"><i class="bi bi-square me-2"></i> Unselect All</button></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button class="dropdown-item text-warning" @click="openModal('moveSelected')"><i class="bi bi-folder-symlink me-2"></i> Move Selected</button></li>
+          <li><button class="dropdown-item text-danger" @click="openModal('deleteSelected')"><i class="bi bi-trash me-2"></i> Delete Selected</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- File Table -->
+    <div v-if="directories.length === 0 && files.length === 0" class="text-center py-4 text-muted border rounded">
+      No files or directories found.
+    </div>
+
+    <div v-else class="table-responsive">
+      <table class="table table-bordered table-striped align-middle">
+        <thead>
+          <tr>
+            <th style="width:30px;">
+              <input type="checkbox" class="form-check-input" v-model="selectAll" @change="toggleSelectAll">
+            </th>
+            <th style="width:1px;"></th>
+            <th>Directory / File Name</th>
+            <th style="width:80px;">Size</th>
+            <th style="width:1px;">Modified</th>
+            <th style="width:1px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Parent Directory -->
+          <tr v-if="parentDirectory !== ''">
+            <td></td>
+            <td><i class="bi bi-folder"></i></td>
+            <td>
+              <a href="#" @click.prevent="navigateTo(parentDirectory)" style="cursor:pointer;">
+                <i class="bi bi-arrow-90deg-up me-1"></i> parent
+              </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+
+          <!-- Directories -->
+          <tr v-for="dir in directories" :key="dir.Path">
+            <td>
+              <input type="checkbox" class="form-check-input file-select" v-model="selectedItems" :value="{ path: dir.Path, type: 'directory', name: dir.Name }">
+            </td>
+            <td><i class="bi bi-folder"></i></td>
+            <td>
+              <a href="#" @click.prevent="navigateTo(dir.Path)" style="font-weight:bold;cursor:pointer;">
+                {{ dir.Name }}
+              </a>
+            </td>
+            <td><span class="small">{{ dir.SizeHuman }}</span></td>
+            <td></td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-gear"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><button class="dropdown-item" @click="showRenameModal(dir, 'directory')"><i class="bi bi-pencil me-2"></i> Rename</button></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="dropdown-item text-danger" @click="showDeleteDirectoryModal(dir)"><i class="bi bi-trash me-2"></i> Delete</button></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Files -->
+          <tr v-for="file in files" :key="file.Path">
+            <td>
+              <input type="checkbox" class="form-check-input file-select" v-model="selectedItems" :value="{ path: file.Path, type: 'file', name: file.Name }">
+            </td>
+            <td>
+              <img v-if="isImage(file.Name)" :src="file.URL" class="img-thumbnail" style="max-width:48px;max-height:48px;cursor:pointer;" @click="showViewModal(file)" />
+              <i v-else class="bi bi-file-earmark"></i>
+            </td>
+            <td>
+              <span style="font-weight:bold;">{{ file.Name }}</span>
+              <div class="small">
+                URL: <a :href="file.URL" target="_blank">{{ file.URL }}</a>
+              </div>
+            </td>
+            <td><span class="small">{{ file.SizeHuman }}</span></td>
+            <td>
+              <span class="small" :title="file.LastModifiedHuman">
+                {{ file.LastModifiedHuman ? file.LastModifiedHuman.substring(0, 10) : '' }}
+              </span>
+            </td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-gear"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><button class="dropdown-item" @click="showViewModal(file)"><i class="bi bi-eye me-2"></i> View</button></li>
+                  <li><button class="dropdown-item" @click="showCloneModal(file)"><i class="bi bi-copy me-2"></i> Clone</button></li>
+                  <li><button class="dropdown-item" @click="showRenameModal(file, 'file')"><i class="bi bi-pencil me-2"></i> Rename</button></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><button class="dropdown-item text-danger" @click="showDeleteFileModal(file)"><i class="bi bi-trash me-2"></i> Delete</button></li>
+                  <li v-if="hasOpener"><hr class="dropdown-divider"></li>
+                  <li v-if="hasOpener"><button class="dropdown-item text-success" @click="fileSelectedUrl(file.URL)"><i class="bi bi-chevron-right me-2"></i> Select</button></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal: Upload File -->
+    <div v-if="modal === 'uploadFile'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'uploadFile'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">File Upload</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <input type="file" ref="uploadFileInput" class="form-control" />
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Close
+            </button>
+            <button type="button" class="btn btn-primary float-end" @click="uploadFile()" :disabled="uploading">
+              <span v-if="uploading" class="spinner-border spinner-border-sm me-1"></span>
+              <i v-else class="bi bi-check"></i>
+              {{ uploading ? 'Uploading...' : 'Start Upload' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Upload Multiple -->
+    <div v-if="modal === 'uploadMultiple'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'uploadMultiple'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Upload Multiple Files</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="border rounded p-5 text-center mb-3" style="border-style: dashed !important; cursor: pointer;"
+                 @click="$refs.multiFileInput.click()"
+                 @dragover.prevent
+                 @drop.prevent="handleDrop($event)">
+              <p class="mb-0"><i class="bi bi-cloud-upload fs-1 text-muted"></i></p>
+              <p class="text-muted">Drag and drop files here, or click to browse</p>
+              <input type="file" ref="multiFileInput" multiple style="display:none;" @change="handleFiles($event.target.files)" />
+            </div>
+            <div class="list-group mb-3" style="max-height: 300px; overflow-y: auto;">
+              <div v-for="(f, i) in filesToUpload" :key="i" class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-file me-2"></i>{{ f.name }} ({{ formatFileSize(f.size) }})</span>
+                <button type="button" class="btn btn-sm btn-outline-danger" @click="removeFile(i)"><i class="bi bi-x"></i></button>
+              </div>
+            </div>
+            <div v-if="uploadProgress > 0" class="progress mb-3">
+              <div class="progress-bar" role="progressbar" :style="{ width: uploadProgress + '%' }">{{ uploadProgress }}%</div>
+            </div>
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Close
+            </button>
+            <button type="button" class="btn btn-primary float-end" @click="uploadMultipleFiles()" :disabled="uploading || filesToUpload.length === 0">
+              <span v-if="uploading" class="spinner-border spinner-border-sm me-1"></span>
+              <i v-else class="bi bi-cloud-upload"></i>
+              {{ uploading ? 'Uploading...' : 'Upload All Files' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Create Directory -->
+    <div v-if="modal === 'createDirectory'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'createDirectory'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">New Directory</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <form @submit.prevent="createDirectory()">
+            <div class="modal-body">
+              <div class="form-group">
+                <label class="form-label">Directory name</label>
+                <input type="text" class="form-control" v-model="createDirName" placeholder="directory-name" />
+              </div>
+            </div>
+            <div class="modal-footer" style="display:block;">
+              <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+                <i class="bi bi-chevron-left"></i> Close
+              </button>
+              <button type="submit" class="btn btn-primary float-end" :disabled="creating">
+                <span v-if="creating" class="spinner-border spinner-border-sm me-1"></span>
+                <i v-else class="bi bi-check"></i>
+                {{ creating ? 'Creating...' : 'Create Directory' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Delete Directory -->
+    <div v-if="modal === 'deleteDirectory'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'deleteDirectory'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Directory Delete</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this folder and all the files in it?</p>
+            <p class="text-danger">This operation is final and CANNOT BE undone!</p>
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Close
+            </button>
+            <button type="button" class="btn btn-danger float-end" @click="deleteDirectory()" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+              <i v-else class="bi bi-trash"></i>
+              {{ deleting ? 'Deleting...' : 'Delete Directory' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Delete File -->
+    <div v-if="modal === 'deleteFile'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'deleteFile'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm File Delete</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete this file?</p>
+            <p class="text-danger">This operation is final and CANNOT BE undone!</p>
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Close
+            </button>
+            <button type="button" class="btn btn-danger float-end" @click="deleteFile()" :disabled="deleting">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+              <i v-else class="bi bi-trash"></i>
+              {{ deleting ? 'Deleting...' : 'Delete File' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Rename -->
+    <div v-if="modal === 'rename'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'rename'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Rename {{ renameType === 'directory' ? 'Directory' : 'File' }}</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <form @submit.prevent="renameItem()">
+            <div class="modal-body">
+              <div class="form-group">
+                <label class="form-label">New Name</label>
+                <input type="text" class="form-control" v-model="renameNewName" />
+              </div>
+            </div>
+            <div class="modal-footer" style="display:block;">
+              <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+                <i class="bi bi-chevron-left"></i> Close
+              </button>
+              <button type="submit" class="btn btn-success float-end" :disabled="renaming">
+                <span v-if="renaming" class="spinner-border spinner-border-sm me-1"></span>
+                <i v-else class="bi bi-check"></i>
+                {{ renaming ? 'Renaming...' : 'Rename' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: View File -->
+    <div v-if="modal === 'viewFile'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'viewFile'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">File View</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img v-if="viewFileUrl" :src="viewFileUrl" class="img-fluid" style="max-height:200px;" />
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Move Selected -->
+    <div v-if="modal === 'moveSelected'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'moveSelected'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Move Selected Items</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <form @submit.prevent="moveSelected()">
+            <div class="modal-body">
+              <div class="form-group mb-3">
+                <label class="form-label">Selected Items</label>
+                <div class="border p-2 rounded" style="max-height: 150px; overflow-y: auto;">
+                  <ul v-if="selectedItems.length > 0" class="list-unstyled mb-0">
+                    <li v-for="item in selectedItems" :key="item.path">
+                      <i :class="item.type === 'directory' ? 'bi bi-folder' : 'bi bi-file'" class="me-1"></i>
+                      {{ item.name }}
+                    </li>
+                  </ul>
+                  <em v-else class="text-muted">No items selected</em>
+                </div>
+              </div>
+              <div class="form-group mb-3">
+                <label class="form-label">Destination Directory</label>
+                <select class="form-select" v-model="moveDestinationDir">
+                  <option value="">-- Root Directory --</option>
+                  <option v-for="dir in moveDestinations" :key="dir.Path" :value="dir.Path">
+                    {{ '— '.repeat(dir.Depth || 0) }}{{ dir.Name }}
+                  </option>
+                </select>
+                <small class="form-text text-muted">Select the folder where you want to move the selected items</small>
+              </div>
+            </div>
+            <div class="modal-footer" style="display:block;">
+              <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+                <i class="bi bi-chevron-left"></i> Cancel
+              </button>
+              <button type="submit" class="btn btn-warning float-end" :disabled="moving || selectedItems.length === 0">
+                <span v-if="moving" class="spinner-border spinner-border-sm me-1"></span>
+                <i v-else class="bi bi-folder-symlink"></i>
+                {{ moving ? 'Moving...' : 'Move Selected Items' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Delete Selected -->
+    <div v-if="modal === 'deleteSelected'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'deleteSelected'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Delete Selected Items</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete the selected items?</p>
+            <p class="text-danger">This operation is final and CANNOT BE undone!</p>
+            <div class="border p-2 rounded mb-3" style="max-height: 150px; overflow-y: auto;">
+              <ul v-if="selectedItems.length > 0" class="list-unstyled mb-0">
+                <li v-for="item in selectedItems" :key="item.path">
+                  <i :class="item.type === 'directory' ? 'bi bi-folder' : 'bi bi-file'" class="me-1"></i>
+                  {{ item.name }}
+                </li>
+              </ul>
+              <em v-else class="text-muted">No items selected</em>
+            </div>
+          </div>
+          <div class="modal-footer" style="display:block;">
+            <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+              <i class="bi bi-chevron-left"></i> Cancel
+            </button>
+            <button type="button" class="btn btn-danger float-end" @click="deleteSelected()" :disabled="deleting || selectedItems.length === 0">
+              <span v-if="deleting" class="spinner-border spinner-border-sm me-1"></span>
+              <i v-else class="bi bi-trash"></i>
+              {{ deleting ? 'Deleting...' : 'Delete Selected Items' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    <!-- Modal: Clone File -->
+    <div v-if="modal === 'cloneFile'" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="modal === 'cloneFile'" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Clone File</h5>
+            <button type="button" class="btn-close" @click="closeModal()"></button>
+          </div>
+          <form @submit.prevent="cloneFile()">
+            <div class="modal-body">
+              <p class="text-muted">A copy of <strong>{{ cloneFileName }}</strong> will be created in the same folder.</p>
+              <div class="form-group">
+                <label class="form-label">New File Name</label>
+                <input type="text" class="form-control" v-model="cloneNewName" />
+              </div>
+            </div>
+            <div class="modal-footer" style="display:block;">
+              <button type="button" class="btn btn-secondary float-start" @click="closeModal()">
+                <i class="bi bi-chevron-left"></i> Close
+              </button>
+              <button type="submit" class="btn btn-success float-end" :disabled="cloning">
+                <span v-if="cloning" class="spinner-border spinner-border-sm me-1"></span>
+                <i v-else class="bi bi-copy"></i>
+                {{ cloning ? 'Cloning...' : 'Clone File' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>

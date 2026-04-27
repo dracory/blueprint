@@ -6,9 +6,9 @@ import (
 	"net/url"
 	"strings"
 
-	"project/pkg/blogadmin/shared"
 	livefluxctl "project/internal/controllers/liveflux"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/base/blogblocks"
 	"github.com/dracory/blockeditor"
@@ -453,4 +453,3 @@ func init() {
 		log.Printf("Failed to register postContentComponent: %v", err)
 	}
 }
-

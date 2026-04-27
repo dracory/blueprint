@@ -49,4 +49,3 @@ func (c *AiTitleGeneratorController) onAddTitle(r *http.Request) string {
 		})).
 		ToHTML()
 }
-

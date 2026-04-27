@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/blogstore"
@@ -563,4 +563,3 @@ func (controller *postUpdateController) handleRemoveTag(w http.ResponseWriter, r
 
 	return api.Success("Tag removed from post successfully").ToString()
 }
-

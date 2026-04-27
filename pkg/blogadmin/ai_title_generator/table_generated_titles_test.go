@@ -406,4 +406,3 @@ func createTestRecordPost(id, title, status string) blogai.RecordPost {
 		Status: status,
 	}
 }
-

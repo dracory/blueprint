@@ -1,27 +1,14 @@
-package admin
+package file_manager
 
 import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/dracory/api"
 	"github.com/dracory/base/files"
 	"github.com/dracory/req"
 )
-
-// FileEntry represents a file or directory entry
-type FileEntry struct {
-	IsDir             bool
-	Path              string
-	URL               string
-	Name              string
-	Size              int64
-	SizeHuman         string
-	LastModified      time.Time
-	LastModifiedHuman string
-}
 
 // fileUploadAjax handles file upload requests
 func (c *FileManagerController) fileUploadAjax(r *http.Request) string {

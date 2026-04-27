@@ -6,17 +6,10 @@ import (
 	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/registry"
-	"project/pkg/useradmin/shared"
-	"project/pkg/useradmin/user_create"
-	"project/pkg/useradmin/user_delete"
-	"project/pkg/useradmin/user_impersonate"
-	"project/pkg/useradmin/user_manager"
-	"project/pkg/useradmin/user_update"
-
-	"github.com/dracory/req"
+	"project/pkg/useradmin"
 )
 
-// usersAdminController handles all user admin requests
+// usersAdminController wraps the pkg/useradmin package for integration
 type usersAdminController struct {
 	registry registry.RegistryInterface
 }
@@ -34,23 +27,33 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	controllerParam := req.GetStringTrimmed(r, "controller")
+	admin, err := useradmin.New(useradmin.AdminOptions{
+		Registry:     controller.registry,
+		AdminHomeURL: links.Admin().Home(),
+		UserAdminURL: links.Admin().Users(),
+		AuthUserID: func(r *http.Request) string {
+			user := helpers.GetAuthUser(r)
+			if user == nil {
+				return ""
+			}
+			return user.GetID()
+		},
+	})
 
-	var html string
-	switch controllerParam {
-	case shared.CONTROLLER_USER_MANAGER:
-		html = user_manager.NewUserManagerController(controller.registry).Handler(w, r)
-	case shared.CONTROLLER_USER_CREATE:
-		html = user_create.NewUserCreateController(controller.registry).Handler(w, r)
-	case shared.CONTROLLER_USER_DELETE:
-		html = user_delete.NewUserDeleteController(controller.registry).Handler(w, r)
-	case shared.CONTROLLER_USER_UPDATE:
-		html = user_update.NewUserUpdateController(controller.registry).Handler(w, r)
-	case shared.CONTROLLER_USER_IMPERSONATE:
-		html = user_impersonate.NewUserImpersonateController(controller.registry).Handler(w, r)
-	default:
-		html = user_manager.NewUserManagerController(controller.registry).Handler(w, r)
+	if err != nil {
+		if logger := controller.registry.GetLogger(); logger != nil {
+			logger.Error("At admin > usersAdminController > Handler", "error", err.Error())
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		if _, writeErr := w.Write([]byte(err.Error())); writeErr != nil {
+			if logger := controller.registry.GetLogger(); logger != nil {
+				logger.Error("At admin > usersAdminController > Handler", "write_error", writeErr.Error())
+			}
+		}
+		return
 	}
+
+	html := admin.Handle(w, r)
 
 	if html != "" {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")

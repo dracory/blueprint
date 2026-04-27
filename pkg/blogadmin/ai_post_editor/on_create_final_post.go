@@ -72,4 +72,3 @@ func (c *AiPostEditorController) onCreateFinalPost(data pageData) string {
 		"redirect": shared.NewLinks("/admin/blog").PostManager(),
 	}).ToString()
 }
-

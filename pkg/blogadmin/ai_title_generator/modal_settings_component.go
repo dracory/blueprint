@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	livefluxctl "project/internal/controllers/liveflux"
 
@@ -295,4 +295,3 @@ func init() {
 		log.Printf("Failed to register titleGeneratorSettingsModal component: %v", err)
 	}
 }
-

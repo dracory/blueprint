@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/testutils"
+	"project/pkg/blogadmin/shared"
 )
 
 func TestBlogSettingsForm_RenderStructure(t *testing.T) {
@@ -155,4 +155,3 @@ func htmlDecode(s string) string {
 	}
 	return html.UnescapeString(decoded)
 }
-

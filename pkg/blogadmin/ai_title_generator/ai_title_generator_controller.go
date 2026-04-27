@@ -3,10 +3,10 @@ package aititlegenerator
 import (
 	"fmt"
 	"net/http"
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/pkg/blogadmin/shared"
 
 	"project/internal/registry"
 	"project/pkg/blogai"
@@ -228,4 +228,3 @@ func (c *AiTitleGeneratorController) prepareData(r *http.Request) (data pageData
 
 	return data, ""
 }
-

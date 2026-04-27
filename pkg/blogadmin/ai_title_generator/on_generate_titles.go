@@ -188,4 +188,3 @@ func (c *AiTitleGeneratorController) stepHandlerSaveTitles(ctx context.Context, 
 
 	return ctx, data, nil
 }
-

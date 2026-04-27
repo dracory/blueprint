@@ -21,4 +21,3 @@ const (
 	CONTROLLER_CATEGORY_MANAGER = "category-manager"
 	CONTROLLER_TAG_MANAGER      = "tag-manager"
 )
-

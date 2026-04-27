@@ -52,4 +52,3 @@ func (c *AiTitleGeneratorController) onRejectTitle(r *http.Request) string {
 		RedirectSeconds:  3,
 	}).ToHTML()
 }
-

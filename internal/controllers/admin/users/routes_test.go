@@ -52,8 +52,8 @@ func TestUsersRoutesReturnsRoutes(t *testing.T) {
 		t.Errorf("Routes() returned error: %v", err)
 	}
 
-	// Should return users and users catchall routes
-	if len(routes) != 2 {
-		t.Errorf("Expected 2 routes (users, users catchall), got %d", len(routes))
+	// Should return users route
+	if len(routes) != 1 {
+		t.Errorf("Expected 1 route (users), got %d", len(routes))
 	}
 }

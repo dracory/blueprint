@@ -147,4 +147,3 @@ func TestRecordPostToMarkdown_EmptySections(t *testing.T) {
 		t.Fatalf("expected empty sections to be skipped, got %q", result)
 	}
 }
-

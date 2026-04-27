@@ -3,10 +3,10 @@ package ai_tools
 import (
 	"net/http"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -155,4 +155,3 @@ func (c *aiToolsController) view() *hb.Tag {
 		Child(breadcrumbs).
 		Child(card)
 }
-

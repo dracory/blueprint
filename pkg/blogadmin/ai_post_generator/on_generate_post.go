@@ -158,4 +158,3 @@ func (c *AiPostGeneratorController) stepHandlerSavePost(ctx context.Context, dat
 
 	return ctx, data, nil
 }
-

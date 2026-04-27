@@ -142,4 +142,3 @@ func mergeParams(params ...map[string]string) map[string]string {
 	}
 	return result
 }
-

@@ -79,4 +79,3 @@ func (controller *postCreateController) prepareDataAndValidate(r *http.Request) 
 	return data, ""
 
 }
-

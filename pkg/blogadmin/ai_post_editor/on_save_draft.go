@@ -41,4 +41,3 @@ func (c *AiPostEditorController) onSaveDraft(data pageData) string {
 
 	return api.SuccessWithData("Draft saved successfully", map[string]any{}).ToString()
 }
-

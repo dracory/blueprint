@@ -266,4 +266,3 @@ func createBlogStoreWithoutTaxonomy(r registry.RegistryInterface) (blogstore.Sto
 
 	return st, nil
 }
-

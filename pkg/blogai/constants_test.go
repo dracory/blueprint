@@ -103,5 +103,3 @@ func TestNewTitleGeneratorAgentV1(t *testing.T) {
 		t.Error("NewTitleGeneratorAgentV1() should not return nil")
 	}
 }
-
-

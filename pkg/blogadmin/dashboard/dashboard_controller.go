@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cdn"
@@ -361,4 +361,3 @@ type dashboardControllerData struct {
 	taxonomyEnabled  bool
 	taxonomyErrorMsg string
 }
-

@@ -2,10 +2,10 @@ package aitest
 
 import (
 	"net/http"
-	"project/pkg/blogadmin/shared"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/aws/smithy-go/ptr"
 	"github.com/dracory/base/req"
@@ -195,4 +195,3 @@ func (c *AiTestController) view() *hb.Tag {
 		Child(breadcrumbs).
 		Child(card)
 }
-

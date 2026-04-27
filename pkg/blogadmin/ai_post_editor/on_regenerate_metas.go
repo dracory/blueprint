@@ -41,4 +41,3 @@ func (c *AiPostEditorController) onRegenerateMetas(data pageData) string {
 		"metaKeywords":    metaKeywords,
 	}).ToString()
 }
-

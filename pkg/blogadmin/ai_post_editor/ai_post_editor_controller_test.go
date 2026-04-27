@@ -388,7 +388,7 @@ func TestAiPostEditorController_StructFields(t *testing.T) {
 
 	// Verify struct fields exist and are accessible
 	controller := NewAiPostEditorController(nil)
-	
+
 	// The struct should have a registry field
 	// We can't directly test private fields, but we can verify the type
 	if controller == nil {
@@ -402,16 +402,16 @@ func TestPageData_Struct(t *testing.T) {
 
 	// Test that pageData can be created
 	data := pageData{}
-	
+
 	// Verify default zero values
 	if data.Request != nil {
 		t.Error("Request should be nil by default")
 	}
-	
+
 	// Test setting values
 	record := &blogai.RecordPost{}
 	record.Title = "Test"
-	
+
 	// We can't directly set BlogAiPost since it's not exported
 	// but we verified the struct can be instantiated
 	_ = data

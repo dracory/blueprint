@@ -22,4 +22,3 @@ func (c *AiPostEditorController) onLoadPost(data pageData) string {
 		"status":          data.BlogAiPost.Status,
 	}).ToString()
 }
-

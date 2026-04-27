@@ -60,4 +60,3 @@ func (c *AiPostEditorController) onRegenerateSection(data pageData) string {
 
 	return api.SuccessWithData("Section regenerated successfully", map[string]any{"section": sectionData}).ToString()
 }
-

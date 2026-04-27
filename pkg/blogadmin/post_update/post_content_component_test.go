@@ -104,4 +104,3 @@ func TestPostContentComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T)
 		assert.Equal(t, "Updated content", updated.GetContent())
 	}
 }
-

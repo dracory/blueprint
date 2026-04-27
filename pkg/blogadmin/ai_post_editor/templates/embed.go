@@ -89,4 +89,3 @@ func Tpl(path string, data map[string]any) string {
 
 	return out
 }
-

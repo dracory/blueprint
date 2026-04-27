@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -190,4 +190,3 @@ func (c *blogSettingsController) page(component hb.TagInterface) hb.TagInterface
 			Child(buttonBack)).
 		Child(card)
 }
-

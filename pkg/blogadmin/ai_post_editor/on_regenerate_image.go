@@ -33,4 +33,3 @@ func (c *AiPostEditorController) onRegenerateImage(data pageData) string {
 
 	return api.SuccessWithData("Image generated successfully", map[string]any{"image": imageDataURL}).ToString()
 }
-

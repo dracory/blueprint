@@ -91,4 +91,3 @@ func setupControllerAppAndPost(t *testing.T) (registry.RegistryInterface, blogst
 
 	return registry, post
 }
-

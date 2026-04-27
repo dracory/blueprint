@@ -80,4 +80,3 @@ func (c *AiTitleGeneratorController) onAddTitleModal(r *http.Request) string {
 		backdrop,
 	}).ToHTML()
 }
-

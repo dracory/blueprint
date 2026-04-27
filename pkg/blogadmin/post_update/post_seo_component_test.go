@@ -92,4 +92,3 @@ func TestPostSEOComponent_HandleSave_UpdatesPostAndSetsSuccess(t *testing.T) {
 		assert.Equal(t, "NOINDEX, FOLLOW", updated.GetMetaRobots())
 	}
 }
-

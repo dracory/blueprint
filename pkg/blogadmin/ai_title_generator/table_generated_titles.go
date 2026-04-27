@@ -182,4 +182,3 @@ func getStatusBadgeClass(status string) string {
 		return "bg-secondary"
 	}
 }
-

@@ -76,4 +76,3 @@ func modalPostDelete(data postDeleteControllerData) hb.TagInterface {
 			backdrop,
 		})
 }
-

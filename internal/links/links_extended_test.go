@@ -32,11 +32,6 @@ func TestAdminLinks(t *testing.T) {
 		{"Stats", func() string { return admin.Stats() }, "/admin/stats"},
 		{"Tasks", func() string { return admin.Tasks() }, "/admin/tasks"},
 		{"Users", func() string { return admin.Users() }, "/admin/users"},
-		{"UsersUserCreate", func() string { return admin.UsersUserCreate() }, "/admin/users/user-create"},
-		{"UsersUserDelete", func() string { return admin.UsersUserDelete() }, "/admin/users/user-delete"},
-		{"UsersUserImpersonate", func() string { return admin.UsersUserImpersonate() }, "/admin/users/user-impersonate"},
-		{"UsersUserManager", func() string { return admin.UsersUserManager() }, "/admin/users/user-manager"},
-		{"UsersUserUpdate", func() string { return admin.UsersUserUpdate() }, "/admin/users/user-update"},
 	}
 
 	for _, tt := range tests {

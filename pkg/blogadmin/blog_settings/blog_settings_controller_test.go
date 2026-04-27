@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"project/internal/config"
-	"project/pkg/blogadmin/shared"
 	"project/internal/links"
 	"project/internal/testutils"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/test"
@@ -130,4 +130,3 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 		t.Error("expected env value in HTML")
 	}
 }
-

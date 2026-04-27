@@ -30,4 +30,3 @@ func (c *AiTitleGeneratorController) onDeleteTitle(r *http.Request) string {
 		RedirectSeconds:  3,
 	}).ToHTML()
 }
-

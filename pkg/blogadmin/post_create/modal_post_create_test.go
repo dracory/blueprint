@@ -57,4 +57,3 @@ func TestModalPostCreate(t *testing.T) {
 		})
 	}
 }
-

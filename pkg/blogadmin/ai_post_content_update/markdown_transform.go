@@ -455,4 +455,3 @@ func headingPrefixLength(line string) int {
 	}
 	return level + 1 // number of '#' plus trailing space
 }
-

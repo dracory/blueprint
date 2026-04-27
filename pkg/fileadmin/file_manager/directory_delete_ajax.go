@@ -1,4 +1,4 @@
-package admin
+package file_manager
 
 import (
 	"net/http"

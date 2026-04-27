@@ -121,4 +121,3 @@ func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userst
 
 	return registry, user
 }
-

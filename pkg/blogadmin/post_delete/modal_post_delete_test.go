@@ -45,4 +45,3 @@ func TestModalPostDelete(t *testing.T) {
 		t.Error("Should have post ID field")
 	}
 }
-

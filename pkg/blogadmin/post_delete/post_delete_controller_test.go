@@ -167,4 +167,3 @@ func TestPostDeleteController_DeletesPost(t *testing.T) {
 		t.Errorf("Post should be marked as trash, got %s", deletedPost.GetStatus())
 	}
 }
-

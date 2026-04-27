@@ -89,4 +89,3 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 	return data, ""
 
 }
-

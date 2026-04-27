@@ -131,4 +131,3 @@ func createTestPost(id, title, status, featured string) blogstore.PostInterface 
 	post.SetFeatured(featured)
 	return post
 }
-

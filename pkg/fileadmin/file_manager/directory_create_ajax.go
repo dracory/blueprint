@@ -1,4 +1,4 @@
-package admin
+package file_manager
 
 import (
 	"net/http"
@@ -29,8 +29,6 @@ func (c *FileManagerController) directoryCreateAjax(r *http.Request) string {
 	dirPath := currentDir + "/" + newDirName
 	dirPath = strings.ReplaceAll(dirPath, "//", "/") // remove double slashes
 	dirPath = strings.TrimRight(dirPath, "/")        // remove trailing slashes
-
-	// cfmt.Infoln("New directory:", dirPath)
 
 	if dirPath == "" || dirPath == "/" {
 		return api.Error("root directory can not be created").ToString()

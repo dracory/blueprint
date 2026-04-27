@@ -132,4 +132,3 @@ func TestPostDetailsComponent_HandleRegenerateImage_BlogStoreNotAvailable(t *tes
 	assert.Equal(t, "Blog store not available", c.FormErrorMessage)
 	assert.Equal(t, "", c.FormSuccessMessage)
 }
-

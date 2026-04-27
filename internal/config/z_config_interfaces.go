@@ -9,6 +9,7 @@ package config
 // ConfigInterface defines the contract for application configuration.
 // It composes all domain-specific configuration interfaces.
 type ConfigInterface interface {
+	// App-specific settings
 	AppConfigInterface
 	AuthConfigInterface
 	DatabaseConfigInterface

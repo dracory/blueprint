@@ -66,28 +66,3 @@ func (l *adminLinks) Users(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	return URL(ADMIN_USERS, p)
 }
-
-func (l *adminLinks) UsersUserCreate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_USERS_USER_CREATE, p)
-}
-
-func (l *adminLinks) UsersUserDelete(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_USERS_USER_DELETE, p)
-}
-
-func (l *adminLinks) UsersUserImpersonate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_USERS_USER_IMPERSONATE, p)
-}
-
-func (l *adminLinks) UsersUserManager(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_USERS_USER_MANAGER, p)
-}
-
-func (l *adminLinks) UsersUserUpdate(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(ADMIN_USERS_USER_UPDATE, p)
-}

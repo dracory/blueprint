@@ -34,4 +34,3 @@ func (c *AiPostEditorController) onRegenerateSummary(data pageData) string {
 
 	return api.SuccessWithData("Summary regenerated successfully", map[string]any{"summary": summary}).ToString()
 }
-

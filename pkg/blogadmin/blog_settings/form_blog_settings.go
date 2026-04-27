@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"project/pkg/blogadmin/shared"
 	"project/internal/registry"
+	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
@@ -268,4 +268,3 @@ func init() {
 		log.Printf("Failed to register formBlogSettings component: %v", err)
 	}
 }
-

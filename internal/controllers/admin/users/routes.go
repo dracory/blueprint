@@ -18,13 +18,7 @@ func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
 		SetPath(links.ADMIN_USERS).
 		SetHandler(NewUsersAdminController(registry).Handler)
 
-	usersCatchAll := rtr.NewRoute().
-		SetName("Admin > Users > Catchall").
-		SetPath(links.ADMIN_USERS + links.CATCHALL).
-		SetHandler(NewUsersAdminController(registry).Handler)
-
 	return []rtr.RouteInterface{
 		users,
-		usersCatchAll,
 	}, nil
 }

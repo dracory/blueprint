@@ -65,4 +65,3 @@ func (c *AiPostEditorController) onRegenerateParagraph(data pageData) string {
 
 	return api.SuccessWithData("Paragraph regenerated successfully", map[string]any{"paragraph": newParagraph}).ToString()
 }
-

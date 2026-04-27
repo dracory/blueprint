@@ -240,4 +240,3 @@ func init() {
 		log.Printf("Failed to register postSEOComponent: %v", err)
 	}
 }
-

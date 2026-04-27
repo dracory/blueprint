@@ -56,7 +56,12 @@ func TestValidateCommand(t *testing.T) {
 			name:        "Command with semicolon injection",
 			cmd:         "ls; rm -rf /",
 			expectError: true,
-			errorMsg:    "dangerous character detected in command: ;",
+			errorMsg:    "command not allowed: rm",
+		},
+		{
+			name:        "Allowed chained commands",
+			cmd:         "cd /path; ls",
+			expectError: false,
 		},
 		{
 			name:        "Command with ampersand injection",
@@ -95,12 +100,6 @@ func TestValidateCommand(t *testing.T) {
 			errorMsg:    "dangerous character detected in command: >",
 		},
 		{
-			name:        "Command with quote injection",
-			cmd:         "ls \"rm -rf /\"",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: \"",
-		},
-		{
 			name:        "Command with single quote injection",
 			cmd:         "ls 'rm -rf /'",
 			expectError: true,
@@ -129,7 +128,7 @@ func TestValidateCommand(t *testing.T) {
 
 // TestValidateCommandAllAllowedCommands tests all allowed commands
 func TestValidateCommandAllAllowedCommands(t *testing.T) {
-	allowedCommands := []string{"ls", "pwd", "cat", "grep", "find", "ps", "df", "du", "whoami", "id", "date", "uptime", "top", "free", "uname"}
+	allowedCommands := []string{"ls", "pwd", "cat", "cd", "chmod", "grep", "find", "ps", "df", "du", "whoami", "id", "date", "uptime", "top", "free", "uname", "touch", "mv", "pm2"}
 
 	for _, cmd := range allowedCommands {
 		t.Run(cmd, func(t *testing.T) {
@@ -402,7 +401,7 @@ func TestGetDeployCommandsContainsConfigValues(t *testing.T) {
 
 // TestValidateCommandWithDangerousCharacters tests all dangerous characters are blocked
 func TestValidateCommandWithDangerousCharacters(t *testing.T) {
-	dangerousChars := []string{";", "&", "|", "`", "$", "(", ")", "<", ">", "\"", "'"}
+	dangerousChars := []string{"&", "|", "`", "$", "(", ")", "<", ">", "'"}
 
 	for _, char := range dangerousChars {
 		t.Run("dangerous_char_"+char, func(t *testing.T) {

@@ -49,42 +49,63 @@ func BuildExecutable(pathExec string) error {
 func validateCommand(cmd string) error {
 	// Define allowed commands for security
 	allowedCommands := map[string]bool{
-		"ls":     true,
-		"pwd":    true,
 		"cat":    true,
-		"grep":   true,
-		"find":   true,
-		"ps":     true,
+		"cd":     true,
+		"chmod":  true,
+		"date":   true,
 		"df":     true,
 		"du":     true,
-		"whoami": true,
-		"id":     true,
-		"date":   true,
-		"uptime": true,
-		"top":    true,
+		"find":   true,
 		"free":   true,
+		"grep":   true,
+		"id":     true,
+		"ls":     true,
+		"mv":     true,
+		"pm2":    true,
+		"ps":     true,
+		"pwd":    true,
+		"top":    true,
+		"touch":  true,
 		"uname":  true,
+		"uptime": true,
+		"whoami": true,
 	}
 
 	// Check for dangerous characters first
-	dangerousChars := []string{";", "&", "|", "`", "$", "(", ")", "<", ">", "\"", "'"}
-	for _, char := range dangerousChars {
-		if strings.Contains(cmd, char) {
-			return errors.New("dangerous character detected in command: " + char)
+	dangerousChars := []string{"&", "|", "`", "$", "(", ")", "<", ">", "'"}
+
+	// Split by semicolon to support chained commands, validate each part
+	chainedCommands := strings.Split(cmd, ";")
+	foundValidCommand := false
+	for _, chainedCmd := range chainedCommands {
+		chainedCmd = strings.TrimSpace(chainedCmd)
+		if chainedCmd == "" {
+			continue
+		}
+		foundValidCommand = true
+
+		for _, char := range dangerousChars {
+			if strings.Contains(chainedCmd, char) {
+				return errors.New("dangerous character detected in command: " + char)
+			}
+		}
+
+		// Extract the base command (first word before any arguments)
+		parts := strings.Fields(chainedCmd)
+		if len(parts) == 0 {
+			return errors.New("empty command not allowed")
+		}
+
+		baseCommand := parts[0]
+
+		// Check if the base command is allowed
+		if !allowedCommands[baseCommand] {
+			return errors.New("command not allowed: " + baseCommand)
 		}
 	}
 
-	// Extract the base command (first word before any arguments)
-	parts := strings.Fields(cmd)
-	if len(parts) == 0 {
+	if !foundValidCommand {
 		return errors.New("empty command not allowed")
-	}
-
-	baseCommand := parts[0]
-
-	// Check if the base command is allowed
-	if !allowedCommands[baseCommand] {
-		return errors.New("command not allowed: " + baseCommand)
 	}
 
 	return nil
