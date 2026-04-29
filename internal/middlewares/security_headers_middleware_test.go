@@ -55,7 +55,6 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 		"connect-src 'self'",
 		"https://cdnjs.cloudflare.com",
 		"http://cdnjs.cloudflare.com",
-		"https://www.statcounter.com",
 	}
 
 	tests := []struct {

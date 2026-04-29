@@ -22,7 +22,7 @@ func NewSecurityHeadersMiddleware(registry registry.RegistryInterface) rtr.Middl
 		CSP: &middlewares.CSPConfig{
 			Enabled:    true,
 			DefaultSrc: []string{"'self'"},
-			ScriptSrc:  getScriptSources(isDevelopment),
+			ScriptSrc:  getScriptSources(),
 			StyleSrc:   getStyleSources(),
 			ConnectSrc: []string{
 				"'self'",
@@ -81,7 +81,7 @@ func NewCustomSecurityHeadersMiddleware(config *middlewares.SecurityHeadersConfi
 }
 
 // getScriptSources returns script sources based on environment
-func getScriptSources(isDevelopment bool) []string {
+func getScriptSources() []string {
 	sources := []string{
 		"'self'",
 		"https://cdn.jsdelivr.net",
