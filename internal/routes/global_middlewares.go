@@ -14,12 +14,12 @@ import (
 
 // Rate limit constants
 const (
-	defaultVisitsPerMin  = 10    // Default rate limit
 	defaultVisitsPerSec  = 20    // Default rate limit per second
+	defaultVisitsPerMin  = 120   // Default rate limit
 	defaultVisitsPerHour = 12000 // Default rate limit per hour
 
-	devVisitsPerMin  = 10000  // Development rate limit per minute
 	devVisitsPerSec  = 1000   // Development rate limit per second
+	devVisitsPerMin  = 10000  // Development rate limit per minute
 	devVisitsPerHour = 100000 // Development rate limit per hour
 )
 
@@ -70,6 +70,7 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 	// Conditionally add logger and recovery when not running tests
 	if registry.GetConfig() != nil {
 		isNotTesting := !registry.GetConfig().IsEnvTesting()
+
 		if isNotTesting {
 			globalMiddlewares = append(globalMiddlewares,
 				rtrMiddleware.LoggerMiddleware(),
@@ -78,22 +79,26 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 		}
 	}
 
-	// Add HTTPS redirect middleware only in production (not in development or testing)
-	if registry.GetConfig() != nil &&
-		!registry.GetConfig().IsEnvTesting() &&
-		!registry.GetConfig().IsEnvDevelopment() {
-		globalMiddlewares = append(globalMiddlewares,
-			httpsredirect.NewHTTPSRedirectMiddlewareWithConfig(httpsredirect.Config{
-				SkipFunc: func(r *http.Request) bool {
-					return r.URL.Path == "/api/internal/webhook"
-				},
-			}),
-		)
+	// Add HTTPS redirect middleware only in production (not in development, local, or testing)
+	if registry.GetConfig() != nil {
+		isNotTesting := !registry.GetConfig().IsEnvTesting()
+		isNotDevelopment := !registry.GetConfig().IsEnvDevelopment()
+		isNotLocal := !registry.GetConfig().IsEnvLocal()
+
+		if isNotTesting && isNotDevelopment && isNotLocal {
+			globalMiddlewares = append(globalMiddlewares,
+				httpsredirect.NewHTTPSRedirectMiddlewareWithConfig(httpsredirect.Config{
+					SkipFunc: func(r *http.Request) bool {
+						return r.URL.Path == "/api/internal/webhook"
+					},
+				}),
+			)
+		}
 	}
 
 	globalMiddlewares = append(globalMiddlewares,
 		middlewares.LogRequestMiddleware(registry),
-		middlewares.NewSecurityHeadersMiddleware(),
+		middlewares.NewSecurityHeadersMiddleware(registry),
 		middlewares.ThemeMiddleware(),
 		middlewares.AuthMiddleware(registry),
 	)

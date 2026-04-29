@@ -3,20 +3,15 @@ package middlewares
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
-
-	"project/internal/config"
-	"project/internal/testutils"
 )
 
 func TestSecurityHeadersMiddleware(t *testing.T) {
-	// Create test config with development environment
-	testConfig := config.New()
-	testConfig.SetAppEnv(config.APP_ENVIRONMENT_DEVELOPMENT)
-	testConfig.SetDatabaseDriver("sqlite") // Required by registry builder
-	testConfig.SetDatabaseName(":memory:") // Required by registry builder
-	registry := testutils.Setup(testutils.WithCfg(testConfig))
+	// Set development environment for testing
+	os.Setenv("APP_ENV", "development")
+	defer os.Unsetenv("APP_ENV")
 
 	cspParts := []string{
 		"default-src 'self';",
@@ -50,12 +45,10 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 		"https://maxcdn.bootstrapcdn.com;",
 		"img-src 'self' data:",
 		"https://sfs.ams3.digitaloceanspaces.com",
-		"https://lesichkov.ams3.digitaloceanspaces.com",
-		"https://provedexpert.gitlab.io;",
+		"https://lesichkov.ams3.digitaloceanspaces.com;",
 		"connect-src 'self'",
 		"https://cdnjs.cloudflare.com",
 		"http://cdnjs.cloudflare.com",
-		"https://www.statcounter.com",
 	}
 
 	tests := []struct {
@@ -74,7 +67,7 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "https://example.com", nil)
 	rr := httptest.NewRecorder()
-	handler := NewSecurityHeadersMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := NewSecurityHeadersMiddleware().GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	handler.ServeHTTP(rr, req)

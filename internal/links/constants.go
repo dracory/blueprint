@@ -28,11 +28,7 @@ const ADMIN_SHOP = ADMIN_HOME + "/shop"
 const ADMIN_STATS = ADMIN_HOME + "/stats"
 const ADMIN_TASKS = ADMIN_HOME + "/tasks"
 const ADMIN_USERS = ADMIN_HOME + "/users"
-const ADMIN_USERS_USER_CREATE = ADMIN_USERS + "/user-create"
-const ADMIN_USERS_USER_DELETE = ADMIN_USERS + "/user-delete"
 const ADMIN_USERS_USER_IMPERSONATE = ADMIN_USERS + "/user-impersonate"
-const ADMIN_USERS_USER_MANAGER = ADMIN_USERS + "/user-manager"
-const ADMIN_USERS_USER_UPDATE = ADMIN_USERS + "/user-update"
 
 // ===========================================================================
 // == USER LINKS

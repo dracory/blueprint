@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"os"
+	"project/internal/registry"
 	"strings"
 
 	"github.com/dracory/rtr"
@@ -10,19 +11,24 @@ import (
 
 // NewSecurityHeadersMiddleware creates middleware that sets security headers
 // Uses RTR security middleware with project-specific configuration
-func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
-	isDevelopment := os.Getenv("APP_ENV") == "development"
+func NewSecurityHeadersMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
+	var isDevelopment bool = false
+
+	if registry != nil {
+		isDevelopment = registry.GetConfig().IsEnvDevelopment() || registry.GetConfig().IsEnvLocal()
+	}
 
 	config := &middlewares.SecurityHeadersConfig{
 		CSP: &middlewares.CSPConfig{
 			Enabled:    true,
 			DefaultSrc: []string{"'self'"},
 			ScriptSrc:  getScriptSources(isDevelopment),
-			StyleSrc:   getStyleSources(isDevelopment),
+			StyleSrc:   getStyleSources(),
 			ConnectSrc: []string{
 				"'self'",
 				"https://cdnjs.cloudflare.com",
 				"http://cdnjs.cloudflare.com",
+				"https://www.statcounter.com",
 			},
 			FontSrc: []string{
 				"'self'",
@@ -38,6 +44,7 @@ func NewSecurityHeadersMiddleware() rtr.MiddlewareInterface {
 				"data:",
 				"https://sfs.ams3.digitaloceanspaces.com",
 				"https://lesichkov.ams3.digitaloceanspaces.com",
+				"https://provedexpert.gitlab.io",
 			},
 			UpgradeInsecureRequests: !isDevelopment,
 		},
@@ -78,24 +85,29 @@ func getScriptSources(isDevelopment bool) []string {
 	sources := []string{
 		"'self'",
 		"https://cdn.jsdelivr.net",
+		"http://cdn.jsdelivr.net",
 		"https://unpkg.com",
+		"https://www.statcounter.com",
 		"https://code.jquery.com",
+		"https://cdn.datatables.net",
 		"https://cdnjs.cloudflare.com",
 		"http://cdnjs.cloudflare.com",
 		"https://www.googletagmanager.com",
 		"https://www.statcounter.com",
 	}
 
-	if isDevelopment {
-		// Allow unsafe-inline and eval in development
-		sources = append([]string{"'unsafe-inline'", "'unsafe-eval'"}, sources...)
-	}
+	// Allow unsafe-inline, unsafe-hashes, and unsafe-eval
+	sources = append([]string{
+		"'unsafe-inline'",
+		"'unsafe-hashes'",
+		"'unsafe-eval'",
+	}, sources...)
 
 	return sources
 }
 
 // getStyleSources returns style sources based on environment
-func getStyleSources(isDevelopment bool) []string {
+func getStyleSources() []string {
 	sources := []string{
 		"'self'",
 		"https://cdn.jsdelivr.net",
@@ -105,12 +117,14 @@ func getStyleSources(isDevelopment bool) []string {
 		"https://fonts.googleapis.com",
 		"https://unpkg.com",
 		"https://code.jquery.com",
+		"https://cdn.datatables.net",
+		"https://cdnjs.cloudflare.com",
 	}
 
-	if isDevelopment {
-		// Allow unsafe-inline in development
-		sources = append([]string{"'unsafe-inline'"}, sources...)
-	}
+	sources = append([]string{
+		"'unsafe-inline'",
+		"'unsafe-hashes'",
+	}, sources...)
 
 	return sources
 }

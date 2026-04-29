@@ -75,6 +75,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	if err == nil {
 		adminRoutes = append(adminRoutes, userRoutes...)
 	}
+
 	// adminRoutes = append(adminRoutes, []rtr.RouteInterface{subscriptionPlans}...)
 	adminRoutes = append(adminRoutes, []rtr.RouteInterface{home, homeCatchAll}...)
 
