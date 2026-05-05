@@ -1,10 +1,10 @@
-Your task is to upgrade a Blueprint based project to the latest version.
+Your task is to upgrade a project to the latest version of Blueprint.
 
 The project is located at:
 
 <project_path>
 
-The project is a web application that is based on Blueprint to manage its components and features.
+The project is a web application based on Blueprint that manages its components and features.
 
 ## Version Comparison
 
