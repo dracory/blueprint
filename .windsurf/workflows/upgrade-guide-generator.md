@@ -9,15 +9,18 @@ This skill generates comprehensive upgrade guides for Blueprint framework versio
 ## When to Use
 
 Use this skill when:
-- A new Blueprint version is ready for release
+- A new Blueprint version is ready for release (see `docs/version_workflow.md` step 3)
 - You need to document breaking changes between versions
 - You want to help users upgrade from one version to another
 
+**Timing**: Generate the upgrade guide **before** merging the release branch to main and tagging the release. This is step 3 in the version workflow.
+
 ## Prerequisites
 
-1. Both versions should have git tags (e.g., `v0.22.0`, `v0.23.0`)
-2. The version constant in `internal/config/version.go` should be updated
-3. The release branch should be merged to main
+1. The version constant in `internal/config/version.go` should be updated to the new version
+2. The release branch (e.g., `release/v0.23.0`) should be ready for release
+3. Previous version should have a git tag (e.g., `v0.22.0`)
+4. **Note**: Generate upgrade guide **before** merging to main and tagging (see `docs/version_workflow.md` step 3)
 
 ## Steps to Generate Upgrade Guide
 
@@ -29,7 +32,28 @@ Example:
 - Current version: `0.23.0`
 - Previous version: `0.22.0` (latest tag)
 
-### 2. Compare Versions
+**Version Gap Handling**:
+- If versions are consecutive (e.g., v0.22.0 → v0.23.0), generate a single upgrade guide
+- If there are version gaps (e.g., v0.20.0 → v0.23.0), generate multiple upgrade guides for each intermediate version:
+  - `upgrade-v0.20.0-to-v0.21.0.md`
+  - `upgrade-v0.21.0-to-v0.22.0.md`
+  - `upgrade-v0.22.0-to-v0.23.0.md`
+
+### 2. Verify Git Tags
+
+Verify that the previous version has a git tag:
+
+```bash
+# List all version tags
+git tag -l "v*"
+
+# Verify specific tag exists
+git tag -l "v0.22.0"
+```
+
+If the tag doesn't exist, you may need to tag the previous version first or use the commit hash instead.
+
+### 3. Compare Versions
 
 Use git to compare the versions:
 
@@ -44,7 +68,9 @@ git diff --stat v0.22.0..v0.23.0
 git diff v0.22.0..v0.23.0
 ```
 
-### 3. Analyze Changes
+### 4. Analyze Changes
+
+**Reference Previous Guides**: Review existing upgrade guides in `docs/upgrade_guides/` to maintain consistency in style, structure, and terminology.
 
 Examine the following areas:
 
@@ -78,7 +104,17 @@ Examine the following areas:
 - Pattern changes (globals to registry, etc.)
 - New architectural patterns introduced
 
-### 4. Identify Breaking Changes
+**Entry Point Changes**
+- main.go location changes
+- cmd/ structure changes
+- Application entry point modifications
+
+**Store/Task API Changes**
+- Enqueue method changes
+- Initialization changes
+- Store interface modifications
+
+### 5. Identify Breaking Changes
 
 Categorize changes as breaking if they:
 - Require code changes in applications using Blueprint
@@ -87,7 +123,14 @@ Categorize changes as breaking if they:
 - Change default behaviors
 - Require environment variable changes
 
-### 5. Generate Upgrade Guide
+### 6. Generate Upgrade Guide
+
+**Section Styling**: Use emojis for section headers to match existing guides:
+- ⚠️ for Breaking Changes
+- 🔄 for Migration Steps  
+- 🧪 for Testing After Migration
+- 📝 for Additional Notes
+- 🆘 for Common Issues and Solutions
 
 Create a new file: `docs/upgrade_guides/upgrade-v{FROM}-to-v{TO}.md`
 
@@ -100,12 +143,16 @@ Follow the template in `docs/upgrade_guides/upgrade-guide-prompt.md`
 
 This guide helps LLMs and developers upgrade Blueprint applications from v{FROM} to v{TO}.
 
-## Summary
+## Overview
 
-[Brief summary of major changes]
+[Brief overview of major changes]
 
 **Key Changes:**
 - [List major changes]
+
+---
+
+## ⚠️ Breaking Changes
 
 ---
 
@@ -172,7 +219,7 @@ This guide helps LLMs and developers upgrade Blueprint applications from v{FROM}
 [Support information]
 ```
 
-### 6. Include Migration Commands
+### 7. Include Migration Commands
 
 For automated changes, provide bash commands:
 
@@ -184,7 +231,7 @@ find . -type f -name "*.go" -exec sed -i 's|old/path|new/path|g' {} \;
 find . -type f -name "*.go" -exec sed -i 's|OldMethod|NewMethod|g' {} \;
 ```
 
-### 7. Test the Guide
+### 8. Test the Guide
 
 After generating the guide:
 1. Review for accuracy
@@ -193,9 +240,18 @@ After generating the guide:
 4. Check code examples are correct
 5. Ensure migration steps are in logical order
 
-### 8. Save the Guide
+### 9. Save the Guide
 
 Save to: `docs/upgrade_guides/upgrade-v{FROM}-to-v{TO}.md`
+
+### 10. Request Review
+
+After saving the guide, request review from the maintainer or team to ensure:
+- All breaking changes are accurately documented
+- Migration steps are complete and tested
+- Code examples are correct and copy-pasteable
+- Style and structure match existing guides
+- No critical information is missing
 
 ## Quality Checklist
 
@@ -207,14 +263,33 @@ Save to: `docs/upgrade_guides/upgrade-v{FROM}-to-v{TO}.md`
 - [ ] Common issues are addressed
 - [ ] Format follows markdown best practices
 - [ ] File naming follows pattern: `upgrade-vX.Y.Z-to-vX.Y.Z.md`
+- [ ] Emoji styling used consistently (⚠️, 🔄, 🧪, 📝, 🆘)
+- [ ] Version gaps handled correctly (multiple guides if needed)
+- [ ] Git tag verified for previous version
+- [ ] Previous guides reviewed for consistency
+- [ ] Quality checklist included in generated guide
 
 ## Example
 
 To generate an upgrade guide from v0.22.0 to v0.23.0:
 
 1. Read `internal/config/version.go` → Version is "0.23.0"
-2. Run: `git log --oneline v0.22.0..v0.23.0`
-3. Analyze commits and diffs for breaking changes
-4. Document each breaking change with old/new usage
-5. Create migration steps with commands
-6. Save to `docs/upgrade_guides/upgrade-v0.22.0-to-v0.23.0.md`
+2. Verify git tag exists: `git tag -l "v0.22.0"`
+3. Run: `git log --oneline v0.22.0..v0.23.0`
+4. Review previous upgrade guides for consistency
+5. Analyze commits and diffs for breaking changes
+6. Document each breaking change with old/new usage
+7. Create migration steps with commands
+8. Apply emoji styling to sections
+9. Save to `docs/upgrade_guides/upgrade-v0.22.0-to-v0.23.0.md`
+10. Request review from maintainer
+
+**Example for Version Gap** (v0.20.0 to v0.23.0):
+
+1. Identify gap: v0.20.0 → v0.23.0 has 2 intermediate versions
+2. Generate three separate guides:
+   - `upgrade-v0.20.0-to-v0.21.0.md`
+   - `upgrade-v0.21.0-to-v0.22.0.md`
+   - `upgrade-v0.22.0-to-v0.23.0.md`
+3. Each guide follows the same process as above
+4. Users must apply guides in order
