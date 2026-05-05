@@ -18,7 +18,7 @@ func sessionStoreInitialize(registry RegistryInterface) error {
 		return nil
 	}
 
-	if store, err := newSessionStore(registry.GetDatabase()); err != nil {
+	if store, err := newSessionStore(registry.GetDatabase(), registry); err != nil {
 		return err
 	} else {
 		registry.SetSessionStore(store)
@@ -49,15 +49,20 @@ func sessionStoreMigrate(registry RegistryInterface) error {
 }
 
 // newSessionStore constructs the Session store without running migrations
-func newSessionStore(db *sql.DB) (sessionstore.StoreInterface, error) {
+func newSessionStore(db *sql.DB, registry RegistryInterface) (sessionstore.StoreInterface, error) {
 	if db == nil {
 		return nil, errors.New("database is not initialized")
+	}
+
+	timeoutSeconds := int64(7200) // 2 hours default
+	if registry.GetConfig() != nil && registry.GetConfig().IsEnvDevelopment() {
+		timeoutSeconds = 14400 // 4 hours in development
 	}
 
 	st, err := sessionstore.NewStore(sessionstore.NewStoreOptions{
 		DB:               db,
 		SessionTableName: "snv_sessions_session",
-		TimeoutSeconds:   7200,
+		TimeoutSeconds:   timeoutSeconds,
 	})
 
 	if err != nil {
