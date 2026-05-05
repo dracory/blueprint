@@ -12,8 +12,11 @@ Generate a comprehensive upgrade guide for upgrading a Go web application from v
 ## Required Analysis Steps
 
 ### 1. Version Comparison
-- Check out the [FROM_VERSION] tag: `git checkout [FROM_VERSION]`
-- Compare with main branch: `git log --oneline [FROM_VERSION]..HEAD`
+- Read the version constant from `internal/config/version.go` to determine current and target versions
+- Compare the two version constants to identify the upgrade path
+- If versions are consecutive, use a single upgrade guide
+- If there are version gaps, generate multiple upgrade guides for each intermediate version
+- Use git to compare changes: `git log --oneline v[FROM_VERSION]..v[TO_VERSION]`
 - Identify breaking changes, new features, and removals
 
 ### 2. Key Areas to Examine
@@ -25,6 +28,7 @@ Generate a comprehensive upgrade guide for upgrading a Go web application from v
 - **Configuration changes** (environment variables, config structure)
 - **Architecture refactors** (global singletons → registry pattern)
 - **Store/task API changes** (enqueue methods, initialization)
+- **Version constant changes** (internal/config/version.go updates)
 
 ### 3. Breaking Change Categories
 - **File location changes** (moved/renamed files)
@@ -97,6 +101,7 @@ For each breaking change:
 - Be specific about what needs to be changed
 - Include file paths when possible
 - Provide search/replace commands when applicable
+- Note when features may already be implemented in target projects to avoid duplication
 
 ### Commands
 - Include bash commands for automated updates
