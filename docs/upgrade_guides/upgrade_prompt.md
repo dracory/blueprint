@@ -4,7 +4,7 @@ The project is located at:
 
 <project_path>
 
-The project is a web application that uses Blueprint to manage its components and features.
+The project is a web application that is based on Blueprint to manage its components and features.
 
 ## Version Comparison
 
