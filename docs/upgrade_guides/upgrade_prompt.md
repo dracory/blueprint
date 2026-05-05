@@ -42,6 +42,8 @@ Follow the upgrade guide step-by-step to:
 - Modify configuration
 - Run tests to verify the upgrade
 
+**Important**: Some features or changes mentioned in the upgrade guide may already be implemented in the project. Before applying each change, check if the feature already exists in the project files. If it does, skip that step to avoid duplication or conflicts.
+
 You should make the necessary changes to the project files to upgrade it to the latest version.
 
 After making the necessary changes, you should test the project to ensure that it is working correctly.
