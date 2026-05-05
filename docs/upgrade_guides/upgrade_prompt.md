@@ -1,10 +1,10 @@
-Your task is to upgrade a project to the latest version of Blueprint.
+Your task is to upgrade a Blueprint based project to the latest version.
 
 The project is located at:
 
 <project_path>
 
-The project is a web application based on Blueprint that manages its components and features.
+The project is a web application that follows the pattern set by Blueprint.
 
 ## Version Comparison
 
@@ -20,8 +20,12 @@ The project is a web application based on Blueprint that manages its components 
 
 3. **Determine the upgrade path**:
    - Compare the two versions
-   - Identify the upgrade guide needed: `upgrade-v{CURRENT}-to-v{LATEST}.md`
-   - Example: If project is v0.22.0 and latest is v0.23.0, use `upgrade-v0.22.0-to-v0.23.0.md`
+   - If versions are consecutive (e.g., v0.22.0 to v0.23.0), use the single upgrade guide: `upgrade-v{CURRENT}-to-v{LATEST}.md`
+   - If there are multiple version gaps (e.g., v0.20.0 to v0.23.0), you must upgrade through each intermediate version sequentially:
+     - First: `upgrade-v0.20.0-to-v0.21.0.md`
+     - Then: `upgrade-v0.21.0-to-v0.22.0.md`
+     - Finally: `upgrade-v0.22.0-to-v0.23.0.md`
+   - After each upgrade step, update the project's version constant before proceeding to the next step
 
 ## Upgrade Process
 
