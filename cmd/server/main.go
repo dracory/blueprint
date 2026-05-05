@@ -45,14 +45,14 @@ func main() {
 	// Set log flags to include file name and line number
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	// Log version on startup
-	fmt.Printf("Starting Blueprint v%s\n", config.GetVersion())
-
 	cfg, err := config.NewFromEnv()
 	if err != nil {
 		fmt.Printf("Failed to load config: %v\n", err)
 		return
 	}
+
+	// Log version on startup
+	fmt.Printf("Starting %s v%s\n", cfg.GetAppName(), config.GetVersion())
 
 	// Initialize registry (logger, caches, database)
 	registry, err := registry.New(cfg)
