@@ -3,11 +3,10 @@ package middlewares
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
-	"testing"
-
 	"project/internal/config"
 	"project/internal/testutils"
+	"strings"
+	"testing"
 )
 
 func TestSecurityHeadersMiddleware(t *testing.T) {
@@ -30,7 +29,8 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 		"https://cdnjs.cloudflare.com",
 		"http://cdnjs.cloudflare.com",
 		"https://www.googletagmanager.com",
-		"https://www.statcounter.com;",
+		"https://www.statcounter.com",
+		"https://cdn.tiny.cloud;",
 		"style-src 'unsafe-inline' 'unsafe-hashes' 'self'",
 		"https://cdn.jsdelivr.net",
 		"https://maxcdn.bootstrapcdn.com",
@@ -55,6 +55,7 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 		"connect-src 'self'",
 		"https://cdnjs.cloudflare.com",
 		"http://cdnjs.cloudflare.com",
+		"https://www.statcounter.com",
 	}
 
 	tests := []struct {

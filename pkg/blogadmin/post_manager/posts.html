@@ -96,7 +96,7 @@
             </td>
             <td>
               <div>
-                <a :href="getWebsitePostUrl(post.id, post.slug)" target="_blank">{{ post.title }}</a>
+                <a :href="getPostUpdateUrl(post.id)">{{ post.title }}</a>
               </div>
               <div class="text-muted small">Ref: {{ post.id }}</div>
             </td>
@@ -134,17 +134,25 @@
               >
                 <i class="bi bi-magic"></i>
               </a>
-              <a 
-                :href="getPostUpdateUrl(post.id)" 
-                target="_blank" 
-                class="btn btn-primary btn-sm me-2" 
+              <a
+                :href="getPostUpdateUrl(post.id)"
+                target="_blank"
+                class="btn btn-primary btn-sm me-2"
                 title="Edit"
               >
                 <i class="bi bi-pencil-square"></i>
               </a>
-              <button 
-                @click="deletePost(post)" 
-                class="btn btn-danger btn-sm" 
+              <a
+                :href="getWebsitePostUrl(post.id, post.slug)"
+                target="_blank"
+                class="btn btn-info btn-sm me-2"
+                title="View"
+              >
+                <i class="bi bi-eye"></i>
+              </a>
+              <button
+                @click="deletePost(post)"
+                class="btn btn-danger btn-sm"
                 title="Delete"
               >
                 <i class="bi bi-trash"></i>

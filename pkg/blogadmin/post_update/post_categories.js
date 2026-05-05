@@ -4,12 +4,17 @@ const PostCategoriesApp = {
   data() {
     return {
       loading: true,
+      postId: '',
       categories: [],
       saving: false
     };
   },
 
   mounted() {
+    // Initialize postId from global variable
+    if (typeof postId !== 'undefined') {
+      this.postId = postId;
+    }
     this.loadCategories();
   },
 
@@ -83,10 +88,8 @@ const PostCategoriesApp = {
   }
 };
 
-// Mount the app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  const el = document.getElementById('post-categories-app');
-  if (el) {
-    createApp(PostCategoriesApp).mount('#post-categories-app');
-  }
-});
+// Mount the app immediately
+const el = document.getElementById('post-categories-app');
+if (el) {
+  createApp(PostCategoriesApp).mount('#post-categories-app');
+}

@@ -94,6 +94,7 @@ func getScriptSources() []string {
 		"http://cdnjs.cloudflare.com",
 		"https://www.googletagmanager.com",
 		"https://www.statcounter.com",
+		"https://cdn.tiny.cloud",
 	}
 
 	// Allow unsafe-inline, unsafe-hashes, and unsafe-eval

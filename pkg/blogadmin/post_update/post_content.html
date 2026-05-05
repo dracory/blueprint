@@ -1,0 +1,143 @@
+<style>
+  /* No custom styles needed for Summernote */
+  .CodeMirror {
+    height: 400px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+  }
+  .codemirror-textarea {
+    display: none;
+  }
+</style>
+
+<div id="post-content-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <form id="FormPostUpdateContent" @submit.prevent="saveContent">
+      <div class="mb-3">
+        <label for="post_title" class="form-label">Title</label>
+        <input 
+          type="text" 
+          id="post_title" 
+          name="post_title" 
+          class="form-control" 
+          v-model="form.title"
+          required
+        />
+        <div class="form-text">The title of this blog as will be seen everywhere</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="post_summary" class="form-label">Summary</label>
+        <textarea 
+          id="post_summary" 
+          name="post_summary" 
+          class="form-control" 
+          v-model="form.summary"
+          rows="3"
+        ></textarea>
+        <div class="form-text">A short summary of this blog post to display on the post listing page.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="post_content" class="form-label">Content</label>
+
+        <!-- Plain textarea -->
+        <textarea
+          v-if="editor === 'textarea'"
+          id="post_content"
+          name="post_content"
+          class="form-control"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <!-- HTML Area (Summernote) -->
+        <div
+          v-if="editor === 'htmlarea'"
+          id="summernote-container"
+        ></div>
+
+        <!-- BlockEditor -->
+        <div v-if="editor === 'blockeditor'" id="blockeditor-container"></div>
+
+        <!-- BlockArea -->
+        <textarea
+          v-if="editor === 'blockarea'"
+          id="blockarea-content"
+          name="post_content"
+          class="form-control blockarea-textarea"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <!-- Markdown (plain textarea with auto-resize) -->
+        <textarea
+          v-if="editor === 'markdown'"
+          id="markdown-content"
+          name="post_content"
+          class="form-control markdown-textarea"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <!-- Markdown (EasyMDE) -->
+        <textarea
+          v-if="editor === 'markdown_easymde'"
+          id="easymde-content"
+          name="post_content"
+          class="form-control easymde-textarea"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <!-- Markdown (CodeMirror) -->
+        <textarea
+          v-if="editor === 'markdown_codemirror'"
+          id="codemirror-content"
+          name="post_content"
+          class="form-control codemirror-textarea"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <!-- HTML (CodeMirror) -->
+        <textarea
+          v-if="editor === 'html_codemirror'"
+          id="codemirror-html-content"
+          name="post_content"
+          class="form-control codemirror-textarea"
+          v-model="form.content"
+          rows="15"
+        ></textarea>
+
+        <div class="form-text">The content of this blog post to display on the post details page.</div>
+      </div>
+
+      <input type="hidden" name="post_id" :value="postId" />
+
+      <div class="mt-3 text-end">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          :disabled="saving"
+        >
+          <i class="bi bi-save me-1"></i>
+          <span>Save</span>
+          <span 
+            v-if="saving" 
+            class="spinner-border spinner-border-sm align-middle ms-2 post-save-spinner" 
+            role="status"
+          >
+            <span class="visually-hidden">Loading</span>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

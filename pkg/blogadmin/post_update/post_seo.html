@@ -1,0 +1,135 @@
+<div id="post-seo-app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <form id="FormPostUpdateSEO" @submit.prevent="saveSEO">
+      <div class="mb-3">
+        <label for="post_slug" class="form-label">Slug</label>
+        <input 
+          type="text" 
+          id="post_slug" 
+          name="post_slug" 
+          class="form-control" 
+          v-model="form.slug"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="post_meta_description" class="form-label">Meta Description</label>
+        <textarea 
+          id="post_meta_description" 
+          name="post_meta_description" 
+          class="form-control" 
+          v-model="form.metaDescription"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="post_meta_keywords" class="form-label">Meta Keywords</label>
+        <textarea 
+          id="post_meta_keywords" 
+          name="post_meta_keywords" 
+          class="form-control" 
+          v-model="form.metaKeywords"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="post_meta_robots" class="form-label">Meta Robots</label>
+        <select 
+          id="post_meta_robots" 
+          name="post_meta_robots" 
+          class="form-select" 
+          v-model="form.metaRobots"
+        >
+          <option value="">- not selected -</option>
+          <option value="INDEX, FOLLOW">INDEX, FOLLOW</option>
+          <option value="NOINDEX, FOLLOW">NOINDEX, FOLLOW</option>
+          <option value="INDEX, NOFOLLOW">INDEX, NOFOLLOW</option>
+          <option value="NOINDEX, NOFOLLOW">NOINDEX, NOFOLLOW</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="post_canonical_url" class="form-label">Canonical URL</label>
+        <input 
+          type="text" 
+          id="post_canonical_url" 
+          name="post_canonical_url" 
+          class="form-control" 
+          v-model="form.canonicalUrl"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Old Slugs (Redirects)</label>
+        <div class="mb-2">
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="new_old_slug" 
+              class="form-control" 
+              v-model="newOldSlug"
+              placeholder="Enter old slug..."
+              @keyup.enter="addOldSlug"
+            />
+            <button 
+              type="button" 
+              class="btn btn-outline-primary"
+              @click="addOldSlug"
+              :disabled="!newOldSlug.trim()"
+            >
+              <i class="bi bi-plus-lg"></i>
+              Add
+            </button>
+          </div>
+        </div>
+        <div v-if="form.oldSlugs.length > 0" class="list-group">
+          <div 
+            v-for="(slug, index) in form.oldSlugs" 
+            :key="index"
+            class="list-group-item d-flex justify-content-between align-items-center"
+          >
+            <span>{{ slug }}</span>
+            <button 
+              type="button" 
+              class="btn btn-sm btn-outline-danger"
+              @click="removeOldSlug(index)"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div v-else class="text-muted small">
+          No old slugs configured
+        </div>
+      </div>
+
+      <input type="hidden" name="post_id" :value="postId" />
+
+      <div class="mt-3 text-end">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          :disabled="saving"
+        >
+          <i class="bi bi-save me-1"></i>
+          <span>Save</span>
+          <span 
+            v-if="saving" 
+            class="spinner-border spinner-border-sm align-middle ms-2 post-save-spinner" 
+            role="status"
+          >
+            <span class="visually-hidden">Loading</span>
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

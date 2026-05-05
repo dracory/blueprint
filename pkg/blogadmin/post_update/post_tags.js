@@ -4,6 +4,7 @@ const PostTagsApp = {
   data() {
     return {
       loading: true,
+      postId: '',
       tags: [],
       filteredTags: [],
       searchQuery: '',
@@ -12,6 +13,10 @@ const PostTagsApp = {
   },
 
   mounted() {
+    // Initialize postId from global variable
+    if (typeof postId !== 'undefined') {
+      this.postId = postId;
+    }
     this.loadTags();
   },
 
@@ -94,10 +99,8 @@ const PostTagsApp = {
   }
 };
 
-// Mount the app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  const el = document.getElementById('post-tags-app');
-  if (el) {
-    createApp(PostTagsApp).mount('#post-tags-app');
-  }
-});
+// Mount the app immediately
+const el = document.getElementById('post-tags-app');
+if (el) {
+  createApp(PostTagsApp).mount('#post-tags-app');
+}
