@@ -48,6 +48,7 @@ require (
 	github.com/dracory/llm v1.3.0
 	github.com/dracory/logstore v1.14.0
 	github.com/dracory/metastore v1.4.0
+	github.com/dracory/migrate v0.0.0-20260507034242-aaff5b53bdb9
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
 	github.com/dracory/sb v0.23.0
