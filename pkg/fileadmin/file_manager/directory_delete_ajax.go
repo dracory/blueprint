@@ -19,8 +19,9 @@ func (c *FileManagerController) directoryDeleteAjax(r *http.Request) string {
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
+	// Allow empty string to represent root directory
 	if currentDir == "." || currentDir == ".." {
-		return api.Error("current_dir is required").ToString()
+		return api.Error("invalid current_dir").ToString()
 	}
 
 	if currentDir == "/" {

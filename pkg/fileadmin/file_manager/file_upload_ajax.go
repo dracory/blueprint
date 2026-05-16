@@ -17,9 +17,8 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 	}
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
+
+	// Allow empty string to represent root directory
 
 	// The argument to FormFile must match the name attribute
 	// of the file input on the frontend

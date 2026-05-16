@@ -12,9 +12,8 @@ import (
 // getMoveDestinationsAjax returns a filtered list of directories valid for moving selected items
 func (c *FileManagerController) getMoveDestinationsAjax(r *http.Request) string {
 	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
+
+	// Allow empty string to represent root directory
 
 	// Parse selected items JSON
 	selectedItemsJSON := req.GetStringTrimmed(r, "selected_items")

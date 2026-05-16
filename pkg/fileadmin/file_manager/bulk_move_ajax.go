@@ -17,11 +17,6 @@ func (c *FileManagerController) bulkMoveAjax(r *http.Request) string {
 		return api.Error("invalid request").ToString()
 	}
 
-	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
-
 	destinationDir := req.GetStringTrimmed(r, "destination_dir")
 
 	// Parse selected items JSON

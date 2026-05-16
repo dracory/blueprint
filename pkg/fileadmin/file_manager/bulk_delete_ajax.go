@@ -14,11 +14,6 @@ import (
 
 // bulkDeleteAjax handles bulk file/folder delete requests
 func (c *FileManagerController) bulkDeleteAjax(r *http.Request) string {
-	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
-
 	// Parse selected items JSON
 	selectedItemsJSON := req.GetStringTrimmed(r, "selected_items")
 	if selectedItemsJSON == "" {
