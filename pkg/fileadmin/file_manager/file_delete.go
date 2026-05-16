@@ -14,15 +14,11 @@ func (c *FileManagerController) fileDeleteAjax(r *http.Request) string {
 		return api.Error("delete_file is required").ToString()
 	}
 	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
 
-	if currentDir == "/" {
-		currentDir = "" // eliminate double slashes
+	filePath, err := verifyAndNormalizePathOrError(currentDir, selectedFileName)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
-
-	filePath := currentDir + "/" + selectedFileName
 
 	if c.storage == nil {
 		return api.Error("Storage not initialized").ToString()

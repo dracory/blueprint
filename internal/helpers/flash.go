@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"net/http"
 	"project/internal/links"
 	"strings"
@@ -23,6 +24,7 @@ func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, messag
 	id := uid.HumanUid()
 
 	if cacheStore == nil {
+		fmt.Println("Flash error: cache store is nil")
 		return "to_flash_url: cache store is nil"
 	}
 
@@ -33,8 +35,10 @@ func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, messag
 		"time":    seconds,
 	}, int64(seconds)+10)
 	if err != nil {
-		// Log error but continue since this is not critical
-		return "to_flash_url: failed to set flash message: " + err.Error()
+		// Log real error to console
+		fmt.Println("Flash error:", err.Error())
+		// Return general error message
+		return "to_flash_url: failed to set flash message (see console for details)"
 	}
 
 	return links.Website().Flash(map[string]string{

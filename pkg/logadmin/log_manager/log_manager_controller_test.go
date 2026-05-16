@@ -1,99 +1,137 @@
 package log_manager
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
-	"net/url"
-	"strings"
-	"testing"
-
+	"net/http/httptest"
 	"project/internal/config"
 	"project/internal/testutils"
+	"testing"
 
+	"github.com/dracory/logstore"
 	"github.com/dracory/test"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestLogManagerController_RendersVueApp(t *testing.T) {
+func TestLogManagerController_Functional(t *testing.T) {
 	registry := testutils.Setup(
+		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
-		testutils.WithLogStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(registry)
 
-	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewLogManagerController(registry).Handler, test.NewRequestOptions{
-		Context: map[any]any{
-			config.AuthenticatedUserContextKey{}: user,
-		},
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
+
+	// Create some logs
+	logStore := registry.GetLogStore()
+	l1 := logstore.NewLog()
+	l1.SetMessage("Test Message 1")
+	l1.SetLevel("info")
+	logStore.LogCreate(ctx, l1)
+
+	l2 := logstore.NewLog()
+	l2.SetMessage("Test Message 2")
+	l2.SetLevel("error")
+	logStore.LogCreate(ctx, l2)
+
+	t.Run("renderPage", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/admin/logs", nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "Log Manager")
 	})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("expected status %d, got %d", http.StatusOK, resp.StatusCode)
-	}
-	// Page should render Vue app mount point
-	if !strings.Contains(html, "logs-app") {
-		t.Error("expected logs-app in HTML")
-	}
-	// Page should include Vue CDN
-	if !strings.Contains(html, "vue.global.js") {
-		t.Error("expected Vue CDN script in HTML")
-	}
-	// Page should include SweetAlert2
-	if !strings.Contains(html, "sweetalert2") {
-		t.Error("expected SweetAlert2 in HTML")
-	}
-}
-
-func TestLogManagerController_LoadLogsAction(t *testing.T) {
-	registry := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithUserStore(true),
-		testutils.WithLogStore(true),
-	)
-
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-
-	// Test load-logs action
-	queryParams := url.Values{}
-	queryParams.Set("action", "load-logs")
-
-	requestBody := map[string]any{
-		"page":       0,
-		"per_page":   100,
-		"sort_order": "desc",
-		"sort_by":    "time",
-	}
-	bodyBytes, _ := json.Marshal(requestBody)
-
-	body, resp, err := test.CallStringEndpoint(http.MethodPost, NewLogManagerController(registry).Handler, test.NewRequestOptions{
-		GetValues: queryParams,
-		Body:      string(bodyBytes),
-		Context: map[any]any{
-			config.AuthenticatedUserContextKey{}: user,
-		},
+	t.Run("handleLoadLogs", func(t *testing.T) {
+		loadData := map[string]any{
+			"page":     0,
+			"per_page": 10,
+		}
+		body, _ := json.Marshal(loadData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLoadLogs, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "Test Message 1")
+		assert.Contains(t, resp, "Test Message 2")
 	})
 
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		t.Errorf("expected status %d, got %d", http.StatusOK, resp.StatusCode)
-	}
-	// Should return JSON response
-	if !strings.Contains(body, `"status"`) {
-		t.Error("expected JSON response with status field")
-	}
-	if !strings.Contains(body, `"logs"`) {
-		t.Error("expected JSON response with logs field")
-	}
+	t.Run("handleLogShowContext", func(t *testing.T) {
+		logs, _ := logStore.LogList(ctx, logstore.LogQuery())
+		logID := logs[0].GetID()
+
+		showData := map[string]string{
+			"log_id": logID,
+		}
+		body, _ := json.Marshal(showData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogShowContext, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "context")
+	})
+
+	t.Run("handleLogDelete", func(t *testing.T) {
+		logs, _ := logStore.LogList(ctx, logstore.LogQuery())
+		logID := logs[0].GetID()
+
+		deleteData := map[string]string{
+			"log_id": logID,
+		}
+		body, _ := json.Marshal(deleteData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDelete, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify deletion
+		l, _ := logStore.LogFindByID(ctx, logID)
+		assert.Nil(t, l)
+	})
+
+	t.Run("handleLogDeleteSelected", func(t *testing.T) {
+		// Create a log first since previous one was deleted
+		l := logstore.NewLog()
+		l.SetMessage("Delete selected")
+		logStore.LogCreate(ctx, l)
+
+		logs, _ := logStore.LogList(ctx, logstore.LogQuery())
+		var logID string
+		for _, log := range logs {
+			if log.GetMessage() == "Delete selected" {
+				logID = log.GetID()
+				break
+			}
+		}
+
+		deleteData := map[string][]string{
+			"bulk_log_ids": {logID},
+		}
+		body, _ := json.Marshal(deleteData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteSelected, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify deletion
+		lFound, _ := logStore.LogFindByID(ctx, logID)
+		assert.Nil(t, lFound)
+	})
+
+	t.Run("handleLogDeleteAll", func(t *testing.T) {
+		// Create another log
+		l3 := logstore.NewLog()
+		l3.SetMessage("Delete me")
+		logStore.LogCreate(ctx, l3)
+
+		deleteData := map[string]string{}
+		body, _ := json.Marshal(deleteData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteAll, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify deletion
+		count, _ := logStore.LogCount(ctx, logstore.LogQuery())
+		assert.Equal(t, int(0), int(count))
+	})
 }

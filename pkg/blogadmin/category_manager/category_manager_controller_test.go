@@ -1,256 +1,110 @@
 package category_manager
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"project/internal/config"
+	"project/internal/testutils"
 	"testing"
 
-	"github.com/dracory/str"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/test"
+	"github.com/stretchr/testify/assert"
 )
 
-// TestCategoryManagerController_Struct tests controller structure
-func TestCategoryManagerController_Struct(t *testing.T) {
-	t.Parallel()
+func TestCategoryManagerController_Functional(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(registry)
 
-	// Verify struct fields
-	// The controller should have a registry field
-}
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
-// TestNewCategoryManagerController tests the constructor
-func TestNewCategoryManagerController(t *testing.T) {
-	t.Parallel()
+	t.Run("renderPage", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/admin/blog/categories", nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "Category Manager")
+	})
 
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Error("Expected controller to be non-nil")
-	}
-	if controller.registry != nil {
-		t.Error("Expected registry to be nil when passed nil")
-	}
-}
+	t.Run("handleLoadCategories", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/admin/blog/categories?action=load-categories", nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "categories")
+	})
 
-// TestSlugify tests the slugify function
-func TestSlugify(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"Hello World", "hello-world"},
-		{"Test Category", "test-category"},
-		{"My_Category-Name", "my-category-name"},
-		{"UPPERCASE", "uppercase"},
-		{"123 Numbers", "123-numbers"},
-		{"", ""},
-		{"Already-Slugified", "already-slugified"},
-		{"Multiple   Spaces", "multiple-spaces"},
-	}
-
-	for _, tt := range tests {
-		result := str.Slugify(tt.input, '-')
-		if result != tt.expected {
-			t.Errorf("str.Slugify(%q) = %q, want %q", tt.input, result, tt.expected)
+	t.Run("handleCreateCategory", func(t *testing.T) {
+		catData := map[string]string{
+			"name":        "New Category",
+			"slug":        "new-category",
+			"description": "Test Description",
 		}
-	}
-}
+		body, _ := json.Marshal(catData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=create-category", bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "New Category")
 
-// TestCategoryManagerController_MultipleInstances tests creating multiple controllers
-func TestCategoryManagerController_MultipleInstances(t *testing.T) {
-	t.Parallel()
+		// Verify it exists in store
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		assert.Len(t, terms, 1)
+		assert.Equal(t, "New Category", terms[0].GetName())
+	})
 
-	controller1 := NewCategoryManagerController(nil)
-	controller2 := NewCategoryManagerController(nil)
+	t.Run("handleUpdateCategory", func(t *testing.T) {
+		// First get the category ID
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		categoryID := terms[0].GetID()
 
-	if controller1 == controller2 {
-		t.Error("Each NewCategoryManagerController call should return a new instance")
-	}
-
-	if controller1 == nil || controller2 == nil {
-		t.Error("Both controllers should be non-nil")
-	}
-}
-
-// TestCategoryManagerController_ensureTaxonomy_MethodExists tests ensureTaxonomy exists
-func TestCategoryManagerController_ensureTaxonomy_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// The ensureTaxonomy method should exist (tested via reflection concept)
-	// This tests that the controller has the expected API
-}
-
-// TestCategoryManagerController_Handler_MethodExists tests handler method exists
-func TestCategoryManagerController_Handler_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// Handler method should exist
-	// We can't directly test it without mocks, but we can verify the controller structure
-}
-
-// TestCategoryManagerController_renderPage_MethodExists tests renderPage method exists
-func TestCategoryManagerController_renderPage_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// renderPage method should exist
-}
-
-// TestCategoryManagerController_handleLoadCategories_MethodExists tests method exists
-func TestCategoryManagerController_handleLoadCategories_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// handleLoadCategories method should exist
-}
-
-// TestCategoryManagerController_handleCreateCategory_MethodExists tests method exists
-func TestCategoryManagerController_handleCreateCategory_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// handleCreateCategory method should exist
-}
-
-// TestCategoryManagerController_handleUpdateCategory_MethodExists tests method exists
-func TestCategoryManagerController_handleUpdateCategory_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// handleUpdateCategory method should exist
-}
-
-// TestCategoryManagerController_handleReorderCategories_MethodExists tests method exists
-func TestCategoryManagerController_handleReorderCategories_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// handleReorderCategories method should exist
-}
-
-// TestCategoryManagerController_handleDeleteCategory_MethodExists tests method exists
-func TestCategoryManagerController_handleDeleteCategory_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewCategoryManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewCategoryManagerController() returned nil")
-	}
-
-	// handleDeleteCategory method should exist
-}
-
-// TestCategoryManagerControllerData_Struct tests the deprecated struct
-func TestCategoryManagerControllerData_Struct(t *testing.T) {
-	t.Parallel()
-
-	// Test the deprecated struct can be instantiated
-	data := categoryManagerControllerData{
-		page:          "1",
-		pageInt:       1,
-		perPage:       10,
-		taxonomyID:    "test-taxonomy",
-		categoryCount: 5,
-		categoryList:  nil,
-	}
-
-	if data.page != "1" {
-		t.Errorf("Expected page '1', got: %s", data.page)
-	}
-	if data.pageInt != 1 {
-		t.Errorf("Expected pageInt 1, got: %d", data.pageInt)
-	}
-	if data.perPage != 10 {
-		t.Errorf("Expected perPage 10, got: %d", data.perPage)
-	}
-	if data.taxonomyID != "test-taxonomy" {
-		t.Errorf("Expected taxonomyID 'test-taxonomy', got: %s", data.taxonomyID)
-	}
-	if data.categoryCount != 5 {
-		t.Errorf("Expected categoryCount 5, got: %d", data.categoryCount)
-	}
-}
-
-// TestCategoryManagerControllerData_ZeroValues tests zero values
-func TestCategoryManagerControllerData_ZeroValues(t *testing.T) {
-	t.Parallel()
-
-	data := categoryManagerControllerData{}
-
-	if data.page != "" {
-		t.Errorf("Expected empty page, got: %s", data.page)
-	}
-	if data.pageInt != 0 {
-		t.Errorf("Expected pageInt 0, got: %d", data.pageInt)
-	}
-	if data.perPage != 0 {
-		t.Errorf("Expected perPage 0, got: %d", data.perPage)
-	}
-	if data.taxonomyID != "" {
-		t.Errorf("Expected empty taxonomyID, got: %s", data.taxonomyID)
-	}
-	if data.categoryCount != 0 {
-		t.Errorf("Expected categoryCount 0, got: %d", data.categoryCount)
-	}
-	if data.categoryList != nil {
-		t.Error("Expected nil categoryList")
-	}
-}
-
-// TestSlugifyEdgeCases tests edge cases for slugify
-func TestSlugifyEdgeCases(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"Special!@#$%^&*()Chars", "special-chars"},
-		{"  Leading spaces", "leading-spaces"},
-		{"Trailing spaces  ", "trailing-spaces"},
-		{"Multiple---Dashes", "multiple-dashes"},
-		{"MixedCASE_Input", "mixedcase-input"},
-		{"Numbers123", "numbers123"},
-		{"äöü", "aou"},
-		{"Very Long String With Many Words That Should Still Work", "very-long-string-with-many-words-that-should-still-work"},
-	}
-
-	for _, tt := range tests {
-		result := str.Slugify(tt.input, '-')
-		if result != tt.expected {
-			t.Errorf("str.Slugify(%q) = %q, want %q", tt.input, result, tt.expected)
+		updateData := map[string]string{
+			"name": "Updated Category",
 		}
-	}
+		body, _ := json.Marshal(updateData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=update-category&category_id="+categoryID, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "Updated Category")
+
+		// Verify update
+		term, _ := registry.GetBlogStore().TermFindByID(ctx, categoryID)
+		assert.Equal(t, "Updated Category", term.GetName())
+	})
+
+	t.Run("handleReorderCategories", func(t *testing.T) {
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		categoryID := terms[0].GetID()
+
+		reorderData := map[string][]string{
+			"category_ids": {categoryID},
+		}
+		body, _ := json.Marshal(reorderData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=reorder-categories", bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+	})
+
+	t.Run("handleDeleteCategory", func(t *testing.T) {
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		categoryID := terms[0].GetID()
+
+		deleteData := map[string]string{
+			"category_id": categoryID,
+		}
+		body, _ := json.Marshal(deleteData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=delete-category", bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify deletion
+		termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		assert.Len(t, termsAfter, 0)
+	})
 }

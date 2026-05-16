@@ -21,22 +21,20 @@ func (c *FileManagerController) fileRenameAjax(r *http.Request) string {
 	}
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
+	oldFilePath, err := verifyAndNormalizePathOrError(currentDir, currentFileName)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
-
-	if currentDir == "/" {
-		currentDir = "" // eliminate double slashes
+	newFilePath, err := verifyAndNormalizePathOrError(currentDir, newFileName)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
-
-	oldFilePath := currentDir + "/" + currentFileName
-	newFilePath := currentDir + "/" + newFileName
 
 	if c.storage == nil {
 		return api.Error("Storage not initialized").ToString()
 	}
 
-	err := c.storage.Move(oldFilePath, newFilePath)
+	err = c.storage.Move(oldFilePath, newFilePath)
 
 	if err == nil {
 		return api.Success("file renamed successfully").ToString()

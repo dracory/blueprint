@@ -26,7 +26,8 @@ import (
 	"project/pkg/blogadmin/tag_manager"
 )
 
-func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
+func Routes(registry registry.RegistryInterface, opts ...AdminOptions) ([]rtr.RouteInterface, error) {
+	_ = opts // Options available for future use
 	if registry == nil {
 		return nil, errors.New("registry cannot be nil")
 	}

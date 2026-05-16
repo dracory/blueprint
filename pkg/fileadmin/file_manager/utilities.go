@@ -1,6 +1,7 @@
 package file_manager
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sort"
@@ -34,6 +35,54 @@ func (c *FileManagerController) HumanFilesize(size int64) string {
 	}
 	return fmt.Sprintf("%.1f %cB",
 		float64(size)/float64(div), "kMGTPE"[exp])
+}
+
+// normalizePath normalizes a directory path by handling root directory representation, removing double slashes, and preventing path traversal
+func verifyAndNormalizePathOrError(dir, filename string) (string, error) {
+	if dir == "/" {
+		dir = ""
+	}
+
+	// Check for path traversal attempts BEFORE cleaning
+	// This prevents any attempt to use ".." to escape the directory structure
+	if dir == "." || dir == ".." {
+		return "", errors.New("path traversal detected")
+	}
+	if filename == "." || filename == ".." {
+		return "", errors.New("path traversal detected")
+	}
+	if strings.HasPrefix(dir, "~") || strings.HasPrefix(filename, "~") {
+		return "", errors.New("path traversal detected")
+	}
+	if strings.Contains(dir, "..") {
+		return "", errors.New("path traversal detected")
+	}
+	if strings.Contains(filename, "..") {
+		return "", errors.New("path traversal detected")
+	}
+
+	// Clean the filename to resolve any other relative components
+	filename = filepath.Clean(filename)
+
+	path := dir + "/" + filename
+	path = strings.ReplaceAll(path, "//", "/")
+
+	// Clean the final path to resolve any remaining relative components
+	path = filepath.Clean(path)
+
+	// Ensure forward slashes are used consistently (Windows compatibility)
+	path = strings.ReplaceAll(path, "\\", "/")
+
+	return path, nil
+}
+
+// normalizeDirPath normalizes a directory path by handling root directory representation, removing double slashes, and trimming trailing slashes
+func verifyAndNormalizeDirPath(dir, filename string) (string, error) {
+	path, err := verifyAndNormalizePathOrError(dir, filename)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimRight(path, "/"), nil
 }
 
 // allDirectories recursively lists all directories starting from the given path
