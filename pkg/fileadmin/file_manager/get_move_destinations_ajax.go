@@ -14,6 +14,9 @@ func (c *FileManagerController) getMoveDestinationsAjax(r *http.Request) string 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
 	// Allow empty string to represent root directory
+	if currentDir == "/" {
+		currentDir = ""
+	}
 
 	// Parse selected items JSON
 	selectedItemsJSON := req.GetStringTrimmed(r, "selected_items")

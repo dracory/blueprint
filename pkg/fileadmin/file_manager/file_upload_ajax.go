@@ -18,8 +18,6 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
-	// Allow empty string to represent root directory
-
 	// The argument to FormFile must match the name attribute
 	// of the file input on the frontend
 	file, fileHeader, err := r.FormFile("upload_file")
@@ -43,7 +41,10 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 		}
 	}()
 
-	remoteFilePath := currentDir + "/" + fileHeader.Filename
+	remoteFilePath, err := verifyAndNormalizePathOrError(currentDir, fileHeader.Filename)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
+	}
 
 	data, err := os.ReadFile(filePath)
 	if err != nil {

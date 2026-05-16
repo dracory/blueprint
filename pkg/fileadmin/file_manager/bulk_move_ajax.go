@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/dracory/api"
@@ -18,6 +19,13 @@ func (c *FileManagerController) bulkMoveAjax(r *http.Request) string {
 	}
 
 	destinationDir := req.GetStringTrimmed(r, "destination_dir")
+
+	// Normalize destination directory to prevent path traversal
+	normalizedDestDir, err := verifyAndNormalizeDirPath("", strings.Trim(destinationDir, "/"))
+	if err != nil {
+		return api.Error("invalid destination directory: " + err.Error()).ToString()
+	}
+	destinationDir = normalizedDestDir
 
 	// Parse selected items JSON
 	selectedItemsJSON := req.GetStringTrimmed(r, "selected_items")
@@ -85,7 +93,7 @@ func (c *FileManagerController) bulkMoveAjax(r *http.Request) string {
 		return api.Error("Failed to move items: " + strings.Join(errors, "; ")).ToString()
 	}
 
-	message := "Successfully moved " + string(rune('0'+successCount)) + " item(s)"
+	message := "Successfully moved " + strconv.Itoa(successCount) + " item(s)"
 	if len(errors) > 0 {
 		message += ". Some items failed: " + strings.Join(errors, "; ")
 	}

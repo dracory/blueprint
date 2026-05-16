@@ -2,7 +2,6 @@ package file_manager
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/dracory/api"
 	"github.com/dracory/req"
@@ -18,14 +17,10 @@ func (c *FileManagerController) directoryCreateAjax(r *http.Request) string {
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
-	// Allow empty string to represent root directory
-	if currentDir == "/" {
-		currentDir = "" // to prevent double slashes
+	dirPath, err := verifyAndNormalizeDirPath(currentDir, newDirName)
+	if err != nil {
+		return api.Error("invalid directory name: " + err.Error()).ToString()
 	}
-
-	dirPath := currentDir + "/" + newDirName
-	dirPath = strings.ReplaceAll(dirPath, "//", "/") // remove double slashes
-	dirPath = strings.TrimRight(dirPath, "/")        // remove trailing slashes
 
 	if dirPath == "" || dirPath == "/" {
 		return api.Error("root directory can not be created").ToString()
@@ -35,7 +30,7 @@ func (c *FileManagerController) directoryCreateAjax(r *http.Request) string {
 		return api.Error("Storage not initialized").ToString()
 	}
 
-	err := c.storage.MakeDirectory(dirPath)
+	err = c.storage.MakeDirectory(dirPath)
 
 	if err == nil {
 		return api.Success("directory created successfully").ToString()
