@@ -33,6 +33,7 @@ type setupOptions struct {
 	WithSettingStore      bool
 	WithSessionStore      bool
 	WithShopStore         bool
+	WithCustomStore       bool
 	WithSubscriptionStore bool
 	WithTaskStore         bool
 	WithUserStore         bool
@@ -132,6 +133,13 @@ func WithSettingStore(enable bool) SetupOption {
 func WithShopStore(enable bool) SetupOption {
 	return func(opts *setupOptions) {
 		opts.WithShopStore = enable
+	}
+}
+
+// WithCustomStore enables the custom store during test setup
+func WithCustomStore(enable bool) SetupOption {
+	return func(opts *setupOptions) {
+		opts.WithCustomStore = enable
 	}
 }
 
@@ -245,6 +253,9 @@ func Setup(options ...SetupOption) registry.RegistryInterface {
 		if opts.WithShopStore {
 			opts.cfg.SetShopStoreUsed(true)
 		}
+		if opts.WithCustomStore {
+			opts.cfg.SetCustomStoreUsed(true)
+		}
 		if opts.WithSubscriptionStore {
 			opts.cfg.SetSubscriptionStoreUsed(true)
 		}
@@ -296,6 +307,9 @@ func Setup(options ...SetupOption) registry.RegistryInterface {
 		}
 		if opts.WithShopStore {
 			opts.cfg.SetShopStoreUsed(true)
+		}
+		if opts.WithCustomStore {
+			opts.cfg.SetCustomStoreUsed(true)
 		}
 		if opts.WithSubscriptionStore {
 			opts.cfg.SetSubscriptionStoreUsed(true)

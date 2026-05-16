@@ -18,15 +18,11 @@ func (c *FileManagerController) fileCloneAjax(r *http.Request) string {
 	}
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
-	if currentDir == "" {
-		return api.Error("current_dir is required").ToString()
-	}
 
-	if currentDir == "/" {
-		currentDir = ""
+	filePath, err := verifyAndNormalizePathOrError(currentDir, selectedFileName)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
-
-	filePath := currentDir + "/" + selectedFileName
 
 	if c.storage == nil {
 		return api.Error("Storage not initialized").ToString()
@@ -39,17 +35,29 @@ func (c *FileManagerController) fileCloneAjax(r *http.Request) string {
 		base := strings.TrimSuffix(selectedFileName, ext)
 		newFileName = base + "_copy" + ext
 	}
-	newFilePath := currentDir + "/" + newFileName
+	newFilePath, err := verifyAndNormalizePathOrError(currentDir, newFileName)
+	if err != nil {
+		return api.Error("invalid file path: " + err.Error()).ToString()
+	}
 
 	// Check if target already exists and append number if needed
-	exists, _ := c.storage.Exists(newFilePath)
+	exists, err := c.storage.Exists(newFilePath)
+	if err != nil {
+		return api.Error("Failed to check if file exists: " + err.Error()).ToString()
+	}
 	counter := 2
 	ext := filepath.Ext(selectedFileName)
 	base := strings.TrimSuffix(newFileName, ext)
 	for exists {
 		newFileName = fmt.Sprintf("%s_copy_%d%s", base, counter, ext)
-		newFilePath = currentDir + "/" + newFileName
-		exists, _ = c.storage.Exists(newFilePath)
+		newFilePath, err = verifyAndNormalizePathOrError(currentDir, newFileName)
+		if err != nil {
+			return api.Error("invalid file path: " + err.Error()).ToString()
+		}
+		exists, err = c.storage.Exists(newFilePath)
+		if err != nil {
+			return api.Error("Failed to check if file exists: " + err.Error()).ToString()
+		}
 		counter++
 	}
 

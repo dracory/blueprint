@@ -1,254 +1,104 @@
 package tag_manager
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"project/internal/config"
+	"project/internal/testutils"
 	"testing"
 
-	"github.com/dracory/str"
+	"github.com/dracory/blogstore"
+	"github.com/dracory/test"
+	"github.com/stretchr/testify/assert"
 )
 
-// TestNewTagManagerController tests the constructor
-func TestNewTagManagerController(t *testing.T) {
-	t.Parallel()
+func TestTagManagerController_Functional(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+	)
 
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Error("Expected controller to be non-nil")
-	}
-	if controller.registry != nil {
-		t.Error("Expected registry to be nil when passed nil")
-	}
-}
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(registry)
 
-// TestSlugify tests the slugify function
-func TestSlugify(t *testing.T) {
-	t.Parallel()
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"Hello World", "hello-world"},
-		{"Test Tag", "test-tag"},
-		{"My_Tag-Name", "my-tag-name"},
-		{"UPPERCASE", "uppercase"},
-		{"123 Numbers", "123-numbers"},
-		{"", ""},
-		{"Already-Slugified", "already-slugified"},
-		{"Multiple   Spaces", "multiple-spaces"},
-	}
+	t.Run("renderPage", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags", nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "Tag Manager")
+	})
 
-	for _, tt := range tests {
-		result := str.Slugify(tt.input, '-')
-		if result != tt.expected {
-			t.Errorf("str.Slugify(%q) = %q, want %q", tt.input, result, tt.expected)
+	t.Run("handleLoadTags", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags?action=load-tags", nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "tags")
+	})
+
+	t.Run("handleCreateTag", func(t *testing.T) {
+		tagData := map[string]string{
+			"name": "New Tag",
+			"slug": "new-tag",
 		}
-	}
-}
+		body, _ := json.Marshal(tagData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=create-tag", bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "New Tag")
 
-// TestTagManagerController_Struct tests controller structure
-func TestTagManagerController_Struct(t *testing.T) {
-	t.Parallel()
+		// Verify it exists in store
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		assert.Len(t, terms, 1)
+		assert.Equal(t, "New Tag", terms[0].GetName())
+	})
 
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
+	t.Run("handleLoadTagPosts", func(t *testing.T) {
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		tagID := terms[0].GetID()
 
-	// Verify struct fields
-	// The controller should have a registry field
-}
+		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags?action=load-tag-posts&tag_id="+tagID, nil).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+		assert.Contains(t, resp, "posts")
+	})
 
-// TestTagManagerController_MultipleInstances tests creating multiple controllers
-func TestTagManagerController_MultipleInstances(t *testing.T) {
-	t.Parallel()
+	t.Run("handleUpdateTag", func(t *testing.T) {
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		tagID := terms[0].GetID()
 
-	controller1 := NewTagManagerController(nil)
-	controller2 := NewTagManagerController(nil)
-
-	if controller1 == controller2 {
-		t.Error("Each NewTagManagerController call should return a new instance")
-	}
-
-	if controller1 == nil || controller2 == nil {
-		t.Error("Both controllers should be non-nil")
-	}
-}
-
-// TestTagManagerController_Handler_MethodExists tests handler method exists
-func TestTagManagerController_Handler_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// Handler method should exist
-}
-
-// TestTagManagerController_renderPage_MethodExists tests renderPage method exists
-func TestTagManagerController_renderPage_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// renderPage method should exist
-}
-
-// TestTagManagerController_handleLoadTags_MethodExists tests method exists
-func TestTagManagerController_handleLoadTags_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// handleLoadTags method should exist
-}
-
-// TestTagManagerController_handleLoadTagPosts_MethodExists tests method exists
-func TestTagManagerController_handleLoadTagPosts_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// handleLoadTagPosts method should exist
-}
-
-// TestTagManagerController_handleCreateTag_MethodExists tests method exists
-func TestTagManagerController_handleCreateTag_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// handleCreateTag method should exist
-}
-
-// TestTagManagerController_handleUpdateTag_MethodExists tests method exists
-func TestTagManagerController_handleUpdateTag_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// handleUpdateTag method should exist
-}
-
-// TestTagManagerController_handleDeleteTag_MethodExists tests method exists
-func TestTagManagerController_handleDeleteTag_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// handleDeleteTag method should exist
-}
-
-// TestTagManagerController_ensureTaxonomy_MethodExists tests ensureTaxonomy exists
-func TestTagManagerController_ensureTaxonomy_MethodExists(t *testing.T) {
-	t.Parallel()
-
-	controller := NewTagManagerController(nil)
-	if controller == nil {
-		t.Fatal("NewTagManagerController() returned nil")
-	}
-
-	// The ensureTaxonomy method should exist
-}
-
-// TestTagManagerControllerData_Struct tests the deprecated struct
-func TestTagManagerControllerData_Struct(t *testing.T) {
-	t.Parallel()
-
-	// Test the deprecated struct can be instantiated
-	data := tagManagerControllerData{
-		page:       "1",
-		pageInt:    1,
-		perPage:    10,
-		taxonomyID: "test-taxonomy",
-		tagCount:   5,
-		tagList:    nil,
-	}
-
-	if data.page != "1" {
-		t.Errorf("Expected page '1', got: %s", data.page)
-	}
-	if data.pageInt != 1 {
-		t.Errorf("Expected pageInt 1, got: %d", data.pageInt)
-	}
-	if data.perPage != 10 {
-		t.Errorf("Expected perPage 10, got: %d", data.perPage)
-	}
-	if data.taxonomyID != "test-taxonomy" {
-		t.Errorf("Expected taxonomyID 'test-taxonomy', got: %s", data.taxonomyID)
-	}
-	if data.tagCount != 5 {
-		t.Errorf("Expected tagCount 5, got: %d", data.tagCount)
-	}
-}
-
-// TestTagManagerControllerData_ZeroValues tests zero values
-func TestTagManagerControllerData_ZeroValues(t *testing.T) {
-	t.Parallel()
-
-	data := tagManagerControllerData{}
-
-	if data.page != "" {
-		t.Errorf("Expected empty page, got: %s", data.page)
-	}
-	if data.pageInt != 0 {
-		t.Errorf("Expected pageInt 0, got: %d", data.pageInt)
-	}
-	if data.perPage != 0 {
-		t.Errorf("Expected perPage 0, got: %d", data.perPage)
-	}
-	if data.taxonomyID != "" {
-		t.Errorf("Expected empty taxonomyID, got: %s", data.taxonomyID)
-	}
-	if data.tagCount != 0 {
-		t.Errorf("Expected tagCount 0, got: %d", data.tagCount)
-	}
-	if data.tagList != nil {
-		t.Error("Expected nil tagList")
-	}
-}
-
-// TestSlugifyEdgeCases tests edge cases for slugify
-func TestSlugifyEdgeCases(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"Special!@#$%^&*()Chars", "special-chars"},
-		{"  Leading spaces", "leading-spaces"},
-		{"Trailing spaces  ", "trailing-spaces"},
-		{"Multiple---Dashes", "multiple-dashes"},
-		{"MixedCASE_Input", "mixedcase-input"},
-		{"Numbers123", "numbers123"},
-		{"äöü", "aou"},
-		{"Very Long String With Many Words That Should Still Work", "very-long-string-with-many-words-that-should-still-work"},
-	}
-
-	for _, tt := range tests {
-		result := str.Slugify(tt.input, '-')
-		if result != tt.expected {
-			t.Errorf("str.Slugify(%q) = %q, want %q", tt.input, result, tt.expected)
+		updateData := map[string]string{
+			"name": "Updated Tag",
 		}
-	}
+		body, _ := json.Marshal(updateData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=update-tag&tag_id="+tagID, bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify update
+		term, _ := registry.GetBlogStore().TermFindByID(ctx, tagID)
+		assert.Equal(t, "Updated Tag", term.GetName())
+	})
+
+	t.Run("handleDeleteTag", func(t *testing.T) {
+		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		tagID := terms[0].GetID()
+
+		deleteData := map[string]string{
+			"tag_id": tagID,
+		}
+		body, _ := json.Marshal(deleteData)
+		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=delete-tag", bytes.NewBuffer(body)).WithContext(ctx)
+		resp := controller.Handler(httptest.NewRecorder(), req)
+		assert.Contains(t, resp, "success")
+
+		// Verify deletion
+		termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+		assert.Len(t, termsAfter, 0)
+	})
 }

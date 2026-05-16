@@ -2,7 +2,6 @@ package file_manager
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/dracory/api"
 	"github.com/dracory/base/cfmt"
@@ -19,18 +18,11 @@ func (c *FileManagerController) directoryDeleteAjax(r *http.Request) string {
 
 	currentDir := req.GetStringTrimmed(r, "current_dir")
 
-	if currentDir == "." || currentDir == ".." {
-		return api.Error("current_dir is required").ToString()
+	dirPath, err := verifyAndNormalizeDirPath(currentDir, selectedDirName)
+	if err != nil {
+		return api.Error("invalid directory name: " + err.Error()).ToString()
 	}
-
-	if currentDir == "/" {
-		currentDir = "" // eliminate double slashes
-	}
-
-	dirPath := currentDir + "/" + selectedDirName
 	cfmt.Infoln("Deleting directory:", dirPath)
-	dirPath = strings.ReplaceAll(dirPath, "//", "/") // remove double slashes
-	dirPath = strings.TrimRight(dirPath, "/")        // remove trailing slashes
 
 	if dirPath == "" || dirPath == "/" {
 		return api.Error("root directory can not be deleted").ToString()
