@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -30,7 +31,7 @@ func blogStoreMigrate(registry RegistryInterface) error {
 		return errors.New("blog store is not initialized")
 	}
 
-	if err := registry.GetBlogStore().AutoMigrate(); err != nil {
+	if err := registry.GetBlogStore().MigrateUp(context.Background()); err != nil {
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func logStoreMigrate(registry RegistryInterface) error {
 		return errors.New("log store is not initialized")
 	}
 
-	err := logStore.AutoMigrate()
+	err := logStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

@@ -41,7 +41,7 @@ func entityStoreMigrate(registry RegistryInterface) error {
 		return errors.New("entity store is not initialized")
 	}
 
-	if err := registry.GetEntityStore().AutoMigrate(context.Background()); err != nil {
+	if err := registry.GetEntityStore().MigrateUp(context.Background()); err != nil {
 		return err
 	}
 

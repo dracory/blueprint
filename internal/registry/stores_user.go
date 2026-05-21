@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func userStoreMigrate(registry RegistryInterface) error {
 		return errors.New("user store is not initialized")
 	}
 
-	err := userStore.AutoMigrate()
+	err := userStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

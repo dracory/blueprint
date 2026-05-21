@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func shopStoreMigrate(registry RegistryInterface) error {
 		return errors.New("shop store is not initialized")
 	}
 
-	err := shopStore.AutoMigrate()
+	err := shopStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

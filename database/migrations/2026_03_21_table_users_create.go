@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"context"
 	"database/sql"
 	"time"
 
@@ -26,7 +27,7 @@ func (m *TableUsersCreate) Description() string {
 	return "Create users table with email and created_at indexes"
 }
 
-func (m *TableUsersCreate) Up(tx *sql.Tx) error {
+func (m *TableUsersCreate) Up(ctx context.Context, tx *sql.Tx) error {
 	dialect := database.DatabaseType(tx)
 
 	tableCreateSql, err := sb.NewBuilder(dialect).
@@ -107,7 +108,7 @@ func (m *TableUsersCreate) Up(tx *sql.Tx) error {
 	return nil
 }
 
-func (m *TableUsersCreate) Down(tx *sql.Tx) error {
+func (m *TableUsersCreate) Down(ctx context.Context, tx *sql.Tx) error {
 	dialect := database.DatabaseType(tx)
 	tableDropSql, err := sb.NewBuilder(dialect).
 		Table("users").

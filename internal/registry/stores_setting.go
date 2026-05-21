@@ -41,7 +41,7 @@ func settingStoreMigrate(registry RegistryInterface) error {
 		return errors.New("setting store is not initialized")
 	}
 
-	if err := settingStore.AutoMigrate(context.Background()); err != nil {
+	if err := settingStore.MigrateUp(context.Background()); err != nil {
 		return err
 	}
 

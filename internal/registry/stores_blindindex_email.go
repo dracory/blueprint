@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -42,7 +43,7 @@ func blindIndexEmailStoreMigrate(registry RegistryInterface) error {
 		return errors.New("blind index email store is not initialized")
 	}
 
-	err := blindIndexEmailStore.AutoMigrate()
+	err := blindIndexEmailStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

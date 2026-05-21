@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func taskStoreMigrate(registry RegistryInterface) error {
 		return errors.New("task store is not initialized")
 	}
 
-	err := taskStore.AutoMigrate()
+	err := taskStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func geoStoreMigrate(registry RegistryInterface) error {
 		return errors.New("geo store is not initialized")
 	}
 
-	err := geoStore.AutoMigrate()
+	err := geoStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

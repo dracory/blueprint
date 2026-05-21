@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func vaultStoreMigrate(registry RegistryInterface) error {
 		return errors.New("vault store is not initialized")
 	}
 
-	err := vaultStore.AutoMigrate()
+	err := vaultStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

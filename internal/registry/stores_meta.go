@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func metaStoreMigrate(registry RegistryInterface) error {
 		return errors.New("meta store is not initialized")
 	}
 
-	err := metaStore.AutoMigrate()
+	err := metaStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

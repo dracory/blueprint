@@ -41,7 +41,7 @@ func sessionStoreMigrate(registry RegistryInterface) error {
 		return errors.New("session store is not initialized")
 	}
 
-	if err := sessionStore.AutoMigrate(context.Background()); err != nil {
+	if err := sessionStore.MigrateUp(context.Background()); err != nil {
 		return err
 	}
 

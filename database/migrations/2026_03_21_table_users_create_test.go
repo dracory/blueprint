@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"context"
 	"database/sql"
 	"testing"
 	"time"
@@ -30,7 +31,7 @@ func TestUsersTableCreate(t *testing.T) {
 
 	// Test Up migration
 	t.Run("Up", func(t *testing.T) {
-		err := migrator.Up()
+		err := migrator.Up(context.Background())
 		if err != nil {
 			t.Fatalf("Migration Up failed: %v", err)
 		}
@@ -116,7 +117,7 @@ func TestUsersTableCreate(t *testing.T) {
 
 	// Test Down migration
 	t.Run("Down", func(t *testing.T) {
-		err := migrator.Down()
+		err := migrator.Down(context.Background())
 		if err != nil {
 			t.Fatalf("Migration Down failed: %v", err)
 		}

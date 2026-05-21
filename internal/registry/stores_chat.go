@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func chatStoreMigrate(registry RegistryInterface) error {
 		return errors.New("chat store is not initialized")
 	}
 
-	err := chatStore.AutoMigrate()
+	err := chatStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

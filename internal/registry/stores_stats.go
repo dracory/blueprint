@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -40,7 +41,7 @@ func statsStoreMigrate(registry RegistryInterface) error {
 		return errors.New("stats store is not initialized")
 	}
 
-	err := statsStore.AutoMigrate()
+	err := statsStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}

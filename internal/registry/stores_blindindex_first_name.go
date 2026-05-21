@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -42,7 +43,7 @@ func blindIndexFirstNameStoreMigrate(registry RegistryInterface) error {
 		return errors.New("blind index first name store is not initialized")
 	}
 
-	err := blindIndexFirstNameStore.AutoMigrate()
+	err := blindIndexFirstNameStore.MigrateUp(context.Background())
 	if err != nil {
 		return err
 	}
