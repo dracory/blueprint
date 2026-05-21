@@ -3,6 +3,7 @@ package testutils
 import (
 	"fmt"
 	"log/slog"
+	"project/database/migrations"
 	"project/internal/config"
 	"project/internal/registry"
 	"sync/atomic"
@@ -326,16 +327,21 @@ func Setup(options ...SetupOption) registry.RegistryInterface {
 	}
 
 	// Build registry using registry.New (opens DB and initializes stores)
-	registry, err := registry.New(opts.cfg)
+	app, err := registry.New(opts.cfg)
 	if err != nil {
 		panic("testutils.Setup: failed to build registry: " + err.Error())
 	}
 
-	if registry.GetLogger() == nil {
-		registry.SetLogger(slog.Default())
+	// Run migrations to create database tables
+	if err := migrations.MigrateAll(app); err != nil {
+		panic("testutils.Setup: failed to run migrations: " + err.Error())
 	}
 
-	return registry
+	if app.GetLogger() == nil {
+		app.SetLogger(slog.Default())
+	}
+
+	return app
 }
 
 // func setupMailServer() {

@@ -34,7 +34,12 @@ func (m *StoreGeoMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("geo store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	if err := store.MigrateUp(ctx); err != nil {
+		return err
+	}
+
+	// Seed geolocation data (countries, states, timezones)
+	return store.Seed(ctx)
 }
 
 func (m *StoreGeoMigrate) Down(ctx context.Context, tx *sql.Tx) error {
