@@ -112,10 +112,12 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 	registry.SetFileCache(fileCache)
 	registry.SetDatabase(db)
 
+	// Initialize stores
 	if err := registry.dataStoresInitialize(); err != nil {
 		return nil, err
 	}
 
+	// Migrate stores to create tables
 	if err := registry.dataStoresMigrate(); err != nil {
 		return nil, err
 	}
