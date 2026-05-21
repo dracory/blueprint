@@ -117,11 +117,6 @@ func New(cfg config.ConfigInterface) (RegistryInterface, error) {
 		return nil, err
 	}
 
-	// Migrate stores to create tables
-	if err := registry.dataStoresMigrate(); err != nil {
-		return nil, err
-	}
-
 	if registry.GetLogStore() != nil {
 		registry.SetLogger(slog.New(logstore.NewSlogHandler(registry.GetLogStore())))
 	}

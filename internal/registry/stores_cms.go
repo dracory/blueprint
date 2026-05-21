@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -17,26 +16,6 @@ func cmsStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetCmsStore(store)
-	}
-
-	return nil
-}
-
-func cmsStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetCmsStoreUsed() {
-		return nil
-	}
-
-	if registry.GetCmsStore() == nil {
-		return errors.New("cms store is not initialized")
-	}
-
-	if err := registry.GetCmsStore().AutoMigrate(context.Background()); err != nil {
-		return err
 	}
 
 	return nil

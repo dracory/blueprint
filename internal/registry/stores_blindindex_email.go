@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -23,29 +22,6 @@ func blindIndexEmailStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetBlindIndexStoreEmail(store)
-	}
-
-	return nil
-}
-
-func blindIndexEmailStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	// Blind index stores: migrate only if user store is enabled and vault store is enabled
-	if !registry.GetConfig().GetUserStoreUsed() || !registry.GetConfig().GetVaultStoreUsed() {
-		return nil
-	}
-
-	blindIndexEmailStore := registry.GetBlindIndexStoreEmail()
-	if blindIndexEmailStore == nil {
-		return errors.New("blind index email store is not initialized")
-	}
-
-	err := blindIndexEmailStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

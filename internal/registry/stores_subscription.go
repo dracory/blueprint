@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,27 +21,6 @@ func subscriptionStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetSubscriptionStore(store)
-	}
-
-	return nil
-}
-
-func subscriptionStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetSubscriptionStoreUsed() {
-		return nil
-	}
-
-	subscriptionStore := registry.GetSubscriptionStore()
-	if subscriptionStore == nil {
-		return errors.New("subscription store is not initialized")
-	}
-
-	if err := subscriptionStore.AutoMigrate(context.Background()); err != nil {
-		return err
 	}
 
 	return nil

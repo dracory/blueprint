@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func userStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetUserStore(store)
-	}
-
-	return nil
-}
-
-func userStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetUserStoreUsed() {
-		return nil
-	}
-
-	userStore := registry.GetUserStore()
-	if userStore == nil {
-		return errors.New("user store is not initialized")
-	}
-
-	err := userStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

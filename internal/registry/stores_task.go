@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func taskStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetTaskStore(store)
-	}
-
-	return nil
-}
-
-func taskStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetTaskStoreUsed() {
-		return nil
-	}
-
-	taskStore := registry.GetTaskStore()
-	if taskStore == nil {
-		return errors.New("task store is not initialized")
-	}
-
-	err := taskStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

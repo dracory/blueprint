@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"fmt"
+	"project/internal/config"
 	"regexp"
 	"strings"
 
@@ -44,8 +45,81 @@ func validateMigrationID(id string) error {
 	return nil
 }
 
-// GetAllMigrations returns all available migrations with validation
-func GetAllMigrations() ([]migrate.MigrationInterface, error) {
+// getStoreMigrations returns store migrations conditionally based on config.
+// These are run directly (not inside a transaction) because store packages
+// manage their own database connections internally.
+func getStoreMigrations(cfg config.ConfigInterface, registry RegistryInterface) []migrate.MigrationInterface {
+	migrations := []migrate.MigrationInterface{}
+
+	if cfg.GetAuditStoreUsed() {
+		migrations = append(migrations, &StoreAuditMigrate{registry: registry})
+	}
+	if cfg.GetBlogStoreUsed() {
+		migrations = append(migrations, &StoreBlogMigrate{registry: registry})
+	}
+	if cfg.GetUserStoreUsed() && cfg.GetVaultStoreUsed() {
+		migrations = append(migrations, &StoreBlindIndexEmailMigrate{registry: registry})
+		migrations = append(migrations, &StoreBlindIndexFirstNameMigrate{registry: registry})
+		migrations = append(migrations, &StoreBlindIndexLastNameMigrate{registry: registry})
+	}
+	if cfg.GetCacheStoreUsed() {
+		migrations = append(migrations, &StoreCacheMigrate{registry: registry})
+	}
+	if cfg.GetChatStoreUsed() {
+		migrations = append(migrations, &StoreChatMigrate{registry: registry})
+	}
+	if cfg.GetCmsStoreUsed() {
+		migrations = append(migrations, &StoreCmsMigrate{registry: registry})
+	}
+	if cfg.GetCustomStoreUsed() {
+		migrations = append(migrations, &StoreCustomMigrate{registry: registry})
+	}
+	if cfg.GetEntityStoreUsed() {
+		migrations = append(migrations, &StoreEntityMigrate{registry: registry})
+	}
+	if cfg.GetFeedStoreUsed() {
+		migrations = append(migrations, &StoreFeedMigrate{registry: registry})
+	}
+	if cfg.GetGeoStoreUsed() {
+		migrations = append(migrations, &StoreGeoMigrate{registry: registry})
+	}
+	if cfg.GetLogStoreUsed() {
+		migrations = append(migrations, &StoreLogMigrate{registry: registry})
+	}
+	if cfg.GetMetaStoreUsed() {
+		migrations = append(migrations, &StoreMetaMigrate{registry: registry})
+	}
+	if cfg.GetSessionStoreUsed() {
+		migrations = append(migrations, &StoreSessionMigrate{registry: registry})
+	}
+	if cfg.GetSettingStoreUsed() {
+		migrations = append(migrations, &StoreSettingMigrate{registry: registry})
+	}
+	if cfg.GetShopStoreUsed() {
+		migrations = append(migrations, &StoreShopMigrate{registry: registry})
+	}
+	if cfg.GetStatsStoreUsed() {
+		migrations = append(migrations, &StoreStatsMigrate{registry: registry})
+	}
+	if cfg.GetSubscriptionStoreUsed() {
+		migrations = append(migrations, &StoreSubscriptionMigrate{registry: registry})
+	}
+	if cfg.GetTaskStoreUsed() {
+		migrations = append(migrations, &StoreTaskMigrate{registry: registry})
+	}
+	if cfg.GetUserStoreUsed() {
+		migrations = append(migrations, &StoreUserMigrate{registry: registry})
+	}
+	if cfg.GetVaultStoreUsed() {
+		migrations = append(migrations, &StoreVaultMigrate{registry: registry})
+	}
+
+	return migrations
+}
+
+// getSQLMigrations returns custom SQL migrations with validation.
+// These are run inside transactions via the migrate framework.
+func getSQLMigrations() ([]migrate.MigrationInterface, error) {
 	migrations := []migrate.MigrationInterface{
 		&TableUsersCreate{},
 		// &TableTapMessagesCreate{},

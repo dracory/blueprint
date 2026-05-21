@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -24,28 +23,6 @@ func chatStoreInitialize(registry RegistryInterface) error {
 	}
 
 	registry.SetChatStore(store)
-	return nil
-}
-
-func chatStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetChatStoreUsed() {
-		return nil
-	}
-
-	chatStore := registry.GetChatStore()
-	if chatStore == nil {
-		return errors.New("chat store is not initialized")
-	}
-
-	err := chatStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 

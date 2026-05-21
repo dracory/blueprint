@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func vaultStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetVaultStore(store)
-	}
-
-	return nil
-}
-
-func vaultStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetVaultStoreUsed() {
-		return nil
-	}
-
-	vaultStore := registry.GetVaultStore()
-	if vaultStore == nil {
-		return errors.New("vault store is not initialized")
-	}
-
-	err := vaultStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

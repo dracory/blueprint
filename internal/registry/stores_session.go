@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,27 +21,6 @@ func sessionStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetSessionStore(store)
-	}
-
-	return nil
-}
-
-func sessionStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetSessionStoreUsed() {
-		return nil
-	}
-
-	sessionStore := registry.GetSessionStore()
-	if sessionStore == nil {
-		return errors.New("session store is not initialized")
-	}
-
-	if err := sessionStore.MigrateUp(context.Background()); err != nil {
-		return err
 	}
 
 	return nil

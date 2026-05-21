@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func statsStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetStatsStore(store)
-	}
-
-	return nil
-}
-
-func statsStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetStatsStoreUsed() {
-		return nil
-	}
-
-	statsStore := registry.GetStatsStore()
-	if statsStore == nil {
-		return errors.New("stats store is not initialized")
-	}
-
-	err := statsStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

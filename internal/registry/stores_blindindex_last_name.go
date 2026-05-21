@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -23,29 +22,6 @@ func blindIndexLastNameStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetBlindIndexStoreLastName(store)
-	}
-
-	return nil
-}
-
-func blindIndexLastNameStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	// Blind index stores: migrate only if user store is enabled and vault store is enabled
-	if !registry.GetConfig().GetUserStoreUsed() || !registry.GetConfig().GetVaultStoreUsed() {
-		return nil
-	}
-
-	blindIndexLastNameStore := registry.GetBlindIndexStoreLastName()
-	if blindIndexLastNameStore == nil {
-		return errors.New("blind index last name store is not initialized")
-	}
-
-	err := blindIndexLastNameStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

@@ -10,7 +10,9 @@ import (
 	"syscall"
 	"time"
 
+	"project/database/migrations"
 	"project/internal/cli"
+
 	// "project/internal/cmsblocks"
 	"project/internal/config"
 	"project/internal/registry"
@@ -65,6 +67,12 @@ func main() {
 			cfmt.Errorf("Failed to close registry: %v", err)
 		}
 	}()
+
+	// Run all migrations (store-level + custom SQL)
+	if err := migrations.MigrateAll(registry); err != nil {
+		fmt.Printf("Failed to run migrations: %v\n", err)
+		return
+	}
 
 	tasks.RegisterTasks(registry) // Register the task handlers
 

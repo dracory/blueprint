@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -17,26 +16,6 @@ func cacheStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetCacheStore(store)
-	}
-
-	return nil
-}
-
-func cacheStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetCacheStoreUsed() {
-		return nil
-	}
-
-	if registry.GetCacheStore() == nil {
-		return errors.New("cache store is not initialized")
-	}
-
-	if err := registry.GetCacheStore().MigrateUp(context.Background()); err != nil {
-		return err
 	}
 
 	return nil

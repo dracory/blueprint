@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func feedStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetFeedStore(store)
-	}
-
-	return nil
-}
-
-func feedStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetFeedStoreUsed() {
-		return nil
-	}
-
-	feedStore := registry.GetFeedStore()
-	if feedStore == nil {
-		return errors.New("feed store is not initialized")
-	}
-
-	err := feedStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

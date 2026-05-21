@@ -26,28 +26,6 @@ func auditStoreInitialize(registry RegistryInterface) error {
 	return nil
 }
 
-func auditStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetAuditStoreUsed() {
-		return nil
-	}
-
-	auditStore := registry.GetAuditStore()
-	if auditStore == nil {
-		return errors.New("audit store is not initialized")
-	}
-
-	err := auditStore.AutoMigrate()
-	if err != nil {
-		return errors.New("error migrating audit store: " + err.Error())
-	}
-
-	return nil
-}
-
 // newAuditStore constructs the Audit store without running migrations
 func newAuditStore(db *sql.DB) (auditstore.StoreInterface, error) {
 	if db == nil {

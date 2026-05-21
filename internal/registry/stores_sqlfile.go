@@ -26,27 +26,6 @@ func sqlFileStorageInitialize(registry RegistryInterface) error {
 	return nil
 }
 
-func sqlFileStorageMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetSqlFileStoreUsed() {
-		return nil
-	}
-
-	if registry.GetSqlFileStorage() == nil {
-		return errors.New("sql file storage is not initialized")
-	}
-
-	// SQL file storage doesn't need migration
-	// if err := registry.GetSqlFileStorage().AutoMigrate(); err != nil {
-	// 	return err
-	// }
-
-	return nil
-}
-
 // newSqlFileStorage constructs the SQL file storage without running migrations
 func newSqlFileStorage(db *sql.DB) (filesystem.StorageInterface, error) {
 	if db == nil {

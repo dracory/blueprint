@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func shopStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetShopStore(store)
-	}
-
-	return nil
-}
-
-func shopStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetShopStoreUsed() {
-		return nil
-	}
-
-	shopStore := registry.GetShopStore()
-	if shopStore == nil {
-		return errors.New("shop store is not initialized")
-	}
-
-	err := shopStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

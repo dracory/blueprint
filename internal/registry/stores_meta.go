@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,28 +21,6 @@ func metaStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetMetaStore(store)
-	}
-
-	return nil
-}
-
-func metaStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetMetaStoreUsed() {
-		return nil
-	}
-
-	metaStore := registry.GetMetaStore()
-	if metaStore == nil {
-		return errors.New("meta store is not initialized")
-	}
-
-	err := metaStore.MigrateUp(context.Background())
-	if err != nil {
-		return err
 	}
 
 	return nil

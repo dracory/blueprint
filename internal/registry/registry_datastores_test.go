@@ -8,6 +8,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
+	"project/database/migrations"
 	"project/internal/config"
 	"project/internal/registry"
 )
@@ -50,6 +51,11 @@ func newTestApp(t *testing.T) registry.RegistryInterface {
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
+
+	if err := migrations.MigrateAll(a); err != nil {
+		t.Fatalf("expected no migration error, got: %v", err)
+	}
+
 	return a
 }
 

@@ -1,7 +1,6 @@
 package registry
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -22,27 +21,6 @@ func entityStoreInitialize(registry RegistryInterface) error {
 		return err
 	} else {
 		registry.SetEntityStore(store)
-	}
-
-	return nil
-}
-
-func entityStoreMigrate(registry RegistryInterface) error {
-	if registry.GetConfig() == nil {
-		return errors.New("config is not initialized")
-	}
-
-	if !registry.GetConfig().GetEntityStoreUsed() {
-		return nil
-	}
-
-	entityStore := registry.GetEntityStore()
-	if entityStore == nil {
-		return errors.New("entity store is not initialized")
-	}
-
-	if err := registry.GetEntityStore().MigrateUp(context.Background()); err != nil {
-		return err
 	}
 
 	return nil
