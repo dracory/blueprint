@@ -38,7 +38,11 @@ func (m *StoreGeoMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreGeoMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetGeoStore()
+	if store == nil {
+		return errors.New("geo store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreGeoMigrate) CreatedAt() time.Time {

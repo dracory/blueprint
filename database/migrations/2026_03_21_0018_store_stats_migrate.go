@@ -38,7 +38,11 @@ func (m *StoreStatsMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreStatsMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetStatsStore()
+	if store == nil {
+		return errors.New("stats store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreStatsMigrate) CreatedAt() time.Time {

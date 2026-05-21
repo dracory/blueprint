@@ -38,7 +38,11 @@ func (m *StoreSessionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreSessionMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetSessionStore()
+	if store == nil {
+		return errors.New("session store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreSessionMigrate) CreatedAt() time.Time {

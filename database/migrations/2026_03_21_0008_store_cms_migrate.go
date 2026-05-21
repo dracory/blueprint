@@ -34,11 +34,15 @@ func (m *StoreCmsMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("cms store is not initialized")
 	}
 
-	return store.AutoMigrate(ctx)
+	return store.MigrateUp(ctx)
 }
 
 func (m *StoreCmsMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetCmsStore()
+	if store == nil {
+		return errors.New("cms store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreCmsMigrate) CreatedAt() time.Time {

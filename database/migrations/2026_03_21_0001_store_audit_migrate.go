@@ -34,12 +34,15 @@ func (m *StoreAuditMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("audit store is not initialized")
 	}
 
-	return store.AutoMigrate()
+	return store.MigrateUp(ctx)
 }
 
 func (m *StoreAuditMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	// Store migrations do not support rollback
-	return nil
+	store := m.registry.GetAuditStore()
+	if store == nil {
+		return errors.New("audit store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreAuditMigrate) CreatedAt() time.Time {

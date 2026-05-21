@@ -121,7 +121,7 @@ func getStoreMigrations(cfg config.ConfigInterface, registry RegistryInterface) 
 // These are run inside transactions via the migrate framework.
 func getSQLMigrations() ([]migrate.MigrationInterface, error) {
 	migrations := []migrate.MigrationInterface{
-		&TableUsersCreate{},
+		// &TableCustomCreate{},
 		// &TableTapMessagesCreate{},
 		// &TablePointersCreate{},
 		// &AddProfileCompletedToUsers{},

@@ -38,7 +38,11 @@ func (m *StoreLogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreLogMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetLogStore()
+	if store == nil {
+		return errors.New("log store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreLogMigrate) CreatedAt() time.Time {

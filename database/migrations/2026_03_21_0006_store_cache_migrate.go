@@ -38,7 +38,11 @@ func (m *StoreCacheMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreCacheMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetCacheStore()
+	if store == nil {
+		return errors.New("cache store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreCacheMigrate) CreatedAt() time.Time {

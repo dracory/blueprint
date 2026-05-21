@@ -38,7 +38,11 @@ func (m *StoreEntityMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreEntityMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetEntityStore()
+	if store == nil {
+		return errors.New("entity store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreEntityMigrate) CreatedAt() time.Time {

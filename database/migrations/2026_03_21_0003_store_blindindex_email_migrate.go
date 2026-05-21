@@ -38,7 +38,11 @@ func (m *StoreBlindIndexEmailMigrate) Up(ctx context.Context, tx *sql.Tx) error 
 }
 
 func (m *StoreBlindIndexEmailMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetBlindIndexStoreEmail()
+	if store == nil {
+		return errors.New("blind index email store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreBlindIndexEmailMigrate) CreatedAt() time.Time {

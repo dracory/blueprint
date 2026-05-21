@@ -38,7 +38,11 @@ func (m *StoreBlogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreBlogMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetBlogStore()
+	if store == nil {
+		return errors.New("blog store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreBlogMigrate) CreatedAt() time.Time {

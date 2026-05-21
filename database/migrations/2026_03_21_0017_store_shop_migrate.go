@@ -38,7 +38,11 @@ func (m *StoreShopMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreShopMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetShopStore()
+	if store == nil {
+		return errors.New("shop store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreShopMigrate) CreatedAt() time.Time {

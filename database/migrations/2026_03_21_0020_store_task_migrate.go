@@ -38,7 +38,11 @@ func (m *StoreTaskMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreTaskMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetTaskStore()
+	if store == nil {
+		return errors.New("task store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreTaskMigrate) CreatedAt() time.Time {

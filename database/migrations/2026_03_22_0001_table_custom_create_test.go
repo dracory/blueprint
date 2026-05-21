@@ -10,7 +10,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-func TestUsersTableCreate(t *testing.T) {
+func TestCustomTableCreate(t *testing.T) {
 	t.Skip("Enable if migrations are used")
 
 	// Create in-memory SQLite database
@@ -26,7 +26,7 @@ func TestUsersTableCreate(t *testing.T) {
 	// Builtin migrations will be added automatically on first Up() call
 
 	// Add migration
-	migration := &TableUsersCreate{}
+	migration := &TableCustomCreate{}
 	migrator.AddMigration(migration)
 
 	// Test Up migration
@@ -135,14 +135,14 @@ func TestUsersTableCreate(t *testing.T) {
 
 	// Test migration interface methods
 	t.Run("Interface Methods", func(t *testing.T) {
-		migration := &TableUsersCreate{}
+		migration := &TableCustomCreate{}
 
-		if migration.ID() != "2026_03_21_table_users_create" {
-			t.Errorf("Expected ID '2026_03_21_table_users_create', got '%s'", migration.ID())
+		if migration.ID() != "2026_03_22_0001_table_custom_create" {
+			t.Errorf("Expected ID '2026_03_22_0001_table_custom_create', got '%s'", migration.ID())
 		}
 
-		if migration.Description() != "Create users table with email and created_at indexes" {
-			t.Errorf("Expected Description 'Create users table with email and created_at indexes', got '%s'", migration.Description())
+		if migration.Description() != "Example: Create custom table with indexes" {
+			t.Errorf("Expected Description 'Example: Create custom table with indexes', got '%s'", migration.Description())
 		}
 
 		// Test CreatedAt returns a valid time
@@ -154,7 +154,7 @@ func TestUsersTableCreate(t *testing.T) {
 		// Verify it's the expected date
 		expectedYear := 2026
 		expectedMonth := time.Month(3)
-		expectedDay := 21
+		expectedDay := 22
 		if createdAt.Year() != expectedYear || createdAt.Month() != expectedMonth || createdAt.Day() != expectedDay {
 			t.Errorf("Expected CreatedAt to be %d-%02d-%02d, got %s",
 				expectedYear, expectedMonth, expectedDay, createdAt.Format("2006-01-02"))

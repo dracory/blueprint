@@ -38,7 +38,11 @@ func (m *StoreMetaMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreMetaMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetMetaStore()
+	if store == nil {
+		return errors.New("meta store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreMetaMigrate) CreatedAt() time.Time {

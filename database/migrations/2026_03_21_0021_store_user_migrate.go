@@ -38,7 +38,11 @@ func (m *StoreUserMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreUserMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetUserStore()
+	if store == nil {
+		return errors.New("user store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreUserMigrate) CreatedAt() time.Time {

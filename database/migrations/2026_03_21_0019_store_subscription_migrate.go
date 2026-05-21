@@ -38,6 +38,7 @@ func (m *StoreSubscriptionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreSubscriptionMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+	// Subscription store uses AutoMigrate which doesn't support rollback
 	return nil
 }
 

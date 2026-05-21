@@ -38,7 +38,11 @@ func (m *StoreChatMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreChatMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetChatStore()
+	if store == nil {
+		return errors.New("chat store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreChatMigrate) CreatedAt() time.Time {

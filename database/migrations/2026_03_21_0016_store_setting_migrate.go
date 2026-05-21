@@ -38,7 +38,11 @@ func (m *StoreSettingMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreSettingMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetSettingStore()
+	if store == nil {
+		return errors.New("setting store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreSettingMigrate) CreatedAt() time.Time {

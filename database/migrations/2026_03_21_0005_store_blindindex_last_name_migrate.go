@@ -38,7 +38,11 @@ func (m *StoreBlindIndexLastNameMigrate) Up(ctx context.Context, tx *sql.Tx) err
 }
 
 func (m *StoreBlindIndexLastNameMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetBlindIndexStoreLastName()
+	if store == nil {
+		return errors.New("blind index last name store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreBlindIndexLastNameMigrate) CreatedAt() time.Time {

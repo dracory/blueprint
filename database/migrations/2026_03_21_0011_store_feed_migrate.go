@@ -38,7 +38,11 @@ func (m *StoreFeedMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreFeedMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetFeedStore()
+	if store == nil {
+		return errors.New("feed store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreFeedMigrate) CreatedAt() time.Time {

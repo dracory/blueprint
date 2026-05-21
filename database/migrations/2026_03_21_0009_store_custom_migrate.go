@@ -38,7 +38,11 @@ func (m *StoreCustomMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreCustomMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetCustomStore()
+	if store == nil {
+		return errors.New("custom store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreCustomMigrate) CreatedAt() time.Time {

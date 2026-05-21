@@ -38,7 +38,11 @@ func (m *StoreVaultMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreVaultMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	return nil
+	store := m.registry.GetVaultStore()
+	if store == nil {
+		return errors.New("vault store is not initialized")
+	}
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreVaultMigrate) CreatedAt() time.Time {
