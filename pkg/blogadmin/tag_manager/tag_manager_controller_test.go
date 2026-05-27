@@ -15,7 +15,7 @@ import (
 	"github.com/dracory/test"
 )
 
-func TestTagManagerController_Functional_RenderPage(t *testing.T) {
+func TestTagManagerController_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -35,7 +35,7 @@ func TestTagManagerController_Functional_RenderPage(t *testing.T) {
 	}
 }
 
-func TestTagManagerController_Functional_HandleLoadTags(t *testing.T) {
+func TestTagManagerController_HandleLoadTags(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -58,7 +58,7 @@ func TestTagManagerController_Functional_HandleLoadTags(t *testing.T) {
 	}
 }
 
-func TestTagManagerController_Functional_HandleCreateTag(t *testing.T) {
+func TestTagManagerController_HandleCreateTag(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -95,7 +95,7 @@ func TestTagManagerController_Functional_HandleCreateTag(t *testing.T) {
 	}
 }
 
-func TestTagManagerController_Functional_HandleLoadTagPosts(t *testing.T) {
+func TestTagManagerController_HandleLoadTagPosts(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -130,7 +130,7 @@ func TestTagManagerController_Functional_HandleLoadTagPosts(t *testing.T) {
 	}
 }
 
-func TestTagManagerController_Functional_HandleUpdateTag(t *testing.T) {
+func TestTagManagerController_HandleUpdateTag(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -172,7 +172,7 @@ func TestTagManagerController_Functional_HandleUpdateTag(t *testing.T) {
 	}
 }
 
-func TestTagManagerController_Functional_HandleDeleteTag(t *testing.T) {
+func TestTagManagerController_HandleDeleteTag(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),

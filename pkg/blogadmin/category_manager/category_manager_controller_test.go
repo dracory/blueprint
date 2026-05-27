@@ -15,7 +15,7 @@ import (
 	"github.com/dracory/test"
 )
 
-func TestCategoryManagerController_Functional_RenderPage(t *testing.T) {
+func TestCategoryManagerController_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -35,7 +35,7 @@ func TestCategoryManagerController_Functional_RenderPage(t *testing.T) {
 	}
 }
 
-func TestCategoryManagerController_Functional_HandleLoadCategories(t *testing.T) {
+func TestCategoryManagerController_HandleLoadCategories(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -58,7 +58,7 @@ func TestCategoryManagerController_Functional_HandleLoadCategories(t *testing.T)
 	}
 }
 
-func TestCategoryManagerController_Functional_HandleCreateCategory(t *testing.T) {
+func TestCategoryManagerController_HandleCreateCategory(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -96,7 +96,7 @@ func TestCategoryManagerController_Functional_HandleCreateCategory(t *testing.T)
 	}
 }
 
-func TestCategoryManagerController_Functional_HandleUpdateCategory(t *testing.T) {
+func TestCategoryManagerController_HandleUpdateCategory(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -143,7 +143,7 @@ func TestCategoryManagerController_Functional_HandleUpdateCategory(t *testing.T)
 	}
 }
 
-func TestCategoryManagerController_Functional_HandleReorderCategories(t *testing.T) {
+func TestCategoryManagerController_HandleReorderCategories(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -180,7 +180,7 @@ func TestCategoryManagerController_Functional_HandleReorderCategories(t *testing
 	}
 }
 
-func TestCategoryManagerController_Functional_HandleDeleteCategory(t *testing.T) {
+func TestCategoryManagerController_HandleDeleteCategory(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),

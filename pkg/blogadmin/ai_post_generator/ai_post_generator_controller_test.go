@@ -114,8 +114,8 @@ func TestAiPostGeneratorController_MultipleInstances(t *testing.T) {
 	}
 }
 
-// TestAiPostGeneratorController_Functional_RenderPage tests rendering the page
-func TestAiPostGeneratorController_Functional_RenderPage(t *testing.T) {
+// TestAiPostGeneratorController_RenderPage tests rendering the page
+func TestAiPostGeneratorController_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),

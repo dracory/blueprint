@@ -171,8 +171,8 @@ func TestAiTitleGeneratorController_Handler_MethodExists(t *testing.T) {
 	// We can't easily test the actual handler without a full HTTP setup
 }
 
-// TestAiTitleGeneratorController_Functional_RenderPage tests rendering the page
-func TestAiTitleGeneratorController_Functional_RenderPage(t *testing.T) {
+// TestAiTitleGeneratorController_RenderPage tests rendering the page
+func TestAiTitleGeneratorController_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -193,8 +193,8 @@ func TestAiTitleGeneratorController_Functional_RenderPage(t *testing.T) {
 	}
 }
 
-// TestAiTitleGeneratorController_Functional_OnAddTitleModal tests the add title modal
-func TestAiTitleGeneratorController_Functional_OnAddTitleModal(t *testing.T) {
+// TestAiTitleGeneratorController_OnAddTitleModal tests the add title modal
+func TestAiTitleGeneratorController_OnAddTitleModal(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),

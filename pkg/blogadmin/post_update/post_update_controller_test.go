@@ -16,7 +16,7 @@ import (
 	"github.com/dracory/test"
 )
 
-func TestPostUpdateController_Functional_RenderDetailsView(t *testing.T) {
+func TestPostUpdateController_RenderDetailsView(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -44,7 +44,7 @@ func TestPostUpdateController_Functional_RenderDetailsView(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleLoadDetails(t *testing.T) {
+func TestPostUpdateController_HandleLoadDetails(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -75,7 +75,7 @@ func TestPostUpdateController_Functional_HandleLoadDetails(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleSaveDetails(t *testing.T) {
+func TestPostUpdateController_HandleSaveDetails(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -114,7 +114,7 @@ func TestPostUpdateController_Functional_HandleSaveDetails(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleLoadCategories(t *testing.T) {
+func TestPostUpdateController_HandleLoadCategories(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -148,7 +148,7 @@ func TestPostUpdateController_Functional_HandleLoadCategories(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleAddCategory(t *testing.T) {
+func TestPostUpdateController_HandleAddCategory(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -190,7 +190,7 @@ func TestPostUpdateController_Functional_HandleAddCategory(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleRemoveCategory(t *testing.T) {
+func TestPostUpdateController_HandleRemoveCategory(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -240,7 +240,7 @@ func TestPostUpdateController_Functional_HandleRemoveCategory(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_HandleLoadTags(t *testing.T) {
+func TestPostUpdateController_HandleLoadTags(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -274,7 +274,7 @@ func TestPostUpdateController_Functional_HandleLoadTags(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_RenderCategoriesView(t *testing.T) {
+func TestPostUpdateController_RenderCategoriesView(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -302,7 +302,7 @@ func TestPostUpdateController_Functional_RenderCategoriesView(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_RenderTagsView(t *testing.T) {
+func TestPostUpdateController_RenderTagsView(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -330,7 +330,7 @@ func TestPostUpdateController_Functional_RenderTagsView(t *testing.T) {
 	}
 }
 
-func TestPostUpdateController_Functional_RenderSEOView(t *testing.T) {
+func TestPostUpdateController_RenderSEOView(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),

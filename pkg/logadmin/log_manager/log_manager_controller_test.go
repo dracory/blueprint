@@ -16,7 +16,7 @@ import (
 	"github.com/dracory/test"
 )
 
-func TestLogManagerController_Functional_RenderPage(t *testing.T) {
+func TestLogManagerController_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
@@ -48,7 +48,7 @@ func TestLogManagerController_Functional_RenderPage(t *testing.T) {
 	}
 }
 
-func TestLogManagerController_Functional_HandleLoadLogs(t *testing.T) {
+func TestLogManagerController_HandleLoadLogs(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
@@ -91,7 +91,7 @@ func TestLogManagerController_Functional_HandleLoadLogs(t *testing.T) {
 	}
 }
 
-func TestLogManagerController_Functional_HandleLogShowContext(t *testing.T) {
+func TestLogManagerController_HandleLogShowContext(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
@@ -133,7 +133,7 @@ func TestLogManagerController_Functional_HandleLogShowContext(t *testing.T) {
 	}
 }
 
-func TestLogManagerController_Functional_HandleLogDelete(t *testing.T) {
+func TestLogManagerController_HandleLogDelete(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
@@ -178,7 +178,7 @@ func TestLogManagerController_Functional_HandleLogDelete(t *testing.T) {
 	}
 }
 
-func TestLogManagerController_Functional_HandleLogDeleteSelected(t *testing.T) {
+func TestLogManagerController_HandleLogDeleteSelected(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
@@ -234,7 +234,7 @@ func TestLogManagerController_Functional_HandleLogDeleteSelected(t *testing.T) {
 	}
 }
 
-func TestLogManagerController_Functional_HandleLogDeleteAll(t *testing.T) {
+func TestLogManagerController_HandleLogDeleteAll(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
