@@ -1,0 +1,230 @@
+<div id="media-app">
+    <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div v-else>
+        <!-- Product Media Header -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+                <i class="bi bi-images me-2"></i>
+                <span>Product Media</span>
+            </h5>
+            <div class="d-flex gap-2">
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="showAddModal = true"
+                    :disabled="loading"
+                >
+                    <i class="bi bi-plus-circle me-2"></i> Add
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    @click="saveMedia"
+                    :disabled="loading"
+                >
+                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i v-else class="bi bi-save me-2"></i>
+                    Save Media
+                </button>
+            </div>
+        </div>
+
+        <!-- Media Grid -->
+        <div v-if="mediaItems.length > 0" class="row g-3 mb-4">
+            <div 
+                v-for="(item, index) in mediaItems" 
+                :key="item.id" 
+                class="col-md-3"
+                :class="{ 'dragging': draggedIndex === index, 'drag-over': dragOverIndex === index }"
+            >
+                <div class="card h-100">
+                    <div class="card-body p-2 position-relative"
+                        draggable="true"
+                        @dragstart="dragStart($event, index)"
+                        @dragover="dragOver($event, index)"
+                        @dragenter="dragEnter($event, index)"
+                        @dragleave="dragLeave($event, index)"
+                        @drop="drop($event, index)"
+                    >
+                        <!-- Drag Handle -->
+                        <div class="drag-handle position-absolute top-0 start-0 p-1 cursor-move" style="z-index: 10;">
+                            <i class="bi bi-grip-vertical text-muted"></i>
+                        </div>
+                        <!-- Open URL Button (Top RHS) -->
+                        <div class="position-absolute top-0 end-0 p-1" style="z-index: 10;">
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-info text-white" 
+                                @click="openUrl(item.url)"
+                                title="Open in new tab"
+                                :disabled="loading"
+                            >
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </button>
+                        </div>
+                        <!-- Media Preview -->
+                        <div class="mb-2 text-center" style="height: 120px; overflow: hidden;">
+                            <img 
+                                v-if="determineMediaType(item.url) === 'image'" 
+                                :src="item.url" 
+                                class="img-fluid rounded" 
+                                alt="Media preview"
+                                style="max-height: 100%; object-fit: contain;"
+                            >
+                            <div v-else class="d-flex align-items-center justify-content-center h-100 bg-light rounded">
+                                <i class="bi bi-play-circle fs-1 text-primary"></i>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-outline-primary" 
+                                @click="openEditModal(index)"
+                                title="Edit"
+                                :disabled="loading"
+                            >
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-danger" 
+                                @click="removeMedia(index)"
+                                title="Remove"
+                                :disabled="loading"
+                            >
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-footer p-2">
+                        <p class="card-text small text-truncate mb-0" :title="item.fileName">{{ item.fileName || 'Unnamed' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="p-4 text-center text-muted border rounded mb-4">
+            <i class="bi bi-images fs-1"></i>
+            <p class="mb-0">No media yet. Add one below.</p>
+        </div>
+
+        <!-- Footer -->
+        <div v-if="mediaItems.length > 0" class="d-flex justify-content-between align-items-center p-3 border-top">
+            <span class="text-muted">{{ mediaItems.length }} total</span>
+            <div class="d-flex gap-2">
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="showAddModal = true"
+                    :disabled="loading"
+                >
+                    <i class="bi bi-plus-circle me-2"></i> Add
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    @click="saveMedia"
+                    :disabled="loading"
+                >
+                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i v-else class="bi bi-save me-2"></i>
+                    Save Media
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Media Modal -->
+    <div v-if="showAddModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Media</h5>
+                    <button type="button" class="btn-close" @click="showAddModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label fw-bold">Media URL</label>
+                    <input
+                        type="url"
+                        class="form-control mb-3"
+                        v-model="newMediaUrl"
+                        placeholder="Enter image or video URL..."
+                        @keypress.enter.prevent="addMedia"
+                        :disabled="loading"
+                    >
+                    <label class="form-label fw-bold">File Name (optional)</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        v-model="newMediaFileName"
+                        placeholder="Enter file name..."
+                        @keypress.enter.prevent="addMedia"
+                        :disabled="loading"
+                    >
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" @click="showAddModal = false">
+                        <i class="bi bi-chevron-left me-2"></i> Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="addMedia"
+                        :disabled="!newMediaUrl.trim() || loading"
+                    >
+                        <i class="bi bi-plus-circle me-2"></i> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Media Modal -->
+    <div v-if="showEditModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Media</h5>
+                    <button type="button" class="btn-close" @click="closeEditModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">URL</label>
+                        <input 
+                            type="url" 
+                            class="form-control" 
+                            v-model="editForm.url" 
+                            placeholder="Enter image or video URL..."
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">File Name</label>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            v-model="editForm.fileName" 
+                            placeholder="Enter file name..."
+                        >
+                    </div>
+                    <div class="mb-3">
+                        <img :src="editForm.url" class="img-fluid rounded" alt="Preview" style="max-height: 200px;">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @click="closeEditModal">Cancel</button>
+                    <button type="button" class="btn btn-primary" @click="saveEdit" :disabled="loading">
+                        <i class="bi bi-check-lg me-1"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

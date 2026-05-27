@@ -1,0 +1,44 @@
+<div id="app">
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card h-100 border-0 shadow-sm" style="background-color: #e3f2fd;">
+        <div class="card-body text-center">
+          <i class="bi bi-box fs-1 text-primary mb-2"></i>
+          <h3 class="card-title">{{ stats.product_count || 0 }}</h3>
+          <p class="card-text text-muted">Products</p>
+          <a :href="urlProducts" class="btn btn-primary btn-sm">Manage Products</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100 border-0 shadow-sm" style="background-color: #f3e5f5;">
+        <div class="card-body text-center">
+          <i class="bi bi-tags fs-1 text-purple mb-2" style="color: #9c27b0;"></i>
+          <h3 class="card-title">{{ stats.category_count || 0 }}</h3>
+          <p class="card-text text-muted">Categories</p>
+          <a :href="urlCategories" class="btn btn-secondary btn-sm">Manage Categories</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100 border-0 shadow-sm" style="background-color: #fff3e0;">
+        <div class="card-body text-center">
+          <i class="bi bi-percent fs-1 text-warning mb-2" style="color: #ff9800;"></i>
+          <h3 class="card-title">Discounts</h3>
+          <p class="card-text text-muted">Manage discounts</p>
+          <a :href="urlDiscounts" class="btn btn-warning btn-sm">Manage Discounts</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card h-100 border-0 shadow-sm" style="background-color: #e8f5e9;">
+        <div class="card-body text-center">
+          <i class="bi bi-cart fs-1 text-success mb-2"></i>
+          <h3 class="card-title">{{ stats.order_count || 0 }}</h3>
+          <p class="card-text text-muted">Orders</p>
+          <a :href="urlOrders" class="btn btn-success btn-sm">Manage Orders</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
