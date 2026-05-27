@@ -13,7 +13,7 @@ import (
 	"github.com/dracory/test"
 )
 
-func TestAiPostGeneratorController_Functional(t *testing.T) {
+func TestAiPostGeneratorController_Functional_RenderPage(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
@@ -27,11 +27,9 @@ func TestAiPostGeneratorController_Functional(t *testing.T) {
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
-	t.Run("renderPage", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-post-generator", nil).WithContext(ctx)
-		resp := controller.Handler(httptest.NewRecorder(), req)
-		if !strings.Contains(resp, "Post Generator") {
-			t.Error("expected Post Generator in response")
-		}
-	})
+	req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-post-generator", nil).WithContext(ctx)
+	resp := controller.Handler(httptest.NewRecorder(), req)
+	if !strings.Contains(resp, "Post Generator") {
+		t.Error("expected Post Generator in response")
+	}
 }

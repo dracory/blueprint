@@ -118,59 +118,98 @@ func TestBlogPostListBlockType_SaveAdminFields(t *testing.T) {
 	}
 }
 
-// TestExtractTagSlugFromURL tests the tag extraction from URL
-func TestExtractTagSlugFromURL(t *testing.T) {
+// TestExtractTagSlugFromURL_URLWithTag tests URL with tag
+func TestExtractTagSlugFromURL_URLWithTag(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
 	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
 
-	tests := []struct {
-		name     string
-		url      string
-		expected string
-	}{
-		{
-			name:     "URL with tag",
-			url:      "/tag/journalists-journorequest-pr-media-press/",
-			expected: "journalists-journorequest-pr-media-press",
-		},
-		{
-			name:     "URL with tag no trailing slash",
-			url:      "/tag/my-tag",
-			expected: "my-tag",
-		},
-		{
-			name:     "URL without tag",
-			url:      "/blog/some-post",
-			expected: "",
-		},
-		{
-			name:     "Root URL",
-			url:      "/",
-			expected: "",
-		},
-		{
-			name:     "Tag with additional path",
-			url:      "/tag/my-tag/extra",
-			expected: "my-tag",
-		},
-		{
-			name:     "Empty tag",
-			url:      "/tag/",
-			expected: "",
-		},
+	req := httptest.NewRequest("GET", "/tag/journalists-journorequest-pr-media-press/", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "journalists-journorequest-pr-media-press" {
+		t.Errorf("extractTagSlugFromURL() = %v, want journalists-journorequest-pr-media-press", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.url, nil)
-			ctx := cmsstore.RequestToContext(context.Background(), req)
-			result := blockType.extractTagSlugFromURL(ctx)
-			if result != tt.expected {
-				t.Errorf("extractTagSlugFromURL() = %v, want %v", result, tt.expected)
-			}
-		})
+// TestExtractTagSlugFromURL_URLWithTagNoTrailingSlash tests URL with tag no trailing slash
+func TestExtractTagSlugFromURL_URLWithTagNoTrailingSlash(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+	)
+
+	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+
+	req := httptest.NewRequest("GET", "/tag/my-tag", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "my-tag" {
+		t.Errorf("extractTagSlugFromURL() = %v, want my-tag", result)
+	}
+}
+
+// TestExtractTagSlugFromURL_URLWithoutTag tests URL without tag
+func TestExtractTagSlugFromURL_URLWithoutTag(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+	)
+
+	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+
+	req := httptest.NewRequest("GET", "/blog/some-post", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "" {
+		t.Errorf("extractTagSlugFromURL() = %v, want empty string", result)
+	}
+}
+
+// TestExtractTagSlugFromURL_RootURL tests root URL
+func TestExtractTagSlugFromURL_RootURL(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+	)
+
+	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+
+	req := httptest.NewRequest("GET", "/", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "" {
+		t.Errorf("extractTagSlugFromURL() = %v, want empty string", result)
+	}
+}
+
+// TestExtractTagSlugFromURL_TagWithAdditionalPath tests tag with additional path
+func TestExtractTagSlugFromURL_TagWithAdditionalPath(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+	)
+
+	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+
+	req := httptest.NewRequest("GET", "/tag/my-tag/extra", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "my-tag" {
+		t.Errorf("extractTagSlugFromURL() = %v, want my-tag", result)
+	}
+}
+
+// TestExtractTagSlugFromURL_EmptyTag tests empty tag
+func TestExtractTagSlugFromURL_EmptyTag(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+	)
+
+	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+
+	req := httptest.NewRequest("GET", "/tag/", nil)
+	ctx := cmsstore.RequestToContext(context.Background(), req)
+	result := blockType.extractTagSlugFromURL(ctx)
+	if result != "" {
+		t.Errorf("extractTagSlugFromURL() = %v, want empty string", result)
 	}
 }

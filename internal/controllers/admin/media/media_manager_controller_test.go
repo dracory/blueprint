@@ -56,8 +56,8 @@ func TestMediaManagerControllerAnyIndexExists(t *testing.T) {
 	_ = controller.AnyIndex
 }
 
-// TestMediaManagerControllerHumanFilesize verifies HumanFilesize helper
-func TestMediaManagerControllerHumanFilesize(t *testing.T) {
+// TestMediaManagerControllerHumanFilesize_Bytes verifies HumanFilesize for bytes
+func TestMediaManagerControllerHumanFilesize_Bytes(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
 	if app == nil {
@@ -66,26 +66,73 @@ func TestMediaManagerControllerHumanFilesize(t *testing.T) {
 	t.Cleanup(func() { _ = app.GetDatabase().Close() })
 
 	controller := NewMediaManagerController(app)
-
-	tests := []struct {
-		name string
-		size int64
-		want string
-	}{
-		{"bytes", 500, "500 B"},
-		{"kilobytes", 1024, "1.0 kB"},
-		{"megabytes", 1048576, "1.0 MB"},
-		{"gigabytes", 1073741824, "1.0 GB"},
-		{"zero", 0, "0 B"},
+	result := controller.HumanFilesize(500)
+	if result != "500 B" {
+		t.Errorf("HumanFilesize(500) = %s, want 500 B", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := controller.HumanFilesize(tt.size)
-			if result != tt.want {
-				t.Errorf("HumanFilesize(%d) = %s, want %s", tt.size, result, tt.want)
-			}
-		})
+// TestMediaManagerControllerHumanFilesize_Kilobytes verifies HumanFilesize for kilobytes
+func TestMediaManagerControllerHumanFilesize_Kilobytes(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	result := controller.HumanFilesize(1024)
+	if result != "1.0 kB" {
+		t.Errorf("HumanFilesize(1024) = %s, want 1.0 kB", result)
+	}
+}
+
+// TestMediaManagerControllerHumanFilesize_Megabytes verifies HumanFilesize for megabytes
+func TestMediaManagerControllerHumanFilesize_Megabytes(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	result := controller.HumanFilesize(1048576)
+	if result != "1.0 MB" {
+		t.Errorf("HumanFilesize(1048576) = %s, want 1.0 MB", result)
+	}
+}
+
+// TestMediaManagerControllerHumanFilesize_Gigabytes verifies HumanFilesize for gigabytes
+func TestMediaManagerControllerHumanFilesize_Gigabytes(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	result := controller.HumanFilesize(1073741824)
+	if result != "1.0 GB" {
+		t.Errorf("HumanFilesize(1073741824) = %s, want 1.0 GB", result)
+	}
+}
+
+// TestMediaManagerControllerHumanFilesize_Zero verifies HumanFilesize for zero
+func TestMediaManagerControllerHumanFilesize_Zero(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	result := controller.HumanFilesize(0)
+	if result != "0 B" {
+		t.Errorf("HumanFilesize(0) = %s, want 0 B", result)
 	}
 }
 
@@ -225,8 +272,8 @@ func TestMediaManagerControllerAnyIndexFileUploadAction(t *testing.T) {
 	}
 }
 
-// TestMediaManagerControllerFileRenameAjaxValidation verifies validation errors
-func TestMediaManagerControllerFileRenameAjaxValidation(t *testing.T) {
+// TestMediaManagerControllerFileRenameAjaxValidation_MissingRenameFile verifies missing rename_file error
+func TestMediaManagerControllerFileRenameAjaxValidation_MissingRenameFile(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
 	if app == nil {
@@ -237,34 +284,17 @@ func TestMediaManagerControllerFileRenameAjaxValidation(t *testing.T) {
 	controller := NewMediaManagerController(app)
 	controller.init(httptest.NewRequest("GET", "/", nil))
 
-	tests := []struct {
-		name         string
-		params       map[string]string
-		wantContains string
-	}{
-		{"missing rename_file", map[string]string{}, "rename_file is required"},
-		{"missing new_file", map[string]string{"rename_file": "old.txt"}, "new_file is required"},
-		{"missing current_dir", map[string]string{"rename_file": "old.txt", "new_file": "new.txt"}, "current_dir is required"},
-	}
+	values := url.Values{}
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			values := url.Values{}
-			for k, v := range tt.params {
-				values.Add(k, v)
-			}
-			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
-
-			result := controller.fileRenameAjax(r)
-			if !strings.Contains(result, tt.wantContains) {
-				t.Errorf("fileRenameAjax() should contain %s, got %s", tt.wantContains, result)
-			}
-		})
+	result := controller.fileRenameAjax(r)
+	if !strings.Contains(result, "rename_file is required") {
+		t.Errorf("fileRenameAjax() should contain 'rename_file is required', got %s", result)
 	}
 }
 
-// TestMediaManagerControllerFileDeleteAjaxValidation verifies validation errors
-func TestMediaManagerControllerFileDeleteAjaxValidation(t *testing.T) {
+// TestMediaManagerControllerFileRenameAjaxValidation_MissingNewFile verifies missing new_file error
+func TestMediaManagerControllerFileRenameAjaxValidation_MissingNewFile(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
 	if app == nil {
@@ -275,33 +305,18 @@ func TestMediaManagerControllerFileDeleteAjaxValidation(t *testing.T) {
 	controller := NewMediaManagerController(app)
 	controller.init(httptest.NewRequest("GET", "/", nil))
 
-	tests := []struct {
-		name         string
-		params       map[string]string
-		wantContains string
-	}{
-		{"missing delete_file", map[string]string{}, "delete_file is required"},
-		{"missing current_dir", map[string]string{"delete_file": "test.txt"}, "current_dir is required"},
-	}
+	values := url.Values{}
+	values.Add("rename_file", "old.txt")
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			values := url.Values{}
-			for k, v := range tt.params {
-				values.Add(k, v)
-			}
-			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
-
-			result := controller.fileDeleteAjax(r)
-			if !strings.Contains(result, tt.wantContains) {
-				t.Errorf("fileDeleteAjax() should contain %s, got %s", tt.wantContains, result)
-			}
-		})
+	result := controller.fileRenameAjax(r)
+	if !strings.Contains(result, "new_file is required") {
+		t.Errorf("fileRenameAjax() should contain 'new_file is required', got %s", result)
 	}
 }
 
-// TestMediaManagerControllerDirectoryCreateAjaxValidation verifies validation errors
-func TestMediaManagerControllerDirectoryCreateAjaxValidation(t *testing.T) {
+// TestMediaManagerControllerFileRenameAjaxValidation_MissingCurrentDir verifies missing current_dir error
+func TestMediaManagerControllerFileRenameAjaxValidation_MissingCurrentDir(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
 	if app == nil {
@@ -312,33 +327,19 @@ func TestMediaManagerControllerDirectoryCreateAjaxValidation(t *testing.T) {
 	controller := NewMediaManagerController(app)
 	controller.init(httptest.NewRequest("GET", "/", nil))
 
-	tests := []struct {
-		name         string
-		params       map[string]string
-		wantContains string
-	}{
-		{"missing create_dir", map[string]string{}, "create_dir is required"},
-		{"missing current_dir", map[string]string{"create_dir": "newdir"}, "current_dir is required"},
-	}
+	values := url.Values{}
+	values.Add("rename_file", "old.txt")
+	values.Add("new_file", "new.txt")
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			values := url.Values{}
-			for k, v := range tt.params {
-				values.Add(k, v)
-			}
-			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
-
-			result := controller.directoryCreateAjax(r)
-			if !strings.Contains(result, tt.wantContains) {
-				t.Errorf("directoryCreateAjax() should contain %s, got %s", tt.wantContains, result)
-			}
-		})
+	result := controller.fileRenameAjax(r)
+	if !strings.Contains(result, "current_dir is required") {
+		t.Errorf("fileRenameAjax() should contain 'current_dir is required', got %s", result)
 	}
 }
 
-// TestMediaManagerControllerDirectoryDeleteAjaxValidation verifies validation errors
-func TestMediaManagerControllerDirectoryDeleteAjaxValidation(t *testing.T) {
+// TestMediaManagerControllerFileDeleteAjaxValidation_MissingDeleteFile verifies missing delete_file error
+func TestMediaManagerControllerFileDeleteAjaxValidation_MissingDeleteFile(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
 	if app == nil {
@@ -349,28 +350,121 @@ func TestMediaManagerControllerDirectoryDeleteAjaxValidation(t *testing.T) {
 	controller := NewMediaManagerController(app)
 	controller.init(httptest.NewRequest("GET", "/", nil))
 
-	tests := []struct {
-		name         string
-		params       map[string]string
-		wantContains string
-	}{
-		{"missing delete_dir", map[string]string{}, "delete_dir is required"},
-		{"invalid current_dir", map[string]string{"delete_dir": "testdir", "current_dir": "."}, "current_dir is required"},
+	values := url.Values{}
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.fileDeleteAjax(r)
+	if !strings.Contains(result, "delete_file is required") {
+		t.Errorf("fileDeleteAjax() should contain 'delete_file is required', got %s", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			values := url.Values{}
-			for k, v := range tt.params {
-				values.Add(k, v)
-			}
-			r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+// TestMediaManagerControllerFileDeleteAjaxValidation_MissingCurrentDir verifies missing current_dir error
+func TestMediaManagerControllerFileDeleteAjaxValidation_MissingCurrentDir(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
 
-			result := controller.directoryDeleteAjax(r)
-			if !strings.Contains(result, tt.wantContains) {
-				t.Errorf("directoryDeleteAjax() should contain %s, got %s", tt.wantContains, result)
-			}
-		})
+	controller := NewMediaManagerController(app)
+	controller.init(httptest.NewRequest("GET", "/", nil))
+
+	values := url.Values{}
+	values.Add("delete_file", "test.txt")
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.fileDeleteAjax(r)
+	if !strings.Contains(result, "current_dir is required") {
+		t.Errorf("fileDeleteAjax() should contain 'current_dir is required', got %s", result)
+	}
+}
+
+// TestMediaManagerControllerDirectoryCreateAjaxValidation_MissingCreateDir verifies missing create_dir error
+func TestMediaManagerControllerDirectoryCreateAjaxValidation_MissingCreateDir(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	controller.init(httptest.NewRequest("GET", "/", nil))
+
+	values := url.Values{}
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.directoryCreateAjax(r)
+	if !strings.Contains(result, "create_dir is required") {
+		t.Errorf("directoryCreateAjax() should contain 'create_dir is required', got %s", result)
+	}
+}
+
+// TestMediaManagerControllerDirectoryCreateAjaxValidation_MissingCurrentDir verifies missing current_dir error
+func TestMediaManagerControllerDirectoryCreateAjaxValidation_MissingCurrentDir(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	controller.init(httptest.NewRequest("GET", "/", nil))
+
+	values := url.Values{}
+	values.Add("create_dir", "newdir")
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.directoryCreateAjax(r)
+	if !strings.Contains(result, "current_dir is required") {
+		t.Errorf("directoryCreateAjax() should contain 'current_dir is required', got %s", result)
+	}
+}
+
+// TestMediaManagerControllerDirectoryDeleteAjaxValidation_MissingDeleteDir verifies missing delete_dir error
+func TestMediaManagerControllerDirectoryDeleteAjaxValidation_MissingDeleteDir(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	controller.init(httptest.NewRequest("GET", "/", nil))
+
+	values := url.Values{}
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.directoryDeleteAjax(r)
+	if !strings.Contains(result, "delete_dir is required") {
+		t.Errorf("directoryDeleteAjax() should contain 'delete_dir is required', got %s", result)
+	}
+}
+
+// TestMediaManagerControllerDirectoryDeleteAjaxValidation_InvalidCurrentDir verifies invalid current_dir error
+func TestMediaManagerControllerDirectoryDeleteAjaxValidation_InvalidCurrentDir(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewMediaManagerController(app)
+	controller.init(httptest.NewRequest("GET", "/", nil))
+
+	values := url.Values{}
+	values.Add("delete_dir", "testdir")
+	values.Add("current_dir", ".")
+	r := httptest.NewRequest("POST", "/?"+values.Encode(), nil)
+
+	result := controller.directoryDeleteAjax(r)
+	if !strings.Contains(result, "current_dir is required") {
+		t.Errorf("directoryDeleteAjax() should contain 'current_dir is required', got %s", result)
 	}
 }
 

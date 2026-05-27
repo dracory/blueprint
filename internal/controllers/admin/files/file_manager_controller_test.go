@@ -75,18 +75,42 @@ func TestFileManagerController_HandlerMultipleCalls(t *testing.T) {
 	}
 }
 
-func TestFileManagerController_HandlerWithDifferentMethods(t *testing.T) {
+func TestFileManagerController_HandlerWithDifferentMethods_GET(t *testing.T) {
 	registry := testutils.Setup()
 	controller := NewFileManagerController(registry)
 
-	methods := []string{"GET", "POST", "PUT", "DELETE"}
+	req := httptest.NewRequest("GET", "/admin/files", nil)
+	w := httptest.NewRecorder()
 
-	for _, method := range methods {
-		t.Run(method, func(t *testing.T) {
-			req := httptest.NewRequest(method, "/admin/files", nil)
-			w := httptest.NewRecorder()
+	controller.Handler(w, req)
+}
 
-			controller.Handler(w, req)
-		})
-	}
+func TestFileManagerController_HandlerWithDifferentMethods_POST(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewFileManagerController(registry)
+
+	req := httptest.NewRequest("POST", "/admin/files", nil)
+	w := httptest.NewRecorder()
+
+	controller.Handler(w, req)
+}
+
+func TestFileManagerController_HandlerWithDifferentMethods_PUT(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewFileManagerController(registry)
+
+	req := httptest.NewRequest("PUT", "/admin/files", nil)
+	w := httptest.NewRecorder()
+
+	controller.Handler(w, req)
+}
+
+func TestFileManagerController_HandlerWithDifferentMethods_DELETE(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewFileManagerController(registry)
+
+	req := httptest.NewRequest("DELETE", "/admin/files", nil)
+	w := httptest.NewRecorder()
+
+	controller.Handler(w, req)
 }

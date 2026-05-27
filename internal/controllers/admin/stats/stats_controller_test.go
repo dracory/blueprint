@@ -32,19 +32,24 @@ func TestStatsController_Handler_DefaultAction(t *testing.T) {
 	controller.Handler(w, req)
 }
 
-func TestStatsController_Handler_WithDifferentMethods(t *testing.T) {
+func TestStatsController_Handler_WithDifferentMethods_GET(t *testing.T) {
 	registry := testutils.Setup()
 	controller := NewStatsController(registry)
 
-	methods := []string{"GET", "POST"}
-	for _, method := range methods {
-		t.Run(method, func(t *testing.T) {
-			req := httptest.NewRequest(method, "/admin/stats", nil)
-			w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/admin/stats", nil)
+	w := httptest.NewRecorder()
 
-			controller.Handler(w, req)
-		})
-	}
+	controller.Handler(w, req)
+}
+
+func TestStatsController_Handler_WithDifferentMethods_POST(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewStatsController(registry)
+
+	req := httptest.NewRequest("POST", "/admin/stats", nil)
+	w := httptest.NewRecorder()
+
+	controller.Handler(w, req)
 }
 
 func TestStatsController_RegistryField(t *testing.T) {

@@ -12,23 +12,21 @@ import (
 	"github.com/dracory/shopstore"
 )
 
-// TestNewProductUpdateController tests the controller constructor
-func TestNewProductUpdateController(t *testing.T) {
-	t.Run("creates controller with registry", func(t *testing.T) {
-		registry := testutils.Setup(
-			testutils.WithCacheStore(true),
-			testutils.WithShopStore(true),
-		)
+// TestNewProductUpdateController_CreatesControllerWithRegistry tests the controller constructor
+func TestNewProductUpdateController_CreatesControllerWithRegistry(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithShopStore(true),
+	)
 
-		controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(registry)
 
-		if controller == nil {
-			t.Error("expected controller to be non-nil")
-		}
-		if controller.registry == nil {
-			t.Error("expected registry to be set")
-		}
-	})
+	if controller == nil {
+		t.Error("expected controller to be non-nil")
+	}
+	if controller.registry == nil {
+		t.Error("expected registry to be set")
+	}
 }
 
 // TestHandler_MissingProductID tests error when product_id is missing
