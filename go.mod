@@ -1,6 +1,6 @@
 module project
 
-go 1.26.1
+go 1.26.3
 
 // replace github.com/dracory/base => ../../_modules_dracory/base
 
@@ -44,7 +44,7 @@ require (
 	github.com/dracory/form v0.23.0
 	github.com/dracory/geostore v1.4.0
 	github.com/dracory/hb v1.88.0
-	github.com/dracory/liveflux v0.25.0
+	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.3.0
 	github.com/dracory/logstore v1.16.0
 	github.com/dracory/metastore v1.5.0
@@ -54,7 +54,7 @@ require (
 	github.com/dracory/sb v0.26.0
 	github.com/dracory/sessionstore v1.11.0
 	github.com/dracory/settingstore v1.7.0
-	github.com/dracory/shopstore v1.13.0
+	github.com/dracory/shopstore v1.14.0
 	github.com/dracory/statsstore v1.0.0
 	github.com/dracory/str v0.18.0
 	github.com/dracory/subscriptionstore v1.0.0
