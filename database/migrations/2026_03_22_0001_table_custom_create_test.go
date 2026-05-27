@@ -21,7 +21,10 @@ func TestCustomTableCreate_Up(t *testing.T) {
 	defer db.Close()
 
 	// Create migrator
-	migrator := migrate.New(db, nil)
+	migrator, err := migrate.New(db, nil)
+	if err != nil {
+		t.Fatalf("Failed to create migrator: %v", err)
+	}
 
 	// Add migration
 	migration := &TableCustomCreate{}
@@ -122,7 +125,10 @@ func TestCustomTableCreate_Down(t *testing.T) {
 	defer db.Close()
 
 	// Create migrator
-	migrator := migrate.New(db, nil)
+	migrator, err := migrate.New(db, nil)
+	if err != nil {
+		t.Fatalf("Failed to create migrator: %v", err)
+	}
 
 	// Add migration
 	migration := &TableCustomCreate{}

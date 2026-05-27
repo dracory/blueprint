@@ -119,7 +119,10 @@ func migrateSQL(registry RegistryInterface) error {
 		return nil
 	}
 
-	migrator := migrate.New(db, nil)
+	migrator, err := migrate.New(db, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create migrator: %w", err)
+	}
 
 	for _, m := range sqlMigrations {
 		migrator.AddMigration(m)
