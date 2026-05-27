@@ -7,82 +7,206 @@ import (
 	"testing"
 )
 
-func TestFileManagerController(t *testing.T) {
+func TestFileManagerController_LoadFilesAction(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name         string
-		action       string
-		wantContains string
-	}{
-		{
-			name:         "load files action",
-			action:       "load-files",
-			wantContains: "",
-		},
-		{
-			name:         "file clone action",
-			action:       "file_clone",
-			wantContains: "clone_file is required",
-		},
-		{
-			name:         "file rename action",
-			action:       "file_rename",
-			wantContains: "rename_file is required",
-		},
-		{
-			name:         "file delete action",
-			action:       "file_delete",
-			wantContains: "delete_file is required",
-		},
-		{
-			name:         "directory create action",
-			action:       "directory_create",
-			wantContains: "create_dir is required",
-		},
-		{
-			name:         "directory delete action",
-			action:       "directory_delete",
-			wantContains: "delete_dir is required",
-		},
-		{
-			name:         "bulk move action",
-			action:       "bulk_move",
-			wantContains: "No items selected",
-		},
-		{
-			name:         "bulk delete action",
-			action:       "bulk_delete",
-			wantContains: "No items selected",
-		},
-		{
-			name:         "get move destinations action",
-			action:       "get_move_destinations",
-			wantContains: "No items selected",
-		},
+	form := url.Values{}
+	form.Add("action", "load-files")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
+	req.PostForm = form
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			form := url.Values{}
-			form.Add("action", tt.action)
+	w := &testResponseWriter{}
+	_ = controller.Handler(w, req)
+}
 
-			req, err := http.NewRequest("POST", "/file-manager", nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.PostForm = form
+func TestFileManagerController_FileCloneAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
 
-			w := &testResponseWriter{}
-			result := controller.Handler(w, req)
+	controller := NewFileManagerController(reg)
 
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("Handler() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+	form := url.Values{}
+	form.Add("action", "file_clone")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "clone_file is required") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "clone_file is required")
+	}
+}
+
+func TestFileManagerController_FileRenameAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "file_rename")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "rename_file is required") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "rename_file is required")
+	}
+}
+
+func TestFileManagerController_FileDeleteAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "file_delete")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "delete_file is required") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "delete_file is required")
+	}
+}
+
+func TestFileManagerController_DirectoryCreateAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "directory_create")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "create_dir is required") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "create_dir is required")
+	}
+}
+
+func TestFileManagerController_DirectoryDeleteAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "directory_delete")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "delete_dir is required") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "delete_dir is required")
+	}
+}
+
+func TestFileManagerController_BulkMoveAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "bulk_move")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "No items selected") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "No items selected")
+	}
+}
+
+func TestFileManagerController_BulkDeleteAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "bulk_delete")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "No items selected") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "No items selected")
+	}
+}
+
+func TestFileManagerController_GetMoveDestinationsAction(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("action", "get_move_destinations")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	w := &testResponseWriter{}
+	result := controller.Handler(w, req)
+
+	if !strings.Contains(result, "No items selected") {
+		t.Errorf("Handler() result = %q, want to contain %q", result, "No items selected")
 	}
 }
 

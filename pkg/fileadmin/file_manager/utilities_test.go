@@ -4,291 +4,314 @@ import (
 	"testing"
 )
 
-func TestNormalizePath(t *testing.T) {
-	tests := []struct {
-		name     string
-		dir      string
-		filename string
-		want     string
-	}{
-		{
-			name:     "empty dir with filename",
-			dir:      "",
-			filename: "file.txt",
-			want:     "/file.txt",
-		},
-		{
-			name:     "root dir with filename",
-			dir:      "/",
-			filename: "file.txt",
-			want:     "/file.txt",
-		},
-		{
-			name:     "subdirectory with filename",
-			dir:      "documents",
-			filename: "file.txt",
-			want:     "documents/file.txt",
-		},
-		{
-			name:     "nested directory with filename",
-			dir:      "documents/reports",
-			filename: "file.txt",
-			want:     "documents/reports/file.txt",
-		},
-		{
-			name:     "directory with trailing slash",
-			dir:      "documents/",
-			filename: "file.txt",
-			want:     "documents/file.txt",
-		},
-		{
-			name:     "empty dir with nested filename",
-			dir:      "",
-			filename: "documents/file.txt",
-			want:     "/documents/file.txt",
-		},
-		{
-			name:     "root dir with nested filename",
-			dir:      "/",
-			filename: "documents/file.txt",
-			want:     "/documents/file.txt",
-		},
+func TestNormalizePath_EmptyDirWithFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", "file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", "file.txt", err)
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := verifyAndNormalizePathOrError(tt.dir, tt.filename)
-			if err != nil {
-				t.Errorf("normalizePath(%q, %q) unexpected error: %v", tt.dir, tt.filename, err)
-			}
-			if got != tt.want {
-				t.Errorf("normalizePath(%q, %q) = %q, want %q", tt.dir, tt.filename, got, tt.want)
-			}
-		})
+	if got != "/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", "file.txt", got, "/file.txt")
 	}
 }
 
-func TestNormalizeDirPath(t *testing.T) {
-	tests := []struct {
-		name     string
-		dir      string
-		filename string
-		want     string
-	}{
-		{
-			name:     "empty dir with dirname",
-			dir:      "",
-			filename: "folder",
-			want:     "/folder",
-		},
-		{
-			name:     "root dir with dirname",
-			dir:      "/",
-			filename: "folder",
-			want:     "/folder",
-		},
-		{
-			name:     "subdirectory with dirname",
-			dir:      "documents",
-			filename: "folder",
-			want:     "documents/folder",
-		},
-		{
-			name:     "nested directory with dirname",
-			dir:      "documents/reports",
-			filename: "folder",
-			want:     "documents/reports/folder",
-		},
-		{
-			name:     "directory with trailing slash",
-			dir:      "documents/",
-			filename: "folder",
-			want:     "documents/folder",
-		},
-		{
-			name:     "dirname with trailing slash",
-			dir:      "",
-			filename: "folder/",
-			want:     "/folder",
-		},
-		{
-			name:     "both dir and filename with trailing slashes",
-			dir:      "documents/",
-			filename: "folder/",
-			want:     "documents/folder",
-		},
-		{
-			name:     "empty dir with nested dirname",
-			dir:      "",
-			filename: "documents/folder",
-			want:     "/documents/folder",
-		},
-		{
-			name:     "root dir with nested dirname",
-			dir:      "/",
-			filename: "documents/folder",
-			want:     "/documents/folder",
-		},
+func TestNormalizePath_RootDirWithFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("/", "file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "/", "file.txt", err)
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := verifyAndNormalizeDirPath(tt.dir, tt.filename)
-			if err != nil {
-				t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", tt.dir, tt.filename, err)
-			}
-			if got != tt.want {
-				t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", tt.dir, tt.filename, got, tt.want)
-			}
-		})
+	if got != "/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "/", "file.txt", got, "/file.txt")
 	}
 }
 
-func TestNormalizePathSecurity(t *testing.T) {
-	tests := []struct {
-		name        string
-		dir         string
-		filename    string
-		want        string
-		expectError bool
-	}{
-		{
-			name:        "path traversal with single dot dot",
-			dir:         "",
-			filename:    "..",
-			expectError: true,
-		},
-		{
-			name:        "path traversal with double dot slash",
-			dir:         "",
-			filename:    "../",
-			expectError: true,
-		},
-		{
-			name:        "path traversal with double dot prefix",
-			dir:         "",
-			filename:    "../file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal with multiple double dots",
-			dir:         "",
-			filename:    "../../file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal in middle of path",
-			dir:         "documents",
-			filename:    "../file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal with backslash (Windows)",
-			dir:         "",
-			filename:    "..\\file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal with mixed separators",
-			dir:         "",
-			filename:    "..\\../file.txt",
-			expectError: true,
-		},
-		{
-			name:     "path traversal with encoded dot",
-			dir:      "",
-			filename: "%2e%2e/file.txt",
-			want:     "/%2e%2e/file.txt",
-		},
-		{
-			name:     "current directory reference",
-			dir:      "",
-			filename: "./file.txt",
-			want:     "/file.txt",
-		},
-		{
-			name:        "path traversal with directory and double dot",
-			dir:         "documents",
-			filename:    "reports/../file.txt",
-			expectError: true,
-		},
-		{
-			name:        "complex path traversal attempt",
-			dir:         "documents",
-			filename:    "./reports/../../secret/file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal escaping root",
-			dir:         "/",
-			filename:    "../../etc/passwd",
-			expectError: true,
-		},
-		{
-			name:        "path traversal in dir parameter",
-			dir:         "../uploads",
-			filename:    "file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path traversal in dir parameter with multiple levels",
-			dir:         "../../uploads",
-			filename:    "file.txt",
-			expectError: true,
-		},
-		{
-			name:        "exact dot in dir parameter",
-			dir:         ".",
-			filename:    "file.txt",
-			expectError: true,
-		},
-		{
-			name:        "exact dot in filename",
-			dir:         "",
-			filename:    ".",
-			expectError: true,
-		},
-		{
-			name:        "path starting with tilde in filename",
-			dir:         "",
-			filename:    "~/file.txt",
-			expectError: true,
-		},
-		{
-			name:        "path starting with tilde in dir",
-			dir:         "~/uploads",
-			filename:    "file.txt",
-			expectError: true,
-		},
-		{
-			name:     "legitimate file with dot in name",
-			dir:      "",
-			filename: ".hiddenfile",
-			want:     "/.hiddenfile",
-		},
-		{
-			name:     "legitimate file with multiple dots",
-			dir:      "",
-			filename: "file.name.with.dots.txt",
-			want:     "/file.name.with.dots.txt",
-		},
+func TestNormalizePath_SubdirectoryWithFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("documents", "file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "documents", "file.txt", err)
 	}
+	if got != "documents/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "documents", "file.txt", got, "documents/file.txt")
+	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := verifyAndNormalizePathOrError(tt.dir, tt.filename)
-			if tt.expectError {
-				if err == nil {
-					t.Errorf("normalizePath(%q, %q) expected error but got none", tt.dir, tt.filename)
-				}
-				return
-			}
-			if err != nil {
-				t.Errorf("normalizePath(%q, %q) unexpected error: %v", tt.dir, tt.filename, err)
-			}
-			if got != tt.want {
-				t.Errorf("normalizePath(%q, %q) = %q, want %q", tt.dir, tt.filename, got, tt.want)
-			}
-		})
+func TestNormalizePath_NestedDirectoryWithFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("documents/reports", "file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "documents/reports", "file.txt", err)
+	}
+	if got != "documents/reports/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "documents/reports", "file.txt", got, "documents/reports/file.txt")
+	}
+}
+
+func TestNormalizePath_DirectoryWithTrailingSlash(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("documents/", "file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "documents/", "file.txt", err)
+	}
+	if got != "documents/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "documents/", "file.txt", got, "documents/file.txt")
+	}
+}
+
+func TestNormalizePath_EmptyDirWithNestedFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", "documents/file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", "documents/file.txt", err)
+	}
+	if got != "/documents/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", "documents/file.txt", got, "/documents/file.txt")
+	}
+}
+
+func TestNormalizePath_RootDirWithNestedFilename(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("/", "documents/file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "/", "documents/file.txt", err)
+	}
+	if got != "/documents/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "/", "documents/file.txt", got, "/documents/file.txt")
+	}
+}
+
+func TestNormalizeDirPath_EmptyDirWithDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("", "folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "", "folder", err)
+	}
+	if got != "/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "", "folder", got, "/folder")
+	}
+}
+
+func TestNormalizeDirPath_RootDirWithDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("/", "folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "/", "folder", err)
+	}
+	if got != "/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "/", "folder", got, "/folder")
+	}
+}
+
+func TestNormalizeDirPath_SubdirectoryWithDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("documents", "folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "documents", "folder", err)
+	}
+	if got != "documents/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "documents", "folder", got, "documents/folder")
+	}
+}
+
+func TestNormalizeDirPath_NestedDirectoryWithDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("documents/reports", "folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "documents/reports", "folder", err)
+	}
+	if got != "documents/reports/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "documents/reports", "folder", got, "documents/reports/folder")
+	}
+}
+
+func TestNormalizeDirPath_DirectoryWithTrailingSlash(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("documents/", "folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "documents/", "folder", err)
+	}
+	if got != "documents/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "documents/", "folder", got, "documents/folder")
+	}
+}
+
+func TestNormalizeDirPath_DirnameWithTrailingSlash(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("", "folder/")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "", "folder/", err)
+	}
+	if got != "/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "", "folder/", got, "/folder")
+	}
+}
+
+func TestNormalizeDirPath_BothDirAndFilenameWithTrailingSlashes(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("documents/", "folder/")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "documents/", "folder/", err)
+	}
+	if got != "documents/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "documents/", "folder/", got, "documents/folder")
+	}
+}
+
+func TestNormalizeDirPath_EmptyDirWithNestedDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("", "documents/folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "", "documents/folder", err)
+	}
+	if got != "/documents/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "", "documents/folder", got, "/documents/folder")
+	}
+}
+
+func TestNormalizeDirPath_RootDirWithNestedDirname(t *testing.T) {
+	got, err := verifyAndNormalizeDirPath("/", "documents/folder")
+	if err != nil {
+		t.Errorf("normalizeDirPath(%q, %q) unexpected error: %v", "/", "documents/folder", err)
+	}
+	if got != "/documents/folder" {
+		t.Errorf("normalizeDirPath(%q, %q) = %q, want %q", "/", "documents/folder", got, "/documents/folder")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithSingleDotDot(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "..")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "..")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithDoubleDotSlash(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "../")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "../")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithDoubleDotPrefix(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "../file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "../file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithMultipleDoubleDots(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "../../file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "../../file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalInMiddleOfPath(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("documents", "../file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "documents", "../file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithBackslash(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "..\\file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "..\\file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithMixedSeparators(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "..\\../file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "..\\../file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithEncodedDot(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", "%2e%2e/file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", "%2e%2e/file.txt", err)
+	}
+	if got != "/%2e%2e/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", "%2e%2e/file.txt", got, "/%2e%2e/file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_CurrentDirectoryReference(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", "./file.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", "./file.txt", err)
+	}
+	if got != "/file.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", "./file.txt", got, "/file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalWithDirectoryAndDoubleDot(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("documents", "reports/../file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "documents", "reports/../file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_ComplexPathTraversalAttempt(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("documents", "./reports/../../secret/file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "documents", "./reports/../../secret/file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalEscapingRoot(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("/", "../../etc/passwd")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "/", "../../etc/passwd")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalInDirParameter(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("../uploads", "file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "../uploads", "file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathTraversalInDirParameterWithMultipleLevels(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("../../uploads", "file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "../../uploads", "file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_ExactDotInDirParameter(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError(".", "file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", ".", "file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_ExactDotInFilename(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", ".")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", ".")
+	}
+}
+
+func TestNormalizePathSecurity_PathStartingWithTildeInFilename(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("", "~/file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "", "~/file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_PathStartingWithTildeInDir(t *testing.T) {
+	_, err := verifyAndNormalizePathOrError("~/uploads", "file.txt")
+	if err == nil {
+		t.Errorf("normalizePath(%q, %q) expected error but got none", "~/uploads", "file.txt")
+	}
+}
+
+func TestNormalizePathSecurity_LegitimateFileWithDotInName(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", ".hiddenfile")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", ".hiddenfile", err)
+	}
+	if got != "/.hiddenfile" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", ".hiddenfile", got, "/.hiddenfile")
+	}
+}
+
+func TestNormalizePathSecurity_LegitimateFileWithMultipleDots(t *testing.T) {
+	got, err := verifyAndNormalizePathOrError("", "file.name.with.dots.txt")
+	if err != nil {
+		t.Errorf("normalizePath(%q, %q) unexpected error: %v", "", "file.name.with.dots.txt", err)
+	}
+	if got != "/file.name.with.dots.txt" {
+		t.Errorf("normalizePath(%q, %q) = %q, want %q", "", "file.name.with.dots.txt", got, "/file.name.with.dots.txt")
 	}
 }

@@ -7,43 +7,25 @@ import (
 	"testing"
 )
 
-func TestDirectoryCreateAjax(t *testing.T) {
+func TestDirectoryCreateAjax_MissingCreateDirParameter(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name         string
-		createDir    string
-		currentDir   string
-		wantContains string
-	}{
-		{
-			name:         "missing create_dir parameter",
-			createDir:    "",
-			currentDir:   "/uploads",
-			wantContains: "create_dir is required",
-		},
+	form := url.Values{}
+	form.Add("create_dir", "")
+	form.Add("current_dir", "/uploads")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
+	req.PostForm = form
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			form := url.Values{}
-			form.Add("create_dir", tt.createDir)
-			form.Add("current_dir", tt.currentDir)
+	result := controller.directoryCreateAjax(req)
 
-			req, err := http.NewRequest("POST", "/file-manager", nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.PostForm = form
-
-			result := controller.directoryCreateAjax(req)
-
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("directoryCreateAjax() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+	if !strings.Contains(result, "create_dir is required") {
+		t.Errorf("directoryCreateAjax() result = %q, want to contain %q", result, "create_dir is required")
 	}
 }

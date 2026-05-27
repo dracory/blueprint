@@ -7,49 +7,48 @@ import (
 	"testing"
 )
 
-func TestDirectoryDeleteAjax(t *testing.T) {
+func TestDirectoryDeleteAjax_MissingDeleteDirParameter(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name         string
-		deleteDir    string
-		currentDir   string
-		wantContains string
-	}{
-		{
-			name:         "missing delete_dir parameter",
-			deleteDir:    "",
-			currentDir:   "/uploads",
-			wantContains: "delete_dir is required",
-		},
-		{
-			name:         "invalid current_dir",
-			deleteDir:    "test",
-			currentDir:   ".",
-			wantContains: "invalid directory name",
-		},
+	form := url.Values{}
+	form.Add("delete_dir", "")
+	form.Add("current_dir", "/uploads")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
+	req.PostForm = form
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			form := url.Values{}
-			form.Add("delete_dir", tt.deleteDir)
-			form.Add("current_dir", tt.currentDir)
+	result := controller.directoryDeleteAjax(req)
 
-			req, err := http.NewRequest("POST", "/file-manager", nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.PostForm = form
+	if !strings.Contains(result, "delete_dir is required") {
+		t.Errorf("directoryDeleteAjax() result = %q, want to contain %q", result, "delete_dir is required")
+	}
+}
 
-			result := controller.directoryDeleteAjax(req)
+func TestDirectoryDeleteAjax_InvalidCurrentDir(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
 
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("directoryDeleteAjax() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("delete_dir", "test")
+	form.Add("current_dir", ".")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	result := controller.directoryDeleteAjax(req)
+
+	if !strings.Contains(result, "invalid directory name") {
+		t.Errorf("directoryDeleteAjax() result = %q, want to contain %q", result, "invalid directory name")
 	}
 }
