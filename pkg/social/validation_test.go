@@ -77,89 +77,233 @@ func TestTo_SkipsEmptyValues(t *testing.T) {
 	}
 }
 
-func TestValidateURL(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected bool
-	}{
-		{"valid HTTPS URL", "https://example.com", true},
-		{"valid HTTP URL", "http://example.com", true},
-		{"valid URL with path", "https://example.com/path/to/page", true},
-		{"valid URL with query", "https://example.com?foo=bar", true},
-		{"empty string", "", false},
-		{"missing scheme", "example.com", false},
-		{"invalid scheme", "ftp://example.com", false},
-		{"javascript scheme", "javascript:alert('xss')", false},
-		{"data URI", "data:text/html,<script>alert('xss')</script>", false},
-		{"relative URL", "/path/to/page", false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := ValidateURL(tt.input)
-			if result != tt.expected {
-				t.Errorf("ValidateURL(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+func TestValidateURL_ValidHTTPS(t *testing.T) {
+	result := ValidateURL("https://example.com")
+	if result != true {
+		t.Errorf("ValidateURL(\"https://example.com\") = %v, want true", result)
 	}
 }
 
-func TestValidateEmail(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected bool
-	}{
-		{"valid email", "user@example.com", true},
-		{"valid email with subdomain", "user@mail.example.com", true},
-		{"valid email with plus", "user+tag@example.com", true},
-		{"valid email with dots", "first.last@example.com", true},
-		{"valid email with numbers", "user123@example.com", true},
-		{"empty string", "", false},
-		{"missing @", "userexample.com", false},
-		{"missing domain", "user@", false},
-		{"missing local part", "@example.com", false},
-		{"spaces in email", "user @example.com", false},
-		{"multiple @ signs", "user@@example.com", false},
-		{"invalid TLD", "user@example", false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := ValidateEmail(tt.input)
-			if result != tt.expected {
-				t.Errorf("ValidateEmail(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+func TestValidateURL_ValidHTTP(t *testing.T) {
+	result := ValidateURL("http://example.com")
+	if result != true {
+		t.Errorf("ValidateURL(\"http://example.com\") = %v, want true", result)
 	}
 }
 
-func TestValidatePhone(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected bool
-	}{
-		{"US number with dashes", "555-123-4567", true},
-		{"US number with spaces", "555 123 4567", true},
-		{"international with plus", "+1-555-123-4567", true},
-		{"international UK format", "+44 20 7946 0958", true},
-		{"with parentheses", "(555) 123-4567", true},
-		{"with dots", "555.123.4567", true},
-		{"empty string", "", false},
-		{"too short", "123", false},
-		{"too long", "+1234567890123456", false},
-		{"letters not allowed", "555-abc-1234", false},
-		{"special chars not allowed", "555@123#4567", false},
+func TestValidateURL_ValidURLWithPath(t *testing.T) {
+	result := ValidateURL("https://example.com/path/to/page")
+	if result != true {
+		t.Errorf("ValidateURL(\"https://example.com/path/to/page\") = %v, want true", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := ValidatePhone(tt.input)
-			if result != tt.expected {
-				t.Errorf("ValidatePhone(%q) = %v, want %v", tt.input, result, tt.expected)
-			}
-		})
+func TestValidateURL_ValidURLWithQuery(t *testing.T) {
+	result := ValidateURL("https://example.com?foo=bar")
+	if result != true {
+		t.Errorf("ValidateURL(\"https://example.com?foo=bar\") = %v, want true", result)
+	}
+}
+
+func TestValidateURL_EmptyString(t *testing.T) {
+	result := ValidateURL("")
+	if result != false {
+		t.Errorf("ValidateURL(\"\") = %v, want false", result)
+	}
+}
+
+func TestValidateURL_MissingScheme(t *testing.T) {
+	result := ValidateURL("example.com")
+	if result != false {
+		t.Errorf("ValidateURL(\"example.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateURL_InvalidScheme(t *testing.T) {
+	result := ValidateURL("ftp://example.com")
+	if result != false {
+		t.Errorf("ValidateURL(\"ftp://example.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateURL_JavascriptScheme(t *testing.T) {
+	result := ValidateURL("javascript:alert('xss')")
+	if result != false {
+		t.Errorf("ValidateURL(\"javascript:alert('xss')\") = %v, want false", result)
+	}
+}
+
+func TestValidateURL_DataURI(t *testing.T) {
+	result := ValidateURL("data:text/html,<script>alert('xss')</script>")
+	if result != false {
+		t.Errorf("ValidateURL(\"data:text/html,<script>alert('xss')</script>\") = %v, want false", result)
+	}
+}
+
+func TestValidateURL_RelativeURL(t *testing.T) {
+	result := ValidateURL("/path/to/page")
+	if result != false {
+		t.Errorf("ValidateURL(\"/path/to/page\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_ValidEmail(t *testing.T) {
+	result := ValidateEmail("user@example.com")
+	if result != true {
+		t.Errorf("ValidateEmail(\"user@example.com\") = %v, want true", result)
+	}
+}
+
+func TestValidateEmail_ValidEmailWithSubdomain(t *testing.T) {
+	result := ValidateEmail("user@mail.example.com")
+	if result != true {
+		t.Errorf("ValidateEmail(\"user@mail.example.com\") = %v, want true", result)
+	}
+}
+
+func TestValidateEmail_ValidEmailWithPlus(t *testing.T) {
+	result := ValidateEmail("user+tag@example.com")
+	if result != true {
+		t.Errorf("ValidateEmail(\"user+tag@example.com\") = %v, want true", result)
+	}
+}
+
+func TestValidateEmail_ValidEmailWithDots(t *testing.T) {
+	result := ValidateEmail("first.last@example.com")
+	if result != true {
+		t.Errorf("ValidateEmail(\"first.last@example.com\") = %v, want true", result)
+	}
+}
+
+func TestValidateEmail_ValidEmailWithNumbers(t *testing.T) {
+	result := ValidateEmail("user123@example.com")
+	if result != true {
+		t.Errorf("ValidateEmail(\"user123@example.com\") = %v, want true", result)
+	}
+}
+
+func TestValidateEmail_EmptyString(t *testing.T) {
+	result := ValidateEmail("")
+	if result != false {
+		t.Errorf("ValidateEmail(\"\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_MissingAtSign(t *testing.T) {
+	result := ValidateEmail("userexample.com")
+	if result != false {
+		t.Errorf("ValidateEmail(\"userexample.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_MissingDomain(t *testing.T) {
+	result := ValidateEmail("user@")
+	if result != false {
+		t.Errorf("ValidateEmail(\"user@\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_MissingLocalPart(t *testing.T) {
+	result := ValidateEmail("@example.com")
+	if result != false {
+		t.Errorf("ValidateEmail(\"@example.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_SpacesInEmail(t *testing.T) {
+	result := ValidateEmail("user @example.com")
+	if result != false {
+		t.Errorf("ValidateEmail(\"user @example.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_MultipleAtSigns(t *testing.T) {
+	result := ValidateEmail("user@@example.com")
+	if result != false {
+		t.Errorf("ValidateEmail(\"user@@example.com\") = %v, want false", result)
+	}
+}
+
+func TestValidateEmail_InvalidTLD(t *testing.T) {
+	result := ValidateEmail("user@example")
+	if result != false {
+		t.Errorf("ValidateEmail(\"user@example\") = %v, want false", result)
+	}
+}
+
+func TestValidatePhone_USNumberWithDashes(t *testing.T) {
+	result := ValidatePhone("555-123-4567")
+	if result != true {
+		t.Errorf("ValidatePhone(\"555-123-4567\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_USNumberWithSpaces(t *testing.T) {
+	result := ValidatePhone("555 123 4567")
+	if result != true {
+		t.Errorf("ValidatePhone(\"555 123 4567\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_InternationalWithPlus(t *testing.T) {
+	result := ValidatePhone("+1-555-123-4567")
+	if result != true {
+		t.Errorf("ValidatePhone(\"+1-555-123-4567\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_InternationalUKFormat(t *testing.T) {
+	result := ValidatePhone("+44 20 7946 0958")
+	if result != true {
+		t.Errorf("ValidatePhone(\"+44 20 7946 0958\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_WithParentheses(t *testing.T) {
+	result := ValidatePhone("(555) 123-4567")
+	if result != true {
+		t.Errorf("ValidatePhone(\"(555) 123-4567\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_WithDots(t *testing.T) {
+	result := ValidatePhone("555.123.4567")
+	if result != true {
+		t.Errorf("ValidatePhone(\"555.123.4567\") = %v, want true", result)
+	}
+}
+
+func TestValidatePhone_EmptyString(t *testing.T) {
+	result := ValidatePhone("")
+	if result != false {
+		t.Errorf("ValidatePhone(\"\") = %v, want false", result)
+	}
+}
+
+func TestValidatePhone_TooShort(t *testing.T) {
+	result := ValidatePhone("123")
+	if result != false {
+		t.Errorf("ValidatePhone(\"123\") = %v, want false", result)
+	}
+}
+
+func TestValidatePhone_TooLong(t *testing.T) {
+	result := ValidatePhone("+1234567890123456")
+	if result != false {
+		t.Errorf("ValidatePhone(\"+1234567890123456\") = %v, want false", result)
+	}
+}
+
+func TestValidatePhone_LettersNotAllowed(t *testing.T) {
+	result := ValidatePhone("555-abc-1234")
+	if result != false {
+		t.Errorf("ValidatePhone(\"555-abc-1234\") = %v, want false", result)
+	}
+}
+
+func TestValidatePhone_SpecialCharsNotAllowed(t *testing.T) {
+	result := ValidatePhone("555@123#4567")
+	if result != false {
+		t.Errorf("ValidatePhone(\"555@123#4567\") = %v, want false", result)
 	}
 }

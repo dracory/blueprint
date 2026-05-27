@@ -168,7 +168,7 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 	}
 
 	// Wait for all to complete
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		<-done
 	}
 

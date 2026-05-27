@@ -58,46 +58,273 @@ func TestLogRequestMiddleware_Filtered(t *testing.T) {
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
 	registry.SetLogger(logger)
 
-	tests := []struct {
-		name string
-		path string
-	}{
-		{"Static Asset CSS", "/style.css"},
-		{"Static Asset JS", "/script.js"},
-		{"Static Asset Image", "/image.png"},
-		{"Static Asset ICO", "/favicon.ico"},
-		{"Health Check", "/health"},
-		{"Ping", "/ping"},
-		{"Assets Folder", "/assets/image.jpg"},
-		{"Static Folder", "/static/style.css"},
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/style.css", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			buf.Reset() // Clear buffer for each test
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
 
-			// Act
-			handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
-			}))
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
 
-			req, err := testutils.NewRequest("GET", tt.path, testutils.NewRequestOptions{})
-			if err != nil {
-				t.Fatal(err)
-			}
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /style.css, got %s", logOutput)
+	}
+}
 
-			w := httptest.NewRecorder()
-			handler.ServeHTTP(w, req)
+func TestLogRequestMiddleware_Filtered_JS(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
 
-			// Assert
-			if w.Code != http.StatusOK {
-				t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
-			}
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
 
-			logOutput := buf.String()
-			if logOutput != "" {
-				t.Errorf("Expected empty log for %s, got %s", tt.path, logOutput)
-			}
-		})
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/script.js", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /script.js, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_Image(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/image.png", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /image.png, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_Favicon(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/favicon.ico", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /favicon.ico, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_Health(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/health", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /health, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_Ping(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/ping", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /ping, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_AssetsFolder(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/assets/image.jpg", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /assets/image.jpg, got %s", logOutput)
+	}
+}
+
+func TestLogRequestMiddleware_Filtered_StaticFolder(t *testing.T) {
+	// Arrange
+	registry := testutils.Setup()
+
+	// Capture logs
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+	registry.SetLogger(logger)
+
+	buf.Reset() // Clear buffer for each test
+
+	// Act
+	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req, err := testutils.NewRequest("GET", "/static/style.css", testutils.NewRequestOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	// Assert
+	if w.Code != http.StatusOK {
+		t.Fatalf("Expected status code %d, got %d", http.StatusOK, w.Code)
+	}
+
+	logOutput := buf.String()
+	if logOutput != "" {
+		t.Errorf("Expected empty log for /static/style.css, got %s", logOutput)
 	}
 }
