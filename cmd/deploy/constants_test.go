@@ -5,24 +5,31 @@ import (
 )
 
 // TestConstants tests that constants are defined
-func TestConstants(t *testing.T) {
+func TestConstants_SSH_KEY(t *testing.T) {
 	t.Parallel()
-	tests := []struct {
-		name     string
-		constant string
-	}{
-		{"SSH_KEY", SSH_KEY},
-		{"SSH_USER", SSH_USER},
-		{"SSH_HOST", SSH_HOST},
-		{"REMOTE_APP_DIR", REMOTE_APP_DIR},
+	if SSH_KEY == "" {
+		t.Error("SSH_KEY should not be empty")
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.constant == "" {
-				t.Errorf("%s should not be empty", tt.name)
-			}
-		})
+func TestConstants_SSH_USER(t *testing.T) {
+	t.Parallel()
+	if SSH_USER == "" {
+		t.Error("SSH_USER should not be empty")
+	}
+}
+
+func TestConstants_SSH_HOST(t *testing.T) {
+	t.Parallel()
+	if SSH_HOST == "" {
+		t.Error("SSH_HOST should not be empty")
+	}
+}
+
+func TestConstants_REMOTE_APP_DIR(t *testing.T) {
+	t.Parallel()
+	if REMOTE_APP_DIR == "" {
+		t.Error("REMOTE_APP_DIR should not be empty")
 	}
 }
 

@@ -52,6 +52,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 				runner := taskstore.NewTaskQueueRunner(ts, taskstore.TaskQueueRunnerOptions{
 					IntervalSeconds: 2,
 					UnstuckMinutes:  2,
+					QueueName:       taskstore.DefaultQueueName,
 					MaxConcurrency:  10,
 					Logger:          log.Default(),
 				})
@@ -69,6 +70,7 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 			})
 		}
 	}
+
 	if registry.GetConfig().GetSessionStoreUsed() {
 		ss := registry.GetSessionStore()
 		if ss != nil {

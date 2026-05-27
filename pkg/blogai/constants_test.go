@@ -4,24 +4,39 @@ import (
 	"testing"
 )
 
-func TestConstants(t *testing.T) {
-	tests := []struct {
-		name string
-		got  string
-		want string
-	}{
-		{name: "POST_RECORD_TYPE", got: POST_RECORD_TYPE, want: "blogai_post"},
-		{name: "POST_STATUS_PENDING", got: POST_STATUS_PENDING, want: "pending"},
-		{name: "POST_STATUS_APPROVED", got: POST_STATUS_APPROVED, want: "approved"},
-		{name: "POST_STATUS_REJECTED", got: POST_STATUS_REJECTED, want: "rejected"},
-		{name: "POST_STATUS_DRAFT", got: POST_STATUS_DRAFT, want: "draft"},
-		{name: "POST_STATUS_PUBLISHED", got: POST_STATUS_PUBLISHED, want: "published"},
+func TestConstants_POST_RECORD_TYPE(t *testing.T) {
+	if POST_RECORD_TYPE != "blogai_post" {
+		t.Errorf("POST_RECORD_TYPE = %q, want \"blogai_post\"", POST_RECORD_TYPE)
 	}
+}
 
-	for _, tt := range tests {
-		if tt.got != tt.want {
-			t.Errorf("%s = %q, want %q", tt.name, tt.got, tt.want)
-		}
+func TestConstants_POST_STATUS_PENDING(t *testing.T) {
+	if POST_STATUS_PENDING != "pending" {
+		t.Errorf("POST_STATUS_PENDING = %q, want \"pending\"", POST_STATUS_PENDING)
+	}
+}
+
+func TestConstants_POST_STATUS_APPROVED(t *testing.T) {
+	if POST_STATUS_APPROVED != "approved" {
+		t.Errorf("POST_STATUS_APPROVED = %q, want \"approved\"", POST_STATUS_APPROVED)
+	}
+}
+
+func TestConstants_POST_STATUS_REJECTED(t *testing.T) {
+	if POST_STATUS_REJECTED != "rejected" {
+		t.Errorf("POST_STATUS_REJECTED = %q, want \"rejected\"", POST_STATUS_REJECTED)
+	}
+}
+
+func TestConstants_POST_STATUS_DRAFT(t *testing.T) {
+	if POST_STATUS_DRAFT != "draft" {
+		t.Errorf("POST_STATUS_DRAFT = %q, want \"draft\"", POST_STATUS_DRAFT)
+	}
+}
+
+func TestConstants_POST_STATUS_PUBLISHED(t *testing.T) {
+	if POST_STATUS_PUBLISHED != "published" {
+		t.Errorf("POST_STATUS_PUBLISHED = %q, want \"published\"", POST_STATUS_PUBLISHED)
 	}
 }
 

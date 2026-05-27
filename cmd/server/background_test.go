@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 )
@@ -150,7 +151,8 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 
 	group := newBackgroundGroup(ctx)
 
-	// Track execution order
+	// Track execution order with mutex for thread safety
+	var mu sync.Mutex
 	executed := make([]int, 0)
 	done := make(chan bool, 3)
 
@@ -158,13 +160,15 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 	for i := 1; i <= 3; i++ {
 		idx := i
 		group.Go(func(ctx context.Context) {
+			mu.Lock()
 			executed = append(executed, idx)
+			mu.Unlock()
 			done <- true
 		})
 	}
 
 	// Wait for all to complete
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		<-done
 	}
 

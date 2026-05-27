@@ -7,74 +7,76 @@ import (
 )
 
 // Test IsFlashRoute
-func TestIsFlashRoute(t *testing.T) {
-	tests := []struct {
-		name     string
-		path     string
-		expected bool
-	}{
-		{
-			name:     "flash path returns true",
-			path:     "/flash/message",
-			expected: true,
-		},
-		{
-			name:     "regular path returns false",
-			path:     "/home",
-			expected: false,
-		},
-		{
-			name:     "path with flash in middle returns true",
-			path:     "/api/flash/notify",
-			expected: true,
-		},
-		{
-			name:     "path ending with flash returns true",
-			path:     "/admin/flash",
-			expected: true,
-		},
-		{
-			name:     "path starting with flash returns true",
-			path:     "/flash",
-			expected: true,
-		},
-		{
-			name:     "complex path without flash returns false",
-			path:     "/api/v1/users/profile",
-			expected: false,
-		},
+func TestIsFlashRoute_FlashPathReturnsTrue(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/flash/message", nil)
+	result := IsFlashRoute(req)
+	if result != true {
+		t.Errorf("IsFlashRoute() = %v, want true", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodGet, tt.path, nil)
-			result := IsFlashRoute(req)
-			if result != tt.expected {
-				t.Errorf("IsFlashRoute() = %v, want %v", result, tt.expected)
-			}
-		})
+func TestIsFlashRoute_RegularPathReturnsFalse(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/home", nil)
+	result := IsFlashRoute(req)
+	if result != false {
+		t.Errorf("IsFlashRoute() = %v, want false", result)
+	}
+}
+
+func TestIsFlashRoute_PathWithFlashInMiddleReturnsTrue(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/api/flash/notify", nil)
+	result := IsFlashRoute(req)
+	if result != true {
+		t.Errorf("IsFlashRoute() = %v, want true", result)
+	}
+}
+
+func TestIsFlashRoute_PathEndingWithFlashReturnsTrue(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/admin/flash", nil)
+	result := IsFlashRoute(req)
+	if result != true {
+		t.Errorf("IsFlashRoute() = %v, want true", result)
+	}
+}
+
+func TestIsFlashRoute_PathStartingWithFlashReturnsTrue(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/flash", nil)
+	result := IsFlashRoute(req)
+	if result != true {
+		t.Errorf("IsFlashRoute() = %v, want true", result)
+	}
+}
+
+func TestIsFlashRoute_ComplexPathWithoutFlashReturnsFalse(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/users/profile", nil)
+	result := IsFlashRoute(req)
+	if result != false {
+		t.Errorf("IsFlashRoute() = %v, want false", result)
 	}
 }
 
 // Test Flash Constants
-func TestFlashConstants(t *testing.T) {
-	tests := []struct {
-		name     string
-		constant string
-		expected string
-	}{
-		{name: "FLASH_ERROR", constant: FLASH_ERROR, expected: "error"},
-		{name: "FLASH_SUCCESS", constant: FLASH_SUCCESS, expected: "success"},
-		{name: "FLASH_INFO", constant: FLASH_INFO, expected: "info"},
-		{name: "FLASH_WARNING", constant: FLASH_WARNING, expected: "warning"},
+func TestFlashConstants_FLASH_ERROR(t *testing.T) {
+	if FLASH_ERROR != "error" {
+		t.Errorf("FLASH_ERROR = %v, want \"error\"", FLASH_ERROR)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.constant != tt.expected {
-				t.Errorf("%s = %v, want %v", tt.name, tt.constant, tt.expected)
-			}
-		})
+func TestFlashConstants_FLASH_SUCCESS(t *testing.T) {
+	if FLASH_SUCCESS != "success" {
+		t.Errorf("FLASH_SUCCESS = %v, want \"success\"", FLASH_SUCCESS)
+	}
+}
+
+func TestFlashConstants_FLASH_INFO(t *testing.T) {
+	if FLASH_INFO != "info" {
+		t.Errorf("FLASH_INFO = %v, want \"info\"", FLASH_INFO)
+	}
+}
+
+func TestFlashConstants_FLASH_WARNING(t *testing.T) {
+	if FLASH_WARNING != "warning" {
+		t.Errorf("FLASH_WARNING = %v, want \"warning\"", FLASH_WARNING)
 	}
 }
 

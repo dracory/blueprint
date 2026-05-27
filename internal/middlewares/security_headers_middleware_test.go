@@ -58,20 +58,6 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 		"https://www.statcounter.com",
 	}
 
-	tests := []struct {
-		header        string
-		expectedValue string
-	}{
-		// HSTS is disabled in development
-		{"X-Frame-Options", "DENY"},
-		{"X-Content-Type-Options", "nosniff"},
-		{"Referrer-Policy", "strict-origin-when-cross-origin"},
-		{
-			"Content-Security-Policy",
-			strings.Join(cspParts, " "),
-		},
-	}
-
 	req := httptest.NewRequest("GET", "https://example.com", nil)
 	rr := httptest.NewRecorder()
 	handler := NewSecurityHeadersMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -79,11 +65,17 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 	}))
 	handler.ServeHTTP(rr, req)
 
-	for _, tt := range tests {
-		t.Run(tt.header, func(t *testing.T) {
-			if value := rr.Header().Get(tt.header); value != tt.expectedValue {
-				t.Errorf("header %s: got %q want %q", tt.header, value, tt.expectedValue)
-			}
-		})
+	if value := rr.Header().Get("X-Frame-Options"); value != "DENY" {
+		t.Errorf("header X-Frame-Options: got %q want DENY", value)
+	}
+	if value := rr.Header().Get("X-Content-Type-Options"); value != "nosniff" {
+		t.Errorf("header X-Content-Type-Options: got %q want nosniff", value)
+	}
+	if value := rr.Header().Get("Referrer-Policy"); value != "strict-origin-when-cross-origin" {
+		t.Errorf("header Referrer-Policy: got %q want strict-origin-when-cross-origin", value)
+	}
+	expectedCSP := strings.Join(cspParts, " ")
+	if value := rr.Header().Get("Content-Security-Policy"); value != expectedCSP {
+		t.Errorf("header Content-Security-Policy: got %q want %q", value, expectedCSP)
 	}
 }

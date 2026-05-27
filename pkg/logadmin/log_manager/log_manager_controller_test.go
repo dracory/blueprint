@@ -6,13 +6,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"project/internal/config"
 	"project/internal/testutils"
+	"strings"
 	"testing"
 
 	"github.com/dracory/logstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLogManagerController_Functional(t *testing.T) {
@@ -43,7 +44,9 @@ func TestLogManagerController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/logs", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Log Manager")
+		if !strings.Contains(resp, "Log Manager") {
+			t.Error("expected Log Manager in response")
+		}
 	})
 
 	t.Run("handleLoadLogs", func(t *testing.T) {
@@ -54,9 +57,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(loadData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLoadLogs, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "Test Message 1")
-		assert.Contains(t, resp, "Test Message 2")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "Test Message 1") {
+			t.Error("expected Test Message 1 in response")
+		}
+		if !strings.Contains(resp, "Test Message 2") {
+			t.Error("expected Test Message 2 in response")
+		}
 	})
 
 	t.Run("handleLogShowContext", func(t *testing.T) {
@@ -69,8 +78,12 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(showData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogShowContext, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "context")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "context") {
+			t.Error("expected context in response")
+		}
 	})
 
 	t.Run("handleLogDelete", func(t *testing.T) {
@@ -83,11 +96,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDelete, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		l, _ := logStore.LogFindByID(ctx, logID)
-		assert.Nil(t, l)
+		if l != nil {
+			t.Error("expected log to be nil after deletion")
+		}
 	})
 
 	t.Run("handleLogDeleteSelected", func(t *testing.T) {
@@ -111,11 +128,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteSelected, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		lFound, _ := logStore.LogFindByID(ctx, logID)
-		assert.Nil(t, lFound)
+		if lFound != nil {
+			t.Error("expected log to be nil after deletion")
+		}
 	})
 
 	t.Run("handleLogDeleteAll", func(t *testing.T) {
@@ -128,10 +149,99 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteAll, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		count, _ := logStore.LogCount(ctx, logstore.LogQuery())
-		assert.Equal(t, int(0), int(count))
+		if int(count) != 0 {
+			t.Errorf("expected 0 logs, got %d", count)
+		}
 	})
+}
+
+func TestLogManagerController_RendersVueApp(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithLogStore(true),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewLogManagerController(registry).Handler, test.NewRequestOptions{
+		Context: map[any]any{
+			config.AuthenticatedUserContextKey{}: user,
+		},
+	})
+
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+	// Page should render Vue app mount point
+	if !strings.Contains(html, "logs-app") {
+		t.Error("expected logs-app in HTML")
+	}
+	// Page should include Vue CDN
+	if !strings.Contains(html, "vue.global.js") {
+		t.Error("expected Vue CDN script in HTML")
+	}
+	// Page should include SweetAlert2
+	if !strings.Contains(html, "sweetalert2") {
+		t.Error("expected SweetAlert2 in HTML")
+	}
+}
+
+func TestLogManagerController_LoadLogsAction(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithLogStore(true),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// Test load-logs action
+	queryParams := url.Values{}
+	queryParams.Set("action", "load-logs")
+
+	requestBody := map[string]any{
+		"page":       0,
+		"per_page":   100,
+		"sort_order": "desc",
+		"sort_by":    "time",
+	}
+	bodyBytes, _ := json.Marshal(requestBody)
+
+	body, resp, err := test.CallStringEndpoint(http.MethodPost, NewLogManagerController(registry).Handler, test.NewRequestOptions{
+		GetValues: queryParams,
+		Body:      string(bodyBytes),
+		Context: map[any]any{
+			config.AuthenticatedUserContextKey{}: user,
+		},
+	})
+
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, resp.StatusCode)
+	}
+	// Should return JSON response
+	if !strings.Contains(body, `"status"`) {
+		t.Error("expected JSON response with status field")
+	}
+	if !strings.Contains(body, `"logs"`) {
+		t.Error("expected JSON response with logs field")
+	}
 }
