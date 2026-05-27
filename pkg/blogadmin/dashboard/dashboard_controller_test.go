@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"testing"
 
 	"project/internal/config"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDashboardController_RequiresAuthentication(t *testing.T) {
@@ -24,22 +24,36 @@ func TestDashboardController_RequiresAuthentication(t *testing.T) {
 
 	// Test without authentication
 	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusSeeOther, responseObj.StatusCode, "Should redirect when unauthenticated")
-	assert.Contains(t, response, "See Other", "Should show redirect response")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if responseObj.StatusCode != http.StatusSeeOther {
+		t.Errorf("Should redirect when unauthenticated, got %d", responseObj.StatusCode)
+	}
+	if !strings.Contains(response, "See Other") {
+		t.Error("Should show redirect response")
+	}
 
 	// Test with authentication
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
 	})
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, authResponseObj.StatusCode, "Should return 200 when authenticated")
-	assert.NotContains(t, authResponse, "See Other", "Should not redirect when authenticated")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if authResponseObj.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 when authenticated, got %d", authResponseObj.StatusCode)
+	}
+	if strings.Contains(authResponse, "See Other") {
+		t.Error("Should not redirect when authenticated")
+	}
 }
 
 func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
@@ -89,7 +103,9 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{
 		Context: map[any]any{
@@ -97,14 +113,26 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
+	if err != nil {
+		t.Errorf("Handler should not return error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("Should return 200 status, got %d", response.StatusCode)
+	}
 
 	// Verify counts are displayed
-	assert.Contains(t, responseHTML, "1", "Should show post count")
-	assert.Contains(t, responseHTML, "Categories", "Should show Categories tab when taxonomy enabled")
-	assert.Contains(t, responseHTML, "Tags", "Should show Tags tab when taxonomy enabled")
-	assert.Contains(t, responseHTML, "Total Posts", "Should show Total Posts label")
+	if !strings.Contains(responseHTML, "1") {
+		t.Error("Should show post count")
+	}
+	if !strings.Contains(responseHTML, "Categories") {
+		t.Error("Should show Categories tab when taxonomy enabled")
+	}
+	if !strings.Contains(responseHTML, "Tags") {
+		t.Error("Should show Tags tab when taxonomy enabled")
+	}
+	if !strings.Contains(responseHTML, "Total Posts") {
+		t.Error("Should show Total Posts label")
+	}
 }
 
 func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
@@ -130,7 +158,9 @@ func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
 	}
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	controller := NewDashboardController(registry)
 	req, _ := http.NewRequest(http.MethodGet, "/admin/blog/dashboard", nil)
@@ -138,9 +168,15 @@ func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
 
 	data, errMsg := controller.prepareData(req)
 
-	assert.Equal(t, "", errMsg, "Should not return error message")
-	assert.True(t, data.taxonomyEnabled, "Should detect taxonomy as enabled")
-	assert.Equal(t, int64(1), data.categoryCount, "Should count categories correctly")
+	if errMsg != "" {
+		t.Errorf("Should not return error message, got %s", errMsg)
+	}
+	if !data.taxonomyEnabled {
+		t.Error("Should detect taxonomy as enabled")
+	}
+	if data.categoryCount != 1 {
+		t.Errorf("Should count categories correctly, got %d", data.categoryCount)
+	}
 }
 
 func TestDashboardController_prepareData_TaxonomyDisabled(t *testing.T) {
@@ -158,7 +194,9 @@ func TestDashboardController_prepareData_TaxonomyDisabled(t *testing.T) {
 	registry.SetBlogStore(blogStore)
 
 	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	assert.NoError(t, err, "Should create test user")
+	if err != nil {
+		t.Errorf("Should create test user: %v", err)
+	}
 
 	controller := NewDashboardController(registry)
 	req, _ := http.NewRequest(http.MethodGet, "/admin/blog/dashboard", nil)
@@ -166,11 +204,21 @@ func TestDashboardController_prepareData_TaxonomyDisabled(t *testing.T) {
 
 	data, errMsg := controller.prepareData(req)
 
-	assert.Equal(t, "", errMsg, "Should not return error message")
-	assert.False(t, data.taxonomyEnabled, "Should detect taxonomy as disabled")
-	assert.Contains(t, data.taxonomyErrorMsg, "not available", "Should set helpful error message")
-	assert.Equal(t, int64(0), data.categoryCount, "Should have 0 categories when taxonomy disabled")
-	assert.Equal(t, int64(0), data.tagCount, "Should have 0 tags when taxonomy disabled")
+	if errMsg != "" {
+		t.Errorf("Should not return error message, got %s", errMsg)
+	}
+	if data.taxonomyEnabled {
+		t.Error("Should detect taxonomy as disabled")
+	}
+	if !strings.Contains(data.taxonomyErrorMsg, "not available") {
+		t.Error("Should set helpful error message")
+	}
+	if data.categoryCount != 0 {
+		t.Errorf("Should have 0 categories when taxonomy disabled, got %d", data.categoryCount)
+	}
+	if data.tagCount != 0 {
+		t.Errorf("Should have 0 tags when taxonomy disabled, got %d", data.tagCount)
+	}
 }
 
 func TestDashboardController_navTabs_WithTaxonomyEnabled(t *testing.T) {
@@ -185,13 +233,27 @@ func TestDashboardController_navTabs_WithTaxonomyEnabled(t *testing.T) {
 	tabs := controller.navTabs(data)
 	html := tabs.ToHTML()
 
-	assert.Contains(t, html, "Dashboard", "Should show Dashboard tab")
-	assert.Contains(t, html, "Posts", "Should show Posts tab")
-	assert.Contains(t, html, "Categories", "Should show Categories tab when taxonomy enabled")
-	assert.Contains(t, html, "Tags", "Should show Tags tab when taxonomy enabled")
-	assert.Contains(t, html, "5", "Should show post count badge")
-	assert.Contains(t, html, "3", "Should show category count badge")
-	assert.Contains(t, html, "7", "Should show tag count badge")
+	if !strings.Contains(html, "Dashboard") {
+		t.Error("Should show Dashboard tab")
+	}
+	if !strings.Contains(html, "Posts") {
+		t.Error("Should show Posts tab")
+	}
+	if !strings.Contains(html, "Categories") {
+		t.Error("Should show Categories tab when taxonomy enabled")
+	}
+	if !strings.Contains(html, "Tags") {
+		t.Error("Should show Tags tab when taxonomy enabled")
+	}
+	if !strings.Contains(html, "5") {
+		t.Error("Should show post count badge")
+	}
+	if !strings.Contains(html, "3") {
+		t.Error("Should show category count badge")
+	}
+	if !strings.Contains(html, "7") {
+		t.Error("Should show tag count badge")
+	}
 }
 
 func TestDashboardController_navTabs_WithTaxonomyDisabled(t *testing.T) {
@@ -204,10 +266,18 @@ func TestDashboardController_navTabs_WithTaxonomyDisabled(t *testing.T) {
 	tabs := controller.navTabs(data)
 	html := tabs.ToHTML()
 
-	assert.Contains(t, html, "Dashboard", "Should show Dashboard tab")
-	assert.Contains(t, html, "Posts", "Should show Posts tab")
-	assert.NotContains(t, html, "Categories", "Should NOT show Categories tab when taxonomy disabled")
-	assert.NotContains(t, html, "Tags", "Should NOT show Tags tab when taxonomy disabled")
+	if !strings.Contains(html, "Dashboard") {
+		t.Error("Should show Dashboard tab")
+	}
+	if !strings.Contains(html, "Posts") {
+		t.Error("Should show Posts tab")
+	}
+	if strings.Contains(html, "Categories") {
+		t.Error("Should NOT show Categories tab when taxonomy disabled")
+	}
+	if strings.Contains(html, "Tags") {
+		t.Error("Should NOT show Tags tab when taxonomy disabled")
+	}
 }
 
 func TestDashboardController_dashboardCards_WithTaxonomyEnabled(t *testing.T) {
@@ -222,12 +292,24 @@ func TestDashboardController_dashboardCards_WithTaxonomyEnabled(t *testing.T) {
 	cards := controller.dashboardCards(data)
 	html := cards.ToHTML()
 
-	assert.Contains(t, html, "Total Posts", "Should show Posts card")
-	assert.Contains(t, html, "10", "Should show correct post count")
-	assert.Contains(t, html, "Categories", "Should show Categories card when taxonomy enabled")
-	assert.Contains(t, html, "5", "Should show correct category count")
-	assert.Contains(t, html, "Tags", "Should show Tags card when taxonomy enabled")
-	assert.Contains(t, html, "8", "Should show correct tag count")
+	if !strings.Contains(html, "Total Posts") {
+		t.Error("Should show Posts card")
+	}
+	if !strings.Contains(html, "10") {
+		t.Error("Should show correct post count")
+	}
+	if !strings.Contains(html, "Categories") {
+		t.Error("Should show Categories card when taxonomy enabled")
+	}
+	if !strings.Contains(html, "5") {
+		t.Error("Should show correct category count")
+	}
+	if !strings.Contains(html, "Tags") {
+		t.Error("Should show Tags card when taxonomy enabled")
+	}
+	if !strings.Contains(html, "8") {
+		t.Error("Should show correct tag count")
+	}
 }
 
 func TestDashboardController_dashboardCards_WithTaxonomyDisabled(t *testing.T) {
@@ -240,10 +322,18 @@ func TestDashboardController_dashboardCards_WithTaxonomyDisabled(t *testing.T) {
 	cards := controller.dashboardCards(data)
 	html := cards.ToHTML()
 
-	assert.Contains(t, html, "Total Posts", "Should show Posts card")
-	assert.Contains(t, html, "10", "Should show correct post count")
-	assert.NotContains(t, html, "Categories", "Should NOT show Categories card when taxonomy disabled")
-	assert.NotContains(t, html, "Tags", "Should NOT show Tags card when taxonomy disabled")
+	if !strings.Contains(html, "Total Posts") {
+		t.Error("Should show Posts card")
+	}
+	if !strings.Contains(html, "10") {
+		t.Error("Should show correct post count")
+	}
+	if strings.Contains(html, "Categories") {
+		t.Error("Should NOT show Categories card when taxonomy disabled")
+	}
+	if strings.Contains(html, "Tags") {
+		t.Error("Should NOT show Tags card when taxonomy disabled")
+	}
 }
 
 // createBlogStoreWithoutTaxonomy creates a blog store with taxonomy disabled

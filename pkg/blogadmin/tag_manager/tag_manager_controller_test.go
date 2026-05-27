@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"project/internal/config"
 	"project/internal/testutils"
+	"strings"
 	"testing"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTagManagerController_Functional(t *testing.T) {
@@ -31,14 +31,20 @@ func TestTagManagerController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Tag Manager")
+		if !strings.Contains(resp, "Tag Manager") {
+			t.Error("expected Tag Manager in response")
+		}
 	})
 
 	t.Run("handleLoadTags", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags?action=load-tags", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "tags")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "tags") {
+			t.Error("expected tags in response")
+		}
 	})
 
 	t.Run("handleCreateTag", func(t *testing.T) {
@@ -49,13 +55,21 @@ func TestTagManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(tagData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=create-tag", bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "New Tag")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "New Tag") {
+			t.Error("expected New Tag in response")
+		}
 
 		// Verify it exists in store
 		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
-		assert.Len(t, terms, 1)
-		assert.Equal(t, "New Tag", terms[0].GetName())
+		if len(terms) != 1 {
+			t.Errorf("expected 1 term, got %d", len(terms))
+		}
+		if terms[0].GetName() != "New Tag" {
+			t.Errorf("expected New Tag, got %s", terms[0].GetName())
+		}
 	})
 
 	t.Run("handleLoadTagPosts", func(t *testing.T) {
@@ -64,8 +78,12 @@ func TestTagManagerController_Functional(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/tags?action=load-tag-posts&tag_id="+tagID, nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "posts")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "posts") {
+			t.Error("expected posts in response")
+		}
 	})
 
 	t.Run("handleUpdateTag", func(t *testing.T) {
@@ -78,11 +96,15 @@ func TestTagManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(updateData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=update-tag&tag_id="+tagID, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify update
 		term, _ := registry.GetBlogStore().TermFindByID(ctx, tagID)
-		assert.Equal(t, "Updated Tag", term.GetName())
+		if term.GetName() != "Updated Tag" {
+			t.Errorf("expected Updated Tag, got %s", term.GetName())
+		}
 	})
 
 	t.Run("handleDeleteTag", func(t *testing.T) {
@@ -95,10 +117,14 @@ func TestTagManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=delete-tag", bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
-		assert.Len(t, termsAfter, 0)
+		if len(termsAfter) != 0 {
+			t.Errorf("expected 0 terms after deletion, got %d", len(termsAfter))
+		}
 	})
 }

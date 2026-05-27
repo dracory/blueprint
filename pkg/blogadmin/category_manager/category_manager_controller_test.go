@@ -8,11 +8,11 @@ import (
 	"net/http/httptest"
 	"project/internal/config"
 	"project/internal/testutils"
+	"strings"
 	"testing"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCategoryManagerController_Functional(t *testing.T) {
@@ -31,14 +31,20 @@ func TestCategoryManagerController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/categories", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Category Manager")
+		if !strings.Contains(resp, "Category Manager") {
+			t.Error("expected Category Manager in response")
+		}
 	})
 
 	t.Run("handleLoadCategories", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/categories?action=load-categories", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "categories")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "categories") {
+			t.Error("expected categories in response")
+		}
 	})
 
 	t.Run("handleCreateCategory", func(t *testing.T) {
@@ -50,13 +56,21 @@ func TestCategoryManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(catData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=create-category", bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "New Category")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "New Category") {
+			t.Error("expected New Category in response")
+		}
 
 		// Verify it exists in store
 		terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
-		assert.Len(t, terms, 1)
-		assert.Equal(t, "New Category", terms[0].GetName())
+		if len(terms) != 1 {
+			t.Errorf("expected 1 term, got %d", len(terms))
+		}
+		if terms[0].GetName() != "New Category" {
+			t.Errorf("expected New Category, got %s", terms[0].GetName())
+		}
 	})
 
 	t.Run("handleUpdateCategory", func(t *testing.T) {
@@ -70,12 +84,18 @@ func TestCategoryManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(updateData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=update-category&category_id="+categoryID, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "Updated Category")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "Updated Category") {
+			t.Error("expected Updated Category in response")
+		}
 
 		// Verify update
 		term, _ := registry.GetBlogStore().TermFindByID(ctx, categoryID)
-		assert.Equal(t, "Updated Category", term.GetName())
+		if term.GetName() != "Updated Category" {
+			t.Errorf("expected Updated Category, got %s", term.GetName())
+		}
 	})
 
 	t.Run("handleReorderCategories", func(t *testing.T) {
@@ -88,7 +108,9 @@ func TestCategoryManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(reorderData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=reorder-categories", bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 	})
 
 	t.Run("handleDeleteCategory", func(t *testing.T) {
@@ -101,10 +123,14 @@ func TestCategoryManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=delete-category", bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
-		assert.Len(t, termsAfter, 0)
+		if len(termsAfter) != 0 {
+			t.Errorf("expected 0 terms after deletion, got %d", len(termsAfter))
+		}
 	})
 }

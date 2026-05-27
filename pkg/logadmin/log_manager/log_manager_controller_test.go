@@ -14,7 +14,6 @@ import (
 
 	"github.com/dracory/logstore"
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLogManagerController_Functional(t *testing.T) {
@@ -45,7 +44,9 @@ func TestLogManagerController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/logs", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Log Manager")
+		if !strings.Contains(resp, "Log Manager") {
+			t.Error("expected Log Manager in response")
+		}
 	})
 
 	t.Run("handleLoadLogs", func(t *testing.T) {
@@ -56,9 +57,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(loadData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLoadLogs, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "Test Message 1")
-		assert.Contains(t, resp, "Test Message 2")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "Test Message 1") {
+			t.Error("expected Test Message 1 in response")
+		}
+		if !strings.Contains(resp, "Test Message 2") {
+			t.Error("expected Test Message 2 in response")
+		}
 	})
 
 	t.Run("handleLogShowContext", func(t *testing.T) {
@@ -71,8 +78,12 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(showData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogShowContext, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
-		assert.Contains(t, resp, "context")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
+		if !strings.Contains(resp, "context") {
+			t.Error("expected context in response")
+		}
 	})
 
 	t.Run("handleLogDelete", func(t *testing.T) {
@@ -85,11 +96,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDelete, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		l, _ := logStore.LogFindByID(ctx, logID)
-		assert.Nil(t, l)
+		if l != nil {
+			t.Error("expected log to be nil after deletion")
+		}
 	})
 
 	t.Run("handleLogDeleteSelected", func(t *testing.T) {
@@ -113,11 +128,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteSelected, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		lFound, _ := logStore.LogFindByID(ctx, logID)
-		assert.Nil(t, lFound)
+		if lFound != nil {
+			t.Error("expected log to be nil after deletion")
+		}
 	})
 
 	t.Run("handleLogDeleteAll", func(t *testing.T) {
@@ -130,11 +149,15 @@ func TestLogManagerController_Functional(t *testing.T) {
 		body, _ := json.Marshal(deleteData)
 		req := httptest.NewRequest(http.MethodPost, "/admin/logs?action="+actionLogDeleteAll, bytes.NewBuffer(body)).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "success")
+		if !strings.Contains(resp, "success") {
+			t.Error("expected success in response")
+		}
 
 		// Verify deletion
 		count, _ := logStore.LogCount(ctx, logstore.LogQuery())
-		assert.Equal(t, int(0), int(count))
+		if int(count) != 0 {
+			t.Errorf("expected 0 logs, got %d", count)
+		}
 	})
 }
 

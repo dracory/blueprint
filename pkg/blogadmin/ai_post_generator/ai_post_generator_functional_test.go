@@ -4,13 +4,13 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"project/internal/config"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAiPostGeneratorController_Functional(t *testing.T) {
@@ -30,6 +30,8 @@ func TestAiPostGeneratorController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-post-generator", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Post Generator")
+		if !strings.Contains(resp, "Post Generator") {
+			t.Error("expected Post Generator in response")
+		}
 	})
 }

@@ -4,13 +4,13 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"project/internal/config"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAiTitleGeneratorController_Functional(t *testing.T) {
@@ -30,12 +30,16 @@ func TestAiTitleGeneratorController_Functional(t *testing.T) {
 	t.Run("renderPage", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-title-generator", nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "AI Title Generator")
+		if !strings.Contains(resp, "AI Title Generator") {
+			t.Error("expected AI Title Generator in response")
+		}
 	})
 
 	t.Run("onAddTitleModal", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-title-generator?action="+ACTION_ADD_TITLE, nil).WithContext(ctx)
 		resp := controller.Handler(httptest.NewRecorder(), req)
-		assert.Contains(t, resp, "Add Custom Title")
+		if !strings.Contains(resp, "Add Custom Title") {
+			t.Error("expected Add Custom Title in response")
+		}
 	})
 }

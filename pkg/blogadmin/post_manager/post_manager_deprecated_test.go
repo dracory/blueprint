@@ -4,13 +4,13 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"project/internal/config"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPostManagerController_DeprecatedMethods(t *testing.T) {
@@ -28,8 +28,12 @@ func TestPostManagerController_DeprecatedMethods(t *testing.T) {
 		req = req.WithContext(context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user))
 
 		data, err := controller.prepareData(req)
-		assert.Empty(t, err)
-		assert.Equal(t, 1, data.pageInt)
+		if err != "" {
+			t.Errorf("expected empty error, got %s", err)
+		}
+		if data.pageInt != 1 {
+			t.Errorf("expected pageInt 1, got %d", data.pageInt)
+		}
 	})
 
 	t.Run("page", func(t *testing.T) {
@@ -38,7 +42,11 @@ func TestPostManagerController_DeprecatedMethods(t *testing.T) {
 			perPage: 10,
 		}
 		html := controller.page(data)
-		assert.NotNil(t, html)
-		assert.Contains(t, html.ToHTML(), "Post Manager")
+		if html == nil {
+			t.Error("expected html to not be nil")
+		}
+		if !strings.Contains(html.ToHTML(), "Post Manager") {
+			t.Error("expected Post Manager in HTML")
+		}
 	})
 }
