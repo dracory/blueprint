@@ -9,7 +9,7 @@ package config
 // 2. Version constant is updated when creating a new release branch
 // 3. When ready, generate upgrade guide, merge to main, and tag the release
 // 4. Immediately create the next release branch and increment the version
-const Version = "0.26.0"
+const Version = "0.27.0"
 
 // GetVersion returns the current version of the Blueprint framework.
 func GetVersion() string {
