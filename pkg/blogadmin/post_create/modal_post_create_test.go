@@ -5,55 +5,52 @@ import (
 	"testing"
 )
 
-func TestModalPostCreate(t *testing.T) {
-	// Test cases
-	tests := []struct {
-		name     string
-		title    string
-		contains []string
-	}{
-		{
-			name:  "with empty title",
-			title: "",
-			contains: []string{
-				"<input",
-				"name=\"post_title\"",
-				"value=\"\"",
-				"Create & Edit",
-			},
-		},
-		{
-			name:  "with title",
-			title: "Test Post",
-			contains: []string{
-				"value=\"Test Post\"",
-			},
-		},
+func TestModalPostCreate_WithEmptyTitle(t *testing.T) {
+	data := postCreateControllerData{title: ""}
+	modal := modalPostCreate(data)
+	html := modal.ToHTML()
+
+	// Verify the output contains expected elements
+	expected := []string{
+		"<input",
+		"name=\"post_title\"",
+		"value=\"\"",
+		"Create & Edit",
+	}
+	for _, s := range expected {
+		if !strings.Contains(html, s) {
+			t.Errorf("HTML output should contain %s", s)
+		}
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Generate the modal with test data
-			data := postCreateControllerData{title: tt.title}
-			modal := modalPostCreate(data)
-			html := modal.ToHTML()
+	// Verify the modal ID is present
+	if !strings.Contains(html, "ModalPostCreate") {
+		t.Error("Modal should have correct ID")
+	}
 
-			// Verify the output contains expected elements
-			for _, s := range tt.contains {
-				if !strings.Contains(html, s) {
-					t.Errorf("HTML output should contain %s", s)
-				}
-			}
+	// Verify the close function script is present
+	if !strings.Contains(html, "function closeModal") {
+		t.Error("Modal should have close function")
+	}
+}
 
-			// Verify the modal ID is present
-			if !strings.Contains(html, "ModalPostCreate") {
-				t.Error("Modal should have correct ID")
-			}
+func TestModalPostCreate_WithTitle(t *testing.T) {
+	data := postCreateControllerData{title: "Test Post"}
+	modal := modalPostCreate(data)
+	html := modal.ToHTML()
 
-			// Verify the close function script is present
-			if !strings.Contains(html, "function closeModal") {
-				t.Error("Modal should have close function")
-			}
-		})
+	// Verify the output contains expected elements
+	if !strings.Contains(html, "value=\"Test Post\"") {
+		t.Error("HTML output should contain value=\"Test Post\"")
+	}
+
+	// Verify the modal ID is present
+	if !strings.Contains(html, "ModalPostCreate") {
+		t.Error("Modal should have correct ID")
+	}
+
+	// Verify the close function script is present
+	if !strings.Contains(html, "function closeModal") {
+		t.Error("Modal should have close function")
 	}
 }

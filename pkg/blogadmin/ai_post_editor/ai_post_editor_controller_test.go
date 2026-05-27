@@ -169,31 +169,75 @@ func TestRecordFromJSON_MissingOptionalFields(t *testing.T) {
 	}
 }
 
-// TestActionConstants tests action constant values
-func TestActionConstants(t *testing.T) {
+// TestActionConstants_ACTION_REGENERATE_SECTION tests ACTION_REGENERATE_SECTION constant
+func TestActionConstants_ACTION_REGENERATE_SECTION(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name     string
-		constant string
-		expected string
-	}{
-		{"ACTION_REGENERATE_SECTION", ACTION_REGENERATE_SECTION, "regenerate_section"},
-		{"ACTION_REGENERATE_IMAGE", ACTION_REGENERATE_IMAGE, "regenerate_image"},
-		{"ACTION_CREATE_FINAL_POST", ACTION_CREATE_FINAL_POST, "create_final_post"},
-		{"ACTION_SAVE_DRAFT", ACTION_SAVE_DRAFT, "save_draft"},
-		{"ACTION_REGENERATE_PARAGRAPH", ACTION_REGENERATE_PARAGRAPH, "regenerate_paragraph"},
-		{"ACTION_LOAD_POST", ACTION_LOAD_POST, "load_post"},
-		{"ACTION_REGENERATE_SUMMARY", ACTION_REGENERATE_SUMMARY, "regenerate_summary"},
-		{"ACTION_REGENERATE_METAS", ACTION_REGENERATE_METAS, "regenerate_metas"},
+	if ACTION_REGENERATE_SECTION != "regenerate_section" {
+		t.Errorf("Expected ACTION_REGENERATE_SECTION to be %q, got: %q", "regenerate_section", ACTION_REGENERATE_SECTION)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.constant != tt.expected {
-				t.Errorf("Expected %s to be %q, got: %q", tt.name, tt.expected, tt.constant)
-			}
-		})
+// TestActionConstants_ACTION_REGENERATE_IMAGE tests ACTION_REGENERATE_IMAGE constant
+func TestActionConstants_ACTION_REGENERATE_IMAGE(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_REGENERATE_IMAGE != "regenerate_image" {
+		t.Errorf("Expected ACTION_REGENERATE_IMAGE to be %q, got: %q", "regenerate_image", ACTION_REGENERATE_IMAGE)
+	}
+}
+
+// TestActionConstants_ACTION_CREATE_FINAL_POST tests ACTION_CREATE_FINAL_POST constant
+func TestActionConstants_ACTION_CREATE_FINAL_POST(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_CREATE_FINAL_POST != "create_final_post" {
+		t.Errorf("Expected ACTION_CREATE_FINAL_POST to be %q, got: %q", "create_final_post", ACTION_CREATE_FINAL_POST)
+	}
+}
+
+// TestActionConstants_ACTION_SAVE_DRAFT tests ACTION_SAVE_DRAFT constant
+func TestActionConstants_ACTION_SAVE_DRAFT(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_SAVE_DRAFT != "save_draft" {
+		t.Errorf("Expected ACTION_SAVE_DRAFT to be %q, got: %q", "save_draft", ACTION_SAVE_DRAFT)
+	}
+}
+
+// TestActionConstants_ACTION_REGENERATE_PARAGRAPH tests ACTION_REGENERATE_PARAGRAPH constant
+func TestActionConstants_ACTION_REGENERATE_PARAGRAPH(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_REGENERATE_PARAGRAPH != "regenerate_paragraph" {
+		t.Errorf("Expected ACTION_REGENERATE_PARAGRAPH to be %q, got: %q", "regenerate_paragraph", ACTION_REGENERATE_PARAGRAPH)
+	}
+}
+
+// TestActionConstants_ACTION_LOAD_POST tests ACTION_LOAD_POST constant
+func TestActionConstants_ACTION_LOAD_POST(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_LOAD_POST != "load_post" {
+		t.Errorf("Expected ACTION_LOAD_POST to be %q, got: %q", "load_post", ACTION_LOAD_POST)
+	}
+}
+
+// TestActionConstants_ACTION_REGENERATE_SUMMARY tests ACTION_REGENERATE_SUMMARY constant
+func TestActionConstants_ACTION_REGENERATE_SUMMARY(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_REGENERATE_SUMMARY != "regenerate_summary" {
+		t.Errorf("Expected ACTION_REGENERATE_SUMMARY to be %q, got: %q", "regenerate_summary", ACTION_REGENERATE_SUMMARY)
+	}
+}
+
+// TestActionConstants_ACTION_REGENERATE_METAS tests ACTION_REGENERATE_METAS constant
+func TestActionConstants_ACTION_REGENERATE_METAS(t *testing.T) {
+	t.Parallel()
+
+	if ACTION_REGENERATE_METAS != "regenerate_metas" {
+		t.Errorf("Expected ACTION_REGENERATE_METAS to be %q, got: %q", "regenerate_metas", ACTION_REGENERATE_METAS)
 	}
 }
 

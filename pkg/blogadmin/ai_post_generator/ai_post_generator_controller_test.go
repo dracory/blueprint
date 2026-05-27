@@ -1,7 +1,15 @@
 package aipostgenerator
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"project/internal/config"
+	"project/internal/testutils"
+	"strings"
 	"testing"
+
+	"github.com/dracory/test"
 )
 
 // TestNewAiPostGeneratorController tests the constructor
@@ -103,5 +111,27 @@ func TestAiPostGeneratorController_MultipleInstances(t *testing.T) {
 
 	if controller1 == nil || controller2 == nil {
 		t.Error("Both controllers should be non-nil")
+	}
+}
+
+// TestAiPostGeneratorController_RenderPage tests rendering the page
+func TestAiPostGeneratorController_RenderPage(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithCustomStore(true),
+	)
+
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewAiPostGeneratorController(registry)
+
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-post-generator", nil).WithContext(ctx)
+	resp := controller.Handler(httptest.NewRecorder(), req)
+	if !strings.Contains(resp, "Post Generator") {
+		t.Error("expected Post Generator in response")
 	}
 }

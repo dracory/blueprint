@@ -7,53 +7,50 @@ import (
 	"testing"
 )
 
-func TestFileRenameAjax(t *testing.T) {
+func TestFileRenameAjax_MissingRenameFileParameter(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name         string
-		renameFile   string
-		newFile      string
-		currentDir   string
-		wantContains string
-	}{
-		{
-			name:         "missing rename_file parameter",
-			renameFile:   "",
-			newFile:      "new.txt",
-			currentDir:   "/uploads",
-			wantContains: "rename_file is required",
-		},
-		{
-			name:         "missing new_file parameter",
-			renameFile:   "old.txt",
-			newFile:      "",
-			currentDir:   "/uploads",
-			wantContains: "new_file is required",
-		},
+	form := url.Values{}
+	form.Add("rename_file", "")
+	form.Add("new_file", "new.txt")
+	form.Add("current_dir", "/uploads")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
+	req.PostForm = form
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			form := url.Values{}
-			form.Add("rename_file", tt.renameFile)
-			form.Add("new_file", tt.newFile)
-			form.Add("current_dir", tt.currentDir)
+	result := controller.fileRenameAjax(req)
 
-			req, err := http.NewRequest("POST", "/file-manager", nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.PostForm = form
+	if !strings.Contains(result, "rename_file is required") {
+		t.Errorf("fileRenameAjax() result = %q, want to contain %q", result, "rename_file is required")
+	}
+}
 
-			result := controller.fileRenameAjax(req)
+func TestFileRenameAjax_MissingNewFileParameter(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
 
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("fileRenameAjax() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("rename_file", "old.txt")
+	form.Add("new_file", "")
+	form.Add("current_dir", "/uploads")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	result := controller.fileRenameAjax(req)
+
+	if !strings.Contains(result, "new_file is required") {
+		t.Errorf("fileRenameAjax() result = %q, want to contain %q", result, "new_file is required")
 	}
 }

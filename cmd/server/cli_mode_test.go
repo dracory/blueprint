@@ -29,46 +29,42 @@ func TestIsCliMode(t *testing.T) {
 	}
 }
 
-func TestIsCliMode_VariousArguments(t *testing.T) {
-	tests := []struct {
-		name     string
-		args     []string
-		expected bool
-	}{
-		{
-			name:     "No arguments",
-			args:     []string{},
-			expected: false,
-		},
-		{
-			name:     "Program name only",
-			args:     []string{"server"},
-			expected: false,
-		},
-		{
-			name:     "Program name with one argument",
-			args:     []string{"server", "task"},
-			expected: true,
-		},
-		{
-			name:     "Program name with multiple arguments",
-			args:     []string{"server", "task", "myTask"},
-			expected: true,
-		},
-		{
-			name:     "Program name with job command",
-			args:     []string{"server", "job"},
-			expected: true,
-		},
+func TestIsCliMode_VariousArguments_NoArguments(t *testing.T) {
+	os.Args = []string{}
+	result := isCliMode()
+	if result != false {
+		t.Errorf("isCliMode() = %v, want false", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			os.Args = tt.args
-			result := isCliMode()
-			if result != tt.expected {
-				t.Errorf("isCliMode() = %v, want %v", result, tt.expected)
-			}
-		})
+func TestIsCliMode_VariousArguments_ProgramNameOnly(t *testing.T) {
+	os.Args = []string{"server"}
+	result := isCliMode()
+	if result != false {
+		t.Errorf("isCliMode() = %v, want false", result)
+	}
+}
+
+func TestIsCliMode_VariousArguments_OneArgument(t *testing.T) {
+	os.Args = []string{"server", "task"}
+	result := isCliMode()
+	if result != true {
+		t.Errorf("isCliMode() = %v, want true", result)
+	}
+}
+
+func TestIsCliMode_VariousArguments_MultipleArguments(t *testing.T) {
+	os.Args = []string{"server", "task", "myTask"}
+	result := isCliMode()
+	if result != true {
+		t.Errorf("isCliMode() = %v, want true", result)
+	}
+}
+
+func TestIsCliMode_VariousArguments_JobCommand(t *testing.T) {
+	os.Args = []string{"server", "job"}
+	result := isCliMode()
+	if result != true {
+		t.Errorf("isCliMode() = %v, want true", result)
 	}
 }

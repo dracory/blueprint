@@ -28,27 +28,39 @@ func TestController_HandlerWithNilRegistry(t *testing.T) {
 	}
 }
 
-func TestController_HandlerWithHeaders(t *testing.T) {
+func TestController_HandlerWithHeaders_GET(t *testing.T) {
 	registry := testutils.Setup()
 	controller := NewController(registry)
 	if controller == nil {
 		t.Fatal("NewController() returned nil")
 	}
 
-	// Test with GET and POST methods (the ones supported by Routes)
-	methods := []string{"GET", "POST"}
-	for _, method := range methods {
-		t.Run(method, func(t *testing.T) {
-			req := httptest.NewRequest(method, "/liveflux", nil)
-			w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/liveflux", nil)
+	w := httptest.NewRecorder()
 
-			result := controller.Handler(w, req)
+	result := controller.Handler(w, req)
 
-			// Handler should return a result for supported methods
-			if result == "" {
-				t.Errorf("Handler() returned empty string for %s method", method)
-			}
-		})
+	// Handler should return a result for supported methods
+	if result == "" {
+		t.Error("Handler() returned empty string for GET method")
+	}
+}
+
+func TestController_HandlerWithHeaders_POST(t *testing.T) {
+	registry := testutils.Setup()
+	controller := NewController(registry)
+	if controller == nil {
+		t.Fatal("NewController() returned nil")
+	}
+
+	req := httptest.NewRequest("POST", "/liveflux", nil)
+	w := httptest.NewRecorder()
+
+	result := controller.Handler(w, req)
+
+	// Handler should return a result for supported methods
+	if result == "" {
+		t.Error("Handler() returned empty string for POST method")
 	}
 }
 

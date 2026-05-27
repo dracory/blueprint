@@ -198,7 +198,7 @@ func TestBlindIndexRebuildTask_checkAndEnqueueTask_WithQueuedTask(t *testing.T) 
 	}
 }
 
-func TestBlindIndexRebuildTask_Handle_IndividualIndexes(t *testing.T) {
+func TestBlindIndexRebuildTask_Handle_IndividualIndexes_Email(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
@@ -212,29 +212,68 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes(t *testing.T) {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
 
-	tests := []struct {
-		name  string
-		index string
-	}{
-		{"Email Index", BlindIndexEmail},
-		{"First Name Index", BlindIndexFirstName},
-		{"Last Name Index", BlindIndexLastName},
+	queuedTask, err := task.Enqueue(BlindIndexEmail)
+	if err != nil {
+		t.Fatalf("Enqueue() expected nil error, got %v", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			queuedTask, err := task.Enqueue(tt.index)
-			if err != nil {
-				t.Fatalf("Enqueue() expected nil error, got %v", err)
-			}
+	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy.SetQueuedTask(queuedTask)
 
-			taskCopy := NewBlindIndexRebuildTask(registry)
-			taskCopy.SetQueuedTask(queuedTask)
+	// Handle may fail due to missing blind index stores, but it should execute the code paths
+	_ = taskCopy.Handle()
+}
 
-			// Handle may fail due to missing blind index stores, but it should execute the code paths
-			_ = taskCopy.Handle()
-		})
+func TestBlindIndexRebuildTask_Handle_IndividualIndexes_FirstName(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithTaskStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	task := NewBlindIndexRebuildTask(registry)
+
+	// Register task
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
+
+	queuedTask, err := task.Enqueue(BlindIndexFirstName)
+	if err != nil {
+		t.Fatalf("Enqueue() expected nil error, got %v", err)
+	}
+
+	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy.SetQueuedTask(queuedTask)
+
+	// Handle may fail due to missing blind index stores, but it should execute the code paths
+	_ = taskCopy.Handle()
+}
+
+func TestBlindIndexRebuildTask_Handle_IndividualIndexes_LastName(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithTaskStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	task := NewBlindIndexRebuildTask(registry)
+
+	// Register task
+	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	if err != nil {
+		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
+	}
+
+	queuedTask, err := task.Enqueue(BlindIndexLastName)
+	if err != nil {
+		t.Fatalf("Enqueue() expected nil error, got %v", err)
+	}
+
+	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy.SetQueuedTask(queuedTask)
+
+	// Handle may fail due to missing blind index stores, but it should execute the code paths
+	_ = taskCopy.Handle()
 }
 
 func TestBlindIndexRebuildTask_Handle_TruncateIndividual(t *testing.T) {

@@ -99,41 +99,147 @@ func TestMergeParams(t *testing.T) {
 }
 
 // TestLinksMethods tests all the link generation methods
-func TestLinksMethods(t *testing.T) {
+func TestLinksMethods_Home(t *testing.T) {
 	t.Parallel()
-
 	links := NewLinks("/admin/blog")
-
-	tests := []struct {
-		name     string
-		method   func(...map[string]string) string
-		expected string
-	}{
-		{"Home", links.Home, "/admin/blog?controller=post-manager"},
-		{"PostCreate", links.PostCreate, "/admin/blog?controller=post-create"},
-		{"PostDelete", links.PostDelete, "/admin/blog?controller=post-delete"},
-		{"PostManager", links.PostManager, "/admin/blog?controller=post-manager"},
-		{"PostUpdate", links.PostUpdate, "/admin/blog?controller=post-update"},
-		{"PostUpdateV1", links.PostUpdateV1, "/admin/blog?controller=post-update-v1"},
-		{"BlogSettings", links.BlogSettings, "/admin/blog?controller=blog-settings"},
-		{"AiTools", links.AiTools, "/admin/blog?controller=ai-tools"},
-		{"AiPostContentUpdate", links.AiPostContentUpdate, "/admin/blog?controller=ai-post-content-update"},
-		{"AiPostGenerator", links.AiPostGenerator, "/admin/blog?controller=ai-post-generator"},
-		{"AiTitleGenerator", links.AiTitleGenerator, "/admin/blog?controller=ai-title-generator"},
-		{"AiPostEditor", links.AiPostEditor, "/admin/blog?controller=ai-post-editor"},
-		{"AiTest", links.AiTest, "/admin/blog?controller=ai-test"},
-		{"Dashboard", links.Dashboard, "/admin/blog?controller=dashboard"},
-		{"CategoryManager", links.CategoryManager, "/admin/blog?controller=category-manager"},
-		{"TagManager", links.TagManager, "/admin/blog?controller=tag-manager"},
+	result := links.Home()
+	if result != "/admin/blog?controller=post-manager" {
+		t.Errorf("Expected '/admin/blog?controller=post-manager', got: %s", result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.method()
-			if result != tt.expected {
-				t.Errorf("Expected '%s', got: %s", tt.expected, result)
-			}
-		})
+func TestLinksMethods_PostCreate(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.PostCreate()
+	if result != "/admin/blog?controller=post-create" {
+		t.Errorf("Expected '/admin/blog?controller=post-create', got: %s", result)
+	}
+}
+
+func TestLinksMethods_PostDelete(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.PostDelete()
+	if result != "/admin/blog?controller=post-delete" {
+		t.Errorf("Expected '/admin/blog?controller=post-delete', got: %s", result)
+	}
+}
+
+func TestLinksMethods_PostManager(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.PostManager()
+	if result != "/admin/blog?controller=post-manager" {
+		t.Errorf("Expected '/admin/blog?controller=post-manager', got: %s", result)
+	}
+}
+
+func TestLinksMethods_PostUpdate(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.PostUpdate()
+	if result != "/admin/blog?controller=post-update" {
+		t.Errorf("Expected '/admin/blog?controller=post-update', got: %s", result)
+	}
+}
+
+func TestLinksMethods_PostUpdateV1(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.PostUpdateV1()
+	if result != "/admin/blog?controller=post-update-v1" {
+		t.Errorf("Expected '/admin/blog?controller=post-update-v1', got: %s", result)
+	}
+}
+
+func TestLinksMethods_BlogSettings(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.BlogSettings()
+	if result != "/admin/blog?controller=blog-settings" {
+		t.Errorf("Expected '/admin/blog?controller=blog-settings', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiTools(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiTools()
+	if result != "/admin/blog?controller=ai-tools" {
+		t.Errorf("Expected '/admin/blog?controller=ai-tools', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiPostContentUpdate(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiPostContentUpdate()
+	if result != "/admin/blog?controller=ai-post-content-update" {
+		t.Errorf("Expected '/admin/blog?controller=ai-post-content-update', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiPostGenerator(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiPostGenerator()
+	if result != "/admin/blog?controller=ai-post-generator" {
+		t.Errorf("Expected '/admin/blog?controller=ai-post-generator', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiTitleGenerator(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiTitleGenerator()
+	if result != "/admin/blog?controller=ai-title-generator" {
+		t.Errorf("Expected '/admin/blog?controller=ai-title-generator', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiPostEditor(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiPostEditor()
+	if result != "/admin/blog?controller=ai-post-editor" {
+		t.Errorf("Expected '/admin/blog?controller=ai-post-editor', got: %s", result)
+	}
+}
+
+func TestLinksMethods_AiTest(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.AiTest()
+	if result != "/admin/blog?controller=ai-test" {
+		t.Errorf("Expected '/admin/blog?controller=ai-test', got: %s", result)
+	}
+}
+
+func TestLinksMethods_Dashboard(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.Dashboard()
+	if result != "/admin/blog?controller=dashboard" {
+		t.Errorf("Expected '/admin/blog?controller=dashboard', got: %s", result)
+	}
+}
+
+func TestLinksMethods_CategoryManager(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.CategoryManager()
+	if result != "/admin/blog?controller=category-manager" {
+		t.Errorf("Expected '/admin/blog?controller=category-manager', got: %s", result)
+	}
+}
+
+func TestLinksMethods_TagManager(t *testing.T) {
+	t.Parallel()
+	links := NewLinks("/admin/blog")
+	result := links.TagManager()
+	if result != "/admin/blog?controller=tag-manager" {
+		t.Errorf("Expected '/admin/blog?controller=tag-manager', got: %s", result)
 	}
 }
 

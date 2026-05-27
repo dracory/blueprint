@@ -7,45 +7,46 @@ import (
 	"testing"
 )
 
-func TestBulkDeleteAjax(t *testing.T) {
+func TestBulkDeleteAjax_MissingSelectedItemsParameter(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name          string
-		selectedItems string
-		wantContains  string
-	}{
-		{
-			name:          "missing selected_items parameter",
-			selectedItems: "",
-			wantContains:  "No items selected",
-		},
-		{
-			name:          "invalid JSON",
-			selectedItems: "invalid json",
-			wantContains:  "Invalid selected items data",
-		},
+	form := url.Values{}
+	form.Add("selected_items", "")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
+	req.PostForm = form
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			form := url.Values{}
-			form.Add("selected_items", tt.selectedItems)
+	result := controller.bulkDeleteAjax(req)
 
-			req, err := http.NewRequest("POST", "/file-manager", nil)
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
-			req.PostForm = form
+	if !strings.Contains(result, "No items selected") {
+		t.Errorf("bulkDeleteAjax() result = %q, want to contain %q", result, "No items selected")
+	}
+}
 
-			result := controller.bulkDeleteAjax(req)
+func TestBulkDeleteAjax_InvalidJSON(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
 
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("bulkDeleteAjax() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+	controller := NewFileManagerController(reg)
+
+	form := url.Values{}
+	form.Add("selected_items", "invalid json")
+
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.PostForm = form
+
+	result := controller.bulkDeleteAjax(req)
+
+	if !strings.Contains(result, "Invalid selected items data") {
+		t.Errorf("bulkDeleteAjax() result = %q, want to contain %q", result, "Invalid selected items data")
 	}
 }

@@ -1,7 +1,6 @@
 package blogpostlist
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -80,101 +79,148 @@ func TestRenderBlogPostListHTML_EmptySummary(t *testing.T) {
 	}
 }
 
-func TestRenderBlogPostListHTML_ColumnClasses(t *testing.T) {
+func TestRenderBlogPostListHTML_ColumnClasses_Column1(t *testing.T) {
 	post := blogstore.NewPost().
 		SetID("1").
 		SetTitle("Test")
 
 	postList := []blogstore.PostInterface{post}
 
-	tests := []struct {
-		columns  int
-		expected string
-	}{
-		{1, "col-12"},
-		{2, "col-md-6 col-sm-6"},
-		{3, "col-md-4 col-sm-6"},
-		{4, "col-md-3 col-sm-6"},
-		{6, "col-md-2 col-sm-4"},
+	html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, 1, 150)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(fmt.Sprintf("columns_%d", tt.columns), func(t *testing.T) {
-			html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, tt.columns, 150)
-			if err != nil {
-				t.Fatalf("Render failed: %v", err)
-			}
-
-			if !strings.Contains(html, tt.expected) {
-				t.Errorf("Expected column class '%s' in HTML\nHTML: %s", tt.expected, html)
-			}
-		})
+	if !strings.Contains(html, "col-12") {
+		t.Errorf("Expected column class 'col-12' in HTML\nHTML: %s", html)
 	}
 }
 
-func TestRenderPagination(t *testing.T) {
-	tests := []struct {
-		name         string
-		totalItems   int
-		itemsPerPage int
-		currentPage  int
-		wantContains []string
-	}{
-		{
-			name:         "single page - no pagination",
-			totalItems:   5,
-			itemsPerPage: 10,
-			currentPage:  1,
-			wantContains: []string{},
-		},
-		{
-			name:         "multiple pages - page 1",
-			totalItems:   25,
-			itemsPerPage: 10,
-			currentPage:  1,
-			wantContains: []string{"page-item active", "?page=1\">1</a>", "?page=2\">2</a>", "?page=3\">3</a>", "Previous", "Next"},
-		},
-		{
-			name:         "multiple pages - page 2",
-			totalItems:   25,
-			itemsPerPage: 10,
-			currentPage:  2,
-			wantContains: []string{"page-item active", "?page=1\">1</a>", "?page=2\">2</a>", "?page=3\">3</a>", "Previous", "Next"},
-		},
-		{
-			name:         "first page - previous disabled",
-			totalItems:   25,
-			itemsPerPage: 10,
-			currentPage:  1,
-			wantContains: []string{"page-item disabled", "aria-label=\"Previous\""},
-		},
-		{
-			name:         "last page - next disabled",
-			totalItems:   25,
-			itemsPerPage: 10,
-			currentPage:  3,
-			wantContains: []string{"page-item disabled", "aria-label=\"Next\""},
-		},
+func TestRenderBlogPostListHTML_ColumnClasses_Column2(t *testing.T) {
+	post := blogstore.NewPost().
+		SetID("1").
+		SetTitle("Test")
+
+	postList := []blogstore.PostInterface{post}
+
+	html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, 2, 150)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := renderPagination(tt.totalItems, tt.itemsPerPage, tt.currentPage)
+	if !strings.Contains(html, "col-md-6 col-sm-6") {
+		t.Errorf("Expected column class 'col-md-6 col-sm-6' in HTML\nHTML: %s", html)
+	}
+}
 
-			// If single page, should return empty string
-			if tt.totalItems <= tt.itemsPerPage {
-				if result != "" {
-					t.Errorf("Expected empty string for single page, got: %s", result)
-				}
-				return
-			}
+func TestRenderBlogPostListHTML_ColumnClasses_Column3(t *testing.T) {
+	post := blogstore.NewPost().
+		SetID("1").
+		SetTitle("Test")
 
-			// Check that expected strings are present
-			for _, want := range tt.wantContains {
-				if !strings.Contains(result, want) {
-					t.Errorf("Expected '%s' in pagination output\nGot: %s", want, result)
-				}
-			}
-		})
+	postList := []blogstore.PostInterface{post}
+
+	html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, 3, 150)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
+	}
+
+	if !strings.Contains(html, "col-md-4 col-sm-6") {
+		t.Errorf("Expected column class 'col-md-4 col-sm-6' in HTML\nHTML: %s", html)
+	}
+}
+
+func TestRenderBlogPostListHTML_ColumnClasses_Column4(t *testing.T) {
+	post := blogstore.NewPost().
+		SetID("1").
+		SetTitle("Test")
+
+	postList := []blogstore.PostInterface{post}
+
+	html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, 4, 150)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
+	}
+
+	if !strings.Contains(html, "col-md-3 col-sm-6") {
+		t.Errorf("Expected column class 'col-md-3 col-sm-6' in HTML\nHTML: %s", html)
+	}
+}
+
+func TestRenderBlogPostListHTML_ColumnClasses_Column6(t *testing.T) {
+	post := blogstore.NewPost().
+		SetID("1").
+		SetTitle("Test")
+
+	postList := []blogstore.PostInterface{post}
+
+	html, err := renderBlogPostListHTML(postList, 1, 10, 1, false, false, false, false, 6, 150)
+	if err != nil {
+		t.Fatalf("Render failed: %v", err)
+	}
+
+	if !strings.Contains(html, "col-md-2 col-sm-4") {
+		t.Errorf("Expected column class 'col-md-2 col-sm-4' in HTML\nHTML: %s", html)
+	}
+}
+
+func TestRenderPagination_SinglePageNoPagination(t *testing.T) {
+	result := renderPagination(5, 10, 1)
+
+	// If single page, should return empty string
+	if result != "" {
+		t.Errorf("Expected empty string for single page, got: %s", result)
+	}
+}
+
+func TestRenderPagination_MultiplePagesPage1(t *testing.T) {
+	result := renderPagination(25, 10, 1)
+
+	wantContains := []string{"page-item active", "?page=1\">1</a>", "?page=2\">2</a>", "?page=3\">3</a>", "Previous", "Next"}
+
+	// Check that expected strings are present
+	for _, want := range wantContains {
+		if !strings.Contains(result, want) {
+			t.Errorf("Expected '%s' in pagination output\nGot: %s", want, result)
+		}
+	}
+}
+
+func TestRenderPagination_MultiplePagesPage2(t *testing.T) {
+	result := renderPagination(25, 10, 2)
+
+	wantContains := []string{"page-item active", "?page=1\">1</a>", "?page=2\">2</a>", "?page=3\">3</a>", "Previous", "Next"}
+
+	// Check that expected strings are present
+	for _, want := range wantContains {
+		if !strings.Contains(result, want) {
+			t.Errorf("Expected '%s' in pagination output\nGot: %s", want, result)
+		}
+	}
+}
+
+func TestRenderPagination_FirstPagePreviousDisabled(t *testing.T) {
+	result := renderPagination(25, 10, 1)
+
+	wantContains := []string{"page-item disabled", "aria-label=\"Previous\""}
+
+	// Check that expected strings are present
+	for _, want := range wantContains {
+		if !strings.Contains(result, want) {
+			t.Errorf("Expected '%s' in pagination output\nGot: %s", want, result)
+		}
+	}
+}
+
+func TestRenderPagination_LastPageNextDisabled(t *testing.T) {
+	result := renderPagination(25, 10, 3)
+
+	wantContains := []string{"page-item disabled", "aria-label=\"Next\""}
+
+	// Check that expected strings are present
+	for _, want := range wantContains {
+		if !strings.Contains(result, want) {
+			t.Errorf("Expected '%s' in pagination output\nGot: %s", want, result)
+		}
 	}
 }

@@ -320,27 +320,52 @@ func TestTableGeneratedTitles_WithEmptyStatus(t *testing.T) {
 	}
 }
 
-func TestGetStatusBadgeClass(t *testing.T) {
-	tests := []struct {
-		status   string
-		expected string
-	}{
-		{blogai.POST_STATUS_PENDING, "bg-warning"},
-		{blogai.POST_STATUS_APPROVED, "bg-success"},
-		{blogai.POST_STATUS_REJECTED, "bg-danger"},
-		{blogai.POST_STATUS_DRAFT, "bg-info"},
-		{blogai.POST_STATUS_PUBLISHED, "bg-primary"},
-		{"unknown_status", "bg-secondary"},
-		{"", "bg-secondary"},
+func TestGetStatusBadgeClass_Pending(t *testing.T) {
+	result := getStatusBadgeClass(blogai.POST_STATUS_PENDING)
+	if result != "bg-warning" {
+		t.Errorf("Should return bg-warning for pending status, got %s", result)
 	}
+}
 
-	for _, test := range tests {
-		t.Run("Status_"+test.status, func(t *testing.T) {
-			result := getStatusBadgeClass(test.status)
-			if result != test.expected {
-				t.Errorf("Should return correct badge class for status %s: expected %s, got %s", test.status, test.expected, result)
-			}
-		})
+func TestGetStatusBadgeClass_Approved(t *testing.T) {
+	result := getStatusBadgeClass(blogai.POST_STATUS_APPROVED)
+	if result != "bg-success" {
+		t.Errorf("Should return bg-success for approved status, got %s", result)
+	}
+}
+
+func TestGetStatusBadgeClass_Rejected(t *testing.T) {
+	result := getStatusBadgeClass(blogai.POST_STATUS_REJECTED)
+	if result != "bg-danger" {
+		t.Errorf("Should return bg-danger for rejected status, got %s", result)
+	}
+}
+
+func TestGetStatusBadgeClass_Draft(t *testing.T) {
+	result := getStatusBadgeClass(blogai.POST_STATUS_DRAFT)
+	if result != "bg-info" {
+		t.Errorf("Should return bg-info for draft status, got %s", result)
+	}
+}
+
+func TestGetStatusBadgeClass_Published(t *testing.T) {
+	result := getStatusBadgeClass(blogai.POST_STATUS_PUBLISHED)
+	if result != "bg-primary" {
+		t.Errorf("Should return bg-primary for published status, got %s", result)
+	}
+}
+
+func TestGetStatusBadgeClass_Unknown(t *testing.T) {
+	result := getStatusBadgeClass("unknown_status")
+	if result != "bg-secondary" {
+		t.Errorf("Should return bg-secondary for unknown status, got %s", result)
+	}
+}
+
+func TestGetStatusBadgeClass_Empty(t *testing.T) {
+	result := getStatusBadgeClass("")
+	if result != "bg-secondary" {
+		t.Errorf("Should return bg-secondary for empty status, got %s", result)
 	}
 }
 

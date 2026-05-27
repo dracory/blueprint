@@ -9,58 +9,48 @@ import (
 	"testing"
 )
 
-func TestFileUploadAjax(t *testing.T) {
+func TestFileUploadAjax_MissingUploadFile(t *testing.T) {
 	reg, cleanup := setupTestRegistry()
 	defer cleanup()
 
 	controller := NewFileManagerController(reg)
 
-	tests := []struct {
-		name         string
-		currentDir   string
-		setupReq     func() (*http.Request, error)
-		wantContains string
-	}{
-		{
-			name:       "missing upload_file",
-			currentDir: "/uploads",
-			setupReq: func() (*http.Request, error) {
-				return http.NewRequest("POST", "/file-manager", nil)
-			},
-			wantContains: "multipart/form-data",
-		},
-		{
-			name:       "invalid multipart boundary",
-			currentDir: "/uploads",
-			setupReq: func() (*http.Request, error) {
-				req, err := http.NewRequest("POST", "/file-manager", strings.NewReader("invalid body"))
-				if err != nil {
-					return nil, err
-				}
-				req.Header.Set("Content-Type", "multipart/form-data")
-				return req, err
-			},
-			wantContains: "boundary",
-		},
+	req, err := http.NewRequest("POST", "/file-manager", nil)
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req, err := tt.setupReq()
-			if err != nil {
-				t.Fatalf("Failed to create request: %v", err)
-			}
+	form := url.Values{}
+	form.Add("current_dir", "/uploads")
+	req.PostForm = form
 
-			form := url.Values{}
-			form.Add("current_dir", tt.currentDir)
-			req.PostForm = form
+	result := controller.fileUploadAjax(req)
 
-			result := controller.fileUploadAjax(req)
+	if !strings.Contains(result, "multipart/form-data") {
+		t.Errorf("fileUploadAjax() result = %q, want to contain %q", result, "multipart/form-data")
+	}
+}
 
-			if tt.wantContains != "" && !strings.Contains(result, tt.wantContains) {
-				t.Errorf("fileUploadAjax() result = %q, want to contain %q", result, tt.wantContains)
-			}
-		})
+func TestFileUploadAjax_InvalidMultipartBoundary(t *testing.T) {
+	reg, cleanup := setupTestRegistry()
+	defer cleanup()
+
+	controller := NewFileManagerController(reg)
+
+	req, err := http.NewRequest("POST", "/file-manager", strings.NewReader("invalid body"))
+	if err != nil {
+		t.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Content-Type", "multipart/form-data")
+
+	form := url.Values{}
+	form.Add("current_dir", "/uploads")
+	req.PostForm = form
+
+	result := controller.fileUploadAjax(req)
+
+	if !strings.Contains(result, "boundary") {
+		t.Errorf("fileUploadAjax() result = %q, want to contain %q", result, "boundary")
 	}
 }
 

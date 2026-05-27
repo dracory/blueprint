@@ -10,65 +10,176 @@ import (
 // Admin Links Tests
 // ============================================================================
 
-func TestAdminLinks(t *testing.T) {
+func TestAdminLinks_Home(t *testing.T) {
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
-
 	admin := Admin()
-
-	tests := []struct {
-		name     string
-		fn       func() string
-		contains string
-	}{
-		{"Home", func() string { return admin.Home() }, "/admin"},
-		{"Blog", func() string { return admin.Blog() }, "/admin/blog"},
-		{"Cms", func() string { return admin.Cms() }, "/admin/cms"},
-		{"CmsOld", func() string { return admin.CmsOld() }, "/admin/cmsold"},
-		{"FileManager", func() string { return admin.FileManager() }, "/admin/file-manager"},
-		{"Logs", func() string { return admin.Logs() }, "/admin/logs"},
-		{"MediaManager", func() string { return admin.MediaManager() }, "/admin/media"},
-		{"Shop", func() string { return admin.Shop() }, "/admin/shop"},
-		{"Stats", func() string { return admin.Stats() }, "/admin/stats"},
-		{"Tasks", func() string { return admin.Tasks() }, "/admin/tasks"},
-		{"Users", func() string { return admin.Users() }, "/admin/users"},
+	result := admin.Home()
+	if result == "" {
+		t.Error("Home() should return non-empty string")
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn()
-			if result == "" {
-				t.Errorf("%s() should return non-empty string", tt.name)
-			}
-			if !strings.Contains(result, tt.contains) {
-				t.Errorf("%s() = %q, should contain %q", tt.name, result, tt.contains)
-			}
-		})
+	if !strings.Contains(result, "/admin") {
+		t.Errorf("Home() = %q, should contain /admin", result)
 	}
 }
 
-func TestAdminLinks_WithParams(t *testing.T) {
+func TestAdminLinks_Blog(t *testing.T) {
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
-
 	admin := Admin()
-
-	tests := []struct {
-		name string
-		fn   func() string
-	}{
-		{"Home with params", func() string { return admin.Home(map[string]string{"key": "value"}) }},
-		{"Blog with params", func() string { return admin.Blog(map[string]string{"page": "1"}) }},
-		{"Users with params", func() string { return admin.Users(map[string]string{"sort": "name"}) }},
+	result := admin.Blog()
+	if result == "" {
+		t.Error("Blog() should return non-empty string")
 	}
+	if !strings.Contains(result, "/admin/blog") {
+		t.Errorf("Blog() = %q, should contain /admin/blog", result)
+	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn()
-			if result == "" {
-				t.Errorf("%s should return non-empty string", tt.name)
-			}
-		})
+func TestAdminLinks_Cms(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Cms()
+	if result == "" {
+		t.Error("Cms() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/cms") {
+		t.Errorf("Cms() = %q, should contain /admin/cms", result)
+	}
+}
+
+func TestAdminLinks_CmsOld(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.CmsOld()
+	if result == "" {
+		t.Error("CmsOld() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/cmsold") {
+		t.Errorf("CmsOld() = %q, should contain /admin/cmsold", result)
+	}
+}
+
+func TestAdminLinks_FileManager(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.FileManager()
+	if result == "" {
+		t.Error("FileManager() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/file-manager") {
+		t.Errorf("FileManager() = %q, should contain /admin/file-manager", result)
+	}
+}
+
+func TestAdminLinks_Logs(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Logs()
+	if result == "" {
+		t.Error("Logs() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/logs") {
+		t.Errorf("Logs() = %q, should contain /admin/logs", result)
+	}
+}
+
+func TestAdminLinks_MediaManager(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.MediaManager()
+	if result == "" {
+		t.Error("MediaManager() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/media") {
+		t.Errorf("MediaManager() = %q, should contain /admin/media", result)
+	}
+}
+
+func TestAdminLinks_Shop(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Shop()
+	if result == "" {
+		t.Error("Shop() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/shop") {
+		t.Errorf("Shop() = %q, should contain /admin/shop", result)
+	}
+}
+
+func TestAdminLinks_Stats(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Stats()
+	if result == "" {
+		t.Error("Stats() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/stats") {
+		t.Errorf("Stats() = %q, should contain /admin/stats", result)
+	}
+}
+
+func TestAdminLinks_Tasks(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Tasks()
+	if result == "" {
+		t.Error("Tasks() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/tasks") {
+		t.Errorf("Tasks() = %q, should contain /admin/tasks", result)
+	}
+}
+
+func TestAdminLinks_Users(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Users()
+	if result == "" {
+		t.Error("Users() should return non-empty string")
+	}
+	if !strings.Contains(result, "/admin/users") {
+		t.Errorf("Users() = %q, should contain /admin/users", result)
+	}
+}
+
+func TestAdminLinks_WithParams_Home(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Home(map[string]string{"key": "value"})
+	if result == "" {
+		t.Error("Home with params should return non-empty string")
+	}
+}
+
+func TestAdminLinks_WithParams_Blog(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Blog(map[string]string{"page": "1"})
+	if result == "" {
+		t.Error("Blog with params should return non-empty string")
+	}
+}
+
+func TestAdminLinks_WithParams_Users(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	admin := Admin()
+	result := admin.Users(map[string]string{"sort": "name"})
+	if result == "" {
+		t.Error("Users with params should return non-empty string")
 	}
 }
 
@@ -76,60 +187,111 @@ func TestAdminLinks_WithParams(t *testing.T) {
 // Website Links Tests
 // ============================================================================
 
-func TestWebsiteLinks(t *testing.T) {
+func TestWebsiteLinks_Home(t *testing.T) {
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
-
 	website := Website()
-
-	tests := []struct {
-		name     string
-		fn       func() string
-		contains string
-	}{
-		{"Home", func() string { return website.Home() }, "/"},
-		{"Blog", func() string { return website.Blog() }, "/blog"},
-		{"Chat", func() string { return website.Chat() }, "/chat"},
-		{"Contact", func() string { return website.Contact() }, "/contact"},
-		{"Shop", func() string { return website.Shop() }, "/shop"},
-		{"SitemapXml", func() string { return website.SitemapXml() }, "/sitemap.xml"},
+	result := website.Home()
+	if result == "" {
+		t.Error("Home() should return non-empty string")
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn()
-			if result == "" {
-				t.Errorf("%s() should return non-empty string", tt.name)
-			}
-			if !strings.Contains(result, tt.contains) {
-				t.Errorf("%s() = %q, should contain %q", tt.name, result, tt.contains)
-			}
-		})
+	if !strings.Contains(result, "/") {
+		t.Errorf("Home() = %q, should contain /", result)
 	}
 }
 
-func TestWebsiteLinks_WithParams(t *testing.T) {
+func TestWebsiteLinks_Blog(t *testing.T) {
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
-
 	website := Website()
-
-	tests := []struct {
-		name string
-		fn   func() string
-	}{
-		{"Blog with params", func() string { return website.Blog(map[string]string{"page": "1"}) }},
-		{"Chat with params", func() string { return website.Chat(map[string]string{"room": "general"}) }},
-		{"Shop with params", func() string { return website.Shop(map[string]string{"category": "all"}) }},
+	result := website.Blog()
+	if result == "" {
+		t.Error("Blog() should return non-empty string")
 	}
+	if !strings.Contains(result, "/blog") {
+		t.Errorf("Blog() = %q, should contain /blog", result)
+	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn()
-			if result == "" {
-				t.Errorf("%s should return non-empty string", tt.name)
-			}
-		})
+func TestWebsiteLinks_Chat(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Chat()
+	if result == "" {
+		t.Error("Chat() should return non-empty string")
+	}
+	if !strings.Contains(result, "/chat") {
+		t.Errorf("Chat() = %q, should contain /chat", result)
+	}
+}
+
+func TestWebsiteLinks_Contact(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Contact()
+	if result == "" {
+		t.Error("Contact() should return non-empty string")
+	}
+	if !strings.Contains(result, "/contact") {
+		t.Errorf("Contact() = %q, should contain /contact", result)
+	}
+}
+
+func TestWebsiteLinks_Shop(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Shop()
+	if result == "" {
+		t.Error("Shop() should return non-empty string")
+	}
+	if !strings.Contains(result, "/shop") {
+		t.Errorf("Shop() = %q, should contain /shop", result)
+	}
+}
+
+func TestWebsiteLinks_SitemapXml(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.SitemapXml()
+	if result == "" {
+		t.Error("SitemapXml() should return non-empty string")
+	}
+	if !strings.Contains(result, "/sitemap.xml") {
+		t.Errorf("SitemapXml() = %q, should contain /sitemap.xml", result)
+	}
+}
+
+func TestWebsiteLinks_WithParams_Blog(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Blog(map[string]string{"page": "1"})
+	if result == "" {
+		t.Error("Blog with params should return non-empty string")
+	}
+}
+
+func TestWebsiteLinks_WithParams_Chat(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Chat(map[string]string{"room": "general"})
+	if result == "" {
+		t.Error("Chat with params should return non-empty string")
+	}
+}
+
+func TestWebsiteLinks_WithParams_Shop(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	website := Website()
+	result := website.Shop(map[string]string{"category": "all"})
+	if result == "" {
+		t.Error("Shop with params should return non-empty string")
 	}
 }
 
@@ -355,33 +517,55 @@ func TestWebsiteLinks_Thumbnail_WithDataURI(t *testing.T) {
 // User Links Tests
 // ============================================================================
 
-func TestUserLinks_Subscriptions(t *testing.T) {
+func TestUserLinks_Subscriptions_PlanSelect(t *testing.T) {
 	t.Setenv("APP_ENV", "testing")
 	t.Setenv("APP_URL", "")
-
 	user := User()
-
-	tests := []struct {
-		name     string
-		fn       func() string
-		contains string
-	}{
-		{"SubscriptionsPlanSelect", func() string { return user.SubscriptionsPlanSelect() }, "/subscription"},
-		{"SubscriptionsPlanSelectAjax", func() string { return user.SubscriptionsPlanSelectAjax() }, "/plan-select-ajax"},
-		{"SubscriptionsPaymentSuccess", func() string { return user.SubscriptionsPaymentSuccess() }, "/payment-success"},
-		{"SubscriptionsPaymentCanceled", func() string { return user.SubscriptionsPaymentCanceled() }, "/payment-canceled"},
+	result := user.SubscriptionsPlanSelect()
+	if result == "" {
+		t.Error("SubscriptionsPlanSelect() should return non-empty string")
 	}
+	if !strings.Contains(result, "/subscription") {
+		t.Errorf("SubscriptionsPlanSelect() = %q, should contain /subscription", result)
+	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := tt.fn()
-			if result == "" {
-				t.Errorf("%s() should return non-empty string", tt.name)
-			}
-			if !strings.Contains(result, tt.contains) {
-				t.Errorf("%s() = %q, should contain %q", tt.name, result, tt.contains)
-			}
-		})
+func TestUserLinks_Subscriptions_PlanSelectAjax(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	user := User()
+	result := user.SubscriptionsPlanSelectAjax()
+	if result == "" {
+		t.Error("SubscriptionsPlanSelectAjax() should return non-empty string")
+	}
+	if !strings.Contains(result, "/plan-select-ajax") {
+		t.Errorf("SubscriptionsPlanSelectAjax() = %q, should contain /plan-select-ajax", result)
+	}
+}
+
+func TestUserLinks_Subscriptions_PaymentSuccess(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	user := User()
+	result := user.SubscriptionsPaymentSuccess()
+	if result == "" {
+		t.Error("SubscriptionsPaymentSuccess() should return non-empty string")
+	}
+	if !strings.Contains(result, "/payment-success") {
+		t.Errorf("SubscriptionsPaymentSuccess() = %q, should contain /payment-success", result)
+	}
+}
+
+func TestUserLinks_Subscriptions_PaymentCanceled(t *testing.T) {
+	t.Setenv("APP_ENV", "testing")
+	t.Setenv("APP_URL", "")
+	user := User()
+	result := user.SubscriptionsPaymentCanceled()
+	if result == "" {
+		t.Error("SubscriptionsPaymentCanceled() should return non-empty string")
+	}
+	if !strings.Contains(result, "/payment-canceled") {
+		t.Errorf("SubscriptionsPaymentCanceled() = %q, should contain /payment-canceled", result)
 	}
 }
 

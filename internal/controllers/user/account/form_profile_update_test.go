@@ -365,7 +365,7 @@ func TestFormProfileUpdate_Handle_RequiresEmail(t *testing.T) {
 	}
 }
 
-func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
+func TestFormProfileUpdate_Handle_Validation_MissingUserId(t *testing.T) {
 	registry := testutils.Setup(
 		testutils.WithGeoStore(true),
 		testutils.WithUserStore(true, true),
@@ -391,99 +391,270 @@ func TestFormProfileUpdate_Handle_Validation(t *testing.T) {
 		t.Fatalf("Mount returned error: %v", err)
 	}
 
-	testCases := []struct {
-		name          string
-		formData      url.Values
-		expectedError string
-	}{
-		{
-			name: "missing user id",
-			formData: url.Values{
-				"email":      {"jane@example.com"},
-				"first_name": {"Jane"},
-				"last_name":  {"Smith"},
-				"country":    {"GB"},
-				"timezone":   {"Europe/London"},
-			},
-			expectedError: "User ID is required",
-		},
-		{
-			name: "missing first name",
-			formData: url.Values{
-				"user_id":    {user.GetID()},
-				"email":      {"jane@example.com"},
-				"first_name": {""},
-				"last_name":  {"Smith"},
-				"country":    {"GB"},
-				"timezone":   {"Europe/London"},
-			},
-			expectedError: "First name is required field",
-		},
-		{
-			name: "missing last name",
-			formData: url.Values{
-				"user_id":    {user.GetID()},
-				"email":      {"jane@example.com"},
-				"first_name": {"Jane"},
-				"last_name":  {""},
-				"country":    {"GB"},
-				"timezone":   {"Europe/London"},
-			},
-			expectedError: "Last name is required field",
-		},
-		{
-			name: "missing email",
-			formData: url.Values{
-				"user_id":    {user.GetID()},
-				"email":      {""},
-				"first_name": {"Jane"},
-				"last_name":  {"Smith"},
-				"country":    {"GB"},
-				"timezone":   {"Europe/London"},
-			},
-			expectedError: "Email is required field",
-		},
-		{
-			name: "missing country",
-			formData: url.Values{
-				"user_id":    {user.GetID()},
-				"email":      {"jane@example.com"},
-				"first_name": {"Jane"},
-				"last_name":  {"Smith"},
-				"country":    {""},
-				"timezone":   {"Europe/London"},
-			},
-			expectedError: "Country is required field",
-		},
-		{
-			name: "missing timezone",
-			formData: url.Values{
-				"user_id":    {user.GetID()},
-				"email":      {"jane@example.com"},
-				"first_name": {"Jane"},
-				"last_name":  {"Smith"},
-				"country":    {"GB"},
-				"timezone":   {""},
-			},
-			expectedError: "Timezone is required field",
-		},
+	formData := url.Values{
+		"email":      {"jane@example.com"},
+		"first_name": {"Jane"},
+		"last_name":  {"Smith"},
+		"country":    {"GB"},
+		"timezone":   {"Europe/London"},
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			err := form.Handle(context.Background(), "apply", tc.formData)
-			if err != nil {
-				t.Fatalf("Handle returned error: %v", err)
-			}
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
 
-			if form.FormError != tc.expectedError {
-				t.Fatalf("Expected error %q, got: %q", tc.expectedError, form.FormError)
-			}
+	if form.FormError != "User ID is required" {
+		t.Fatalf("Expected error %q, got: %q", "User ID is required", form.FormError)
+	}
 
-			if form.FormSuccess != "" {
-				t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
-			}
-		})
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
+	}
+}
+
+func TestFormProfileUpdate_Handle_Validation_MissingFirstName(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithGeoStore(true),
+		testutils.WithUserStore(true, true),
+		testutils.WithVaultStore(true, "test-key"),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("SeedUser returned error: %v", err)
+	}
+
+	if err := userTokenize(registry, user); err != nil {
+		t.Fatalf("TokenizeUser returned error: %v", err)
+	}
+
+	component := NewFormProfileUpdate(registry)
+	form := component.(*formProfileUpdate)
+
+	err = form.Mount(context.Background(), map[string]string{
+		"user_id": user.GetID(),
+	})
+	if err != nil {
+		t.Fatalf("Mount returned error: %v", err)
+	}
+
+	formData := url.Values{
+		"user_id":    {user.GetID()},
+		"email":      {"jane@example.com"},
+		"first_name": {""},
+		"last_name":  {"Smith"},
+		"country":    {"GB"},
+		"timezone":   {"Europe/London"},
+	}
+
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
+
+	if form.FormError != "First name is required field" {
+		t.Fatalf("Expected error %q, got: %q", "First name is required field", form.FormError)
+	}
+
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
+	}
+}
+
+func TestFormProfileUpdate_Handle_Validation_MissingLastName(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithGeoStore(true),
+		testutils.WithUserStore(true, true),
+		testutils.WithVaultStore(true, "test-key"),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("SeedUser returned error: %v", err)
+	}
+
+	if err := userTokenize(registry, user); err != nil {
+		t.Fatalf("TokenizeUser returned error: %v", err)
+	}
+
+	component := NewFormProfileUpdate(registry)
+	form := component.(*formProfileUpdate)
+
+	err = form.Mount(context.Background(), map[string]string{
+		"user_id": user.GetID(),
+	})
+	if err != nil {
+		t.Fatalf("Mount returned error: %v", err)
+	}
+
+	formData := url.Values{
+		"user_id":    {user.GetID()},
+		"email":      {"jane@example.com"},
+		"first_name": {"Jane"},
+		"last_name":  {""},
+		"country":    {"GB"},
+		"timezone":   {"Europe/London"},
+	}
+
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
+
+	if form.FormError != "Last name is required field" {
+		t.Fatalf("Expected error %q, got: %q", "Last name is required field", form.FormError)
+	}
+
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
+	}
+}
+
+func TestFormProfileUpdate_Handle_Validation_MissingEmail(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithGeoStore(true),
+		testutils.WithUserStore(true, true),
+		testutils.WithVaultStore(true, "test-key"),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("SeedUser returned error: %v", err)
+	}
+
+	if err := userTokenize(registry, user); err != nil {
+		t.Fatalf("TokenizeUser returned error: %v", err)
+	}
+
+	component := NewFormProfileUpdate(registry)
+	form := component.(*formProfileUpdate)
+
+	err = form.Mount(context.Background(), map[string]string{
+		"user_id": user.GetID(),
+	})
+	if err != nil {
+		t.Fatalf("Mount returned error: %v", err)
+	}
+
+	formData := url.Values{
+		"user_id":    {user.GetID()},
+		"email":      {""},
+		"first_name": {"Jane"},
+		"last_name":  {"Smith"},
+		"country":    {"GB"},
+		"timezone":   {"Europe/London"},
+	}
+
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
+
+	if form.FormError != "Email is required field" {
+		t.Fatalf("Expected error %q, got: %q", "Email is required field", form.FormError)
+	}
+
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
+	}
+}
+
+func TestFormProfileUpdate_Handle_Validation_MissingCountry(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithGeoStore(true),
+		testutils.WithUserStore(true, true),
+		testutils.WithVaultStore(true, "test-key"),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("SeedUser returned error: %v", err)
+	}
+
+	if err := userTokenize(registry, user); err != nil {
+		t.Fatalf("TokenizeUser returned error: %v", err)
+	}
+
+	component := NewFormProfileUpdate(registry)
+	form := component.(*formProfileUpdate)
+
+	err = form.Mount(context.Background(), map[string]string{
+		"user_id": user.GetID(),
+	})
+	if err != nil {
+		t.Fatalf("Mount returned error: %v", err)
+	}
+
+	formData := url.Values{
+		"user_id":    {user.GetID()},
+		"email":      {"jane@example.com"},
+		"first_name": {"Jane"},
+		"last_name":  {"Smith"},
+		"country":    {""},
+		"timezone":   {"Europe/London"},
+	}
+
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
+
+	if form.FormError != "Country is required field" {
+		t.Fatalf("Expected error %q, got: %q", "Country is required field", form.FormError)
+	}
+
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
+	}
+}
+
+func TestFormProfileUpdate_Handle_Validation_MissingTimezone(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithGeoStore(true),
+		testutils.WithUserStore(true, true),
+		testutils.WithVaultStore(true, "test-key"),
+	)
+
+	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("SeedUser returned error: %v", err)
+	}
+
+	if err := userTokenize(registry, user); err != nil {
+		t.Fatalf("TokenizeUser returned error: %v", err)
+	}
+
+	component := NewFormProfileUpdate(registry)
+	form := component.(*formProfileUpdate)
+
+	err = form.Mount(context.Background(), map[string]string{
+		"user_id": user.GetID(),
+	})
+	if err != nil {
+		t.Fatalf("Mount returned error: %v", err)
+	}
+
+	formData := url.Values{
+		"user_id":    {user.GetID()},
+		"email":      {"jane@example.com"},
+		"first_name": {"Jane"},
+		"last_name":  {"Smith"},
+		"country":    {"GB"},
+		"timezone":   {""},
+	}
+
+	err = form.Handle(context.Background(), "apply", formData)
+	if err != nil {
+		t.Fatalf("Handle returned error: %v", err)
+	}
+
+	if form.FormError != "Timezone is required field" {
+		t.Fatalf("Expected error %q, got: %q", "Timezone is required field", form.FormError)
+	}
+
+	if form.FormSuccess != "" {
+		t.Fatalf("Expected no success message, got: %s", form.FormSuccess)
 	}
 }
 

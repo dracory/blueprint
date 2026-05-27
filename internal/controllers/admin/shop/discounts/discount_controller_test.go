@@ -245,8 +245,8 @@ func TestDiscountControllerFuncUpdateNoShopStore(t *testing.T) {
 	}
 }
 
-// TestDiscountControllerFuncUpdateValidation verifies validation errors
-func TestDiscountControllerFuncUpdateValidation(t *testing.T) {
+// TestDiscountControllerFuncUpdateValidation_MissingTitle verifies missing title error
+func TestDiscountControllerFuncUpdateValidation_MissingTitle(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup(testutils.WithShopStore(true))
 	if app == nil {
@@ -266,74 +266,194 @@ func TestDiscountControllerFuncUpdateValidation(t *testing.T) {
 		t.Fatalf("FuncCreate() failed: %v", err)
 	}
 
-	tests := []struct {
-		name    string
-		data    map[string]string
-		wantErr string
-	}{
-		{
-			name:    "missing title",
-			data:    map[string]string{},
-			wantErr: "title is required",
-		},
-		{
-			name: "missing status",
-			data: map[string]string{
-				"title": "Test",
-			},
-			wantErr: "status is required",
-		},
-		{
-			name: "missing code",
-			data: map[string]string{
-				"title":  "Test",
-				"status": shopstore.DISCOUNT_STATUS_DRAFT,
-			},
-			wantErr: "code is required",
-		},
-		{
-			name: "missing type",
-			data: map[string]string{
-				"title":  "Test",
-				"status": shopstore.DISCOUNT_STATUS_DRAFT,
-				"code":   "TEST",
-			},
-			wantErr: "discount type is required",
-		},
-		{
-			name: "missing starts_at",
-			data: map[string]string{
-				"title":  "Test",
-				"status": shopstore.DISCOUNT_STATUS_DRAFT,
-				"code":   "TEST",
-				"type":   shopstore.DISCOUNT_TYPE_PERCENT,
-			},
-			wantErr: "starts_at is required",
-		},
-		{
-			name: "missing ends_at",
-			data: map[string]string{
-				"title":     "Test",
-				"status":    shopstore.DISCOUNT_STATUS_DRAFT,
-				"code":      "TEST",
-				"type":      shopstore.DISCOUNT_TYPE_PERCENT,
-				"starts_at": "2026-01-01 00:00:00",
-			},
-			wantErr: "ends_at is required",
-		},
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing title")
+	}
+	if err.Error() != "title is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want title is required", err)
+	}
+}
+
+// TestDiscountControllerFuncUpdateValidation_MissingStatus verifies missing status error
+func TestDiscountControllerFuncUpdateValidation_MissingStatus(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup(testutils.WithShopStore(true))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewDiscountController(app)
+
+	// First create a discount to update
+	r := httptest.NewRequest("POST", "/", nil)
+	createData := map[string]string{
+		"title": "Test Discount",
+	}
+	discountID, err := controller.FuncCreate(r, createData)
+	if err != nil {
+		t.Fatalf("FuncCreate() failed: %v", err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := httptest.NewRequest("PUT", "/", nil)
-			err := controller.FuncUpdate(r, discountID, tt.data)
-			if err == nil {
-				t.Errorf("FuncUpdate() should return error for %s", tt.name)
-			}
-			if err.Error() != tt.wantErr {
-				t.Errorf("FuncUpdate() returned unexpected error for %s: got %v, want %s", tt.name, err, tt.wantErr)
-			}
-		})
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{
+		"title": "Test",
+	}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing status")
+	}
+	if err.Error() != "status is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want status is required", err)
+	}
+}
+
+// TestDiscountControllerFuncUpdateValidation_MissingCode verifies missing code error
+func TestDiscountControllerFuncUpdateValidation_MissingCode(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup(testutils.WithShopStore(true))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewDiscountController(app)
+
+	// First create a discount to update
+	r := httptest.NewRequest("POST", "/", nil)
+	createData := map[string]string{
+		"title": "Test Discount",
+	}
+	discountID, err := controller.FuncCreate(r, createData)
+	if err != nil {
+		t.Fatalf("FuncCreate() failed: %v", err)
+	}
+
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{
+		"title":  "Test",
+		"status": shopstore.DISCOUNT_STATUS_DRAFT,
+	}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing code")
+	}
+	if err.Error() != "code is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want code is required", err)
+	}
+}
+
+// TestDiscountControllerFuncUpdateValidation_MissingType verifies missing type error
+func TestDiscountControllerFuncUpdateValidation_MissingType(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup(testutils.WithShopStore(true))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewDiscountController(app)
+
+	// First create a discount to update
+	r := httptest.NewRequest("POST", "/", nil)
+	createData := map[string]string{
+		"title": "Test Discount",
+	}
+	discountID, err := controller.FuncCreate(r, createData)
+	if err != nil {
+		t.Fatalf("FuncCreate() failed: %v", err)
+	}
+
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{
+		"title":  "Test",
+		"status": shopstore.DISCOUNT_STATUS_DRAFT,
+		"code":   "TEST",
+	}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing type")
+	}
+	if err.Error() != "discount type is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want discount type is required", err)
+	}
+}
+
+// TestDiscountControllerFuncUpdateValidation_MissingStartsAt verifies missing starts_at error
+func TestDiscountControllerFuncUpdateValidation_MissingStartsAt(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup(testutils.WithShopStore(true))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewDiscountController(app)
+
+	// First create a discount to update
+	r := httptest.NewRequest("POST", "/", nil)
+	createData := map[string]string{
+		"title": "Test Discount",
+	}
+	discountID, err := controller.FuncCreate(r, createData)
+	if err != nil {
+		t.Fatalf("FuncCreate() failed: %v", err)
+	}
+
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{
+		"title":  "Test",
+		"status": shopstore.DISCOUNT_STATUS_DRAFT,
+		"code":   "TEST",
+		"type":   shopstore.DISCOUNT_TYPE_PERCENT,
+	}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing starts_at")
+	}
+	if err.Error() != "starts_at is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want starts_at is required", err)
+	}
+}
+
+// TestDiscountControllerFuncUpdateValidation_MissingEndsAt verifies missing ends_at error
+func TestDiscountControllerFuncUpdateValidation_MissingEndsAt(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup(testutils.WithShopStore(true))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+	t.Cleanup(func() { _ = app.GetDatabase().Close() })
+
+	controller := NewDiscountController(app)
+
+	// First create a discount to update
+	r := httptest.NewRequest("POST", "/", nil)
+	createData := map[string]string{
+		"title": "Test Discount",
+	}
+	discountID, err := controller.FuncCreate(r, createData)
+	if err != nil {
+		t.Fatalf("FuncCreate() failed: %v", err)
+	}
+
+	r = httptest.NewRequest("PUT", "/", nil)
+	data := map[string]string{
+		"title":     "Test",
+		"status":    shopstore.DISCOUNT_STATUS_DRAFT,
+		"code":      "TEST",
+		"type":      shopstore.DISCOUNT_TYPE_PERCENT,
+		"starts_at": "2026-01-01 00:00:00",
+	}
+	err = controller.FuncUpdate(r, discountID, data)
+	if err == nil {
+		t.Error("FuncUpdate() should return error for missing ends_at")
+	}
+	if err.Error() != "ends_at is required" {
+		t.Errorf("FuncUpdate() returned unexpected error: got %v, want ends_at is required", err)
 	}
 }
 
