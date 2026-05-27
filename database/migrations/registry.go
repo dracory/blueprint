@@ -3,6 +3,7 @@ package migrations
 import (
 	"fmt"
 	"project/internal/config"
+	"project/internal/registry"
 	"regexp"
 	"strings"
 
@@ -48,70 +49,70 @@ func validateMigrationID(id string) error {
 // getStoreMigrations returns store migrations conditionally based on config.
 // These are run directly (not inside a transaction) because store packages
 // manage their own database connections internally.
-func getStoreMigrations(cfg config.ConfigInterface, registry RegistryInterface) []migrate.MigrationInterface {
+func getStoreMigrations(cfg config.ConfigInterface, reg registry.RegistryInterface) []migrate.MigrationInterface {
 	migrations := []migrate.MigrationInterface{}
 
 	if cfg.GetAuditStoreUsed() {
-		migrations = append(migrations, &StoreAuditMigrate{registry: registry})
+		migrations = append(migrations, &StoreAuditMigrate{registry: reg})
 	}
 	if cfg.GetBlogStoreUsed() {
-		migrations = append(migrations, &StoreBlogMigrate{registry: registry})
+		migrations = append(migrations, &StoreBlogMigrate{registry: reg})
 	}
 	if cfg.GetUserStoreUsed() && cfg.GetVaultStoreUsed() {
-		migrations = append(migrations, &StoreBlindIndexEmailMigrate{registry: registry})
-		migrations = append(migrations, &StoreBlindIndexFirstNameMigrate{registry: registry})
-		migrations = append(migrations, &StoreBlindIndexLastNameMigrate{registry: registry})
+		migrations = append(migrations, &StoreBlindIndexEmailMigrate{registry: reg})
+		migrations = append(migrations, &StoreBlindIndexFirstNameMigrate{registry: reg})
+		migrations = append(migrations, &StoreBlindIndexLastNameMigrate{registry: reg})
 	}
 	if cfg.GetCacheStoreUsed() {
-		migrations = append(migrations, &StoreCacheMigrate{registry: registry})
+		migrations = append(migrations, &StoreCacheMigrate{registry: reg})
 	}
 	if cfg.GetChatStoreUsed() {
-		migrations = append(migrations, &StoreChatMigrate{registry: registry})
+		migrations = append(migrations, &StoreChatMigrate{registry: reg})
 	}
 	if cfg.GetCmsStoreUsed() {
-		migrations = append(migrations, &StoreCmsMigrate{registry: registry})
+		migrations = append(migrations, &StoreCmsMigrate{registry: reg})
 	}
 	if cfg.GetCustomStoreUsed() {
-		migrations = append(migrations, &StoreCustomMigrate{registry: registry})
+		migrations = append(migrations, &StoreCustomMigrate{registry: reg})
 	}
 	if cfg.GetEntityStoreUsed() {
-		migrations = append(migrations, &StoreEntityMigrate{registry: registry})
+		migrations = append(migrations, &StoreEntityMigrate{registry: reg})
 	}
 	if cfg.GetFeedStoreUsed() {
-		migrations = append(migrations, &StoreFeedMigrate{registry: registry})
+		migrations = append(migrations, &StoreFeedMigrate{registry: reg})
 	}
 	if cfg.GetGeoStoreUsed() {
-		migrations = append(migrations, &StoreGeoMigrate{registry: registry})
+		migrations = append(migrations, &StoreGeoMigrate{registry: reg})
 	}
 	if cfg.GetLogStoreUsed() {
-		migrations = append(migrations, &StoreLogMigrate{registry: registry})
+		migrations = append(migrations, &StoreLogMigrate{registry: reg})
 	}
 	if cfg.GetMetaStoreUsed() {
-		migrations = append(migrations, &StoreMetaMigrate{registry: registry})
+		migrations = append(migrations, &StoreMetaMigrate{registry: reg})
 	}
 	if cfg.GetSessionStoreUsed() {
-		migrations = append(migrations, &StoreSessionMigrate{registry: registry})
+		migrations = append(migrations, &StoreSessionMigrate{registry: reg})
 	}
 	if cfg.GetSettingStoreUsed() {
-		migrations = append(migrations, &StoreSettingMigrate{registry: registry})
+		migrations = append(migrations, &StoreSettingMigrate{registry: reg})
 	}
 	if cfg.GetShopStoreUsed() {
-		migrations = append(migrations, &StoreShopMigrate{registry: registry})
+		migrations = append(migrations, &StoreShopMigrate{registry: reg})
 	}
 	if cfg.GetStatsStoreUsed() {
-		migrations = append(migrations, &StoreStatsMigrate{registry: registry})
+		migrations = append(migrations, &StoreStatsMigrate{registry: reg})
 	}
 	if cfg.GetSubscriptionStoreUsed() {
-		migrations = append(migrations, &StoreSubscriptionMigrate{registry: registry})
+		migrations = append(migrations, &StoreSubscriptionMigrate{registry: reg})
 	}
 	if cfg.GetTaskStoreUsed() {
-		migrations = append(migrations, &StoreTaskMigrate{registry: registry})
+		migrations = append(migrations, &StoreTaskMigrate{registry: reg})
 	}
 	if cfg.GetUserStoreUsed() {
-		migrations = append(migrations, &StoreUserMigrate{registry: registry})
+		migrations = append(migrations, &StoreUserMigrate{registry: reg})
 	}
 	if cfg.GetVaultStoreUsed() {
-		migrations = append(migrations, &StoreVaultMigrate{registry: registry})
+		migrations = append(migrations, &StoreVaultMigrate{registry: reg})
 	}
 
 	return migrations

@@ -2,72 +2,17 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
+	"project/internal/registry"
 
-	"project/internal/config"
-
-	"github.com/dracory/auditstore"
-	"github.com/dracory/blindindexstore"
-	"github.com/dracory/blogstore"
-	"github.com/dracory/cachestore"
-	"github.com/dracory/chatstore"
-	"github.com/dracory/cmsstore"
-	"github.com/dracory/customstore"
-	"github.com/dracory/entitystore"
-	"github.com/dracory/feedstore"
-	"github.com/dracory/filesystem"
-	"github.com/dracory/geostore"
-	"github.com/dracory/logstore"
-	"github.com/dracory/metastore"
 	"github.com/dracory/migrate"
-	"github.com/dracory/sessionstore"
-	"github.com/dracory/settingstore"
-	"github.com/dracory/shopstore"
-	"github.com/dracory/statsstore"
-	"github.com/dracory/subscriptionstore"
-	"github.com/dracory/taskstore"
-	"github.com/dracory/userstore"
-	"github.com/dracory/vaultstore"
 )
-
-// RegistryInterface is the narrow subset of the application registry needed
-// to run migrations. The application's full registry satisfies this interface.
-type RegistryInterface interface {
-	GetConfig() config.ConfigInterface
-	GetDatabase() *sql.DB
-
-	// Stores
-	GetAuditStore() auditstore.StoreInterface
-	GetBlogStore() blogstore.StoreInterface
-	GetBlindIndexStoreEmail() blindindexstore.StoreInterface
-	GetBlindIndexStoreFirstName() blindindexstore.StoreInterface
-	GetBlindIndexStoreLastName() blindindexstore.StoreInterface
-	GetCacheStore() cachestore.StoreInterface
-	GetChatStore() chatstore.StoreInterface
-	GetCmsStore() cmsstore.StoreInterface
-	GetCustomStore() customstore.StoreInterface
-	GetEntityStore() entitystore.StoreInterface
-	GetFeedStore() feedstore.StoreInterface
-	GetGeoStore() geostore.StoreInterface
-	GetLogStore() logstore.StoreInterface
-	GetMetaStore() metastore.StoreInterface
-	GetSessionStore() sessionstore.StoreInterface
-	GetSettingStore() settingstore.StoreInterface
-	GetShopStore() shopstore.StoreInterface
-	GetSqlFileStorage() filesystem.StorageInterface
-	GetStatsStore() statsstore.StoreInterface
-	GetSubscriptionStore() subscriptionstore.StoreInterface
-	GetTaskStore() taskstore.StoreInterface
-	GetUserStore() userstore.StoreInterface
-	GetVaultStore() vaultstore.StoreInterface
-}
 
 // MigrateAll runs all migrations in two phases:
 // 1. Store migrations (MigrateUp/AutoMigrate) — run directly, not inside a transaction.
 // 2. Custom SQL migrations — run via the migrate framework with transaction support.
-func MigrateAll(registry RegistryInterface) error {
+func MigrateAll(registry registry.RegistryInterface) error {
 	if registry == nil {
 		return errors.New("registry is nil")
 	}
@@ -88,7 +33,7 @@ func MigrateAll(registry RegistryInterface) error {
 // migrateStores runs MigrateUp/AutoMigrate for each enabled store.
 // These are not wrapped in transactions because the store packages
 // manage their own database connections internally.
-func migrateStores(registry RegistryInterface) error {
+func migrateStores(registry registry.RegistryInterface) error {
 	cfg := registry.GetConfig()
 
 	storeMigrations := getStoreMigrations(cfg, registry)
@@ -104,7 +49,7 @@ func migrateStores(registry RegistryInterface) error {
 }
 
 // migrateSQL runs date-prefixed SQL migrations using the migrate framework.
-func migrateSQL(registry RegistryInterface) error {
+func migrateSQL(registry registry.RegistryInterface) error {
 	db := registry.GetDatabase()
 	if db == nil {
 		return errors.New("database is nil")

@@ -6,6 +6,8 @@ import (
 	"errors"
 	"time"
 
+	"project/internal/registry"
+
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
 )
@@ -13,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreShopMigrate)(nil)
 
 type StoreShopMigrate struct {
-	registry RegistryInterface
+	registry registry.RegistryInterface
 }
 
 func (m *StoreShopMigrate) ID() string {
