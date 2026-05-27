@@ -55,44 +55,29 @@ func TestBlogPostWidget_Description(t *testing.T) {
 }
 
 // TestBlogPostWidget_processContent tests the processContent method
-func TestBlogPostWidget_processContent(t *testing.T) {
+func TestBlogPostWidget_processContent_BlockArea(t *testing.T) {
 	widget := NewBlogPostWidget(nil)
-
-	tests := []struct {
-		name     string
-		content  string
-		editor   string
-		expected string
-	}{
-		{
-			name:     "BlockArea editor",
-			content:  "test content",
-			editor:   "BlockArea",
-			expected: "test content", // Will be processed by BlogPostBlocksToString
-		},
-		{
-			name:     "Other editor",
-			content:  "raw content",
-			editor:   "other",
-			expected: "raw content",
-		},
-		{
-			name:     "Empty editor",
-			content:  "content",
-			editor:   "",
-			expected: "content",
-		},
+	result := widget.processContent("test content", "BlockArea")
+	// For BlockArea, the content is passed through BlogPostBlocksToString
+	// which may modify it, so we just check it's not empty when input is not empty
+	if result == "" {
+		t.Error("processContent() should not return empty for non-empty input")
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := widget.processContent(tt.content, tt.editor)
-			// For BlockArea, the content is passed through BlogPostBlocksToString
-			// which may modify it, so we just check it's not empty when input is not empty
-			if tt.content != "" && result == "" {
-				t.Error("processContent() should not return empty for non-empty input")
-			}
-		})
+func TestBlogPostWidget_processContent_OtherEditor(t *testing.T) {
+	widget := NewBlogPostWidget(nil)
+	result := widget.processContent("raw content", "other")
+	if result == "" {
+		t.Error("processContent() should not return empty for non-empty input")
+	}
+}
+
+func TestBlogPostWidget_processContent_EmptyEditor(t *testing.T) {
+	widget := NewBlogPostWidget(nil)
+	result := widget.processContent("content", "")
+	if result == "" {
+		t.Error("processContent() should not return empty for non-empty input")
 	}
 }
 

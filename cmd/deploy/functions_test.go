@@ -7,190 +7,356 @@ import (
 	"testing"
 )
 
-func TestValidateCommand(t *testing.T) {
-	tests := []struct {
-		name        string
-		cmd         string
-		expectError bool
-		errorMsg    string
-	}{
-		{
-			name:        "Allowed command - ls",
-			cmd:         "ls",
-			expectError: false,
-		},
-		{
-			name:        "Allowed command with arguments - ls -la",
-			cmd:         "ls -la",
-			expectError: false,
-		},
-		{
-			name:        "Allowed command - pwd",
-			cmd:         "pwd",
-			expectError: false,
-		},
-		{
-			name:        "Allowed command - cat",
-			cmd:         "cat file.txt",
-			expectError: false,
-		},
-		{
-			name:        "Disallowed command - rm",
-			cmd:         "rm file.txt",
-			expectError: true,
-			errorMsg:    "command not allowed: rm",
-		},
-		{
-			name:        "Disallowed command - sudo",
-			cmd:         "sudo ls",
-			expectError: true,
-			errorMsg:    "command not allowed: sudo",
-		},
-		{
-			name:        "Empty command",
-			cmd:         "",
-			expectError: true,
-			errorMsg:    "empty command not allowed",
-		},
-		{
-			name:        "Command with semicolon injection",
-			cmd:         "ls; rm -rf /",
-			expectError: true,
-			errorMsg:    "command not allowed: rm",
-		},
-		{
-			name:        "Allowed chained commands",
-			cmd:         "cd /path; ls",
-			expectError: false,
-		},
-		{
-			name:        "Command with ampersand injection",
-			cmd:         "ls & rm -rf /",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: &",
-		},
-		{
-			name:        "Command with pipe injection",
-			cmd:         "ls | rm -rf /",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: |",
-		},
-		{
-			name:        "Command with backtick injection",
-			cmd:         "ls `rm -rf /`",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: `",
-		},
-		{
-			name:        "Command with dollar sign injection",
-			cmd:         "ls $HOME",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: $",
-		},
-		{
-			name:        "Command with parentheses injection",
-			cmd:         "ls $(rm -rf /)",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: $",
-		},
-		{
-			name:        "Command with redirection injection",
-			cmd:         "ls > /etc/passwd",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: >",
-		},
-		{
-			name:        "Command with single quote injection",
-			cmd:         "ls 'rm -rf /'",
-			expectError: true,
-			errorMsg:    "dangerous character detected in command: '",
-		},
+func TestValidateCommand_AllowedLS(t *testing.T) {
+	err := validateCommand("ls")
+	if err != nil {
+		t.Errorf("Expected no error but got: %v", err)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateCommand(tt.cmd)
+func TestValidateCommand_AllowedLSWithArgs(t *testing.T) {
+	err := validateCommand("ls -la")
+	if err != nil {
+		t.Errorf("Expected no error but got: %v", err)
+	}
+}
 
-			if tt.expectError {
-				if err == nil {
-					t.Errorf("Expected error but got none")
-				} else if tt.errorMsg != "" && err.Error() != tt.errorMsg {
-					t.Errorf("Expected error message '%s' but got '%s'", tt.errorMsg, err.Error())
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Expected no error but got: %v", err)
-				}
-			}
-		})
+func TestValidateCommand_AllowedPWD(t *testing.T) {
+	err := validateCommand("pwd")
+	if err != nil {
+		t.Errorf("Expected no error but got: %v", err)
+	}
+}
+
+func TestValidateCommand_AllowedCat(t *testing.T) {
+	err := validateCommand("cat file.txt")
+	if err != nil {
+		t.Errorf("Expected no error but got: %v", err)
+	}
+}
+
+func TestValidateCommand_DisallowedRM(t *testing.T) {
+	err := validateCommand("rm file.txt")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "command not allowed: rm" {
+		t.Errorf("Expected error message 'command not allowed: rm' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_DisallowedSudo(t *testing.T) {
+	err := validateCommand("sudo ls")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "command not allowed: sudo" {
+		t.Errorf("Expected error message 'command not allowed: sudo' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_Empty(t *testing.T) {
+	err := validateCommand("")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "empty command not allowed" {
+		t.Errorf("Expected error message 'empty command not allowed' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_SemicolonInjection(t *testing.T) {
+	err := validateCommand("ls; rm -rf /")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "command not allowed: rm" {
+		t.Errorf("Expected error message 'command not allowed: rm' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_AllowedChained(t *testing.T) {
+	err := validateCommand("cd /path; ls")
+	if err != nil {
+		t.Errorf("Expected no error but got: %v", err)
+	}
+}
+
+func TestValidateCommand_AmpersandInjection(t *testing.T) {
+	err := validateCommand("ls & rm -rf /")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: &" {
+		t.Errorf("Expected error message 'dangerous character detected in command: &' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_PipeInjection(t *testing.T) {
+	err := validateCommand("ls | rm -rf /")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: |" {
+		t.Errorf("Expected error message 'dangerous character detected in command: |' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_BacktickInjection(t *testing.T) {
+	err := validateCommand("ls `rm -rf /`")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: `" {
+		t.Errorf("Expected error message 'dangerous character detected in command: `' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_DollarSignInjection(t *testing.T) {
+	err := validateCommand("ls $HOME")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: $" {
+		t.Errorf("Expected error message 'dangerous character detected in command: $' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_ParenthesesInjection(t *testing.T) {
+	err := validateCommand("ls $(rm -rf /)")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: $" {
+		t.Errorf("Expected error message 'dangerous character detected in command: $' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_RedirectionInjection(t *testing.T) {
+	err := validateCommand("ls > /etc/passwd")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: >" {
+		t.Errorf("Expected error message 'dangerous character detected in command: >' but got '%s'", err.Error())
+	}
+}
+
+func TestValidateCommand_SingleQuoteInjection(t *testing.T) {
+	err := validateCommand("ls 'rm -rf /'")
+	if err == nil {
+		t.Error("Expected error but got none")
+	} else if err.Error() != "dangerous character detected in command: '" {
+		t.Errorf("Expected error message 'dangerous character detected in command: '' but got '%s'", err.Error())
 	}
 }
 
 // TestValidateCommandAllAllowedCommands tests all allowed commands
-func TestValidateCommandAllAllowedCommands(t *testing.T) {
-	allowedCommands := []string{"ls", "pwd", "cat", "cd", "chmod", "grep", "find", "ps", "df", "du", "whoami", "id", "date", "uptime", "top", "free", "uname", "touch", "mv", "pm2"}
+func TestValidateCommandAllAllowedCommands_LS(t *testing.T) {
+	err := validateCommand("ls")
+	if err != nil {
+		t.Errorf("Command 'ls' should be allowed but got error: %v", err)
+	}
+}
 
-	for _, cmd := range allowedCommands {
-		t.Run(cmd, func(t *testing.T) {
-			err := validateCommand(cmd)
-			if err != nil {
-				t.Errorf("Command '%s' should be allowed but got error: %v", cmd, err)
-			}
-		})
+func TestValidateCommandAllAllowedCommands_PWD(t *testing.T) {
+	err := validateCommand("pwd")
+	if err != nil {
+		t.Errorf("Command 'pwd' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Cat(t *testing.T) {
+	err := validateCommand("cat")
+	if err != nil {
+		t.Errorf("Command 'cat' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_CD(t *testing.T) {
+	err := validateCommand("cd")
+	if err != nil {
+		t.Errorf("Command 'cd' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Chmod(t *testing.T) {
+	err := validateCommand("chmod")
+	if err != nil {
+		t.Errorf("Command 'chmod' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Grep(t *testing.T) {
+	err := validateCommand("grep")
+	if err != nil {
+		t.Errorf("Command 'grep' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Find(t *testing.T) {
+	err := validateCommand("find")
+	if err != nil {
+		t.Errorf("Command 'find' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_PS(t *testing.T) {
+	err := validateCommand("ps")
+	if err != nil {
+		t.Errorf("Command 'ps' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_DF(t *testing.T) {
+	err := validateCommand("df")
+	if err != nil {
+		t.Errorf("Command 'df' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_DU(t *testing.T) {
+	err := validateCommand("du")
+	if err != nil {
+		t.Errorf("Command 'du' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Whoami(t *testing.T) {
+	err := validateCommand("whoami")
+	if err != nil {
+		t.Errorf("Command 'whoami' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_ID(t *testing.T) {
+	err := validateCommand("id")
+	if err != nil {
+		t.Errorf("Command 'id' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Date(t *testing.T) {
+	err := validateCommand("date")
+	if err != nil {
+		t.Errorf("Command 'date' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Uptime(t *testing.T) {
+	err := validateCommand("uptime")
+	if err != nil {
+		t.Errorf("Command 'uptime' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Top(t *testing.T) {
+	err := validateCommand("top")
+	if err != nil {
+		t.Errorf("Command 'top' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Free(t *testing.T) {
+	err := validateCommand("free")
+	if err != nil {
+		t.Errorf("Command 'free' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Uname(t *testing.T) {
+	err := validateCommand("uname")
+	if err != nil {
+		t.Errorf("Command 'uname' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_Touch(t *testing.T) {
+	err := validateCommand("touch")
+	if err != nil {
+		t.Errorf("Command 'touch' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_MV(t *testing.T) {
+	err := validateCommand("mv")
+	if err != nil {
+		t.Errorf("Command 'mv' should be allowed but got error: %v", err)
+	}
+}
+
+func TestValidateCommandAllAllowedCommands_PM2(t *testing.T) {
+	err := validateCommand("pm2")
+	if err != nil {
+		t.Errorf("Command 'pm2' should be allowed but got error: %v", err)
 	}
 }
 
 // TestValidateCommandWithMultipleArguments tests commands with multiple arguments
-func TestValidateCommandWithMultipleArguments(t *testing.T) {
-	tests := []struct {
-		name        string
-		cmd         string
-		expectError bool
-	}{
-		{"grep with multiple args", "grep -r pattern /path/to/search", false},
-		{"find with multiple args", "find /path -name pattern -type f", false},
-		{"ls with multiple flags", "ls -la -h /path", false},
-		{"cat with multiple files", "cat file1.txt file2.txt", false},
+func TestValidateCommandWithMultipleArguments_Grep(t *testing.T) {
+	err := validateCommand("grep -r pattern /path/to/search")
+	if err != nil {
+		t.Errorf("Unexpected error for command 'grep -r pattern /path/to/search': %v", err)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateCommand(tt.cmd)
-			if tt.expectError && err == nil {
-				t.Errorf("Expected error for command: %s", tt.cmd)
-			}
-			if !tt.expectError && err != nil {
-				t.Errorf("Unexpected error for command '%s': %v", tt.cmd, err)
-			}
-		})
+func TestValidateCommandWithMultipleArguments_Find(t *testing.T) {
+	err := validateCommand("find /path -name pattern -type f")
+	if err != nil {
+		t.Errorf("Unexpected error for command 'find /path -name pattern -type f': %v", err)
+	}
+}
+
+func TestValidateCommandWithMultipleArguments_LS(t *testing.T) {
+	err := validateCommand("ls -la -h /path")
+	if err != nil {
+		t.Errorf("Unexpected error for command 'ls -la -h /path': %v", err)
+	}
+}
+
+func TestValidateCommandWithMultipleArguments_Cat(t *testing.T) {
+	err := validateCommand("cat file1.txt file2.txt")
+	if err != nil {
+		t.Errorf("Unexpected error for command 'cat file1.txt file2.txt': %v", err)
 	}
 }
 
 // TestPrivateKeyPath tests the private key path generation
-func TestPrivateKeyPath(t *testing.T) {
+func TestPrivateKeyPath_IDRSA(t *testing.T) {
 	currentUser, err := user.Current()
 	if err != nil {
 		t.Fatalf("Failed to get current user: %v", err)
 	}
-
-	tests := []struct {
-		name     string
-		sshKey   string
-		expected string
-	}{
-		{"id_rsa", "id_rsa", filepath.Join(currentUser.HomeDir, ".ssh", "id_rsa")},
-		{"id_ed25519", "id_ed25519", filepath.Join(currentUser.HomeDir, ".ssh", "id_ed25519")},
-		{"custom_key", "custom_key", filepath.Join(currentUser.HomeDir, ".ssh", "custom_key")},
-		{"key_with_path", "keys/deploy_key", filepath.Join(currentUser.HomeDir, ".ssh", "keys", "deploy_key")},
+	result := PrivateKeyPath("id_rsa")
+	expected := filepath.Join(currentUser.HomeDir, ".ssh", "id_rsa")
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := PrivateKeyPath(tt.sshKey)
-			if result != tt.expected {
-				t.Errorf("Expected '%s', got '%s'", tt.expected, result)
-			}
-		})
+func TestPrivateKeyPath_IDEd25519(t *testing.T) {
+	currentUser, err := user.Current()
+	if err != nil {
+		t.Fatalf("Failed to get current user: %v", err)
+	}
+	result := PrivateKeyPath("id_ed25519")
+	expected := filepath.Join(currentUser.HomeDir, ".ssh", "id_ed25519")
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
+	}
+}
+
+func TestPrivateKeyPath_CustomKey(t *testing.T) {
+	currentUser, err := user.Current()
+	if err != nil {
+		t.Fatalf("Failed to get current user: %v", err)
+	}
+	result := PrivateKeyPath("custom_key")
+	expected := filepath.Join(currentUser.HomeDir, ".ssh", "custom_key")
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
+	}
+}
+
+func TestPrivateKeyPath_WithPath(t *testing.T) {
+	currentUser, err := user.Current()
+	if err != nil {
+		t.Fatalf("Failed to get current user: %v", err)
+	}
+	result := PrivateKeyPath("keys/deploy_key")
+	expected := filepath.Join(currentUser.HomeDir, ".ssh", "keys", "deploy_key")
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
 	}
 }
 
@@ -400,50 +566,160 @@ func TestGetDeployCommandsContainsConfigValues(t *testing.T) {
 }
 
 // TestValidateCommandWithDangerousCharacters tests all dangerous characters are blocked
-func TestValidateCommandWithDangerousCharacters(t *testing.T) {
-	dangerousChars := []string{"&", "|", "`", "$", "(", ")", "<", ">", "'"}
+func TestValidateCommandWithDangerousCharacters_Ampersand(t *testing.T) {
+	cmd := "ls & rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '&' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
 
-	for _, char := range dangerousChars {
-		t.Run("dangerous_char_"+char, func(t *testing.T) {
-			cmd := "ls " + char + " rm -rf /"
-			err := validateCommand(cmd)
-			if err == nil {
-				t.Errorf("Command with '%s' should be rejected", char)
-			}
-			if !strings.Contains(err.Error(), "dangerous character") {
-				t.Errorf("Error should mention dangerous character, got: %v", err)
-			}
-		})
+func TestValidateCommandWithDangerousCharacters_Pipe(t *testing.T) {
+	cmd := "ls | rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '|' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_Backtick(t *testing.T) {
+	cmd := "ls `rm -rf /`"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '`' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_Dollar(t *testing.T) {
+	cmd := "ls $ rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '$' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_LeftParen(t *testing.T) {
+	cmd := "ls ( rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '(' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_RightParen(t *testing.T) {
+	cmd := "ls ) rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with ')' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_LessThan(t *testing.T) {
+	cmd := "ls < rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '<' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_GreaterThan(t *testing.T) {
+	cmd := "ls > rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with '>' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
+	}
+}
+
+func TestValidateCommandWithDangerousCharacters_SingleQuote(t *testing.T) {
+	cmd := "ls ' rm -rf /"
+	err := validateCommand(cmd)
+	if err == nil {
+		t.Error("Command with ''' should be rejected")
+	}
+	if !strings.Contains(err.Error(), "dangerous character") {
+		t.Errorf("Error should mention dangerous character, got: %v", err)
 	}
 }
 
 // TestValidateCommandEdgeCases tests edge cases in command validation
-func TestValidateCommandEdgeCases(t *testing.T) {
-	tests := []struct {
-		name        string
-		cmd         string
-		expectError bool
-	}{
-		{"Command with only spaces", "   ", true},
-		{"Command with tabs", "ls\t-la", false},
-		{"Very long command", "ls " + strings.Repeat("arg ", 100), false},
-		{"Command with numbers", "ls 123", false},
-		{"Command with hyphens", "ls -la -h", false},
-		{"Command with equals", "ls --color=auto", false},
-		{"Command with slashes", "ls /home/user", false},
-		{"Command with dots", "ls ../files", false},
+func TestValidateCommandEdgeCases_OnlySpaces(t *testing.T) {
+	err := validateCommand("   ")
+	if err == nil {
+		t.Error("Expected error for:    ")
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateCommand(tt.cmd)
-			if tt.expectError && err == nil {
-				t.Errorf("Expected error for: %s", tt.cmd)
-			}
-			if !tt.expectError && err != nil {
-				t.Errorf("Unexpected error for '%s': %v", tt.cmd, err)
-			}
-		})
+func TestValidateCommandEdgeCases_WithTabs(t *testing.T) {
+	err := validateCommand("ls\t-la")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls\t-la': %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_VeryLong(t *testing.T) {
+	cmd := "ls " + strings.Repeat("arg ", 100)
+	err := validateCommand(cmd)
+	if err != nil {
+		t.Errorf("Unexpected error for long command: %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_WithNumbers(t *testing.T) {
+	err := validateCommand("ls 123")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls 123': %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_WithHyphens(t *testing.T) {
+	err := validateCommand("ls -la -h")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls -la -h': %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_WithEquals(t *testing.T) {
+	err := validateCommand("ls --color=auto")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls --color=auto': %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_WithSlashes(t *testing.T) {
+	err := validateCommand("ls /home/user")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls /home/user': %v", err)
+	}
+}
+
+func TestValidateCommandEdgeCases_WithDots(t *testing.T) {
+	err := validateCommand("ls ../files")
+	if err != nil {
+		t.Errorf("Unexpected error for 'ls ../files': %v", err)
 	}
 }
 
@@ -560,28 +836,31 @@ func TestValidateCommandCaseSensitivity(t *testing.T) {
 }
 
 // TestValidateCommandWithPath tests command validation with paths
-func TestValidateCommandWithPath(t *testing.T) {
-	tests := []struct {
-		name        string
-		cmd         string
-		expectError bool
-	}{
-		{"command with absolute path", "/usr/bin/ls", true},
-		{"command with relative path", "./ls", true},
-		{"command with parent path", "../ls", true},
-		{"command with tilde", "~/ls", true},
+func TestValidateCommandWithPath_AbsolutePath(t *testing.T) {
+	err := validateCommand("/usr/bin/ls")
+	if err == nil {
+		t.Error("Expected error for: /usr/bin/ls")
 	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateCommand(tt.cmd)
-			if tt.expectError && err == nil {
-				t.Errorf("Expected error for: %s", tt.cmd)
-			}
-			if !tt.expectError && err != nil {
-				t.Errorf("Unexpected error for '%s': %v", tt.cmd, err)
-			}
-		})
+func TestValidateCommandWithPath_RelativePath(t *testing.T) {
+	err := validateCommand("./ls")
+	if err == nil {
+		t.Error("Expected error for: ./ls")
+	}
+}
+
+func TestValidateCommandWithPath_ParentPath(t *testing.T) {
+	err := validateCommand("../ls")
+	if err == nil {
+		t.Error("Expected error for: ../ls")
+	}
+}
+
+func TestValidateCommandWithPath_Tilde(t *testing.T) {
+	err := validateCommand("~/ls")
+	if err == nil {
+		t.Error("Expected error for: ~/ls")
 	}
 }
 

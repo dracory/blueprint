@@ -179,48 +179,51 @@ func (m *mockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) 
 }
 
 // TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock tests IP lookup with mock HTTP client
-func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock(t *testing.T) {
+func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock_Successful(t *testing.T) {
 	registry := testutils.Setup()
 	task := NewStatsVisitorEnhanceTask(registry)
-
-	tests := []struct {
-		name       string
-		response   *http.Response
-		err        error
-		wantResult string
-	}{
-		{
-			name:       "successful lookup",
-			response:   &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;US;USA;United States"))},
-			wantResult: "US",
-		},
-		{
-			name:       "empty country code",
-			response:   &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;;USA;"))},
-			wantResult: "UN",
-		},
-		{
-			name:       "error response",
-			response:   &http.Response{StatusCode: http.StatusInternalServerError, Body: io.NopCloser(bytes.NewBufferString(""))},
-			wantResult: "ER",
-		},
-		{
-			name:       "network error",
-			err:        http.ErrHandlerTimeout,
-			wantResult: "ER",
-		},
+	task.httpClient = &http.Client{
+		Transport: &mockRoundTripper{response: &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;US;USA;United States"))}},
 	}
+	result := task.findCountryByIp(context.TODO(), "1.2.3.4")
+	if result != "US" {
+		t.Errorf("findCountryByIp() = %q, want US", result)
+	}
+}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			task.httpClient = &http.Client{
-				Transport: &mockRoundTripper{response: tt.response, err: tt.err},
-			}
-			result := task.findCountryByIp(context.TODO(), "1.2.3.4")
-			if result != tt.wantResult {
-				t.Errorf("findCountryByIp() = %q, want %q", result, tt.wantResult)
-			}
-		})
+func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock_EmptyCountry(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+	task.httpClient = &http.Client{
+		Transport: &mockRoundTripper{response: &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewBufferString("1;;USA;"))}},
+	}
+	result := task.findCountryByIp(context.TODO(), "1.2.3.4")
+	if result != "UN" {
+		t.Errorf("findCountryByIp() = %q, want UN", result)
+	}
+}
+
+func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock_ErrorResponse(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+	task.httpClient = &http.Client{
+		Transport: &mockRoundTripper{response: &http.Response{StatusCode: http.StatusInternalServerError, Body: io.NopCloser(bytes.NewBufferString(""))}},
+	}
+	result := task.findCountryByIp(context.TODO(), "1.2.3.4")
+	if result != "ER" {
+		t.Errorf("findCountryByIp() = %q, want ER", result)
+	}
+}
+
+func TestStatsVisitorEnhanceTask_FindCountryByIp_WithMock_NetworkError(t *testing.T) {
+	registry := testutils.Setup()
+	task := NewStatsVisitorEnhanceTask(registry)
+	task.httpClient = &http.Client{
+		Transport: &mockRoundTripper{err: http.ErrHandlerTimeout},
+	}
+	result := task.findCountryByIp(context.TODO(), "1.2.3.4")
+	if result != "ER" {
+		t.Errorf("findCountryByIp() = %q, want ER", result)
 	}
 }
 
