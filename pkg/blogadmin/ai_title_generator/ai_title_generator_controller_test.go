@@ -1,9 +1,17 @@
 package aititlegenerator
 
 import (
+	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"project/internal/config"
 	"project/internal/registry"
+	"project/internal/testutils"
+
+	"github.com/dracory/test"
 )
 
 // TestNewAiTitleGeneratorController tests the constructor
@@ -161,4 +169,48 @@ func TestAiTitleGeneratorController_Handler_MethodExists(t *testing.T) {
 
 	// Method existence is verified by compilation
 	// We can't easily test the actual handler without a full HTTP setup
+}
+
+// TestAiTitleGeneratorController_Functional_RenderPage tests rendering the page
+func TestAiTitleGeneratorController_Functional_RenderPage(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithCustomStore(true),
+	)
+
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewAiTitleGeneratorController(registry)
+
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-title-generator", nil).WithContext(ctx)
+	resp := controller.Handler(httptest.NewRecorder(), req)
+	if !strings.Contains(resp, "AI Title Generator") {
+		t.Error("expected AI Title Generator in response")
+	}
+}
+
+// TestAiTitleGeneratorController_Functional_OnAddTitleModal tests the add title modal
+func TestAiTitleGeneratorController_Functional_OnAddTitleModal(t *testing.T) {
+	registry := testutils.Setup(
+		testutils.WithBlogStore(true),
+		testutils.WithCacheStore(true),
+		testutils.WithUserStore(true),
+		testutils.WithCustomStore(true),
+	)
+
+	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	controller := NewAiTitleGeneratorController(registry)
+
+	// Context with auth user
+	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/blog/ai-title-generator?action="+ACTION_ADD_TITLE, nil).WithContext(ctx)
+	resp := controller.Handler(httptest.NewRecorder(), req)
+	if !strings.Contains(resp, "Add Custom Title") {
+		t.Error("expected Add Custom Title in response")
+	}
 }
