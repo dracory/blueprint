@@ -126,8 +126,8 @@ const UsersApp = {
                     })
                 });
                 const data = await response.json();
-                
-                if (data.success) {
+
+                if (data.status === 'success') {
                     this.users = data.data?.users || [];
                     this.totalUsers = data.data?.total || 0;
                     // Sync jumpToPage with currentPage to ensure UI consistency
@@ -283,8 +283,8 @@ const UsersApp = {
                 });
 
                 const data = await response.json();
-                
-                if (data.success) {
+
+                if (data.status === 'success') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Deleted',
@@ -331,7 +331,7 @@ const UsersApp = {
                     body: JSON.stringify(this.newUser)
                 });
                 const data = await response.json();
-                if (data.success) {
+                if (data.status === 'success') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Created',

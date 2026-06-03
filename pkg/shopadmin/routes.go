@@ -12,6 +12,7 @@ import (
 	"project/pkg/shopadmin/category_manager"
 	"project/pkg/shopadmin/discount_manager"
 	"project/pkg/shopadmin/home"
+	"project/pkg/shopadmin/order_details"
 	"project/pkg/shopadmin/order_manager"
 	"project/pkg/shopadmin/product_manager"
 	"project/pkg/shopadmin/products"
@@ -34,8 +35,6 @@ func Routes(registry registry.RegistryInterface, opts ...AdminOptions) ([]rtr.Ro
 			return home.NewHomeController(registry, options.FileManagerURL).Handler(w, r)
 		case shared.CONTROLLER_PRODUCTS:
 			return product_manager.NewProductManagerController(registry).Handler(w, r)
-		case shared.CONTROLLER_PRODUCT_CREATE:
-			return products.NewProductCreateController(registry).Handler(w, r)
 		case shared.CONTROLLER_PRODUCT_UPDATE:
 			return products.NewProductUpdateController(registry, options.FileManagerURL).Handler(w, r)
 		case shared.CONTROLLER_PRODUCT_DELETE:
@@ -50,6 +49,8 @@ func Routes(registry registry.RegistryInterface, opts ...AdminOptions) ([]rtr.Ro
 			return discount_manager.NewDiscountManagerController(registry).Handler(w, r)
 		case shared.CONTROLLER_ORDERS:
 			return order_manager.NewOrderManagerController(registry).Handler(w, r)
+		case shared.CONTROLLER_ORDER_DETAILS:
+			return order_details.NewOrderDetailsController(registry).Handler(w, r)
 		}
 
 		// Default to home

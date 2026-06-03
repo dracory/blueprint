@@ -210,17 +210,8 @@ func (controller *productManagerController) page(r *http.Request, data productMa
 		},
 	})
 
-	buttonProductNew := hb.Button().
-		Class("btn btn-primary float-end").
-		Child(hb.I().Class("bi bi-plus-circle").Style("margin-top:-4px;margin-right:8px;font-size:16px;")).
-		HTML("New Product").
-		HxGet(shared.NewLinks("/admin/shop").ProductCreate(map[string]string{})).
-		HxTarget("body").
-		HxSwap("beforeend")
-
 	title := hb.Heading1().
-		HTML("Shop. Product Manager").
-		Child(buttonProductNew)
+		HTML("Shop. Product Manager")
 
 	return layouts.AdminPage(
 		breadcrumbs,

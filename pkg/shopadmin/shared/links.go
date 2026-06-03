@@ -23,11 +23,6 @@ func (l *Links) Products(params map[string]string) string {
 	return links.Admin().Shop(params)
 }
 
-func (l *Links) ProductCreate(params map[string]string) string {
-	params["controller"] = CONTROLLER_PRODUCT_CREATE
-	return links.Admin().Shop(params)
-}
-
 func (l *Links) ProductDelete(params map[string]string) string {
 	params["controller"] = CONTROLLER_PRODUCT_DELETE
 	return links.Admin().Shop(params)
@@ -60,5 +55,10 @@ func (l *Links) Discounts(params map[string]string) string {
 
 func (l *Links) Orders(params map[string]string) string {
 	params["controller"] = CONTROLLER_ORDERS
+	return links.Admin().Shop(params)
+}
+
+func (l *Links) OrderDetails(params map[string]string) string {
+	params["controller"] = CONTROLLER_ORDER_DETAILS
 	return links.Admin().Shop(params)
 }

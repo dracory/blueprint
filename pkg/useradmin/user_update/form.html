@@ -14,10 +14,6 @@
             This may be due to a vault key mismatch. These fields show encrypted data and are disabled until the tokens can be read.
         </div>
 
-        <div v-if="successMessage" class="alert alert-success">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ successMessage }}
-        </div>
-
         <form @submit.prevent="save('apply')">
             <div class="mb-3">
                 <label class="form-label">Status</label>
@@ -27,6 +23,15 @@
                     <option value="unverified">Unverified</option>
                     <option value="inactive">Inactive</option>
                     <option value="deleted">In Trash Bin</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Role</label>
+                <select v-model="form.role" class="form-select" :disabled="hasUnreadableFields">
+                    <option value="">- not selected -</option>
+                    <option value="user">User</option>
+                    <option value="administrator">Administrator</option>
                 </select>
             </div>
 

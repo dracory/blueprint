@@ -1,0 +1,77 @@
+<div id="app">
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div v-else>
+    <div v-if="order" class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Order #{{ order.id }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6>Customer Information</h6>
+            <p><strong>Name:</strong> {{ order.customer_name || '-' }}</p>
+            <p><strong>Email:</strong> {{ order.customer_email || '-' }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Order Information</h6>
+            <p><strong>Status:</strong> 
+              <span class="badge" :class="getStatusBadgeClass(order.status)">{{ order.status }}</span>
+            </p>
+            <p><strong>Created:</strong> <span v-html="formatDate(order.created_at)"></span></p>
+            <p><strong>Updated:</strong> <span v-html="formatDate(order.updated_at)"></span></p>
+          </div>
+        </div>
+        <hr>
+        <h6>Order Items</h6>
+        <div v-if="order.items && order.items.length > 0" class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in order.items" :key="item.id">
+                <td>
+                  {{ item.name || '-' }}
+                  <br><small class="text-muted">Ref: {{ item.id || '-' }}</small>
+                </td>
+                <td>{{ item.quantity || 0 }}</td>
+                <td>{{ item.price || '-' }}</td>
+                <td>{{ item.total || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="text-muted">
+          No items found for this order.
+        </div>
+        <div v-if="order.shipping_address" class="mt-4">
+          <h6>Shipping Address</h6>
+          <p>
+            {{ order.shipping_address.address_line1 || 'n/a' }}<br>
+            <span v-if="order.shipping_address.address_line2">{{ order.shipping_address.address_line2 }}<br></span>
+            {{ order.shipping_address.city || 'n/a' }}, {{ order.shipping_address.county || 'n/a' }}<br>
+            {{ order.shipping_address.postcode || 'n/a' }}<br>
+            {{ order.shipping_address.country || 'n/a' }}<br>
+            Phone: {{ order.shipping_address.phone || 'n/a' }}
+          </p>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a :href="urlOrders" class="btn btn-secondary">Back to Orders</a>
+      </div>
+    </div>
+    <div v-else class="alert alert-warning">
+      Order not found.
+    </div>
+  </div>
+</div>

@@ -1,45 +1,230 @@
 <div id="app">
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="card-title mb-0">Orders</h5>
-      <button class="btn btn-primary btn-sm" @click="loadOrders">Refresh</button>
+  <div v-if="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
-    <div class="card-body">
-      <div v-if="loading" class="text-center py-4">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
+  </div>
+
+  <div v-else>
+    <!-- Filter Bar -->
+    <div class="card bg-body-tertiary mb-3">
+      <div class="card-body d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <button @click="openFilterModal()" class="btn btn-primary me-3">
+            <i class="bi bi-funnel me-1"></i> Filters
+          </button>
+          <span class="text-body">{{ filterStatus }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <select v-model="perPage" @change="changePerPage()" class="form-select form-select-sm" style="width: auto;">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <button 
+            @click="clearFilters()" 
+            class="btn btn-sm btn-outline-secondary" 
+            title="Clear all filters"
+            v-if="hasActiveFilters"
+          >
+            <i class="bi bi-x-circle"></i>
+          </button>
+          <button class="btn btn-primary btn-sm" @click="loadOrders">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+          </button>
         </div>
       </div>
-      <div v-else-if="error" class="alert alert-danger">
-        {{ error }}
-      </div>
-      <div v-else>
-        <div v-if="orders.length === 0" class="text-center py-4 text-muted">
-          No orders found
-        </div>
-        <div v-else class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Status</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in orders" :key="order.id">
-                <td>{{ order.id }}</td>
-                <td>
-                  <span class="badge" :class="getStatusBadgeClass(order.status)">
-                    {{ order.status }}
+    </div>
+
+    <!-- Orders Table -->
+    <div v-if="orders.length === 0" class="text-center py-4 text-muted border rounded">
+      No orders found matching your criteria.
+    </div>
+
+    <div v-else class="table-responsive">
+      <table class="table table-striped table-hover table-bordered align-middle">
+        <thead>
+          <tr>
+            <th style="cursor: default;">
+              <div class="d-flex flex-column">
+                <span @click="sortBy('customer_name')" style="cursor: pointer;">
+                  Name
+                  <span v-if="sortByColumn === 'customer_name'">
+                    {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
                   </span>
-                </td>
-                <td>{{ formatDate(order.created_at) }}</td>
-                <td>{{ formatDate(order.updated_at) }}</td>
-              </tr>
-            </tbody>
-          </table>
+                </span>
+                <span @click="sortBy('customer_email')" class="small text-muted" style="cursor: pointer;">
+                  Email
+                  <span v-if="sortByColumn === 'customer_email'">
+                    {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
+                  </span>
+                </span>
+              </div>
+            </th>
+            <th @click="sortBy('status')" style="cursor: pointer; width: 120px;">
+              Status
+              <span v-if="sortByColumn === 'status'">
+                {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
+              </span>
+            </th>
+            <th @click="sortBy('created_at')" style="cursor: pointer; width: 1px; white-space: nowrap;">
+              Date
+              <span v-if="sortByColumn === 'created_at'">
+                {{ sortOrder === 'asc' ? '&#8595;' : '&#8593;' }}
+              </span>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="order in orders" :key="order.id">
+            <td>
+              <div>{{ order.customer_name || '-' }}</div>
+              <div class="small text-muted">{{ order.customer_email || '-' }}</div>
+              <div class="small text-muted">Ref: {{ order.id }}</div>
+            </td>
+            <td>
+              <span class="badge" :class="getStatusBadgeClass(order.status)">{{ order.status }}</span>
+            </td>
+            <td class="small" style="white-space: nowrap;" v-html="formatDate(order.created_at)"></td>
+            <td>
+              <a :href="urlOrderDetails.replace('ORDER_ID', order.id)" class="btn btn-sm btn-primary" title="View Order">
+                <i class="bi bi-eye"></i>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div v-if="totalOrders > 0" class="d-flex justify-content-between align-items-center mt-3">
+      <div class="text-muted small">
+        Showing {{ (currentPage * perPage) + 1 }}-{{ Math.min((currentPage + 1) * perPage, totalOrders) }} of {{ totalOrders }} orders
+      </div>
+      <div class="d-flex align-items-center justify-content-center flex-grow-1">
+        <div class="d-flex align-items-center gap-2">
+          <span class="small text-muted">Page</span>
+          <div class="btn-group" role="group">
+            <button 
+              @click="goToPage(currentPage - 1)" 
+              class="btn btn-sm btn-outline-secondary"
+              :disabled="currentPage === 0"
+              title="Previous page"
+            >
+              &laquo;
+            </button>
+            <select v-model.number="jumpToPage" @change="goToPage(jumpToPage - 1)" class="form-select form-select-sm bg-primary text-white border-primary" style="width: auto; border-radius: 0;">
+              <option v-for="page in totalPages" :key="page" :value="page">{{ page }}</option>
+            </select>
+            <button 
+              @click="goToPage(currentPage + 1)" 
+              class="btn btn-sm btn-outline-secondary"
+              :disabled="currentPage >= totalPages - 1"
+              title="Next page"
+            >
+              &raquo;
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="small">Per page</span>
+        <select v-model="perPage" @change="changePerPage()" class="form-select form-select-sm" style="width: auto;">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div v-if="showFilterModal" class="modal-backdrop fade show" style="display: block; z-index: 1040;"></div>
+    <div v-if="showFilterModal" class="modal fade show" style="display: block; z-index: 1050;">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Filter Orders</h5>
+            <button type="button" class="btn-close" @click="closeFilterModal()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Status</label>
+              <select v-model="filters.status" class="form-select">
+                <option value="">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Customer Name</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.customer_name" 
+                placeholder="Search customer name"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Customer Email</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.customer_email" 
+                placeholder="Search customer email"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Order ID</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                v-model="filters.order_id" 
+                placeholder="Search order ID"
+              />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Created Date Range</label>
+              <div class="input-group">
+                <input 
+                  type="date" 
+                  v-model="filters.created_from" 
+                  class="form-control" 
+                  placeholder="From"
+                />
+                <span class="input-group-text">to</span>
+                <input 
+                  type="date" 
+                  v-model="filters.created_to" 
+                  class="form-control" 
+                  placeholder="To"
+                />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Sort By</label>
+              <select v-model="sortByColumn" class="form-select">
+                <option value="created_at">Date</option>
+                <option value="status">Status</option>
+                <option value="customer_name">Customer Name</option>
+                <option value="customer_email">Customer Email</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Sort Order</label>
+              <select v-model="sortOrder" class="form-select">
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" @click="clearFilters()">Clear Filters</button>
+            <button type="button" class="btn btn-primary" @click="applyFilters()">Apply Filters</button>
+          </div>
         </div>
       </div>
     </div>

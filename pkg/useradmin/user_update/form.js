@@ -6,8 +6,6 @@ createApp({
             loading: true,
             saving: false,
             action: '',
-            errorMessage: '',
-            successMessage: '',
             redirectTo: '',
             userId: '',
             returnUrl: '',
@@ -20,7 +18,8 @@ createApp({
                 phone: '',
                 country: '',
                 timezone: '',
-                memo: ''
+                memo: '',
+                role: ''
             },
             originalEmail: '',
             countries: [],
@@ -58,14 +57,17 @@ createApp({
             this.loading = true;
             this.errorMessage = '';
             try {
-                const params = new URLSearchParams({
-                    action: 'get-user',
-                    user_id: this.userId
+                const response = await fetch(urlGetUser, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'user-fetch-ajax',
+                        user_id: this.userId
+                    })
                 });
-                const response = await fetch(urlGetUser + '?' + params.toString());
                 const result = await response.json();
 
-                if (result.success) {
+                if (result.status === 'success') {
                     const d = result.data;
                     this.form.status = d.status || '';
                     this.form.first_name = d.first_name || '';
@@ -76,6 +78,7 @@ createApp({
                     this.form.country = d.country || '';
                     this.form.timezone = d.timezone || '';
                     this.form.memo = d.memo || '';
+                    this.form.role = d.role || '';
                     this.originalEmail = d.email || '';
                     this.countries = d.countries || [];
                     this.timezones = d.timezones || [];
@@ -83,11 +86,17 @@ createApp({
                         this.fieldStatus = { ...this.fieldStatus, ...d.field_status };
                     }
                 } else {
-                    this.errorMessage = result.message || 'Failed to load user';
+                    Notiflix.Notify.failure(result.message || 'Failed to load user', {
+                        position: 'right-top',
+                        timeout: 3000,
+                    });
                 }
             } catch (err) {
                 console.error('Error loading user:', err);
-                this.errorMessage = 'Failed to load user';
+                Notiflix.Notify.failure('Failed to load user', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
             } finally {
                 this.loading = false;
             }
@@ -99,13 +108,16 @@ createApp({
                 return;
             }
             try {
-                const params = new URLSearchParams({
-                    action: 'get-timezones',
-                    country_code: this.form.country
+                const response = await fetch(urlGetTimezones, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'get-timezones-ajax',
+                        country_code: this.form.country
+                    })
                 });
-                const response = await fetch(urlGetTimezones + '?' + params.toString());
                 const result = await response.json();
-                if (result.success) {
+                if (result.status === 'success') {
                     this.timezones = result.data.timezones || [];
                 }
             } catch (err) {
@@ -114,37 +126,56 @@ createApp({
         },
         async save(actionType) {
             this.action = actionType;
-            this.errorMessage = '';
-            this.successMessage = '';
             this.redirectTo = '';
 
             if (!this.form.status) {
-                this.errorMessage = 'Status is required';
+                Notiflix.Notify.failure('Status is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             if (!this.form.first_name.trim()) {
-                this.errorMessage = 'First name is required';
+                Notiflix.Notify.failure('First name is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             if (!this.form.last_name.trim()) {
-                this.errorMessage = 'Last name is required';
+                Notiflix.Notify.failure('Last name is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             if (!this.form.email.trim()) {
-                this.errorMessage = 'Email is required';
+                Notiflix.Notify.failure('Email is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(this.form.email.trim())) {
-                this.errorMessage = 'Invalid email address';
+                Notiflix.Notify.failure('Invalid email address', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             if (!this.form.country) {
-                this.errorMessage = 'Country is required';
+                Notiflix.Notify.failure('Country is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
             if (!this.form.timezone) {
-                this.errorMessage = 'Timezone is required';
+                Notiflix.Notify.failure('Timezone is required', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
                 return;
             }
 
@@ -160,27 +191,26 @@ createApp({
                     phone: this.form.phone.trim(),
                     country: this.form.country,
                     timezone: this.form.timezone,
-                    memo: this.form.memo.trim()
+                    memo: this.form.memo.trim(),
+                    role: this.form.role.trim()
                 };
 
                 const response = await fetch(urlUpdateUser, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        ...payload,
+                        action: 'user-update-ajax'
+                    })
                 });
                 const result = await response.json();
 
-                if (result.success) {
-                    this.successMessage = 'User saved successfully';
+                if (result.status === 'success') {
                     if (actionType === 'save') {
                         this.redirectTo = this.returnUrl;
-                        Swal.fire({
-                            title: 'Saved!',
-                            text: 'User has been saved successfully.',
-                            icon: 'success',
-                            timer: 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
+                        Notiflix.Notify.success('User saved successfully', {
+                            position: 'right-top',
+                            timeout: 3000,
                         });
                         setTimeout(() => {
                             if (this.redirectTo) {
@@ -188,23 +218,25 @@ createApp({
                             }
                         }, 3000);
                     } else {
-                        Swal.fire({
-                            title: 'Saved!',
-                            text: 'User has been saved successfully.',
-                            icon: 'success',
-                            toast: true,
-                            position: 'top-end',
-                            timer: 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false
+                        Notiflix.Notify.success('User saved successfully', {
+                            position: 'right-top',
+                            timeout: 3000,
                         });
+                        // Reload user data after successful save
+                        await this.loadUser();
                     }
                 } else {
-                    this.errorMessage = result.message || 'Failed to save user';
+                    Notiflix.Notify.failure(result.message || 'Failed to save user', {
+                        position: 'right-top',
+                        timeout: 3000,
+                    });
                 }
             } catch (err) {
                 console.error('Error saving user:', err);
-                this.errorMessage = 'Failed to save user';
+                Notiflix.Notify.failure('Failed to save user', {
+                    position: 'right-top',
+                    timeout: 3000,
+                });
             } finally {
                 this.saving = false;
             }
