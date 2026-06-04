@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"project/internal/controllers/website/pages/indexnow"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(app app.AppInterface) []rtr.RouteInterface {
 	adsRoute := rtr.NewRoute().
 		SetName("Website > ads.txt").
 		SetPath("/ads.txt").
@@ -31,17 +31,17 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	sitemapRoute := rtr.NewRoute().
 		SetName("Website > Sitemap").
 		SetPath(links.SITEMAP_XML).
-		SetHTMLHandler(NewSitemapXmlController(registry).Handler)
+		SetHTMLHandler(NewSitemapXmlController(app).Handler)
 
 	indexNowRoute := rtr.NewRoute().
 		SetName("Website > IndexNow Controller").
 		SetPath(links.INDEXNOW).
-		SetHTMLHandler(indexnow.NewIndexNowController(registry).Handler)
+		SetHTMLHandler(indexnow.NewIndexNowController(app).Handler)
 
 	indexNowKeyRoute := rtr.NewRoute().
 		SetName("Website > IndexNow Key").
-		SetPath("/" + registry.GetConfig().GetIndexNowKey() + ".txt").
-		SetHTMLHandler(NewIndexNowKeyController(registry).Handler)
+		SetPath("/" + app.GetConfig().GetIndexNowKey() + ".txt").
+		SetHTMLHandler(NewIndexNowKeyController(app).Handler)
 
 	return []rtr.RouteInterface{
 		adsRoute,

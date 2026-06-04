@@ -16,14 +16,14 @@ import (
 )
 
 func TestCategoryManagerController_RenderPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -36,14 +36,14 @@ func TestCategoryManagerController_RenderPage(t *testing.T) {
 }
 
 func TestCategoryManagerController_HandleLoadCategories(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -59,14 +59,14 @@ func TestCategoryManagerController_HandleLoadCategories(t *testing.T) {
 }
 
 func TestCategoryManagerController_HandleCreateCategory(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -87,7 +87,7 @@ func TestCategoryManagerController_HandleCreateCategory(t *testing.T) {
 	}
 
 	// Verify it exists in store
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	if len(terms) != 1 {
 		t.Errorf("expected 1 term, got %d", len(terms))
 	}
@@ -97,14 +97,14 @@ func TestCategoryManagerController_HandleCreateCategory(t *testing.T) {
 }
 
 func TestCategoryManagerController_HandleUpdateCategory(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -120,7 +120,7 @@ func TestCategoryManagerController_HandleUpdateCategory(t *testing.T) {
 	controller.Handler(httptest.NewRecorder(), req)
 
 	// First get the category ID
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	categoryID := terms[0].GetID()
 
 	updateData := map[string]string{
@@ -137,21 +137,21 @@ func TestCategoryManagerController_HandleUpdateCategory(t *testing.T) {
 	}
 
 	// Verify update
-	term, _ := registry.GetBlogStore().TermFindByID(ctx, categoryID)
+	term, _ := app.GetBlogStore().TermFindByID(ctx, categoryID)
 	if term.GetName() != "Updated Category" {
 		t.Errorf("expected Updated Category, got %s", term.GetName())
 	}
 }
 
 func TestCategoryManagerController_HandleReorderCategories(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -166,7 +166,7 @@ func TestCategoryManagerController_HandleReorderCategories(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=create-category", bytes.NewBuffer(body)).WithContext(ctx)
 	controller.Handler(httptest.NewRecorder(), req)
 
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	categoryID := terms[0].GetID()
 
 	reorderData := map[string][]string{
@@ -181,14 +181,14 @@ func TestCategoryManagerController_HandleReorderCategories(t *testing.T) {
 }
 
 func TestCategoryManagerController_HandleDeleteCategory(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewCategoryManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewCategoryManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -203,7 +203,7 @@ func TestCategoryManagerController_HandleDeleteCategory(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/admin/blog/categories?action=create-category", bytes.NewBuffer(body)).WithContext(ctx)
 	controller.Handler(httptest.NewRecorder(), req)
 
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	categoryID := terms[0].GetID()
 
 	deleteData := map[string]string{
@@ -217,7 +217,7 @@ func TestCategoryManagerController_HandleDeleteCategory(t *testing.T) {
 	}
 
 	// Verify deletion
-	termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	termsAfter, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	if len(termsAfter) != 0 {
 		t.Errorf("expected 0 terms after deletion, got %d", len(termsAfter))
 	}

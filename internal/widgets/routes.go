@@ -1,14 +1,14 @@
 package widgets
 
 import (
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
 
 const PATH_COMMENTABLE = "/widgets/commentable"
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(app app.AppInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		// rtr.NewRoute().
 		// 	SetName("Website > Commentable Widget").

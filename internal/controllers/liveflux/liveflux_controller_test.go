@@ -8,20 +8,20 @@ import (
 )
 
 func TestNewController(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	controller := NewController(nil)
 	if controller == nil {
 		t.Error("NewController() should not return nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	controller = NewController(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	controller = NewController(app)
 	if controller == nil {
 		t.Error("NewController() should not return nil")
 	}
-	if controller.registry != registry {
-		t.Error("Controller registry should match the provided registry")
+	if controller.app != app {
+		t.Error("Controller app should match the provided app")
 	}
 	if controller.Engine == nil {
 		t.Error("Controller Engine should not be nil")
@@ -35,8 +35,8 @@ func TestAppContextKey(t *testing.T) {
 }
 
 func TestControllerHandler(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewController(registry)
+	app := testutils.Setup()
+	controller := NewController(app)
 	if controller == nil {
 		t.Fatal("NewController() returned nil")
 	}

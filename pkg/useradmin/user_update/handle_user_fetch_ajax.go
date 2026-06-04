@@ -23,17 +23,17 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 		return
 	}
 
-	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), userID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), userID)
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("handleUserFetchAjax UserFindByID", slog.String("user_id", userID), slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("handleUserFetchAjax UserFindByID", slog.String("user_id", userID), slog.String("error", err.Error()))
 		}
 		api.Respond(w, r, api.Error("Error loading user"))
 		return
 	}
 	if user == nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("handleUserFetchAjax user not found", slog.String("user_id", userID))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("handleUserFetchAjax user not found", slog.String("user_id", userID))
 		}
 		api.Respond(w, r, api.Error("User not found"))
 		return
@@ -59,11 +59,11 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 		"role":          true,
 	}
 
-	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
-		firstName, lastName, email, phone, business, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
+		firstName, lastName, email, phone, business, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 		if err != nil {
-			if controller.registry.GetLogger() != nil {
-				controller.registry.GetLogger().Error("userUpdateController.handleUserFetchAjax UserUntokenize", slog.String("error", err.Error()))
+			if controller.app.GetLogger() != nil {
+				controller.app.GetLogger().Error("userUpdateController.handleUserFetchAjax UserUntokenize", slog.String("error", err.Error()))
 			}
 			fieldStatus["first_name"] = false
 			fieldStatus["last_name"] = false
@@ -78,21 +78,21 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 		}
 	}
 
-	if controller.registry.GetGeoStore() == nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleUserFetchAjax GeoStore not configured")
+	if controller.app.GetGeoStore() == nil {
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleUserFetchAjax GeoStore not configured")
 		}
 		api.Respond(w, r, api.Error("GeoStore is not configured"))
 		return
 	}
 
-	countryList, err := controller.registry.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
+	countryList, err := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
 		SortOrder: sb.ASC,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleUserFetchAjax CountryList", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleUserFetchAjax CountryList", slog.String("error", err.Error()))
 		}
 		api.Respond(w, r, api.Error("Failed to load countries"))
 		return
@@ -105,14 +105,14 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 		})
 	}
 
-	timezoneList, err := controller.registry.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
+	timezoneList, err := controller.app.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
 		SortOrder:   sb.ASC,
 		OrderBy:     geostore.COLUMN_TIMEZONE,
 		CountryCode: country,
 	})
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleUserFetchAjax TimezoneList", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleUserFetchAjax TimezoneList", slog.String("error", err.Error()))
 		}
 		api.Respond(w, r, api.Error("Failed to load timezones"))
 		return

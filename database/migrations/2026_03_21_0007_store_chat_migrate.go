@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreChatMigrate)(nil)
 
 type StoreChatMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreChatMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreChatMigrate) Description() string {
 }
 
 func (m *StoreChatMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetChatStore()
+	store := m.app.GetChatStore()
 	if store == nil {
 		return errors.New("chat store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreChatMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreChatMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetChatStore()
+	store := m.app.GetChatStore()
 	if store == nil {
 		return errors.New("chat store is not initialized")
 	}

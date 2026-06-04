@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -23,11 +23,11 @@ const (
 )
 
 type categoryUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewCategoryUpdateController(registry registry.RegistryInterface) *categoryUpdateController {
-	return &categoryUpdateController{registry: registry}
+func NewCategoryUpdateController(app app.AppInterface) *categoryUpdateController {
+	return &categoryUpdateController{app: app}
 }
 
 func (controller *categoryUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -35,27 +35,27 @@ func (controller *categoryUpdateController) Handler(w http.ResponseWriter, r *ht
 	action := req.GetStringTrimmed(r, "action")
 
 	if categoryID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Category ID is required", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Category ID is required", links.Admin().Home(), 10)
 	}
 
-	category, err := controller.registry.GetShopStore().CategoryFindByID(r.Context(), categoryID)
+	category, err := controller.app.GetShopStore().CategoryFindByID(r.Context(), categoryID)
 	if err != nil {
 		slog.Error("Error. categoryUpdateController: CategoryFindByID", slog.String("error", err.Error()), slog.String("category_id", categoryID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Category not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Category not found", links.Admin().Home(), 10)
 	}
 
 	if category == nil {
 		slog.Warn("Warning. categoryUpdateController: CategoryFindByID", slog.String("error", "Category not found"), slog.String("category_id", categoryID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Category not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Category not found", links.Admin().Home(), 10)
 	}
 
 	switch action {
 	case ACTION_LOAD_DETAILS:
-		return detailscomponent.HandleAjaxLoadDetails(controller.registry, categoryID)
+		return detailscomponent.HandleAjaxLoadDetails(controller.app, categoryID)
 	case ACTION_SAVE_DETAILS:
-		return detailscomponent.HandleAjaxSaveDetails(controller.registry, r, categoryID)
+		return detailscomponent.HandleAjaxSaveDetails(controller.app, r, categoryID)
 	case ACTION_LIST_CATEGORIES:
-		return detailscomponent.HandleAjaxListCategories(controller.registry)
+		return detailscomponent.HandleAjaxListCategories(controller.app)
 	default:
 		return controller.handleRenderPage(r, category, categoryID)
 	}
@@ -64,7 +64,7 @@ func (controller *categoryUpdateController) Handler(w http.ResponseWriter, r *ht
 func (controller *categoryUpdateController) handleRenderPage(r *http.Request, category shopstore.CategoryInterface, categoryID string) string {
 	pageContent := controller.renderPageContent(r, category, categoryID)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Category | Shop",
 		Content: hb.Wrap().HTML(pageContent),
 		ScriptURLs: []string{
@@ -110,7 +110,7 @@ func (controller *categoryUpdateController) renderPageContent(r *http.Request, c
 		Text("Category: ").
 		Text(category.GetTitle())
 
-	body := detailscomponent.Render(controller.registry, categoryID)
+	body := detailscomponent.Render(controller.app, categoryID)
 
 	card := hb.Div().
 		Class("card").

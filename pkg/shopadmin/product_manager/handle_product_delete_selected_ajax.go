@@ -11,7 +11,7 @@ import (
 func (controller *productManagerController) handleProductDeleteSelected(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		return api.Error("Shop store not available").ToString()

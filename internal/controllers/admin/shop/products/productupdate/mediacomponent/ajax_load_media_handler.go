@@ -3,7 +3,7 @@ package mediacomponent
 import (
 	"context"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/shopstore"
@@ -18,8 +18,8 @@ type MediaItem struct {
 }
 
 // HandleAjaxLoadMedia handles AJAX requests to load media and returns JSON string
-func HandleAjaxLoadMedia(registry registry.RegistryInterface, productID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxLoadMedia(app app.AppInterface, productID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
@@ -27,7 +27,7 @@ func HandleAjaxLoadMedia(registry registry.RegistryInterface, productID string) 
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(productID)
 	mediaQuery.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
-	medias, err := registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	medias, err := app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		return api.ErrorWithData("Failed to load media", map[string]any{}).ToString()
 	}

@@ -2,12 +2,12 @@ package file_manager
 
 import (
 	"project/internal/config"
-	"project/internal/registry"
+	"project/internal/app"
 
 	_ "modernc.org/sqlite"
 )
 
-func setupTestRegistry() (registry.RegistryInterface, func()) {
+func setupTestRegistry() (app.AppInterface, func()) {
 	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
@@ -24,9 +24,9 @@ func setupTestRegistry() (registry.RegistryInterface, func()) {
 	cfg.SetSqlFileStoreUsed(true)
 	cfg.SetMediaRoot("/uploads")
 
-	reg, err := registry.New(cfg)
+	reg, err := app.New(cfg)
 	if err != nil {
-		panic("failed to create registry: " + err.Error())
+		panic("failed to create app: " + err.Error())
 	}
 
 	cleanup := func() {

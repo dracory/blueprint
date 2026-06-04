@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreUserMigrate)(nil)
 
 type StoreUserMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreUserMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreUserMigrate) Description() string {
 }
 
 func (m *StoreUserMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetUserStore()
+	store := m.app.GetUserStore()
 	if store == nil {
 		return errors.New("user store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreUserMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreUserMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetUserStore()
+	store := m.app.GetUserStore()
 	if store == nil {
 		return errors.New("user store is not initialized")
 	}

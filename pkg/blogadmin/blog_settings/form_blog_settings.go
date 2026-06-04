@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/hb"
@@ -16,7 +16,7 @@ import (
 
 type formBlogSettings struct {
 	liveflux.Base
-	registry                 registry.RegistryInterface
+	app                 app.AppInterface
 	BlogTopic                string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -27,14 +27,14 @@ type formBlogSettings struct {
 	ReturnURL                string
 }
 
-func NewFormBlogSettings(registry registry.RegistryInterface) liveflux.ComponentInterface {
+func NewFormBlogSettings(app app.AppInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formBlogSettings{})
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	if c, ok := inst.(*formBlogSettings); ok {
-		c.registry = registry
+		c.app = app
 	}
 	return inst
 }
@@ -44,7 +44,7 @@ func (c *formBlogSettings) GetKind() string {
 }
 
 func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) error {
-	if c.registry == nil {
+	if c.app == nil {
 		c.FormErrorMessage = "Application not initialized"
 		return nil
 	}
@@ -54,7 +54,7 @@ func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) 
 		c.ReturnURL = shared.NewLinks("/admin/blog").PostManager()
 	}
 
-	store := c.registry.GetSettingStore()
+	store := c.app.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		return nil
@@ -62,8 +62,8 @@ func (c *formBlogSettings) Mount(ctx context.Context, params map[string]string) 
 
 	value, err := store.Get(ctx, SettingKeyBlogTopic, "")
 	if err != nil {
-		if c.registry.GetLogger() != nil {
-			c.registry.GetLogger().Error("Blog settings form: failed to load blog topic", "error", err.Error())
+		if c.app.GetLogger() != nil {
+			c.app.GetLogger().Error("Blog settings form: failed to load blog topic", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to load blog settings"
 		return nil
@@ -108,7 +108,7 @@ func (c *formBlogSettings) handleUpdate(ctx context.Context, action string, data
 		return nil
 	}
 
-	store := c.registry.GetSettingStore()
+	store := c.app.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		c.FormSuccessMessage = ""
@@ -116,8 +116,8 @@ func (c *formBlogSettings) handleUpdate(ctx context.Context, action string, data
 	}
 
 	if err := store.Set(ctx, SettingKeyBlogTopic, topic); err != nil {
-		if c.registry.GetLogger() != nil {
-			c.registry.GetLogger().Error("Blog settings form: failed to save blog topic", "error", err.Error())
+		if c.app.GetLogger() != nil {
+			c.app.GetLogger().Error("Blog settings form: failed to save blog topic", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to save blog topic. Please try again later."
 		c.FormSuccessMessage = ""

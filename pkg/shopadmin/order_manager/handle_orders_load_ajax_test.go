@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleOrdersLoadAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewOrderManagerController(registry)
+	controller := NewOrderManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleOrdersLoadAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleOrdersLoadAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleOrdersLoadAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewOrderManagerController(registry)
+	controller := NewOrderManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleOrdersLoadAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleOrdersLoadAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleOrdersLoadAjax_LoadsOrders(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewOrderManagerController(registry)
+	controller := NewOrderManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleOrdersLoadAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

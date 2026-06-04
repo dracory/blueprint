@@ -17,12 +17,12 @@ import (
 )
 
 func TestAPIAuthMiddleware_MissingAuthorizationHeader(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	res := httptest.NewRecorder()
 	nextCalled := false
@@ -43,12 +43,12 @@ func TestAPIAuthMiddleware_MissingAuthorizationHeader(t *testing.T) {
 }
 
 func TestAPIAuthMiddleware_InvalidToken(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", "invalid-token")
 	res := httptest.NewRecorder()
@@ -70,22 +70,22 @@ func TestAPIAuthMiddleware_InvalidToken(t *testing.T) {
 }
 
 func TestAPIAuthMiddleware_ExpiredSession(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
 
-	session, err := testutils.SeedSession(registry.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, -60)
+	session, err := testutils.SeedSession(app.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, -60)
 	if err != nil {
 		t.Fatalf("failed to seed session: %v", err)
 	}
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", session.GetKey())
 	res := httptest.NewRecorder()
@@ -107,7 +107,7 @@ func TestAPIAuthMiddleware_ExpiredSession(t *testing.T) {
 }
 
 func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
@@ -119,11 +119,11 @@ func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt(time.Now().Add(time.Hour).UTC().Format("2006-01-02 15:04:05"))
 
-	if err := registry.GetSessionStore().SessionCreate(baseReq.Context(), session); err != nil {
+	if err := app.GetSessionStore().SessionCreate(baseReq.Context(), session); err != nil {
 		t.Fatalf("failed to create session: %v", err)
 	}
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", session.GetKey())
 	res := httptest.NewRecorder()
@@ -145,18 +145,18 @@ func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
 }
 
 func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	userStore := registry.GetUserStore()
+	userStore := app.GetUserStore()
 	user, err := testutils.SeedUser(userStore, test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
 
-	session, err := testutils.SeedSession(registry.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, 3600)
+	session, err := testutils.SeedSession(app.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, 3600)
 	if err != nil {
 		t.Fatalf("failed to seed session: %v", err)
 	}
@@ -165,7 +165,7 @@ func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
 		t.Fatalf("failed to delete user: %v", err)
 	}
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", session.GetKey())
 	res := httptest.NewRecorder()
@@ -187,22 +187,22 @@ func TestAPIAuthMiddleware_UserNotFound(t *testing.T) {
 }
 
 func TestAPIAuthMiddleware_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
 	}
 
-	session, err := testutils.SeedSession(registry.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, 3600)
+	session, err := testutils.SeedSession(app.GetSessionStore(), httptest.NewRequest(http.MethodGet, "/", nil), user, 3600)
 	if err != nil {
 		t.Fatalf("failed to seed session: %v", err)
 	}
 
-	middleware := NewAPIAuthMiddleware(registry).GetHandler()
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	req.Header.Set("Authorization", session.GetKey())
 	res := httptest.NewRecorder()

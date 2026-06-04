@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/tasks/email_admin_new_contact"
 
 	"github.com/dracory/bs"
@@ -25,7 +25,7 @@ import (
 
 type formContact struct {
 	liveflux.Base
-	registry        registry.RegistryInterface
+	app        app.AppInterface
 	UserID          string
 	Email           string
 	FirstName       string
@@ -43,7 +43,7 @@ type formContact struct {
 	CaptchaAnswer   string
 }
 
-func NewFormContact(registry registry.RegistryInterface) liveflux.ComponentInterface {
+func NewFormContact(app app.AppInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&formContact{})
 	if err != nil {
 		log.Println(err)
@@ -51,7 +51,7 @@ func NewFormContact(registry registry.RegistryInterface) liveflux.ComponentInter
 	}
 
 	if c, ok := inst.(*formContact); ok {
-		c.registry = registry
+		c.app = app
 	}
 
 	return inst
@@ -79,11 +79,11 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	c.CaptchaExpected = hashCaptchaValue(sumStr)
 	c.CaptchaAnswer = ""
 
-	if c.UserID == "" || c.registry == nil || c.registry.GetUserStore() == nil {
+	if c.UserID == "" || c.app == nil || c.app.GetUserStore() == nil {
 		return nil
 	}
 
-	user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
+	user, err := c.app.GetUserStore().UserFindByID(ctx, c.UserID)
 	if err != nil || user == nil {
 		return nil
 	}
@@ -176,33 +176,33 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		"email":      c.Email,
 		"text":       c.Text,
 	}); err != nil {
-		if c.registry != nil && c.registry.GetLogger() != nil {
-			c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
+		if c.app != nil && c.app.GetLogger() != nil {
+			c.app.GetLogger().Error("At formContact.Handle", "error", err.Error())
 		}
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
-	if c.registry == nil || c.registry.GetCustomStore() == nil {
+	if c.app == nil || c.app.GetCustomStore() == nil {
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
-	if err := c.registry.GetCustomStore().RecordCreate(record); err != nil {
-		c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
+	if err := c.app.GetCustomStore().RecordCreate(record); err != nil {
+		c.app.GetLogger().Error("At formContact.Handle", "error", err.Error())
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
 	}
 
-	if _, err := email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(c.registry).Enqueue(); err != nil {
-		c.registry.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
+	if _, err := email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(c.app).Enqueue(); err != nil {
+		c.app.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
 	}
 
-	if c.UserID != "" && c.registry != nil && c.registry.GetUserStore() != nil {
-		user, err := c.registry.GetUserStore().UserFindByID(ctx, c.UserID)
+	if c.UserID != "" && c.app != nil && c.app.GetUserStore() != nil {
+		user, err := c.app.GetUserStore().UserFindByID(ctx, c.UserID)
 		if err == nil && user != nil {
 			if c.CanUpdateFirst {
 				user.SetFirstName(c.FirstName)
@@ -211,8 +211,8 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 				user.SetLastName(c.LastName)
 			}
 
-			if err := c.registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
-				c.registry.GetLogger().Error("At formContact.Handle", "error", err.Error())
+			if err := c.app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+				c.app.GetLogger().Error("At formContact.Handle", "error", err.Error())
 			}
 		}
 	}

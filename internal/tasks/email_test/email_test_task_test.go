@@ -13,9 +13,9 @@ import (
 )
 
 func TestNewEmailTestTask_InitializesFields(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	handler, ok := NewEmailTestTask(registry).(*emailTestTask)
+	handler, ok := NewEmailTestTask(app).(*emailTestTask)
 	if !ok {
 		t.Fatalf("expected *emailTestTask, got different type")
 	}
@@ -25,15 +25,15 @@ func TestNewEmailTestTask_InitializesFields(t *testing.T) {
 	}
 
 	// verify app is set via reflection since app field is unexported
-	v := reflect.ValueOf(handler).Elem().FieldByName("registry")
+	v := reflect.ValueOf(handler).Elem().FieldByName("app")
 	if !v.IsValid() || v.IsNil() {
-		t.Fatalf("expected registry to be set on task")
+		t.Fatalf("expected app to be set on task")
 	}
 }
 
 func TestEmailTestTask_Metadata(t *testing.T) {
-	registry := testutils.Setup()
-	task := NewEmailTestTask(registry)
+	app := testutils.Setup()
+	task := NewEmailTestTask(app)
 
 	if got, want := task.Alias(), "EmailTestTask"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -51,9 +51,9 @@ func TestEmailTestTask_Metadata(t *testing.T) {
 func TestEmailTestTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler, ok := NewEmailTestTask(registry).(*emailTestTask)
+	handler, ok := NewEmailTestTask(app).(*emailTestTask)
 	if !ok {
 		t.Fatalf("expected *emailTestTask, got different type")
 	}
@@ -64,8 +64,8 @@ func TestEmailTestTask_Enqueue_TaskStoreNil(t *testing.T) {
 }
 
 func TestEmailTestTask_Enqueue_InvalidParams(t *testing.T) {
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	handler, ok := NewEmailTestTask(registry).(*emailTestTask)
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	handler, ok := NewEmailTestTask(app).(*emailTestTask)
 	if !ok {
 		t.Fatalf("expected *emailTestTask, got different type")
 	}
@@ -92,22 +92,22 @@ func TestEmailTestTask_Handle_SendEmail(t *testing.T) {
 	cfg.SetMailPassword("")
 	cfg.SetTaskStoreUsed(true)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	emails.InitEmailSender(registry)
+	emails.InitEmailSender(app)
 
 	// Register task so that queued tasks can be processed if needed
-	if registry.GetTaskStore() == nil {
+	if app.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailTestTask(registry), true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewEmailTestTask(app), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task
-	enqueueHandler, ok := NewEmailTestTask(registry).(*emailTestTask)
+	enqueueHandler, ok := NewEmailTestTask(app).(*emailTestTask)
 	if !ok {
 		t.Fatalf("expected *emailTestTask, got different type")
 	}
@@ -118,7 +118,7 @@ func TestEmailTestTask_Handle_SendEmail(t *testing.T) {
 	}
 
 	// Set queued task and required params on handler
-	handlerIface := NewEmailTestTask(registry)
+	handlerIface := NewEmailTestTask(app)
 	handler, ok := handlerIface.(*emailTestTask)
 	if !ok {
 		t.Fatalf("expected *emailTestTask, got different type")

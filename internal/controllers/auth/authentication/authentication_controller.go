@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 	"strings"
 	"time"
@@ -38,14 +38,14 @@ const (
 // authenticationController handles the authentication of the user,
 // once the user has logged in successfully via the AuthKnight service.
 type authenticationController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
 // NewAuthenticationController creates a new instance with injected app only.
-func NewAuthenticationController(application registry.RegistryInterface) *authenticationController {
-	return &authenticationController{registry: application}
+func NewAuthenticationController(application app.AppInterface) *authenticationController {
+	return &authenticationController{app: application}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -69,43 +69,43 @@ func NewAuthenticationController(application registry.RegistryInterface) *authen
 // - string: the result of the authentication request.
 func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
-	if c.registry.GetUserStore() == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
+	if c.app.GetUserStore() == nil {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() {
-		if c.registry.GetVaultStore() == nil {
-			return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
+	if c.app.GetConfig().GetUserStoreVaultEnabled() {
+		if c.app.GetVaultStore() == nil {
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
 		}
 	}
 
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetBlindIndexStoreEmail() == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, `blind index store is required`, homeURL, 5)
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetBlindIndexStoreEmail() == nil {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `blind index store is required`, homeURL, 5)
 	}
 
-	if c.registry.GetSessionStore() == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, `session store is required`, homeURL, 5)
+	if c.app.GetSessionStore() == nil {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `session store is required`, homeURL, 5)
 	}
 
 	email, backUrl, errorMessage := c.emailAndBackUrlFromAuthKnightRequest(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
 	}
 
 	user, err := c.userFindByEmailOrCreate(r.Context(), email, userstore.USER_STATUS_ACTIVE)
 
 	if err != nil {
-		c.registry.GetLogger().Error("At Auth Controller > AnyIndex > User Create Error", slog.String("error", err.Error()))
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, msgUserNotFound, homeURL, 5)
+		c.app.GetLogger().Error("At Auth Controller > AnyIndex > User Create Error", slog.String("error", err.Error()))
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgUserNotFound, homeURL, 5)
 	}
 
 	if user == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, msgAccountNotFound, homeURL, 5)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgAccountNotFound, homeURL, 5)
 	}
 
 	if !user.IsActive() {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, msgAccountNotActive, homeURL, 5)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgAccountNotActive, homeURL, 5)
 	}
 
 	session := sessionstore.NewSession().
@@ -114,15 +114,15 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
-	if c.registry.GetConfig() != nil && c.registry.GetConfig().IsEnvDevelopment() {
+	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
 		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
 	}
 
-	err = c.registry.GetSessionStore().SessionCreate(r.Context(), session)
+	err = c.app.GetSessionStore().SessionCreate(r.Context(), session)
 
 	if err != nil {
-		c.registry.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", err.Error()))
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
+		c.app.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", err.Error()))
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
 	}
 
 	auth.AuthCookieSet(w, r, session.GetKey())
@@ -133,13 +133,13 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		redirectUrl = backUrl
 	}
 
-	return helpers.ToFlashSuccess(c.registry.GetCacheStore(), w, r, "Login was successful", redirectUrl, 5)
+	return helpers.ToFlashSuccess(c.app.GetCacheStore(), w, r, "Login was successful", redirectUrl, 5)
 }
 
 // == PRIVATE METHODS =========================================================
 
 func (c *authenticationController) findUserIDInBlindIndex(ctx context.Context, email string) (userID string, err error) {
-	recordsFound, err := c.registry.GetBlindIndexStoreEmail().SearchValueList(ctx, blindindexstore.NewSearchValueQuery().
+	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(ctx, blindindexstore.NewSearchValueQuery().
 		SetSearchValue(email).
 		SetSearchType(blindindexstore.SEARCH_TYPE_EQUALS))
 
@@ -164,11 +164,11 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 	response, err := c.callAuthKnight(r.Context(), once)
 
 	if err != nil {
-		c.registry.GetLogger().Error("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Error", slog.String("error", err.Error()))
+		c.app.GetLogger().Error("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Error", slog.String("error", err.Error()))
 		return "", "", "No response from authentication provider"
 	}
 
-	c.registry.GetLogger().Info("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Response", slog.Any("response", response))
+	c.app.GetLogger().Info("At Auth Controller > emailFromAuthKnightRequest > Call Auth Knight Response", slog.Any("response", response))
 
 	status := lo.ValueOr(response, "status", "")
 	message := lo.ValueOr(response, "message", "")
@@ -187,7 +187,7 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 	}
 
 	if status != "success" {
-		c.registry.GetLogger().Warn("At Auth Controller > AnyIndex > Response Status", slog.String("error", message.(string)))
+		c.app.GetLogger().Warn("At Auth Controller > AnyIndex > Response Status", slog.String("error", message.(string)))
 		return "", "", "Invalid authentication response status"
 	}
 
@@ -251,9 +251,9 @@ func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.
 func (c *authenticationController) callAuthKnight(ctx context.Context, once string) (map[string]interface{}, error) {
 	var response map[string]interface{}
 
-	if c.registry.GetConfig() != nil && c.registry.GetConfig().IsEnvTesting() {
+	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvTesting() {
 		var testResponseJSONString = ""
-		if once == testutils.TestKey(c.registry.GetConfig()) {
+		if once == testutils.TestKey(c.app.GetConfig()) {
 			testResponseJSONString = `{"status":"success","message":"success","data":{"email":"test@test.com"}}`
 		} else {
 			testResponseJSONString = `{"status":"error","message":"once data is invalid:test","data":{}}`
@@ -317,7 +317,7 @@ func (c *authenticationController) calculateRedirectURL(user userstore.UserInter
 	// 3. If user does not have any names, redirect to profile
 	if !user.IsRegistrationCompleted() {
 		redirectUrl = links.Auth().Register()
-		redirectUrl = helpers.ToFlashInfoURL(c.registry.GetCacheStore(), "Thank you for logging in. Please complete your data to finish your registration", redirectUrl, 5)
+		redirectUrl = helpers.ToFlashInfoURL(c.app.GetCacheStore(), "Thank you for logging in. Please complete your data to finish your registration", redirectUrl, 5)
 	}
 
 	return redirectUrl
@@ -385,29 +385,29 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		SetStatus(status).
 		SetEmail(email)
 
-	if c.registry.GetUserStore() == nil {
+	if c.app.GetUserStore() == nil {
 		return nil, errors.New("user store is nil")
 	}
 
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() && c.registry.GetVaultStore() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetVaultStore() == nil {
 		return nil, errors.New(`vault store is nil`)
 	}
 
-	err := c.registry.GetUserStore().UserCreate(ctx, user)
+	err := c.app.GetUserStore().UserCreate(ctx, user)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if !c.registry.GetConfig().GetUserStoreVaultEnabled() {
+	if !c.app.GetConfig().GetUserStoreVaultEnabled() {
 		return user, nil
 	}
 
-	if c.registry.GetVaultStore() == nil {
+	if c.app.GetVaultStore() == nil {
 		return nil, errors.New(`vault store is nil`)
 	}
 
-	emailToken, err := c.registry.GetVaultStore().TokenCreate(ctx, email, c.registry.GetConfig().GetVaultStoreKey(), 20)
+	emailToken, err := c.app.GetVaultStore().TokenCreate(ctx, email, c.app.GetConfig().GetVaultStoreKey(), 20)
 
 	if err != nil {
 		return nil, err
@@ -415,7 +415,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 
 	user.SetEmail(emailToken)
 
-	err = c.registry.GetUserStore().UserUpdate(ctx, user)
+	err = c.app.GetUserStore().UserUpdate(ctx, user)
 
 	if err != nil {
 		return nil, err
@@ -425,7 +425,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		SetSourceReferenceID(user.GetID()).
 		SetSearchValue(email)
 
-	err = c.registry.GetBlindIndexStoreEmail().SearchValueCreate(ctx, searchValue)
+	err = c.app.GetBlindIndexStoreEmail().SearchValueCreate(ctx, searchValue)
 
 	if err != nil {
 		return nil, err
@@ -454,12 +454,12 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 //   - userstore.UserInterface: The user object.
 //   - error: An error object if an error occurred during the operation.
 func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, email string, status string) (userstore.UserInterface, error) {
-	if c.registry.GetUserStore() == nil {
+	if c.app.GetUserStore() == nil {
 		return nil, errors.New("user store is nil")
 	}
 
-	if c.registry.GetConfig().GetUserStoreVaultEnabled() {
-		if c.registry.GetVaultStore() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() {
+		if c.app.GetVaultStore() == nil {
 			return nil, errors.New(`vault store is nil`)
 		}
 
@@ -472,14 +472,14 @@ func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, 
 			return c.userCreate(ctx, email, status)
 		}
 
-		user, err := c.registry.GetUserStore().UserFindByID(ctx, userID)
+		user, err := c.app.GetUserStore().UserFindByID(ctx, userID)
 
 		if err != nil {
 			return nil, err
 		}
 
 		if user == nil {
-			c.registry.GetLogger().Warn("At Auth Controller > userFindByEmailOrCreate",
+			c.app.GetLogger().Warn("At Auth Controller > userFindByEmailOrCreate",
 				slog.String("error", "User not found, even though email was found in the blind index, and user ID returned successfully"),
 				slog.String("user", userID))
 			return nil, nil
@@ -488,7 +488,7 @@ func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, 
 		return user, nil
 	}
 
-	user, err := c.registry.GetUserStore().UserFindByEmail(ctx, email)
+	user, err := c.app.GetUserStore().UserFindByEmail(ctx, email)
 
 	if err != nil {
 		return nil, err

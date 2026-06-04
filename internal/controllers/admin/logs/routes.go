@@ -3,20 +3,20 @@ package admin
 import (
 	"errors"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
 
-func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
-	if registry == nil {
-		return nil, errors.New("registry cannot be nil")
+func Routes(app app.AppInterface) ([]rtr.RouteInterface, error) {
+	if app == nil {
+		return nil, errors.New("app cannot be nil")
 	}
 
 	logs := rtr.NewRoute().
 		SetName("Admin > Logs").
 		SetPath(links.ADMIN_LOGS).
-		SetHandler(NewLogsAdminController(registry).Handler)
+		SetHandler(NewLogsAdminController(app).Handler)
 
 	return []rtr.RouteInterface{
 		logs,

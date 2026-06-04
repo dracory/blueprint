@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleUserDeleteAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleUserDeleteAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleUserDeleteAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleUserDeleteAjax_RequiresUserStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleUserDeleteAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleUserDeleteAjax_RequiresUserStore(t *testing.T) {
 }
 
 func TestHandleUserDeleteAjax_RequiresUserID(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleUserDeleteAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

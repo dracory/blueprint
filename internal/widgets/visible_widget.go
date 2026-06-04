@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/config"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 	"slices"
 
 	"github.com/samber/lo"
@@ -17,13 +17,13 @@ var _ Widget = (*visibleWidget)(nil) // verify it extends the interface
 // NewVisibleWidget creates a new instance of the show widget
 //
 // Parameters:
-//   - registry: Registry interface for accessing services
+//   - app: app interface for accessing services
 //
 // Returns:
 //   - *visibleWidget - A pointer to the show widget
-func NewVisibleWidget(registry registry.RegistryInterface) *visibleWidget {
+func NewVisibleWidget(app app.AppInterface) *visibleWidget {
 	return &visibleWidget{
-		registry: registry,
+		app: app,
 	}
 }
 
@@ -40,7 +40,7 @@ func NewVisibleWidget(registry registry.RegistryInterface) *visibleWidget {
 // <x-visible environment="staging" auth="no">content</x-visible>
 // <x-visible environment="local" auth="yes">content</x-visible>
 type visibleWidget struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == PUBLIC METHODS =========================================================
@@ -158,23 +158,23 @@ func (t *visibleWidget) isEnvironmentMatch(environment string) bool {
 		return false
 	}
 
-	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && t.registry.GetConfig().IsEnvDevelopment() {
+	if environment == config.APP_ENVIRONMENT_DEVELOPMENT && t.app.GetConfig().IsEnvDevelopment() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_LOCAL && t.registry.GetConfig().IsEnvLocal() {
+	if environment == config.APP_ENVIRONMENT_LOCAL && t.app.GetConfig().IsEnvLocal() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_PRODUCTION && t.registry.GetConfig().IsEnvProduction() {
+	if environment == config.APP_ENVIRONMENT_PRODUCTION && t.app.GetConfig().IsEnvProduction() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_STAGING && t.registry.GetConfig().IsEnvStaging() {
+	if environment == config.APP_ENVIRONMENT_STAGING && t.app.GetConfig().IsEnvStaging() {
 		return true
 	}
 
-	if environment == config.APP_ENVIRONMENT_TESTING && t.registry.GetConfig().IsEnvTesting() {
+	if environment == config.APP_ENVIRONMENT_TESTING && t.app.GetConfig().IsEnvTesting() {
 		return true
 	}
 

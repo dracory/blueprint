@@ -3,19 +3,19 @@ package layouts
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cmsstore/frontend"
 	"github.com/dracory/hb"
 )
 
 func NewCmsLayout(
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 	r *http.Request,
 	options Options,
 ) *cmsLayout {
 	layout := &cmsLayout{}
-	layout.registry = registry
+	layout.app = app
 	layout.request = r
 	layout.title = options.Title
 	layout.content = options.Content
@@ -27,7 +27,7 @@ func NewCmsLayout(
 }
 
 type cmsLayout struct {
-	registry   registry.RegistryInterface
+	app   app.AppInterface
 	request    *http.Request
 	title      string
 	content    hb.TagInterface
@@ -38,23 +38,23 @@ type cmsLayout struct {
 }
 
 func (layout *cmsLayout) ToHTML() string {
-	if layout.registry == nil {
+	if layout.app == nil {
 		return "App is not initialized"
 	}
-	if layout.registry.GetConfig() == nil {
+	if layout.app.GetConfig() == nil {
 		return "Config is not initialized"
 	}
-	if !layout.registry.GetConfig().GetCmsStoreUsed() {
+	if !layout.app.GetConfig().GetCmsStoreUsed() {
 		return "Cms store is not used"
 	}
-	// if layout.registry.GetConfig().GetCmsStoreTemplateID() == "" {
+	// if layout.app.GetConfig().GetCmsStoreTemplateID() == "" {
 	// 	return "Cms store template is not set"
 	// }
-	if layout.registry.GetCmsStore() == nil {
+	if layout.app.GetCmsStore() == nil {
 		return "Cms store is not initialized"
 	}
 
-	// list := widgets.WidgetRegistry(layout.registry)
+	// list := widgets.WidgetRegistry(layout.app)
 
 	// shortcodes := []cmsstore.ShortcodeInterface{}
 	// for _, widget := range list {
@@ -62,8 +62,8 @@ func (layout *cmsLayout) ToHTML() string {
 	// }
 
 	fe := frontend.New(frontend.Config{
-		Store:  layout.registry.GetCmsStore(),
-		Logger: layout.registry.GetLogger(),
+		Store:  layout.app.GetCmsStore(),
+		Logger: layout.app.GetLogger(),
 	})
 
 	pageContent := ""
@@ -88,7 +88,7 @@ func (layout *cmsLayout) ToHTML() string {
 
 	html, err := fe.TemplateRenderHtmlByID(
 		layout.request,
-		layout.registry.GetConfig().GetCmsStoreTemplateID(),
+		layout.app.GetConfig().GetCmsStoreTemplateID(),
 		struct {
 			PageContent         string
 			PageCanonicalURL    string
@@ -108,11 +108,11 @@ func (layout *cmsLayout) ToHTML() string {
 		})
 
 	if err != nil {
-		layout.registry.GetLogger().Error(
+		layout.app.GetLogger().Error(
 			"At CmsLayout",
 			slog.Any("error", err),
-			slog.Any("template_id", layout.registry.GetConfig().GetCmsStoreTemplateID()))
-		return "Template (" + layout.registry.GetConfig().GetCmsStoreTemplateID() + ") error. Please try again later"
+			slog.Any("template_id", layout.app.GetConfig().GetCmsStoreTemplateID()))
+		return "Template (" + layout.app.GetConfig().GetCmsStoreTemplateID() + ") error. Please try again later"
 	}
 
 	return html

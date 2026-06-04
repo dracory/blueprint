@@ -2,7 +2,7 @@ package layouts
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -18,7 +18,7 @@ import (
 // NOTE: It is used for the registration page, which only has a
 // registration form and no navigation
 type blankLayout struct {
-	registry   registry.RegistryInterface
+	app   app.AppInterface
 	r          *http.Request
 	title      string
 	content    hb.TagInterface
@@ -31,9 +31,9 @@ type blankLayout struct {
 // == CONSTRUCTOR =============================================================
 
 // NewBlankLayout creates a new guest layout
-func NewBlankLayout(registry registry.RegistryInterface, r *http.Request, options Options) *blankLayout {
+func NewBlankLayout(app app.AppInterface, r *http.Request, options Options) *blankLayout {
 	layout := &blankLayout{}
-	layout.registry = registry
+	layout.app = app
 	layout.r = r
 	layout.title = options.Title + " | " + options.AppName
 	layout.content = options.Content

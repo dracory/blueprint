@@ -14,14 +14,14 @@ import (
 )
 
 func TestPostManagerController_DeprecatedMethods_PrepareData(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewPostManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewPostManagerController(app)
 
 	req := httptest.NewRequest(http.MethodGet, "/admin/blog/posts?page=1", nil)
 	req = req.WithContext(context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user))
@@ -36,13 +36,13 @@ func TestPostManagerController_DeprecatedMethods_PrepareData(t *testing.T) {
 }
 
 func TestPostManagerController_DeprecatedMethods_Page(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	controller := NewPostManagerController(registry)
+	controller := NewPostManagerController(app)
 
 	data := postManagerControllerData{
 		pageInt: 0,

@@ -7,15 +7,15 @@ import (
 )
 
 func TestWidgetRegistry(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	widgets := WidgetRegistry(nil)
 	if widgets == nil {
 		t.Error("WidgetRegistry() should not return nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	widgets = WidgetRegistry(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	widgets = WidgetRegistry(app)
 	if widgets == nil {
 		t.Error("WidgetRegistry() should not return nil")
 	}

@@ -17,15 +17,15 @@ const (
 )
 
 func TestUserTokenizeSuccess(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 		testutils.WithVaultStore(true),
 	)
 
 	ctx := context.Background()
-	registry.GetConfig().SetVaultStoreKey(vaultKeyTest)
+	app.GetConfig().SetVaultStoreKey(vaultKeyTest)
 
-	userStore := registry.GetUserStore()
+	userStore := app.GetUserStore()
 	user, err := testutils.SeedUser(userStore, seedUserID)
 	if err != nil {
 		t.Fatalf("failed to seed user: %v", err)
@@ -39,7 +39,7 @@ func TestUserTokenizeSuccess(t *testing.T) {
 
 	firstToken, lastToken, emailToken, phoneToken, businessToken, err := UserTokenize(
 		ctx,
-		registry.GetVaultStore(),
+		app.GetVaultStore(),
 		vaultKeyTest,
 		user,
 		"John",
@@ -52,11 +52,11 @@ func TestUserTokenizeSuccess(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	assertTokenStored(t, registry.GetVaultStore(), vaultKeyTest, firstToken, "John")
-	assertTokenStored(t, registry.GetVaultStore(), vaultKeyTest, lastToken, "Doe")
-	assertTokenStored(t, registry.GetVaultStore(), vaultKeyTest, emailToken, "john@example.com")
-	assertTokenStored(t, registry.GetVaultStore(), vaultKeyTest, phoneToken, "+44111222333")
-	assertTokenStored(t, registry.GetVaultStore(), vaultKeyTest, businessToken, "JD Consulting")
+	assertTokenStored(t, app.GetVaultStore(), vaultKeyTest, firstToken, "John")
+	assertTokenStored(t, app.GetVaultStore(), vaultKeyTest, lastToken, "Doe")
+	assertTokenStored(t, app.GetVaultStore(), vaultKeyTest, emailToken, "john@example.com")
+	assertTokenStored(t, app.GetVaultStore(), vaultKeyTest, phoneToken, "+44111222333")
+	assertTokenStored(t, app.GetVaultStore(), vaultKeyTest, businessToken, "JD Consulting")
 }
 
 func TestUserTokenizeReturnsErrorWhenVaultStoreNil(t *testing.T) {
@@ -66,27 +66,27 @@ func TestUserTokenizeReturnsErrorWhenVaultStoreNil(t *testing.T) {
 }
 
 func TestUserTokenizeReturnsErrorWhenUserNil(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 		testutils.WithVaultStore(true),
 	)
 
-	if _, _, _, _, _, err := UserTokenize(context.Background(), registry.GetVaultStore(), vaultKeyTest, nil, "", "", "", "", ""); err == nil {
+	if _, _, _, _, _, err := UserTokenize(context.Background(), app.GetVaultStore(), vaultKeyTest, nil, "", "", "", "", ""); err == nil {
 		t.Fatalf("expected error when user is nil")
 	}
 }
 
 func TestUserTokenizePropagatesVaultErrors(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 		testutils.WithVaultStore(true),
 	)
 	ctx := context.Background()
 
-	store := registry.GetVaultStore()
+	store := app.GetVaultStore()
 	user := userstore.NewUser()
 
-	if _, err := registry.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
+	if _, err := app.GetDatabase().ExecContext(ctx, fmt.Sprintf("DROP TABLE IF EXISTS %s", store.GetVaultTableName())); err != nil {
 		t.Fatalf("failed to drop vault table: %v", err)
 	}
 

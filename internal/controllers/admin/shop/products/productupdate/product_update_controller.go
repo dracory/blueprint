@@ -9,7 +9,7 @@ import (
 	"project/internal/controllers/admin/shop/products/productupdate/tagscomponent"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
@@ -27,11 +27,11 @@ const (
 )
 
 type productUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewProductUpdateController(registry registry.RegistryInterface) *productUpdateController {
-	return &productUpdateController{registry: registry}
+func NewProductUpdateController(app app.AppInterface) *productUpdateController {
+	return &productUpdateController{app: app}
 }
 
 func (controller *productUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -40,38 +40,38 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 	action := req.GetStringTrimmed(r, "action")
 
 	if productID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product ID is required", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product ID is required", links.Admin().Home(), 10)
 	}
 
-	product, err := controller.registry.GetShopStore().ProductFindByID(r.Context(), productID)
+	product, err := controller.app.GetShopStore().ProductFindByID(r.Context(), productID)
 	if err != nil {
 		slog.Error("Error. productUpdateController: ProductFindByID", slog.String("error", err.Error()), slog.String("product_id", productID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
 	}
 
 	if product == nil {
 		slog.Warn("Warning. productUpdateController: ProductFindByID", slog.String("error", "Product not found"), slog.String("product_id", productID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
 	}
 
 	// Dispatch based on action
 	switch action {
 	case ACTION_LOAD_DETAILS:
-		return detailscomponent.HandleAjaxLoadDetails(controller.registry, productID)
+		return detailscomponent.HandleAjaxLoadDetails(controller.app, productID)
 	case ACTION_SAVE_DETAILS:
-		return detailscomponent.HandleAjaxSaveDetails(controller.registry, r, productID)
+		return detailscomponent.HandleAjaxSaveDetails(controller.app, r, productID)
 	case ACTION_LOAD_METADATA:
-		return metadatacomponent.HandleAjaxLoadMetadata(controller.registry, productID)
+		return metadatacomponent.HandleAjaxLoadMetadata(controller.app, productID)
 	case ACTION_SAVE_METADATA:
-		return metadatacomponent.HandleAjaxSaveMetadata(controller.registry, r, productID)
+		return metadatacomponent.HandleAjaxSaveMetadata(controller.app, r, productID)
 	case ACTION_LOAD_TAGS:
-		return tagscomponent.HandleAjaxLoadTags(controller.registry, productID)
+		return tagscomponent.HandleAjaxLoadTags(controller.app, productID)
 	case ACTION_SAVE_TAGS:
-		return tagscomponent.HandleAjaxSaveTags(controller.registry, r, productID)
+		return tagscomponent.HandleAjaxSaveTags(controller.app, r, productID)
 	case ACTION_LOAD_MEDIA:
-		return mediacomponent.HandleAjaxLoadMedia(controller.registry, productID)
+		return mediacomponent.HandleAjaxLoadMedia(controller.app, productID)
 	case ACTION_SAVE_MEDIA:
-		return mediacomponent.HandleAjaxSaveMedia(controller.registry, r, productID)
+		return mediacomponent.HandleAjaxSaveMedia(controller.app, r, productID)
 	default:
 		// No action specified - render page
 		return controller.handleRenderPage(r, product, view, productID)

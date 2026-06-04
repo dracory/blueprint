@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleCategoryDeleteAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleCategoryDelete, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleCategoryDeleteAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleCategoryDeleteAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleCategoryDelete, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleCategoryDeleteAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleCategoryDeleteAjax_DeletesCategory(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleCategoryDelete, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

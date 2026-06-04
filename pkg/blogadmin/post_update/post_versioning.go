@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/sb"
@@ -12,11 +12,11 @@ import (
 	"github.com/samber/lo"
 )
 
-func createPostVersioning(ctx context.Context, registry registry.RegistryInterface, post blogstore.PostInterface) error {
-	if registry == nil {
+func createPostVersioning(ctx context.Context, app app.AppInterface, post blogstore.PostInterface) error {
+	if app == nil {
 		return errors.New("blog store not available")
 	}
-	if registry.GetBlogStore() == nil {
+	if app.GetBlogStore() == nil {
 		return errors.New("blog store not available")
 	}
 
@@ -24,11 +24,11 @@ func createPostVersioning(ctx context.Context, registry registry.RegistryInterfa
 		return errors.New("post is nil")
 	}
 
-	if !registry.GetBlogStore().VersioningEnabled() {
+	if !app.GetBlogStore().VersioningEnabled() {
 		return nil
 	}
 
-	lastVersioningList, err := registry.GetBlogStore().VersioningList(ctx, blogstore.NewVersioningQuery().
+	lastVersioningList, err := app.GetBlogStore().VersioningList(ctx, blogstore.NewVersioningQuery().
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
 		SetEntityID(post.GetID()).
 		SetOrderBy(versionstore.COLUMN_CREATED_AT).
@@ -54,7 +54,7 @@ func createPostVersioning(ctx context.Context, registry registry.RegistryInterfa
 		}
 	}
 
-	return registry.GetBlogStore().VersioningCreate(ctx, blogstore.NewVersioning().
+	return app.GetBlogStore().VersioningCreate(ctx, blogstore.NewVersioning().
 		SetEntityID(post.GetID()).
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
 		SetContent(content))

@@ -30,8 +30,8 @@ func TestTimezoneFromRequest_NoUser(t *testing.T) {
 
 // TestTimezoneFromRequest_WithUserTimezone tests retrieving timezone from user
 func TestTimezoneFromRequest_WithUserTimezone(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user with timezone
 	user := userstore.NewUser().
@@ -40,7 +40,7 @@ func TestTimezoneFromRequest_WithUserTimezone(t *testing.T) {
 		SetLastName("User").
 		SetTimezone("America/New_York")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -60,8 +60,8 @@ func TestTimezoneFromRequest_WithUserTimezone(t *testing.T) {
 
 // TestTimezoneFromRequest_UserWithEmptyTimezone tests that empty timezone returns UTC
 func TestTimezoneFromRequest_UserWithEmptyTimezone(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user with empty timezone
 	user := userstore.NewUser().
@@ -69,7 +69,7 @@ func TestTimezoneFromRequest_UserWithEmptyTimezone(t *testing.T) {
 		SetFirstName("NoTimeZone").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}

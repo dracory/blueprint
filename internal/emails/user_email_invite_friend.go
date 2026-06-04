@@ -5,7 +5,7 @@ import (
 	"errors"
 	"html"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/email"
 	"github.com/dracory/hb"
@@ -13,36 +13,36 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewInviteFriendEmail(registry registry.RegistryInterface, us userstore.StoreInterface) *inviteFriendEmail {
-	return &inviteFriendEmail{registry: registry, userStore: us}
+func NewInviteFriendEmail(app app.AppInterface, us userstore.StoreInterface) *inviteFriendEmail {
+	return &inviteFriendEmail{app: app, userStore: us}
 }
 
 type inviteFriendEmail struct {
-	registry  registry.RegistryInterface
+	app  app.AppInterface
 	userStore userstore.StoreInterface
 }
 
 // Send sends an invitation email to a friend
 func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipientEmail string, recipientName string) error {
-	appName := lo.IfF(e.registry != nil, func() string {
-		if e.registry.GetConfig() == nil {
+	appName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
 			return ""
 		}
-		return e.registry.GetConfig().GetAppName()
+		return e.app.GetConfig().GetAppName()
 	}).Else("")
 
-	fromEmail := lo.IfF(e.registry != nil, func() string {
-		if e.registry.GetConfig() == nil {
+	fromEmail := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
 			return ""
 		}
-		return e.registry.GetConfig().GetMailFromAddress()
+		return e.app.GetConfig().GetMailFromAddress()
 	}).Else("")
 
-	fromName := lo.IfF(e.registry != nil, func() string {
-		if e.registry.GetConfig() == nil {
+	fromName := lo.IfF(e.app != nil, func() string {
+		if e.app.GetConfig() == nil {
 			return ""
 		}
-		return e.registry.GetConfig().GetMailFromName()
+		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
 	if e.userStore == nil {
@@ -69,7 +69,7 @@ func (e *inviteFriendEmail) Send(sendingUserID string, userNote string, recipien
 	emailContent := e.template(appName, userName, userNote, recipientName)
 
 	// Use the new CreateEmailTemplate function instead of blankEmailTemplate
-	finalHtml := CreateEmailTemplate(e.registry, emailSubject, emailContent)
+	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
 
 	// Use the new SendEmail function instead of Send
 	errSend := SendEmail(SendOptions{

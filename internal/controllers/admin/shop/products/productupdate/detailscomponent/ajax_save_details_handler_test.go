@@ -14,7 +14,7 @@ import (
 
 // TestHandleAjaxSaveDetails_Success tests successful details saving
 func TestHandleAjaxSaveDetails_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -26,7 +26,7 @@ func TestHandleAjaxSaveDetails_Success(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -34,14 +34,14 @@ func TestHandleAjaxSaveDetails_Success(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-details&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveDetails(registry, req, product.GetID())
+	response := HandleAjaxSaveDetails(app, req, product.GetID())
 
 	if !strings.Contains(response, `"details"`) {
 		t.Error("expected response to contain details field")
 	}
 
 	// Verify product was actually updated
-	updatedProduct, err := registry.GetShopStore().ProductFindByID(context.Background(), product.GetID())
+	updatedProduct, err := app.GetShopStore().ProductFindByID(context.Background(), product.GetID())
 	if err != nil {
 		t.Fatalf("failed to find updated product: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestHandleAjaxSaveDetails_Success(t *testing.T) {
 
 // TestHandleAjaxSaveDetails_InvalidBody tests error with invalid JSON body
 func TestHandleAjaxSaveDetails_InvalidBody(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -65,7 +65,7 @@ func TestHandleAjaxSaveDetails_InvalidBody(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-details&product_id=test123",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveDetails(registry, req, "test123")
+	response := HandleAjaxSaveDetails(app, req, "test123")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -74,7 +74,7 @@ func TestHandleAjaxSaveDetails_InvalidBody(t *testing.T) {
 
 // TestHandleAjaxSaveDetails_ProductNotFound tests error when product not found
 func TestHandleAjaxSaveDetails_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -83,7 +83,7 @@ func TestHandleAjaxSaveDetails_ProductNotFound(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-details&product_id=nonexistent",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveDetails(registry, req, "nonexistent")
+	response := HandleAjaxSaveDetails(app, req, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")

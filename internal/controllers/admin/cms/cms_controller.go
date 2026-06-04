@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/base/webtheme"
 
@@ -13,17 +13,17 @@ import (
 )
 
 type cmsNewController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewCmsNewController(registry registry.RegistryInterface) *cmsNewController {
-	return &cmsNewController{registry: registry}
+func NewCmsNewController(app app.AppInterface) *cmsNewController {
+	return &cmsNewController{app: app}
 }
 
 func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Request) {
 	admin, err := adminCmsStore.New(adminCmsStore.AdminOptions{
-		Store:                  controller.registry.GetCmsStore(),
-		Logger:                 controller.registry.GetLogger(),
+		Store:                  controller.app.GetCmsStore(),
+		Logger:                 controller.app.GetLogger(),
 		BlockEditorDefinitions: webtheme.BlockEditorDefinitions(),
 		// BlockEditorRenderer: func(blocks []ui.BlockInterface) string {
 		// 	return webtheme.New(blocks).ToHtml()
@@ -34,7 +34,7 @@ func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Reque
 			Scripts    []string
 			ScriptURLs []string
 		}) string {
-			return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+			return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 				Title:      pageTitle + " | CMS (NEW)",
 				Content:    hb.Raw(pageContent),
 				ScriptURLs: options.ScriptURLs,
@@ -48,12 +48,12 @@ func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Reque
 	})
 
 	if err != nil {
-		if logger := controller.registry.GetLogger(); logger != nil {
+		if logger := controller.app.GetLogger(); logger != nil {
 			logger.Error("At admin > cmsNewController > Handler", "error", err.Error())
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		if _, writeErr := w.Write([]byte(err.Error())); writeErr != nil {
-			if logger := controller.registry.GetLogger(); logger != nil {
+			if logger := controller.app.GetLogger(); logger != nil {
 				logger.Error("At admin > cmsNewController > Handler", "write_error", writeErr.Error())
 			}
 		}

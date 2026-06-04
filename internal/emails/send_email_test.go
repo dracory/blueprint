@@ -18,7 +18,7 @@ func TestInitEmailSender(t *testing.T) {
 		senderMu.Unlock()
 	}()
 
-	// Test with nil registry
+	// Test with nil app
 	InitEmailSender(nil)
 
 	senderMu.RLock()
@@ -29,14 +29,14 @@ func TestInitEmailSender(t *testing.T) {
 		senderMu.RUnlock()
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	InitEmailSender(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	InitEmailSender(app)
 
 	senderMu.RLock()
 	if emailSender == nil {
 		senderMu.RUnlock()
-		t.Error("emailSender should be initialized after InitEmailSender with valid registry")
+		t.Error("emailSender should be initialized after InitEmailSender with valid app")
 	} else {
 		senderMu.RUnlock()
 	}

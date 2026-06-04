@@ -14,7 +14,7 @@ import (
 
 // TestHandleAjaxSaveMetadata_Success tests successful metadata saving
 func TestHandleAjaxSaveMetadata_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -25,7 +25,7 @@ func TestHandleAjaxSaveMetadata_Success(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -33,7 +33,7 @@ func TestHandleAjaxSaveMetadata_Success(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-metadata&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMetadata(registry, req, product.GetID())
+	response := HandleAjaxSaveMetadata(app, req, product.GetID())
 
 	if !strings.Contains(response, `"metadata"`) {
 		t.Error("expected response to contain metadata field")
@@ -46,7 +46,7 @@ func TestHandleAjaxSaveMetadata_Success(t *testing.T) {
 	}
 
 	// Verify metadata was actually saved
-	updatedProduct, err := registry.GetShopStore().ProductFindByID(context.Background(), product.GetID())
+	updatedProduct, err := app.GetShopStore().ProductFindByID(context.Background(), product.GetID())
 	if err != nil {
 		t.Fatalf("failed to find updated product: %v", err)
 	}
@@ -63,7 +63,7 @@ func TestHandleAjaxSaveMetadata_Success(t *testing.T) {
 
 // TestHandleAjaxSaveMetadata_InvalidBody tests error with invalid JSON body
 func TestHandleAjaxSaveMetadata_InvalidBody(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -72,7 +72,7 @@ func TestHandleAjaxSaveMetadata_InvalidBody(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-metadata&product_id=test123",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMetadata(registry, req, "test123")
+	response := HandleAjaxSaveMetadata(app, req, "test123")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -84,7 +84,7 @@ func TestHandleAjaxSaveMetadata_InvalidBody(t *testing.T) {
 
 // TestHandleAjaxSaveMetadata_ProductNotFound tests error when product not found
 func TestHandleAjaxSaveMetadata_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -93,7 +93,7 @@ func TestHandleAjaxSaveMetadata_ProductNotFound(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-metadata&product_id=nonexistent",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMetadata(registry, req, "nonexistent")
+	response := HandleAjaxSaveMetadata(app, req, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")

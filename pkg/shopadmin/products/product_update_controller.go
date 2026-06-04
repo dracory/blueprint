@@ -1,4 +1,4 @@
-﻿package products
+package products
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/bs"
@@ -21,12 +21,12 @@ import (
 )
 
 type productUpdateController struct {
-	registry       registry.RegistryInterface
+	app       app.AppInterface
 	fileManagerURL string
 }
 
-func NewProductUpdateController(registry registry.RegistryInterface, fileManagerURL string) *productUpdateController {
-	return &productUpdateController{registry: registry, fileManagerURL: fileManagerURL}
+func NewProductUpdateController(app app.AppInterface, fileManagerURL string) *productUpdateController {
+	return &productUpdateController{app: app, fileManagerURL: fileManagerURL}
 }
 
 func (controller *productUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -57,18 +57,18 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 	}
 
 	if productID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product ID is required", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product ID is required", links.Admin().Home(), 10)
 	}
 
-	product, err := controller.registry.GetShopStore().ProductFindByID(r.Context(), productID)
+	product, err := controller.app.GetShopStore().ProductFindByID(r.Context(), productID)
 	if err != nil {
 		slog.Error("Error. productUpdateController: ProductFindByID", slog.String("error", err.Error()), slog.String("product_id", productID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
 	}
 
 	if product == nil {
 		slog.Warn("Warning. productUpdateController: ProductFindByID", slog.String("error", "Product not found"), slog.String("product_id", productID))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Product not found", links.Admin().Home(), 10)
 	}
 
 	// Handle POST requests for each view
@@ -81,15 +81,15 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 
 		switch view {
 		case "details":
-			component = NewProductDetailsComponent(controller.registry)
+			component = NewProductDetailsComponent(controller.app)
 		case "metadata":
-			component = NewProductMetadataComponent(controller.registry)
+			component = NewProductMetadataComponent(controller.app)
 		case "media":
-			component = NewProductMediaComponent(controller.registry)
+			component = NewProductMediaComponent(controller.app)
 		case "tags":
-			component = NewProductTagsComponent(controller.registry)
+			component = NewProductTagsComponent(controller.app)
 		default:
-			component = NewProductDetailsComponent(controller.registry)
+			component = NewProductDetailsComponent(controller.app)
 		}
 
 		component.Mount(r, product, productID)
@@ -99,7 +99,7 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 
 	pageContent := controller.page(r, product, view, productID)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Product | Shop",
 		Content: pageContent,
 		ScriptURLs: []string{
@@ -188,23 +188,23 @@ func (controller *productUpdateController) page(r *http.Request, product shopsto
 
 	switch view {
 	case "details":
-		component := NewProductDetailsComponent(controller.registry)
+		component := NewProductDetailsComponent(controller.app)
 		component.Mount(r, product, productID)
 		body = component.Render()
 	case "media":
-		component := NewProductMediaComponent(controller.registry)
+		component := NewProductMediaComponent(controller.app)
 		component.Mount(r, product, productID)
 		body = component.Render()
 	case "tags":
-		component := NewProductTagsComponent(controller.registry)
+		component := NewProductTagsComponent(controller.app)
 		component.Mount(r, product, productID)
 		body = component.Render()
 	case "metadata":
-		component := NewProductMetadataComponent(controller.registry)
+		component := NewProductMetadataComponent(controller.app)
 		component.Mount(r, product, productID)
 		body = component.Render()
 	default:
-		component := NewProductDetailsComponent(controller.registry)
+		component := NewProductDetailsComponent(controller.app)
 		component.Mount(r, product, productID)
 		body = component.Render()
 	}
@@ -239,7 +239,7 @@ func (controller *productUpdateController) page(r *http.Request, product shopsto
 func (controller *productUpdateController) handleLoadMedia(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -286,7 +286,7 @@ func (controller *productUpdateController) handleLoadMedia(w http.ResponseWriter
 func (controller *productUpdateController) handleSaveMedia(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -342,7 +342,7 @@ func (controller *productUpdateController) handleSaveMedia(w http.ResponseWriter
 func (controller *productUpdateController) handleLoadMetadata(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -390,7 +390,7 @@ func (controller *productUpdateController) handleLoadMetadata(w http.ResponseWri
 func (controller *productUpdateController) handleSaveMetadata(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -449,7 +449,7 @@ func (controller *productUpdateController) handleSaveMetadata(w http.ResponseWri
 func (controller *productUpdateController) handleLoadTags(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -500,7 +500,7 @@ func (controller *productUpdateController) handleLoadTags(w http.ResponseWriter,
 func (controller *productUpdateController) handleSaveTags(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -565,7 +565,7 @@ func (controller *productUpdateController) handleSaveTags(w http.ResponseWriter,
 func (controller *productUpdateController) handleLoadDetails(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
@@ -607,7 +607,7 @@ func (controller *productUpdateController) handleLoadDetails(w http.ResponseWrit
 func (controller *productUpdateController) handleSaveDetails(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))

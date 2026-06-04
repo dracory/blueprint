@@ -12,7 +12,7 @@ import (
 
 // TestHandleAjaxLoadDetails_Success tests successful details loading
 func TestHandleAjaxLoadDetails_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -24,11 +24,11 @@ func TestHandleAjaxLoadDetails_Success(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadDetails(registry, product.GetID())
+	response := HandleAjaxLoadDetails(app, product.GetID())
 
 	if !strings.Contains(response, `"details"`) {
 		t.Error("expected response to contain details field")
@@ -43,12 +43,12 @@ func TestHandleAjaxLoadDetails_Success(t *testing.T) {
 
 // TestHandleAjaxLoadDetails_ProductNotFound tests error when product not found
 func TestHandleAjaxLoadDetails_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	response := HandleAjaxLoadDetails(registry, "nonexistent")
+	response := HandleAjaxLoadDetails(app, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/shopstore"
@@ -17,8 +17,8 @@ type DetailsRequest struct {
 }
 
 // HandleAjaxSaveDetails handles AJAX requests to save product details and returns JSON string
-func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request, productID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxSaveDetails(app app.AppInterface, r *http.Request, productID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
@@ -27,7 +27,7 @@ func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request,
 		return api.ErrorWithData("Invalid request body", map[string]any{}).ToString()
 	}
 
-	product, err := registry.GetShopStore().ProductFindByID(context.Background(), productID)
+	product, err := app.GetShopStore().ProductFindByID(context.Background(), productID)
 	if err != nil {
 		return api.ErrorWithData("Product not found", map[string]any{}).ToString()
 	}
@@ -49,7 +49,7 @@ func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request,
 		product.SetStatus(req.Details.Status)
 	}
 
-	if err := registry.GetShopStore().ProductUpdate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductUpdate(context.Background(), product); err != nil {
 		return api.ErrorWithData("Failed to save product details: "+err.Error(), map[string]any{}).ToString()
 	}
 

@@ -54,11 +54,11 @@ func TestUserSettingSet_NilRequest(t *testing.T) {
 
 // Test UserSettingGet with no user in context
 func TestUserSettingGet_NoUser(t *testing.T) {
-	registry := testutils.Setup(testutils.WithSessionStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithSessionStore(true))
+	defer app.GetDatabase().Close()
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	result := UserSettingGet(registry.GetSessionStore(), req, "key", "default")
+	result := UserSettingGet(app.GetSessionStore(), req, "key", "default")
 	if result != "default" {
 		t.Errorf("UserSettingGet(no user) = %v, want 'default'", result)
 	}
@@ -66,11 +66,11 @@ func TestUserSettingGet_NoUser(t *testing.T) {
 
 // Test UserSettingSet with no user in context
 func TestUserSettingSet_NoUser(t *testing.T) {
-	registry := testutils.Setup(testutils.WithSessionStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithSessionStore(true))
+	defer app.GetDatabase().Close()
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	err := UserSettingSet(registry.GetSessionStore(), req, "key", "value")
+	err := UserSettingSet(app.GetSessionStore(), req, "key", "value")
 	if err == nil {
 		t.Error("UserSettingSet(no user) expected error, got nil")
 	}
@@ -81,8 +81,8 @@ func TestUserSettingSet_NoUser(t *testing.T) {
 
 // Test UserSettingGet with no session found
 func TestUserSettingGet_NoSession(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user
 	user := userstore.NewUser().
@@ -90,7 +90,7 @@ func TestUserSettingGet_NoSession(t *testing.T) {
 		SetFirstName("Settings").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -101,7 +101,7 @@ func TestUserSettingGet_NoSession(t *testing.T) {
 	ctx := context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user)
 	req = req.WithContext(ctx)
 
-	result := UserSettingGet(registry.GetSessionStore(), req, "nonexistent-key", "default")
+	result := UserSettingGet(app.GetSessionStore(), req, "nonexistent-key", "default")
 	if result != "default" {
 		t.Errorf("UserSettingGet(no session) = %v, want 'default'", result)
 	}
@@ -109,8 +109,8 @@ func TestUserSettingGet_NoSession(t *testing.T) {
 
 // Test UserSettingSet with no session found
 func TestUserSettingSet_NoSession(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user
 	user := userstore.NewUser().
@@ -118,7 +118,7 @@ func TestUserSettingSet_NoSession(t *testing.T) {
 		SetFirstName("Settings2").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -129,7 +129,7 @@ func TestUserSettingSet_NoSession(t *testing.T) {
 	ctx := context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user)
 	req = req.WithContext(ctx)
 
-	err = UserSettingSet(registry.GetSessionStore(), req, "nonexistent-key", "value")
+	err = UserSettingSet(app.GetSessionStore(), req, "nonexistent-key", "value")
 	if err == nil {
 		t.Error("UserSettingSet(no session) expected error, got nil")
 	}

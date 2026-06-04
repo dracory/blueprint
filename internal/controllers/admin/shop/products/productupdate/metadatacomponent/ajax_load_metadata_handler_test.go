@@ -12,7 +12,7 @@ import (
 
 // TestHandleAjaxLoadMetadata_Success tests successful metadata loading
 func TestHandleAjaxLoadMetadata_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -27,11 +27,11 @@ func TestHandleAjaxLoadMetadata_Success(t *testing.T) {
 		"key2": "value2",
 	})
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadMetadata(registry, product.GetID())
+	response := HandleAjaxLoadMetadata(app, product.GetID())
 
 	if !strings.Contains(response, `"metadata"`) {
 		t.Error("expected response to contain metadata field")
@@ -46,12 +46,12 @@ func TestHandleAjaxLoadMetadata_Success(t *testing.T) {
 
 // TestHandleAjaxLoadMetadata_ProductNotFound tests error when product not found
 func TestHandleAjaxLoadMetadata_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	response := HandleAjaxLoadMetadata(registry, "nonexistent")
+	response := HandleAjaxLoadMetadata(app, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -63,7 +63,7 @@ func TestHandleAjaxLoadMetadata_ProductNotFound(t *testing.T) {
 
 // TestHandleAjaxLoadMetadata_NoMetadata tests product with no metadata
 func TestHandleAjaxLoadMetadata_NoMetadata(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -74,11 +74,11 @@ func TestHandleAjaxLoadMetadata_NoMetadata(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadMetadata(registry, product.GetID())
+	response := HandleAjaxLoadMetadata(app, product.GetID())
 
 	if !strings.Contains(response, `"metadata"`) {
 		t.Error("expected response to contain metadata field")

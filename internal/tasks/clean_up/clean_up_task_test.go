@@ -8,9 +8,9 @@ import (
 )
 
 func TestNewCleanUpTask_InitializesFields(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	handlerIface := NewCleanUpTask(registry)
+	handlerIface := NewCleanUpTask(app)
 	handler, ok := handlerIface.(*cleanUpTask)
 	if !ok {
 		t.Fatalf("expected *cleanUpTask, got different type")
@@ -21,15 +21,15 @@ func TestNewCleanUpTask_InitializesFields(t *testing.T) {
 	}
 
 	// verify app is set via reflection since app field is unexported
-	v := reflect.ValueOf(handler).Elem().FieldByName("registry")
+	v := reflect.ValueOf(handler).Elem().FieldByName("app")
 	if !v.IsValid() || v.IsNil() {
-		t.Fatalf("expected registry to be set on handler")
+		t.Fatalf("expected app to be set on handler")
 	}
 }
 
 func TestCleanUpTask_Metadata(t *testing.T) {
-	registry := testutils.Setup()
-	handler := NewCleanUpTask(registry)
+	app := testutils.Setup()
+	handler := NewCleanUpTask(app)
 
 	if got, want := handler.Alias(), "CleanUpTask"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -56,9 +56,9 @@ func TestCleanUpTask_Enqueue_AppNil(t *testing.T) {
 func TestCleanUpTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	handlerIface := NewCleanUpTask(registry)
+	handlerIface := NewCleanUpTask(app)
 	handler, ok := handlerIface.(*cleanUpTask)
 	if !ok {
 		t.Fatalf("expected *cleanUpTask, got different type")
@@ -72,9 +72,9 @@ func TestCleanUpTask_Enqueue_TaskStoreNil(t *testing.T) {
 func TestCleanUpTask_Handle_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	handler := NewCleanUpTask(registry)
+	handler := NewCleanUpTask(app)
 
 	if ok := handler.Handle(); !ok {
 		t.Fatalf("Handle() expected true when task store is nil, got false")
@@ -82,13 +82,13 @@ func TestCleanUpTask_Handle_TaskStoreNil(t *testing.T) {
 }
 
 func TestCleanUpTask_Handle_Success(t *testing.T) {
-	registry := testutils.Setup(testutils.WithTaskStore(true))
+	app := testutils.Setup(testutils.WithTaskStore(true))
 
-	if registry.GetTaskStore() == nil {
+	if app.GetTaskStore() == nil {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	handler := NewCleanUpTask(registry)
+	handler := NewCleanUpTask(app)
 
 	if ok := handler.Handle(); !ok {
 		t.Fatalf("Handle() expected true, got false")

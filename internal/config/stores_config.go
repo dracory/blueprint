@@ -7,7 +7,7 @@ import "fmt"
 // ============================================================================
 //
 // This is where you can configure which database stores will be enabled
-// an available through the registry.
+// an available through the app.
 //
 // ============================================================================
 

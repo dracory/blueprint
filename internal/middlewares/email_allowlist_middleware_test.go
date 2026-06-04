@@ -21,9 +21,9 @@ func TestEmailAllowlistMiddleware_UnauthenticatedRedirectsToLogin(t *testing.T) 
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not reach next handler")
 	}, test.NewRequestOptions{})
 
@@ -39,7 +39,7 @@ func TestEmailAllowlistMiddleware_UnauthenticatedRedirectsToLogin(t *testing.T) 
 		t.Fatalf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -67,11 +67,11 @@ func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetEmailsAllowedAccess([]string{"allowed@example.com"})
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
-		registry.GetUserStore(),
-		registry.GetSessionStore(),
+		app.GetUserStore(),
+		app.GetSessionStore(),
 		"blocked-user",
 		httptest.NewRequest("GET", "/", nil),
 		1,
@@ -83,11 +83,11 @@ func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
 
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 	user.SetEmail("blocked@example.com")
-	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatal(err)
 	}
 
-	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not reach next handler")
 	}, test.NewRequestOptions{
 		Context: map[any]any{
@@ -104,7 +104,7 @@ func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
 		t.Fatalf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,11 +130,11 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetEmailsAllowedAccess([]string{allowedEmail})
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
-		registry.GetUserStore(),
-		registry.GetSessionStore(),
+		app.GetUserStore(),
+		app.GetSessionStore(),
 		test.USER_01,
 		httptest.NewRequest("GET", "/", nil),
 		1,
@@ -146,12 +146,12 @@ func TestEmailAllowlistMiddleware_AllowedEmail(t *testing.T) {
 
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 	user.SetEmail(allowedEmail)
-	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatal(err)
 	}
 
 	called := false
-	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		called = true
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -180,11 +180,11 @@ func TestEmailAllowlistMiddleware_AllEmailsAllowedWhenMapEmpty(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetEmailsAllowedAccess([]string{})
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
-		registry.GetUserStore(),
-		registry.GetSessionStore(),
+		app.GetUserStore(),
+		app.GetSessionStore(),
 		"any-user",
 		httptest.NewRequest("GET", "/", nil),
 		1,
@@ -196,13 +196,13 @@ func TestEmailAllowlistMiddleware_AllEmailsAllowedWhenMapEmpty(t *testing.T) {
 
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 	user.SetEmail("random@example.com")
-	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatal(err)
 	}
 
 	called := false
 
-	_, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	_, response, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		called = true
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -236,11 +236,11 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 	cfg.SetVaultStoreUsed(true)
 	cfg.SetVaultStoreKey("test-vault-key")
 	cfg.SetEmailsAllowedAccess([]string{allowedEmail})
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	user, session, err := testutils.SeedUserAndSession(
-		registry.GetUserStore(),
-		registry.GetSessionStore(),
+		app.GetUserStore(),
+		app.GetSessionStore(),
 		"vault-user",
 		httptest.NewRequest("GET", "/", nil),
 		1,
@@ -254,8 +254,8 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 	email := allowedEmail
 	_, _, emailToken, _, _, err := ext.UserTokenize(
 		context.Background(),
-		registry.GetVaultStore(),
-		registry.GetConfig().GetVaultStoreKey(),
+		app.GetVaultStore(),
+		app.GetConfig().GetVaultStoreKey(),
 		user,
 		"Test", "User", email, "", "",
 	)
@@ -264,7 +264,7 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 	}
 
 	user.SetEmail(emailToken)
-	if err := registry.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+	if err := app.GetUserStore().UserUpdate(context.Background(), user); err != nil {
 		t.Fatal(err)
 	}
 
@@ -278,7 +278,7 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 
 	// First middleware call
 	called1 := false
-	body1, response1, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body1, response1, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		called1 = true
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -302,7 +302,7 @@ func TestEmailAllowlistMiddleware_WithVaultCaching(t *testing.T) {
 
 	// Second call should hit the cache
 	called2 := false
-	body2, response2, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body2, response2, err := test.CallMiddleware("GET", NewEmailAllowlistMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		called2 = true
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{

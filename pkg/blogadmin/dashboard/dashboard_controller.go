@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/blogstore"
@@ -20,23 +20,23 @@ import (
 // == CONTROLLER ==============================================================
 
 type dashboardController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewDashboardController(registry registry.RegistryInterface) *dashboardController {
-	return &dashboardController{registry: registry}
+func NewDashboardController(app app.AppInterface) *dashboardController {
+	return &dashboardController{app: app}
 }
 
 func (controller *dashboardController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Admin().Blog(), 10)
 	}
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Blog | Dashboard",
 		Content: controller.page(data),
 		ScriptURLs: []string{
@@ -268,7 +268,7 @@ func (controller *dashboardController) prepareData(r *http.Request) (data dashbo
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return data, "Blog store not available"
 	}
@@ -289,7 +289,7 @@ func (controller *dashboardController) prepareData(r *http.Request) (data dashbo
 	// Count posts
 	postCount, err := blogStore.PostCount(ctx, blogstore.PostQueryOptions{})
 	if err != nil {
-		controller.registry.GetLogger().Error("blog dashboard: error counting posts", "error", err)
+		controller.app.GetLogger().Error("blog dashboard: error counting posts", "error", err)
 	}
 	data.postCount = postCount
 
@@ -301,7 +301,7 @@ func (controller *dashboardController) prepareData(r *http.Request) (data dashbo
 				TaxonomyID: categoryTaxonomy.GetID(),
 			})
 			if err != nil {
-				controller.registry.GetLogger().Error("blog dashboard: error counting categories", "error", err)
+				controller.app.GetLogger().Error("blog dashboard: error counting categories", "error", err)
 			}
 			data.categoryCount = categoryCount
 		}
@@ -313,7 +313,7 @@ func (controller *dashboardController) prepareData(r *http.Request) (data dashbo
 				TaxonomyID: tagTaxonomy.GetID(),
 			})
 			if err != nil {
-				controller.registry.GetLogger().Error("blog dashboard: error counting tags", "error", err)
+				controller.app.GetLogger().Error("blog dashboard: error counting tags", "error", err)
 			}
 			data.tagCount = tagCount
 		}
@@ -326,7 +326,7 @@ func (controller *dashboardController) ensureTaxonomies(ctx context.Context, sto
 	// Check if category taxonomy exists
 	_, err := store.TaxonomyFindBySlug(ctx, blogstore.TAXONOMY_CATEGORY)
 	if err != nil {
-		controller.registry.GetLogger().Info("Creating category taxonomy")
+		controller.app.GetLogger().Info("Creating category taxonomy")
 		taxonomy := blogstore.NewTaxonomy()
 		taxonomy.SetID(uid.HumanUid()[:8])
 		taxonomy.SetName("Category")
@@ -340,7 +340,7 @@ func (controller *dashboardController) ensureTaxonomies(ctx context.Context, sto
 	// Check if tag taxonomy exists
 	_, err = store.TaxonomyFindBySlug(ctx, blogstore.TAXONOMY_TAG)
 	if err != nil {
-		controller.registry.GetLogger().Info("Creating tag taxonomy")
+		controller.app.GetLogger().Info("Creating tag taxonomy")
 		taxonomy := blogstore.NewTaxonomy()
 		taxonomy.SetID(uid.HumanUid()[:8])
 		taxonomy.SetName("Tag")

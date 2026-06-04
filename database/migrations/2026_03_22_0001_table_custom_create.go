@@ -17,7 +17,7 @@ var _ migrate.MigrationInterface = (*TableCustomCreate)(nil)
 // TableCustomCreate is an example template for custom SQL migrations.
 // Copy this file and adapt it to create your own table migrations.
 // Uncomment and modify the Table/Column definitions below to match your schema.
-// Register new migrations in registry.go getSQLMigrations().
+// Register new migrations in app.go getSQLMigrations().
 type TableCustomCreate struct{}
 
 func (m *TableCustomCreate) ID() string {

@@ -10,8 +10,8 @@ import (
 )
 
 func TestContactController_AnyIndex(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewContactController(registry)
+	app := testutils.Setup()
+	controller := NewContactController(app)
 
 	// Create a test request
 	req := httptest.NewRequest("GET", "/contact", nil)
@@ -33,8 +33,8 @@ func TestContactController_AnyIndex(t *testing.T) {
 }
 
 func TestFormContact_GetKind(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")
@@ -52,8 +52,8 @@ func TestFormContact_GetKind(t *testing.T) {
 }
 
 func TestFormContact_Mount(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")
@@ -85,8 +85,8 @@ func TestFormContact_Mount(t *testing.T) {
 }
 
 func TestFormContact_MountWithUserID(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")
@@ -105,8 +105,8 @@ func TestFormContact_MountWithUserID(t *testing.T) {
 }
 
 func TestFormContact_Fields(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")
@@ -138,8 +138,8 @@ func TestFormContact_Fields(t *testing.T) {
 }
 
 func TestFormContact_CanUpdateFields(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")
@@ -179,8 +179,8 @@ func TestFormContact_CanUpdateFields(t *testing.T) {
 }
 
 func TestFormContact_CaptchaFields(t *testing.T) {
-	registry := testutils.Setup()
-	component := NewFormContact(registry)
+	app := testutils.Setup()
+	component := NewFormContact(app)
 
 	if component == nil {
 		t.Fatal("NewFormContact() should not return nil")

@@ -3,12 +3,12 @@ package user_manager
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
 
-type userManagerController struct{ registry registry.RegistryInterface }
+type userManagerController struct{ app app.AppInterface }
 
 const (
 	actionLoadUsers  = "load-users-ajax"
@@ -16,8 +16,8 @@ const (
 	actionCreateUser = "create-user-ajax"
 )
 
-func NewUserManagerController(registry registry.RegistryInterface) *userManagerController {
-	return &userManagerController{registry: registry}
+func NewUserManagerController(app app.AppInterface) *userManagerController {
+	return &userManagerController{app: app}
 }
 
 func (controller *userManagerController) Handler(w http.ResponseWriter, r *http.Request) string {

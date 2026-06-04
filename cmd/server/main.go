@@ -14,8 +14,8 @@ import (
 	"project/internal/cli"
 
 	// "project/internal/cmsblocks"
+	"project/internal/app"
 	"project/internal/config"
-	"project/internal/registry"
 	"project/internal/routes"
 	"project/internal/tasks"
 
@@ -56,31 +56,31 @@ func main() {
 	// Log version on startup
 	fmt.Printf("Starting %s v%s\n", cfg.GetAppName(), config.GetVersion())
 
-	// Initialize registry (logger, caches, database)
-	registry, err := registry.New(cfg)
+	// Initialize app (logger, caches, database)
+	app, err := app.New(cfg)
 	if err != nil {
-		fmt.Printf("Failed to initialize registry: %v\n", err)
+		fmt.Printf("Failed to initialize app: %v\n", err)
 		return
 	}
 	defer func() {
-		if err := registry.Close(); err != nil {
-			cfmt.Errorf("Failed to close registry: %v", err)
+		if err := app.Close(); err != nil {
+			cfmt.Errorf("Failed to close app: %v", err)
 		}
 	}()
 
 	// Run all migrations (store-level + custom SQL)
-	if err := migrations.MigrateAll(registry); err != nil {
+	if err := migrations.MigrateAll(app); err != nil {
 		fmt.Printf("Failed to run migrations: %v\n", err)
 		return
 	}
 
-	tasks.RegisterTasks(registry) // Register the task handlers
+	tasks.RegisterTasks(app) // Register the task handlers
 
 	if isCliMode() {
 		if len(os.Args) < 2 {
 			return
 		}
-		if err := cli.ExecuteCliCommand(registry, os.Args[1:]); err != nil {
+		if err := cli.ExecuteCliCommand(app, os.Args[1:]); err != nil {
 			fmt.Printf("Failed to execute CLI command: %v\n", err)
 			os.Exit(1)
 		}
@@ -92,17 +92,17 @@ func main() {
 	defer cancel()
 
 	background := newBackgroundGroup(ctx)
-	if err := startBackgroundProcesses(ctx, background, registry); err != nil {
+	if err := startBackgroundProcesses(ctx, background, app); err != nil {
 		cfmt.Errorln("Failed to start background processes:", err.Error())
 		return
 	}
 
 	// Start the web server
 	server, err := websrv.Start(websrv.Options{
-		Host:    registry.GetConfig().GetAppHost(),
-		Port:    registry.GetConfig().GetAppPort(),
-		URL:     registry.GetConfig().GetAppUrl(),
-		Handler: routes.Router(registry).ServeHTTP,
+		Host:    app.GetConfig().GetAppHost(),
+		Port:    app.GetConfig().GetAppPort(),
+		URL:     app.GetConfig().GetAppUrl(),
+		Handler: routes.Router(app).ServeHTTP,
 	})
 
 	if err != nil {

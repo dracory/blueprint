@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/api"
@@ -25,13 +25,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type categoryUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewCategoryUpdateController(registry registry.RegistryInterface) *categoryUpdateController {
-	return &categoryUpdateController{registry: registry}
+func NewCategoryUpdateController(app app.AppInterface) *categoryUpdateController {
+	return &categoryUpdateController{app: app}
 }
 
 func (controller *categoryUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -48,18 +48,18 @@ func (controller *categoryUpdateController) Handler(w http.ResponseWriter, r *ht
 }
 
 func (controller *categoryUpdateController) renderPage(r *http.Request) string {
-	if controller.registry.GetShopStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
+	if controller.app.GetShopStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
 	}
 
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
 	}
 
 	categoryID := req.GetStringTrimmed(r, "category_id")
 	if categoryID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Category ID is required", links.Admin().Shop(map[string]string{"controller": shared.CONTROLLER_CATEGORIES}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Category ID is required", links.Admin().Shop(map[string]string{"controller": shared.CONTROLLER_CATEGORIES}), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -86,7 +86,7 @@ func (controller *categoryUpdateController) renderPage(r *http.Request) string {
 		Child(initScript).
 		Child(hb.Div().ID("app"))
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Update Category | Shop",
 		Content: content,
 		ScriptURLs: []string{
@@ -100,7 +100,7 @@ func (controller *categoryUpdateController) renderPage(r *http.Request) string {
 func (controller *categoryUpdateController) handleLoadCategory(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		return api.Error("Shop store not available").ToString()
 	}
@@ -130,7 +130,7 @@ func (controller *categoryUpdateController) handleLoadCategory(w http.ResponseWr
 func (controller *categoryUpdateController) handleUpdateCategory(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		return api.Error("Shop store not available").ToString()
 	}

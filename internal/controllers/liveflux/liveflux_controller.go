@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/liveflux"
 )
@@ -12,16 +12,16 @@ import (
 // livefluxController adapts liveflux.Handler to the rtr HTML handler signature.
 type livefluxController struct {
 	Engine   http.Handler
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type contextKey string
 
 const AppContextKey contextKey = "app"
 
-func NewController(registry registry.RegistryInterface) *livefluxController {
+func NewController(app app.AppInterface) *livefluxController {
 	return &livefluxController{
-		registry: registry,
+		app: app,
 		Engine:   liveflux.NewHandler(nil),
 	}
 }
@@ -29,7 +29,7 @@ func NewController(registry registry.RegistryInterface) *livefluxController {
 // Handler returns the rendered HTML string for the component action/mount.
 func (c *livefluxController) Handler(w http.ResponseWriter, r *http.Request) string {
 	// add app to context
-	ctx := context.WithValue(r.Context(), AppContextKey, c.registry)
+	ctx := context.WithValue(r.Context(), AppContextKey, c.app)
 	r = r.WithContext(ctx)
 
 	rec := httptest.NewRecorder()

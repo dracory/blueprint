@@ -3,7 +3,7 @@ package middlewares
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
@@ -11,7 +11,7 @@ import (
 	"github.com/dromara/carbon/v2"
 )
 
-func NewStatsMiddleware(application registry.RegistryInterface) rtr.MiddlewareInterface {
+func NewStatsMiddleware(application app.AppInterface) rtr.MiddlewareInterface {
 	stats := new(statsMiddleware)
 	return rtr.NewMiddleware().
 		SetName(stats.Name()).
@@ -24,7 +24,7 @@ func (m statsMiddleware) Name() string {
 	return "Stats Middleware"
 }
 
-func (m statsMiddleware) Handler(application registry.RegistryInterface, next http.Handler) http.Handler {
+func (m statsMiddleware) Handler(application app.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !application.GetConfig().GetStatsStoreUsed() {
 			next.ServeHTTP(w, r)

@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/useradmin/shared"
 
 	"github.com/dracory/bs"
@@ -14,7 +14,7 @@ import (
 )
 
 type userDeleteController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type userDeleteControllerData struct {
@@ -23,8 +23,8 @@ type userDeleteControllerData struct {
 	successMessage string
 }
 
-func NewUserDeleteController(registry registry.RegistryInterface) *userDeleteController {
-	return &userDeleteController{registry: registry}
+func NewUserDeleteController(app app.AppInterface) *userDeleteController {
+	return &userDeleteController{app: app}
 }
 
 func (controller userDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -123,7 +123,7 @@ func (controller *userDeleteController) modal(data userDeleteControllerData) hb.
 }
 
 func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) (data userDeleteControllerData, errorMessage string) {
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -138,11 +138,11 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, "user id is required"
 	}
 
-	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), data.userID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), data.userID)
 
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		}
 		return data, "User not found"
 	}
@@ -157,11 +157,11 @@ func (controller *userDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, ""
 	}
 
-	err = controller.registry.GetUserStore().UserSoftDelete(r.Context(), user)
+	err = controller.app.GetUserStore().UserSoftDelete(r.Context(), user)
 
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		}
 		return data, "Deleting user failed. Please contact an administrator."
 	}

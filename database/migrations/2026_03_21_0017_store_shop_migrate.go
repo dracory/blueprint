@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreShopMigrate)(nil)
 
 type StoreShopMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreShopMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreShopMigrate) Description() string {
 }
 
 func (m *StoreShopMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetShopStore()
+	store := m.app.GetShopStore()
 	if store == nil {
 		return errors.New("shop store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreShopMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreShopMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetShopStore()
+	store := m.app.GetShopStore()
 	if store == nil {
 		return errors.New("shop store is not initialized")
 	}

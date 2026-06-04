@@ -30,8 +30,8 @@ func TestGetAuthUser_NoContextValue(t *testing.T) {
 
 // TestGetAuthUser_WithValidUser tests retrieving user from context
 func TestGetAuthUser_WithValidUser(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user
 	user := userstore.NewUser().
@@ -39,7 +39,7 @@ func TestGetAuthUser_WithValidUser(t *testing.T) {
 		SetFirstName("Test2").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -80,8 +80,8 @@ func TestGetAPIAuthUser_NoContextValue(t *testing.T) {
 
 // TestGetAPIAuthUser_WithValidUser tests retrieving API user from context
 func TestGetAPIAuthUser_WithValidUser(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user
 	user := userstore.NewUser().
@@ -89,7 +89,7 @@ func TestGetAPIAuthUser_WithValidUser(t *testing.T) {
 		SetFirstName("API").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}

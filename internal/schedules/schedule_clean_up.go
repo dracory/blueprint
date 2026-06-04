@@ -1,25 +1,25 @@
 package schedules
 
 import (
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/tasks/clean_up"
 
 	"github.com/dracory/base/cfmt"
 )
 
 // scheduleCleanUpTask schedules the clean up task
-func scheduleCleanUpTask(registry registry.RegistryInterface) {
-	if registry == nil {
-		cfmt.Errorln("CleanUp scheduling skipped; registry is nil")
+func scheduleCleanUpTask(app app.AppInterface) {
+	if app == nil {
+		cfmt.Errorln("CleanUp scheduling skipped; app is nil")
 		return
 	}
 
-	if registry.GetTaskStore() == nil {
+	if app.GetTaskStore() == nil {
 		cfmt.Warningln("CleanUp scheduling skipped; task store not configured.")
 		return
 	}
 
-	task := clean_up.NewCleanUpTask(registry)
+	task := clean_up.NewCleanUpTask(app)
 
 	go func() {
 		if handled := task.Handle(); !handled {

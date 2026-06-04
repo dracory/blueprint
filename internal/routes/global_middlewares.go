@@ -9,7 +9,7 @@ import (
 
 	"project/internal/middlewares"
 	"project/internal/middlewares/httpsredirect"
-	"project/internal/registry"
+	"project/internal/app"
 )
 
 // Rate limit constants
@@ -24,10 +24,10 @@ const (
 )
 
 // getRateLimits returns appropriate rate limits based on environment
-func getRateLimits(registry registry.RegistryInterface) (perSec, perMin, perHour int) {
-	if registry.GetConfig() != nil {
-		isDevelopment := registry.GetConfig().IsEnvDevelopment()
-		isLocal := registry.GetConfig().IsEnvLocal()
+func getRateLimits(app app.AppInterface) (perSec, perMin, perHour int) {
+	if app.GetConfig() != nil {
+		isDevelopment := app.GetConfig().IsEnvDevelopment()
+		isLocal := app.GetConfig().IsEnvLocal()
 
 		if isDevelopment || isLocal {
 			return devVisitsPerSec, devVisitsPerMin, devVisitsPerHour
@@ -37,9 +37,9 @@ func getRateLimits(registry registry.RegistryInterface) (perSec, perMin, perHour
 }
 
 // globalMiddlewares returns a list of middlewares to be applied to all routes
-func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInterface {
+func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 	// Get rate limits based on environment
-	perSec, perMin, perHour := getRateLimits(registry)
+	perSec, perMin, perHour := getRateLimits(app)
 
 	globalMiddlewares := []rtr.MiddlewareInterface{
 		// Exclude generic patterns that could match legit routes like /user/news
@@ -68,8 +68,8 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 	}
 
 	// Conditionally add logger and recovery when not running tests
-	if registry.GetConfig() != nil {
-		isNotTesting := !registry.GetConfig().IsEnvTesting()
+	if app.GetConfig() != nil {
+		isNotTesting := !app.GetConfig().IsEnvTesting()
 
 		if isNotTesting {
 			globalMiddlewares = append(globalMiddlewares,
@@ -80,10 +80,10 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 	}
 
 	// Add HTTPS redirect middleware only in production (not in development, local, or testing)
-	if registry.GetConfig() != nil {
-		isNotTesting := !registry.GetConfig().IsEnvTesting()
-		isNotDevelopment := !registry.GetConfig().IsEnvDevelopment()
-		isNotLocal := !registry.GetConfig().IsEnvLocal()
+	if app.GetConfig() != nil {
+		isNotTesting := !app.GetConfig().IsEnvTesting()
+		isNotDevelopment := !app.GetConfig().IsEnvDevelopment()
+		isNotLocal := !app.GetConfig().IsEnvLocal()
 
 		if isNotTesting && isNotDevelopment && isNotLocal {
 			globalMiddlewares = append(globalMiddlewares,
@@ -97,10 +97,10 @@ func globalMiddlewares(registry registry.RegistryInterface) []rtr.MiddlewareInte
 	}
 
 	globalMiddlewares = append(globalMiddlewares,
-		middlewares.LogRequestMiddleware(registry),
-		middlewares.NewSecurityHeadersMiddleware(registry),
+		middlewares.LogRequestMiddleware(app),
+		middlewares.NewSecurityHeadersMiddleware(app),
 		middlewares.ThemeMiddleware(),
-		middlewares.AuthMiddleware(registry),
+		middlewares.AuthMiddleware(app),
 	)
 
 	return globalMiddlewares

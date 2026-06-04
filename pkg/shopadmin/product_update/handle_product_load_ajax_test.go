@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleProductLoadAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleLoadProduct, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleProductLoadAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleProductLoadAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadProduct, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleProductLoadAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleProductLoadAjax_LoadsProduct(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadProduct, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

@@ -25,7 +25,7 @@ func TestNewProductManagerController(t *testing.T) {
 	}
 }
 
-// TestProductManagerControllerRegistry verifies controller has registry
+// TestProductManagerControllerRegistry verifies controller has app
 func TestProductManagerControllerRegistry(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup(testutils.WithShopStore(true))
@@ -36,8 +36,8 @@ func TestProductManagerControllerRegistry(t *testing.T) {
 
 	controller := NewProductManagerController(app)
 
-	if controller.registry == nil {
-		t.Error("Controller registry is nil")
+	if controller.app == nil {
+		t.Error("Controller app is nil")
 	}
 }
 
@@ -62,8 +62,8 @@ func TestProductManagerController_NilRegistry(t *testing.T) {
 	if controller == nil {
 		t.Error("NewProductManagerController(nil) should not return nil")
 	}
-	if controller.registry != nil {
-		t.Error("Controller registry should be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Controller app should be nil when passed nil")
 	}
 }
 
@@ -88,11 +88,11 @@ func TestProductManagerController_MultipleInstances(t *testing.T) {
 		t.Error("Controllers should be separate instances")
 	}
 
-	if controller1.registry != app1 {
+	if controller1.app != app1 {
 		t.Error("Controller1 should have app1")
 	}
 
-	if controller2.registry != app2 {
+	if controller2.app != app2 {
 		t.Error("Controller2 should have app2")
 	}
 }

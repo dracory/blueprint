@@ -2,19 +2,19 @@ package detailscomponent
 
 import (
 	"context"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/shopstore"
 )
 
-func HandleAjaxListCategories(registry registry.RegistryInterface) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxListCategories(app app.AppInterface) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
 	query := shopstore.NewCategoryQuery()
-	categories, err := registry.GetShopStore().CategoryList(context.Background(), query)
+	categories, err := app.GetShopStore().CategoryList(context.Background(), query)
 	if err != nil {
 		return api.ErrorWithData("Failed to load categories", map[string]any{}).ToString()
 	}

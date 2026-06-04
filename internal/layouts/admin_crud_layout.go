@@ -3,17 +3,17 @@ package layouts
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 )
 
-func NewAdminCrudLayout(registry registry.RegistryInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
-	return adminCrudLayout(registry, r, title, content, styleURLs, style, jsURLs, js)
+func NewAdminCrudLayout(app app.AppInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
+	return adminCrudLayout(app, r, title, content, styleURLs, style, jsURLs, js)
 }
 
-func adminCrudLayout(registry registry.RegistryInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
+func adminCrudLayout(app app.AppInterface, r *http.Request, title string, content string, styleURLs []string, style string, jsURLs []string, js string) string {
 	jsURLs = append([]string{
 		cdn.Jquery_3_7_1(),
 		cdn.JqueryUiJs_1_13_1(),
@@ -24,7 +24,7 @@ func adminCrudLayout(registry registry.RegistryInterface, r *http.Request, title
 		cdn.JqueryUiCss_1_13_1(),
 	}, styleURLs...)
 	// cfmt.Infoln(styleURLs)
-	dashboard := NewAdminLayout(registry, r, Options{
+	dashboard := NewAdminLayout(app, r, Options{
 		Title:      title,
 		Content:    hb.Raw(content),
 		Scripts:    []string{js},

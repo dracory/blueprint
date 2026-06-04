@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
@@ -13,20 +13,20 @@ import (
 	"project/pkg/logadmin/shared"
 )
 
-func Routes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
-	if registry == nil {
-		return nil, errors.New("registry cannot be nil")
+func Routes(app app.AppInterface) ([]rtr.RouteInterface, error) {
+	if app == nil {
+		return nil, errors.New("app cannot be nil")
 	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
 		switch controller {
 		case shared.CONTROLLER_LOG_MANAGER:
-			return log_manager.NewLogManagerController(registry).Handler(w, r)
+			return log_manager.NewLogManagerController(app).Handler(w, r)
 		}
 
 		// Default to log manager
-		return log_manager.NewLogManagerController(registry).Handler(w, r)
+		return log_manager.NewLogManagerController(app).Handler(w, r)
 	}
 
 	logs := rtr.NewRoute().

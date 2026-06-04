@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
@@ -15,7 +15,7 @@ import (
 )
 
 type productDeleteController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type productDeleteControllerData struct {
@@ -25,8 +25,8 @@ type productDeleteControllerData struct {
 	//errorMessage   string
 }
 
-func NewProductDeleteController(registry registry.RegistryInterface) *productDeleteController {
-	return &productDeleteController{registry: registry}
+func NewProductDeleteController(app app.AppInterface) *productDeleteController {
+	return &productDeleteController{app: app}
 }
 
 func (controller productDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -125,7 +125,7 @@ func (controller *productDeleteController) modal(data productDeleteControllerDat
 }
 
 func (controller *productDeleteController) prepareDataAndValidate(r *http.Request) (data productDeleteControllerData, errorMessage string) {
-	if controller.registry.GetShopStore() == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "ShopStore is nil"
 	}
 
@@ -140,7 +140,7 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 		return data, "product id is required"
 	}
 
-	product, err := controller.registry.GetShopStore().ProductFindByID(context.Background(), data.productID)
+	product, err := controller.app.GetShopStore().ProductFindByID(context.Background(), data.productID)
 
 	if err != nil {
 		slog.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
@@ -157,7 +157,7 @@ func (controller *productDeleteController) prepareDataAndValidate(r *http.Reques
 		return data, ""
 	}
 
-	err = controller.registry.GetShopStore().ProductSoftDelete(context.Background(), product)
+	err = controller.app.GetShopStore().ProductSoftDelete(context.Background(), product)
 
 	if err != nil {
 		slog.Error("At productDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))

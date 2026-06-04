@@ -6,7 +6,7 @@ import (
 
 	"project/internal/helpers"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
@@ -15,35 +15,35 @@ import (
 )
 
 type Controller struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewController(registry registry.RegistryInterface) *Controller {
-	return &Controller{registry: registry}
+func NewController(app app.AppInterface) *Controller {
+	return &Controller{app: app}
 }
 
 func (c *Controller) Handler(w http.ResponseWriter, r *http.Request) string {
-	if c.registry == nil {
-		return "Registry not available"
+	if c.app == nil {
+		return "app not available"
 	}
 	postID := req.GetStringTrimmed(r, "post_id")
 	if strings.TrimSpace(postID) == "" {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Post ID is required", shared.NewLinks("/admin/blog").PostManager(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Post ID is required", shared.NewLinks("/admin/blog").PostManager(), 10)
 	}
 
-	component := NewFormAiPostContentUpdate(c.registry)
+	component := NewFormAiPostContentUpdate(c.app)
 	if component == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Failed to initialize AI content editor", shared.NewLinks("/admin/blog").PostManager(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize AI content editor", shared.NewLinks("/admin/blog").PostManager(), 10)
 	}
 
 	rendered := liveflux.SSR(component, map[string]string{
 		"post_id": postID,
 	})
 	if rendered == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Error rendering AI content editor", shared.NewLinks("/admin/blog").PostManager(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error rendering AI content editor", shared.NewLinks("/admin/blog").PostManager(), 10)
 	}
 
-	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:   "Edit Post Content",
 		Content: rendered,
 		ScriptURLs: []string{

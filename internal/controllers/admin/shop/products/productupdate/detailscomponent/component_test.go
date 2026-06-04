@@ -9,14 +9,14 @@ import (
 
 // TestRender_Success tests successful component rendering
 func TestRender_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
 	productID := "test-product-123"
 
-	result := Render(registry, productID)
+	result := Render(app, productID)
 
 	if result == nil {
 		t.Fatal("expected result to be non-nil")
@@ -40,14 +40,14 @@ func TestRender_Success(t *testing.T) {
 
 // TestRender_ContainsRequiredScripts tests that required scripts are included
 func TestRender_ContainsRequiredScripts(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
 	productID := "test-product-456"
 
-	result := Render(registry, productID)
+	result := Render(app, productID)
 	html := result.ToHTML()
 
 	// Check for Vue.js
@@ -68,14 +68,14 @@ func TestRender_ContainsRequiredScripts(t *testing.T) {
 
 // TestRender_ContainsFormWrapper tests that form wrapper is present
 func TestRender_ContainsFormWrapper(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
 	productID := "test-product-789"
 
-	result := Render(registry, productID)
+	result := Render(app, productID)
 	html := result.ToHTML()
 
 	if !strings.Contains(html, "FormProductDetailsUpdate") {
@@ -85,14 +85,14 @@ func TestRender_ContainsFormWrapper(t *testing.T) {
 
 // TestRender_ContainsInitScript tests that initialization script is present
 func TestRender_ContainsInitScript(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
 	productID := "test-product-init"
 
-	result := Render(registry, productID)
+	result := Render(app, productID)
 	html := result.ToHTML()
 
 	if !strings.Contains(html, "productId") {

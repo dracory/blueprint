@@ -11,7 +11,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
@@ -27,11 +27,11 @@ import (
 var tagsFiles embed.FS
 
 type tagManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewTagManagerController(registry registry.RegistryInterface) *tagManagerController {
-	return &tagManagerController{registry: registry}
+func NewTagManagerController(app app.AppInterface) *tagManagerController {
+	return &tagManagerController{app: app}
 }
 
 func (controller *tagManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -56,8 +56,8 @@ func (controller *tagManagerController) Handler(w http.ResponseWriter, r *http.R
 func (controller *tagManagerController) renderPage(r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		if controller.registry != nil && controller.registry.GetCacheStore() != nil {
-			return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
+		if controller.app != nil && controller.app.GetCacheStore() != nil {
+			return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
 		}
 		return hb.Div().HTML("Error: You are not logged in. Please login to continue.").ToHTML()
 	}
@@ -108,7 +108,7 @@ func (controller *tagManagerController) renderPage(r *http.Request) string {
 		Child(hb.HR()).
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Blog | Tag Manager",
 		Content: content,
 		ScriptURLs: []string{
@@ -121,7 +121,7 @@ func (controller *tagManagerController) renderPage(r *http.Request) string {
 func (controller *tagManagerController) handleLoadTags(r *http.Request) string {
 	ctx := r.Context()
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -164,7 +164,7 @@ func (controller *tagManagerController) handleLoadTagPosts(r *http.Request) stri
 		return api.Error("Tag ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -231,7 +231,7 @@ func (controller *tagManagerController) handleCreateTag(w http.ResponseWriter, r
 		return api.Error("Tag name is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -289,7 +289,7 @@ func (controller *tagManagerController) handleUpdateTag(w http.ResponseWriter, r
 		return api.Error("Tag name is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -338,7 +338,7 @@ func (controller *tagManagerController) handleDeleteTag(w http.ResponseWriter, r
 		return api.Error("Tag ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -360,7 +360,7 @@ func (controller *tagManagerController) handleDeleteTag(w http.ResponseWriter, r
 func (controller *tagManagerController) ensureTaxonomy(ctx context.Context, store blogstore.StoreInterface) (blogstore.TaxonomyInterface, error) {
 	tagTaxonomy, err := store.TaxonomyFindBySlug(ctx, blogstore.TAXONOMY_TAG)
 	if err != nil || tagTaxonomy == nil {
-		controller.registry.GetLogger().Info("Creating tag taxonomy")
+		controller.app.GetLogger().Info("Creating tag taxonomy")
 		tagTaxonomy = blogstore.NewTaxonomy()
 		tagTaxonomy.SetName("Tag")
 		tagTaxonomy.SetSlug(blogstore.TAXONOMY_TAG)

@@ -2,18 +2,18 @@ package middlewares
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/dracory/cmsstore"
 )
 
-func CmsAddMiddlewares(registry registry.RegistryInterface) {
-	if !registry.GetConfig().GetCmsStoreUsed() {
+func CmsAddMiddlewares(app app.AppInterface) {
+	if !app.GetConfig().GetCmsStoreUsed() {
 		return
 	}
 
-	if registry.GetCmsStore() == nil {
+	if app.GetCmsStore() == nil {
 		return
 	}
 
@@ -31,8 +31,8 @@ func CmsAddMiddlewares(registry registry.RegistryInterface) {
 		SetIdentifier("CmsLayoutMiddleware").
 		SetName("Cms Layout Middleware").
 		SetType(cmsstore.MIDDLEWARE_TYPE_AFTER).
-		SetHandler(NewCmsLayoutMiddleware(registry).GetHandler())
+		SetHandler(NewCmsLayoutMiddleware(app).GetHandler())
 
-	registry.GetCmsStore().AddMiddleware(helloMiddleware)
-	registry.GetCmsStore().AddMiddleware(afterMiddleware)
+	app.GetCmsStore().AddMiddleware(helloMiddleware)
+	app.GetCmsStore().AddMiddleware(afterMiddleware)
 }

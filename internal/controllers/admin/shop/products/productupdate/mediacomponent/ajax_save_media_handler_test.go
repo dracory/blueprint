@@ -14,7 +14,7 @@ import (
 
 // TestHandleAjaxSaveMedia_Success tests successful media saving
 func TestHandleAjaxSaveMedia_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -25,7 +25,7 @@ func TestHandleAjaxSaveMedia_Success(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -33,7 +33,7 @@ func TestHandleAjaxSaveMedia_Success(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-media&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMedia(registry, req, product.GetID())
+	response := HandleAjaxSaveMedia(app, req, product.GetID())
 
 	if !strings.Contains(response, `"media"`) {
 		t.Error("expected response to contain media field")
@@ -45,7 +45,7 @@ func TestHandleAjaxSaveMedia_Success(t *testing.T) {
 	// Verify media was actually saved
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(product.GetID())
-	medias, err := registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	medias, err := app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		t.Fatalf("failed to list media: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestHandleAjaxSaveMedia_Success(t *testing.T) {
 
 // TestHandleAjaxSaveMedia_MultipleItems tests saving multiple media with correct sequence
 func TestHandleAjaxSaveMedia_MultipleItems(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -78,7 +78,7 @@ func TestHandleAjaxSaveMedia_MultipleItems(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -90,7 +90,7 @@ func TestHandleAjaxSaveMedia_MultipleItems(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-media&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMedia(registry, req, product.GetID())
+	response := HandleAjaxSaveMedia(app, req, product.GetID())
 
 	if !strings.Contains(response, `"media"`) {
 		t.Error("expected response to contain media field")
@@ -99,7 +99,7 @@ func TestHandleAjaxSaveMedia_MultipleItems(t *testing.T) {
 	// Verify media was saved with correct sequence
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(product.GetID())
-	medias, err := registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	medias, err := app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		t.Fatalf("failed to list media: %v", err)
 	}
@@ -149,7 +149,7 @@ func TestDetermineMediaType(t *testing.T) {
 	}
 }
 func TestHandleAjaxSaveMedia_InvalidBody(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -158,7 +158,7 @@ func TestHandleAjaxSaveMedia_InvalidBody(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-media&product_id=test123",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMedia(registry, req, "test123")
+	response := HandleAjaxSaveMedia(app, req, "test123")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -170,7 +170,7 @@ func TestHandleAjaxSaveMedia_InvalidBody(t *testing.T) {
 
 // TestHandleAjaxSaveMedia_EmptyMedia tests saving empty media list
 func TestHandleAjaxSaveMedia_EmptyMedia(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -181,7 +181,7 @@ func TestHandleAjaxSaveMedia_EmptyMedia(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -193,7 +193,7 @@ func TestHandleAjaxSaveMedia_EmptyMedia(t *testing.T) {
 	media.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
 	media.SetSequence(0)
 	media.SetType("image")
-	if err := registry.GetShopStore().MediaCreate(context.Background(), media); err != nil {
+	if err := app.GetShopStore().MediaCreate(context.Background(), media); err != nil {
 		t.Fatalf("failed to create media: %v", err)
 	}
 
@@ -202,7 +202,7 @@ func TestHandleAjaxSaveMedia_EmptyMedia(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-media&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveMedia(registry, req, product.GetID())
+	response := HandleAjaxSaveMedia(app, req, product.GetID())
 
 	if !strings.Contains(response, `"media"`) {
 		t.Error("expected response to contain media field")
@@ -211,7 +211,7 @@ func TestHandleAjaxSaveMedia_EmptyMedia(t *testing.T) {
 	// Verify old media was deleted
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(product.GetID())
-	medias, err := registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	medias, err := app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		t.Fatalf("failed to list media: %v", err)
 	}

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"project/database/migrations"
 	"project/internal/config"
-	"project/internal/registry"
+	"project/internal/app"
 	"sync/atomic"
 
 	//smtpmock "github.com/mocktools/go-smtp-mock"
@@ -182,7 +182,7 @@ func DefaultConf() config.ConfigInterface {
 	cfg := config.New()
 	cfg.SetAppEnv("testing")
 	cfg.SetAppDebug(true)
-	cfg.SetAppName("Test registry")
+	cfg.SetAppName("Test app")
 	cfg.SetDatabaseDriver("sqlite")
 	cfg.SetDatabaseHost("")
 	cfg.SetDatabasePort("")
@@ -202,9 +202,9 @@ func DefaultConf() config.ConfigInterface {
 	return cfg
 }
 
-// Setup initializes a default in-memory SQLite registry for tests,
-// unless overridden via options. It returns the initialized registry.
-func Setup(options ...SetupOption) registry.RegistryInterface {
+// Setup initializes a default in-memory SQLite app for tests,
+// unless overridden via options. It returns the initialized app.
+func Setup(options ...SetupOption) app.AppInterface {
 	// collect options
 	opts := &setupOptions{}
 	for _, opt := range options {
@@ -326,10 +326,10 @@ func Setup(options ...SetupOption) registry.RegistryInterface {
 		}
 	}
 
-	// Build registry using registry.New (opens DB and initializes stores)
-	app, err := registry.New(opts.cfg)
+	// Build app using app.New (opens DB and initializes stores)
+	app, err := app.New(opts.cfg)
 	if err != nil {
-		panic("testutils.Setup: failed to build registry: " + err.Error())
+		panic("testutils.Setup: failed to build app: " + err.Error())
 	}
 
 	// Run migrations to create database tables

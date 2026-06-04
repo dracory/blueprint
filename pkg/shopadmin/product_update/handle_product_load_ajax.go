@@ -11,7 +11,7 @@ import (
 func (controller *productUpdateController) handleLoadProduct(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		return api.Error("Shop store not available").ToString()
 	}

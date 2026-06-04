@@ -9,42 +9,42 @@ import (
 	"project/internal/cmsblocks"
 	"project/internal/emails"
 	"project/internal/middlewares"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/schedules"
 	"project/internal/widgets"
 
 	"github.com/dracory/taskstore"
 )
 
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, registry registry.RegistryInterface) error {
+func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app app.AppInterface) error {
 	_ = ctx // Suppress unused parameter warning, use it when needed for context cancellation or propagation
 
-	if registry == nil {
-		return errors.New("startBackgroundProcesses called with nil registry")
+	if app == nil {
+		return errors.New("startBackgroundProcesses called with nil app")
 	}
 
-	if registry.GetConfig() == nil {
+	if app.GetConfig() == nil {
 		return errors.New("startBackgroundProcesses called with nil config")
 	}
 
-	if registry.GetDatabase() == nil {
+	if app.GetDatabase() == nil {
 		return errors.New("startBackgroundProcesses called with nil db")
 	}
 
-	if registry.GetConfig().GetTaskStoreUsed() && registry.GetTaskStore() == nil {
+	if app.GetConfig().GetTaskStoreUsed() && app.GetTaskStore() == nil {
 		return errors.New("startBackgroundProcesses task store is enabled but not initialized")
 	}
 
-	if registry.GetConfig().GetCacheStoreUsed() && registry.GetCacheStore() == nil {
+	if app.GetConfig().GetCacheStoreUsed() && app.GetCacheStore() == nil {
 		return errors.New("startBackgroundProcesses cache store is enabled but not initialized")
 	}
 
-	if registry.GetConfig().GetSessionStoreUsed() && registry.GetSessionStore() == nil {
+	if app.GetConfig().GetSessionStoreUsed() && app.GetSessionStore() == nil {
 		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
 	}
 
-	if registry.GetConfig().GetTaskStoreUsed() {
-		ts := registry.GetTaskStore()
+	if app.GetConfig().GetTaskStoreUsed() {
+		ts := app.GetTaskStore()
 		if ts != nil {
 			group.Go(func(ctx context.Context) {
 				// Run the default task queue worker loop using the updated TaskQueue API
@@ -60,8 +60,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 			})
 		}
 	}
-	if registry.GetConfig().GetCacheStoreUsed() {
-		cs := registry.GetCacheStore()
+	if app.GetConfig().GetCacheStoreUsed() {
+		cs := app.GetCacheStore()
 		if cs != nil {
 			group.Go(func(ctx context.Context) {
 				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
@@ -71,8 +71,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 		}
 	}
 
-	if registry.GetConfig().GetSessionStoreUsed() {
-		ss := registry.GetSessionStore()
+	if app.GetConfig().GetSessionStoreUsed() {
+		ss := app.GetSessionStore()
 		if ss != nil {
 			group.Go(func(ctx context.Context) {
 				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
@@ -83,14 +83,14 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, regis
 	}
 
 	group.Go(func(ctx context.Context) {
-		schedules.StartAsync(ctx, registry)
+		schedules.StartAsync(ctx, app)
 	})
 
 	// Initialize email sender
-	emails.InitEmailSender(registry)
-	middlewares.CmsAddMiddlewares(registry) // Add CMS middlewares
-	widgets.CmsAddShortcodes(registry)      // Add CMS shortcodes
-	cmsblocks.CmsAddBlockTypes(registry)    // Add CMS block types
+	emails.InitEmailSender(app)
+	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
+	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
+	cmsblocks.CmsAddBlockTypes(app)    // Add CMS block types
 
 	return nil
 }

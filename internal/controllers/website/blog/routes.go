@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 	"time"
 
@@ -44,7 +44,7 @@ func (t *teeResponseWriter) Flush() {
 }
 
 func Routes(
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 ) []rtr.RouteInterface {
 	mcpBlogHealthRoute := rtr.NewRoute().
 		SetName("Website > Blog > MCP Endpoint > Health").
@@ -93,8 +93,8 @@ func Routes(
 
 			apiKey := r.Header.Get("X-MCP-API-Key")
 			expectedKey := ""
-			if registry != nil && registry.GetConfig() != nil {
-				expectedKey = registry.GetConfig().GetCmsMcpApiKey()
+			if app != nil && app.GetConfig() != nil {
+				expectedKey = app.GetConfig().GetCmsMcpApiKey()
 			}
 			if strings.TrimSpace(expectedKey) == "" {
 				w.Header().Set("Content-Type", "application/json")
@@ -109,7 +109,7 @@ func Routes(
 				return
 			}
 
-			if registry == nil || registry.GetBlogStore() == nil {
+			if app == nil || app.GetBlogStore() == nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`{"error":"Blog store not available","message":"Blog store is not initialized"}`))
@@ -117,44 +117,44 @@ func Routes(
 			}
 
 			tw := &teeResponseWriter{w: w, status: http.StatusOK}
-			m := blogstoreMcp.NewMCP(registry.GetBlogStore())
+			m := blogstoreMcp.NewMCP(app.GetBlogStore())
 			m.Handler(tw, r)
 		})
 
 	blogRoute := rtr.NewRoute().
 		SetName("Guest > Blog").
 		SetPath(links.BLOG).
-		SetHTMLHandler(home.NewBlogController(registry).Handler)
+		SetHTMLHandler(home.NewBlogController(app).Handler)
 
 	blogPostRegex01Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post with ID > Index").
 		SetPath(links.BLOG_POST_WITH_REGEX).
-		SetHTMLHandler(post.NewPostController(registry).Handler)
+		SetHTMLHandler(post.NewPostController(app).Handler)
 
 	blogPostRegex02Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post with ID && Title > Index").
 		SetPath(links.BLOG_POST_WITH_REGEX2).
-		SetHTMLHandler(post.NewPostController(registry).Handler)
+		SetHTMLHandler(post.NewPostController(app).Handler)
 
 	// blogPost01Route := rtr.NewRoute().
 	// 	SetName("Guest > Blog > Post (ID)").
 	// 	SetPath(links.BLOG_01).
-	// 	SetHTMLHandler(post.NewPostController(registry).Handler)
+	// 	SetHTMLHandler(post.NewPostController(app).Handler)
 
 	// blogPost02Route := rtr.NewRoute().
 	// 	SetName("Guest > Blog > Post (ID && Title)").
 	// 	SetPath(links.BLOG_02).
-	// 	SetHTMLHandler(post.NewPostController(registry).Handler)
+	// 	SetHTMLHandler(post.NewPostController(app).Handler)
 
 	blogPost01Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post (ID)").
 		SetPath(links.BLOG_POST_01).
-		SetHTMLHandler(post.NewPostController(registry).Handler)
+		SetHTMLHandler(post.NewPostController(app).Handler)
 
 	blogPost02Route := rtr.NewRoute().
 		SetName("Guest > Blog > Post (ID && Title)").
 		SetPath(links.BLOG_POST_02).
-		SetHTMLHandler(post.NewPostController(registry).Handler)
+		SetHTMLHandler(post.NewPostController(app).Handler)
 
 	return []rtr.RouteInterface{
 		mcpBlogHealthRoute,

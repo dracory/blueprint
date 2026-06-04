@@ -12,12 +12,12 @@ import (
 
 // TestSearchBlockType_BasicProperties tests basic properties
 func TestSearchBlockType_BasicProperties(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewSearchBlockType(registry.GetCmsStore(), registry.GetBlogStore())
+	blockType := NewSearchBlockType(app.GetCmsStore(), app.GetBlogStore())
 
 	if blockType.TypeKey() != "search" {
 		t.Errorf("Expected type key 'search', got '%s'", blockType.TypeKey())
@@ -30,13 +30,13 @@ func TestSearchBlockType_BasicProperties(t *testing.T) {
 
 // TestSearchBlockType_GetPreview tests preview
 func TestSearchBlockType_GetPreview(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	// Create a real block for testing
 	block := cmsstore.NewBlock()
@@ -74,13 +74,13 @@ func TestSearchBlockType_GetPreview(t *testing.T) {
 
 // TestSearchBlockType_Validate tests validation
 func TestSearchBlockType_Validate(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
@@ -93,13 +93,13 @@ func TestSearchBlockType_Validate(t *testing.T) {
 
 // TestSearchBlockType_AdminFields tests admin fields
 func TestSearchBlockType_AdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
@@ -118,13 +118,13 @@ func TestSearchBlockType_AdminFields(t *testing.T) {
 
 // TestSearchBlockType_SaveAdminFields tests saving admin fields
 func TestSearchBlockType_SaveAdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
@@ -158,13 +158,13 @@ func TestSearchBlockType_SaveAdminFields(t *testing.T) {
 
 // TestSearchBlockType_Render_EmptyQuery tests rendering without search query
 func TestSearchBlockType_Render_EmptyQuery(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
@@ -191,13 +191,13 @@ func TestSearchBlockType_Render_EmptyQuery(t *testing.T) {
 
 // TestSearchBlockType_Render_WithQuery tests rendering with search query
 func TestSearchBlockType_Render_WithQuery(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCmsStore(true),
 		testutils.WithBlogStore(true),
 	)
 
-	cmsStore := registry.GetCmsStore()
-	blockType := NewSearchBlockType(cmsStore, registry.GetBlogStore())
+	cmsStore := app.GetCmsStore()
+	blockType := NewSearchBlockType(cmsStore, app.GetBlogStore())
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")

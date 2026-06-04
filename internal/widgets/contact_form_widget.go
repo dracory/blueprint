@@ -2,7 +2,7 @@ package widgets
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 )
@@ -14,7 +14,7 @@ import (
 //
 // Returns:
 //   - *contactForm - A pointer to the contactForm shrtcode
-func NewContactFormWidget(registry registry.RegistryInterface) *contactFormWidget {
+func NewContactFormWidget(app app.AppInterface) *contactFormWidget {
 	return &contactFormWidget{}
 }
 
@@ -24,7 +24,7 @@ var _ Widget = (*contactFormWidget)(nil) // verify it extends the interface
 //
 // This shortcode is used to send a contact message from the website.
 type contactFormWidget struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // Alias the shortcode alias to be used in the template.

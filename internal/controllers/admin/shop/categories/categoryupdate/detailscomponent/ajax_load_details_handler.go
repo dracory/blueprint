@@ -2,17 +2,17 @@ package detailscomponent
 
 import (
 	"context"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 )
 
-func HandleAjaxLoadDetails(registry registry.RegistryInterface, categoryID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxLoadDetails(app app.AppInterface, categoryID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
-	category, err := registry.GetShopStore().CategoryFindByID(context.Background(), categoryID)
+	category, err := app.GetShopStore().CategoryFindByID(context.Background(), categoryID)
 	if err != nil {
 		return api.ErrorWithData("Failed to load category", map[string]any{}).ToString()
 	}

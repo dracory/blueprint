@@ -16,7 +16,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{},
@@ -28,7 +28,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -38,7 +38,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -62,7 +62,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
@@ -76,7 +76,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
@@ -87,7 +87,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -111,11 +111,11 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
-			"once": {testutils.TestKey(registry.GetConfig())},
+			"once": {testutils.TestKey(app.GetConfig())},
 		},
 	})
 
@@ -125,7 +125,7 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
@@ -135,7 +135,7 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -160,13 +160,13 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if registry.GetUserStore() == nil {
+	if app.GetUserStore() == nil {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 
 	if err != nil {
 		t.Fatal(err)
@@ -178,7 +178,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 
 	user.SetEmail("test@test.com")
 
-	err = registry.GetUserStore().UserUpdate(context.Background(), user)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -186,7 +186,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 
 	req, err := test.NewRequest(http.MethodPost, "/", test.NewRequestOptions{
 		PostValues: url.Values{
-			"once": {testutils.TestKey(registry.GetConfig())},
+			"once": {testutils.TestKey(app.GetConfig())},
 		},
 	})
 
@@ -196,7 +196,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 	// response := recorder.Body.String()
@@ -206,7 +206,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -231,13 +231,13 @@ func TestAuthController_NilUserStore(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(false) // No session store
 	cfg.SetUserStoreUsed(false)    // No user store
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	recorder := httptest.NewRecorder()
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -251,13 +251,13 @@ func TestAuthController_NilSessionStore(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(false) // No session store
 	cfg.SetUserStoreUsed(true)     // Has user store
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	recorder := httptest.NewRecorder()
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewAuthenticationController(registry).Handler(w, r)
+		_ = NewAuthenticationController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -267,14 +267,14 @@ func TestAuthController_NilSessionStore(t *testing.T) {
 }
 
 func TestAuthController_NewController(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewAuthenticationController(registry)
+	app := testutils.Setup()
+	controller := NewAuthenticationController(app)
 
 	if controller == nil {
 		t.Fatal("Controller should not be nil")
 	}
 
-	if controller.registry == nil {
-		t.Fatal("Controller registry should not be nil")
+	if controller.app == nil {
+		t.Fatal("Controller app should not be nil")
 	}
 }

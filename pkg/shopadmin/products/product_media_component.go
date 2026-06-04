@@ -1,4 +1,4 @@
-﻿package products
+package products
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/hb"
@@ -19,7 +19,7 @@ import (
 var mediaEmbed embed.FS
 
 type productMediaComponent struct {
-	registry       registry.RegistryInterface
+	app       app.AppInterface
 	request        *http.Request
 	product        shopstore.ProductInterface
 	productID      string
@@ -31,8 +31,8 @@ type productMediaComponent struct {
 	formSuccessMessage string
 }
 
-func NewProductMediaComponent(registry registry.RegistryInterface) *productMediaComponent {
-	return &productMediaComponent{registry: registry}
+func NewProductMediaComponent(app app.AppInterface) *productMediaComponent {
+	return &productMediaComponent{app: app}
 }
 
 func (c *productMediaComponent) Mount(r *http.Request, product shopstore.ProductInterface, productID string) {
@@ -45,7 +45,7 @@ func (c *productMediaComponent) Mount(r *http.Request, product shopstore.Product
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(productID)
 	mediaQuery.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
-	medias, _ := c.registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	medias, _ := c.app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	c.formMedias = medias
 }
 
@@ -62,7 +62,7 @@ func (c *productMediaComponent) Handle(r *http.Request) error {
 	// Delete existing media for this product
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(c.productID)
-	existingMedias, err := c.registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	existingMedias, err := c.app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		slog.Error("At productMediaComponent > Handle", slog.String("error", err.Error()))
 		c.formErrorMessage = "System error. Loading existing media failed"
@@ -70,7 +70,7 @@ func (c *productMediaComponent) Handle(r *http.Request) error {
 	}
 
 	for _, existingMedia := range existingMedias {
-		err := c.registry.GetShopStore().MediaDelete(context.Background(), existingMedia)
+		err := c.app.GetShopStore().MediaDelete(context.Background(), existingMedia)
 		if err != nil {
 			slog.Error("At productMediaComponent > Handle", slog.String("error", err.Error()))
 		}
@@ -93,7 +93,7 @@ func (c *productMediaComponent) Handle(r *http.Request) error {
 		media.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
 		media.SetSequence(i)
 
-		err := c.registry.GetShopStore().MediaCreate(context.Background(), media)
+		err := c.app.GetShopStore().MediaCreate(context.Background(), media)
 		if err != nil {
 			slog.Error("At productMediaComponent > Handle", slog.String("error", err.Error()))
 			c.formErrorMessage = "System error. Creating media failed"

@@ -23,7 +23,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/emails"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/taskstore"
 )
@@ -35,16 +35,16 @@ import (
 //
 // Returns:
 //   - taskstore.TaskHandlerInterface: The task handler
-func NewEmailToAdminTask(registry registry.RegistryInterface) taskstore.TaskHandlerInterface {
+func NewEmailToAdminTask(app app.AppInterface) taskstore.TaskHandlerInterface {
 	return &emailToAdminTask{
-		registry: registry,
+		app: app,
 	}
 }
 
 // emailToAdminTask send a notification email to admin
 type emailToAdminTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	registry                  registry.RegistryInterface
+	app                  app.AppInterface
 }
 
 // Alias returns the unique identifier for this task handler
@@ -74,16 +74,16 @@ func (handler *emailToAdminTask) Description() string {
 //   - error: Any error that occurred during enqueueing
 func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueInterface, err error) {
 	// Validate task store is initialized
-	if handler.registry == nil || handler.registry.GetConfig() == nil {
+	if handler.app == nil || handler.app.GetConfig() == nil {
 		return nil, errors.New("app/config is nil")
 	}
 
-	if handler.registry.GetTaskStore() == nil {
+	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
 
 	// Enqueue task with the provided HTML content
-	return handler.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		handler.Alias(),
@@ -106,7 +106,7 @@ func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueI
 // Returns:
 //   - bool: true if task was processed successfully, false otherwise
 func (handler *emailToAdminTask) Handle() bool {
-	if handler.registry == nil || handler.registry.GetConfig() == nil {
+	if handler.app == nil || handler.app.GetConfig() == nil {
 		handler.LogError("App/Config is nil. Aborted.")
 		return false
 	}
@@ -136,7 +136,7 @@ func (handler *emailToAdminTask) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Send email using the email service
-	err := emails.NewEmailNotifyAdmin(handler.registry).Send(html)
+	err := emails.NewEmailNotifyAdmin(handler.app).Send(html)
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

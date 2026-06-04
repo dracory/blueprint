@@ -8,14 +8,14 @@ import (
 )
 
 func TestNewTaskController(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewTaskController(registry)
+	app := testutils.Setup()
+	controller := NewTaskController(app)
 
 	if controller == nil {
 		t.Error("NewTaskController() should not return nil")
 	}
-	if controller.registry != registry {
-		t.Error("Controller registry should match the provided registry")
+	if controller.app != app {
+		t.Error("Controller app should match the provided app")
 	}
 	if controller.logger == nil {
 		t.Error("Controller logger should not be nil")
@@ -23,8 +23,8 @@ func TestNewTaskController(t *testing.T) {
 }
 
 func TestTaskController_Handler_DefaultAction(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewTaskController(registry)
+	app := testutils.Setup()
+	controller := NewTaskController(app)
 
 	req := httptest.NewRequest("GET", "/admin/tasks", nil)
 	w := httptest.NewRecorder()
@@ -36,10 +36,10 @@ func TestTaskController_Handler_DefaultAction(t *testing.T) {
 }
 
 func TestTaskController_Handler_WithTaskStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 	)
-	controller := NewTaskController(registry)
+	controller := NewTaskController(app)
 
 	req := httptest.NewRequest("GET", "/admin/tasks", nil)
 	w := httptest.NewRecorder()
@@ -51,18 +51,18 @@ func TestTaskController_Handler_WithTaskStore(t *testing.T) {
 }
 
 func TestTaskController_RegistryField(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewTaskController(registry)
+	app := testutils.Setup()
+	controller := NewTaskController(app)
 
-	if controller.registry != registry {
-		t.Error("Controller registry should match the provided registry")
+	if controller.app != app {
+		t.Error("Controller app should match the provided app")
 	}
 }
 
 func TestTaskController_NilRegistry(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
-			// Expected to panic with nil registry
+			// Expected to panic with nil app
 		}
 	}()
 
@@ -87,18 +87,18 @@ func TestTaskController_MultipleInstances(t *testing.T) {
 		t.Error("Controllers should be separate instances")
 	}
 
-	if controller1.registry != registry1 {
+	if controller1.app != registry1 {
 		t.Error("Controller1 should have registry1")
 	}
 
-	if controller2.registry != registry2 {
+	if controller2.app != registry2 {
 		t.Error("Controller2 should have registry2")
 	}
 }
 
 func TestAdminLayout_SetTitle(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	layout.SetTitle("Test Title")
 	if layout.title != "Test Title" {
@@ -107,8 +107,8 @@ func TestAdminLayout_SetTitle(t *testing.T) {
 }
 
 func TestAdminLayout_SetBody(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	layout.SetBody("<p>Test Body</p>")
 	if layout.body != "<p>Test Body</p>" {
@@ -117,8 +117,8 @@ func TestAdminLayout_SetBody(t *testing.T) {
 }
 
 func TestAdminLayout_SetScriptURLs(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	urls := []string{"https://example.com/script.js"}
 	layout.SetScriptURLs(urls)
@@ -128,8 +128,8 @@ func TestAdminLayout_SetScriptURLs(t *testing.T) {
 }
 
 func TestAdminLayout_SetScripts(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	scripts := []string{"console.log('test');"}
 	layout.SetScripts(scripts)
@@ -139,8 +139,8 @@ func TestAdminLayout_SetScripts(t *testing.T) {
 }
 
 func TestAdminLayout_SetStyleURLs(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	urls := []string{"https://example.com/style.css"}
 	layout.SetStyleURLs(urls)
@@ -150,8 +150,8 @@ func TestAdminLayout_SetStyleURLs(t *testing.T) {
 }
 
 func TestAdminLayout_SetStyles(t *testing.T) {
-	registry := testutils.Setup()
-	layout := &adminLayout{app: registry}
+	app := testutils.Setup()
+	layout := &adminLayout{app: app}
 
 	styles := []string{"body { color: red; }"}
 	layout.SetStyles(styles)
@@ -161,9 +161,9 @@ func TestAdminLayout_SetStyles(t *testing.T) {
 }
 
 func TestAdminLayout_Render(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	layout := &adminLayout{
-		app:   registry,
+		app:   app,
 		title: "Test Title",
 		body:  "<p>Test Body</p>",
 	}
@@ -181,9 +181,9 @@ func TestAdminLayout_Render(t *testing.T) {
 }
 
 func TestAdminLayout_RenderWithScripts(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	layout := &adminLayout{
-		app:        registry,
+		app:        app,
 		title:      "Test Title",
 		body:       "<p>Test Body</p>",
 		scriptURLs: []string{"https://example.com/script.js"},
@@ -200,9 +200,9 @@ func TestAdminLayout_RenderWithScripts(t *testing.T) {
 }
 
 func TestAdminLayout_RenderWithStyles(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	layout := &adminLayout{
-		app:       registry,
+		app:       app,
 		title:     "Test Title",
 		body:      "<p>Test Body</p>",
 		styleURLs: []string{"https://example.com/style.css"},

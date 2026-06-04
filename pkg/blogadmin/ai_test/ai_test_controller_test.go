@@ -12,8 +12,8 @@ func TestNewAiTestController(t *testing.T) {
 	if controller == nil {
 		t.Error("Expected controller to be non-nil")
 	}
-	if controller.registry != nil {
-		t.Error("Expected registry to be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Expected app to be nil when passed nil")
 	}
 }
 
@@ -27,7 +27,7 @@ func TestAiTestController_StructFields(t *testing.T) {
 	}
 
 	// Verify the controller has the expected structure
-	// The struct should have a registry field
+	// The struct should have a app field
 }
 
 // TestAiTestController_MultipleInstances tests creating multiple controllers
@@ -46,13 +46,13 @@ func TestAiTestController_MultipleInstances(t *testing.T) {
 	}
 }
 
-// TestAiTestController_WithRegistry tests controller with registry
+// TestAiTestController_WithRegistry tests controller with app
 func TestAiTestController_WithRegistry(t *testing.T) {
 	t.Parallel()
 
-	// Even with nil registry, controller should work for basic tests
+	// Even with nil app, controller should work for basic tests
 	controller := NewAiTestController(nil)
 
 	// Verify it doesn't panic
-	_ = controller.registry
+	_ = controller.app
 }

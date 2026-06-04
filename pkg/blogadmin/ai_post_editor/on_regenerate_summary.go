@@ -8,12 +8,12 @@ import (
 )
 
 func (c *AiPostEditorController) onRegenerateSummary(data pageData) string {
-	agent := blogai.NewBlogWriterAgent(c.registry.GetLogger())
+	agent := blogai.NewBlogWriterAgent(c.app.GetLogger())
 	if agent == nil {
 		return api.Error("failed to initialize LLM engine").ToString()
 	}
 
-	llmEngine, err := shared.LlmEngine(c.registry)
+	llmEngine, err := shared.LlmEngine(c.app)
 	if err != nil {
 		return api.Error("failed to initialize LLM engine: " + err.Error()).ToString()
 	}
@@ -28,7 +28,7 @@ func (c *AiPostEditorController) onRegenerateSummary(data pageData) string {
 
 	data.BlogAiPost.Summary = summary
 	data.Record.SetPayload(data.BlogAiPost.ToJSON())
-	if err := c.registry.GetCustomStore().RecordUpdate(data.Record); err != nil {
+	if err := c.app.GetCustomStore().RecordUpdate(data.Record); err != nil {
 		return api.Error("Failed to save updated blog post: " + err.Error()).ToString()
 	}
 

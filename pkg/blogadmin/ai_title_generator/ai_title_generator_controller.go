@@ -8,7 +8,7 @@ import (
 	"project/internal/links"
 	"project/pkg/blogadmin/shared"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogai"
 	"strings"
 
@@ -30,7 +30,7 @@ const (
 )
 
 type AiTitleGeneratorController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type pageData struct {
@@ -40,15 +40,15 @@ type pageData struct {
 	HasSystemPrompt     bool
 }
 
-func NewAiTitleGeneratorController(registry registry.RegistryInterface) *AiTitleGeneratorController {
-	return &AiTitleGeneratorController{registry: registry}
+func NewAiTitleGeneratorController(app app.AppInterface) *AiTitleGeneratorController {
+	return &AiTitleGeneratorController{app: app}
 }
 
 func (c *AiTitleGeneratorController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errorMessage := c.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, errorMessage, shared.NewLinks("/admin/blog").Home(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, shared.NewLinks("/admin/blog").Home(), 10)
 	}
 
 	if r.Method == http.MethodGet && data.Action == ACTION_ADD_TITLE {
@@ -70,7 +70,7 @@ func (c *AiTitleGeneratorController) Handler(w http.ResponseWriter, r *http.Requ
 		}
 	}
 
-	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:   "AI Title Generator",
 		Content: c.view(data),
 		ScriptURLs: []string{
@@ -106,7 +106,7 @@ func (c *AiTitleGeneratorController) view(data pageData) *hb.Tag {
 		},
 	})
 
-	settingsComponent := NewTitleGeneratorSettingsModal(c.registry)
+	settingsComponent := NewTitleGeneratorSettingsModal(c.app)
 	settingsSSR := liveflux.SSR(settingsComponent, map[string]string{
 		"return_url": shared.NewLinks("/admin/blog").AiTitleGenerator(),
 	})
@@ -196,11 +196,11 @@ func (c *AiTitleGeneratorController) prepareData(r *http.Request) (data pageData
 		Action:  req.GetStringTrimmed(r, "action"),
 	}
 
-	if c.registry.GetCustomStore() == nil {
+	if c.app.GetCustomStore() == nil {
 		return data, "Custom store is not initialized"
 	}
 
-	records, err := c.registry.GetCustomStore().RecordList(customstore.RecordQuery().
+	records, err := c.app.GetCustomStore().RecordList(customstore.RecordQuery().
 		SetType(blogai.POST_RECORD_TYPE))
 	if err != nil {
 		return data, fmt.Sprintf("Failed to fetch titles: %s", err.Error())
@@ -210,7 +210,7 @@ func (c *AiTitleGeneratorController) prepareData(r *http.Request) (data pageData
 	for _, record := range records {
 		recordPost, err := blogai.NewRecordPostFromCustomRecord(record)
 		if err != nil {
-			c.registry.GetLogger().Warn("Failed to parse custom record into RecordPost: " + err.Error())
+			c.app.GetLogger().Warn("Failed to parse custom record into RecordPost: " + err.Error())
 			continue
 		}
 		recordPosts = append(recordPosts, recordPost)
@@ -219,8 +219,8 @@ func (c *AiTitleGeneratorController) prepareData(r *http.Request) (data pageData
 	data.ExistingPostRecords = recordPosts
 
 	// Determine if the system prompt setting is configured
-	if c.registry.GetSettingStore() != nil {
-		value, err := c.registry.GetSettingStore().Get(r.Context(), SETTING_KEY_BLOG_TOPIC, "")
+	if c.app.GetSettingStore() != nil {
+		value, err := c.app.GetSettingStore().Get(r.Context(), SETTING_KEY_BLOG_TOPIC, "")
 		if err == nil && strings.TrimSpace(value) != "" {
 			data.HasSystemPrompt = true
 		}

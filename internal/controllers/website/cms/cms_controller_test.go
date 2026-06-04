@@ -17,15 +17,15 @@ func TestCmsController_Handler_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
-	controller := NewCmsController(registry)
+	controller := NewCmsController(app)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -55,9 +55,9 @@ func TestCmsController_Handler_CmsNotConfigured(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false) // CMS store is not enabled
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	controller := NewCmsController(registry)
+	controller := NewCmsController(app)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -84,16 +84,16 @@ func TestGetInstance_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
 	// --- Execute ---
-	instance := GetInstance(registry)
+	instance := GetInstance(app)
 
 	// --- Assert ---
 	if instance == nil {
@@ -105,10 +105,10 @@ func TestGetInstance_NilWhenCmsNotConfigured(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
 	cfg.SetCmsStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// --- Execute ---
-	instance := GetInstance(registry)
+	instance := GetInstance(app)
 
 	// --- Assert ---
 	// When CMS store is nil, the instance should still be created but won't work properly
@@ -121,17 +121,17 @@ func TestGetInstance_NilWhenCmsNotConfigured(t *testing.T) {
 func TestNewCmsController(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// --- Execute ---
-	controller := NewCmsController(registry)
+	controller := NewCmsController(app)
 
 	// --- Assert ---
 	if controller == nil {
 		t.Fatal("Expected controller to not be nil")
 	}
-	if controller.registry == nil {
-		t.Fatal("Expected controller.registry to not be nil")
+	if controller.app == nil {
+		t.Fatal("Expected controller.app to not be nil")
 	}
 }
 
@@ -141,10 +141,10 @@ func TestCmsMcpEndpoint_RequiresApiKey(t *testing.T) {
 	cfg.SetCmsStoreTemplateID("test-template")
 	cfg.SetCmsMcpApiKey("test-mcp-key")
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	r := rtr.NewRouter()
-	r.AddRoutes(Routes(registry))
+	r.AddRoutes(Routes(app))
 
 	// Missing key
 	reqMissing := httptest.NewRequest(http.MethodPost, links.MCP_CMS, bytes.NewBuffer([]byte(`{"jsonrpc":"2.0","id":"1","method":"list_tools","params":{}}`)))
@@ -177,23 +177,23 @@ func TestCmsMcpEndpoint_RequiresApiKey(t *testing.T) {
 
 func TestNewWidgetController(t *testing.T) {
 	cfg := testutils.DefaultConf()
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	controller := NewWidgetController(registry)
+	controller := NewWidgetController(app)
 
 	if controller == nil {
 		t.Fatal("Expected controller to not be nil")
 	}
-	if controller.registry == nil {
-		t.Fatal("Expected controller.registry to not be nil")
+	if controller.app == nil {
+		t.Fatal("Expected controller.app to not be nil")
 	}
 }
 
 func TestWidgetController_Handler_NoAlias(t *testing.T) {
 	cfg := testutils.DefaultConf()
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	controller := NewWidgetController(registry)
+	controller := NewWidgetController(app)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -207,9 +207,9 @@ func TestWidgetController_Handler_NoAlias(t *testing.T) {
 
 func TestWidgetController_Handler_WithAlias(t *testing.T) {
 	cfg := testutils.DefaultConf()
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	controller := NewWidgetController(registry)
+	controller := NewWidgetController(app)
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/?alias=nonexistent", nil)

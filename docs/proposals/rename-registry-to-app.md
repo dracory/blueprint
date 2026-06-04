@@ -1,6 +1,6 @@
 # Rename Registry to App
 
-**Status:** Draft
+**Status:** Completed
 
 ## Problem
 

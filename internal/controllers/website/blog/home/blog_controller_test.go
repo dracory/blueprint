@@ -18,21 +18,21 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	cfg.SetBlogStoreUsed(true)
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
-	controller := NewBlogController(registry)
+	controller := NewBlogController(app)
 
 	// Create test posts in the database
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Post 1")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	err = registry.GetBlogStore().PostCreate(context.Background(), post1)
+	err = app.GetBlogStore().PostCreate(context.Background(), post1)
 	if err != nil {
 		t.Fatalf("Failed to create test post 1: %v", err)
 	}
@@ -40,7 +40,7 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	post2 := blogstore.NewPost()
 	post2.SetTitle("Post 2")
 	post2.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	err = registry.GetBlogStore().PostCreate(context.Background(), post2)
+	err = app.GetBlogStore().PostCreate(context.Background(), post2)
 	if err != nil {
 		t.Fatalf("Failed to create test post 2: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	draftPost := blogstore.NewPost()
 	draftPost.SetTitle("Draft Post")
 	draftPost.SetStatus(blogstore.POST_STATUS_DRAFT)
-	err = registry.GetBlogStore().PostCreate(context.Background(), draftPost)
+	err = app.GetBlogStore().PostCreate(context.Background(), draftPost)
 	if err != nil {
 		t.Fatalf("Failed to create draft post: %v", err)
 	}
@@ -114,18 +114,18 @@ func TestBlogController_Handler_PostListError(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
-	registry.SetBlogStore(&fakeBlogStore{
-		StoreInterface: registry.GetBlogStore(),
+	app.SetBlogStore(&fakeBlogStore{
+		StoreInterface: app.GetBlogStore(),
 		postListError:  errors.New("simulated database error"),
 	})
-	controller := NewBlogController(registry)
+	controller := NewBlogController(app)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -149,7 +149,7 @@ func TestBlogController_Handler_PostListError(t *testing.T) {
 	}
 
 	// Check that the flash message was set correctly.
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -175,19 +175,19 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetCmsStoreUsed(true)
 	cfg.SetCmsStoreTemplateID("test-template")
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test template
-	err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template")
+	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
 	if err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 	// This fake store will only error on PostCount
-	registry.SetBlogStore(&fakeBlogStore{
-		StoreInterface: registry.GetBlogStore(),
+	app.SetBlogStore(&fakeBlogStore{
+		StoreInterface: app.GetBlogStore(),
 		postCountError: errors.New("database count error"),
 	})
-	controller := NewBlogController(registry)
+	controller := NewBlogController(app)
 
 	// --- Execute ---
 	w := httptest.NewRecorder()
@@ -208,7 +208,7 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 	}
 
 	// Check that the flash message was set correctly.
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -229,8 +229,8 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 
 func TestBlogController_PageRendering(t *testing.T) {
 	// --- Setup ---
-	registry := testutils.Setup()
-	controller := NewBlogController(registry)
+	app := testutils.Setup()
+	controller := NewBlogController(app)
 
 	data := blogControllerData{
 		postList: []blogstore.PostInterface{

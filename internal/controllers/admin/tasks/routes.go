@@ -3,14 +3,14 @@ package admin
 import (
 	"errors"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
 
-func TaskRoutes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
-	if registry == nil {
-		return nil, errors.New("registry cannot be nil")
+func TaskRoutes(app app.AppInterface) ([]rtr.RouteInterface, error) {
+	if app == nil {
+		return nil, errors.New("app cannot be nil")
 	}
 	return []rtr.RouteInterface{
 		// &router.Route{
@@ -41,10 +41,10 @@ func TaskRoutes(registry registry.RegistryInterface) ([]rtr.RouteInterface, erro
 		rtr.NewRoute().
 			SetName("Admin > Tasks > Home").
 			SetPath(links.ADMIN_TASKS).
-			SetHTMLHandler(NewTaskController(registry).Handler),
+			SetHTMLHandler(NewTaskController(app).Handler),
 		rtr.NewRoute().
 			SetName("Admin > Tasks > Catchall").
 			SetPath(links.ADMIN_TASKS + links.CATCHALL).
-			SetHTMLHandler(NewTaskController(registry).Handler),
+			SetHTMLHandler(NewTaskController(app).Handler),
 	}, nil
 }

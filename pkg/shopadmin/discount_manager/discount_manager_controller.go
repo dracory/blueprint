@@ -3,7 +3,7 @@ package discount_manager
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
@@ -17,13 +17,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type discountManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewDiscountManagerController(registry registry.RegistryInterface) *discountManagerController {
-	return &discountManagerController{registry: registry}
+func NewDiscountManagerController(app app.AppInterface) *discountManagerController {
+	return &discountManagerController{app: app}
 }
 
 func (controller *discountManagerController) Handler(w http.ResponseWriter, r *http.Request) string {

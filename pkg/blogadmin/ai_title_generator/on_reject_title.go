@@ -17,7 +17,7 @@ func (c *AiTitleGeneratorController) onRejectTitle(r *http.Request) string {
 		return shared.ErrorPopup("Title ID is required").ToHTML()
 	}
 
-	customStore := c.registry.GetCustomStore()
+	customStore := c.app.GetCustomStore()
 	if customStore == nil {
 		return shared.ErrorPopup("Custom store not configured").ToHTML()
 	}

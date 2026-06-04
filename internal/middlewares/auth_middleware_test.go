@@ -18,14 +18,14 @@ func TestAuthHandler_NoSessionKey(t *testing.T) {
 	// cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a request without a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(registry, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -50,7 +50,7 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 	// cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a request with a session cookie
 	req := httptest.NewRequest("GET", "/", nil)
@@ -60,7 +60,7 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(registry, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -85,10 +85,10 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 	// cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	userStore := registry.GetUserStore()
-	sessionStore := registry.GetSessionStore()
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
 
 	if userStore == nil {
 		t.Fatal("userStore should not be nil")
@@ -123,7 +123,7 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(registry, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -146,10 +146,10 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 	// cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	userStore := registry.GetUserStore()
-	sessionStore := registry.GetSessionStore()
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
 
 	if userStore == nil {
 		t.Fatal("userStore should not be nil")
@@ -190,7 +190,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(registry, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -214,10 +214,10 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 	// cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	userStore := registry.GetUserStore()
-	sessionStore := registry.GetSessionStore()
+	userStore := app.GetUserStore()
+	sessionStore := app.GetSessionStore()
 
 	if userStore == nil {
 		t.Fatal("userStore should not be nil")
@@ -252,7 +252,7 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(registry, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) == nil {
 			t.Fatal("User should be set in context")
 		}
@@ -274,7 +274,7 @@ func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(false)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -283,7 +283,7 @@ func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(registry, next)
+	handler := authHandler(app, next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
@@ -299,9 +299,9 @@ func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(true)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 	// Simulate uninitialized session store
-	registry.SetSessionStore(nil)
+	app.SetSessionStore(nil)
 
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -310,7 +310,7 @@ func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(registry, next)
+	handler := authHandler(app, next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
@@ -329,7 +329,7 @@ func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T)
 	cfg.SetUserStoreUsed(false)
 	cfg.SetSessionStoreUsed(true)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -338,7 +338,7 @@ func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T)
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(registry, next)
+	handler := authHandler(app, next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
@@ -357,10 +357,10 @@ func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Ensure user store is nil
-	registry.SetUserStore(nil)
+	app.SetUserStore(nil)
 
 	req := httptest.NewRequest("GET", "/", nil)
 	rr := httptest.NewRecorder()
@@ -369,7 +369,7 @@ func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(registry, next)
+	handler := authHandler(app, next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {

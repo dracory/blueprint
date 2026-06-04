@@ -14,7 +14,7 @@ import (
 
 // TestHandleAjaxSaveTags_Success tests successful tags saving
 func TestHandleAjaxSaveTags_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -25,7 +25,7 @@ func TestHandleAjaxSaveTags_Success(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -33,7 +33,7 @@ func TestHandleAjaxSaveTags_Success(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-tags&product_id="+product.GetID(),
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveTags(registry, req, product.GetID())
+	response := HandleAjaxSaveTags(app, req, product.GetID())
 
 	if !strings.Contains(response, `"tags"`) {
 		t.Error("expected response to contain tags field")
@@ -43,7 +43,7 @@ func TestHandleAjaxSaveTags_Success(t *testing.T) {
 	}
 
 	// Verify tags were actually saved
-	updatedProduct, err := registry.GetShopStore().ProductFindByID(context.Background(), product.GetID())
+	updatedProduct, err := app.GetShopStore().ProductFindByID(context.Background(), product.GetID())
 	if err != nil {
 		t.Fatalf("failed to find updated product: %v", err)
 	}
@@ -60,7 +60,7 @@ func TestHandleAjaxSaveTags_Success(t *testing.T) {
 
 // TestHandleAjaxSaveTags_InvalidBody tests error with invalid JSON body
 func TestHandleAjaxSaveTags_InvalidBody(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -69,7 +69,7 @@ func TestHandleAjaxSaveTags_InvalidBody(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-tags&product_id=test123",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveTags(registry, req, "test123")
+	response := HandleAjaxSaveTags(app, req, "test123")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -81,7 +81,7 @@ func TestHandleAjaxSaveTags_InvalidBody(t *testing.T) {
 
 // TestHandleAjaxSaveTags_ProductNotFound tests error when product not found
 func TestHandleAjaxSaveTags_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -90,7 +90,7 @@ func TestHandleAjaxSaveTags_ProductNotFound(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/?action=save-tags&product_id=nonexistent",
 		strings.NewReader(body))
 
-	response := HandleAjaxSaveTags(registry, req, "nonexistent")
+	response := HandleAjaxSaveTags(app, req, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")

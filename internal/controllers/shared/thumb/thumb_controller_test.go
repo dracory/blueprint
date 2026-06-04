@@ -518,11 +518,11 @@ func TestPrepareDataFilesLink(t *testing.T) {
 
 // TestNewThumbController verifies the constructor creates a valid controller
 func TestNewThumbController(t *testing.T) {
-	// Since we don't have easy access to a registry in this test package,
+	// Since we don't have easy access to a app in this test package,
 	// we'll just verify the constructor doesn't panic with nil
 	c := NewThumbController(nil)
 	if c == nil {
-		t.Fatal("NewThumbController should not return nil even with nil registry")
+		t.Fatal("NewThumbController should not return nil even with nil app")
 	}
 }
 
@@ -532,9 +532,9 @@ func TestThumbController_Handler_NilRegistry(t *testing.T) {
 	req := httptest.NewRequest("GET", "/", nil)
 
 	result := c.Handler(w, req)
-	// Handler should not panic even with nil registry
+	// Handler should not panic even with nil app
 	if result == "" {
-		t.Log("Handler returned empty string with nil registry (expected)")
+		t.Log("Handler returned empty string with nil app (expected)")
 	}
 }
 

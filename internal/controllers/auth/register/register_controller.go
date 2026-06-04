@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -24,7 +24,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type registerController struct {
-	registry                               registry.RegistryInterface
+	app                               app.AppInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formFirstName                          string
 	formLastName                           string
@@ -37,9 +37,9 @@ type registerController struct {
 
 // == CONSTRUCTOR =============================================================
 
-func NewRegisterController(registry registry.RegistryInterface) *registerController {
+func NewRegisterController(app app.AppInterface) *registerController {
 	return &registerController{
-		registry:                               registry,
+		app:                               app,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",
 		formCountry:                            "country",
 		formTimezone:                           "timezone",
@@ -54,22 +54,22 @@ func NewRegisterController(registry registry.RegistryInterface) *registerControl
 // == PUBLIC METHODS ==========================================================
 
 func (controller *registerController) Handler(w http.ResponseWriter, r *http.Request) string {
-	if !controller.registry.GetConfig().GetRegistrationEnabled() {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, `Registrations are currently disabled`, links.Website().Home(), 10)
+	if !controller.app.GetConfig().GetRegistrationEnabled() {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `Registrations are currently disabled`, links.Website().Home(), 10)
 	}
 
-	if controller.registry.GetUserStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
+	if controller.app.GetUserStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
 	}
 
-	if controller.registry.GetConfig().GetUserStoreVaultEnabled() && controller.registry.GetVaultStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, `vault store is required`, links.Website().Home(), 5)
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.GetVaultStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, links.Website().Home(), 5)
 	}
 
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
 	}
 
 	if data.action == controller.actionOnCountrySelectedTimezoneOptions {
@@ -87,13 +87,13 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		cdn.Sweetalert2_11(),
 	}
 
-	if controller.registry.GetConfig().IsEnvProduction() {
+	if controller.app.GetConfig().IsEnvProduction() {
 		//scriptURLs = append([]string{helpers.GoogleTagScriptURL()}, scriptURLs...)
 		//scripts = append(scripts, helpers.GoogleTagInitScript(), helpers.GoogleConversionScript())
 	}
 
 	return layouts.NewBlankLayout(
-		controller.registry,
+		controller.app,
 		r,
 		layouts.Options{
 			Title: "Register",
@@ -121,7 +121,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 // == PRIVATE METHODS =========================================================
 
 func (controller *registerController) postUpdate(ctx context.Context, data registerControllerData) string {
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		data.formErrorMessage = "We are very sorry user store is not configured. Saving the details not possible."
 		return controller.formRegister(ctx, data).ToHTML()
 	}
@@ -146,39 +146,39 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		return controller.formRegister(ctx, data).ToHTML()
 	}
 
-	if controller.registry.GetConfig().GetUserStoreVaultEnabled() {
-		if controller.registry.GetVaultStore() == nil {
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
+		if controller.app.GetVaultStore() == nil {
 			data.formErrorMessage = "We are very sorry vault store is not configured. Saving the details not possible."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
 
-		firstNameToken, err := controller.registry.GetVaultStore().TokenCreate(ctx, data.firstName, controller.registry.GetConfig().GetVaultStoreKey(), 20)
+		firstNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.firstName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
 
-		lastNameToken, err := controller.registry.GetVaultStore().TokenCreate(ctx, data.lastName, controller.registry.GetConfig().GetVaultStoreKey(), 20)
+		lastNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.lastName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error creating last name token", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error creating last name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
 
-		businessNameToken, err := controller.registry.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.registry.GetConfig().GetVaultStoreKey(), 20)
+		businessNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error creating business name token", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error creating business name token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
 
-		phoneToken, err := controller.registry.GetVaultStore().TokenCreate(ctx, data.phone, controller.registry.GetConfig().GetVaultStoreKey(), 20)
+		phoneToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.phone, controller.app.GetConfig().GetVaultStoreKey(), 20)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error creating phone token", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error creating phone token", slog.String("error", err.Error()))
 			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
@@ -198,10 +198,10 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		data.authUser.SetTimezone(data.timezone)
 	}
 
-	err := controller.registry.GetUserStore().UserUpdate(ctx, data.authUser)
+	err := controller.app.GetUserStore().UserUpdate(ctx, data.authUser)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("Error updating user profile", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("Error updating user profile", slog.String("error", err.Error()))
 		data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
 		return controller.formRegister(ctx, data).ToHTML()
 	}
@@ -238,11 +238,11 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	businessName = user.GetBusinessName()
 	phone = user.GetPhone()
 
-	if !controller.registry.GetConfig().GetUserStoreVaultEnabled() {
+	if !controller.app.GetConfig().GetUserStoreVaultEnabled() {
 		return email, firstName, lastName, businessName, phone, nil
 	}
 
-	if controller.registry.GetVaultStore() == nil {
+	if controller.app.GetVaultStore() == nil {
 		return "", "", "", "", "", errors.New("vault store is nil")
 	}
 
@@ -254,46 +254,46 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	phoneToken := phone
 
 	if emailToken != "" {
-		email, err = controller.registry.GetVaultStore().TokenRead(ctx, emailToken, controller.registry.GetConfig().GetVaultStoreKey())
+		email, err = controller.app.GetVaultStore().TokenRead(ctx, emailToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if firstNameToken != "" {
-		firstName, err = controller.registry.GetVaultStore().TokenRead(ctx, firstNameToken, controller.registry.GetConfig().GetVaultStoreKey())
+		firstName, err = controller.app.GetVaultStore().TokenRead(ctx, firstNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading first name", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading first name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if lastNameToken != "" {
-		lastName, err = controller.registry.GetVaultStore().TokenRead(ctx, lastNameToken, controller.registry.GetConfig().GetVaultStoreKey())
+		lastName, err = controller.app.GetVaultStore().TokenRead(ctx, lastNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading last name", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading last name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if businessNameToken != "" {
-		businessName, err = controller.registry.GetVaultStore().TokenRead(ctx, businessNameToken, controller.registry.GetConfig().GetVaultStoreKey())
+		businessName, err = controller.app.GetVaultStore().TokenRead(ctx, businessNameToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading business name", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading business name", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
 
 	if phoneToken != "" {
-		phone, err = controller.registry.GetVaultStore().TokenRead(ctx, phoneToken, controller.registry.GetConfig().GetVaultStoreKey())
+		phone, err = controller.app.GetVaultStore().TokenRead(ctx, phoneToken, controller.app.GetConfig().GetVaultStoreKey())
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading phone", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading phone", slog.String("error", err.Error()))
 			return "", "", "", "", "", err
 		}
 	}
@@ -302,7 +302,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 }
 
 func (controller *registerController) prepareData(r *http.Request) (data registerControllerData, errorMessage string) {
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		return registerControllerData{}, "User store is nil"
 	}
 
@@ -313,17 +313,17 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 		return registerControllerData{}, "You must be logged in to access this page"
 	}
 
-	if controller.registry.GetGeoStore() == nil {
+	if controller.app.GetGeoStore() == nil {
 		return registerControllerData{}, "Geo store is nil"
 	}
 
-	countries, errCountries := controller.registry.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
+	countries, errCountries := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
 		SortOrder: "asc",
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 
 	if errCountries != nil {
-		controller.registry.GetLogger().Error("Error listing countries", slog.String("error", errCountries.Error()))
+		controller.app.GetLogger().Error("Error listing countries", slog.String("error", errCountries.Error()))
 		return registerControllerData{}, "Error listing countries"
 	}
 
@@ -331,7 +331,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 
 	if r.Method == http.MethodGet {
 		if err != nil {
-			controller.registry.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
 			return registerControllerData{}, "Error reading email"
 		}
 
@@ -377,10 +377,10 @@ func (controller *registerController) selectTimezoneByCountry(ctx context.Contex
 		query.CountryCode = country
 	}
 
-	timezones, errZones := controller.registry.GetGeoStore().TimezoneList(ctx, query)
+	timezones, errZones := controller.app.GetGeoStore().TimezoneList(ctx, query)
 
 	if errZones != nil {
-		controller.registry.GetLogger().Error("Error listing timezones", slog.String("error", errZones.Error()))
+		controller.app.GetLogger().Error("Error listing timezones", slog.String("error", errZones.Error()))
 		return hb.Text("Error listing timezones")
 	}
 

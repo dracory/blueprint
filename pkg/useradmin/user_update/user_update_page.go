@@ -28,35 +28,35 @@ var (
 func (controller *userUpdateController) renderPage(w http.ResponseWriter, r *http.Request) string {
 	userID := req.GetStringTrimmed(r, "user_id")
 
-	if controller.registry.GetUserStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "User store is not configured", shared.NewLinks("/admin/users").UserManager(), 10)
+	if controller.app.GetUserStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "User store is not configured", shared.NewLinks("/admin/users").UserManager(), 10)
 	}
 
 	if userID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "User ID is required", shared.NewLinks("/admin/users").UserManager(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "User ID is required", shared.NewLinks("/admin/users").UserManager(), 10)
 	}
 
-	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), userID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), userID)
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("renderPage UserFindByID", slog.String("user_id", userID), slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("renderPage UserFindByID", slog.String("user_id", userID), slog.String("error", err.Error()))
 		}
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Error loading user", shared.NewLinks("/admin/users").UserManager(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error loading user", shared.NewLinks("/admin/users").UserManager(), 10)
 	}
 	if user == nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("renderPage user not found", slog.String("user_id", userID))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("renderPage user not found", slog.String("user_id", userID))
 		}
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "User not found", shared.NewLinks("/admin/users").UserManager(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "User not found", shared.NewLinks("/admin/users").UserManager(), 10)
 	}
 
 	firstName := user.GetFirstName()
 	lastName := user.GetLastName()
-	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
-		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
+		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 		if err != nil {
-			if controller.registry.GetLogger() != nil {
-				controller.registry.GetLogger().Error("At userUpdateController > renderPage", slog.String("error", err.Error()))
+			if controller.app.GetLogger() != nil {
+				controller.app.GetLogger().Error("At userUpdateController > renderPage", slog.String("error", err.Error()))
 			}
 		}
 	}
@@ -113,7 +113,7 @@ func (controller *userUpdateController) renderPage(w http.ResponseWriter, r *htt
 		card,
 	)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit User | Users",
 		Content: content,
 		ScriptURLs: []string{

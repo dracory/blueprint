@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -20,7 +20,7 @@ import (
 )
 
 type blogController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type blogControllerData struct {
@@ -30,9 +30,9 @@ type blogControllerData struct {
 	perPage   int
 }
 
-func NewBlogController(registry registry.RegistryInterface) *blogController {
+func NewBlogController(app app.AppInterface) *blogController {
 	return &blogController{
-		registry: registry,
+		app: app,
 	}
 }
 
@@ -40,7 +40,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
 	}
 
 	options := layouts.Options{
@@ -52,14 +52,14 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 		},
 	}
 
-	if controller.registry.GetConfig().GetCmsStoreUsed() {
+	if controller.app.GetConfig().GetCmsStoreUsed() {
 		return layouts.NewCmsLayout(
-			controller.registry,
+			controller.app,
 			r,
 			options).ToHTML()
 	} else {
 		return layouts.NewBlankLayout(
-			controller.registry,
+			controller.app,
 			r,
 			options).ToHTML()
 	}
@@ -108,10 +108,10 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		page = 0
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 
 	if blogStore == nil {
-		controller.registry.GetLogger().Error("Error. At blogController.prepareData", slog.String("error", "blog store is not initialized"))
+		controller.app.GetLogger().Error("Error. At blogController.prepareData", slog.String("error", "blog store is not initialized"))
 		return data, "Sorry, the blog is currently unavailable. Please try again later."
 	}
 
@@ -126,14 +126,14 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 	postList, errList := blogStore.PostList(r.Context(), options)
 
 	if errList != nil {
-		controller.registry.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
+		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errList.Error()))
 		return data, "Sorry, there was an error loading the posts. Please try again later."
 	}
 
 	postCount, errCount := blogStore.PostCount(r.Context(), options)
 
 	if errCount != nil {
-		controller.registry.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
+		controller.app.GetLogger().Error("Error. At blogController.page", slog.String("error", errCount.Error()))
 		return data, "Sorry, there was an error loading the posts count. Please try again later."
 	}
 

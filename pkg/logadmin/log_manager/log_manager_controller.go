@@ -10,7 +10,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/logadmin/shared"
 
 	"github.com/dracory/api"
@@ -36,13 +36,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type logManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewLogManagerController(registry registry.RegistryInterface) *logManagerController {
-	return &logManagerController{registry: registry}
+func NewLogManagerController(app app.AppInterface) *logManagerController {
+	return &logManagerController{app: app}
 }
 
 func (controller *logManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -65,13 +65,13 @@ func (controller *logManagerController) Handler(w http.ResponseWriter, r *http.R
 }
 
 func (controller *logManagerController) renderPage(r *http.Request) string {
-	if controller.registry.GetLogStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Log store is not initialized", links.Admin().Home(), 10)
+	if controller.app.GetLogStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Log store is not initialized", links.Admin().Home(), 10)
 	}
 
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -119,7 +119,7 @@ func (controller *logManagerController) renderPage(r *http.Request) string {
 		Child(hb.HR()).
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Log Manager",
 		Content: content,
 		ScriptURLs: []string{
@@ -132,7 +132,7 @@ func (controller *logManagerController) renderPage(r *http.Request) string {
 func (controller *logManagerController) handleLoadLogs(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	logStore := controller.registry.GetLogStore()
+	logStore := controller.app.GetLogStore()
 	if logStore == nil {
 		return api.Error("Log store not available").ToString()
 	}
@@ -265,7 +265,7 @@ func (controller *logManagerController) handleLoadLogs(w http.ResponseWriter, r 
 func (controller *logManagerController) handleLogDelete(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	logStore := controller.registry.GetLogStore()
+	logStore := controller.app.GetLogStore()
 	if logStore == nil {
 		return api.Error("Log store not available").ToString()
 	}
@@ -293,7 +293,7 @@ func (controller *logManagerController) handleLogDelete(w http.ResponseWriter, r
 func (controller *logManagerController) handleLogDeleteSelected(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	logStore := controller.registry.GetLogStore()
+	logStore := controller.app.GetLogStore()
 	if logStore == nil {
 		return api.Error("Log store not available").ToString()
 	}
@@ -322,7 +322,7 @@ func (controller *logManagerController) handleLogDeleteSelected(w http.ResponseW
 func (controller *logManagerController) handleLogDeleteAll(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	logStore := controller.registry.GetLogStore()
+	logStore := controller.app.GetLogStore()
 	if logStore == nil {
 		return api.Error("Log store not available").ToString()
 	}
@@ -386,7 +386,7 @@ func (controller *logManagerController) handleLogDeleteAll(w http.ResponseWriter
 func (controller *logManagerController) handleLogShowContext(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	logStore := controller.registry.GetLogStore()
+	logStore := controller.app.GetLogStore()
 	if logStore == nil {
 		return api.Error("Log store not available").ToString()
 	}

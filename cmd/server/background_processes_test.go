@@ -44,7 +44,7 @@ func TestStartBackgroundProcesses_NilRegistry(t *testing.T) {
 
 	err := startBackgroundProcesses(ctx, group, nil)
 	if err == nil {
-		t.Error("startBackgroundProcesses with nil registry should return error")
+		t.Error("startBackgroundProcesses with nil app should return error")
 	}
 }
 
@@ -55,7 +55,7 @@ func TestStartBackgroundProcesses_NilConfig(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create a minimal mock registry without config
+	// Create a minimal mock app without config
 	app := testutils.Setup()
 
 	// This will likely fail because we can't easily mock GetConfig() returning nil
@@ -74,7 +74,7 @@ func TestStartBackgroundProcesses_MinimalConfig(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create registry with minimal config but all required stores disabled
+	// Create app with minimal config but all required stores disabled
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(false)
 	cfg.SetSessionStoreUsed(false)
@@ -95,7 +95,7 @@ func TestStartBackgroundProcesses_NilDatabase(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create a mock registry with nil database
+	// Create a mock app with nil database
 	app := testutils.Setup()
 	// We can't easily set database to nil, so this test documents the expected behavior
 	err := startBackgroundProcesses(ctx, group, app)
@@ -112,7 +112,7 @@ func TestStartBackgroundProcesses_TaskStoreEnabledButNil(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create registry with task store enabled but not initialized
+	// Create app with task store enabled but not initialized
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(true)
 	cfg.SetCacheStoreUsed(false)
@@ -136,7 +136,7 @@ func TestStartBackgroundProcesses_CacheStoreEnabledButNil(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create registry with cache store enabled but not initialized
+	// Create app with cache store enabled but not initialized
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetTaskStoreUsed(false)
@@ -159,7 +159,7 @@ func TestStartBackgroundProcesses_SessionStoreEnabledButNil(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create registry with session store enabled but not initialized
+	// Create app with session store enabled but not initialized
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetTaskStoreUsed(false)
@@ -182,7 +182,7 @@ func TestStartBackgroundProcesses_AllStoresEnabled(t *testing.T) {
 	group := newBackgroundGroup(ctx)
 	defer group.stop()
 
-	// Create registry with all stores enabled
+	// Create app with all stores enabled
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),

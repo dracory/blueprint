@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -16,7 +16,7 @@ import (
 )
 
 type productCreateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type productCreateControllerData struct {
@@ -25,8 +25,8 @@ type productCreateControllerData struct {
 	//errorMessage   string
 }
 
-func NewProductCreateController(registry registry.RegistryInterface) *productCreateController {
-	return &productCreateController{registry: registry}
+func NewProductCreateController(app app.AppInterface) *productCreateController {
+	return &productCreateController{app: app}
 }
 
 func (controller productCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -130,7 +130,7 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	if controller.registry.GetShopStore() == nil {
+	if controller.app.GetShopStore() == nil {
 		return data, "Shop store is not configured. Please contact an administrator."
 	}
 
@@ -147,7 +147,7 @@ func (controller *productCreateController) prepareDataAndValidate(r *http.Reques
 	product := shopstore.NewProduct()
 	product.SetTitle(data.formTitle)
 
-	err := controller.registry.GetShopStore().ProductCreate(context.Background(), product)
+	err := controller.app.GetShopStore().ProductCreate(context.Background(), product)
 
 	if err != nil {
 		slog.Error("At productCreateController > prepareDataAndValidate", slog.String("error", err.Error()))

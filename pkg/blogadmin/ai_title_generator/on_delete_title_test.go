@@ -14,8 +14,8 @@ import (
 
 // TestOnDeleteTitle_MissingID tests deleting with missing title ID
 func TestOnDeleteTitle_MissingID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -34,11 +34,11 @@ func TestOnDeleteTitle_MissingID(t *testing.T) {
 
 // TestOnDeleteTitle_WithID tests deleting with valid ID
 func TestOnDeleteTitle_WithID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	// Skip if custom store is not available
-	if registry.GetCustomStore() == nil {
+	if app.GetCustomStore() == nil {
 		t.Skip("Custom store not available")
 	}
 
@@ -52,7 +52,7 @@ func TestOnDeleteTitle_WithID(t *testing.T) {
 		t.Fatalf("Failed to set payload: %v", err)
 	}
 
-	customStore := registry.GetCustomStore()
+	customStore := app.GetCustomStore()
 	if err := customStore.RecordCreate(record); err != nil {
 		t.Fatalf("Failed to create record: %v", err)
 	}
@@ -78,11 +78,11 @@ func TestOnDeleteTitle_WithID(t *testing.T) {
 
 // TestOnDeleteTitle_InvalidID tests deleting with non-existent ID
 func TestOnDeleteTitle_InvalidID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	// Skip if custom store is not available
-	if registry.GetCustomStore() == nil {
+	if app.GetCustomStore() == nil {
 		t.Skip("Custom store not available")
 	}
 
@@ -113,8 +113,8 @@ func TestOnDeleteTitle_InvalidID(t *testing.T) {
 
 // TestOnDeleteTitle_EmptyID tests deleting with empty ID parameter
 func TestOnDeleteTitle_EmptyID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -131,7 +131,7 @@ func TestOnDeleteTitle_EmptyID(t *testing.T) {
 	}
 }
 
-// TestOnDeleteTitle_NilRegistry tests behavior with nil registry (should handle gracefully)
+// TestOnDeleteTitle_NilRegistry tests behavior with nil app (should handle gracefully)
 func TestOnDeleteTitle_NilRegistry(t *testing.T) {
 	c := NewAiTitleGeneratorController(nil)
 
@@ -143,19 +143,19 @@ func TestOnDeleteTitle_NilRegistry(t *testing.T) {
 		},
 	}
 
-	// This will panic due to nil registry, which is acceptable for production
+	// This will panic due to nil app, which is acceptable for production
 	// but we test that the method exists and has proper signature
 	var didPanic bool
 	defer func() {
 		if r := recover(); r != nil {
 			didPanic = true
-			t.Logf("Expected panic with nil registry: %v", r)
+			t.Logf("Expected panic with nil app: %v", r)
 		}
 	}()
 
 	_ = c.onDeleteTitle(req)
 
 	if !didPanic {
-		t.Error("Expected panic with nil registry, but function did not panic")
+		t.Error("Expected panic with nil app, but function did not panic")
 	}
 }

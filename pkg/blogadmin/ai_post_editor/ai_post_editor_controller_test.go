@@ -15,8 +15,8 @@ func TestNewAiPostEditorController(t *testing.T) {
 	if controller == nil {
 		t.Error("Expected controller to be non-nil")
 	}
-	if controller.registry != nil {
-		t.Error("Expected registry to be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Expected app to be nil when passed nil")
 	}
 }
 
@@ -433,7 +433,7 @@ func TestAiPostEditorController_StructFields(t *testing.T) {
 	// Verify struct fields exist and are accessible
 	controller := NewAiPostEditorController(nil)
 
-	// The struct should have a registry field
+	// The struct should have a app field
 	// We can't directly test private fields, but we can verify the type
 	if controller == nil {
 		t.Fatal("NewAiPostEditorController() returned nil")

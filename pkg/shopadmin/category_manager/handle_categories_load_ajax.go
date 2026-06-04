@@ -13,7 +13,7 @@ import (
 func (controller *categoryManagerController) handleLoadCategories(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		json.NewEncoder(w).Encode(api.Error("Shop store not available"))
 		return ""

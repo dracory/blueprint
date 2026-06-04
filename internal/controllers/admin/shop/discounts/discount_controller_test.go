@@ -26,7 +26,7 @@ func TestNewDiscountController(t *testing.T) {
 	}
 }
 
-// TestDiscountControllerRegistry verifies controller has registry
+// TestDiscountControllerRegistry verifies controller has app
 func TestDiscountControllerRegistry(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup(testutils.WithShopStore(true))
@@ -37,8 +37,8 @@ func TestDiscountControllerRegistry(t *testing.T) {
 
 	controller := NewDiscountController(app)
 
-	if controller.registry == nil {
-		t.Error("Controller registry is nil")
+	if controller.app == nil {
+		t.Error("Controller app is nil")
 	}
 }
 

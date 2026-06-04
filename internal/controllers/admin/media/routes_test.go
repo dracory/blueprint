@@ -24,7 +24,7 @@ func TestMediaRoutesFunctionExists(t *testing.T) {
 	}
 }
 
-// TestMediaRoutesNilRegistry verifies Routes handles nil registry
+// TestMediaRoutesNilRegistry verifies Routes handles nil app
 func TestMediaRoutesNilRegistry(t *testing.T) {
 	routes, err := Routes(nil)
 

@@ -3,7 +3,7 @@ package middlewares
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"slices"
 	"strings"
 
@@ -20,15 +20,15 @@ import (
 // malicious spiders, DDOS, etc
 // ==================================================================
 // it is useful to detect spamming bots
-func LogRequestMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
+func LogRequestMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Log Request Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
-			return logRequestHandler(registry, next)
+			return logRequestHandler(app, next)
 		})
 }
 
-func logRequestHandler(registry registry.RegistryInterface, next http.Handler) http.Handler {
+func logRequestHandler(app app.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := req.GetIP(r)
 
@@ -40,7 +40,7 @@ func logRequestHandler(registry registry.RegistryInterface, next http.Handler) h
 			return
 		}
 
-		registry.GetLogger().Info("["+method+" request by "+ip+"] "+r.RequestURI,
+		app.GetLogger().Info("["+method+" request by "+ip+"] "+r.RequestURI,
 			slog.String("host", r.Host),
 			slog.String("path", rawPath),
 			slog.String("query", r.URL.RawQuery),

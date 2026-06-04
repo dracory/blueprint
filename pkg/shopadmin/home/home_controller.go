@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/api"
@@ -28,14 +28,14 @@ const (
 // == CONT ==============================================================
 
 type homeController struct {
-	registry       registry.RegistryInterface
+	app       app.AppInterface
 	fileManagerURL string
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController(registry registry.RegistryInterface, fileManagerURL string) *homeController {
-	return &homeController{registry: registry, fileManagerURL: fileManagerURL}
+func NewHomeController(app app.AppInterface, fileManagerURL string) *homeController {
+	return &homeController{app: app, fileManagerURL: fileManagerURL}
 }
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -52,7 +52,7 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 func (controller *homeController) renderPage(r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -101,7 +101,7 @@ func (controller *homeController) renderPage(r *http.Request) string {
 		Child(hb.HR()).
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Shop | Dashboard",
 		Content: content,
 		ScriptURLs: []string{
@@ -114,7 +114,7 @@ func (controller *homeController) renderPage(r *http.Request) string {
 func (controller *homeController) handleLoadStats(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		return api.Error("Shop store not available").ToString()

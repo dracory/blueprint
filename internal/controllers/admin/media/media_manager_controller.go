@@ -9,7 +9,7 @@ import (
 	"os"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 	"time"
 
@@ -32,8 +32,8 @@ const JSON_ACTION_DIRECTORY_CREATE = "directory_create"
 const JSON_ACTION_DIRECTORY_DELETE = "directory_delete"
 const MAX_UPLOAD_SIZE = 50 * 1024 * 1024 // 50MB
 
-func NewMediaManagerController(registry registry.RegistryInterface) *mediaManagerController {
-	cfg := registry.GetConfig()
+func NewMediaManagerController(app app.AppInterface) *mediaManagerController {
+	cfg := app.GetConfig()
 	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
@@ -41,7 +41,7 @@ func NewMediaManagerController(registry registry.RegistryInterface) *mediaManage
 
 	return &mediaManagerController{
 		rootDirPath: rootDirPath,
-		registry:    registry,
+		app:    app,
 	}
 }
 
@@ -58,7 +58,7 @@ type FileEntry struct {
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
-	registry    registry.RegistryInterface
+	app    app.AppInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }
@@ -69,11 +69,11 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	controller.storage, err = filesystem.NewStorage(filesystem.Disk{
 		DiskName:             "S3",
 		Driver:               filesystem.DRIVER_S3,
-		Url:                  controller.registry.GetConfig().GetMediaUrl(),
-		Region:               controller.registry.GetConfig().GetMediaRegion(),
-		Key:                  controller.registry.GetConfig().GetMediaKey(),
-		Secret:               controller.registry.GetConfig().GetMediaSecret(),
-		Bucket:               controller.registry.GetConfig().GetMediaBucket(),
+		Url:                  controller.app.GetConfig().GetMediaUrl(),
+		Region:               controller.app.GetConfig().GetMediaRegion(),
+		Key:                  controller.app.GetConfig().GetMediaKey(),
+		Secret:               controller.app.GetConfig().GetMediaSecret(),
+		Bucket:               controller.app.GetConfig().GetMediaBucket(),
 		UsePathStyleEndpoint: true,
 	})
 
@@ -83,7 +83,7 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	}
 
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 			Title:   "Media Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()

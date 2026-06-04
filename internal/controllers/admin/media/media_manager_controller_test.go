@@ -25,7 +25,7 @@ func TestNewMediaManagerController(t *testing.T) {
 	}
 }
 
-// TestMediaManagerControllerRegistry verifies controller has registry
+// TestMediaManagerControllerRegistry verifies controller has app
 func TestMediaManagerControllerRegistry(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
@@ -36,8 +36,8 @@ func TestMediaManagerControllerRegistry(t *testing.T) {
 
 	controller := NewMediaManagerController(app)
 
-	if controller.registry == nil {
-		t.Error("Controller registry is nil")
+	if controller.app == nil {
+		t.Error("Controller app is nil")
 	}
 }
 

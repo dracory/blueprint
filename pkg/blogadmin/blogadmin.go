@@ -9,7 +9,7 @@ import (
 
 	"github.com/dracory/blogstore"
 
-	"project/internal/registry"
+	"project/internal/app"
 )
 
 // LLMEngineInterface defines the interface for LLM operations
@@ -38,7 +38,7 @@ type AdminOptions struct {
 	BlogTopic string
 
 	// Registry provides access to all stores and services
-	Registry registry.RegistryInterface
+	Registry app.AppInterface
 }
 
 // AdminInterface defines the interface for the blog admin
@@ -73,9 +73,9 @@ func (a *admin) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Use Routes() with registry to handle the request
+	// Use Routes() with app to handle the request
 	if a.opts.Registry == nil {
-		http.Error(w, "Registry not configured", http.StatusInternalServerError)
+		http.Error(w, "app not configured", http.StatusInternalServerError)
 		return
 	}
 

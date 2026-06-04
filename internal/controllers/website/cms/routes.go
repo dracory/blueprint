@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"project/internal/links"
 	"project/internal/middlewares"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 	"time"
 
@@ -41,7 +41,7 @@ func (t *teeResponseWriter) Flush() {
 	}
 }
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(app app.AppInterface) []rtr.RouteInterface {
 	return []rtr.RouteInterface{
 		rtr.NewRoute().
 			SetName("Website > Cms > MCP Endpoint > Health").
@@ -90,8 +90,8 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 
 				apiKey := r.Header.Get("X-MCP-API-Key")
 				expectedKey := ""
-				if registry != nil && registry.GetConfig() != nil {
-					expectedKey = registry.GetConfig().GetCmsMcpApiKey()
+				if app != nil && app.GetConfig() != nil {
+					expectedKey = app.GetConfig().GetCmsMcpApiKey()
 				}
 				if strings.TrimSpace(expectedKey) == "" {
 					w.Header().Set("Content-Type", "application/json")
@@ -106,7 +106,7 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 					return
 				}
 
-				if registry == nil || registry.GetCmsStore() == nil {
+				if app == nil || app.GetCmsStore() == nil {
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte(`{"error":"CMS store not available","message":"CMS store is not initialized"}`))
@@ -114,33 +114,33 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 				}
 
 				tw := &teeResponseWriter{w: w, status: http.StatusOK}
-				m := cmsstoreMcp.NewMCP(registry.GetCmsStore())
+				m := cmsstoreMcp.NewMCP(app.GetCmsStore())
 				m.Handler(tw, r)
 			}),
 
 		rtr.NewRoute().
 			SetName("Website > Widget Controller > Handler").
 			SetPath(links.WIDGET).
-			SetHTMLHandler(NewWidgetController(registry).Handler),
+			SetHTMLHandler(NewWidgetController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Website > Cms > Home Page").
 			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 				rtr.NewMiddleware().
 					SetName("stats").
-					SetHandler(middlewares.NewStatsMiddleware(registry).GetHandler()),
+					SetHandler(middlewares.NewStatsMiddleware(app).GetHandler()),
 			}).
 			SetPath(links.HOME).
-			SetHTMLHandler(NewCmsController(registry).Handler),
+			SetHTMLHandler(NewCmsController(app).Handler),
 
 		rtr.NewRoute().
 			SetName("Website > Cms > Catch All Pages").
 			AddBeforeMiddlewares([]rtr.MiddlewareInterface{
 				rtr.NewMiddleware().
 					SetName("stats").
-					SetHandler(middlewares.NewStatsMiddleware(registry).GetHandler()),
+					SetHandler(middlewares.NewStatsMiddleware(app).GetHandler()),
 			}).
 			SetPath(links.CATCHALL).
-			SetHTMLHandler(NewCmsController(registry).Handler),
+			SetHTMLHandler(NewCmsController(app).Handler),
 	}
 }

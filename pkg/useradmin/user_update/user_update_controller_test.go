@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
@@ -16,12 +16,12 @@ import (
 )
 
 func TestUserUpdateController_RequiresUserID(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	_, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(registry).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
 
@@ -29,18 +29,18 @@ func TestUserUpdateController_RequiresUserID(t *testing.T) {
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
-	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
 	assert.Equal(t, "User ID is required", flash.Message, "Should show correct error message")
 }
 
 func TestUserUpdateController_InvalidUserID(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	_, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(registry).Handler, test.NewRequestOptions{
+	_, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"user_id": {"invalid_id"},
 		},
@@ -50,15 +50,15 @@ func TestUserUpdateController_InvalidUserID(t *testing.T) {
 	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
 
 	// Verify flash message was set
-	flash, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	assert.NoError(t, err, "Should find flash message")
 	assert.Equal(t, "User not found", flash.Message, "Should show correct error message")
 }
 
 func TestUserUpdateController_ShowsPage(t *testing.T) {
-	registry, user := setupControllerAppAndUser(t)
+	app, user := setupControllerAppAndUser(t)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(registry).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserUpdateController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{
 			"user_id": {user.GetID()},
 		},
@@ -70,7 +70,7 @@ func TestUserUpdateController_ShowsPage(t *testing.T) {
 	assert.Contains(t, responseHTML, "User:", "Should show user label")
 }
 
-func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (app.AppInterface, userstore.UserInterface) {
 	t.Helper()
 
 	reg := testutils.Setup(

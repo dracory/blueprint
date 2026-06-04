@@ -1,10 +1,10 @@
-﻿package products
+package products
 
 import (
 	"embed"
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/hb"
@@ -15,7 +15,7 @@ import (
 var metadataEmbed embed.FS
 
 type productMetadataComponent struct {
-	registry  registry.RegistryInterface
+	app  app.AppInterface
 	request   *http.Request
 	product   shopstore.ProductInterface
 	productID string
@@ -26,8 +26,8 @@ type productMetadataComponent struct {
 	formSuccessMessage string
 }
 
-func NewProductMetadataComponent(registry registry.RegistryInterface) *productMetadataComponent {
-	return &productMetadataComponent{registry: registry}
+func NewProductMetadataComponent(app app.AppInterface) *productMetadataComponent {
+	return &productMetadataComponent{app: app}
 }
 
 func (c *productMetadataComponent) Mount(r *http.Request, product shopstore.ProductInterface, productID string) {

@@ -23,13 +23,13 @@ var (
 )
 
 func (controller *orderManagerController) renderPage(r *http.Request) string {
-	if controller.registry.GetShopStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
+	if controller.app.GetShopStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
 	}
 
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -60,7 +60,7 @@ func (controller *orderManagerController) renderPage(r *http.Request) string {
 		Child(hb.Raw(html)).
 		Child(hb.Script(js))
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Orders | Shop",
 		Content: content,
 		ScriptURLs: []string{

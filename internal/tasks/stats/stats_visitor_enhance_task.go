@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 	"time"
 
@@ -35,17 +35,17 @@ var ipLookupHTTPClient = &http.Client{
 // =================================================================
 type statsVisitorEnhanceTask struct {
 	taskstore.TaskHandlerBase
-	registry   registry.RegistryInterface
+	app   app.AppInterface
 	httpClient *http.Client // Injectable for testing
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewStatsVisitorEnhanceTask(registry registry.RegistryInterface) *statsVisitorEnhanceTask {
-	if registry == nil {
-		log.Fatal("registry is nil")
+func NewStatsVisitorEnhanceTask(app app.AppInterface) *statsVisitorEnhanceTask {
+	if app == nil {
+		log.Fatal("app is nil")
 	}
-	return &statsVisitorEnhanceTask{registry: registry}
+	return &statsVisitorEnhanceTask{app: app}
 }
 
 // == IMPLEMENTATION ==========================================================
@@ -56,10 +56,10 @@ var _ taskstore.TaskHandlerInterface = (*statsVisitorEnhanceTask)(nil) // verify
 // == PUBLIC METHODS ==========================================================
 
 func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.TaskQueueInterface, error) {
-	if t.registry == nil || t.registry.GetTaskStore() == nil {
+	if t.app == nil || t.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return t.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		t.Alias(),
@@ -80,13 +80,13 @@ func (t *statsVisitorEnhanceTask) Description() string {
 }
 
 func (t *statsVisitorEnhanceTask) Handle() bool {
-	if t.registry == nil || t.registry.GetStatsStore() == nil {
+	if t.app == nil || t.app.GetStatsStore() == nil {
 		t.LogError("Task StatsVisitorEnhance. Store is nil")
 		return false
 	}
 
 	ctx := context.Background()
-	unprocessedEntries, err := t.registry.GetStatsStore().VisitorList(ctx, statsstore.VisitorQueryOptions{
+	unprocessedEntries, err := t.app.GetStatsStore().VisitorList(ctx, statsstore.VisitorQueryOptions{
 		Country: "empty",
 		Limit:   10,
 	})
@@ -114,7 +114,7 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 // == PRIVATE METHODS =========================================================
 
 func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor statsstore.VisitorInterface) bool {
-	if t.registry == nil || t.registry.GetStatsStore() == nil {
+	if t.app == nil || t.app.GetStatsStore() == nil {
 		t.LogError("Task StatsVisitorEnhance. Store is nil")
 		return false
 	}
@@ -150,7 +150,7 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 	visitor.SetUserOs(userOs)
 	visitor.SetUserOsVersion(userOsVersion)
 
-	errUpdated := t.registry.GetStatsStore().VisitorUpdate(ctx, visitor)
+	errUpdated := t.app.GetStatsStore().VisitorUpdate(ctx, visitor)
 
 	if errUpdated != nil {
 		t.LogError("Task StatsVisitorEnhance. Error updating visitor: " + errUpdated.Error())

@@ -13,7 +13,7 @@ import (
 func (controller *productManagerController) handleLoadProducts(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(api.Error("Shop store not available").ToString()))

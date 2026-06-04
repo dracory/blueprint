@@ -6,13 +6,13 @@ import (
 	"project/internal/controllers/auth/logout"
 	"project/internal/controllers/auth/register"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
 )
 
-func Routes(application registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(application app.AppInterface) []rtr.RouteInterface {
 	authRoute := rtr.NewRoute().
 		SetName("Auth > Auth Controller").
 		SetPath(links.AUTH_AUTH).

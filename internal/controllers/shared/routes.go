@@ -10,13 +10,13 @@ import (
 	"project/internal/controllers/shared/resource"
 	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/dashboard"
 	"github.com/dracory/rtr"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func Routes(app app.AppInterface) []rtr.RouteInterface {
 	adsTxt := rtr.NewRoute().
 		SetName("Shared > ads.txt").
 		SetPath("/ads.txt").
@@ -34,18 +34,18 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 		SetName("Shared > Files Controller").
 		SetPath(links.FILES).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(file.NewFileController(registry.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(file.NewFileController(app.GetSqlFileStorage()).Handler)
 
 	flash := rtr.NewRoute().
 		SetName("Shared > Flash Controller").
 		SetPath(links.FLASH).
-		SetHTMLHandler(flash.NewFlashController(registry).Handler)
+		SetHTMLHandler(flash.NewFlashController(app).Handler)
 
 	media := rtr.NewRoute().
 		SetName("Shared > Media Controller").
 		SetPath(links.MEDIA).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(media.NewMediaController(registry.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(media.NewMediaController(app.GetSqlFileStorage()).Handler)
 
 	resources := rtr.NewRoute().
 		SetName("Shared > Resources Controller").
@@ -60,17 +60,17 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	thumbRoute := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path").
-		SetHTMLHandler(thumb.NewThumbController(registry).Handler)
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	thumbRoutePathCarchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path...").
-		SetHTMLHandler(thumb.NewThumbController(registry).Handler)
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	thumbCatchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/*").
-		SetHTMLHandler(thumb.NewThumbController(registry).Handler)
+		SetHTMLHandler(thumb.NewThumbController(app).Handler)
 
 	pageNotFound := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").

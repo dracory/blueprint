@@ -3,32 +3,32 @@ package home
 import (
 	"net/http"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 )
 
 // == CONSTRUCTOR ==============================================================
 
-func NewHomeController(registry registry.RegistryInterface) *homeController {
+func NewHomeController(app app.AppInterface) *homeController {
 	return &homeController{
-		registry: registry,
+		app: app,
 	}
 }
 
 // == CONTROLLER ===============================================================
 
 type homeController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
 	appName := "Dracory Blueprint"
-	if controller != nil && controller.registry != nil && controller.registry.GetConfig() != nil {
-		if controller.registry.GetConfig().GetAppName() != "" {
-			appName = controller.registry.GetConfig().GetAppName()
+	if controller != nil && controller.app != nil && controller.app.GetConfig() != nil {
+		if controller.app.GetConfig().GetAppName() != "" {
+			appName = controller.app.GetConfig().GetAppName()
 		}
 	}
 
@@ -217,9 +217,9 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 		Styles:  styles,
 	}
 
-	if controller.registry != nil && controller.registry.GetConfig() != nil && controller.registry.GetConfig().GetCmsStoreUsed() {
-		return layouts.NewCmsLayout(controller.registry, r, options).ToHTML()
+	if controller.app != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreUsed() {
+		return layouts.NewCmsLayout(controller.app, r, options).ToHTML()
 	}
 
-	return layouts.NewBlankLayout(controller.registry, r, options).ToHTML()
+	return layouts.NewBlankLayout(controller.app, r, options).ToHTML()
 }

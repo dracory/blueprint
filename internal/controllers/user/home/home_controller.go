@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/userstore"
@@ -18,13 +18,13 @@ import (
 // == CONTROLLER ==============================================================
 
 type homeController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewHomeController(registry registry.RegistryInterface) *homeController {
-	return &homeController{registry: registry}
+func NewHomeController(app app.AppInterface) *homeController {
+	return &homeController{app: app}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -33,10 +33,10 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 	data, errorMessage := controller.prepareData(r)
 
 	if errorMessage != "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, errorMessage, links.User().Home(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.User().Home(map[string]string{}), 10)
 	}
 
-	return layouts.NewUserLayout(controller.registry, r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, layouts.Options{
 		Title:   "Home",
 		Content: controller.view(data),
 	}).ToHTML()
@@ -64,11 +64,11 @@ func (controller *homeController) prepareData(r *http.Request) (data homeControl
 	userLastName := authUser.GetLastName()
 	userEmail := authUser.GetEmail()
 
-	if controller.registry.GetConfig().GetUserStoreVaultEnabled() {
-		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), authUser)
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
+		userFirstName, userLastName, userEmail, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), authUser)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("Error: user > home > prepareData", slog.String("error", err.Error()))
 			return data, "User data failed to be fetched"
 		}
 	}

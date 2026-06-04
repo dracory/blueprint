@@ -10,7 +10,7 @@ import (
 	"net/http"
 	neturl "net/url"
 	"os"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/resources"
 	"strings"
 	"time"
@@ -26,11 +26,11 @@ import (
 
 // == CONSTRUCTOR ==============================================================
 
-// NewThumbController creates a new thumbnail controller instance with the provided registry.
-// The registry provides access to application services like logging, caching, and configuration.
+// NewThumbController creates a new thumbnail controller instance with the provided app.
+// The app provides access to application services like logging, caching, and configuration.
 //
 // Parameters:
-//   - registry: Application registry interface for accessing services
+//   - app: Application app interface for accessing services
 //
 // Returns:
 //   - *thumbnailController: New controller instance ready for use
@@ -39,8 +39,8 @@ import (
 //
 //	controller := NewThumbController(appRegistry)
 //	// Use controller for handling thumbnail requests
-func NewThumbController(registry registry.RegistryInterface) *thumbnailController {
-	return &thumbnailController{registry: registry}
+func NewThumbController(app app.AppInterface) *thumbnailController {
+	return &thumbnailController{app: app}
 }
 
 // == CONTROLLER ==============================================================
@@ -66,9 +66,9 @@ func NewThumbController(registry registry.RegistryInterface) *thumbnailControlle
 // - GIF (animated support)
 //
 // Type:
-//   - registry: Application service registry for logging, caching, etc.
+//   - app: Application service app for logging, caching, etc.
 type thumbnailController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // Handler is the main HTTP request handler for thumbnail generation and serving.
@@ -108,7 +108,7 @@ func (controller *thumbnailController) Handler(w http.ResponseWriter, r *http.Re
 
 	cacheKey := str.MD5(fmt.Sprint(data.path, data.extension, data.width, "x", data.height, data.quality))
 
-	fileCache := controller.registry.GetFileCache()
+	fileCache := controller.app.GetFileCache()
 	if fileCache != nil {
 		if fileCache.Contains(cacheKey) {
 			thumb, err := fileCache.Fetch(cacheKey)
@@ -355,13 +355,13 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = controller.urlToBytes(data.path)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from URL", "error", err.Error())
 			return "", err.Error()
 		}
 	} else if data.isCache {
-		fileCache := controller.registry.GetFileCache()
+		fileCache := controller.app.GetFileCache()
 		if fileCache == nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "cache not initialized")
 			return "", "cache not initialized"
 		}
 		dataBase64ImageStr, err := fileCache.Fetch(data.path)
@@ -369,9 +369,9 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		if err != nil {
 			// Downgrade noisy cache expiry to info level, keep other cache errors as error
 			if err.Error() == "cache expired" {
-				controller.registry.GetLogger().Info("Cache expired at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+				controller.app.GetLogger().Info("Cache expired at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			} else {
-				controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			}
 			return "", err.Error()
 		}
@@ -384,7 +384,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 			if len(parts) == 2 {
 				payload = parts[1]
 			} else {
-				controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "invalid data URL format")
+				controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", "invalid data URL format")
 				return "", "invalid data URL format"
 			}
 		}
@@ -392,29 +392,29 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = base64.StdEncoding.DecodeString(payload)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from CACHE", "error", err.Error())
 			return "", err.Error()
 		}
 	} else if data.isFiles {
-		storage := controller.registry.GetSqlFileStorage()
+		storage := controller.app.GetSqlFileStorage()
 		if storage == nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file storage not initialized")
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file storage not initialized")
 			return "", "file storage not initialized"
 		}
 
 		exists, err := storage.Exists(data.path)
 		if err != nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
 			return "", err.Error()
 		}
 		if !exists {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file not found")
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", "file not found")
 			return "", "file not found"
 		}
 
 		imgBytes, err = storage.ReadFile(data.path)
 		if err != nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from FILES", "error", err.Error())
 			return "", err.Error()
 		}
 	} else {
@@ -422,7 +422,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 		imgBytes, err = resources.ToBytes(data.path)
 
 		if err != nil {
-			controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
+			controller.app.GetLogger().Error("Error at thumbnailController > generateThumb > from RESOURCE", "error", err.Error())
 			return "", err.Error()
 		}
 	}
@@ -430,7 +430,7 @@ func (controller *thumbnailController) generateThumb(data thumbnailControllerDat
 	imgBytesResized, err := img.Resize(imgBytes, int(data.width), int(data.height), ext)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("Error at thumbnailController > generateThumb", "error", err.Error())
+		controller.app.GetLogger().Error("Error at thumbnailController > generateThumb", "error", err.Error())
 		return "", err.Error()
 	}
 
@@ -607,7 +607,7 @@ func (controller *thumbnailController) isPublicDomain(host string) bool {
 func (controller *thumbnailController) urlToBytes(targetURL string) ([]byte, error) {
 	// Validate URL before making request
 	if err := controller.validateURL(targetURL); err != nil {
-		controller.registry.GetLogger().Error("URL validation failed", "url", targetURL, "error", err.Error())
+		controller.app.GetLogger().Error("URL validation failed", "url", targetURL, "error", err.Error())
 		return nil, err
 	}
 

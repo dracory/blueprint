@@ -20,7 +20,7 @@ func (controller *orderManagerController) handleOrdersLoadAjax(w http.ResponseWr
 
 	ctx := r.Context()
 
-	shopStore := controller.registry.GetShopStore()
+	shopStore := controller.app.GetShopStore()
 	if shopStore == nil {
 		api.Respond(w, r, api.Error("Shop store not available"))
 		return ""
@@ -93,10 +93,10 @@ func (controller *orderManagerController) handleOrdersLoadAjax(w http.ResponseWr
 	}
 
 	// Filter by customer name/email
-	if (reqBody.CustomerName != "" || reqBody.CustomerEmail != "") && controller.registry.GetUserStore() != nil {
+	if (reqBody.CustomerName != "" || reqBody.CustomerEmail != "") && controller.app.GetUserStore() != nil {
 		matchingCustomerIDs := []string{}
 
-		users, err := controller.registry.GetUserStore().UserList(ctx, userstore.NewUserQuery())
+		users, err := controller.app.GetUserStore().UserList(ctx, userstore.NewUserQuery())
 		if err == nil {
 			for _, user := range users {
 				fullName := strings.ToLower(user.GetFirstName() + " " + user.GetLastName())
@@ -168,8 +168,8 @@ func (controller *orderManagerController) handleOrdersLoadAjax(w http.ResponseWr
 		customerName := ""
 		customerEmail := ""
 
-		if order.GetCustomerID() != "" && controller.registry.GetUserStore() != nil {
-			customer, err := controller.registry.GetUserStore().UserFindByID(ctx, order.GetCustomerID())
+		if order.GetCustomerID() != "" && controller.app.GetUserStore() != nil {
+			customer, err := controller.app.GetUserStore().UserFindByID(ctx, order.GetCustomerID())
 			if err == nil && customer != nil {
 				customerName = customer.GetFirstName() + " " + customer.GetLastName()
 				customerEmail = customer.GetEmail()

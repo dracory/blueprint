@@ -25,7 +25,7 @@
 - `/internal` - Private application code
 - **internal/cmsblocks/** - CMS block components
 - **internal/config/** - Configuration system with Blueprint-style environment loading
-- **internal/registry/** - Registry pattern for service management (database, cache, session, logger, geo, task, asset, user stores)
+- **internal/app/** - Application instance for service management (database, cache, session, logger, geo, task, asset, user stores)
 - **internal/cli/** - CLI dispatcher using github.com/dracory/base/cli
 - **internal/routes/** - Router setup using github.com/dracory/rtr
 - **internal/controllers/** - HTTP controllers (admin, auth, liveflux, user, webhook, website)

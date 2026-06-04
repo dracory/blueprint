@@ -9,15 +9,15 @@ import (
 )
 
 func TestStartAsync(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	StartAsync(ctx, nil)
 	// Should not panic
 
-	// Test with valid registry
-	registry := testutils.Setup()
+	// Test with valid app
+	app := testutils.Setup()
 
 	// Start the scheduler in a goroutine with a short timeout
 	ctx, cancel = context.WithTimeout(context.Background(), 100*time.Millisecond)
@@ -25,7 +25,7 @@ func TestStartAsync(t *testing.T) {
 
 	done := make(chan bool)
 	go func() {
-		StartAsync(ctx, registry)
+		StartAsync(ctx, app)
 		done <- true
 	}()
 
@@ -48,21 +48,21 @@ func TestStartAsync_NilRegistry(t *testing.T) {
 }
 
 func TestNewScheduler(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	scheduler := newScheduler(nil)
 	if scheduler == nil {
-		t.Error("newScheduler() should not return nil even with nil registry")
+		t.Error("newScheduler() should not return nil even with nil app")
 	}
 
 	// Clean up
 	scheduler.Stop()
 	scheduler.Clear()
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	scheduler = newScheduler(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	scheduler = newScheduler(app)
 	if scheduler == nil {
-		t.Error("newScheduler() should not return nil with valid registry")
+		t.Error("newScheduler() should not return nil with valid app")
 	}
 
 	// Clean up
@@ -71,51 +71,51 @@ func TestNewScheduler(t *testing.T) {
 }
 
 func TestStartAsync_ContextCancellation(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Create a context that cancels immediately
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel() // Cancel immediately
 
 	// Should not panic and should return immediately
-	StartAsync(ctx, registry)
+	StartAsync(ctx, app)
 }
 
 func TestScheduleBlindIndexRebuildTask(t *testing.T) {
-	// Test with nil registry - should not panic
+	// Test with nil app - should not panic
 	scheduleBlindIndexRebuildTask(nil)
 	// Should not panic
 }
 
 func TestScheduleCleanUpTask(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	scheduleCleanUpTask(nil)
 	// Should not panic
 
-	// Test with valid registry
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	scheduleCleanUpTask(registry)
+	// Test with valid app
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	scheduleCleanUpTask(app)
 	// Should not panic
 }
 
 func TestScheduleStatsVisitorEnhanceTask(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	scheduleStatsVisitorEnhanceTask(nil)
 	// Should not panic
 
-	// Test with valid registry
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	scheduleStatsVisitorEnhanceTask(registry)
+	// Test with valid app
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	scheduleStatsVisitorEnhanceTask(app)
 	// Should not panic
 }
 
 func TestQueueClearJob(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	queueClearJob(nil)
 	// Should not panic
 
-	// Test with valid registry
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	queueClearJob(registry)
+	// Test with valid app
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	queueClearJob(app)
 	// Should not panic
 }

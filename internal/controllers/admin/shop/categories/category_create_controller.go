@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
@@ -17,11 +17,11 @@ import (
 )
 
 type categoryCreateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewCategoryCreateController(registry registry.RegistryInterface) *categoryCreateController {
-	return &categoryCreateController{registry: registry}
+func NewCategoryCreateController(app app.AppInterface) *categoryCreateController {
+	return &categoryCreateController{app: app}
 }
 
 func (controller *categoryCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -29,7 +29,7 @@ func (controller *categoryCreateController) Handler(w http.ResponseWriter, r *ht
 		return controller.handlePost(w, r)
 	}
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Create Category | Shop",
 		Content: hb.Wrap().HTML(controller.renderPage(r)),
 		ScriptURLs: []string{
@@ -72,9 +72,9 @@ func (controller *categoryCreateController) renderPage(r *http.Request) string {
 
 	// Fetch categories for parent selection
 	var categories []shopstore.CategoryInterface
-	if controller.registry.GetShopStore() != nil {
+	if controller.app.GetShopStore() != nil {
 		query := shopstore.NewCategoryQuery()
-		categories, _ = controller.registry.GetShopStore().CategoryList(r.Context(), query)
+		categories, _ = controller.app.GetShopStore().CategoryList(r.Context(), query)
 	}
 
 	// Build parent category options
@@ -175,7 +175,7 @@ func (controller *categoryCreateController) handlePost(w http.ResponseWriter, r 
 	parentID := r.FormValue("parent_id")
 
 	if title == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Title is required", shared.NewLinks().CategoryCreate(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Title is required", shared.NewLinks().CategoryCreate(map[string]string{}), 10)
 	}
 
 	category := shopstore.NewCategory()
@@ -184,10 +184,10 @@ func (controller *categoryCreateController) handlePost(w http.ResponseWriter, r 
 	category.SetStatus(status)
 	category.SetParentID(parentID)
 
-	if err := controller.registry.GetShopStore().CategoryCreate(context.Background(), category); err != nil {
+	if err := controller.app.GetShopStore().CategoryCreate(context.Background(), category); err != nil {
 		slog.Error("Failed to create category", slog.String("error", err.Error()))
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Failed to create category", shared.NewLinks().CategoryCreate(map[string]string{}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Failed to create category", shared.NewLinks().CategoryCreate(map[string]string{}), 10)
 	}
 
-	return helpers.ToFlashSuccess(controller.registry.GetCacheStore(), w, r, "Category created successfully", shared.NewLinks().Categories(map[string]string{}), 10)
+	return helpers.ToFlashSuccess(controller.app.GetCacheStore(), w, r, "Category created successfully", shared.NewLinks().Categories(map[string]string{}), 10)
 }

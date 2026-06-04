@@ -6,7 +6,7 @@ package useradmin
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/useradmin/shared"
 	"project/pkg/useradmin/user_create"
 	"project/pkg/useradmin/user_delete"
@@ -20,7 +20,7 @@ import (
 // AdminOptions contains all dependencies and configuration for the user admin
 type AdminOptions struct {
 	// Registry provides access to all stores and services
-	Registry registry.RegistryInterface
+	Registry app.AppInterface
 
 	// AdminHomeURL is the URL for the admin home page
 	AdminHomeURL string

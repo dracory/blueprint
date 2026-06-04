@@ -5,27 +5,27 @@ import (
 	"net/url"
 	"testing"
 
-	"project/internal/registry"
+	"project/internal/app"
 )
 
 // TestNewBlockeditorWidget tests the constructor
 func TestNewBlockeditorWidget(t *testing.T) {
 	t.Parallel()
 
-	// Test with nil registry
+	// Test with nil app
 	widget := NewBlockeditorWidget(nil)
 	if widget == nil {
 		t.Fatal("NewBlockeditorWidget(nil) should return non-nil")
 	}
-	if widget.registry != nil {
-		t.Error("widget.registry should be nil when passed nil")
+	if widget.app != nil {
+		t.Error("widget.app should be nil when passed nil")
 	}
 
-	// Test with valid registry interface
-	var mockRegistry registry.RegistryInterface
+	// Test with valid app interface
+	var mockRegistry app.AppInterface
 	widget = NewBlockeditorWidget(mockRegistry)
 	if widget == nil {
-		t.Fatal("NewBlockeditorWidget(registry) should return non-nil")
+		t.Fatal("NewBlockeditorWidget(app) should return non-nil")
 	}
 }
 
@@ -95,12 +95,12 @@ func TestBlockeditorWidget_Struct(t *testing.T) {
 
 	widget := &blockeditorWidget{}
 
-	// Test that registry field exists and can be set
-	var reg registry.RegistryInterface
-	widget.registry = reg
+	// Test that app field exists and can be set
+	var reg app.AppInterface
+	widget.app = reg
 
-	if widget.registry != reg {
-		t.Error("Should be able to set registry field")
+	if widget.app != reg {
+		t.Error("Should be able to set app field")
 	}
 }
 

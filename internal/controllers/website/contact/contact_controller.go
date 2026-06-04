@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -14,13 +14,13 @@ import (
 // == CONTROLLER ==============================================================
 
 type contactController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewContactController(registry registry.RegistryInterface) *contactController {
-	return &contactController{registry: registry}
+func NewContactController(app app.AppInterface) *contactController {
+	return &contactController{app: app}
 }
 
 func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Request) string {
@@ -30,7 +30,7 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 		userID = authUser.GetID()
 	}
 
-	component := NewFormContact(controller.registry)
+	component := NewFormContact(controller.app)
 	rendered := liveflux.SSR(component, map[string]string{
 		"user_id": userID,
 	})
@@ -50,7 +50,7 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 				Child(rendered),
 		)
 
-	return layouts.NewUserLayout(controller.registry, r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, layouts.Options{
 		Title:   "Contact",
 		Content: page,
 		ScriptURLs: []string{

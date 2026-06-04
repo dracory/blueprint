@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/hb"
@@ -25,7 +25,7 @@ import (
 //
 // It uses the "page" context value to transfer the page data (i.e. title,
 // meta keywords, description) from the CMS frontend to the layout.
-func NewCmsLayoutMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
+func NewCmsLayoutMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("CmsLayoutMiddleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -46,7 +46,7 @@ func NewCmsLayoutMiddleware(registry registry.RegistryInterface) rtr.MiddlewareI
 				next.ServeHTTP(rec, r)
 				finalContent := rec.Body.String()
 
-				fullPage := layouts.NewUserLayout(registry, r, layouts.Options{
+				fullPage := layouts.NewUserLayout(app, r, layouts.Options{
 					Title:      title,
 					Content:    hb.Raw(finalContent),
 					ScriptURLs: []string{},
@@ -54,7 +54,7 @@ func NewCmsLayoutMiddleware(registry registry.RegistryInterface) rtr.MiddlewareI
 				}).ToHTML()
 
 				if _, err := w.Write([]byte(fullPage)); err != nil {
-					registry.GetLogger().Error("Failed to write response",
+					app.GetLogger().Error("Failed to write response",
 						slog.String("error", err.Error()),
 						slog.String("path", r.URL.Path),
 					)

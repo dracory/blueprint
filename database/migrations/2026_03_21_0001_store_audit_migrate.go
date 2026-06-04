@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreAuditMigrate)(nil)
 
 type StoreAuditMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreAuditMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreAuditMigrate) Description() string {
 }
 
 func (m *StoreAuditMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetAuditStore()
+	store := m.app.GetAuditStore()
 	if store == nil {
 		return errors.New("audit store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreAuditMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreAuditMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetAuditStore()
+	store := m.app.GetAuditStore()
 	if store == nil {
 		return errors.New("audit store is not initialized")
 	}

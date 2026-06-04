@@ -15,10 +15,10 @@ func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
 	cfg.SetUserStoreUsed(false)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Simulate user store not used/unavailable
-	registry.SetUserStore(nil)
+	app.SetUserStore(nil)
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
@@ -26,7 +26,7 @@ func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLoginController(registry).Handler(w, r)
+		_ = NewLoginController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -34,7 +34,7 @@ func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,14 +57,14 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Ensure user store exists but vault store is required and missing
-	if registry.GetUserStore() == nil {
+	if app.GetUserStore() == nil {
 		t.Fatal("user store should be initialized in test setup")
 	}
-	registry.GetConfig().SetVaultStoreUsed(true)
-	registry.SetVaultStore(nil)
+	app.GetConfig().SetVaultStoreUsed(true)
+	app.SetVaultStore(nil)
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
@@ -72,7 +72,7 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLoginController(registry).Handler(w, r)
+		_ = NewLoginController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -80,7 +80,7 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), recorder.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestLoginControllerHandler_ValidRedirectWithBackURL(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	backUrl := "http://localhost/home"
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{
@@ -117,7 +117,7 @@ func TestLoginControllerHandler_ValidRedirectWithBackURL(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLoginController(registry).Handler(w, r)
+		_ = NewLoginController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 
@@ -131,7 +131,7 @@ func TestLoginControllerHandler_InvalidBackURL(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	invalidBackUrl := "http://evil.com"
 	req, err := test.NewRequest(http.MethodGet, "/", test.NewRequestOptions{
@@ -145,7 +145,7 @@ func TestLoginControllerHandler_InvalidBackURL(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_ = NewLoginController(registry).Handler(w, r)
+		_ = NewLoginController(app).Handler(w, r)
 	})
 	handler.ServeHTTP(recorder, req)
 

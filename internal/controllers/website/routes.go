@@ -3,7 +3,7 @@ package website
 import (
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 
@@ -16,15 +16,15 @@ import (
 	"project/internal/controllers/website/swagger"
 )
 
-func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
-	if registry == nil || registry.GetConfig() == nil {
+func Routes(app app.AppInterface) []rtr.RouteInterface {
+	if app == nil || app.GetConfig() == nil {
 		return []rtr.RouteInterface{}
 	}
 
 	homeRoute := rtr.NewRoute().
 		SetName("Website > Home Controller").
 		SetPath(links.HOME).
-		SetHTMLHandler(home.NewHomeController(registry).Handler)
+		SetHTMLHandler(home.NewHomeController(app).Handler)
 
 	pageNotFoundRoute := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
@@ -45,18 +45,18 @@ func Routes(registry registry.RegistryInterface) []rtr.RouteInterface {
 	}
 
 	// Comment if you do not use the blog routes
-	websiteRoutes = append(websiteRoutes, blog.Routes(registry)...)
-	websiteRoutes = append(websiteRoutes, contact.Routes(registry)...)
+	websiteRoutes = append(websiteRoutes, blog.Routes(app)...)
+	websiteRoutes = append(websiteRoutes, contact.Routes(app)...)
 
 	// Comment if you do not use the payment routes
 	// websiteRoutes = append(websiteRoutes, paymentRoutes...)
-	websiteRoutes = append(websiteRoutes, seo.Routes(registry)...)
+	websiteRoutes = append(websiteRoutes, seo.Routes(app)...)
 	websiteRoutes = append(websiteRoutes, swagger.Routes()...)
 
-	isCmsUsed := registry.GetConfig().GetCmsStoreUsed() && registry.GetCmsStore() != nil
+	isCmsUsed := app.GetConfig().GetCmsStoreUsed() && app.GetCmsStore() != nil
 
 	if isCmsUsed {
-		websiteRoutes = append(websiteRoutes, cms.Routes(registry)...)
+		websiteRoutes = append(websiteRoutes, cms.Routes(app)...)
 	} else {
 		websiteRoutes = append(websiteRoutes, []rtr.RouteInterface{homeRoute, pageNotFoundRoute}...)
 	}

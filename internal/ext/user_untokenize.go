@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/userstore"
 )
@@ -20,7 +20,7 @@ type UserUntokenizeFieldStatus struct {
 
 func UserUntokenize(
 	ctx context.Context,
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 	vaultKey string,
 	user userstore.UserInterface,
 ) (
@@ -31,7 +31,7 @@ func UserUntokenize(
 	phone string,
 	err error,
 ) {
-	if registry.GetVaultStore() == nil {
+	if app.GetVaultStore() == nil {
 		return "", "", "", "", "", errors.New("user_untokenized: vaultstore is nil")
 	}
 
@@ -76,14 +76,14 @@ func UserUntokenize(
 		return "", "", "", "", "", nil
 	}
 
-	untokenized, err := registry.GetVaultStore().TokensReadToResolvedMap(
+	untokenized, err := app.GetVaultStore().TokensReadToResolvedMap(
 		ctx,
 		keyTokenMap,
 		vaultKey,
 	) // use TokensReadToResolvedMap as more resource optimized
 
 	if err != nil {
-		registry.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))
+		app.GetLogger().Error("Error reading tokens", slog.String("error", err.Error()))
 		return "", "", "", "", "", err
 	}
 
@@ -101,7 +101,7 @@ func UserUntokenize(
 // This allows for granular handling of corrupted tokens.
 func UserUntokenizeFieldByField(
 	ctx context.Context,
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 	vaultKey string,
 	user userstore.UserInterface,
 ) (
@@ -112,7 +112,7 @@ func UserUntokenizeFieldByField(
 	phone string,
 	status UserUntokenizeFieldStatus,
 ) {
-	if registry.GetVaultStore() == nil {
+	if app.GetVaultStore() == nil {
 		return user.GetFirstName(), user.GetLastName(), user.GetEmail(), user.GetBusinessName(), user.GetPhone(), UserUntokenizeFieldStatus{}
 	}
 
@@ -134,13 +134,13 @@ func UserUntokenizeFieldByField(
 		if token == "" {
 			return "", true // Empty token is not an error
 		}
-		result, err := registry.GetVaultStore().TokensReadToResolvedMap(
+		result, err := app.GetVaultStore().TokensReadToResolvedMap(
 			ctx,
 			map[string]string{key: token},
 			vaultKey,
 		)
 		if err != nil {
-			registry.GetLogger().Error("Error untokenizing field", slog.String("field", key), slog.String("error", err.Error()))
+			app.GetLogger().Error("Error untokenizing field", slog.String("field", key), slog.String("error", err.Error()))
 			return token, false // Return original token on error, mark as failed
 		}
 		return result[key], true
@@ -161,7 +161,7 @@ func UserUntokenizeFieldByField(
 // is enabled, it delegates to UserUntokenize to read and decrypt the tokens.
 func UserUntokenizeTransparently(
 	ctx context.Context,
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 	user userstore.UserInterface,
 ) (
 	email string,
@@ -176,15 +176,15 @@ func UserUntokenizeTransparently(
 	}
 
 	// Vault disabled: treat fields as plain text
-	if !registry.GetConfig().GetUserStoreVaultEnabled() {
+	if !app.GetConfig().GetUserStoreVaultEnabled() {
 		return user.GetEmail(), user.GetFirstName(), user.GetLastName(), user.GetBusinessName(), user.GetPhone(), nil
 	}
 
 	// Vault enabled: ensure vault store is available and untokenize
 	firstName, lastName, email, businessName, phone, err = UserUntokenize(
 		ctx,
-		registry,
-		registry.GetConfig().GetVaultStoreKey(),
+		app,
+		app.GetConfig().GetVaultStoreKey(),
 		user,
 	)
 	if err != nil {

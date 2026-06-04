@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleCategoriesLoadAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleLoadCategories, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleCategoriesLoadAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleCategoriesLoadAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadCategories, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleCategoriesLoadAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleCategoriesLoadAjax_LoadsCategories(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewCategoryManagerController(registry)
+	controller := NewCategoryManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadCategories, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

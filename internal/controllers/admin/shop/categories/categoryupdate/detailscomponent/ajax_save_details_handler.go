@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 )
@@ -17,8 +17,8 @@ type CategoryDetailsRequest struct {
 	ParentID    string `json:"parent_id"`
 }
 
-func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request, categoryID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxSaveDetails(app app.AppInterface, r *http.Request, categoryID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
@@ -27,7 +27,7 @@ func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request,
 		return api.ErrorWithData("Invalid request body", map[string]any{}).ToString()
 	}
 
-	category, err := registry.GetShopStore().CategoryFindByID(context.Background(), categoryID)
+	category, err := app.GetShopStore().CategoryFindByID(context.Background(), categoryID)
 	if err != nil {
 		return api.ErrorWithData("Failed to load category", map[string]any{}).ToString()
 	}
@@ -41,7 +41,7 @@ func HandleAjaxSaveDetails(registry registry.RegistryInterface, r *http.Request,
 	category.SetStatus(req.Status)
 	category.SetParentID(req.ParentID)
 
-	if err := registry.GetShopStore().CategoryUpdate(context.Background(), category); err != nil {
+	if err := app.GetShopStore().CategoryUpdate(context.Background(), category); err != nil {
 		slog.Error("Failed to update category", slog.String("error", err.Error()))
 		return api.ErrorWithData("Failed to save category", map[string]any{}).ToString()
 	}

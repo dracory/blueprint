@@ -12,7 +12,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 	"project/pkg/blogai"
 
@@ -31,11 +31,11 @@ import (
 var postCategoriesFiles embed.FS
 
 type postUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewPostUpdateController(registry registry.RegistryInterface) *postUpdateController {
-	return &postUpdateController{registry: registry}
+func NewPostUpdateController(app app.AppInterface) *postUpdateController {
+	return &postUpdateController{app: app}
 }
 
 func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -88,31 +88,31 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 	}
 
 	if postID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post ID is required", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post ID is required", links.Admin().Blog(), 10)
 	}
 
-	post, err := controller.registry.GetBlogStore().PostFindByID(r.Context(), postID)
+	post, err := controller.app.GetBlogStore().PostFindByID(r.Context(), postID)
 	if err != nil {
-		controller.registry.GetLogger().Error(
+		controller.app.GetLogger().Error(
 			"Error. postUpdateController: PostFindByID",
 			slog.String("error", err.Error()),
 			slog.String("post_id", postID),
 		)
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 
 	if post == nil {
-		controller.registry.GetLogger().Warn(
+		controller.app.GetLogger().Warn(
 			"Warning. postUpdateController: PostFindByID",
 			slog.String("error", "Post not found"),
 			slog.String("post_id", postID),
 		)
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Post not found", links.Admin().Blog(), 10)
 	}
 
 	pageContent := controller.page(r, post, view)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Post | Blog",
 		Content: pageContent,
 		ScriptURLs: []string{
@@ -321,7 +321,7 @@ func (controller *postUpdateController) handleLoadCategories(w http.ResponseWrit
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -389,7 +389,7 @@ func (controller *postUpdateController) handleAddCategory(w http.ResponseWriter,
 		return api.Error("Category ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -424,7 +424,7 @@ func (controller *postUpdateController) handleRemoveCategory(w http.ResponseWrit
 		return api.Error("Category ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -624,7 +624,7 @@ func (controller *postUpdateController) handleLoadTags(w http.ResponseWriter, r 
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -691,7 +691,7 @@ func (controller *postUpdateController) handleAddTag(w http.ResponseWriter, r *h
 		return api.Error("Tag ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -726,7 +726,7 @@ func (controller *postUpdateController) handleRemoveTag(w http.ResponseWriter, r
 		return api.Error("Tag ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -749,7 +749,7 @@ func (controller *postUpdateController) handleLoadDetails(w http.ResponseWriter,
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -795,7 +795,7 @@ func (controller *postUpdateController) handleSaveDetails(w http.ResponseWriter,
 		return api.Error("Status is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -827,12 +827,12 @@ func (controller *postUpdateController) handleSaveDetails(w http.ResponseWriter,
 	post.SetStatus(reqData.Status)
 
 	if err := blogStore.PostUpdate(ctx, post); err != nil {
-		controller.registry.GetLogger().Error("Error saving post details", "error", err.Error())
+		controller.app.GetLogger().Error("Error saving post details", "error", err.Error())
 		return api.Error("System error. Saving post failed").ToString()
 	}
 
-	if err := createPostVersioning(context.Background(), controller.registry, post); err != nil {
-		controller.registry.GetLogger().Error("Error creating post versioning", "error", err.Error())
+	if err := createPostVersioning(context.Background(), controller.app, post); err != nil {
+		controller.app.GetLogger().Error("Error creating post versioning", "error", err.Error())
 	}
 
 	return api.Success("Post saved successfully").ToString()
@@ -855,7 +855,7 @@ func (controller *postUpdateController) handleRegenerateImage(w http.ResponseWri
 		return api.Error("Invalid request body").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -865,25 +865,25 @@ func (controller *postUpdateController) handleRegenerateImage(w http.ResponseWri
 		return api.Error("Post not found").ToString()
 	}
 
-	agent := blogai.NewBlogWriterAgent(controller.registry.GetLogger())
+	agent := blogai.NewBlogWriterAgent(controller.app.GetLogger())
 	if agent == nil {
 		return api.Error("Failed to initialize AI engine").ToString()
 	}
 
-	llmEngine, err := shared.LlmEngine(controller.registry)
+	llmEngine, err := shared.LlmEngine(controller.app)
 	if err != nil || llmEngine == nil {
 		return api.Error("Failed to initialize AI engine").ToString()
 	}
 
 	imageURL, err := agent.GenerateImage(llmEngine, post.GetTitle(), post.GetSummary())
 	if err != nil {
-		controller.registry.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage", "error", err.Error())
+		controller.app.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage", "error", err.Error())
 		return api.Error("Failed to generate image").ToString()
 	}
 
 	post.SetImageUrl(imageURL)
 	if err := blogStore.PostUpdate(ctx, post); err != nil {
-		controller.registry.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage.Save", "error", err.Error())
+		controller.app.GetLogger().Error("BlogAi.PostUpdateV2.RegenerateImage.Save", "error", err.Error())
 		return api.Error("Failed to save generated image").ToString()
 	}
 
@@ -901,7 +901,7 @@ func (controller *postUpdateController) handleLoadContent(w http.ResponseWriter,
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -942,7 +942,7 @@ func (controller *postUpdateController) handleSaveContent(w http.ResponseWriter,
 		return api.Error("Title is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -957,12 +957,12 @@ func (controller *postUpdateController) handleSaveContent(w http.ResponseWriter,
 	post.SetContent(reqData.Content)
 
 	if err := blogStore.PostUpdate(ctx, post); err != nil {
-		controller.registry.GetLogger().Error("Error saving post content", "error", err.Error())
+		controller.app.GetLogger().Error("Error saving post content", "error", err.Error())
 		return api.Error("System error. Saving post failed").ToString()
 	}
 
-	if err := createPostVersioning(context.Background(), controller.registry, post); err != nil {
-		controller.registry.GetLogger().Error("Error creating post versioning", "error", err.Error())
+	if err := createPostVersioning(context.Background(), controller.app, post); err != nil {
+		controller.app.GetLogger().Error("Error creating post versioning", "error", err.Error())
 	}
 
 	return api.Success("Post saved successfully").ToString()
@@ -983,7 +983,7 @@ func (controller *postUpdateController) handleLoadSEO(w http.ResponseWriter, r *
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -1025,7 +1025,7 @@ func (controller *postUpdateController) handleSaveSEO(w http.ResponseWriter, r *
 		return api.Error("Invalid request body").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -1041,17 +1041,17 @@ func (controller *postUpdateController) handleSaveSEO(w http.ResponseWriter, r *
 	post.SetMetaKeywords(reqData.MetaKeywords)
 	post.SetMetaRobots(reqData.MetaRobots)
 	if err := post.SetOldSlugs(reqData.OldSlugs); err != nil {
-		controller.registry.GetLogger().Error("Error setting old slugs", "error", err.Error())
+		controller.app.GetLogger().Error("Error setting old slugs", "error", err.Error())
 		return api.Error("System error. Setting old slugs failed").ToString()
 	}
 
 	if err := blogStore.PostUpdate(ctx, post); err != nil {
-		controller.registry.GetLogger().Error("Error saving post SEO", "error", err.Error())
+		controller.app.GetLogger().Error("Error saving post SEO", "error", err.Error())
 		return api.Error("System error. Saving post failed").ToString()
 	}
 
-	if err := createPostVersioning(context.Background(), controller.registry, post); err != nil {
-		controller.registry.GetLogger().Error("Error creating post versioning", "error", err.Error())
+	if err := createPostVersioning(context.Background(), controller.app, post); err != nil {
+		controller.app.GetLogger().Error("Error creating post versioning", "error", err.Error())
 	}
 
 	return api.Success("Post saved successfully").ToString()
@@ -1073,7 +1073,7 @@ func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -1092,15 +1092,15 @@ func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter
 	query.SetSortOrder(sb.DESC)
 	query.SetLimit(50)
 
-	controller.registry.GetLogger().Info("Loading versions for post", "post_id", reqData.PostID)
+	controller.app.GetLogger().Info("Loading versions for post", "post_id", reqData.PostID)
 
 	versions, err := blogStore.EnableDebug(true).VersioningList(ctx, query)
 	if err != nil {
-		controller.registry.GetLogger().Error("Failed to load versions", "error", err.Error(), "post_id", reqData.PostID)
+		controller.app.GetLogger().Error("Failed to load versions", "error", err.Error(), "post_id", reqData.PostID)
 		return api.Error("Failed to load versions").ToString()
 	}
 
-	controller.registry.GetLogger().Info("Versions loaded from query", "count", len(versions), "post_id", reqData.PostID)
+	controller.app.GetLogger().Info("Versions loaded from query", "count", len(versions), "post_id", reqData.PostID)
 
 	// Filter versions by entity_id as a safety measure (in case versionstore doesn't filter correctly)
 	filteredVersions := []blogstore.VersioningInterface{}
@@ -1110,7 +1110,7 @@ func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter
 		}
 	}
 
-	controller.registry.GetLogger().Info("Versions after filtering", "count", len(filteredVersions), "post_id", reqData.PostID)
+	controller.app.GetLogger().Info("Versions after filtering", "count", len(filteredVersions), "post_id", reqData.PostID)
 
 	// Convert versions to serializable format
 	versionList := []map[string]any{}
@@ -1143,7 +1143,7 @@ func (controller *postUpdateController) handleLoadVersionDetail(w http.ResponseW
 		return api.Error("Version ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -1226,7 +1226,7 @@ func (controller *postUpdateController) handleRestoreVersionAttributes(w http.Re
 		return api.Error("At least one attribute must be selected").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -1258,13 +1258,13 @@ func (controller *postUpdateController) handleRestoreVersionAttributes(w http.Re
 
 	// Update the post
 	if err := blogStore.PostUpdate(ctx, post); err != nil {
-		controller.registry.GetLogger().Error("Error updating post from version attributes", "error", err.Error())
+		controller.app.GetLogger().Error("Error updating post from version attributes", "error", err.Error())
 		return api.Error("Error restoring attributes").ToString()
 	}
 
 	// Create a new version for the restoration
-	if err := createPostVersioning(context.Background(), controller.registry, post); err != nil {
-		controller.registry.GetLogger().Error("Error creating post versioning after restore", "error", err.Error())
+	if err := createPostVersioning(context.Background(), controller.app, post); err != nil {
+		controller.app.GetLogger().Error("Error creating post versioning after restore", "error", err.Error())
 	}
 
 	return api.Success("Selected attributes restored successfully").ToString()

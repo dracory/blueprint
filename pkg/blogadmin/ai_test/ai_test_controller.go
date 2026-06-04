@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/aws/smithy-go/ptr"
@@ -15,11 +15,11 @@ import (
 )
 
 type AiTestController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewAiTestController(registry registry.RegistryInterface) *AiTestController {
-	return &AiTestController{registry: registry}
+func NewAiTestController(app app.AppInterface) *AiTestController {
+	return &AiTestController{app: app}
 }
 
 func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -29,7 +29,7 @@ func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) strin
 			userMsg = "Tell me shortly about blogs."
 		}
 
-		model, err := shared.LlmEngine(c.registry)
+		model, err := shared.LlmEngine(c.app)
 		if err != nil {
 			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
@@ -85,7 +85,7 @@ func (c *AiTestController) Handler(w http.ResponseWriter, r *http.Request) strin
 		return ""
 	}
 
-	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:      "Test AI Connectivity",
 		Content:    c.view(),
 		ScriptURLs: []string{cdn.Sweetalert2_11()},
@@ -105,7 +105,7 @@ func (c *AiTestController) view() *hb.Tag {
 
 	desc := hb.Paragraph().
 		HTML(`Welcome to the AI Diagnostics page!<br><br>
-		Here you can verify that your AI model is correctly configured and reachable from the registry.<br>
+		Here you can verify that your AI model is correctly configured and reachable from the app.<br>
 		Enter a custom message below and click the button to send a test request to your configured AI provider.<br>
 		If everything is set up correctly, you will see a response from the AI.<br>
 		If not, you will see an error message with details.<br><br>

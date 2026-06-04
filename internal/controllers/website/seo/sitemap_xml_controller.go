@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/blogstore"
@@ -15,12 +15,12 @@ import (
 )
 
 type sitemapXmlController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // NewSitemapXmlController creates a new instance of the sitemapXmlController struct.
-func NewSitemapXmlController(registry registry.RegistryInterface) *sitemapXmlController {
-	return &sitemapXmlController{registry: registry}
+func NewSitemapXmlController(app app.AppInterface) *sitemapXmlController {
+	return &sitemapXmlController{app: app}
 }
 
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -68,21 +68,21 @@ func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Req
 }
 
 func (c sitemapXmlController) blogPostLocations() []string {
-	if c.registry == nil {
-		slog.Warn("At sitemapXmlController > blogPostLocations", slog.String("reason", "registry is not configured"))
+	if c.app == nil {
+		slog.Warn("At sitemapXmlController > blogPostLocations", slog.String("reason", "app is not configured"))
 		return []string{}
 	}
 
-	if !c.registry.GetConfig().GetBlogStoreUsed() {
+	if !c.app.GetConfig().GetBlogStoreUsed() {
 		return []string{}
 	}
 
-	if c.registry.GetBlogStore() == nil {
+	if c.app.GetBlogStore() == nil {
 		slog.Warn("At sitemapXmlController > blogPostLocations", slog.String("reason", "blog store is not configured"))
 		return []string{}
 	}
 
-	postList, err := c.registry.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
+	postList, err := c.app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		OrderBy:   "title",
 		SortOrder: sb.DESC,

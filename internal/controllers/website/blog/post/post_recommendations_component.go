@@ -10,7 +10,7 @@ import (
 
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -27,13 +27,13 @@ const (
 
 type postRecommendationsComponent struct {
 	liveflux.Base
-	registry      registry.RegistryInterface
+	app      app.AppInterface
 	CurrentPostID string
 	Posts         []blogstore.PostInterface
 	errorMessage  string
 }
 
-func NewPostRecommendationsComponent(registry registry.RegistryInterface) liveflux.ComponentInterface {
+func NewPostRecommendationsComponent(app app.AppInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&postRecommendationsComponent{})
 	if err != nil {
 		log.Println(err)
@@ -41,7 +41,7 @@ func NewPostRecommendationsComponent(registry registry.RegistryInterface) livefl
 	}
 
 	if component, ok := inst.(*postRecommendationsComponent); ok {
-		component.registry = registry
+		component.app = app
 	}
 
 	return inst
@@ -54,18 +54,18 @@ func (c *postRecommendationsComponent) GetKind() string {
 func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[string]string) error {
 	c.CurrentPostID = strings.TrimSpace(params["post_id"])
 
-	if c.registry == nil {
-		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.registry = registry
+	if c.app == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(app.AppInterface); ok {
+			c.app = app
 		}
 	}
 
-	if c.registry == nil {
+	if c.app == nil {
 		c.errorMessage = "Application not initialized"
 		return nil
 	}
 
-	store := c.registry.GetBlogStore()
+	store := c.app.GetBlogStore()
 	if store == nil {
 		c.errorMessage = "Blog store is not configured"
 		return nil
@@ -80,7 +80,7 @@ func (c *postRecommendationsComponent) Mount(ctx context.Context, params map[str
 
 	postList, err := store.PostList(context.Background(), options)
 	if err != nil {
-		if logger := c.registry.GetLogger(); logger != nil {
+		if logger := c.app.GetLogger(); logger != nil {
 			logger.Error("Failed to load recommended posts", "error", err.Error())
 		}
 		c.errorMessage = "Unable to load more posts right now"
@@ -227,7 +227,7 @@ func (c *postRecommendationsComponent) truncatedSummary(text string) string {
 }
 
 func (c *postRecommendationsComponent) postImage(post blogstore.PostInterface) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(c.app, post, "300", "200", "80")
 
 	return hb.Image(``).
 		Class("card-img-top").

@@ -11,7 +11,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
@@ -26,11 +26,11 @@ import (
 var categoriesFiles embed.FS
 
 type categoryManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewCategoryManagerController(registry registry.RegistryInterface) *categoryManagerController {
-	return &categoryManagerController{registry: registry}
+func NewCategoryManagerController(app app.AppInterface) *categoryManagerController {
+	return &categoryManagerController{app: app}
 }
 
 func (controller *categoryManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -55,8 +55,8 @@ func (controller *categoryManagerController) Handler(w http.ResponseWriter, r *h
 func (controller *categoryManagerController) renderPage(r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		if controller.registry != nil && controller.registry.GetCacheStore() != nil {
-			return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
+		if controller.app != nil && controller.app.GetCacheStore() != nil {
+			return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
 		}
 		return hb.Div().HTML("Error: You are not logged in. Please login to continue.").ToHTML()
 	}
@@ -109,7 +109,7 @@ func (controller *categoryManagerController) renderPage(r *http.Request) string 
 		Child(hb.HR()).
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Blog | Category Manager",
 		Content: content,
 		ScriptURLs: []string{
@@ -122,7 +122,7 @@ func (controller *categoryManagerController) renderPage(r *http.Request) string 
 func (controller *categoryManagerController) handleLoadCategories(r *http.Request) string {
 	ctx := r.Context()
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -179,7 +179,7 @@ func (controller *categoryManagerController) handleCreateCategory(w http.Respons
 		return api.Error("Category name is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -238,7 +238,7 @@ func (controller *categoryManagerController) handleUpdateCategory(w http.Respons
 		return api.Error("Category name is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -284,7 +284,7 @@ func (controller *categoryManagerController) handleReorderCategories(w http.Resp
 		return api.Error("Invalid request body").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -326,7 +326,7 @@ func (controller *categoryManagerController) handleDeleteCategory(w http.Respons
 		return api.Error("Category ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -348,7 +348,7 @@ func (controller *categoryManagerController) handleDeleteCategory(w http.Respons
 func (controller *categoryManagerController) ensureTaxonomy(ctx context.Context, store blogstore.StoreInterface) (blogstore.TaxonomyInterface, error) {
 	categoryTaxonomy, err := store.TaxonomyFindBySlug(ctx, blogstore.TAXONOMY_CATEGORY)
 	if err != nil || categoryTaxonomy == nil {
-		controller.registry.GetLogger().Info("Creating category taxonomy")
+		controller.app.GetLogger().Info("Creating category taxonomy")
 		categoryTaxonomy = blogstore.NewTaxonomy()
 		categoryTaxonomy.SetName("Category")
 		categoryTaxonomy.SetSlug(blogstore.TAXONOMY_CATEGORY)

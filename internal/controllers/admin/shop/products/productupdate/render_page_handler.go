@@ -21,7 +21,7 @@ import (
 func (controller *productUpdateController) handleRenderPage(r *http.Request, product shopstore.ProductInterface, view string, productID string) string {
 	pageContent := controller.renderPageContent(r, product, view, productID)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Edit Product | Shop",
 		Content: hb.Wrap().HTML(pageContent),
 		ScriptURLs: []string{
@@ -107,15 +107,15 @@ func (controller *productUpdateController) renderPageContent(r *http.Request, pr
 
 	switch view {
 	case "details":
-		body = detailscomponent.Render(controller.registry, productID)
+		body = detailscomponent.Render(controller.app, productID)
 	case "media":
-		body = mediacomponent.Render(controller.registry, productID)
+		body = mediacomponent.Render(controller.app, productID)
 	case "tags":
-		body = tagscomponent.Render(controller.registry, productID)
+		body = tagscomponent.Render(controller.app, productID)
 	case "metadata":
-		body = metadatacomponent.Render(controller.registry, productID)
+		body = metadatacomponent.Render(controller.app, productID)
 	default:
-		body = detailscomponent.Render(controller.registry, productID)
+		body = detailscomponent.Render(controller.app, productID)
 	}
 
 	card := hb.Div().

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
@@ -26,49 +26,49 @@ import (
 	"project/pkg/blogadmin/tag_manager"
 )
 
-func Routes(registry registry.RegistryInterface, opts ...AdminOptions) ([]rtr.RouteInterface, error) {
+func Routes(app app.AppInterface, opts ...AdminOptions) ([]rtr.RouteInterface, error) {
 	_ = opts // Options available for future use
-	if registry == nil {
-		return nil, errors.New("registry cannot be nil")
+	if app == nil {
+		return nil, errors.New("app cannot be nil")
 	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
 		switch controller {
 		case shared.CONTROLLER_HOME:
-			return post_manager.NewPostManagerController(registry).Handler(w, r)
+			return post_manager.NewPostManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_CREATE:
-			return post_create.NewPostCreateController(registry).Handler(w, r)
+			return post_create.NewPostCreateController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_DELETE:
-			return post_delete.NewPostDeleteController(registry).Handler(w, r)
+			return post_delete.NewPostDeleteController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_MANAGER:
-			return post_manager.NewPostManagerController(registry).Handler(w, r)
+			return post_manager.NewPostManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_POST_UPDATE:
-			return post_update.NewPostUpdateController(registry).Handler(w, r)
+			return post_update.NewPostUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TOOLS:
-			return aiTools.NewAiToolsController(registry).Handler(w, r)
+			return aiTools.NewAiToolsController(app).Handler(w, r)
 		case shared.CONTROLLER_BLOG_SETTINGS:
-			return blogSettings.NewBlogSettingsController(registry).Handler(w, r)
+			return blogSettings.NewBlogSettingsController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_CONTENT_UPDATE:
-			return aiPostContentUpdate.NewController(registry).Handler(w, r)
+			return aiPostContentUpdate.NewController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_GENERATOR:
-			return aiPostGenerator.NewAiPostGeneratorController(registry).Handler(w, r)
+			return aiPostGenerator.NewAiPostGeneratorController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TITLE_GENERATOR:
-			return aiTitleGenerator.NewAiTitleGeneratorController(registry).Handler(w, r)
+			return aiTitleGenerator.NewAiTitleGeneratorController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_POST_EDITOR:
-			return aiPostEditor.NewAiPostEditorController(registry).Handler(w, r)
+			return aiPostEditor.NewAiPostEditorController(app).Handler(w, r)
 		case shared.CONTROLLER_AI_TEST:
-			return aiTest.NewAiTestController(registry).Handler(w, r)
+			return aiTest.NewAiTestController(app).Handler(w, r)
 		case shared.CONTROLLER_DASHBOARD:
-			return dashboard.NewDashboardController(registry).Handler(w, r)
+			return dashboard.NewDashboardController(app).Handler(w, r)
 		case shared.CONTROLLER_CATEGORY_MANAGER:
-			return category_manager.NewCategoryManagerController(registry).Handler(w, r)
+			return category_manager.NewCategoryManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_TAG_MANAGER:
-			return tag_manager.NewTagManagerController(registry).Handler(w, r)
+			return tag_manager.NewTagManagerController(app).Handler(w, r)
 		}
 
 		// Default to dashboard
-		return dashboard.NewDashboardController(registry).Handler(w, r)
+		return dashboard.NewDashboardController(app).Handler(w, r)
 	}
 
 	blog := rtr.NewRoute().

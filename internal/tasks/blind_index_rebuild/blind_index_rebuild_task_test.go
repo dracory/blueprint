@@ -10,12 +10,12 @@ import (
 )
 
 func TestNewBlindIndexRebuildTask_InitializesFields(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
-	if task.registry != registry {
-		t.Fatalf("expected registry to be set on task")
+	if task.app != app {
+		t.Fatalf("expected app to be set on task")
 	}
 
 	expected := []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName}
@@ -25,8 +25,8 @@ func TestNewBlindIndexRebuildTask_InitializesFields(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Metadata(t *testing.T) {
-	registry := testutils.Setup()
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup()
+	task := NewBlindIndexRebuildTask(app)
 
 	if got, want := task.Alias(), "BlindIndexUpdate"; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
@@ -44,9 +44,9 @@ func TestBlindIndexRebuildTask_Metadata(t *testing.T) {
 func TestBlindIndexRebuildTask_Enqueue_TaskStoreNil(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(false)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	if _, err := task.Enqueue(BlindIndexAll); err == nil {
 		t.Fatalf("expected error when task store is nil, got nil")
@@ -54,8 +54,8 @@ func TestBlindIndexRebuildTask_Enqueue_TaskStoreNil(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Enqueue_InvalidIndex(t *testing.T) {
-	registry := testutils.Setup()
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup()
+	task := NewBlindIndexRebuildTask(app)
 
 	if _, err := task.Enqueue("invalid"); err == nil {
 		t.Fatalf("expected error when invalid index is provided, got nil")
@@ -63,25 +63,25 @@ func TestBlindIndexRebuildTask_Enqueue_InvalidIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Handle(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
 	// Register task (this is needed for the task definition to be available)
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(registry), true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), NewBlindIndexRebuildTask(app), true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
 	// Enqueue task with valid funnel and lead
-	queuedTask, err := NewBlindIndexRebuildTask(registry).Enqueue(BlindIndexAll)
+	queuedTask, err := NewBlindIndexRebuildTask(app).Enqueue(BlindIndexAll)
 	if err != nil {
 		t.Fatalf("Enqueue() expected nil error, got %q", err)
 	}
 
 	// Set queued task
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.SetQueuedTask(queuedTask)
 
 	// ACT
@@ -112,11 +112,11 @@ func TestBlindIndexRebuildTask_Handle(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Enqueue_EmailIndex(t *testing.T) {
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task first
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -128,11 +128,11 @@ func TestBlindIndexRebuildTask_Enqueue_EmailIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Enqueue_FirstNameIndex(t *testing.T) {
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task first
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -144,11 +144,11 @@ func TestBlindIndexRebuildTask_Enqueue_FirstNameIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Enqueue_LastNameIndex(t *testing.T) {
-	registry := testutils.Setup(testutils.WithTaskStore(true))
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup(testutils.WithTaskStore(true))
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task first
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -160,8 +160,8 @@ func TestBlindIndexRebuildTask_Enqueue_LastNameIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_SetQueuedTask(t *testing.T) {
-	registry := testutils.Setup()
-	task := NewBlindIndexRebuildTask(registry)
+	app := testutils.Setup()
+	task := NewBlindIndexRebuildTask(app)
 
 	// SetQueuedTask should not panic even with nil
 	task.SetQueuedTask(nil)

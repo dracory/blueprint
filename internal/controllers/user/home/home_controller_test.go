@@ -20,9 +20,9 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(registry).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, user.NewHomeController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 		Context:   map[any]any{},
 	})
@@ -37,7 +37,7 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -68,8 +68,8 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 }
 
 func TestNewHomeController(t *testing.T) {
-	registry := testutils.Setup()
-	controller := user.NewHomeController(registry)
+	app := testutils.Setup()
+	controller := user.NewHomeController(app)
 
 	if controller == nil {
 		t.Fatal("Controller should not be nil")
@@ -81,10 +81,10 @@ func TestHomeController_WithLoggedInUser(t *testing.T) {
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Create a test user
-	testUser, err := testutils.SeedUser(registry.GetUserStore(), "test_user_01")
+	testUser, err := testutils.SeedUser(app.GetUserStore(), "test_user_01")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +93,7 @@ func TestHomeController_WithLoggedInUser(t *testing.T) {
 	testUser.SetFirstName("John")
 	testUser.SetLastName("Doe")
 	testUser.SetEmail("john@example.com")
-	err = registry.GetUserStore().UserUpdate(context.Background(), testUser)
+	err = app.GetUserStore().UserUpdate(context.Background(), testUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +104,7 @@ func TestHomeController_WithLoggedInUser(t *testing.T) {
 	req = req.WithContext(ctx)
 
 	recorder := httptest.NewRecorder()
-	controller := user.NewHomeController(registry)
+	controller := user.NewHomeController(app)
 	result := controller.Handler(recorder, req)
 
 	// Should return HTML content when user is logged in

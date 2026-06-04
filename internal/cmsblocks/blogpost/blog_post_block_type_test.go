@@ -13,11 +13,11 @@ import (
 
 // TestBlogPostBlockType_BasicProperties tests basic properties
 func TestBlogPostBlockType_BasicProperties(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostBlockType(app.GetBlogStore())
 
 	if blockType.TypeKey() != "blog_post" {
 		t.Errorf("Expected type key 'blog_post', got '%s'", blockType.TypeKey())
@@ -30,11 +30,11 @@ func TestBlogPostBlockType_BasicProperties(t *testing.T) {
 
 // TestBlogPostBlockType_GetPreview tests preview
 func TestBlogPostBlockType_GetPreview(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	// Create a real block for testing
@@ -58,11 +58,11 @@ func TestBlogPostBlockType_GetPreview(t *testing.T) {
 
 // TestBlogPostBlockType_Validate tests validation
 func TestBlogPostBlockType_Validate(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	block := cmsstore.NewBlock()
@@ -76,11 +76,11 @@ func TestBlogPostBlockType_Validate(t *testing.T) {
 
 // TestBlogPostBlockType_AdminFields tests admin fields
 func TestBlogPostBlockType_AdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	block := cmsstore.NewBlock()
@@ -102,11 +102,11 @@ func TestBlogPostBlockType_AdminFields(t *testing.T) {
 
 // TestBlogPostBlockType_SaveAdminFields tests saving admin fields
 func TestBlogPostBlockType_SaveAdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	block := cmsstore.NewBlock()
@@ -139,11 +139,11 @@ func TestBlogPostBlockType_SaveAdminFields(t *testing.T) {
 
 // TestBlogPostBlockType_Render tests the Render method includes tags and share links
 func TestBlogPostBlockType_Render(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	// Create a published post with tags
@@ -267,11 +267,11 @@ func TestBlogPostBlockType_Render(t *testing.T) {
 
 // TestBlogPostBlockType_RenderWithNoTags tests rendering a post without tags
 func TestBlogPostBlockType_RenderWithNoTags(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blogStore := registry.GetBlogStore()
+	blogStore := app.GetBlogStore()
 	blockType := NewBlogPostBlockType(blogStore)
 
 	// Create a published post without tags

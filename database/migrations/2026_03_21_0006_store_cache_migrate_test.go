@@ -33,10 +33,10 @@ func TestStoreCacheMigrate_UpWithNilRegistry(t *testing.T) {
 	migration := &StoreCacheMigrate{}
 	err := migration.Up(context.Background(), nil)
 	if err == nil {
-		t.Error("Expected error when registry is nil")
+		t.Error("Expected error when app is nil")
 	}
-	if err.Error() != "registry is nil" {
-		t.Errorf("Expected error 'registry is nil', got '%s'", err.Error())
+	if err.Error() != "app is nil" {
+		t.Errorf("Expected error 'app is nil', got '%s'", err.Error())
 	}
 }
 
@@ -44,9 +44,9 @@ func TestStoreCacheMigrate_DownWithNilRegistry(t *testing.T) {
 	migration := &StoreCacheMigrate{}
 	defer func() {
 		if r := recover(); r != nil {
-			// Expected panic due to nil registry
+			// Expected panic due to nil app
 		} else {
-			t.Error("Expected panic when registry is nil")
+			t.Error("Expected panic when app is nil")
 		}
 	}()
 	migration.Down(context.Background(), nil)

@@ -11,7 +11,7 @@ import (
 )
 
 func TestController_HandlerWithNilRegistry(t *testing.T) {
-	// Test handler with nil registry
+	// Test handler with nil app
 	controller := NewController(nil)
 	if controller == nil {
 		t.Fatal("NewController(nil) should not return nil")
@@ -22,15 +22,15 @@ func TestController_HandlerWithNilRegistry(t *testing.T) {
 
 	result := controller.Handler(w, req)
 
-	// Handler should still return a result even with nil registry
+	// Handler should still return a result even with nil app
 	if result == "" {
-		t.Error("Handler() with nil registry returned empty string")
+		t.Error("Handler() with nil app returned empty string")
 	}
 }
 
 func TestController_HandlerWithHeaders_GET(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewController(registry)
+	app := testutils.Setup()
+	controller := NewController(app)
 	if controller == nil {
 		t.Fatal("NewController() returned nil")
 	}
@@ -47,8 +47,8 @@ func TestController_HandlerWithHeaders_GET(t *testing.T) {
 }
 
 func TestController_HandlerWithHeaders_POST(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewController(registry)
+	app := testutils.Setup()
+	controller := NewController(app)
 	if controller == nil {
 		t.Fatal("NewController() returned nil")
 	}
@@ -65,8 +65,8 @@ func TestController_HandlerWithHeaders_POST(t *testing.T) {
 }
 
 func TestController_HandlerWithContext(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewController(registry)
+	app := testutils.Setup()
+	controller := NewController(app)
 	if controller == nil {
 		t.Fatal("NewController() returned nil")
 	}
@@ -74,7 +74,7 @@ func TestController_HandlerWithContext(t *testing.T) {
 	req := httptest.NewRequest("GET", "/liveflux", nil)
 	w := httptest.NewRecorder()
 
-	// The handler should add the registry to context
+	// The handler should add the app to context
 	result := controller.Handler(w, req)
 
 	if result == "" {
@@ -83,7 +83,7 @@ func TestController_HandlerWithContext(t *testing.T) {
 }
 
 func TestRoutes(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	routes := Routes(nil)
 	if routes == nil {
 		t.Error("Routes(nil) should not return nil")
@@ -92,14 +92,14 @@ func TestRoutes(t *testing.T) {
 		t.Errorf("Routes(nil) returned %d routes, want 2", len(routes))
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	routes = Routes(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	routes = Routes(app)
 	if routes == nil {
-		t.Error("Routes(registry) should not return nil")
+		t.Error("Routes(app) should not return nil")
 	}
 	if len(routes) != 2 {
-		t.Errorf("Routes(registry) returned %d routes, want 2", len(routes))
+		t.Errorf("Routes(app) returned %d routes, want 2", len(routes))
 	}
 
 	// Verify route properties
@@ -117,8 +117,8 @@ func TestRoutes(t *testing.T) {
 }
 
 func TestRoutesMethods(t *testing.T) {
-	registry := testutils.Setup()
-	routes := Routes(registry)
+	app := testutils.Setup()
+	routes := Routes(app)
 
 	if len(routes) != 2 {
 		t.Fatalf("Routes() returned %d routes, want 2", len(routes))
@@ -136,8 +136,8 @@ func TestRoutesMethods(t *testing.T) {
 }
 
 func TestRoutesHandlerAssignment(t *testing.T) {
-	registry := testutils.Setup()
-	routes := Routes(registry)
+	app := testutils.Setup()
+	routes := Routes(app)
 
 	if len(routes) != 2 {
 		t.Fatalf("Routes() returned %d routes, want 2", len(routes))
@@ -160,8 +160,8 @@ func TestContextKeyType(t *testing.T) {
 }
 
 func TestControllerEngine(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewController(registry)
+	app := testutils.Setup()
+	controller := NewController(app)
 
 	if controller.Engine == nil {
 		t.Error("Controller Engine should not be nil")
@@ -178,18 +178,18 @@ func TestNewControllerWithNil(t *testing.T) {
 		t.Fatal("NewController(nil) should not return nil")
 	}
 
-	if controller.registry != nil {
-		t.Error("Controller registry should be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Controller app should be nil when passed nil")
 	}
 
 	if controller.Engine == nil {
-		t.Error("Controller Engine should not be nil even with nil registry")
+		t.Error("Controller Engine should not be nil even with nil app")
 	}
 }
 
 func TestRoutesReturnType(t *testing.T) {
-	registry := testutils.Setup()
-	routes := Routes(registry)
+	app := testutils.Setup()
+	routes := Routes(app)
 
 	// Verify return type is []rtr.RouteInterface
 	var _ []rtr.RouteInterface = routes

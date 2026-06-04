@@ -22,10 +22,10 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Act
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{})
@@ -48,7 +48,7 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -79,9 +79,9 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -89,7 +89,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -114,7 +114,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -144,9 +144,9 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -157,7 +157,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 	user.SetLastName("Last Name")
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
-	err = registry.GetUserStore().UserUpdate(context.Background(), user)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -165,7 +165,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -190,7 +190,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -220,8 +220,8 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
+	app := testutils.Setup(testutils.WithCfg(cfg))
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), test.USER_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -236,7 +236,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 	user.SetLastName("Last Name")
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
-	err = registry.GetUserStore().UserUpdate(context.Background(), user)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -244,7 +244,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		t.Fatal("Should not be called")
 		w.WriteHeader(http.StatusOK)
 	}, test.NewRequestOptions{
@@ -269,7 +269,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(registry.GetCacheStore(), body)
+	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -299,9 +299,9 @@ func TestAdminMiddleware_Success(t *testing.T) {
 	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	user, session, err := testutils.SeedUserAndSession(registry.GetUserStore(), registry.GetSessionStore(), test.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
+	user, session, err := testutils.SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), test.ADMIN_01, httptest.NewRequest("GET", "/", nil), 1)
 
 	if err != nil {
 		t.Fatal(err)
@@ -316,7 +316,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 	user.SetCountry("US")
 	user.SetTimezone("America/New_York")
 
-	err = registry.GetUserStore().UserUpdate(context.Background(), user)
+	err = app.GetUserStore().UserUpdate(context.Background(), user)
 
 	if err != nil {
 		t.Fatal(err)
@@ -324,7 +324,7 @@ func TestAdminMiddleware_Success(t *testing.T) {
 
 	// Act
 
-	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(registry).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
+	body, response, err := test.CallMiddleware("GET", NewAdminMiddleware(app).GetHandler(), func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte("Success")); err != nil {
 			t.Errorf("failed to write response: %v", err)
 			return

@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
 
-func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
+func NewEmailAllowlistMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	return rtr.NewMiddleware().
 		SetName("Email Allowlist Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
@@ -18,11 +18,11 @@ func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.Middle
 
 				// if the user is not authenticated, redirect to login
 				if user == nil {
-					helpers.ToFlashError(registry.GetCacheStore(), w, r, "Only authenticated users can access this page", links.AUTH_LOGIN, 15)
+					helpers.ToFlashError(app.GetCacheStore(), w, r, "Only authenticated users can access this page", links.AUTH_LOGIN, 15)
 					return
 				}
 
-				allowedEmails := registry.GetConfig().GetEmailsAllowedAccess()
+				allowedEmails := app.GetConfig().GetEmailsAllowedAccess()
 
 				// if the list is empty, all emails are allowed
 				if len(allowedEmails) == 0 {
@@ -32,19 +32,19 @@ func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.Middle
 
 				email := user.GetEmail()
 				// Untokenize email if vault is enabled (with caching to reduce vault hits)
-				if registry.GetConfig().GetUserStoreVaultEnabled() && email != "" {
+				if app.GetConfig().GetUserStoreVaultEnabled() && email != "" {
 					cacheKey := "email_untokenize:" + email
 					// Try to get from cache first
-					cachedEmail, err := registry.GetCacheStore().GetJSON(cacheKey, "")
+					cachedEmail, err := app.GetCacheStore().GetJSON(cacheKey, "")
 					if err == nil && cachedEmail != "" {
 						email = cachedEmail.(string)
 					} else {
 						// Cache miss - decrypt from vault
-						untokenizedEmail, err := registry.GetVaultStore().TokenRead(r.Context(), email, registry.GetConfig().GetVaultStoreKey())
+						untokenizedEmail, err := app.GetVaultStore().TokenRead(r.Context(), email, app.GetConfig().GetVaultStoreKey())
 						if err == nil {
 							email = untokenizedEmail
 							// Cache for 5 minutes
-							registry.GetCacheStore().SetJSON(cacheKey, email, 5*60)
+							app.GetCacheStore().SetJSON(cacheKey, email, 5*60)
 						}
 					}
 				}
@@ -64,7 +64,7 @@ func NewEmailAllowlistMiddleware(registry registry.RegistryInterface) rtr.Middle
 				}
 
 				homeURL := links.Website().Home()
-				helpers.ToFlashError(registry.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
+				helpers.ToFlashError(app.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
 			})
 		})
 }

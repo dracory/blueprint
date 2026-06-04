@@ -16,14 +16,14 @@ import (
 )
 
 func TestTagManagerController_RenderPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -36,14 +36,14 @@ func TestTagManagerController_RenderPage(t *testing.T) {
 }
 
 func TestTagManagerController_HandleLoadTags(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -59,14 +59,14 @@ func TestTagManagerController_HandleLoadTags(t *testing.T) {
 }
 
 func TestTagManagerController_HandleCreateTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -86,7 +86,7 @@ func TestTagManagerController_HandleCreateTag(t *testing.T) {
 	}
 
 	// Verify it exists in store
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	if len(terms) != 1 {
 		t.Errorf("expected 1 term, got %d", len(terms))
 	}
@@ -96,14 +96,14 @@ func TestTagManagerController_HandleCreateTag(t *testing.T) {
 }
 
 func TestTagManagerController_HandleLoadTagPosts(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -117,7 +117,7 @@ func TestTagManagerController_HandleLoadTagPosts(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=create-tag", bytes.NewBuffer(body)).WithContext(ctx)
 	controller.Handler(httptest.NewRecorder(), req)
 
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	tagID := terms[0].GetID()
 
 	req = httptest.NewRequest(http.MethodGet, "/admin/blog/tags?action=load-tag-posts&tag_id="+tagID, nil).WithContext(ctx)
@@ -131,14 +131,14 @@ func TestTagManagerController_HandleLoadTagPosts(t *testing.T) {
 }
 
 func TestTagManagerController_HandleUpdateTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -152,7 +152,7 @@ func TestTagManagerController_HandleUpdateTag(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=create-tag", bytes.NewBuffer(body)).WithContext(ctx)
 	controller.Handler(httptest.NewRecorder(), req)
 
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	tagID := terms[0].GetID()
 
 	updateData := map[string]string{
@@ -166,21 +166,21 @@ func TestTagManagerController_HandleUpdateTag(t *testing.T) {
 	}
 
 	// Verify update
-	term, _ := registry.GetBlogStore().TermFindByID(ctx, tagID)
+	term, _ := app.GetBlogStore().TermFindByID(ctx, tagID)
 	if term.GetName() != "Updated Tag" {
 		t.Errorf("expected Updated Tag, got %s", term.GetName())
 	}
 }
 
 func TestTagManagerController_HandleDeleteTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewTagManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewTagManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -194,7 +194,7 @@ func TestTagManagerController_HandleDeleteTag(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/admin/blog/tags?action=create-tag", bytes.NewBuffer(body)).WithContext(ctx)
 	controller.Handler(httptest.NewRecorder(), req)
 
-	terms, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	terms, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	tagID := terms[0].GetID()
 
 	deleteData := map[string]string{
@@ -208,7 +208,7 @@ func TestTagManagerController_HandleDeleteTag(t *testing.T) {
 	}
 
 	// Verify deletion
-	termsAfter, _ := registry.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
+	termsAfter, _ := app.GetBlogStore().TermList(ctx, blogstore.TermQueryOptions{})
 	if len(termsAfter) != 0 {
 		t.Errorf("expected 0 terms after deletion, got %d", len(termsAfter))
 	}

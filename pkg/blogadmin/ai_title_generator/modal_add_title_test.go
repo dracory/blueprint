@@ -11,8 +11,8 @@ import (
 
 // TestOnAddTitleModal_BasicStructure tests modal generation structure
 func TestOnAddTitleModal_BasicStructure(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -35,8 +35,8 @@ func TestOnAddTitleModal_BasicStructure(t *testing.T) {
 
 // TestOnAddTitleModal_FormElements tests form elements
 func TestOnAddTitleModal_FormElements(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -62,8 +62,8 @@ func TestOnAddTitleModal_FormElements(t *testing.T) {
 
 // TestOnAddTitleModal_Buttons tests button elements
 func TestOnAddTitleModal_Buttons(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -89,8 +89,8 @@ func TestOnAddTitleModal_Buttons(t *testing.T) {
 
 // TestOnAddTitleModal_HTMXAttributes tests HTMX integration
 func TestOnAddTitleModal_HTMXAttributes(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -119,8 +119,8 @@ func TestOnAddTitleModal_HTMXAttributes(t *testing.T) {
 
 // TestOnAddTitleModal_WithCustomTitle tests pre-populated title value
 func TestOnAddTitleModal_WithCustomTitle(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -140,8 +140,8 @@ func TestOnAddTitleModal_WithCustomTitle(t *testing.T) {
 
 // TestOnAddTitleModal_JavaScriptFunction tests modal close script
 func TestOnAddTitleModal_JavaScriptFunction(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -164,8 +164,8 @@ func TestOnAddTitleModal_JavaScriptFunction(t *testing.T) {
 
 // TestOnAddTitleModal_Backdrop tests modal backdrop
 func TestOnAddTitleModal_Backdrop(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -185,8 +185,8 @@ func TestOnAddTitleModal_Backdrop(t *testing.T) {
 
 // TestOnAddTitleModal_ActionParameter tests action parameter in form
 func TestOnAddTitleModal_ActionParameter(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -203,8 +203,8 @@ func TestOnAddTitleModal_ActionParameter(t *testing.T) {
 
 // TestOnAddTitleModal_RequiredAttribute tests required field validation
 func TestOnAddTitleModal_RequiredAttribute(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "GET",

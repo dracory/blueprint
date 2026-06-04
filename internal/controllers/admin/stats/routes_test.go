@@ -24,7 +24,7 @@ func TestRoutesFunctionExists(t *testing.T) {
 	}
 }
 
-// TestRoutesNilRegistry verifies Routes handles nil registry
+// TestRoutesNilRegistry verifies Routes handles nil app
 func TestRoutesNilRegistry(t *testing.T) {
 	routes, err := Routes(nil)
 

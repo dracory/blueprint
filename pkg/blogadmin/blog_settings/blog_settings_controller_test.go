@@ -18,23 +18,23 @@ import (
 )
 
 func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("SeedUser returned error: %v", err)
 	}
 
 	// Seed existing value to ensure store is operational
-	if err := registry.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"); err != nil {
+	if err := app.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"); err != nil {
 		t.Errorf("Set returned error: %v", err)
 	}
 
-	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
+	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -61,13 +61,13 @@ func TestBlogSettingsController_Handler_RendersAssets(t *testing.T) {
 }
 
 func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("SeedUser returned error: %v", err)
 	}
@@ -77,12 +77,12 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 	t.Cleanup(func() { os.Unsetenv("BLOG_TOPIC") })
 
 	// Seed existing value to ensure store is operational
-	if err := registry.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"); err != nil {
+	if err := app.GetSettingStore().Set(context.Background(), SettingKeyBlogTopic, "Seeded Topic"); err != nil {
 		t.Errorf("Set returned error: %v", err)
 	}
 
 	// GET should render env override messaging and disable inputs
-	getHTML, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
+	getHTML, resp, err := test.CallStringEndpoint(http.MethodGet, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -108,7 +108,7 @@ func TestBlogSettingsController_Handler_WithEnvOverride(t *testing.T) {
 	}
 
 	// POST should not mutate the store and should show error message
-	postHTML, postResp, err := test.CallStringEndpoint(http.MethodPost, NewBlogSettingsController(registry).Handler, test.NewRequestOptions{
+	postHTML, postResp, err := test.CallStringEndpoint(http.MethodPost, NewBlogSettingsController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},

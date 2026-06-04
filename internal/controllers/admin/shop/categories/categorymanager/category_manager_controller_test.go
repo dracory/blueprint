@@ -22,7 +22,7 @@ func TestNewCategoryManagerController(t *testing.T) {
 	}
 }
 
-// TestCategoryManagerControllerRegistry verifies controller has registry
+// TestCategoryManagerControllerRegistry verifies controller has app
 func TestCategoryManagerControllerRegistry(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup(testutils.WithShopStore(true))
@@ -33,8 +33,8 @@ func TestCategoryManagerControllerRegistry(t *testing.T) {
 
 	controller := NewCategoryManagerController(app)
 
-	if controller.registry == nil {
-		t.Error("Controller registry is nil")
+	if controller.app == nil {
+		t.Error("Controller app is nil")
 	}
 }
 

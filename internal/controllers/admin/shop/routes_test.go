@@ -25,7 +25,7 @@ func TestShopRoutesFunctionExists(t *testing.T) {
 	}
 }
 
-// TestShopRoutesNilRegistry verifies ShopRoutes handles nil registry
+// TestShopRoutesNilRegistry verifies ShopRoutes handles nil app
 func TestShopRoutesNilRegistry(t *testing.T) {
 	t.Parallel()
 	routes, err := ShopRoutes(nil)

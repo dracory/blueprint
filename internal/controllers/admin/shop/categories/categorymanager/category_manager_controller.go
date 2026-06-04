@@ -7,7 +7,7 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/cdn"
@@ -20,11 +20,11 @@ import (
 var categoriesFiles embed.FS
 
 type categoryManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewCategoryManagerController(registry registry.RegistryInterface) *categoryManagerController {
-	return &categoryManagerController{registry: registry}
+func NewCategoryManagerController(app app.AppInterface) *categoryManagerController {
+	return &categoryManagerController{app: app}
 }
 
 func (controller *categoryManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -36,7 +36,7 @@ func (controller *categoryManagerController) Handler(w http.ResponseWriter, r *h
 	case "delete-category":
 		return controller.handleDeleteCategory(w, r)
 	default:
-		return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 			Title:   "Categories | Shop",
 			Content: hb.Wrap().HTML(controller.renderPage(r)),
 			ScriptURLs: []string{
@@ -112,12 +112,12 @@ func (controller *categoryManagerController) renderPage(r *http.Request) string 
 }
 
 func (controller *categoryManagerController) handleLoadCategories(r *http.Request) string {
-	if controller.registry.GetShopStore() == nil {
+	if controller.app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
 	query := shopstore.NewCategoryQuery()
-	categories, err := controller.registry.GetShopStore().CategoryList(r.Context(), query)
+	categories, err := controller.app.GetShopStore().CategoryList(r.Context(), query)
 	if err != nil {
 		return api.ErrorWithData("Failed to load categories", map[string]any{}).ToString()
 	}
@@ -145,11 +145,11 @@ func (controller *categoryManagerController) handleDeleteCategory(w http.Respons
 		return api.ErrorWithData("Category ID is required", map[string]any{}).ToString()
 	}
 
-	if controller.registry.GetShopStore() == nil {
+	if controller.app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
-	if err := controller.registry.GetShopStore().CategoryDeleteByID(r.Context(), categoryID); err != nil {
+	if err := controller.app.GetShopStore().CategoryDeleteByID(r.Context(), categoryID); err != nil {
 		slog.Error("Failed to delete category", slog.String("error", err.Error()))
 		return api.ErrorWithData("Failed to delete category", map[string]any{}).ToString()
 	}

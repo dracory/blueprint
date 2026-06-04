@@ -1,19 +1,19 @@
 package shared
 
 import (
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/llm"
 )
 
-func LlmEngine(registry registry.RegistryInterface) (llm.LlmInterface, error) {
+func LlmEngine(app app.AppInterface) (llm.LlmInterface, error) {
 	provider := llm.ProviderOpenRouter
-	if registry.GetConfig().IsEnvTesting() {
+	if app.GetConfig().IsEnvTesting() {
 		provider = llm.ProviderMock
 	}
 	return llm.JSONModel(provider, llm.LlmOptions{
-		ApiKey: registry.GetConfig().GetOpenRouterApiKey(),
+		ApiKey: app.GetConfig().GetOpenRouterApiKey(),
 		Model:  llm.OPENROUTER_MODEL_GEMINI_2_5_FLASH_LITE,
 	})
 }

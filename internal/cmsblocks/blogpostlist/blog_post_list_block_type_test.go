@@ -12,11 +12,11 @@ import (
 
 // TestBlogPostListBlockType_BasicProperties tests basic properties
 func TestBlogPostListBlockType_BasicProperties(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	if blockType.TypeKey() != "blog_post_list" {
 		t.Errorf("Expected type key 'blog_post_list', got '%s'", blockType.TypeKey())
@@ -29,11 +29,11 @@ func TestBlogPostListBlockType_BasicProperties(t *testing.T) {
 
 // TestBlogPostListBlockType_GetPreview tests preview
 func TestBlogPostListBlockType_GetPreview(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post_list")
 
@@ -45,11 +45,11 @@ func TestBlogPostListBlockType_GetPreview(t *testing.T) {
 
 // TestBlogPostListBlockType_Validate tests validation
 func TestBlogPostListBlockType_Validate(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post_list")
 
@@ -61,11 +61,11 @@ func TestBlogPostListBlockType_Validate(t *testing.T) {
 
 // TestBlogPostListBlockType_AdminFields tests admin fields
 func TestBlogPostListBlockType_AdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post_list")
 	block.SetMeta("posts_per_page", "6")
@@ -85,11 +85,11 @@ func TestBlogPostListBlockType_AdminFields(t *testing.T) {
 
 // TestBlogPostListBlockType_SaveAdminFields tests saving admin fields
 func TestBlogPostListBlockType_SaveAdminFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post_list")
 
@@ -120,11 +120,11 @@ func TestBlogPostListBlockType_SaveAdminFields(t *testing.T) {
 
 // TestExtractTagSlugFromURL_URLWithTag tests URL with tag
 func TestExtractTagSlugFromURL_URLWithTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/tag/journalists-journorequest-pr-media-press/", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)
@@ -136,11 +136,11 @@ func TestExtractTagSlugFromURL_URLWithTag(t *testing.T) {
 
 // TestExtractTagSlugFromURL_URLWithTagNoTrailingSlash tests URL with tag no trailing slash
 func TestExtractTagSlugFromURL_URLWithTagNoTrailingSlash(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/tag/my-tag", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)
@@ -152,11 +152,11 @@ func TestExtractTagSlugFromURL_URLWithTagNoTrailingSlash(t *testing.T) {
 
 // TestExtractTagSlugFromURL_URLWithoutTag tests URL without tag
 func TestExtractTagSlugFromURL_URLWithoutTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/blog/some-post", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)
@@ -168,11 +168,11 @@ func TestExtractTagSlugFromURL_URLWithoutTag(t *testing.T) {
 
 // TestExtractTagSlugFromURL_RootURL tests root URL
 func TestExtractTagSlugFromURL_RootURL(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)
@@ -184,11 +184,11 @@ func TestExtractTagSlugFromURL_RootURL(t *testing.T) {
 
 // TestExtractTagSlugFromURL_TagWithAdditionalPath tests tag with additional path
 func TestExtractTagSlugFromURL_TagWithAdditionalPath(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/tag/my-tag/extra", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)
@@ -200,11 +200,11 @@ func TestExtractTagSlugFromURL_TagWithAdditionalPath(t *testing.T) {
 
 // TestExtractTagSlugFromURL_EmptyTag tests empty tag
 func TestExtractTagSlugFromURL_EmptyTag(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)
 
-	blockType := NewBlogPostListBlockType(registry.GetBlogStore())
+	blockType := NewBlogPostListBlockType(app.GetBlogStore())
 
 	req := httptest.NewRequest("GET", "/tag/", nil)
 	ctx := cmsstore.RequestToContext(context.Background(), req)

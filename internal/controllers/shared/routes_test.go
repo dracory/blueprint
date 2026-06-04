@@ -10,12 +10,12 @@ import (
 
 // TestSharedRoutesCount verifies the number of shared routes registered.
 func TestSharedRoutesCount(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := shared.Routes(registry)
+	routes := shared.Routes(app)
 	if len(routes) != 11 {
 		t.Fatalf("expected 8 shared routes, got %d", len(routes))
 	}
@@ -23,12 +23,12 @@ func TestSharedRoutesCount(t *testing.T) {
 
 // TestSharedRoutesNotNil ensures no route entries are nil.
 func TestSharedRoutesNotNil(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := shared.Routes(registry)
+	routes := shared.Routes(app)
 	for i, rt := range routes {
 		if rt == nil {
 			t.Fatalf("route at index %d is nil", i)
@@ -37,12 +37,12 @@ func TestSharedRoutesNotNil(t *testing.T) {
 }
 
 func TestSharedRoutesAreAdded(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
-	routes := shared.Routes(registry)
+	routes := shared.Routes(app)
 	expectedPaths := []string{
 		"/ads.txt",
 		"/files/*",
@@ -70,14 +70,14 @@ func TestSharedRoutesAreAdded(t *testing.T) {
 
 // TestSharedRoutesAreInGlobalRouter verifies that all shared routes are added to the application router.
 func TestSharedRoutesAreInGlobalRouter(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	sharedRoutes := shared.Routes(registry)
-	_, allRoutes := approutes.RoutesList(registry)
+	sharedRoutes := shared.Routes(app)
+	_, allRoutes := approutes.RoutesList(app)
 
 	for i, s := range sharedRoutes {
 		found := false

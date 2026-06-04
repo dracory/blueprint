@@ -7,27 +7,27 @@ import (
 )
 
 func TestNewContactController(t *testing.T) {
-	// Test with valid registry
-	registry := testutils.Setup()
-	controller := NewContactController(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	controller := NewContactController(app)
 	if controller == nil {
 		t.Error("NewContactController() should not return nil")
 	}
-	if controller.registry != registry {
-		t.Error("Controller registry should match the provided registry")
+	if controller.app != app {
+		t.Error("Controller app should match the provided app")
 	}
 }
 
 func TestNewFormContact(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	component := NewFormContact(nil)
 	if component == nil {
 		t.Error("NewFormContact() should not return nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	component = NewFormContact(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	component = NewFormContact(app)
 	if component == nil {
 		t.Error("NewFormContact() should not return nil")
 	}

@@ -20,8 +20,8 @@ func TestNewAiPostGeneratorController(t *testing.T) {
 	if controller == nil {
 		t.Error("Expected controller to be non-nil")
 	}
-	if controller.registry != nil {
-		t.Error("Expected registry to be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Expected app to be nil when passed nil")
 	}
 }
 
@@ -45,7 +45,7 @@ func TestAiPostGeneratorController_StructFields(t *testing.T) {
 	}
 
 	// Verify the controller has the expected structure
-	// The struct should have a registry field
+	// The struct should have a app field
 }
 
 // TestPageData_Struct tests pageData structure
@@ -116,15 +116,15 @@ func TestAiPostGeneratorController_MultipleInstances(t *testing.T) {
 
 // TestAiPostGeneratorController_RenderPage tests rendering the page
 func TestAiPostGeneratorController_RenderPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithCustomStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewAiPostGeneratorController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewAiPostGeneratorController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)

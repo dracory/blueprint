@@ -15,8 +15,8 @@ import (
 )
 
 func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
-	registry := testutils.Setup(testutils.WithCacheStore(true))
-	controller := NewPostController(registry)
+	app := testutils.Setup(testutils.WithCacheStore(true))
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/", map[string]string{})
@@ -36,7 +36,7 @@ func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
 		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), resp)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -47,8 +47,8 @@ func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_PostNotFound(t *testing.T) {
-	registry := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
-	controller := NewPostController(registry)
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/nonexistent/Nonexistent-Post", map[string]string{
@@ -67,7 +67,7 @@ func TestBlogPostController_Handler_PostNotFound(t *testing.T) {
 		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), resp)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -78,18 +78,18 @@ func TestBlogPostController_Handler_PostNotFound(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
-	registry := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
 
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewPostController(registry)
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
@@ -108,7 +108,7 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), resp)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithSessionStore(true),
@@ -131,16 +131,16 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
 
-	controller := NewPostController(registry)
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
@@ -148,7 +148,7 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 		"title": post.GetSlug(),
 	})
 
-	r, err = testutils.LoginAs(registry, r, user)
+	r, err = testutils.LoginAs(app, r, user)
 	if err != nil {
 		t.Fatalf("Failed to authenticate test user: %v", err)
 	}
@@ -164,7 +164,7 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), resp)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -181,9 +181,9 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	cfg.SetCmsStoreTemplateID("test-template")
 	cfg.SetCacheStoreUsed(true)
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template"); err != nil {
+	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
@@ -192,11 +192,11 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	post.SetContent("Published content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewPostController(registry)
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
@@ -224,18 +224,18 @@ func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 }
 
 func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
-	registry := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
+	app := testutils.Setup(testutils.WithBlogStore(true), testutils.WithCacheStore(true))
 
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetContent("Test content")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
 
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	controller := NewPostController(registry)
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/wrong-slug", map[string]string{
@@ -254,7 +254,7 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 		t.Fatalf("Expected status code %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), response)
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,13 +281,13 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCfg(cfg),
 		testutils.WithUserStore(true),
 		testutils.WithSessionStore(true),
 	)
 
-	if err := testutils.SeedTemplate(registry.GetCmsStore(), "test-site", "test-template"); err != nil {
+	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
 		t.Fatalf("Failed to create test template: %v", err)
 	}
 
@@ -296,16 +296,16 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	post.SetContent("Draft content")
 	post.SetStatus(blogstore.POST_STATUS_DRAFT)
 
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("Failed to create test post: %v", err)
 	}
 
-	adminUser, err := testutils.SeedUser(registry.GetUserStore(), test.ADMIN_01)
+	adminUser, err := testutils.SeedUser(app.GetUserStore(), test.ADMIN_01)
 	if err != nil {
 		t.Fatalf("Failed to create admin user: %v", err)
 	}
 
-	controller := NewPostController(registry)
+	controller := NewPostController(app)
 
 	w := httptest.NewRecorder()
 	r := newRequestWithParams(http.MethodGet, "/blog/post/"+post.GetID()+"/"+post.GetSlug(), map[string]string{
@@ -313,7 +313,7 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 		"title": post.GetSlug(),
 	})
 
-	r, err = testutils.LoginAs(registry, r, adminUser)
+	r, err = testutils.LoginAs(app, r, adminUser)
 	if err != nil {
 		t.Fatalf("Failed to authenticate admin user: %v", err)
 	}
@@ -346,8 +346,8 @@ func newRequestWithParams(method, path string, params map[string]string) *http.R
 
 func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 	// --- Setup ---
-	registry := testutils.Setup()
-	controller := NewPostController(registry)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	markdown := "# Hello World\n\nThis is **bold** text."
 	expectedHTML := "<h1 id=\"hello-world\">Hello World</h1>\n<p>This is <strong>bold</strong> text.</p>\n"
@@ -367,8 +367,8 @@ func TestBlogPostController_ProcessContent_Markdown(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 	// --- Setup ---
-	registry := testutils.Setup()
-	controller := NewPostController(registry)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	blockContent := `[{"Id":"block-1","Type":"text","Sequence":1,"ParentId":"","Attributes":{"Text":"Test content"}}]`
 
@@ -388,8 +388,8 @@ func TestBlogPostController_ProcessContent_BlockArea(t *testing.T) {
 
 func TestBlogPostController_ProcessContent_BlockEditor(t *testing.T) {
 	// --- Setup ---
-	registry := testutils.Setup()
-	controller := NewPostController(registry)
+	app := testutils.Setup()
+	controller := NewPostController(app)
 
 	blockEditorContent := `{"blocks": [{"type": "paragraph", "data": {"text": "Test content"}}]}`
 

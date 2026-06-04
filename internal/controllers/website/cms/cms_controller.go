@@ -2,7 +2,7 @@ package cms
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/widgets"
 	"sync"
 
@@ -19,19 +19,19 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewCmsController(registry registry.RegistryInterface) *cmsController {
-	return &cmsController{registry: registry}
+func NewCmsController(app app.AppInterface) *cmsController {
+	return &cmsController{app: app}
 }
 
 // == PUBLIC METHODS ===========================================================
 
 func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) string {
-	instance := GetInstance(controller.registry)
+	instance := GetInstance(controller.app)
 	if instance == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return "cms is not configured"
@@ -42,9 +42,9 @@ func (controller cmsController) Handler(w http.ResponseWriter, r *http.Request) 
 var instance cmsFrontend.FrontendInterface
 var once sync.Once
 
-func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterface {
+func GetInstance(app app.AppInterface) cmsFrontend.FrontendInterface {
 	once.Do(func() {
-		list := widgets.WidgetRegistry(registry)
+		list := widgets.WidgetRegistry(app)
 
 		shortcodes := []cmsstore.ShortcodeInterface{}
 		for _, widget := range list {
@@ -56,9 +56,9 @@ func GetInstance(registry registry.RegistryInterface) cmsFrontend.FrontendInterf
 			BlockEditorRenderer: func(blocks []ui.BlockInterface) string {
 				return webtheme.New(blocks).ToHtml()
 			},
-			Store:              registry.GetCmsStore(),
+			Store:              app.GetCmsStore(),
 			Shortcodes:         shortcodes,
-			Logger:             registry.GetLogger(),
+			Logger:             app.GetLogger(),
 			CacheEnabled:       true,
 			CacheExpireSeconds: 1 * 60, // 1 mins
 			PageNotFoundHandler: func(w http.ResponseWriter, r *http.Request, alias string) (bool, string) {

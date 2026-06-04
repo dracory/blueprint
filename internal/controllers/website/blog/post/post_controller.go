@@ -8,7 +8,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/post_update"
 	"strings"
 
@@ -25,14 +25,14 @@ import (
 )
 
 type postController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func NewPostController(
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 ) *postController {
 	return &postController{
-		registry: registry,
+		app: app,
 	}
 }
 
@@ -42,35 +42,35 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 	blogsUrl := links.Website().Blog(map[string]string{})
 
 	if postID == "" {
-		c.registry.GetLogger().Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
-		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
 
-	post, errPost := c.registry.GetBlogStore().PostFindByID(r.Context(), postID)
+	post, errPost := c.app.GetBlogStore().PostFindByID(r.Context(), postID)
 
 	if errPost != nil {
-		c.registry.GetLogger().Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
-		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("Error. At BlogPostController.AnyIndex. Post not found", slog.String("error", errPost.Error()))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return "post is missing"
 	}
 
 	if post == nil {
-		c.registry.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
-		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("ERROR: anyPost: post with ID "+postID+" is missing", slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if !c.accessAllowed(r, post) {
-		c.registry.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
-		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
+		c.app.GetLogger().Error("WARNING: anyPost: post with ID "+postID+" is unpublished", slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for is no longer active. Redirecting to the blog location...", blogsUrl, 5)
 		return ""
 	}
 
 	if postSlug == "" || postSlug != post.GetSlug() {
 		url := links.Website().BlogPost(post.GetID(), post.GetSlug())
-		c.registry.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
-		helpers.ToFlash(c.registry.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
+		c.app.GetLogger().Error("ERROR: anyPost: post Title is missing for ID "+postID, slog.String("postID", postID))
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "success", "The post location has changed. Redirecting to the new address...", url, 5)
 		return ""
 	}
 
@@ -93,14 +93,14 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		CanonicalURL: canonicalURL,
 	}
 
-	if c.registry.GetConfig().GetCmsStoreUsed() {
+	if c.app.GetConfig().GetCmsStoreUsed() {
 		return layouts.NewCmsLayout(
-			c.registry,
+			c.app,
 			r,
 			options).ToHTML()
 	} else {
 		return layouts.NewBlankLayout(
-			c.registry,
+			c.app,
 			r,
 			options).ToHTML()
 	}
@@ -257,13 +257,13 @@ func (c *postController) sectionPost(post blogstore.PostInterface) *hb.Tag {
 }
 
 func (c *postController) recommendationsSection(post blogstore.PostInterface) hb.TagInterface {
-	component := NewPostRecommendationsComponent(c.registry)
+	component := NewPostRecommendationsComponent(c.app)
 	rendered := liveflux.Placeholder(component, map[string]string{
 		"post_id": post.GetID(),
 	})
 
-	// 	if c.registry != nil && c.registry.GetLogger() != nil {
-	// 		c.registry.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
+	// 	if c.app != nil && c.app.GetLogger() != nil {
+	// 		c.app.GetLogger().Warn("blogPostController: recommendations component render returned nil", "post_id", post.ID())
 	// 	}
 	// 	return hb.Div()
 	// }
@@ -272,7 +272,7 @@ func (c *postController) recommendationsSection(post blogstore.PostInterface) hb
 }
 
 func (c *postController) postImage(post blogstore.PostInterface) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(c.registry, post, "300", "200", "80")
+	thumbnailURL := shared.SizedThumbnailURL(c.app, post, "300", "200", "80")
 
 	return hb.Image(``).
 		Class("img img-responsive img-thumbnail w-100").

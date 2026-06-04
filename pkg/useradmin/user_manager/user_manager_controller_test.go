@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
@@ -16,12 +16,12 @@ import (
 )
 
 func TestUserManagerController_ShowsPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserManagerController(registry).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewUserManagerController(app).Handler, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
 
@@ -67,10 +67,10 @@ func TestActionConstantsNotEmpty(t *testing.T) {
 	}
 }
 
-func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userstore.UserInterface) {
+func setupControllerAppAndUser(t *testing.T) (app.AppInterface, userstore.UserInterface) {
 	t.Helper()
 
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
@@ -82,9 +82,9 @@ func setupControllerAppAndUser(t *testing.T) (registry.RegistryInterface, userst
 	user.SetStatus(userstore.USER_STATUS_ACTIVE)
 	user.SetRole(userstore.USER_ROLE_USER)
 
-	if err := registry.GetUserStore().UserCreate(context.Background(), user); err != nil {
+	if err := app.GetUserStore().UserCreate(context.Background(), user); err != nil {
 		t.Fatalf("Failed to create test user: %v", err)
 	}
 
-	return registry, user
+	return app, user
 }

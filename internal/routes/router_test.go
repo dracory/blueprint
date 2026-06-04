@@ -13,12 +13,12 @@ import (
 func TestRoutes_HTTPWorkflows_WebsiteHomeReturnsOk(t *testing.T) {
 	t.Parallel()
 
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithUserStore(true),
 	)
-	router := routes.Router(registry)
+	router := routes.Router(app)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rr := httptest.NewRecorder()
@@ -38,14 +38,14 @@ func TestRoutes_HTTPWorkflows_WebsiteHomeReturnsOk(t *testing.T) {
 func TestRoutes_HTTPWorkflows_UserHomeRedirectsUnauthenticatedUsers(t *testing.T) {
 	t.Parallel()
 
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithGeoStore(true),
 		testutils.WithSessionStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithUserStore(true),
 	)
-	router := routes.Router(registry)
+	router := routes.Router(app)
 
 	req := httptest.NewRequest(http.MethodGet, "/user", nil)
 	rr := httptest.NewRecorder()
@@ -60,7 +60,7 @@ func TestRoutes_HTTPWorkflows_UserHomeRedirectsUnauthenticatedUsers(t *testing.T
 		t.Fatalf("expected redirect Location header to be set")
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(registry.GetCacheStore(), rr.Result())
+	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
 	if err != nil {
 		t.Fatalf("failed to fetch flash message: %v", err)
 	}

@@ -3,7 +3,7 @@ package widgets
 import (
 	"testing"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 )
 
@@ -11,23 +11,23 @@ import (
 func TestNewBlogPostWidget(t *testing.T) {
 	t.Parallel()
 
-	// Test with nil registry
+	// Test with nil app
 	widget := NewBlogPostWidget(nil)
 	if widget == nil {
 		t.Fatal("NewBlogPostWidget(nil) should return non-nil")
 	}
-	if widget.registry != nil {
-		t.Error("widget.registry should be nil when passed nil")
+	if widget.app != nil {
+		t.Error("widget.app should be nil when passed nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	widget = NewBlogPostWidget(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	widget = NewBlogPostWidget(app)
 	if widget == nil {
-		t.Fatal("NewBlogPostWidget(registry) should return non-nil")
+		t.Fatal("NewBlogPostWidget(app) should return non-nil")
 	}
-	if widget.registry == nil {
-		t.Error("widget.registry should not be nil when passed valid registry")
+	if widget.app == nil {
+		t.Error("widget.app should not be nil when passed valid app")
 	}
 }
 
@@ -124,12 +124,12 @@ func TestBlogPostWidget_Struct(t *testing.T) {
 
 	widget := &blogPostWidget{}
 
-	// Test that registry field exists and can be set
-	var reg registry.RegistryInterface
-	widget.registry = reg
+	// Test that app field exists and can be set
+	var reg app.AppInterface
+	widget.app = reg
 
-	if widget.registry != reg {
-		t.Error("Should be able to set registry field")
+	if widget.app != reg {
+		t.Error("Should be able to set app field")
 	}
 }
 
@@ -151,11 +151,11 @@ func TestBlogPostWidget_MultipleInstances(t *testing.T) {
 		t.Error("All widgets should be non-nil")
 	}
 
-	if widget1.registry != registry1 {
+	if widget1.app != registry1 {
 		t.Error("Widget1 should have registry1")
 	}
 
-	if widget2.registry != registry2 {
+	if widget2.app != registry2 {
 		t.Error("Widget2 should have registry2")
 	}
 }

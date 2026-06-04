@@ -14,8 +14,8 @@ import (
 
 // TestOnAddTitle_MissingTitle tests adding with missing title
 func TestOnAddTitle_MissingTitle(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -34,8 +34,8 @@ func TestOnAddTitle_MissingTitle(t *testing.T) {
 
 // TestOnAddTitle_EmptyTitle tests adding with empty title
 func TestOnAddTitle_EmptyTitle(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -54,8 +54,8 @@ func TestOnAddTitle_EmptyTitle(t *testing.T) {
 
 // TestOnAddTitle_WhitespaceTitle tests adding with whitespace-only title
 func TestOnAddTitle_WhitespaceTitle(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -74,8 +74,8 @@ func TestOnAddTitle_WhitespaceTitle(t *testing.T) {
 
 // TestOnAddTitle_ValidTitle tests adding with valid title
 func TestOnAddTitle_ValidTitle(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -109,8 +109,8 @@ func TestOnAddTitle_ValidTitle(t *testing.T) {
 
 // TestOnAddTitle_TitleWithSpecialChars tests adding title with special characters
 func TestOnAddTitle_TitleWithSpecialChars(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	req := &http.Request{
 		Method: "POST",
@@ -138,18 +138,18 @@ func TestOnAddTitle_TitleWithSpecialChars(t *testing.T) {
 
 // TestOnAddTitle_VerifyRecordCreated verifies the record was actually created
 func TestOnAddTitle_VerifyRecordCreated(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewAiTitleGeneratorController(registry)
+	app := testutils.Setup()
+	c := NewAiTitleGeneratorController(app)
 
 	// Skip if custom store is not available
-	if registry.GetCustomStore() == nil {
+	if app.GetCustomStore() == nil {
 		t.Skip("Custom store not available")
 	}
 
 	testTitle := "Unique Test Title 12345"
 
 	// Count records before
-	recordsBefore, err := registry.GetCustomStore().RecordList(customstore.RecordQuery().SetType(blogai.POST_RECORD_TYPE))
+	recordsBefore, err := app.GetCustomStore().RecordList(customstore.RecordQuery().SetType(blogai.POST_RECORD_TYPE))
 	if err != nil {
 		t.Fatalf("Failed to list records before: %v", err)
 	}
@@ -179,7 +179,7 @@ func TestOnAddTitle_VerifyRecordCreated(t *testing.T) {
 	}
 
 	// Count records after
-	recordsAfter, err := registry.GetCustomStore().RecordList(customstore.RecordQuery().SetType(blogai.POST_RECORD_TYPE))
+	recordsAfter, err := app.GetCustomStore().RecordList(customstore.RecordQuery().SetType(blogai.POST_RECORD_TYPE))
 	if err != nil {
 		t.Fatalf("Failed to list records after: %v", err)
 	}
@@ -210,7 +210,7 @@ func TestOnAddTitle_VerifyRecordCreated(t *testing.T) {
 	}
 }
 
-// TestOnAddTitle_NilRegistry tests behavior with nil registry
+// TestOnAddTitle_NilRegistry tests behavior with nil app
 func TestOnAddTitle_NilRegistry(t *testing.T) {
 	c := NewAiTitleGeneratorController(nil)
 
@@ -226,13 +226,13 @@ func TestOnAddTitle_NilRegistry(t *testing.T) {
 	defer func() {
 		if r := recover(); r != nil {
 			didPanic = true
-			t.Logf("Expected panic with nil registry: %v", r)
+			t.Logf("Expected panic with nil app: %v", r)
 		}
 	}()
 
 	_ = c.onAddTitle(req)
 
 	if !didPanic {
-		t.Error("Expected panic with nil registry, but function did not panic")
+		t.Error("Expected panic with nil app, but function did not panic")
 	}
 }

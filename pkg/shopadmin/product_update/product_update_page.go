@@ -24,18 +24,18 @@ var (
 )
 
 func (controller *productUpdateController) renderPage(w http.ResponseWriter, r *http.Request) string {
-	if controller.registry.GetShopStore() == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
+	if controller.app.GetShopStore() == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Shop store is not initialized", links.Admin().Home(), 10)
 	}
 
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "You are not logged in. Please login to continue.", links.Admin().Home(), 10)
 	}
 
 	productID := req.GetStringTrimmed(r, "product_id")
 	if productID == "" {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), nil, r, "Product ID is required", links.Admin().Shop(map[string]string{"controller": shared.CONTROLLER_PRODUCTS}), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), nil, r, "Product ID is required", links.Admin().Shop(map[string]string{"controller": shared.CONTROLLER_PRODUCTS}), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -63,7 +63,7 @@ func (controller *productUpdateController) renderPage(w http.ResponseWriter, r *
 		Child(hb.HR()).
 		Child(appDiv)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Update Product | Shop",
 		Content: content,
 		ScriptURLs: []string{

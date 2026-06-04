@@ -5,7 +5,7 @@ import (
 
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
@@ -15,19 +15,19 @@ import (
 // == CONTROLLER ==============================================================
 
 type aiToolsController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewAiToolsController(registry registry.RegistryInterface) *aiToolsController {
-	return &aiToolsController{registry: registry}
+func NewAiToolsController(app app.AppInterface) *aiToolsController {
+	return &aiToolsController{app: app}
 }
 
 func (c *aiToolsController) Handler(w http.ResponseWriter, r *http.Request) string {
 	if r.Method == http.MethodPost && r.FormValue("action") == "testai" {
 		w.Header().Set("Content-Type", "application/json")
-		model, err := shared.LlmEngine(c.registry)
+		model, err := shared.LlmEngine(c.app)
 		if err != nil {
 			if _, writeErr := w.Write([]byte(hb.Swal(hb.SwalOptions{
 				Title:            "Error",
@@ -80,9 +80,9 @@ func (c *aiToolsController) Handler(w http.ResponseWriter, r *http.Request) stri
 		return ""
 	}
 
-	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:      "BlogAI",
-		AppName:    c.registry.GetConfig().GetAppName(),
+		AppName:    c.app.GetConfig().GetAppName(),
 		Content:    c.view(),
 		ScriptURLs: []string{cdn.Sweetalert2_11()},
 		Styles:     []string{},

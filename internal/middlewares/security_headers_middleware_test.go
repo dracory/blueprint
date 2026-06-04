@@ -13,9 +13,9 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 	// Create test config with development environment
 	testConfig := config.New()
 	testConfig.SetAppEnv(config.APP_ENVIRONMENT_DEVELOPMENT)
-	testConfig.SetDatabaseDriver("sqlite") // Required by registry builder
-	testConfig.SetDatabaseName(":memory:") // Required by registry builder
-	registry := testutils.Setup(testutils.WithCfg(testConfig))
+	testConfig.SetDatabaseDriver("sqlite") // Required by app builder
+	testConfig.SetDatabaseName(":memory:") // Required by app builder
+	app := testutils.Setup(testutils.WithCfg(testConfig))
 
 	cspParts := []string{
 		"default-src 'self';",
@@ -60,7 +60,7 @@ func TestSecurityHeadersMiddleware(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "https://example.com", nil)
 	rr := httptest.NewRecorder()
-	handler := NewSecurityHeadersMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := NewSecurityHeadersMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 	handler.ServeHTTP(rr, req)

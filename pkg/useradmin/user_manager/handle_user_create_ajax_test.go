@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleUserCreateAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleUserCreateAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleUserCreateAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleUserCreateAjax_RequiresUserStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleUserCreateAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleUserCreateAjax_RequiresUserStore(t *testing.T) {
 }
 
 func TestHandleUserCreateAjax_RequiresFields(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	controller := NewUserManagerController(registry)
+	controller := NewUserManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleUserCreateAjax, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

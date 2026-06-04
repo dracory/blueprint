@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleDiscountsLoadAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleLoadDiscounts, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleDiscountsLoadAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleDiscountsLoadAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadDiscounts, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleDiscountsLoadAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleDiscountsLoadAjax_LoadsDiscounts(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleLoadDiscounts, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

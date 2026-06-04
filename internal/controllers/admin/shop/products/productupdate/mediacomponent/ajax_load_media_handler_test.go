@@ -12,7 +12,7 @@ import (
 
 // TestHandleAjaxLoadMedia_Success tests successful media loading
 func TestHandleAjaxLoadMedia_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -23,7 +23,7 @@ func TestHandleAjaxLoadMedia_Success(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
@@ -36,11 +36,11 @@ func TestHandleAjaxLoadMedia_Success(t *testing.T) {
 	media.SetSequence(0)
 	media.SetType("image")
 
-	if err := registry.GetShopStore().MediaCreate(context.Background(), media); err != nil {
+	if err := app.GetShopStore().MediaCreate(context.Background(), media); err != nil {
 		t.Fatalf("failed to create media: %v", err)
 	}
 
-	response := HandleAjaxLoadMedia(registry, product.GetID())
+	response := HandleAjaxLoadMedia(app, product.GetID())
 
 	if !strings.Contains(response, `"media"`) {
 		t.Error("expected response to contain media field")
@@ -55,7 +55,7 @@ func TestHandleAjaxLoadMedia_Success(t *testing.T) {
 
 // TestHandleAjaxLoadMedia_ProductNotFound tests when product has no media
 func TestHandleAjaxLoadMedia_NoMedia(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -66,11 +66,11 @@ func TestHandleAjaxLoadMedia_NoMedia(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadMedia(registry, product.GetID())
+	response := HandleAjaxLoadMedia(app, product.GetID())
 
 	if !strings.Contains(response, `"media"`) {
 		t.Error("expected response to contain media field")

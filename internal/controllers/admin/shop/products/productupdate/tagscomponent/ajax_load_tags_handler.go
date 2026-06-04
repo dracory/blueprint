@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 )
@@ -17,12 +17,12 @@ type TagItem struct {
 }
 
 // HandleAjaxLoadTags handles AJAX requests to load tags and returns JSON string
-func HandleAjaxLoadTags(registry registry.RegistryInterface, productID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxLoadTags(app app.AppInterface, productID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
-	product, err := registry.GetShopStore().ProductFindByID(context.Background(), productID)
+	product, err := app.GetShopStore().ProductFindByID(context.Background(), productID)
 	if err != nil {
 		return api.ErrorWithData("Product not found", map[string]any{}).ToString()
 	}

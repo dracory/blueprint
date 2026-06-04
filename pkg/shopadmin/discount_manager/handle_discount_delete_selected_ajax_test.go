@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleDiscountDeleteSelectedAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleDiscountDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleDiscountDeleteSelectedAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleDiscountDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleDiscountDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleDiscountDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleDiscountDeleteSelectedAjax_DeletesSelectedDiscounts(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewDiscountManagerController(registry)
+	controller := NewDiscountManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleDiscountDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

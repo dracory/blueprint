@@ -10,11 +10,11 @@ import (
 )
 
 func TestIndexNowKeyController_Handler(t *testing.T) {
-	// Setup test registry with config
-	registry := testutils.Setup()
-	registry.GetConfig().SetIndexNowKey("cd325dd195454606a8316fb303224f37")
+	// Setup test app with config
+	app := testutils.Setup()
+	app.GetConfig().SetIndexNowKey("cd325dd195454606a8316fb303224f37")
 
-	controller := NewIndexNowKeyController(registry)
+	controller := NewIndexNowKeyController(app)
 
 	body, response, err := test.CallStringEndpoint(http.MethodGet, controller.Handler, test.NewRequestOptions{})
 	if err != nil {

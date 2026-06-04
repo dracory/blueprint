@@ -8,8 +8,8 @@ import (
 )
 
 func TestNewHomeController(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewHomeController(registry)
+	app := testutils.Setup()
+	controller := NewHomeController(app)
 
 	if controller == nil {
 		t.Error("NewHomeController() should not return nil")
@@ -17,8 +17,8 @@ func TestNewHomeController(t *testing.T) {
 }
 
 func TestHomeController_Handler(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewHomeController(registry)
+	app := testutils.Setup()
+	controller := NewHomeController(app)
 
 	req := httptest.NewRequest("GET", "/admin/shop", nil)
 	w := httptest.NewRecorder()
@@ -34,8 +34,8 @@ func TestHomeController_NilRegistry(t *testing.T) {
 	if controller == nil {
 		t.Error("NewHomeController(nil) should not return nil")
 	}
-	if controller.registry != nil {
-		t.Error("Controller registry should be nil when passed nil")
+	if controller.app != nil {
+		t.Error("Controller app should be nil when passed nil")
 	}
 }
 

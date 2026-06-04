@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreBlogMigrate)(nil)
 
 type StoreBlogMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreBlogMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreBlogMigrate) Description() string {
 }
 
 func (m *StoreBlogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetBlogStore()
+	store := m.app.GetBlogStore()
 	if store == nil {
 		return errors.New("blog store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreBlogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreBlogMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetBlogStore()
+	store := m.app.GetBlogStore()
 	if store == nil {
 		return errors.New("blog store is not initialized")
 	}

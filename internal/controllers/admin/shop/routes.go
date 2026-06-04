@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
@@ -18,50 +18,50 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 )
 
-func ShopRoutes(registry registry.RegistryInterface) ([]rtr.RouteInterface, error) {
-	if registry == nil {
-		return nil, errors.New("registry cannot be nil")
+func ShopRoutes(app app.AppInterface) ([]rtr.RouteInterface, error) {
+	if app == nil {
+		return nil, errors.New("app cannot be nil")
 	}
 	handler := func(w http.ResponseWriter, r *http.Request) string {
 		controller := req.GetStringTrimmed(r, "controller")
 
 		if controller == shared.CONTROLLER_CATEGORIES {
-			return categorymanager.NewCategoryManagerController(registry).Handler(w, r)
+			return categorymanager.NewCategoryManagerController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_CATEGORY_CREATE {
-			return categories.NewCategoryCreateController(registry).Handler(w, r)
+			return categories.NewCategoryCreateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_CATEGORY_UPDATE {
-			return categoryupdate.NewCategoryUpdateController(registry).Handler(w, r)
+			return categoryupdate.NewCategoryUpdateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_DISCOUNTS {
-			return shopDiscounts.NewDiscountController(registry).AnyIndex(w, r)
+			return shopDiscounts.NewDiscountController(app).AnyIndex(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_CREATE {
-			return shopProducts.NewProductCreateController(registry).Handler(w, r)
+			return shopProducts.NewProductCreateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_DELETE {
-			return shopProducts.NewProductDeleteController(registry).Handler(w, r)
+			return shopProducts.NewProductDeleteController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCTS {
-			return shopProducts.NewProductManagerController(registry).Handler(w, r)
+			return shopProducts.NewProductManagerController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_PRODUCT_UPDATE {
-			return productupdate.NewProductUpdateController(registry).Handler(w, r)
+			return productupdate.NewProductUpdateController(app).Handler(w, r)
 		}
 
 		if controller == shared.CONTROLLER_ORDERS {
 			return NewOrderManagerController().Handler(w, r)
 		}
 
-		return NewHomeController(registry).Handler(w, r)
+		return NewHomeController(app).Handler(w, r)
 	}
 
 	shopOrders := rtr.NewRoute().

@@ -9,7 +9,7 @@ import (
 	"project/internal/testutils"
 )
 
-// TestController_NilRegistry tests controller with nil registry
+// TestController_NilRegistry tests controller with nil app
 func TestController_NilRegistry(t *testing.T) {
 	c := NewController(nil)
 	if c == nil {
@@ -17,20 +17,20 @@ func TestController_NilRegistry(t *testing.T) {
 	}
 }
 
-// TestController_WithRegistry tests controller with valid registry
+// TestController_WithRegistry tests controller with valid app
 func TestController_WithRegistry(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewController(registry)
+	app := testutils.Setup()
+	c := NewController(app)
 	if c == nil {
-		t.Error("NewController(registry) should return a controller")
+		t.Error("NewController(app) should return a controller")
 	}
 }
 
 // TestController_MultipleInstances tests that multiple instances are independent
 func TestController_MultipleInstances(t *testing.T) {
-	registry := testutils.Setup()
-	c1 := NewController(registry)
-	c2 := NewController(registry)
+	app := testutils.Setup()
+	c1 := NewController(app)
+	c2 := NewController(app)
 
 	if c1 == c2 {
 		t.Error("Multiple instances should be independent")
@@ -39,8 +39,8 @@ func TestController_MultipleInstances(t *testing.T) {
 
 // TestController_Handler_MissingPostID tests Handler with missing post_id
 func TestController_Handler_MissingPostID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewController(registry)
+	app := testutils.Setup()
+	c := NewController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -58,8 +58,8 @@ func TestController_Handler_MissingPostID(t *testing.T) {
 
 // TestController_Handler_WithPostID tests Handler with post_id parameter
 func TestController_Handler_WithPostID(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewController(registry)
+	app := testutils.Setup()
+	c := NewController(app)
 
 	req := &http.Request{
 		Method: "GET",
@@ -82,12 +82,12 @@ func TestController_Handler_WithPostID(t *testing.T) {
 
 // TestController_StructFields tests controller struct fields
 func TestController_StructFields(t *testing.T) {
-	registry := testutils.Setup()
-	c := NewController(registry)
+	app := testutils.Setup()
+	c := NewController(app)
 
-	// Verify the controller has the registry field set
-	if c.registry != registry {
-		t.Error("Controller registry field should match input")
+	// Verify the controller has the app field set
+	if c.app != app {
+		t.Error("Controller app field should match input")
 	}
 }
 

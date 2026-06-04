@@ -12,7 +12,7 @@ import (
 
 // TestHandleAjaxLoadTags_Success tests successful tags loading
 func TestHandleAjaxLoadTags_Success(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -26,11 +26,11 @@ func TestHandleAjaxLoadTags_Success(t *testing.T) {
 		"tags": "featured, new, sale",
 	})
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadTags(registry, product.GetID())
+	response := HandleAjaxLoadTags(app, product.GetID())
 
 	if !strings.Contains(response, `"tags"`) {
 		t.Error("expected response to contain tags field")
@@ -48,12 +48,12 @@ func TestHandleAjaxLoadTags_Success(t *testing.T) {
 
 // TestHandleAjaxLoadTags_ProductNotFound tests error when product not found
 func TestHandleAjaxLoadTags_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	response := HandleAjaxLoadTags(registry, "nonexistent")
+	response := HandleAjaxLoadTags(app, "nonexistent")
 
 	if !strings.Contains(response, `"error"`) {
 		t.Error("expected response to contain error field")
@@ -65,7 +65,7 @@ func TestHandleAjaxLoadTags_ProductNotFound(t *testing.T) {
 
 // TestHandleAjaxLoadTags_NoTags tests product with no tags
 func TestHandleAjaxLoadTags_NoTags(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
@@ -76,11 +76,11 @@ func TestHandleAjaxLoadTags_NoTags(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	response := HandleAjaxLoadTags(registry, product.GetID())
+	response := HandleAjaxLoadTags(app, product.GetID())
 
 	if !strings.Contains(response, `"tags"`) {
 		t.Error("expected response to contain tags field")

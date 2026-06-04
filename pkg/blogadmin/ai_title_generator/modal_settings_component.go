@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	livefluxctl "project/internal/controllers/liveflux"
@@ -18,7 +18,7 @@ import (
 type titleGeneratorSettingsModal struct {
 	liveflux.Base
 
-	registry                 registry.RegistryInterface
+	app                 app.AppInterface
 	FormBlogTopic            string
 	FormErrorMessage         string
 	FormSuccessMessage       string
@@ -29,7 +29,7 @@ type titleGeneratorSettingsModal struct {
 	IsOpen                   bool
 }
 
-func NewTitleGeneratorSettingsModal(registry registry.RegistryInterface) liveflux.ComponentInterface {
+func NewTitleGeneratorSettingsModal(app app.AppInterface) liveflux.ComponentInterface {
 	inst, err := liveflux.New(&titleGeneratorSettingsModal{})
 	if err != nil {
 		log.Println(err)
@@ -37,7 +37,7 @@ func NewTitleGeneratorSettingsModal(registry registry.RegistryInterface) liveflu
 	}
 
 	if c, ok := inst.(*titleGeneratorSettingsModal); ok {
-		c.registry = registry
+		c.app = app
 	}
 
 	return inst
@@ -48,9 +48,9 @@ func (c *titleGeneratorSettingsModal) GetKind() string {
 }
 
 func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[string]string) error {
-	if c.registry == nil {
-		if registry, ok := ctx.Value(livefluxctl.AppContextKey).(registry.RegistryInterface); ok {
-			c.registry = registry
+	if c.app == nil {
+		if app, ok := ctx.Value(livefluxctl.AppContextKey).(app.AppInterface); ok {
+			c.app = app
 		}
 	}
 
@@ -59,7 +59,7 @@ func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[stri
 		c.ReturnURL = shared.NewLinks("/admin/blog").AiTitleGenerator()
 	}
 
-	store := c.registry.GetSettingStore()
+	store := c.app.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		return nil
@@ -67,8 +67,8 @@ func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[stri
 
 	value, err := store.Get(ctx, SETTING_KEY_BLOG_TOPIC, "")
 	if err != nil {
-		if c.registry.GetLogger() != nil {
-			c.registry.GetLogger().Error("AI title generator settings modal: failed to load blog title", "error", err.Error())
+		if c.app.GetLogger() != nil {
+			c.app.GetLogger().Error("AI title generator settings modal: failed to load blog title", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to load title generator settings"
 		return nil
@@ -83,7 +83,7 @@ func (c *titleGeneratorSettingsModal) Mount(ctx context.Context, params map[stri
 
 func (c *titleGeneratorSettingsModal) Handle(ctx context.Context, action string, data url.Values) error {
 	// get app from context
-	// c.registry = ctx.Value("app").(registry.RegistryInterface)
+	// c.app = ctx.Value("app").(app.AppInterface)
 
 	switch action {
 	case "open":
@@ -113,7 +113,7 @@ func (c *titleGeneratorSettingsModal) onSave(ctx context.Context, action string,
 		return nil
 	}
 
-	store := c.registry.GetSettingStore()
+	store := c.app.GetSettingStore()
 	if store == nil {
 		c.FormErrorMessage = "Setting store is not configured"
 		c.FormSuccessMessage = ""
@@ -121,8 +121,8 @@ func (c *titleGeneratorSettingsModal) onSave(ctx context.Context, action string,
 	}
 
 	if err := store.Set(ctx, SETTING_KEY_BLOG_TOPIC, blogTopic); err != nil {
-		if c.registry.GetLogger() != nil {
-			c.registry.GetLogger().Error("AI title generator settings modal: failed to save blog topic", "error", err.Error())
+		if c.app.GetLogger() != nil {
+			c.app.GetLogger().Error("AI title generator settings modal: failed to save blog topic", "error", err.Error())
 		}
 		c.FormErrorMessage = "Failed to save blog topic. Please try again later."
 		c.FormSuccessMessage = ""

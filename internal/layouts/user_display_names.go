@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"project/internal/ext"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/userstore"
 )
@@ -18,7 +18,7 @@ import (
 // - If userstore vault is disabled, it will use the userstore to get the display names
 //
 // Parameters:
-// - registry: the registry interface
+// - app: the app interface
 // - r: the http request
 // - authUser: the authenticated user
 // - vaultKey: the vault key
@@ -28,7 +28,7 @@ import (
 // - lastName: the user's last name
 // - err: the error
 func userDisplayNames(
-	registry registry.RegistryInterface,
+	app app.AppInterface,
 	r *http.Request,
 	authUser userstore.UserInterface,
 	vaultKey string,
@@ -45,8 +45,8 @@ func userDisplayNames(
 	lastName = authUser.GetLastName()
 	email := authUser.GetEmail()
 
-	if registry.GetConfig().GetUserStoreVaultEnabled() {
-		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), registry, vaultKey, authUser)
+	if app.GetConfig().GetUserStoreVaultEnabled() {
+		firstName, lastName, _, _, _, err = ext.UserUntokenize(r.Context(), app, vaultKey, authUser)
 		if err != nil {
 			return "", "", err
 		}

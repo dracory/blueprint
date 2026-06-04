@@ -38,17 +38,17 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 		return
 	}
 
-	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), payload.UserID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), payload.UserID)
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleUserUpdateAjax UserFindByID", slog.String("user_id", payload.UserID), slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleUserUpdateAjax UserFindByID", slog.String("user_id", payload.UserID), slog.String("error", err.Error()))
 		}
 		api.Respond(w, r, api.Error("Error loading user"))
 		return
 	}
 	if user == nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleUserUpdateAjax user not found", slog.String("user_id", payload.UserID))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleUserUpdateAjax user not found", slog.String("user_id", payload.UserID))
 		}
 		api.Respond(w, r, api.Error("User not found"))
 		return
@@ -88,8 +88,8 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 	}
 
 	originalEmail := user.GetEmail()
-	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
-		_, _, originalEmail, _, _, _ = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
+		_, _, originalEmail, _, _, _ = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 	}
 
 	user.SetMemo(strings.TrimSpace(payload.Memo))
@@ -98,11 +98,11 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 	user.SetCountry(payload.Country)
 	user.SetTimezone(payload.Timezone)
 
-	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
 		firstToken, lastToken, emailToken, phoneToken, businessToken, err := ext.UserTokenize(
 			r.Context(),
-			controller.registry.GetVaultStore(),
-			controller.registry.GetConfig().GetVaultStoreKey(),
+			controller.app.GetVaultStore(),
+			controller.app.GetConfig().GetVaultStoreKey(),
 			user,
 			strings.TrimSpace(payload.FirstName),
 			strings.TrimSpace(payload.LastName),
@@ -111,8 +111,8 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 			strings.TrimSpace(payload.BusinessName),
 		)
 		if err != nil {
-			if controller.registry.GetLogger() != nil {
-				controller.registry.GetLogger().Error("Error tokenizing user", slog.String("error", err.Error()))
+			if controller.app.GetLogger() != nil {
+				controller.app.GetLogger().Error("Error tokenizing user", slog.String("error", err.Error()))
 			}
 			api.Respond(w, r, api.Error("System error. Saving user failed"))
 			return
@@ -130,18 +130,18 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 		user.SetBusinessName(strings.TrimSpace(payload.BusinessName))
 	}
 
-	if err := controller.registry.GetUserStore().UserUpdate(r.Context(), user); err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("Error updating user", slog.String("error", err.Error()))
+	if err := controller.app.GetUserStore().UserUpdate(r.Context(), user); err != nil {
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error updating user", slog.String("error", err.Error()))
 		}
 		api.Respond(w, r, api.Error("System error. Saving user failed"))
 		return
 	}
 
-	if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
 		if originalEmail != strings.TrimSpace(payload.Email) {
-			if controller.registry.GetTaskStore() != nil {
-				_, err := controller.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
+			if controller.app.GetTaskStore() != nil {
+				_, err := controller.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 					r.Context(),
 					taskstore.DefaultQueueName,
 					"BlindIndexUpdate",
@@ -151,8 +151,8 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 					},
 				)
 				if err != nil {
-					if controller.registry.GetLogger() != nil {
-						controller.registry.GetLogger().Error("Error enqueuing blind index rebuild", slog.String("error", err.Error()))
+					if controller.app.GetLogger() != nil {
+						controller.app.GetLogger().Error("Error enqueuing blind index rebuild", slog.String("error", err.Error()))
 					}
 				}
 			}

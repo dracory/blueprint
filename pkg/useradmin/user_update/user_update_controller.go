@@ -3,13 +3,13 @@ package user_update
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
 
 type userUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 const (
@@ -18,8 +18,8 @@ const (
 	actionUserUpdate   = "user-update-ajax"
 )
 
-func NewUserUpdateController(registry registry.RegistryInterface) *userUpdateController {
-	return &userUpdateController{registry: registry}
+func NewUserUpdateController(app app.AppInterface) *userUpdateController {
+	return &userUpdateController{app: app}
 }
 
 func (controller *userUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {

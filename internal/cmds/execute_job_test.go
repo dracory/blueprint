@@ -19,8 +19,8 @@ func TestExecuteJob_MissingTaskID(t *testing.T) {
 	defer log.SetOutput(oldLogger.Writer())
 
 	// Setup test environment and execute
-	registry := testutils.Setup()
-	ExecuteJob(registry, []string{})
+	app := testutils.Setup()
+	ExecuteJob(app, []string{})
 
 	// Get the captured output
 	output := logOutput.String()
@@ -44,10 +44,10 @@ func TestExecuteJob_TaskNotFound(t *testing.T) {
 	// Setup test environment and execute
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Pass the task ID as a proper command-line argument
-	ExecuteJob(registry, []string{"--task_id=nonexistent"})
+	ExecuteJob(app, []string{"--task_id=nonexistent"})
 
 	// Get the captured output
 	output := logOutput.String()
@@ -69,10 +69,10 @@ func TestExecuteJob_NilTaskStore(t *testing.T) {
 	defer log.SetOutput(oldLogger.Writer())
 
 	// Setup test environment WITHOUT task store
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Pass the task ID as a proper command-line argument
-	ExecuteJob(registry, []string{"--task_id=12345"})
+	ExecuteJob(app, []string{"--task_id=12345"})
 
 	// Get the captured output
 	output := logOutput.String()
@@ -96,10 +96,10 @@ func TestExecuteJob_EmptyTaskID(t *testing.T) {
 	// Setup test environment
 	cfg := testutils.DefaultConf()
 	cfg.SetTaskStoreUsed(true)
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Pass empty task ID
-	ExecuteJob(registry, []string{"--task_id="})
+	ExecuteJob(app, []string{"--task_id="})
 
 	// Get the captured output
 	output := logOutput.String()

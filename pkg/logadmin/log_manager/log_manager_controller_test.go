@@ -17,20 +17,20 @@ import (
 )
 
 func TestLogManagerController_RenderPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -49,20 +49,20 @@ func TestLogManagerController_RenderPage(t *testing.T) {
 }
 
 func TestLogManagerController_HandleLoadLogs(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -92,20 +92,20 @@ func TestLogManagerController_HandleLoadLogs(t *testing.T) {
 }
 
 func TestLogManagerController_HandleLogShowContext(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -134,20 +134,20 @@ func TestLogManagerController_HandleLogShowContext(t *testing.T) {
 }
 
 func TestLogManagerController_HandleLogDelete(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -179,20 +179,20 @@ func TestLogManagerController_HandleLogDelete(t *testing.T) {
 }
 
 func TestLogManagerController_HandleLogDeleteSelected(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -235,20 +235,20 @@ func TestLogManagerController_HandleLogDeleteSelected(t *testing.T) {
 }
 
 func TestLogManagerController_HandleLogDeleteAll(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithLogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewLogManagerController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewLogManagerController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
 
 	// Create some logs
-	logStore := registry.GetLogStore()
+	logStore := app.GetLogStore()
 	l1 := logstore.NewLog()
 	l1.SetMessage("Test Message 1")
 	l1.SetLevel("info")
@@ -280,18 +280,18 @@ func TestLogManagerController_HandleLogDeleteAll(t *testing.T) {
 }
 
 func TestLogManagerController_RendersVueApp(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithLogStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
-	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewLogManagerController(registry).Handler, test.NewRequestOptions{
+	html, resp, err := test.CallStringEndpoint(http.MethodGet, NewLogManagerController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -318,13 +318,13 @@ func TestLogManagerController_RendersVueApp(t *testing.T) {
 }
 
 func TestLogManagerController_LoadLogsAction(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithLogStore(true),
 	)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -341,7 +341,7 @@ func TestLogManagerController_LoadLogsAction(t *testing.T) {
 	}
 	bodyBytes, _ := json.Marshal(requestBody)
 
-	body, resp, err := test.CallStringEndpoint(http.MethodPost, NewLogManagerController(registry).Handler, test.NewRequestOptions{
+	body, resp, err := test.CallStringEndpoint(http.MethodPost, NewLogManagerController(app).Handler, test.NewRequestOptions{
 		GetValues: queryParams,
 		Body:      string(bodyBytes),
 		Context: map[any]any{

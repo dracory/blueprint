@@ -12,15 +12,15 @@ import (
 
 func TestLogRequestMiddleware(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -51,17 +51,17 @@ func TestLogRequestMiddleware(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -86,17 +86,17 @@ func TestLogRequestMiddleware_Filtered(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_JS(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -121,17 +121,17 @@ func TestLogRequestMiddleware_Filtered_JS(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_Image(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -156,17 +156,17 @@ func TestLogRequestMiddleware_Filtered_Image(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_Favicon(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -191,17 +191,17 @@ func TestLogRequestMiddleware_Filtered_Favicon(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_Health(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -226,17 +226,17 @@ func TestLogRequestMiddleware_Filtered_Health(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_Ping(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -261,17 +261,17 @@ func TestLogRequestMiddleware_Filtered_Ping(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_AssetsFolder(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -296,17 +296,17 @@ func TestLogRequestMiddleware_Filtered_AssetsFolder(t *testing.T) {
 
 func TestLogRequestMiddleware_Filtered_StaticFolder(t *testing.T) {
 	// Arrange
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
 	// Capture logs
 	var buf bytes.Buffer
 	logger := slog.New(slog.NewJSONHandler(&buf, nil))
-	registry.SetLogger(logger)
+	app.SetLogger(logger)
 
 	buf.Reset() // Clear buffer for each test
 
 	// Act
-	handler := LogRequestMiddleware(registry).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := LogRequestMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 

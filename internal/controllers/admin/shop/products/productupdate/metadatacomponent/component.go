@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"project/internal/controllers/admin/shop/shared"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 )
@@ -15,7 +15,7 @@ import (
 var metadataFiles embed.FS
 
 // Render renders the metadata component HTML for the given product
-func Render(registry registry.RegistryInterface, productID string) hb.TagInterface {
+func Render(app app.AppInterface, productID string) hb.TagInterface {
 	htmlContent, err := metadataFiles.ReadFile("metadata.html")
 	if err != nil {
 		slog.Error("Failed to read metadata HTML template", "error", err)

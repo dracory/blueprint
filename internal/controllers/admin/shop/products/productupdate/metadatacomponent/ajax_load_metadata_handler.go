@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/spf13/cast"
@@ -18,12 +18,12 @@ type MetadataItem struct {
 }
 
 // HandleAjaxLoadMetadata handles AJAX requests to load metadata and returns JSON string
-func HandleAjaxLoadMetadata(registry registry.RegistryInterface, productID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxLoadMetadata(app app.AppInterface, productID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
-	product, err := registry.GetShopStore().ProductFindByID(context.Background(), productID)
+	product, err := app.GetShopStore().ProductFindByID(context.Background(), productID)
 	if err != nil {
 		return api.ErrorWithData("Product not found", map[string]any{}).ToString()
 	}

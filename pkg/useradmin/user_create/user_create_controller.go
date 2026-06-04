@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/useradmin/shared"
 	"strings"
 
@@ -15,7 +15,7 @@ import (
 )
 
 type userCreateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type userCreateControllerData struct {
@@ -25,8 +25,8 @@ type userCreateControllerData struct {
 	successMessage string
 }
 
-func NewUserCreateController(registry registry.RegistryInterface) *userCreateController {
-	return &userCreateController{registry: registry}
+func NewUserCreateController(app app.AppInterface) *userCreateController {
+	return &userCreateController{app: app}
 }
 
 func (controller userCreateController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -136,7 +136,7 @@ func (controller *userCreateController) modal(data userCreateControllerData) hb.
 }
 
 func (controller *userCreateController) prepareDataAndValidate(r *http.Request) (data userCreateControllerData, errorMessage string) {
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		return data, "User store is not configured"
 	}
 
@@ -171,11 +171,11 @@ func (controller *userCreateController) prepareDataAndValidate(r *http.Request) 
 	user.SetLastName(data.lastName)
 	user.SetEmail(data.email)
 
-	err := controller.registry.GetUserStore().UserCreate(r.Context(), user)
+	err := controller.app.GetUserStore().UserCreate(r.Context(), user)
 
 	if err != nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("Error. At userCreateController > prepareDataAndValidate", slog.String("error", err.Error()))
 		}
 		return data, "Creating user failed. Please contact an administrator."
 	}

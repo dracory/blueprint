@@ -1,0 +1,49 @@
+package app
+
+import (
+	"database/sql"
+	"errors"
+
+	"github.com/dracory/blogstore"
+)
+
+func blogStoreInitialize(app AppInterface) error {
+	if !app.GetConfig().GetBlogStoreUsed() {
+		return nil
+	}
+
+	if store, err := newBlogStore(app.GetDatabase()); err != nil {
+		return err
+	} else {
+		app.SetBlogStore(store)
+	}
+
+	return nil
+}
+
+func newBlogStore(db *sql.DB) (blogstore.StoreInterface, error) {
+	if db == nil {
+		return nil, errors.New("database is not initialized")
+	}
+
+	st, err := blogstore.NewStore(blogstore.NewStoreOptions{
+		DB:                  db,
+		PostTableName:       "snv_blogs_post",
+		TaxonomyEnabled:     true,
+		TaxonomyTableName:   "snv_blogs_taxonomy",
+		TermTableName:       "snv_blogs_term",
+		VersioningEnabled:   true,
+		VersioningTableName: "snv_blogs_version",
+		AutomigrateEnabled:  true,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if st == nil {
+		return nil, errors.New("blogstore.NewStore returned a nil store")
+	}
+
+	return st, nil
+}

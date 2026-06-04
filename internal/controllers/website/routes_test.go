@@ -7,7 +7,7 @@ import (
 )
 
 func TestRoutes(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	routes := Routes(nil)
 	if routes == nil {
 		t.Error("Routes() should not return nil")
@@ -16,14 +16,14 @@ func TestRoutes(t *testing.T) {
 		t.Errorf("Routes(nil) should return empty slice, got %d routes", len(routes))
 	}
 
-	// Test with registry with config
-	registry := testutils.Setup()
-	routes = Routes(registry)
+	// Test with app with config
+	app := testutils.Setup()
+	routes = Routes(app)
 	if routes == nil {
 		t.Error("Routes() should not return nil")
 	}
 	// Should have favicon, blog, contact, seo, swagger routes (minimum 5)
 	if len(routes) < 5 {
-		t.Errorf("Routes(registry with config) should return at least 5 routes, got %d", len(routes))
+		t.Errorf("Routes(app with config) should return at least 5 routes, got %d", len(routes))
 	}
 }

@@ -22,8 +22,8 @@ var (
 )
 
 func (controller *userManagerController) renderPage(w http.ResponseWriter, r *http.Request) string {
-	if controller.registry == nil {
-		http.Error(w, "Registry not initialized", http.StatusInternalServerError)
+	if controller.app == nil {
+		http.Error(w, "app not initialized", http.StatusInternalServerError)
 		return ""
 	}
 
@@ -54,7 +54,7 @@ func (controller *userManagerController) renderPage(w http.ResponseWriter, r *ht
 		Child(hb.Raw(html)).
 		Child(hb.Script(js))
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Users | User Manager",
 		Content: layouts.AdminPage(breadcrumbs, content),
 		ScriptURLs: []string{

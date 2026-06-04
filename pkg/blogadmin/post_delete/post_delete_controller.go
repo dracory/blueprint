@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/hb"
@@ -12,7 +12,7 @@ import (
 )
 
 type postDeleteController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type postDeleteControllerData struct {
@@ -21,8 +21,8 @@ type postDeleteControllerData struct {
 	successMessage string
 }
 
-func NewPostDeleteController(registry registry.RegistryInterface) *postDeleteController {
-	return &postDeleteController{registry: registry}
+func NewPostDeleteController(app app.AppInterface) *postDeleteController {
+	return &postDeleteController{app: app}
 }
 
 func (controller *postDeleteController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -60,10 +60,10 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, "post id is required"
 	}
 
-	post, err := controller.registry.GetBlogStore().PostFindByID(r.Context(), data.postID)
+	post, err := controller.app.GetBlogStore().PostFindByID(r.Context(), data.postID)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Post not found"
 	}
 
@@ -77,10 +77,10 @@ func (controller *postDeleteController) prepareDataAndValidate(r *http.Request) 
 		return data, ""
 	}
 
-	err = controller.registry.GetBlogStore().PostTrash(r.Context(), post)
+	err = controller.app.GetBlogStore().PostTrash(r.Context(), post)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At postDeleteController > prepareDataAndValidate", slog.String("error", err.Error()))
 		return data, "Deleting post failed. Please contact an administrator."
 	}
 

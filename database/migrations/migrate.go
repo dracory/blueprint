@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 )
@@ -12,18 +12,18 @@ import (
 // MigrateAll runs all migrations in two phases:
 // 1. Store migrations (MigrateUp/AutoMigrate) — run directly, not inside a transaction.
 // 2. Custom SQL migrations — run via the migrate framework with transaction support.
-func MigrateAll(registry registry.RegistryInterface) error {
-	if registry == nil {
-		return errors.New("registry is nil")
+func MigrateAll(app app.AppInterface) error {
+	if app == nil {
+		return errors.New("app is nil")
 	}
 
 	// Phase 1: Store-level migrations (run directly outside transactions)
-	if err := migrateStores(registry); err != nil {
+	if err := migrateStores(app); err != nil {
 		return err
 	}
 
 	// Phase 2: Custom SQL migrations via the migrate framework
-	if err := migrateSQL(registry); err != nil {
+	if err := migrateSQL(app); err != nil {
 		return err
 	}
 
@@ -33,10 +33,10 @@ func MigrateAll(registry registry.RegistryInterface) error {
 // migrateStores runs MigrateUp/AutoMigrate for each enabled store.
 // These are not wrapped in transactions because the store packages
 // manage their own database connections internally.
-func migrateStores(registry registry.RegistryInterface) error {
-	cfg := registry.GetConfig()
+func migrateStores(app app.AppInterface) error {
+	cfg := app.GetConfig()
 
-	storeMigrations := getStoreMigrations(cfg, registry)
+	storeMigrations := getStoreMigrations(cfg, app)
 
 	ctx := context.Background()
 	for _, m := range storeMigrations {
@@ -49,8 +49,8 @@ func migrateStores(registry registry.RegistryInterface) error {
 }
 
 // migrateSQL runs date-prefixed SQL migrations using the migrate framework.
-func migrateSQL(registry registry.RegistryInterface) error {
-	db := registry.GetDatabase()
+func migrateSQL(app app.AppInterface) error {
+	db := app.GetDatabase()
 	if db == nil {
 		return errors.New("database is nil")
 	}

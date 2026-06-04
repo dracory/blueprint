@@ -2,7 +2,7 @@ package emails
 
 import (
 	"fmt"
-	"project/internal/registry"
+	"project/internal/app"
 	"sync"
 
 	"github.com/dracory/email"
@@ -35,20 +35,20 @@ var (
 )
 
 // InitEmailSender initializes the email sender
-func InitEmailSender(registry registry.RegistryInterface) {
-	if registry == nil {
+func InitEmailSender(app app.AppInterface) {
+	if app == nil {
 		return
 	}
 
-	if registry.GetConfig() == nil {
+	if app.GetConfig() == nil {
 		return
 	}
 
 	sender := email.NewSMTPSender(email.Config{
-		Host:     registry.GetConfig().GetMailHost(),
-		Port:     cast.ToString(registry.GetConfig().GetMailPort()),
-		Username: registry.GetConfig().GetMailUsername(),
-		Password: registry.GetConfig().GetMailPassword(),
+		Host:     app.GetConfig().GetMailHost(),
+		Port:     cast.ToString(app.GetConfig().GetMailPort()),
+		Username: app.GetConfig().GetMailUsername(),
+		Password: app.GetConfig().GetMailPassword(),
 		// Skip logger for now as it's causing type compatibility issues
 	})
 

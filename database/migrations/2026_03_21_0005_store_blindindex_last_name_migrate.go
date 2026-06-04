@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreBlindIndexLastNameMigrate)(nil)
 
 type StoreBlindIndexLastNameMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreBlindIndexLastNameMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreBlindIndexLastNameMigrate) Description() string {
 }
 
 func (m *StoreBlindIndexLastNameMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetBlindIndexStoreLastName()
+	store := m.app.GetBlindIndexStoreLastName()
 	if store == nil {
 		return errors.New("blind index last name store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreBlindIndexLastNameMigrate) Up(ctx context.Context, tx *sql.Tx) err
 }
 
 func (m *StoreBlindIndexLastNameMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetBlindIndexStoreLastName()
+	store := m.app.GetBlindIndexStoreLastName()
 	if store == nil {
 		return errors.New("blind index last name store is not initialized")
 	}

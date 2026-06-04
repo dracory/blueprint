@@ -1,10 +1,10 @@
-﻿package products
+package products
 
 import (
 	"embed"
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/hb"
@@ -15,14 +15,14 @@ import (
 var detailsEmbed embed.FS
 
 type productDetailsComponent struct {
-	registry  registry.RegistryInterface
+	app  app.AppInterface
 	request   *http.Request
 	product   shopstore.ProductInterface
 	productID string
 }
 
-func NewProductDetailsComponent(registry registry.RegistryInterface) *productDetailsComponent {
-	return &productDetailsComponent{registry: registry}
+func NewProductDetailsComponent(app app.AppInterface) *productDetailsComponent {
+	return &productDetailsComponent{app: app}
 }
 
 func (c *productDetailsComponent) Mount(r *http.Request, product shopstore.ProductInterface, productID string) {

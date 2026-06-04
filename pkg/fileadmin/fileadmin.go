@@ -6,14 +6,14 @@ package fileadmin
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/fileadmin/file_manager"
 )
 
 // AdminOptions contains all dependencies and configuration for the file admin
 type AdminOptions struct {
 	// Registry provides access to all stores and services
-	Registry registry.RegistryInterface
+	Registry app.AppInterface
 
 	// AdminHomeURL is the URL for the admin home page
 	AdminHomeURL string
@@ -58,7 +58,7 @@ func (a *admin) Handle(w http.ResponseWriter, r *http.Request) string {
 	}
 
 	if a.opts.Registry == nil {
-		http.Error(w, "Registry not configured", http.StatusInternalServerError)
+		http.Error(w, "app not configured", http.StatusInternalServerError)
 		return ""
 	}
 

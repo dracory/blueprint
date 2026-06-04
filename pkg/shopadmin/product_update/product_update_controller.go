@@ -3,7 +3,7 @@ package product_update
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
@@ -16,13 +16,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type productUpdateController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewProductUpdateController(registry registry.RegistryInterface) *productUpdateController {
-	return &productUpdateController{registry: registry}
+func NewProductUpdateController(app app.AppInterface) *productUpdateController {
+	return &productUpdateController{app: app}
 }
 
 func (controller *productUpdateController) Handler(w http.ResponseWriter, r *http.Request) string {

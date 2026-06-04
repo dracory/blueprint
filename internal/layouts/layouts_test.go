@@ -148,7 +148,7 @@ func TestAdminPage(t *testing.T) {
 }
 
 func TestNewBlankLayout(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	r := &http.Request{}
 	opts := Options{
 		AppName:    "TestApp",
@@ -160,7 +160,7 @@ func TestNewBlankLayout(t *testing.T) {
 		Styles:     []string{"body { color: red; }"},
 	}
 
-	layout := NewBlankLayout(registry, r, opts)
+	layout := NewBlankLayout(app, r, opts)
 	if layout == nil {
 		t.Fatal("NewBlankLayout() should return non-nil")
 	}
@@ -190,14 +190,14 @@ func TestBreadcrumb(t *testing.T) {
 }
 
 func TestNewAdminLayout(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	r := &http.Request{}
 	opts := Options{
 		Title:   "Admin Test",
 		Content: hb.Div().Text("Admin content"),
 	}
 
-	layout := NewAdminLayout(registry, r, opts)
+	layout := NewAdminLayout(app, r, opts)
 	if layout == nil {
 		t.Fatal("NewAdminLayout() should return non-nil")
 	}
@@ -212,14 +212,14 @@ func TestNewAdminLayout(t *testing.T) {
 }
 
 func TestNewUserLayout(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	r := &http.Request{}
 	opts := Options{
 		Title:   "User Test",
 		Content: hb.Div().Text("User content"),
 	}
 
-	layout := NewUserLayout(registry, r, opts)
+	layout := NewUserLayout(app, r, opts)
 	if layout == nil {
 		t.Fatal("NewUserLayout() should return non-nil")
 	}
@@ -234,10 +234,10 @@ func TestNewUserLayout(t *testing.T) {
 }
 
 func TestNewAdminCrudLayout(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 	r := &http.Request{}
 
-	html := NewAdminCrudLayout(registry, r, "Admin CRUD Test", "<p>Admin CRUD content</p>", []string{}, "", []string{}, "")
+	html := NewAdminCrudLayout(app, r, "Admin CRUD Test", "<p>Admin CRUD content</p>", []string{}, "", []string{}, "")
 	if html == "" {
 		t.Error("NewAdminCrudLayout() should return non-empty HTML")
 	}

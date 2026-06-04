@@ -14,7 +14,7 @@ func (controller *userManagerController) handleUserDeleteAjax(w http.ResponseWri
 		return ""
 	}
 
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		api.Respond(w, r, api.Error("User store not configured"))
 		return ""
 	}
@@ -32,9 +32,9 @@ func (controller *userManagerController) handleUserDeleteAjax(w http.ResponseWri
 		return ""
 	}
 
-	user, err := controller.registry.GetUserStore().UserFindByID(r.Context(), reqBody.UserID)
+	user, err := controller.app.GetUserStore().UserFindByID(r.Context(), reqBody.UserID)
 	if err != nil {
-		controller.registry.GetLogger().Error("userManagerController.handleUserDeleteAjax", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("userManagerController.handleUserDeleteAjax", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("User not found"))
 		return ""
 	}
@@ -43,8 +43,8 @@ func (controller *userManagerController) handleUserDeleteAjax(w http.ResponseWri
 		return ""
 	}
 
-	if err := controller.registry.GetUserStore().UserSoftDelete(r.Context(), user); err != nil {
-		controller.registry.GetLogger().Error("userManagerController.handleUserDeleteAjax", slog.String("error", err.Error()))
+	if err := controller.app.GetUserStore().UserSoftDelete(r.Context(), user); err != nil {
+		controller.app.GetLogger().Error("userManagerController.handleUserDeleteAjax", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("Failed to delete user"))
 		return ""
 	}

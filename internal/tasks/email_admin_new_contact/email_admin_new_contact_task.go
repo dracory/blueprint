@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/emails"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/taskstore"
 )
@@ -16,16 +16,16 @@ import (
 // go run . task email-to-admin-on-new-contact-form-submitted --html=HTML
 //
 // =================================================================
-func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(registry registry.RegistryInterface) *emailToAdminOnNewContactFormSubmittedTaskHandler {
+func NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app app.AppInterface) *emailToAdminOnNewContactFormSubmittedTaskHandler {
 	return &emailToAdminOnNewContactFormSubmittedTaskHandler{
-		registry: registry,
+		app: app,
 	}
 }
 
 // emailToAdminOnNewContactFormSubmittedTaskHandler sends a notification email to admin
 type emailToAdminOnNewContactFormSubmittedTaskHandler struct {
 	taskstore.TaskHandlerBase
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewContactFormSubmittedTaskHandler)(nil) // verify it extends the task interface
@@ -43,14 +43,14 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Description() s
 }
 
 func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task taskstore.TaskQueueInterface, err error) {
-	if handler.registry == nil {
+	if handler.app == nil {
 		return nil, errors.New("app is nil")
 	}
 
-	if handler.registry.GetTaskStore() == nil {
+	if handler.app.GetTaskStore() == nil {
 		return nil, errors.New("task store is nil")
 	}
-	return handler.registry.GetTaskStore().TaskDefinitionEnqueueByAlias(
+	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 		context.Background(),
 		taskstore.DefaultQueueName,
 		handler.Alias(),
@@ -74,8 +74,8 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Handle() bool {
 	handler.LogInfo("Parameters ok ...")
 
 	// Initialize emails package with config and send using DI
-	emails.InitEmailSender(handler.registry)
-	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.registry).Send()
+	emails.InitEmailSender(handler.app)
+	err := emails.NewEmailToAdminOnNewContactFormSubmitted(handler.app).Send()
 
 	if err != nil {
 		handler.LogError("Sending email failed. Code: ")

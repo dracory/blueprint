@@ -3,17 +3,17 @@ package order_details
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
 
 type orderDetailsController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewOrderDetailsController(registry registry.RegistryInterface) *orderDetailsController {
-	return &orderDetailsController{registry: registry}
+func NewOrderDetailsController(app app.AppInterface) *orderDetailsController {
+	return &orderDetailsController{app: app}
 }
 
 func (controller *orderDetailsController) Handler(w http.ResponseWriter, r *http.Request) string {

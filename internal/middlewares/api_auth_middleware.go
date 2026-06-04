@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"project/internal/config"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/rtr"
@@ -19,8 +19,8 @@ type apiAuthCacheItem struct {
 	user    userstore.UserInterface
 }
 
-func NewAPIAuthMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
-	memoryCache := registry.GetMemoryCache()
+func NewAPIAuthMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
+	memoryCache := app.GetMemoryCache()
 
 	return rtr.NewMiddleware().
 		SetName("API Auth Middleware").
@@ -49,7 +49,7 @@ func NewAPIAuthMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInt
 				}
 
 				// 2. Validate session token
-				session, err := registry.GetSessionStore().SessionFindByKey(context.Background(), token)
+				session, err := app.GetSessionStore().SessionFindByKey(context.Background(), token)
 				if err != nil {
 					if _, writeErr := w.Write([]byte(api.Error("Failed to validate token").ToString())); writeErr != nil {
 						return
@@ -73,7 +73,7 @@ func NewAPIAuthMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInt
 					return
 				}
 
-				user, err := registry.GetUserStore().UserFindByID(r.Context(), userID)
+				user, err := app.GetUserStore().UserFindByID(r.Context(), userID)
 				if err != nil {
 					if _, writeErr := w.Write([]byte(api.Error("Failed to load user").ToString())); writeErr != nil {
 						return

@@ -24,7 +24,7 @@ func TestCmsRoutesFunctionExists(t *testing.T) {
 	}
 }
 
-// TestCmsRoutesNilRegistry verifies Routes handles nil registry
+// TestCmsRoutesNilRegistry verifies Routes handles nil app
 func TestCmsRoutesNilRegistry(t *testing.T) {
 	routes, err := Routes(nil)
 

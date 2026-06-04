@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"project/internal/controllers/admin/shop/shared"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 )
@@ -14,7 +14,7 @@ import (
 //go:embed *.js
 var detailsFiles embed.FS
 
-func Render(registry registry.RegistryInterface, categoryID string) hb.TagInterface {
+func Render(app app.AppInterface, categoryID string) hb.TagInterface {
 	htmlContent, err := detailsFiles.ReadFile("details.html")
 	if err != nil {
 		slog.Error("Failed to read details HTML template", "error", err)

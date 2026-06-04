@@ -4,18 +4,18 @@ import (
 	"net/http"
 	// "project/internal/controllers/website/shared"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 )
 
 type indexNowController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewIndexNowController(registry registry.RegistryInterface) *indexNowController {
+func NewIndexNowController(app app.AppInterface) *indexNowController {
 	return &indexNowController{
-		registry: registry,
+		app: app,
 	}
 }
 
@@ -27,14 +27,14 @@ func (controller *indexNowController) Handler(w http.ResponseWriter, r *http.Req
 		ScriptURLs:     []string{},
 	}
 
-	if controller.registry.GetConfig().GetCmsStoreUsed() {
+	if controller.app.GetConfig().GetCmsStoreUsed() {
 		return layouts.NewCmsLayout(
-			controller.registry,
+			controller.app,
 			r,
 			options).ToHTML()
 	} else {
 		return layouts.NewBlankLayout(
-			controller.registry,
+			controller.app,
 			r,
 			options).ToHTML()
 	}
@@ -93,10 +93,10 @@ func (controller *indexNowController) sectionKey() hb.TagInterface {
 
 	keyCode := hb.Code().
 		Class("d-block p-3 bg-light rounded text-break").
-		Text(controller.registry.GetConfig().GetIndexNowKey())
+		Text(controller.app.GetConfig().GetIndexNowKey())
 
 	keyLink := hb.A().
-		Href("/" + controller.registry.GetConfig().GetIndexNowKey() + ".txt").
+		Href("/" + controller.app.GetConfig().GetIndexNowKey() + ".txt").
 		Text("View key file")
 
 	cardBody := hb.Div().

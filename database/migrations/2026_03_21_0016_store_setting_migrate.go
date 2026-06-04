@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreSettingMigrate)(nil)
 
 type StoreSettingMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreSettingMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreSettingMigrate) Description() string {
 }
 
 func (m *StoreSettingMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetSettingStore()
+	store := m.app.GetSettingStore()
 	if store == nil {
 		return errors.New("setting store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreSettingMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreSettingMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetSettingStore()
+	store := m.app.GetSettingStore()
 	if store == nil {
 		return errors.New("setting store is not initialized")
 	}

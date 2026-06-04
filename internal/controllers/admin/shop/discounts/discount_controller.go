@@ -7,7 +7,7 @@ import (
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	crud "github.com/dracory/crud/v2"
@@ -19,11 +19,11 @@ import (
 )
 
 type discountController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewDiscountController(registry registry.RegistryInterface) *discountController {
-	return &discountController{registry: registry}
+func NewDiscountController(app app.AppInterface) *discountController {
+	return &discountController{app: app}
 }
 
 func (discountController *discountController) AnyIndex(w http.ResponseWriter, r *http.Request) string {
@@ -144,7 +144,7 @@ func (discountController *discountController) FuncLayout(w http.ResponseWriter, 
 		cdn.Jquery_3_6_4(),
 	}, scriptURLs...)
 
-	return layouts.NewAdminLayout(discountController.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(discountController.app, r, layouts.Options{
 		Title:      title + " | Admin",
 		Content:    hb.Wrap().HTML(content),
 		StyleURLs:  styleURLs,
@@ -158,11 +158,11 @@ func (discountController *discountController) FuncLayout(w http.ResponseWriter, 
 }
 
 func (discountController *discountController) FuncRows(r *http.Request) ([]crud.Row, error) {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
 
-	discounts, err := discountController.registry.GetShopStore().DiscountList(context.Background(), shopstore.NewDiscountQuery())
+	discounts, err := discountController.app.GetShopStore().DiscountList(context.Background(), shopstore.NewDiscountQuery())
 
 	if err != nil {
 		return nil, err
@@ -187,11 +187,11 @@ func (discountController *discountController) FuncRows(r *http.Request) ([]crud.
 }
 
 func (discountController *discountController) FuncUpdate(r *http.Request, entityID string, data map[string]string) error {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return errors.New("shop store not configured")
 	}
 
-	discount, err := discountController.registry.GetShopStore().DiscountFindByID(context.Background(), entityID)
+	discount, err := discountController.app.GetShopStore().DiscountFindByID(context.Background(), entityID)
 
 	if err != nil {
 		return err
@@ -250,7 +250,7 @@ func (discountController *discountController) FuncUpdate(r *http.Request, entity
 	discount.SetStartsAt(startsAt)
 	discount.SetEndsAt(endsAt)
 
-	err = discountController.registry.GetShopStore().DiscountUpdate(context.Background(), discount)
+	err = discountController.app.GetShopStore().DiscountUpdate(context.Background(), discount)
 
 	if err != nil {
 		return err
@@ -260,11 +260,11 @@ func (discountController *discountController) FuncUpdate(r *http.Request, entity
 }
 
 func (discountController *discountController) FuncFetchReadData(r *http.Request, discountID string) ([]crud.KeyValue, error) {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
 
-	discount, err := discountController.registry.GetShopStore().DiscountFindByID(context.Background(), discountID)
+	discount, err := discountController.app.GetShopStore().DiscountFindByID(context.Background(), discountID)
 
 	if err != nil {
 		return nil, err
@@ -290,11 +290,11 @@ func (discountController *discountController) FuncFetchReadData(r *http.Request,
 }
 
 func (discountController *discountController) FuncFetchUpdateData(r *http.Request, discountID string) (map[string]string, error) {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return nil, errors.New("shop store not configured")
 	}
 
-	discount, err := discountController.registry.GetShopStore().DiscountFindByID(context.Background(), discountID)
+	discount, err := discountController.app.GetShopStore().DiscountFindByID(context.Background(), discountID)
 
 	if err != nil {
 		return nil, err
@@ -319,7 +319,7 @@ func (discountController *discountController) FuncFetchUpdateData(r *http.Reques
 }
 
 func (discountController *discountController) FuncCreate(r *http.Request, data map[string]string) (discountID string, err error) {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return "", errors.New("shop store not configured")
 	}
 
@@ -328,7 +328,7 @@ func (discountController *discountController) FuncCreate(r *http.Request, data m
 	discount.SetStatus(shopstore.DISCOUNT_STATUS_DRAFT)
 	discount.SetAmount(0.00)
 
-	err = discountController.registry.GetShopStore().DiscountCreate(context.Background(), discount)
+	err = discountController.app.GetShopStore().DiscountCreate(context.Background(), discount)
 
 	if err != nil {
 		return "", err
@@ -338,10 +338,10 @@ func (discountController *discountController) FuncCreate(r *http.Request, data m
 }
 
 func (discountController *discountController) FuncTrash(r *http.Request, discountID string) error {
-	if discountController.registry.GetShopStore() == nil {
+	if discountController.app.GetShopStore() == nil {
 		return errors.New("shop store not configured")
 	}
 
-	err := discountController.registry.GetShopStore().DiscountSoftDeleteByID(context.Background(), discountID)
+	err := discountController.app.GetShopStore().DiscountSoftDeleteByID(context.Background(), discountID)
 	return err
 }

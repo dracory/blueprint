@@ -7,7 +7,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/hb"
 
@@ -17,18 +17,18 @@ import (
 
 type statsController struct {
 	logger   *slog.Logger
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewStatsController(registry registry.RegistryInterface) *statsController {
+func NewStatsController(app app.AppInterface) *statsController {
 	return &statsController{
-		logger:   registry.GetLogger(),
-		registry: registry,
+		logger:   app.GetLogger(),
+		app: app,
 	}
 }
 
 func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
-	geostore := c.registry.GetGeoStore()
+	geostore := c.app.GetGeoStore()
 	f := func(iso2Code string) (string, error) {
 		if geostore == nil {
 			return "N/A", errors.New("geostore is nil")
@@ -43,9 +43,9 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
 		ResponseWriter:    w,
 		Request:           r,
-		Logger:            c.registry.GetLogger(),
-		Store:             c.registry.GetStatsStore(),
-		Layout:            &adminLayout{app: c.registry},
+		Logger:            c.app.GetLogger(),
+		Store:             c.app.GetStatsStore(),
+		Layout:            &adminLayout{app: c.app},
 		HomeURL:           links.Admin().Home(),
 		WebsiteUrl:        links.Website().Home(),
 		CountryNameByIso2: f,
@@ -55,7 +55,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		if c.logger != nil {
 			c.logger.Error("At admin > statsController > Handler", "error", err.Error())
 		}
-		helpers.ToFlashError(c.registry.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
+		helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminLayout struct {
-	app   registry.RegistryInterface
+	app   app.AppInterface
 	title string
 	body  string
 

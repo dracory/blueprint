@@ -2,20 +2,20 @@ package seo
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 )
 
 type indexNowKeyController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewIndexNowKeyController(registry registry.RegistryInterface) *indexNowKeyController {
+func NewIndexNowKeyController(app app.AppInterface) *indexNowKeyController {
 	return &indexNowKeyController{
-		registry: registry,
+		app: app,
 	}
 }
 
 func (c indexNowKeyController) Handler(w http.ResponseWriter, r *http.Request) string {
 	w.Header().Set("Content-Type", "text/plain")
-	return c.registry.GetConfig().GetIndexNowKey()
+	return c.app.GetConfig().GetIndexNowKey()
 }

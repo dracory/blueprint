@@ -1,24 +1,24 @@
 package widgets
 
-import "project/internal/registry"
+import "project/internal/app"
 
 // WidgetRegistry returns a list of all widgets
 //
 // Register all the new widgets here so that they can be used in the CMS
 //
 // Parameters:
-//   - registry: Registry interface for accessing services
+//   - app: app interface for accessing services
 //
 // Returns:
 //   - []Widget - A list of all widgets
-func WidgetRegistry(registry registry.RegistryInterface) []Widget {
+func WidgetRegistry(app app.AppInterface) []Widget {
 	return []Widget{
-		NewAuthenticatedWidget(registry),
-		// NewContactFormWidget(registry),
-		// NewTermsOfUseWidget(registry),
-		NewUnauthenticatedWidget(registry),
-		NewVisibleWidget(registry),
-		NewPrintWidget(registry),
-		NewBlockeditorWidget(registry),
+		NewAuthenticatedWidget(app),
+		// NewContactFormWidget(app),
+		// NewTermsOfUseWidget(app),
+		NewUnauthenticatedWidget(app),
+		NewVisibleWidget(app),
+		NewPrintWidget(app),
+		NewBlockeditorWidget(app),
 	}
 }

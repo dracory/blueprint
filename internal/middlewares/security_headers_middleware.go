@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"os"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/rtr"
@@ -11,11 +11,11 @@ import (
 
 // NewSecurityHeadersMiddleware creates middleware that sets security headers
 // Uses RTR security middleware with project-specific configuration
-func NewSecurityHeadersMiddleware(registry registry.RegistryInterface) rtr.MiddlewareInterface {
+func NewSecurityHeadersMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	var isDevelopment bool = false
 
-	if registry != nil {
-		isDevelopment = registry.GetConfig().IsEnvDevelopment() || registry.GetConfig().IsEnvLocal()
+	if app != nil {
+		isDevelopment = app.GetConfig().IsEnvDevelopment() || app.GetConfig().IsEnvLocal()
 	}
 
 	config := &middlewares.SecurityHeadersConfig{

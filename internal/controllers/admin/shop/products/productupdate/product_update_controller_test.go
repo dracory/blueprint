@@ -14,29 +14,29 @@ import (
 
 // TestNewProductUpdateController_CreatesControllerWithRegistry tests the controller constructor
 func TestNewProductUpdateController_CreatesControllerWithRegistry(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 
 	if controller == nil {
 		t.Error("expected controller to be non-nil")
 	}
-	if controller.registry == nil {
-		t.Error("expected registry to be set")
+	if controller.app == nil {
+		t.Error("expected app to be set")
 	}
 }
 
 // TestHandler_MissingProductID tests error when product_id is missing
 func TestHandler_MissingProductID(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 	w := httptest.NewRecorder()
 
@@ -50,12 +50,12 @@ func TestHandler_MissingProductID(t *testing.T) {
 
 // TestHandler_ProductNotFound tests error when product doesn't exist
 func TestHandler_ProductNotFound(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id=nonexistent", nil)
 	w := httptest.NewRecorder()
 
@@ -69,7 +69,7 @@ func TestHandler_ProductNotFound(t *testing.T) {
 
 // TestHandler_RenderDetailsView tests rendering the details view
 func TestHandler_RenderDetailsView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -82,11 +82,11 @@ func TestHandler_RenderDetailsView(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id="+product.GetID()+"&view=details", nil)
 	w := httptest.NewRecorder()
 
@@ -102,7 +102,7 @@ func TestHandler_RenderDetailsView(t *testing.T) {
 
 // TestHandler_RenderMediaView tests rendering the media view
 func TestHandler_RenderMediaView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -114,11 +114,11 @@ func TestHandler_RenderMediaView(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id="+product.GetID()+"&view=media", nil)
 	w := httptest.NewRecorder()
 
@@ -134,7 +134,7 @@ func TestHandler_RenderMediaView(t *testing.T) {
 
 // TestHandler_RenderTagsView tests rendering the tags view
 func TestHandler_RenderTagsView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -146,11 +146,11 @@ func TestHandler_RenderTagsView(t *testing.T) {
 	product.SetQuantity("3")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id="+product.GetID()+"&view=tags", nil)
 	w := httptest.NewRecorder()
 
@@ -166,7 +166,7 @@ func TestHandler_RenderTagsView(t *testing.T) {
 
 // TestHandler_RenderMetadataView tests rendering the metadata view
 func TestHandler_RenderMetadataView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -178,11 +178,11 @@ func TestHandler_RenderMetadataView(t *testing.T) {
 	product.SetQuantity("2")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id="+product.GetID()+"&view=metadata", nil)
 	w := httptest.NewRecorder()
 
@@ -198,7 +198,7 @@ func TestHandler_RenderMetadataView(t *testing.T) {
 
 // TestHandler_DefaultView tests that default view is details
 func TestHandler_DefaultView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -210,11 +210,11 @@ func TestHandler_DefaultView(t *testing.T) {
 	product.SetQuantity("1")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update?product_id="+product.GetID(), nil)
 	w := httptest.NewRecorder()
 

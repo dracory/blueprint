@@ -14,7 +14,7 @@ import (
 
 // TestHandleRenderPage_DetailsView tests rendering the details view
 func TestHandleRenderPage_DetailsView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -27,11 +27,11 @@ func TestHandleRenderPage_DetailsView(t *testing.T) {
 	product.SetQuantity("10")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "details", product.GetID())
@@ -49,7 +49,7 @@ func TestHandleRenderPage_DetailsView(t *testing.T) {
 
 // TestHandleRenderPage_MediaView tests rendering the media view
 func TestHandleRenderPage_MediaView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -61,11 +61,11 @@ func TestHandleRenderPage_MediaView(t *testing.T) {
 	product.SetQuantity("5")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "media", product.GetID())
@@ -83,7 +83,7 @@ func TestHandleRenderPage_MediaView(t *testing.T) {
 
 // TestHandleRenderPage_TagsView tests rendering the tags view
 func TestHandleRenderPage_TagsView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -95,11 +95,11 @@ func TestHandleRenderPage_TagsView(t *testing.T) {
 	product.SetQuantity("3")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "tags", product.GetID())
@@ -117,7 +117,7 @@ func TestHandleRenderPage_TagsView(t *testing.T) {
 
 // TestHandleRenderPage_MetadataView tests rendering the metadata view
 func TestHandleRenderPage_MetadataView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -129,11 +129,11 @@ func TestHandleRenderPage_MetadataView(t *testing.T) {
 	product.SetQuantity("2")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "metadata", product.GetID())
@@ -151,7 +151,7 @@ func TestHandleRenderPage_MetadataView(t *testing.T) {
 
 // TestHandleRenderPage_DefaultView tests that default view is details
 func TestHandleRenderPage_DefaultView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -163,11 +163,11 @@ func TestHandleRenderPage_DefaultView(t *testing.T) {
 	product.SetQuantity("1")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "", product.GetID())
@@ -184,7 +184,7 @@ func TestHandleRenderPage_DefaultView(t *testing.T) {
 
 // TestHandleRenderPage_InvalidView tests that invalid view defaults to details
 func TestHandleRenderPage_InvalidView(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -196,11 +196,11 @@ func TestHandleRenderPage_InvalidView(t *testing.T) {
 	product.SetQuantity("1")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "invalid-view", product.GetID())
@@ -217,7 +217,7 @@ func TestHandleRenderPage_InvalidView(t *testing.T) {
 
 // TestHandleRenderPage_ContainsBreadcrumbs tests that breadcrumbs are rendered
 func TestHandleRenderPage_ContainsBreadcrumbs(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -229,11 +229,11 @@ func TestHandleRenderPage_ContainsBreadcrumbs(t *testing.T) {
 	product.SetQuantity("1")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "details", product.GetID())
@@ -254,7 +254,7 @@ func TestHandleRenderPage_ContainsBreadcrumbs(t *testing.T) {
 
 // TestHandleRenderPage_ContainsTabs tests that navigation tabs are rendered
 func TestHandleRenderPage_ContainsTabs(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 		testutils.WithCmsStore(true, "test-template"),
@@ -266,11 +266,11 @@ func TestHandleRenderPage_ContainsTabs(t *testing.T) {
 	product.SetQuantity("1")
 	product.SetStatus(shopstore.PRODUCT_STATUS_ACTIVE)
 
-	if err := registry.GetShopStore().ProductCreate(context.Background(), product); err != nil {
+	if err := app.GetShopStore().ProductCreate(context.Background(), product); err != nil {
 		t.Fatalf("failed to create product: %v", err)
 	}
 
-	controller := NewProductUpdateController(registry)
+	controller := NewProductUpdateController(app)
 	req := httptest.NewRequest(http.MethodGet, "/admin/shop/products/update", nil)
 
 	result := controller.handleRenderPage(req, product, "details", product.GetID())

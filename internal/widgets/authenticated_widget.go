@@ -3,7 +3,7 @@ package widgets
 import (
 	"net/http"
 	"project/internal/helpers"
-	"project/internal/registry"
+	"project/internal/app"
 )
 
 var _ Widget = (*authenticatedWidget)(nil) // verify it extends the interface
@@ -13,12 +13,12 @@ var _ Widget = (*authenticatedWidget)(nil) // verify it extends the interface
 // NewAuthenticatedWidget returns a new instance of authenticatedWidget.
 //
 // Parameters:
-// - registry: Registry interface for accessing services
+// - app: app interface for accessing services
 //
 // Returns:
 // - *authenticatedWidget: a pointer to an authenticatedWidget.
-func NewAuthenticatedWidget(registry registry.RegistryInterface) *authenticatedWidget {
-	return &authenticatedWidget{registry: registry}
+func NewAuthenticatedWidget(app app.AppInterface) *authenticatedWidget {
+	return &authenticatedWidget{app: app}
 }
 
 // == WIDGET =================================================================
@@ -27,7 +27,7 @@ func NewAuthenticatedWidget(registry registry.RegistryInterface) *authenticatedW
 //
 // It displays the content of the shortcode if the user is authenticated.
 type authenticatedWidget struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == PUBLIC METHODS =========================================================

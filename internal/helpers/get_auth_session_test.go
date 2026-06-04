@@ -31,8 +31,8 @@ func TestGetAuthSession_NoContextValue(t *testing.T) {
 
 // TestGetAuthSession_WithValidSession tests retrieving session from context
 func TestGetAuthSession_WithValidSession(t *testing.T) {
-	registry := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
-	defer registry.GetDatabase().Close()
+	app := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
+	defer app.GetDatabase().Close()
 
 	// Create a test user
 	user := userstore.NewUser().
@@ -40,7 +40,7 @@ func TestGetAuthSession_WithValidSession(t *testing.T) {
 		SetFirstName("Test").
 		SetLastName("User")
 
-	err := registry.GetUserStore().UserCreate(context.Background(), user)
+	err := app.GetUserStore().UserCreate(context.Background(), user)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -57,7 +57,7 @@ func TestGetAuthSession_WithValidSession(t *testing.T) {
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt("2099-12-31 23:59:59")
 
-	err = registry.GetSessionStore().SessionCreate(req.Context(), session)
+	err = app.GetSessionStore().SessionCreate(req.Context(), session)
 	if err != nil {
 		t.Fatalf("Failed to create session: %v", err)
 	}

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreMetaMigrate)(nil)
 
 type StoreMetaMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreMetaMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreMetaMigrate) Description() string {
 }
 
 func (m *StoreMetaMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetMetaStore()
+	store := m.app.GetMetaStore()
 	if store == nil {
 		return errors.New("meta store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreMetaMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreMetaMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetMetaStore()
+	store := m.app.GetMetaStore()
 	if store == nil {
 		return errors.New("meta store is not initialized")
 	}

@@ -19,7 +19,7 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 		api.Respond(w, r, api.Error("Method not allowed"))
 		return ""
 	}
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		api.Respond(w, r, api.Error("User store not configured"))
 		return ""
 	}
@@ -96,9 +96,9 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 	userIDs := []string{}
 
 	if firstName != "" {
-		ids, err := controller.registry.GetBlindIndexStoreFirstName().Search(r.Context(), firstName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		ids, err := controller.app.GetBlindIndexStoreFirstName().Search(r.Context(), firstName, blindindexstore.SEARCH_TYPE_CONTAINS)
 		if err != nil {
-			controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index first_name", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index first_name", slog.String("error", err.Error()))
 		}
 		if len(ids) == 0 {
 			api.Respond(w, r, api.SuccessWithData("", map[string]interface{}{FieldUsers: []interface{}{}, FieldTotal: 0}))
@@ -108,9 +108,9 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 	}
 
 	if lastName != "" {
-		ids, err := controller.registry.GetBlindIndexStoreLastName().Search(r.Context(), lastName, blindindexstore.SEARCH_TYPE_CONTAINS)
+		ids, err := controller.app.GetBlindIndexStoreLastName().Search(r.Context(), lastName, blindindexstore.SEARCH_TYPE_CONTAINS)
 		if err != nil {
-			controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index last_name", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index last_name", slog.String("error", err.Error()))
 		}
 		if len(ids) == 0 {
 			api.Respond(w, r, api.SuccessWithData("", map[string]interface{}{FieldUsers: []interface{}{}, FieldTotal: 0}))
@@ -120,9 +120,9 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 	}
 
 	if email != "" {
-		ids, err := controller.registry.GetBlindIndexStoreEmail().Search(r.Context(), email, blindindexstore.SEARCH_TYPE_CONTAINS)
+		ids, err := controller.app.GetBlindIndexStoreEmail().Search(r.Context(), email, blindindexstore.SEARCH_TYPE_CONTAINS)
 		if err != nil {
-			controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index email", slog.String("error", err.Error()))
+			controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax blind index email", slog.String("error", err.Error()))
 		}
 		if len(ids) == 0 {
 			api.Respond(w, r, api.SuccessWithData("", map[string]interface{}{FieldUsers: []interface{}{}, FieldTotal: 0}))
@@ -135,16 +135,16 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 		query.SetIDIn(userIDs)
 	}
 
-	userList, err := controller.registry.GetUserStore().UserList(r.Context(), query)
+	userList, err := controller.app.GetUserStore().UserList(r.Context(), query)
 	if err != nil {
-		controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax UserList", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax UserList", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("Failed to load users"))
 		return ""
 	}
 
-	userCount, err := controller.registry.GetUserStore().UserCount(r.Context(), query)
+	userCount, err := controller.app.GetUserStore().UserCount(r.Context(), query)
 	if err != nil {
-		controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax UserCount", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax UserCount", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("Failed to count users"))
 		return ""
 	}
@@ -155,11 +155,11 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 		lastNameVal := user.GetLastName()
 		emailVal := user.GetEmail()
 
-		if controller.registry.GetConfig().GetVaultStoreUsed() && controller.registry.GetVaultStore() != nil {
+		if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() != nil {
 			var err error
-			firstNameVal, lastNameVal, emailVal, _, _, err = ext.UserUntokenize(r.Context(), controller.registry, controller.registry.GetConfig().GetVaultStoreKey(), user)
+			firstNameVal, lastNameVal, emailVal, _, _, err = ext.UserUntokenize(r.Context(), controller.app, controller.app.GetConfig().GetVaultStoreKey(), user)
 			if err != nil {
-				controller.registry.GetLogger().Error("userManagerController.handleUsersFetchAjax UserUntokenize", slog.String("error", err.Error()))
+				controller.app.GetLogger().Error("userManagerController.handleUsersFetchAjax UserUntokenize", slog.String("error", err.Error()))
 				firstNameVal = "n/a"
 				lastNameVal = "n/a"
 				emailVal = "n/a"

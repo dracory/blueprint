@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"project/internal/config"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"
@@ -16,14 +16,14 @@ import (
 )
 
 func TestDashboardController_RequiresAuthentication(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
 	// Test without authentication
-	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{})
+	response, responseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(app).Handler, test.NewRequestOptions{})
 	if err != nil {
 		t.Errorf("Handler should not return error: %v", err)
 	}
@@ -35,12 +35,12 @@ func TestDashboardController_RequiresAuthentication(t *testing.T) {
 	}
 
 	// Test with authentication
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("Should create test user: %v", err)
 	}
 
-	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{
+	authResponse, authResponseObj, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -57,7 +57,7 @@ func TestDashboardController_RequiresAuthentication(t *testing.T) {
 }
 
 func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -67,7 +67,7 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 	post := blogstore.NewPost()
 	post.SetTitle("Test Post")
 	post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	if err := registry.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+	if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
 		t.Fatalf("failed to create test post: %v", err)
 	}
 
@@ -75,14 +75,14 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 	categoryTaxonomy := blogstore.NewTaxonomy()
 	categoryTaxonomy.SetName("Category")
 	categoryTaxonomy.SetSlug(blogstore.TAXONOMY_CATEGORY)
-	if err := registry.GetBlogStore().TaxonomyCreate(context.Background(), categoryTaxonomy); err != nil {
+	if err := app.GetBlogStore().TaxonomyCreate(context.Background(), categoryTaxonomy); err != nil {
 		t.Fatalf("failed to create category taxonomy: %v", err)
 	}
 
 	tagTaxonomy := blogstore.NewTaxonomy()
 	tagTaxonomy.SetName("Tag")
 	tagTaxonomy.SetSlug(blogstore.TAXONOMY_TAG)
-	if err := registry.GetBlogStore().TaxonomyCreate(context.Background(), tagTaxonomy); err != nil {
+	if err := app.GetBlogStore().TaxonomyCreate(context.Background(), tagTaxonomy); err != nil {
 		t.Fatalf("failed to create tag taxonomy: %v", err)
 	}
 
@@ -90,7 +90,7 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 	category := blogstore.NewTerm()
 	category.SetName("Test Category")
 	category.SetTaxonomyID(categoryTaxonomy.GetID())
-	if err := registry.GetBlogStore().TermCreate(context.Background(), category); err != nil {
+	if err := app.GetBlogStore().TermCreate(context.Background(), category); err != nil {
 		t.Fatalf("failed to create test category: %v", err)
 	}
 
@@ -98,16 +98,16 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 	tag := blogstore.NewTerm()
 	tag.SetName("Test Tag")
 	tag.SetTaxonomyID(tagTaxonomy.GetID())
-	if err := registry.GetBlogStore().TermCreate(context.Background(), tag); err != nil {
+	if err := app.GetBlogStore().TermCreate(context.Background(), tag); err != nil {
 		t.Fatalf("failed to create test tag: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("Should create test user: %v", err)
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(registry).Handler, test.NewRequestOptions{
+	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewDashboardController(app).Handler, test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}: user,
 		},
@@ -136,7 +136,7 @@ func TestDashboardController_WithTaxonomyEnabled(t *testing.T) {
 }
 
 func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
@@ -146,23 +146,23 @@ func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
 	categoryTaxonomy := blogstore.NewTaxonomy()
 	categoryTaxonomy.SetName("Category")
 	categoryTaxonomy.SetSlug(blogstore.TAXONOMY_CATEGORY)
-	if err := registry.GetBlogStore().TaxonomyCreate(context.Background(), categoryTaxonomy); err != nil {
+	if err := app.GetBlogStore().TaxonomyCreate(context.Background(), categoryTaxonomy); err != nil {
 		t.Fatalf("failed to create category taxonomy: %v", err)
 	}
 
 	category := blogstore.NewTerm()
 	category.SetName("Test Category")
 	category.SetTaxonomyID(categoryTaxonomy.GetID())
-	if err := registry.GetBlogStore().TermCreate(context.Background(), category); err != nil {
+	if err := app.GetBlogStore().TermCreate(context.Background(), category); err != nil {
 		t.Fatalf("failed to create test category: %v", err)
 	}
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("Should create test user: %v", err)
 	}
 
-	controller := NewDashboardController(registry)
+	controller := NewDashboardController(app)
 	req, _ := http.NewRequest(http.MethodGet, "/admin/blog/dashboard", nil)
 	req = req.WithContext(context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user))
 
@@ -180,25 +180,25 @@ func TestDashboardController_prepareData_TaxonomyEnabled(t *testing.T) {
 }
 
 func TestDashboardController_prepareData_TaxonomyDisabled(t *testing.T) {
-	// Create a registry with blog store but taxonomy disabled
-	registry := testutils.Setup(
+	// Create a app with blog store but taxonomy disabled
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 	)
 
 	// Manually create blog store without taxonomy enabled
-	blogStore, err := createBlogStoreWithoutTaxonomy(registry)
+	blogStore, err := createBlogStoreWithoutTaxonomy(app)
 	if err != nil {
 		t.Fatalf("failed to create blog store without taxonomy: %v", err)
 	}
-	registry.SetBlogStore(blogStore)
+	app.SetBlogStore(blogStore)
 
-	user, err := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Errorf("Should create test user: %v", err)
 	}
 
-	controller := NewDashboardController(registry)
+	controller := NewDashboardController(app)
 	req, _ := http.NewRequest(http.MethodGet, "/admin/blog/dashboard", nil)
 	req = req.WithContext(context.WithValue(req.Context(), config.AuthenticatedUserContextKey{}, user))
 
@@ -337,7 +337,7 @@ func TestDashboardController_dashboardCards_WithTaxonomyDisabled(t *testing.T) {
 }
 
 // createBlogStoreWithoutTaxonomy creates a blog store with taxonomy disabled
-func createBlogStoreWithoutTaxonomy(r registry.RegistryInterface) (blogstore.StoreInterface, error) {
+func createBlogStoreWithoutTaxonomy(r app.AppInterface) (blogstore.StoreInterface, error) {
 	if r.GetDatabase() == nil {
 		return nil, errors.New("database is not initialized")
 	}

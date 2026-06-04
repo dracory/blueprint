@@ -3,7 +3,7 @@ package order_manager
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
@@ -15,13 +15,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type orderManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewOrderManagerController(registry registry.RegistryInterface) *orderManagerController {
-	return &orderManagerController{registry: registry}
+func NewOrderManagerController(app app.AppInterface) *orderManagerController {
+	return &orderManagerController{app: app}
 }
 
 func (controller *orderManagerController) Handler(w http.ResponseWriter, r *http.Request) string {

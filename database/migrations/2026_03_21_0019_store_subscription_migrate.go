@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreSubscriptionMigrate)(nil)
 
 type StoreSubscriptionMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreSubscriptionMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreSubscriptionMigrate) Description() string {
 }
 
 func (m *StoreSubscriptionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetSubscriptionStore()
+	store := m.app.GetSubscriptionStore()
 	if store == nil {
 		return errors.New("subscription store is not initialized")
 	}

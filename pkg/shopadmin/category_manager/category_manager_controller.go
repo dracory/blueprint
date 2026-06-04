@@ -3,7 +3,7 @@ package category_manager
 import (
 	"net/http"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/req"
 )
@@ -17,13 +17,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type categoryManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewCategoryManagerController(registry registry.RegistryInterface) *categoryManagerController {
-	return &categoryManagerController{registry: registry}
+func NewCategoryManagerController(app app.AppInterface) *categoryManagerController {
+	return &categoryManagerController{app: app}
 }
 
 func (controller *categoryManagerController) Handler(w http.ResponseWriter, r *http.Request) string {

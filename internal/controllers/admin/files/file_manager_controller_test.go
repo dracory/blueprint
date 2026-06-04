@@ -8,8 +8,8 @@ import (
 )
 
 func TestNewFileManagerController(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	if controller == nil {
 		t.Error("NewFileManagerController() should not return nil")
@@ -17,8 +17,8 @@ func TestNewFileManagerController(t *testing.T) {
 }
 
 func TestFileManagerController_Handler(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	req := httptest.NewRequest("GET", "/admin/files", nil)
 	w := httptest.NewRecorder()
@@ -31,11 +31,11 @@ func TestFileManagerController_Handler(t *testing.T) {
 }
 
 func TestFileManagerController_RegistryField(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
-	if controller.registry != registry {
-		t.Error("Controller registry should match the provided registry")
+	if controller.app != app {
+		t.Error("Controller app should match the provided app")
 	}
 }
 
@@ -54,18 +54,18 @@ func TestFileManagerController_MultipleInstances(t *testing.T) {
 		t.Error("Controllers should be separate instances")
 	}
 
-	if controller1.registry != registry1 {
+	if controller1.app != registry1 {
 		t.Error("Controller1 should have registry1")
 	}
 
-	if controller2.registry != registry2 {
+	if controller2.app != registry2 {
 		t.Error("Controller2 should have registry2")
 	}
 }
 
 func TestFileManagerController_HandlerMultipleCalls(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	for i := 0; i < 3; i++ {
 		req := httptest.NewRequest("GET", "/admin/files", nil)
@@ -76,8 +76,8 @@ func TestFileManagerController_HandlerMultipleCalls(t *testing.T) {
 }
 
 func TestFileManagerController_HandlerWithDifferentMethods_GET(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	req := httptest.NewRequest("GET", "/admin/files", nil)
 	w := httptest.NewRecorder()
@@ -86,8 +86,8 @@ func TestFileManagerController_HandlerWithDifferentMethods_GET(t *testing.T) {
 }
 
 func TestFileManagerController_HandlerWithDifferentMethods_POST(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	req := httptest.NewRequest("POST", "/admin/files", nil)
 	w := httptest.NewRecorder()
@@ -96,8 +96,8 @@ func TestFileManagerController_HandlerWithDifferentMethods_POST(t *testing.T) {
 }
 
 func TestFileManagerController_HandlerWithDifferentMethods_PUT(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	req := httptest.NewRequest("PUT", "/admin/files", nil)
 	w := httptest.NewRecorder()
@@ -106,8 +106,8 @@ func TestFileManagerController_HandlerWithDifferentMethods_PUT(t *testing.T) {
 }
 
 func TestFileManagerController_HandlerWithDifferentMethods_DELETE(t *testing.T) {
-	registry := testutils.Setup()
-	controller := NewFileManagerController(registry)
+	app := testutils.Setup()
+	controller := NewFileManagerController(app)
 
 	req := httptest.NewRequest("DELETE", "/admin/files", nil)
 	w := httptest.NewRecorder()

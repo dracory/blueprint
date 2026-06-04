@@ -8,14 +8,14 @@ import (
 )
 
 func TestBlindIndexRebuildTask_Handle_InvalidIndex(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task first
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -35,15 +35,15 @@ func TestBlindIndexRebuildTask_Handle_InvalidIndex(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Handle_TruncateYes(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -66,9 +66,9 @@ func TestBlindIndexRebuildTask_Handle_TruncateYes(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_rebuildEmailIndex_NilUserStore(t *testing.T) {
-	registry := testutils.Setup() // No user store
+	app := testutils.Setup() // No user store
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexEmail
 	task.truncate = false
 
@@ -79,9 +79,9 @@ func TestBlindIndexRebuildTask_rebuildEmailIndex_NilUserStore(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_rebuildFirstNameIndex_NilUserStore(t *testing.T) {
-	registry := testutils.Setup() // No user store
+	app := testutils.Setup() // No user store
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexFirstName
 	task.truncate = false
 
@@ -92,9 +92,9 @@ func TestBlindIndexRebuildTask_rebuildFirstNameIndex_NilUserStore(t *testing.T) 
 }
 
 func TestBlindIndexRebuildTask_rebuildLastNameIndex_NilUserStore(t *testing.T) {
-	registry := testutils.Setup() // No user store
+	app := testutils.Setup() // No user store
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexLastName
 	task.truncate = false
 
@@ -105,11 +105,11 @@ func TestBlindIndexRebuildTask_rebuildLastNameIndex_NilUserStore(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_rebuildEmailIndex_TruncateNilStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexEmail
 	task.truncate = true
 
@@ -120,11 +120,11 @@ func TestBlindIndexRebuildTask_rebuildEmailIndex_TruncateNilStore(t *testing.T) 
 }
 
 func TestBlindIndexRebuildTask_rebuildFirstNameIndex_TruncateNilStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexFirstName
 	task.truncate = true
 
@@ -135,11 +135,11 @@ func TestBlindIndexRebuildTask_rebuildFirstNameIndex_TruncateNilStore(t *testing
 }
 
 func TestBlindIndexRebuildTask_rebuildLastNameIndex_TruncateNilStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 	task.index = BlindIndexLastName
 	task.truncate = true
 
@@ -150,9 +150,9 @@ func TestBlindIndexRebuildTask_rebuildLastNameIndex_TruncateNilStore(t *testing.
 }
 
 func TestBlindIndexRebuildTask_insertEmailForUser_NilStore(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Verify task is created - the nil store check is tested in other tests
 	if task == nil {
@@ -161,9 +161,9 @@ func TestBlindIndexRebuildTask_insertEmailForUser_NilStore(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_checkAndEnqueueTask_NoQueuedTask(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Without queued task and without enqueue param, should return false
 	if ok := task.checkAndEnqueueTask(); ok {
@@ -172,14 +172,14 @@ func TestBlindIndexRebuildTask_checkAndEnqueueTask_NoQueuedTask(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_checkAndEnqueueTask_WithQueuedTask(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -199,15 +199,15 @@ func TestBlindIndexRebuildTask_checkAndEnqueueTask_WithQueuedTask(t *testing.T) 
 }
 
 func TestBlindIndexRebuildTask_Handle_IndividualIndexes_Email(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -217,7 +217,7 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_Email(t *testing.T) {
 		t.Fatalf("Enqueue() expected nil error, got %v", err)
 	}
 
-	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy := NewBlindIndexRebuildTask(app)
 	taskCopy.SetQueuedTask(queuedTask)
 
 	// Handle may fail due to missing blind index stores, but it should execute the code paths
@@ -225,15 +225,15 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_Email(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Handle_IndividualIndexes_FirstName(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -243,7 +243,7 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_FirstName(t *testing.T) 
 		t.Fatalf("Enqueue() expected nil error, got %v", err)
 	}
 
-	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy := NewBlindIndexRebuildTask(app)
 	taskCopy.SetQueuedTask(queuedTask)
 
 	// Handle may fail due to missing blind index stores, but it should execute the code paths
@@ -251,15 +251,15 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_FirstName(t *testing.T) 
 }
 
 func TestBlindIndexRebuildTask_Handle_IndividualIndexes_LastName(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -269,7 +269,7 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_LastName(t *testing.T) {
 		t.Fatalf("Enqueue() expected nil error, got %v", err)
 	}
 
-	taskCopy := NewBlindIndexRebuildTask(registry)
+	taskCopy := NewBlindIndexRebuildTask(app)
 	taskCopy.SetQueuedTask(queuedTask)
 
 	// Handle may fail due to missing blind index stores, but it should execute the code paths
@@ -277,15 +277,15 @@ func TestBlindIndexRebuildTask_Handle_IndividualIndexes_LastName(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_Handle_TruncateIndividual(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithUserStore(true),
 	)
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Register task
-	err := registry.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
+	err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 	if err != nil {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %v", err)
 	}
@@ -307,9 +307,9 @@ func TestBlindIndexRebuildTask_Handle_TruncateIndividual(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_TaskInterface(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	// Test that task implements TaskHandlerInterface
 	var _ interface {
@@ -320,9 +320,9 @@ func TestBlindIndexRebuildTask_TaskInterface(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_AllowedIndexes(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task := NewBlindIndexRebuildTask(registry)
+	task := NewBlindIndexRebuildTask(app)
 
 	expected := []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName}
 
@@ -338,20 +338,20 @@ func TestBlindIndexRebuildTask_AllowedIndexes(t *testing.T) {
 }
 
 func TestBlindIndexRebuildTask_MultipleInstances(t *testing.T) {
-	registry := testutils.Setup()
+	app := testutils.Setup()
 
-	task1 := NewBlindIndexRebuildTask(registry)
-	task2 := NewBlindIndexRebuildTask(registry)
+	task1 := NewBlindIndexRebuildTask(app)
+	task2 := NewBlindIndexRebuildTask(app)
 
 	if task1 == task2 {
 		t.Error("NewBlindIndexRebuildTask should return different instances")
 	}
 
-	if task1.registry != registry {
-		t.Error("task1 registry should match")
+	if task1.app != app {
+		t.Error("task1 app should match")
 	}
 
-	if task2.registry != registry {
-		t.Error("task2 registry should match")
+	if task2.app != app {
+		t.Error("task2 app should match")
 	}
 }

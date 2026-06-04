@@ -9,7 +9,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
@@ -35,13 +35,13 @@ const (
 // == CONTROLLER ==============================================================
 
 type postManagerController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
-func NewPostManagerController(registry registry.RegistryInterface) *postManagerController {
-	return &postManagerController{registry: registry}
+func NewPostManagerController(app app.AppInterface) *postManagerController {
+	return &postManagerController{app: app}
 }
 
 func (controller *postManagerController) Handler(w http.ResponseWriter, r *http.Request) string {
@@ -62,7 +62,7 @@ func (controller *postManagerController) Handler(w http.ResponseWriter, r *http.
 func (controller *postManagerController) renderPage(w http.ResponseWriter, r *http.Request) string {
 	authUser := helpers.GetAuthUser(r)
 	if authUser == nil {
-		return helpers.ToFlashError(controller.registry.GetCacheStore(), w, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "You are not logged in. Please login to continue.", links.Admin().Blog(), 10)
 	}
 
 	breadcrumbs := layouts.Breadcrumbs([]layouts.Breadcrumb{
@@ -130,7 +130,7 @@ func (controller *postManagerController) renderPage(w http.ResponseWriter, r *ht
 		Child(hb.HR()).
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:   "Blog | Post Manager",
 		Content: content,
 		ScriptURLs: []string{
@@ -143,7 +143,7 @@ func (controller *postManagerController) renderPage(w http.ResponseWriter, r *ht
 func (controller *postManagerController) handleLoadPosts(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -221,7 +221,7 @@ func (controller *postManagerController) handleDeletePost(w http.ResponseWriter,
 		return api.Error("Post ID is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -259,7 +259,7 @@ func (controller *postManagerController) handleCreatePost(w http.ResponseWriter,
 		return api.Error("Title is required").ToString()
 	}
 
-	blogStore := controller.registry.GetBlogStore()
+	blogStore := controller.app.GetBlogStore()
 	if blogStore == nil {
 		return api.Error("Blog store not available").ToString()
 	}
@@ -365,23 +365,23 @@ func (controller *postManagerController) prepareData(r *http.Request) (data post
 		OrderBy:              data.sortBy,
 	}
 
-	data.blogList, err = controller.registry.GetBlogStore().
+	data.blogList, err = controller.app.GetBlogStore().
 		// EnableDebug(true).
 		PostList(r.Context(), query)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "error retrieving posts"
 	}
 
 	// DEBUG: cfmt.Successln("Invoice List: ", blogList)
 
-	data.blogCount, err = controller.registry.GetBlogStore().
+	data.blogCount, err = controller.app.GetBlogStore().
 		// EnableDebug().
 		PostCount(r.Context(), query)
 
 	if err != nil {
-		controller.registry.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
+		controller.app.GetLogger().Error("At managerController > prepareData", slog.String("error", err.Error()))
 		return data, "Error retrieving posts count"
 	}
 

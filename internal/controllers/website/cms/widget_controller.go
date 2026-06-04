@@ -2,7 +2,7 @@ package cms
 
 import (
 	"net/http"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/widgets"
 
 	"github.com/dracory/req"
@@ -11,13 +11,13 @@ import (
 // == CONTROLLER ===============================================================
 
 type widgetController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR ==============================================================
 
-func NewWidgetController(registry registry.RegistryInterface) *widgetController {
-	return &widgetController{registry: registry}
+func NewWidgetController(app app.AppInterface) *widgetController {
+	return &widgetController{app: app}
 }
 
 // == PUBLIC METHODS ==========================================================
@@ -29,7 +29,7 @@ func (controller *widgetController) Handler(w http.ResponseWriter, r *http.Reque
 		return "Widget type not specified"
 	}
 
-	widgetList := widgets.WidgetRegistry(controller.registry)
+	widgetList := widgets.WidgetRegistry(controller.app)
 
 	for _, widget := range widgetList {
 		if widget.Alias() == alias {

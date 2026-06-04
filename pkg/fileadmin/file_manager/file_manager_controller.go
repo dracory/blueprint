@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"project/internal/layouts"
-	"project/internal/registry"
+	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/api"
@@ -38,24 +38,24 @@ const (
 
 // FileManagerController handles file management operations
 type FileManagerController struct {
-	registry    registry.RegistryInterface
+	app    app.AppInterface
 	rootDirPath string
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }
 
 // NewFileManagerController creates a new file manager controller
-func NewFileManagerController(registry registry.RegistryInterface) *FileManagerController {
-	cfg := registry.GetConfig()
+func NewFileManagerController(app app.AppInterface) *FileManagerController {
+	cfg := app.GetConfig()
 	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
 	rootDirPath = strings.Trim(rootDirPath, "/")
 	rootDirPath = strings.Trim(rootDirPath, ".")
 	rootDirPath = "/" + rootDirPath
 
 	return &FileManagerController{
-		registry:    registry,
+		app:    app,
 		rootDirPath: rootDirPath,
-		storage:     registry.GetSqlFileStorage(),
+		storage:     app.GetSqlFileStorage(),
 	}
 }
 
@@ -115,7 +115,7 @@ func (c *FileManagerController) anyIndex(_ http.ResponseWriter, r *http.Request)
 // init initializes the controller by setting the layout function
 func (controller *FileManagerController) init(r *http.Request) string {
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+		return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 			Title:   "File Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()
@@ -125,11 +125,11 @@ func (controller *FileManagerController) init(r *http.Request) string {
 
 // renderPage renders the file manager Vue.js application
 func (controller *FileManagerController) renderPage(r *http.Request) string {
-	if controller.registry == nil {
+	if controller.app == nil {
 		return api.Error("app is required").ToString()
 	}
 
-	cfg := controller.registry.GetConfig()
+	cfg := controller.app.GetConfig()
 	if cfg == nil {
 		return api.Error("config is required").ToString()
 	}
@@ -171,7 +171,7 @@ func (controller *FileManagerController) renderPage(r *http.Request) string {
 		Class("container").
 		Child(vueContainer)
 
-	return layouts.NewAdminLayout(controller.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
 		Title:      "File Manager",
 		Content:    content,
 		ScriptURLs: []string{},

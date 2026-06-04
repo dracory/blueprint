@@ -4,21 +4,21 @@ import (
 	"net/http"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/auth"
 )
 
 type logoutController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
-func NewLogoutController(registry registry.RegistryInterface) *logoutController {
-	return &logoutController{registry: registry}
+func NewLogoutController(app app.AppInterface) *logoutController {
+	return &logoutController{app: app}
 }
 
 func (controller *logoutController) AnyIndex(w http.ResponseWriter, r *http.Request) string {
 	auth.AuthCookieRemove(w, r)
 
-	return helpers.ToFlashSuccess(controller.registry.GetCacheStore(), w, r, "You have been logged out successfully", links.Website().Home(), 5)
+	return helpers.ToFlashSuccess(controller.app.GetCacheStore(), w, r, "You have been logged out successfully", links.Website().Home(), 5)
 }

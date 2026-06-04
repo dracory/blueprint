@@ -20,15 +20,15 @@ func (controller *userUpdateController) handleTimezonesFetchAjax(w http.Response
 		return
 	}
 
-	if controller.registry.GetGeoStore() == nil {
-		if controller.registry.GetLogger() != nil {
-			controller.registry.GetLogger().Error("userUpdateController.handleTimezonesFetchAjax GeoStore not configured")
+	if controller.app.GetGeoStore() == nil {
+		if controller.app.GetLogger() != nil {
+			controller.app.GetLogger().Error("userUpdateController.handleTimezonesFetchAjax GeoStore not configured")
 		}
 		api.Respond(w, r, api.Error("GeoStore is not configured"))
 		return
 	}
 
-	timezoneList, err := controller.registry.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
+	timezoneList, err := controller.app.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
 		SortOrder:   sb.ASC,
 		OrderBy:     geostore.COLUMN_TIMEZONE,
 		CountryCode: countryCode,

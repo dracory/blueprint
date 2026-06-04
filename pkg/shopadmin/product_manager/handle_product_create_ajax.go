@@ -16,7 +16,7 @@ func (controller *productManagerController) handleProductCreateAjax(w http.Respo
 		return ""
 	}
 
-	if controller.registry.GetShopStore() == nil {
+	if controller.app.GetShopStore() == nil {
 		api.Respond(w, r, api.Error("Shop store not configured"))
 		return ""
 	}
@@ -37,8 +37,8 @@ func (controller *productManagerController) handleProductCreateAjax(w http.Respo
 	product := shopstore.NewProduct()
 	product.SetTitle(strings.TrimSpace(reqBody.Title))
 
-	if err := controller.registry.GetShopStore().ProductCreate(r.Context(), product); err != nil {
-		controller.registry.GetLogger().Error("productManagerController.handleProductCreateAjax", slog.String("error", err.Error()))
+	if err := controller.app.GetShopStore().ProductCreate(r.Context(), product); err != nil {
+		controller.app.GetLogger().Error("productManagerController.handleProductCreateAjax", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("Failed to create product"))
 		return ""
 	}

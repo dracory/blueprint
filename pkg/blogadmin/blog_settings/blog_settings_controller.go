@@ -9,7 +9,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"
@@ -19,7 +19,7 @@ import (
 )
 
 type blogSettingsController struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 type blogSettingsData struct {
@@ -28,28 +28,28 @@ type blogSettingsData struct {
 	isEnvOverride   bool
 }
 
-func NewBlogSettingsController(registry registry.RegistryInterface) *blogSettingsController {
-	return &blogSettingsController{registry: registry}
+func NewBlogSettingsController(app app.AppInterface) *blogSettingsController {
+	return &blogSettingsController{app: app}
 }
 
 func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request) string {
 	data, errMessage := c.prepareData(r)
 	if errMessage != "" {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, errMessage, shared.NewLinks("/admin/blog").Home(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errMessage, shared.NewLinks("/admin/blog").Home(), 10)
 	}
 
 	var formComponent liveflux.ComponentInterface
 
 	if r.Method == http.MethodPost {
 		// Create the component for handling POST
-		formComponent = NewFormBlogSettings(c.registry)
+		formComponent = NewFormBlogSettings(c.app)
 		if formComponent == nil {
-			return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Failed to initialize form component", shared.NewLinks("/admin/blog").Home(), 10)
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize form component", shared.NewLinks("/admin/blog").Home(), 10)
 		}
 
 		comp, ok := formComponent.(*formBlogSettings)
 		if !ok {
-			return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Invalid form component", shared.NewLinks("/admin/blog").Home(), 10)
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid form component", shared.NewLinks("/admin/blog").Home(), 10)
 		}
 
 		// Parse form data
@@ -81,10 +81,10 @@ func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request)
 
 	// Use the existing component if available, otherwise create a new one
 	if formComponent == nil {
-		formComponent = NewFormBlogSettings(c.registry)
+		formComponent = NewFormBlogSettings(c.app)
 	}
 	if formComponent == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Failed to initialize blog settings form", shared.NewLinks("/admin/blog").Home(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Failed to initialize blog settings form", shared.NewLinks("/admin/blog").Home(), 10)
 	}
 
 	if comp, ok := formComponent.(*formBlogSettings); ok {
@@ -100,10 +100,10 @@ func (c *blogSettingsController) Handler(w http.ResponseWriter, r *http.Request)
 	})
 
 	if rendered == nil {
-		return helpers.ToFlashError(c.registry.GetCacheStore(), w, r, "Error rendering blog settings form", shared.NewLinks("/admin/blog").Home(), 10)
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error rendering blog settings form", shared.NewLinks("/admin/blog").Home(), 10)
 	}
 
-	return layouts.NewAdminLayout(c.registry, r, layouts.Options{
+	return layouts.NewAdminLayout(c.app, r, layouts.Options{
 		Title:   "Settings | Blog",
 		Content: c.page(rendered),
 		ScriptURLs: []string{
@@ -122,15 +122,15 @@ func (c *blogSettingsController) prepareData(r *http.Request) (blogSettingsData,
 		return data, "You are not logged in. Please login to continue."
 	}
 
-	store := c.registry.GetSettingStore()
+	store := c.app.GetSettingStore()
 	if store == nil {
-		c.registry.GetLogger().Error("Blog settings controller: setting store is not configured")
+		c.app.GetLogger().Error("Blog settings controller: setting store is not configured")
 		return data, "Blog settings are unavailable. Please contact an administrator."
 	}
 
 	value, err := store.Get(r.Context(), SettingKeyBlogTopic, "")
 	if err != nil {
-		c.registry.GetLogger().Error("Blog settings controller: failed to load blog topic", slog.String("error", err.Error()))
+		c.app.GetLogger().Error("Blog settings controller: failed to load blog topic", slog.String("error", err.Error()))
 		return data, "Failed to load blog settings. Please try again later."
 	}
 

@@ -7,36 +7,36 @@ import (
 	"project/internal/controllers/shared"
 	"project/internal/controllers/user"
 	"project/internal/controllers/website"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/widgets"
 
 	"github.com/dracory/rtr"
 )
 
-func routes(registry registry.RegistryInterface) []rtr.RouteInterface {
+func routes(app app.AppInterface) []rtr.RouteInterface {
 	routes := []rtr.RouteInterface{}
 
-	routes = append(routes, admin.Routes(registry)...)
-	routes = append(routes, auth.Routes(registry)...)
-	routes = append(routes, liveflux.Routes(registry)...)
-	routes = append(routes, shared.Routes(registry)...)
-	routes = append(routes, user.Routes(registry)...)
-	routes = append(routes, widgets.Routes(registry)...)
-	routes = append(routes, website.Routes(registry)...)
+	routes = append(routes, admin.Routes(app)...)
+	routes = append(routes, auth.Routes(app)...)
+	routes = append(routes, liveflux.Routes(app)...)
+	routes = append(routes, shared.Routes(app)...)
+	routes = append(routes, user.Routes(app)...)
+	routes = append(routes, widgets.Routes(app)...)
+	routes = append(routes, website.Routes(app)...)
 
 	return routes
 }
 
-func RoutesList(registry registry.RegistryInterface) (globalMiddlewareList []rtr.MiddlewareInterface, routeList []rtr.RouteInterface) {
-	return globalMiddlewares(registry), routes(registry)
+func RoutesList(app app.AppInterface) (globalMiddlewareList []rtr.MiddlewareInterface, routeList []rtr.RouteInterface) {
+	return globalMiddlewares(app), routes(app)
 }
 
-// Router creates the router for the registry.
-func Router(registry registry.RegistryInterface) rtr.RouterInterface {
+// Router creates the router for the app.
+func Router(app app.AppInterface) rtr.RouterInterface {
 	r := rtr.NewRouter()
 
 	// Add global middlewares
-	globalMiddlewareList, routeList := RoutesList(registry)
+	globalMiddlewareList, routeList := RoutesList(app)
 
 	r.AddBeforeMiddlewares(globalMiddlewareList)
 

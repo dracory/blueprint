@@ -16,7 +16,7 @@ func (controller *userManagerController) handleUserCreateAjax(w http.ResponseWri
 		return ""
 	}
 
-	if controller.registry.GetUserStore() == nil {
+	if controller.app.GetUserStore() == nil {
 		api.Respond(w, r, api.Error("User store not configured"))
 		return ""
 	}
@@ -49,8 +49,8 @@ func (controller *userManagerController) handleUserCreateAjax(w http.ResponseWri
 	user.SetLastName(strings.TrimSpace(reqBody.LastName))
 	user.SetEmail(strings.TrimSpace(reqBody.Email))
 
-	if err := controller.registry.GetUserStore().UserCreate(r.Context(), user); err != nil {
-		controller.registry.GetLogger().Error("userManagerController.handleUserCreateAjax", slog.String("error", err.Error()))
+	if err := controller.app.GetUserStore().UserCreate(r.Context(), user); err != nil {
+		controller.app.GetLogger().Error("userManagerController.handleUserCreateAjax", slog.String("error", err.Error()))
 		api.Respond(w, r, api.Error("Failed to create user"))
 		return ""
 	}

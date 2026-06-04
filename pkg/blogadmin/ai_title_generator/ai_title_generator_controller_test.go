@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"project/internal/config"
-	"project/internal/registry"
+	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
@@ -18,18 +18,18 @@ import (
 func TestNewAiTitleGeneratorController(t *testing.T) {
 	t.Parallel()
 
-	// Test with interface - we can only test with nil since RegistryInterface is not directly instantiable
-	var mockRegistry registry.RegistryInterface
+	// Test with interface - we can only test with nil since AppInterface is not directly instantiable
+	var mockRegistry app.AppInterface
 	controller := NewAiTitleGeneratorController(mockRegistry)
 	if controller == nil {
 		t.Fatal("NewAiTitleGeneratorController should not return nil")
 	}
-	if controller.registry != mockRegistry {
-		t.Error("Controller should store the registry")
+	if controller.app != mockRegistry {
+		t.Error("Controller should store the app")
 	}
 
-	// Note: Nil registry acceptance is tested but methods will panic
-	// if registry is nil when accessing stores. This is acceptable
+	// Note: Nil app acceptance is tested but methods will panic
+	// if app is nil when accessing stores. This is acceptable
 	// as long as production code never passes nil.
 }
 
@@ -39,12 +39,12 @@ func TestAiTitleGeneratorController_Struct(t *testing.T) {
 
 	controller := &AiTitleGeneratorController{}
 
-	// Test that registry field exists and can be set
-	var reg registry.RegistryInterface
-	controller.registry = reg
+	// Test that app field exists and can be set
+	var reg app.AppInterface
+	controller.app = reg
 
-	if controller.registry != reg {
-		t.Error("Should be able to set registry field")
+	if controller.app != reg {
+		t.Error("Should be able to set app field")
 	}
 }
 
@@ -140,19 +140,19 @@ func TestAiTitleGeneratorController_MultipleInstances(t *testing.T) {
 		t.Error("Multiple instances should be independent")
 	}
 
-	// Test that each has its own registry reference
-	var mockRegistry1 registry.RegistryInterface
-	var mockRegistry2 registry.RegistryInterface
+	// Test that each has its own app reference
+	var mockRegistry1 app.AppInterface
+	var mockRegistry2 app.AppInterface
 
-	controller1.registry = mockRegistry1
-	controller2.registry = mockRegistry2
+	controller1.app = mockRegistry1
+	controller2.app = mockRegistry2
 
-	if controller1.registry != mockRegistry1 {
-		t.Error("First controller should have correct registry")
+	if controller1.app != mockRegistry1 {
+		t.Error("First controller should have correct app")
 	}
 
-	if controller2.registry != mockRegistry2 {
-		t.Error("Second controller should have correct registry")
+	if controller2.app != mockRegistry2 {
+		t.Error("Second controller should have correct app")
 	}
 }
 
@@ -173,15 +173,15 @@ func TestAiTitleGeneratorController_Handler_MethodExists(t *testing.T) {
 
 // TestAiTitleGeneratorController_RenderPage tests rendering the page
 func TestAiTitleGeneratorController_RenderPage(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithCustomStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewAiTitleGeneratorController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewAiTitleGeneratorController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)
@@ -195,15 +195,15 @@ func TestAiTitleGeneratorController_RenderPage(t *testing.T) {
 
 // TestAiTitleGeneratorController_OnAddTitleModal tests the add title modal
 func TestAiTitleGeneratorController_OnAddTitleModal(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 		testutils.WithCacheStore(true),
 		testutils.WithUserStore(true),
 		testutils.WithCustomStore(true),
 	)
 
-	user, _ := testutils.SeedUser(registry.GetUserStore(), test.USER_01)
-	controller := NewAiTitleGeneratorController(registry)
+	user, _ := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	controller := NewAiTitleGeneratorController(app)
 
 	// Context with auth user
 	ctx := context.WithValue(context.Background(), config.AuthenticatedUserContextKey{}, user)

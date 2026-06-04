@@ -1,0 +1,50 @@
+package app
+
+import (
+	"database/sql"
+	"errors"
+
+	"github.com/dracory/subscriptionstore"
+)
+
+// subscriptionStoreInitialize initializes the subscription store if enabled in the configuration.
+func subscriptionStoreInitialize(app AppInterface) error {
+	if app.GetConfig() == nil {
+		return errors.New("config is not initialized")
+	}
+
+	if !app.GetConfig().GetSubscriptionStoreUsed() {
+		return nil
+	}
+
+	if store, err := newSubscriptionStore(app.GetDatabase()); err != nil {
+		return err
+	} else {
+		app.SetSubscriptionStore(store)
+	}
+
+	return nil
+}
+
+// newSubscriptionStore constructs the Subscription store without running migrations
+func newSubscriptionStore(db *sql.DB) (subscriptionstore.StoreInterface, error) {
+	if db == nil {
+		return nil, errors.New("database is not initialized")
+	}
+
+	st, err := subscriptionstore.NewStore(subscriptionstore.NewStoreOptions{
+		DB:                    db,
+		PlanTableName:         "snv_subscriptions_plan",
+		SubscriptionTableName: "snv_subscriptions_subscription",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if st == nil {
+		return nil, errors.New("subscriptionstore.NewStore returned a nil store")
+	}
+
+	return st, nil
+}

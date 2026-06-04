@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/api"
 	"github.com/dracory/shopstore"
@@ -20,8 +20,8 @@ type MediaRequest struct {
 }
 
 // HandleAjaxSaveMedia handles AJAX requests to save media and returns JSON string
-func HandleAjaxSaveMedia(registry registry.RegistryInterface, r *http.Request, productID string) string {
-	if registry.GetShopStore() == nil {
+func HandleAjaxSaveMedia(app app.AppInterface, r *http.Request, productID string) string {
+	if app.GetShopStore() == nil {
 		return api.ErrorWithData("Shop store not available", map[string]any{}).ToString()
 	}
 
@@ -33,13 +33,13 @@ func HandleAjaxSaveMedia(registry registry.RegistryInterface, r *http.Request, p
 	// Delete existing media for this product
 	mediaQuery := shopstore.NewMediaQuery()
 	mediaQuery.SetEntityID(productID)
-	existingMedias, err := registry.GetShopStore().MediaList(context.Background(), mediaQuery)
+	existingMedias, err := app.GetShopStore().MediaList(context.Background(), mediaQuery)
 	if err != nil {
 		return api.ErrorWithData("Failed to load existing media", map[string]any{}).ToString()
 	}
 
 	for _, existingMedia := range existingMedias {
-		err := registry.GetShopStore().MediaDelete(context.Background(), existingMedia)
+		err := app.GetShopStore().MediaDelete(context.Background(), existingMedia)
 		if err != nil {
 			return api.ErrorWithData("Failed to delete existing media", map[string]any{}).ToString()
 		}
@@ -59,7 +59,7 @@ func HandleAjaxSaveMedia(registry registry.RegistryInterface, r *http.Request, p
 		media.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
 		media.SetSequence(i)
 
-		err := registry.GetShopStore().MediaCreate(context.Background(), media)
+		err := app.GetShopStore().MediaCreate(context.Background(), media)
 		if err != nil {
 			slog.Error("Failed to create media", slog.String("error", err.Error()), slog.String("url", item.URL), slog.String("product_id", productID))
 			return api.ErrorWithData("Failed to save media: "+err.Error(), map[string]any{}).ToString()

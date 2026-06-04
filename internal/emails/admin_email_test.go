@@ -8,29 +8,29 @@ import (
 )
 
 func TestEmailToAdminOnNewContactFormSubmitted(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	email := NewEmailToAdminOnNewContactFormSubmitted(nil)
 	if email == nil {
 		t.Fatal("NewEmailToAdminOnNewContactFormSubmitted(nil) should return non-nil")
 	}
-	if email.registry != nil {
-		t.Error("email.registry should be nil when passed nil")
+	if email.app != nil {
+		t.Error("email.app should be nil when passed nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	email = NewEmailToAdminOnNewContactFormSubmitted(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	email = NewEmailToAdminOnNewContactFormSubmitted(app)
 	if email == nil {
-		t.Fatal("NewEmailToAdminOnNewContactFormSubmitted(registry) should return non-nil")
+		t.Fatal("NewEmailToAdminOnNewContactFormSubmitted(app) should return non-nil")
 	}
-	if email.registry == nil {
-		t.Error("email.registry should not be nil when passed valid registry")
+	if email.app == nil {
+		t.Error("email.app should not be nil when passed valid app")
 	}
 }
 
 func TestEmailToAdminOnNewContactFormSubmitted_Template(t *testing.T) {
-	registry := testutils.Setup()
-	email := NewEmailToAdminOnNewContactFormSubmitted(registry)
+	app := testutils.Setup()
+	email := NewEmailToAdminOnNewContactFormSubmitted(app)
 
 	// Test template generation
 	html := email.template("TestApp")
@@ -65,9 +65,9 @@ func TestEmailToAdminOnNewContactFormSubmitted_Send(t *testing.T) {
 		t.Error("Send() with uninitialized sender should return error")
 	}
 
-	// Test with valid registry but uninitialized sender
-	registry := testutils.Setup()
-	email = NewEmailToAdminOnNewContactFormSubmitted(registry)
+	// Test with valid app but uninitialized sender
+	app := testutils.Setup()
+	email = NewEmailToAdminOnNewContactFormSubmitted(app)
 	err = email.Send()
 	if err == nil {
 		t.Error("Send() with uninitialized sender should return error")
@@ -75,29 +75,29 @@ func TestEmailToAdminOnNewContactFormSubmitted_Send(t *testing.T) {
 }
 
 func TestEmailToAdminOnNewUserRegistered(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	email := NewEmailToAdminOnNewUserRegistered(nil)
 	if email == nil {
 		t.Fatal("NewEmailToAdminOnNewUserRegistered(nil) should return non-nil")
 	}
-	if email.registry != nil {
-		t.Error("email.registry should be nil when passed nil")
+	if email.app != nil {
+		t.Error("email.app should be nil when passed nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	email = NewEmailToAdminOnNewUserRegistered(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	email = NewEmailToAdminOnNewUserRegistered(app)
 	if email == nil {
-		t.Fatal("NewEmailToAdminOnNewUserRegistered(registry) should return non-nil")
+		t.Fatal("NewEmailToAdminOnNewUserRegistered(app) should return non-nil")
 	}
-	if email.registry == nil {
-		t.Error("email.registry should not be nil when passed valid registry")
+	if email.app == nil {
+		t.Error("email.app should not be nil when passed valid app")
 	}
 }
 
 func TestEmailToAdminOnNewUserRegistered_Template(t *testing.T) {
-	registry := testutils.Setup()
-	email := NewEmailToAdminOnNewUserRegistered(registry)
+	app := testutils.Setup()
+	email := NewEmailToAdminOnNewUserRegistered(app)
 
 	// Test template generation
 	html := email.template("TestApp", "user-123")
@@ -132,9 +132,9 @@ func TestEmailToAdminOnNewUserRegistered_Send(t *testing.T) {
 		t.Error("Send() with uninitialized sender should return error")
 	}
 
-	// Test with valid registry but uninitialized sender
-	registry := testutils.Setup()
-	email = NewEmailToAdminOnNewUserRegistered(registry)
+	// Test with valid app but uninitialized sender
+	app := testutils.Setup()
+	email = NewEmailToAdminOnNewUserRegistered(app)
 	err = email.Send("user-123")
 	if err == nil {
 		t.Error("Send() with uninitialized sender should return error")
@@ -142,23 +142,23 @@ func TestEmailToAdminOnNewUserRegistered_Send(t *testing.T) {
 }
 
 func TestEmailNotifyAdmin(t *testing.T) {
-	// Test with nil registry
+	// Test with nil app
 	email := NewEmailNotifyAdmin(nil)
 	if email == nil {
 		t.Fatal("NewEmailNotifyAdmin(nil) should return non-nil")
 	}
-	if email.registry != nil {
-		t.Error("email.registry should be nil when passed nil")
+	if email.app != nil {
+		t.Error("email.app should be nil when passed nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	email = NewEmailNotifyAdmin(registry)
+	// Test with valid app
+	app := testutils.Setup()
+	email = NewEmailNotifyAdmin(app)
 	if email == nil {
-		t.Fatal("NewEmailNotifyAdmin(registry) should return non-nil")
+		t.Fatal("NewEmailNotifyAdmin(app) should return non-nil")
 	}
-	if email.registry == nil {
-		t.Error("email.registry should not be nil when passed valid registry")
+	if email.app == nil {
+		t.Error("email.app should not be nil when passed valid app")
 	}
 }
 
@@ -181,9 +181,9 @@ func TestEmailNotifyAdmin_Send(t *testing.T) {
 		t.Error("Send() with uninitialized sender should return error")
 	}
 
-	// Test with valid registry but uninitialized sender
-	registry := testutils.Setup()
-	email = NewEmailNotifyAdmin(registry)
+	// Test with valid app but uninitialized sender
+	app := testutils.Setup()
+	email = NewEmailNotifyAdmin(app)
 	err = email.Send("<p>Test HTML</p>")
 	if err == nil {
 		t.Error("Send() with uninitialized sender should return error")
@@ -191,32 +191,32 @@ func TestEmailNotifyAdmin_Send(t *testing.T) {
 }
 
 func TestInviteFriendEmail(t *testing.T) {
-	// Test with nil registry and nil user store
+	// Test with nil app and nil user store
 	email := NewInviteFriendEmail(nil, nil)
 	if email == nil {
 		t.Fatal("NewInviteFriendEmail(nil, nil) should return non-nil")
 	}
-	if email.registry != nil {
-		t.Error("email.registry should be nil when passed nil")
+	if email.app != nil {
+		t.Error("email.app should be nil when passed nil")
 	}
 	if email.userStore != nil {
 		t.Error("email.userStore should be nil when passed nil")
 	}
 
-	// Test with valid registry
-	registry := testutils.Setup()
-	email = NewInviteFriendEmail(registry, nil)
+	// Test with valid app
+	app := testutils.Setup()
+	email = NewInviteFriendEmail(app, nil)
 	if email == nil {
-		t.Fatal("NewInviteFriendEmail(registry, nil) should return non-nil")
+		t.Fatal("NewInviteFriendEmail(app, nil) should return non-nil")
 	}
-	if email.registry == nil {
-		t.Error("email.registry should not be nil when passed valid registry")
+	if email.app == nil {
+		t.Error("email.app should not be nil when passed valid app")
 	}
 }
 
 func TestInviteFriendEmail_Template(t *testing.T) {
-	registry := testutils.Setup()
-	email := NewInviteFriendEmail(registry, nil)
+	app := testutils.Setup()
+	email := NewInviteFriendEmail(app, nil)
 
 	// Test template generation
 	html := email.template("TestApp", "John", "Hello friend!", "Jane")
@@ -257,9 +257,9 @@ func TestInviteFriendEmail_Send(t *testing.T) {
 		t.Error("Send() with nil userStore should return error")
 	}
 
-	// Test with valid registry but nil user store
-	registry := testutils.Setup()
-	email = NewInviteFriendEmail(registry, nil)
+	// Test with valid app but nil user store
+	app := testutils.Setup()
+	email = NewInviteFriendEmail(app, nil)
 	err = email.Send("user-123", "Hello!", "friend@example.com", "Friend")
 	if err == nil {
 		t.Error("Send() with nil userStore should return error")

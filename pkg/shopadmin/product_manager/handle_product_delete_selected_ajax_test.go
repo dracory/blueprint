@@ -12,12 +12,12 @@ import (
 )
 
 func TestHandleProductDeleteSelectedAjax_RequiresPOST(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductManagerController(registry)
+	controller := NewProductManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodGet, controller.handleProductDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -27,11 +27,11 @@ func TestHandleProductDeleteSelectedAjax_RequiresPOST(t *testing.T) {
 }
 
 func TestHandleProductDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	controller := NewProductManagerController(registry)
+	controller := NewProductManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleProductDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})
@@ -41,12 +41,12 @@ func TestHandleProductDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
 }
 
 func TestHandleProductDeleteSelectedAjax_DeletesSelectedProducts(t *testing.T) {
-	registry := testutils.Setup(
+	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
 	)
 
-	controller := NewProductManagerController(registry)
+	controller := NewProductManagerController(app)
 	_, response, err := test.CallStringEndpoint(http.MethodPost, controller.handleProductDeleteSelected, test.NewRequestOptions{
 		GetValues: url.Values{},
 	})

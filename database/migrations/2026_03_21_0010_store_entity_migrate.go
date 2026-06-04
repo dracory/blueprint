@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"project/internal/registry"
+	"project/internal/app"
 
 	"github.com/dracory/migrate"
 	"github.com/dromara/carbon/v2"
@@ -15,7 +15,7 @@ import (
 var _ migrate.MigrationInterface = (*StoreEntityMigrate)(nil)
 
 type StoreEntityMigrate struct {
-	registry registry.RegistryInterface
+	app app.AppInterface
 }
 
 func (m *StoreEntityMigrate) ID() string {
@@ -27,11 +27,11 @@ func (m *StoreEntityMigrate) Description() string {
 }
 
 func (m *StoreEntityMigrate) Up(ctx context.Context, tx *sql.Tx) error {
-	if m.registry == nil {
-		return errors.New("registry is nil")
+	if m.app == nil {
+		return errors.New("app is nil")
 	}
 
-	store := m.registry.GetEntityStore()
+	store := m.app.GetEntityStore()
 	if store == nil {
 		return errors.New("entity store is not initialized")
 	}
@@ -40,7 +40,7 @@ func (m *StoreEntityMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 }
 
 func (m *StoreEntityMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	store := m.registry.GetEntityStore()
+	store := m.app.GetEntityStore()
 	if store == nil {
 		return errors.New("entity store is not initialized")
 	}

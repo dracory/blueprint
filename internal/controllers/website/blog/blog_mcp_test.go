@@ -17,10 +17,10 @@ func TestBlogMcpEndpoint_RequiresApiKey(t *testing.T) {
 	cfg.SetBlogStoreUsed(true)
 	cfg.SetCmsMcpApiKey("test-mcp-key")
 
-	registry := testutils.Setup(testutils.WithCfg(cfg))
+	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	r := rtr.NewRouter()
-	r.AddRoutes(Routes(registry))
+	r.AddRoutes(Routes(app))
 
 	// Missing key
 	reqMissing := httptest.NewRequest(http.MethodPost, links.MCP_BLOG, bytes.NewBuffer([]byte(`{"jsonrpc":"2.0","id":"1","method":"list_tools","params":{}}`)))
