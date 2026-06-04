@@ -29,10 +29,10 @@ git clone https://github.com/dracory/blueprint
 
 ## Environment Variables
 
-- Copy the `.env_example` file to `.env`
+- Copy the `.env.example` file to `.env`
 
 ```bash
-cp .env_example .env
+cp .env.example .env
 ```
 
 - Set the dev vault values
@@ -46,6 +46,8 @@ task env-dev
 ```bash
 task env-prod
 ```
+
+For a complete reference of all available environment variables, see [Environment Variables Documentation](docs/environment-variables.md).
 
 
 ## Local Development
