@@ -9,7 +9,7 @@
 
 ## Description
 
-This is a quick start blueprint for an MVC web applications
+Blueprint is a rapid application development (RAD) starter template built on the Dracory framework. It provides a batteries-included foundation for building production-ready web applications and APIs with pre-configured infrastructure and best practices. The philosophy is simple: it's easier to remove what you don't need than to add missing infrastructure later.
 
 - Ready to develop in the cloud (Gitpod / Github CodeSpaces)
 - Database connection setup (SQLite example)

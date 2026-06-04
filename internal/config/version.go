@@ -1,7 +1,7 @@
 package config
 
-// Version is the current version of the Blueprint framework.
-// This constant is used by AI tools and upgrade scripts to identify the framework version.
+// Version is the current version of the Blueprint rapid application development (RAD) starter template.
+// This constant is used by AI tools and upgrade scripts to identify the template version.
 // When upgrading, AI can compare this constant with upgrade guides to determine the appropriate migration path.
 //
 // Version Workflow:
@@ -11,7 +11,7 @@ package config
 // 4. Immediately create the next release branch and increment the version
 const Version = "0.30.0"
 
-// GetVersion returns the current version of the Blueprint framework.
+// GetVersion returns the current version of the Blueprint rapid application development (RAD) starter template.
 func GetVersion() string {
 	return Version
 }

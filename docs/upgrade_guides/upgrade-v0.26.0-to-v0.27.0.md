@@ -23,11 +23,11 @@ if err != nil {
 **Action Required**:
 - Update any custom code that calls `migrate.New()` directly
 - Add error handling for the new error return value
-- The Blueprint framework's `database/migrations/migrate.go` has been updated automatically
-- If you have custom migration code outside of the framework, update it to handle the error
+- The Blueprint rapid application development (RAD) starter template's `database/migrations/migrate.go` has been updated automatically
+- If you have custom migration code outside of the template, update it to handle the error
 
 **Files to Check**:
-- `database/migrations/migrate.go` (already updated in framework)
+- `database/migrations/migrate.go` (already updated in template)
 - Any custom migration files in your project that use `migrate.New()`
 
 ### 2. Go Version Update
