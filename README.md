@@ -9,17 +9,77 @@
 
 ## Description
 
-Blueprint is a rapid application development (RAD) starter template built on the Dracory framework. It provides a batteries-included foundation for building production-ready web applications and APIs with pre-configured infrastructure and best practices. The philosophy is simple: it's easier to remove what you don't need than to add missing infrastructure later.
+**Build production-ready Go apps in minutes, not days and months.**
 
-- Ready to develop in the cloud (Gitpod / Github CodeSpaces)
-- Database connection setup (SQLite example)
-- Router setup
-- Background tasks setup
-- Scheduler setup
-- Controllers setup
-- CMS setup (optional)
-- Data Vault (optional)
-- Blind Index (optional)
+Blueprint is a rapid application development (RAD) starter template built on the Dracory framework. Think of it as "Laravel on steroids" for Go - a batteries-included foundation for building production-ready web applications and APIs with pre-configured infrastructure and best practices. The philosophy is simple: it's easier to remove what you don't need than to add missing infrastructure later.
+
+**What's Included:**
+
+**Core Infrastructure:**
+- Database connection setup (SQLite, MySQL, PostgreSQL support)
+- High-performance router with middleware chains
+- Background task queue system
+- Cron-like job scheduler
+- Configuration management with validation
+- Environment-specific configuration (dev, staging, prod)
+- Encrypted environment variable support (Data Vault)
+- Graceful shutdown handling
+- Logging and structured logging
+
+**Authentication & Security:**
+- Complete authentication system
+- Session management
+- API authentication middleware
+- Security headers middleware
+- Jail bots middleware (IP-based bot protection)
+- Email allowlist middleware
+- HTTPS redirect middleware
+- Blind Index for searchable encrypted data
+- Vault to securely store secrets
+
+**Admin & CMS:**
+- Full admin interface with Vue.js
+- CMS blocks system
+- Blog management (blogadmin)
+- File management (fileadmin)
+- User management (useradmin)
+- Shop/e-commerce (shopadmin)
+- Log viewing (logadmin)
+- Task management (task admin)
+- CMS management (cmsadmin)
+- Social media integration
+- Testimonials system
+
+**Development Tools:**
+- CLI command dispatcher
+- Deployment utilities
+- Environment encryption tool (envenc)
+- Load testing utility
+- Task runner (taskfile.yml)
+- Gitpod & GitHub CodeSpaces ready
+- Docker support
+- CI/CD pipelines
+
+**Testing & Quality:**
+- Comprehensive test utilities
+- Integration test setup
+- Coverage reporting
+- Test fixtures and helpers
+
+**Email & Notifications:**
+- Email system with SMTP
+- Email templates
+- Admin email notifications
+- User registration emails
+- Contact form emails
+
+**Additional Features:**
+- Theme system
+- Widget components
+- Layout templates
+- Helper functions
+- Resource management
+- Link management
 
 ## Installation
 
