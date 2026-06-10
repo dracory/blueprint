@@ -171,3 +171,4 @@ Before finishing, confirm:
 - **Evaluate guide applicability before applying**. A guide may be skipped if its proposed changes are already present, conflict with newer package APIs, or are superseded by a later guide's approach. Document the reason for any skipped guides.
 - **Update the version constant once at the end** to the latest Blueprint version after all applicable guides are completed.
 - **Prefer Blueprint files as reference** when the upgrade guide is ambiguous.
+- **Ask the user for clarification** when uncertain about how to apply a change, which guide to prioritize, or whether to skip a step. Do not guess or make assumptions that could break the project.
