@@ -172,3 +172,4 @@ Before finishing, confirm:
 - **Update the version constant once at the end** to the latest Blueprint version after all applicable guides are completed.
 - **Prefer Blueprint files as reference** when the upgrade guide is ambiguous.
 - **Ask the user for clarification** when uncertain about how to apply a change, which guide to prioritize, or whether to skip a step. Do not guess or make assumptions that could break the project.
+- **Avoid bulk changes**. Apply changes incrementally and verify each step compiles and passes tests before moving on. Large sweeping changes across many files at once increase the risk of creating an unrecoverable mess.
