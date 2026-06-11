@@ -45,8 +45,34 @@ If `<project_path>` is not known, ask the user to provide it.
    - Read the `Version` constant.
    - Example: `const Version = "0.23.0"`
 
-3. **Determine the upgrade path**:
-   - If current == latest, report that no upgrade is needed.
+3. **Structural validation check** (catches version constant mismatches with actual code structure across the whole project):
+   - For each key directory that commonly changes between Blueprint versions, list `.go` files in both the project and the blueprint reference. Key directories to check include:
+     - `internal/config`
+     - `internal/app`
+     - `cmd/server`
+     - `database/migrations`
+     - `internal/controllers` (and sub-packages)
+   - Compare the file lists. Flag any of these discrepancies:
+     - **Files present in blueprint but missing in project** — suggests the project never applied that guide's file changes.
+     - **Files present in project but missing in blueprint** — suggests old files that should have been removed.
+     - **Different file counts** — a strong indicator of a structural mismatch.
+     - **Different package names or directory renames** — e.g., `internal/registry` vs `internal/app`.
+   - **Naming consistency check** — When a package, type, or concept is renamed in an upgrade (e.g., `registry` → `app`), verify that ALL occurrences were updated:
+     - File names: `registry_*.go` should become `app_*.go` (especially test files).
+     - Function parameter names: `registry AppInterface` should become `app AppInterface`.
+     - Variable names and comments referencing the old name.
+     - Error message strings referencing the old name.
+   - **Completeness check** — When a feature is added to blueprint (e.g., a new middleware, a test file for a migration), check if the project has it. Missing test files are a common sign of an incomplete upgrade.
+   - If structural discrepancies are found, **do not trust the version constant alone**. Read the relevant upgrade guide(s) to determine what file changes were expected, and treat the project as if it needs those guides applied.
+   - Examples of structural mismatches:
+     - The project claims `0.29.0` but still has `internal/config/load.go`, `functions.go`, and `defaults.go` while blueprint has `app_config.go`, `database_config.go`, etc. — the project likely missed the v0.18.0→v0.19.0 config restructure.
+     - The project still has `internal/registry/registry_interface.go` while blueprint has `internal/app/app_interface.go` — the project likely missed the v0.28.0→v0.29.0 registry→app rename.
+     - The project renamed `registry_implementation.go` → `app_implementation.go` but left `registry_close_test.go`, `registry_datastores_test.go`, and `registry_logger_test.go` unchanged — the rename was incomplete.
+     - The project renamed `registry AppInterface` parameters to `app AppInterface` in `app_implementation.go` but left them as `registry AppInterface` in `stores_*.go` files — the rename was inconsistent across the package.
+
+4. **Determine the upgrade path**:
+   - If current == latest AND structural validation passes, report that no upgrade is needed.
+   - If structural discrepancies exist despite matching version constants, plan to apply the relevant guides anyway.
    - Identify all relevant upgrade guides between the current and latest versions.
    - Guides are typically applied from oldest to newest, but the order is flexible:
      - Some guides may be skipped if the project's packages already have newer methods that make the older guide's changes irrelevant or conflicting.
@@ -142,6 +168,9 @@ After all guides have been applied:
 Before finishing, confirm:
 
 - [ ] Project version constant matches the latest Blueprint version.
+- [ ] Structural validation passes: key directories match blueprint (no missing or stale files).
+- [ ] Naming consistency passes: no old names in file names, parameter names, variable names, or error messages after a rename.
+- [ ] Completeness passes: every production file that should have a test file has one; every new blueprint feature is present in the project.
 - [ ] All applicable upgrade guides were applied; skipped guides were documented with justification.
 - [ ] `go.mod` dependencies are updated and `go mod tidy` has been run.
 - [ ] Breaking changes from each guide are applied.
@@ -152,6 +181,18 @@ Before finishing, confirm:
 - [ ] `go build -o ./tmp/main ./cmd/server` succeeds.
 
 ## Common Issues
+
+### Issue: Version constant says latest but files are outdated
+**Symptom**: The version constant matches the latest Blueprint version, but the project still has old files (e.g., `internal/config/load.go`, `internal/registry/registry_interface.go`) or is missing new files that were introduced in an earlier release.
+**Solution**: Trust the structural validation over the version constant. Check the relevant directories against the Blueprint reference, read the upgrade guide for the version where those files were changed, and apply the file changes even if the version constant suggests it's already done.
+
+### Issue: Rename was applied inconsistently across the codebase
+**Symptom**: A type or package was renamed (e.g., `registry` → `app`) but some files still use the old name in file names, parameter names, variable names, or error messages.
+**Solution**: When a rename happens, search the entire codebase for ALL occurrences — not just imports and type references. Rename files, parameters, variables, and error messages to maintain consistency.
+
+### Issue: Missing test files after upgrade
+**Symptom**: Blueprint added `*_test.go` files for migrations, cmd/server commands, or other components, but the project doesn't have them.
+**Solution**: After applying file changes from an upgrade guide, always check if blueprint has corresponding test files. If the project is missing them, add them (or port the relevant ones) to maintain parity.
 
 ### Issue: Build fails after dependency update
 **Solution**: Run `go mod tidy` to resolve dependency conflicts.
@@ -167,6 +208,7 @@ Before finishing, confirm:
 
 ## Important Rules
 
+- **Always run structural validation** after reading version constants. Compare the actual files in `internal/config` (and other key directories) against the Blueprint reference. Do not rely solely on the version constant.
 - **Always check for existing features** before applying a change from an upgrade guide. Skip steps that are already present in the project.
 - **Evaluate guide applicability before applying**. A guide may be skipped if its proposed changes are already present, conflict with newer package APIs, or are superseded by a later guide's approach. Document the reason for any skipped guides.
 - **Update the version constant once at the end** to the latest Blueprint version after all applicable guides are completed.
