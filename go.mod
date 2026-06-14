@@ -17,7 +17,7 @@ require (
 	github.com/aws/smithy-go v1.27.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
-	github.com/dracory/auditstore v1.1.0
+	github.com/dracory/auditstore v1.2.0
 	github.com/dracory/auth v0.29.0
 	github.com/dracory/base v0.37.0
 	github.com/dracory/blindindexstore v1.10.0
