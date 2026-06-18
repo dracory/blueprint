@@ -25,7 +25,7 @@ type logListFilters struct {
 // logListResult represents the result of a log listing.
 type logListResult struct {
 	Logs    []logstore.LogInterface
-	Total   int
+	Total   int64
 	HasMore bool
 }
 
@@ -87,7 +87,7 @@ func listLogs(app app.AppInterface, f logListFilters) (logListResult, error) {
 	}
 
 	// Total count for pagination
-	total := 0
+	total := int64(0)
 	if n, err := app.GetLogStore().LogCount(context.Background(), query); err == nil {
 		total = n
 	}

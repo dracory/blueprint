@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 	"project/pkg/blogai"
 
@@ -279,7 +279,7 @@ func (controller *postUpdateController) page(r *http.Request, post blogstore.Pos
 		Child(versioningModal)
 }
 
-func (controller *postUpdateController) renderCategoriesView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderCategoriesView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_categories.html")
 	if err != nil {
 		slog.Error("Failed to read post categories HTML template", "error", err)
@@ -313,7 +313,7 @@ func (controller *postUpdateController) renderCategoriesView(r *http.Request, po
 	return vueContainer
 }
 
-func (controller *postUpdateController) handleLoadCategories(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadCategories(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -368,7 +368,7 @@ func (controller *postUpdateController) handleLoadCategories(w http.ResponseWrit
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleAddCategory(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleAddCategory(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -403,7 +403,7 @@ func (controller *postUpdateController) handleAddCategory(w http.ResponseWriter,
 	return api.Success("Category added to post successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRemoveCategory(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRemoveCategory(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -438,7 +438,7 @@ func (controller *postUpdateController) handleRemoveCategory(w http.ResponseWrit
 	return api.Success("Category removed from post successfully").ToString()
 }
 
-func (controller *postUpdateController) renderTagsView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderTagsView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_tags.html")
 	if err != nil {
 		slog.Error("Failed to read post tags HTML template", "error", err)
@@ -472,7 +472,7 @@ func (controller *postUpdateController) renderTagsView(r *http.Request, post blo
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderDetailsView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderDetailsView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_details.html")
 	if err != nil {
 		slog.Error("Failed to read post details HTML template", "error", err)
@@ -506,7 +506,7 @@ func (controller *postUpdateController) renderDetailsView(r *http.Request, post 
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderContentView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderContentView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_content.html")
 	if err != nil {
 		slog.Error("Failed to read post content HTML template", "error", err)
@@ -540,7 +540,7 @@ func (controller *postUpdateController) renderContentView(r *http.Request, post 
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderSEOView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderSEOView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_seo.html")
 	if err != nil {
 		slog.Error("Failed to read post SEO HTML template", "error", err)
@@ -573,7 +573,7 @@ func (controller *postUpdateController) renderSEOView(r *http.Request, post blog
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderVersioningModal(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderVersioningModal(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_versioning.html")
 	if err != nil {
 		slog.Error("Failed to read post versioning HTML template", "error", err)
@@ -616,7 +616,7 @@ func (controller *postUpdateController) renderVersioningModal(r *http.Request, p
 	return vueContainer
 }
 
-func (controller *postUpdateController) handleLoadTags(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadTags(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -670,7 +670,7 @@ func (controller *postUpdateController) handleLoadTags(w http.ResponseWriter, r 
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleAddTag(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleAddTag(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -705,7 +705,7 @@ func (controller *postUpdateController) handleAddTag(w http.ResponseWriter, r *h
 	return api.Success("Tag added to post successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRemoveTag(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRemoveTag(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -741,7 +741,7 @@ func (controller *postUpdateController) handleRemoveTag(w http.ResponseWriter, r
 }
 
 // Details component handlers
-func (controller *postUpdateController) handleLoadDetails(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadDetails(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -769,7 +769,7 @@ func (controller *postUpdateController) handleLoadDetails(w http.ResponseWriter,
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveDetails(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveDetails(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -838,7 +838,7 @@ func (controller *postUpdateController) handleSaveDetails(w http.ResponseWriter,
 	return api.Success("Post saved successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRegenerateImage(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRegenerateImage(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -893,7 +893,7 @@ func (controller *postUpdateController) handleRegenerateImage(w http.ResponseWri
 }
 
 // Content component handlers
-func (controller *postUpdateController) handleLoadContent(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadContent(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -919,7 +919,7 @@ func (controller *postUpdateController) handleLoadContent(w http.ResponseWriter,
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveContent(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveContent(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -968,14 +968,14 @@ func (controller *postUpdateController) handleSaveContent(w http.ResponseWriter,
 	return api.Success("Post saved successfully").ToString()
 }
 
-func (controller *postUpdateController) handleBlockEditorHandle(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleBlockEditorHandle(_ http.ResponseWriter, _ *http.Request) string {
 	// This is a placeholder for BlockEditor handling
 	// The actual implementation would depend on the BlockEditor library
 	return api.Error("BlockEditor handle not implemented").ToString()
 }
 
 // SEO component handlers
-func (controller *postUpdateController) handleLoadSEO(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadSEO(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -1003,7 +1003,7 @@ func (controller *postUpdateController) handleLoadSEO(w http.ResponseWriter, r *
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveSEO(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveSEO(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -1058,7 +1058,7 @@ func (controller *postUpdateController) handleSaveSEO(w http.ResponseWriter, r *
 }
 
 // Versioning component handlers
-func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadVersions(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	var reqData struct {
@@ -1118,7 +1118,7 @@ func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter
 		versionList = append(versionList, map[string]any{
 			"id":         version.ID(),
 			"content":    version.Content(),
-			"created_at": version.CreatedAt(),
+			"created_at": version.GetCreatedAt(),
 		})
 	}
 
@@ -1128,7 +1128,7 @@ func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleLoadVersionDetail(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadVersionDetail(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	var reqData struct {
@@ -1193,11 +1193,11 @@ func (controller *postUpdateController) handleLoadVersionDetail(w http.ResponseW
 
 	return api.SuccessWithData("Version detail loaded", map[string]any{
 		"attributes": attributeList,
-		"created_at": version.CreatedAt(),
+		"created_at": version.GetCreatedAt(),
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleRestoreVersionAttributes(w http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRestoreVersionAttributes(_ http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {

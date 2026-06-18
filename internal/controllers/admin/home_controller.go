@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
@@ -323,11 +323,11 @@ func (c *homeController) visitorsData() (dates []string, visits []int64, err err
 
 	ctx := context.Background()
 	for _, date := range datesInRange {
-		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, statsstore.VisitorQueryOptions{
-			CreatedAtGte: date + " 00:00:00",
-			CreatedAtLte: date + " 23:59:59",
-			Distinct:     statsstore.COLUMN_IP_ADDRESS,
-		})
+		query := statsstore.NewVisitorQuery().
+			SetCreatedAtGte(date + " 00:00:00").
+			SetCreatedAtLte(date + " 23:59:59").
+			SetDistinct(statsstore.COLUMN_IP_ADDRESS)
+		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, query)
 
 		if err != nil {
 			return nil, nil, err

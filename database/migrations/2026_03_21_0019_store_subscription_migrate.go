@@ -36,12 +36,20 @@ func (m *StoreSubscriptionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("subscription store is not initialized")
 	}
 
-	return store.AutoMigrate(ctx)
+	return store.MigrateUp(ctx, tx)
 }
 
 func (m *StoreSubscriptionMigrate) Down(ctx context.Context, tx *sql.Tx) error {
-	// Subscription store uses AutoMigrate which doesn't support rollback
-	return nil
+	if m.app == nil {
+		return errors.New("app is nil")
+	}
+
+	store := m.app.GetSubscriptionStore()
+	if store == nil {
+		return errors.New("subscription store is not initialized")
+	}
+
+	return store.MigrateDown(ctx, tx)
 }
 
 func (m *StoreSubscriptionMigrate) CreatedAt() time.Time {
