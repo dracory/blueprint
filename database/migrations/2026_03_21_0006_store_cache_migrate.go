@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreCacheMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreCacheMigrate)(nil)
 
 type StoreCacheMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreCacheMigrate) ID() string {
+func (m *StoreCacheMigrate) Signature() string {
 	return "2026_03_21_0006_store_cache_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreCacheMigrate) Description() string {
 	return "Run cache store MigrateUp to create cache tables"
 }
 
-func (m *StoreCacheMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCacheMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreCacheMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("cache store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreCacheMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCacheMigrate) Down() error {
 	store := m.app.GetCacheStore()
 	if store == nil {
 		return errors.New("cache store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreCacheMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:06:00", "UTC").StdTime()
-}

@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreAuditMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreAuditMigrate)(nil)
 
 type StoreAuditMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreAuditMigrate) ID() string {
+func (m *StoreAuditMigrate) Signature() string {
 	return "2026_03_21_0001_store_audit_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreAuditMigrate) Description() string {
 	return "Run audit store AutoMigrate to create audit tables"
 }
 
-func (m *StoreAuditMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreAuditMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreAuditMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("audit store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreAuditMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreAuditMigrate) Down() error {
 	store := m.app.GetAuditStore()
 	if store == nil {
 		return errors.New("audit store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreAuditMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:01:00", "UTC").StdTime()
-}

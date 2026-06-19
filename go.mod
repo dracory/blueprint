@@ -10,11 +10,11 @@ go 1.26.3
 
 // replace github.com/dracory/database => ../../_modules_dracory/database
 
-replace github.com/dracory/cmsstore => ../../_modules_dracory/cmsstore
+// replace github.com/dracory/cmsstore => ../../_modules_dracory/cmsstore
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/aws/smithy-go v1.27.1
+	github.com/aws/smithy-go v1.27.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
 	github.com/dracory/auditstore v1.5.0
@@ -28,15 +28,15 @@ require (
 	github.com/dracory/cdn v1.11.0
 	github.com/dracory/chatstore v1.0.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.31.0
+	github.com/dracory/cmsstore v1.32.0
 	github.com/dracory/crud/v2 v2.0.0-20260318082437-20bdfa2008c2
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.9.0
 	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/database v0.8.0
 	github.com/dracory/dataobject v1.7.0
-	github.com/dracory/email v0.1.0
-	github.com/dracory/entitystore v1.8.0
+	github.com/dracory/email v0.2.0
+	github.com/dracory/entitystore v1.9.0
 	github.com/dracory/env v1.2.0
 	github.com/dracory/envenc v1.4.1
 	github.com/dracory/feedstore v1.0.0
@@ -48,7 +48,7 @@ require (
 	github.com/dracory/llm v1.3.0
 	github.com/dracory/logstore v1.17.0
 	github.com/dracory/metastore v1.6.0
-	github.com/dracory/migrate v0.3.0
+	github.com/dracory/neat v0.20.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
 	github.com/dracory/sb v0.26.0
@@ -58,7 +58,7 @@ require (
 	github.com/dracory/statsstore v1.1.0
 	github.com/dracory/str v0.18.0
 	github.com/dracory/subscriptionstore v1.1.0
-	github.com/dracory/taskstore v1.22.0
+	github.com/dracory/taskstore v1.23.0
 	github.com/dracory/test v0.10.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
@@ -119,7 +119,6 @@ require (
 	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
-	github.com/dracory/neat v0.19.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -139,7 +138,7 @@ require (
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
-	github.com/jackc/pgx/v5 v5.9.2 // indirect
+	github.com/jackc/pgx/v5 v5.10.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.8.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

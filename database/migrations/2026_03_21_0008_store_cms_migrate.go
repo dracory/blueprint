@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreCmsMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreCmsMigrate)(nil)
 
 type StoreCmsMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreCmsMigrate) ID() string {
+func (m *StoreCmsMigrate) Signature() string {
 	return "2026_03_21_0008_store_cms_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreCmsMigrate) Description() string {
 	return "Run CMS store AutoMigrate to create CMS tables"
 }
 
-func (m *StoreCmsMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCmsMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreCmsMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("cms store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreCmsMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCmsMigrate) Down() error {
 	store := m.app.GetCmsStore()
 	if store == nil {
 		return errors.New("cms store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreCmsMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:08:00", "UTC").StdTime()
-}

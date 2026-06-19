@@ -1,37 +1,22 @@
 package migrations
 
-import (
-	"context"
-	"testing"
-
-	"github.com/dromara/carbon/v2"
-)
+import "testing"
 
 func TestStoreGeoMigrate_InterfaceMethods(t *testing.T) {
 	migration := &StoreGeoMigrate{}
 
-	if migration.ID() != "2026_03_21_0012_store_geo_migrate" {
-		t.Errorf("Expected ID '2026_03_21_0012_store_geo_migrate', got '%s'", migration.ID())
+	if migration.Signature() != "2026_03_21_0012_store_geo_migrate" {
+		t.Errorf("Expected signature '2026_03_21_0012_store_geo_migrate', got '%s'", migration.Signature())
 	}
 
 	if migration.Description() != "Run geo store MigrateUp to create geo tables" {
 		t.Errorf("Expected description 'Run geo store MigrateUp to create geo tables', got '%s'", migration.Description())
 	}
-
-	createdAt := migration.CreatedAt()
-	if createdAt.IsZero() {
-		t.Error("Expected CreatedAt to return a non-zero time")
-	}
-
-	expectedTime := carbon.Parse("2026-03-21 00:12:00", "UTC").StdTime()
-	if !createdAt.Equal(expectedTime) {
-		t.Errorf("Expected CreatedAt to be %v, got %v", expectedTime, createdAt)
-	}
 }
 
-func TestStoreGeoMigrate_UpWithNilRegistry(t *testing.T) {
+func TestStoreGeoMigrate_UpWithNilApp(t *testing.T) {
 	migration := &StoreGeoMigrate{}
-	err := migration.Up(context.Background(), nil)
+	err := migration.Up()
 	if err == nil {
 		t.Error("Expected error when app is nil")
 	}
@@ -40,7 +25,7 @@ func TestStoreGeoMigrate_UpWithNilRegistry(t *testing.T) {
 	}
 }
 
-func TestStoreGeoMigrate_DownWithNilRegistry(t *testing.T) {
+func TestStoreGeoMigrate_DownWithNilApp(t *testing.T) {
 	migration := &StoreGeoMigrate{}
 	defer func() {
 		if r := recover(); r != nil {
@@ -49,5 +34,5 @@ func TestStoreGeoMigrate_DownWithNilRegistry(t *testing.T) {
 			t.Error("Expected panic when app is nil")
 		}
 	}()
-	migration.Down(context.Background(), nil)
+	migration.Down()
 }

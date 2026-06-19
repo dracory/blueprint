@@ -89,7 +89,7 @@ func TestBlindIndexRebuildTask_Handle(t *testing.T) {
 		t.Fatalf("Handle() expected true, got false")
 	}
 
-	details := task.QueuedTask().Details()
+	details := task.QueuedTask().GetDetails()
 	if details == "" {
 		t.Fatalf("Details() should not be empty")
 	}

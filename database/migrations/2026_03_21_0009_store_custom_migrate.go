@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreCustomMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreCustomMigrate)(nil)
 
 type StoreCustomMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreCustomMigrate) ID() string {
+func (m *StoreCustomMigrate) Signature() string {
 	return "2026_03_21_0009_store_custom_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreCustomMigrate) Description() string {
 	return "Run custom store MigrateUp to create custom tables"
 }
 
-func (m *StoreCustomMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCustomMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreCustomMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("custom store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreCustomMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreCustomMigrate) Down() error {
 	store := m.app.GetCustomStore()
 	if store == nil {
 		return errors.New("custom store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreCustomMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:09:00", "UTC").StdTime()
-}

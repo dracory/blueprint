@@ -85,7 +85,7 @@ func (t *cleanUpTask) Handle() bool {
 	t.LogInfo("Purging " + cast.ToString(len(purgeTasks)) + " tasks older than " + purgeSince + " ...")
 
 	for _, purgeTask := range purgeTasks {
-		err := t.app.GetTaskStore().TaskQueueDeleteByID(context.Background(), purgeTask.ID())
+		err := t.app.GetTaskStore().TaskQueueDeleteByID(context.Background(), purgeTask.GetID())
 
 		if err != nil {
 			t.LogError("Error purging task: " + err.Error())

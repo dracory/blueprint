@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreSubscriptionMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreSubscriptionMigrate)(nil)
 
 type StoreSubscriptionMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreSubscriptionMigrate) ID() string {
+func (m *StoreSubscriptionMigrate) Signature() string {
 	return "2026_03_21_0019_store_subscription_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreSubscriptionMigrate) Description() string {
 	return "Run subscription store AutoMigrate to create subscription tables"
 }
 
-func (m *StoreSubscriptionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreSubscriptionMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,10 +34,10 @@ func (m *StoreSubscriptionMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("subscription store is not initialized")
 	}
 
-	return store.MigrateUp(ctx, tx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreSubscriptionMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreSubscriptionMigrate) Down() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -49,9 +47,5 @@ func (m *StoreSubscriptionMigrate) Down(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("subscription store is not initialized")
 	}
 
-	return store.MigrateDown(ctx, tx)
-}
-
-func (m *StoreSubscriptionMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:19:00", "UTC").StdTime()
+	return store.MigrateDown(context.Background())
 }

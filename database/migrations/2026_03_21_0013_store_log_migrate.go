@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreLogMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreLogMigrate)(nil)
 
 type StoreLogMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreLogMigrate) ID() string {
+func (m *StoreLogMigrate) Signature() string {
 	return "2026_03_21_0013_store_log_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreLogMigrate) Description() string {
 	return "Run log store MigrateUp to create log tables"
 }
 
-func (m *StoreLogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreLogMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreLogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("log store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreLogMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreLogMigrate) Down() error {
 	store := m.app.GetLogStore()
 	if store == nil {
 		return errors.New("log store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreLogMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:13:00", "UTC").StdTime()
-}

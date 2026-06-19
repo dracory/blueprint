@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreMetaMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreMetaMigrate)(nil)
 
 type StoreMetaMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreMetaMigrate) ID() string {
+func (m *StoreMetaMigrate) Signature() string {
 	return "2026_03_21_0014_store_meta_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreMetaMigrate) Description() string {
 	return "Run meta store MigrateUp to create meta tables"
 }
 
-func (m *StoreMetaMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreMetaMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreMetaMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("meta store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreMetaMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreMetaMigrate) Down() error {
 	store := m.app.GetMetaStore()
 	if store == nil {
 		return errors.New("meta store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreMetaMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:14:00", "UTC").StdTime()
-}
