@@ -186,14 +186,14 @@ admin, err := useradmin.New(useradmin.AdminOptions{
 **Action Required**:
 - Update all AdminOptions struct literals to use `Registry:` instead of `app:`
 - This affects useradmin, shopadmin, blogadmin, fileadmin, and logadmin packages
-- The Blueprint framework's controller files have been updated automatically
+- The Blueprint rapid application development (RAD) starter template's controller files have been updated automatically
 
 **Files to Check**:
-- `internal/controllers/admin/users/users_controller.go` (already updated in framework)
-- `internal/controllers/admin/shop/*/` (already updated in framework)
-- `internal/controllers/admin/blog/blog_controller.go` (already updated in framework)
-- `internal/controllers/admin/files/file_manager_controller.go` (already updated in framework)
-- `internal/controllers/admin/logs/logs_controller.go` (already updated in framework)
+- `internal/controllers/admin/users/users_controller.go` (already updated in template)
+- `internal/controllers/admin/shop/*/` (already updated in template)
+- `internal/controllers/admin/blog/blog_controller.go` (already updated in template)
+- `internal/controllers/admin/files/file_manager_controller.go` (already updated in template)
+- `internal/controllers/admin/logs/logs_controller.go` (already updated in template)
 - Any custom controllers that use external admin packages
 
 **Migration Command**:
@@ -217,7 +217,7 @@ find . -type f -name "*.go" -exec sed -i 's|app:|Registry:|g' {} \;
 - `internal/registry/registry_close_test.go` → `internal/app/app_close_test.go`
 
 **Action Required**:
-- No action required for applications using Blueprint - this is an internal framework change
+- No action required for applications using Blueprint - this is an internal template change
 - If you have custom code that directly references these file paths, update them
 - If you have test files that reference the old directory structure, update them
 
@@ -417,7 +417,7 @@ app, err := app.New(cfg)
 
 **Symptom**: External packages (useradmin, shopadmin, etc.) still reference old field names.
 
-**Solution**: Ensure AdminOptions struct literals use `Registry:` instead of `app:`. The Blueprint framework's controllers have been updated automatically.
+**Solution**: Ensure AdminOptions struct literals use `Registry:` instead of `app:`. The Blueprint starter template's controllers have been updated automatically.
 
 ---
 

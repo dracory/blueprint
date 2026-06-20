@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreBlindIndexLastNameMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreBlindIndexLastNameMigrate)(nil)
 
 type StoreBlindIndexLastNameMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreBlindIndexLastNameMigrate) ID() string {
+func (m *StoreBlindIndexLastNameMigrate) Signature() string {
 	return "2026_03_21_0005_store_blindindex_last_name_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreBlindIndexLastNameMigrate) Description() string {
 	return "Run blind index last name store MigrateUp to create blind index last name tables"
 }
 
-func (m *StoreBlindIndexLastNameMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreBlindIndexLastNameMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreBlindIndexLastNameMigrate) Up(ctx context.Context, tx *sql.Tx) err
 		return errors.New("blind index last name store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreBlindIndexLastNameMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreBlindIndexLastNameMigrate) Down() error {
 	store := m.app.GetBlindIndexStoreLastName()
 	if store == nil {
 		return errors.New("blind index last name store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreBlindIndexLastNameMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:05:00", "UTC").StdTime()
-}

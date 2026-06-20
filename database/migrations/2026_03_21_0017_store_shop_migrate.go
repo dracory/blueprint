@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreShopMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreShopMigrate)(nil)
 
 type StoreShopMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreShopMigrate) ID() string {
+func (m *StoreShopMigrate) Signature() string {
 	return "2026_03_21_0017_store_shop_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreShopMigrate) Description() string {
 	return "Run shop store MigrateUp to create shop tables"
 }
 
-func (m *StoreShopMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreShopMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreShopMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("shop store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreShopMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreShopMigrate) Down() error {
 	store := m.app.GetShopStore()
 	if store == nil {
 		return errors.New("shop store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreShopMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:17:00", "UTC").StdTime()
-}

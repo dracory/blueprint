@@ -10,6 +10,11 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Supported values: sqlite, postgres, mysql
 	driver := env.GetStringOrError(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
 
+	// Default connection name
+	//
+	// Name of the default connection. Defaults to "default".
+	defaultConnection := env.GetStringOrDefault(KEY_DB_DEFAULT_CONNECTION, "default")
+
 	// Database Host
 	//
 	// The hostname or IP address of the database server.
@@ -40,6 +45,17 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// The password for authenticating with the database server.
 	// Not required when using sqlite.
 	pass := env.GetString(KEY_DB_PASSWORD)
+
+	// Direct DSN override
+	//
+	// Optional driver-specific connection string. When provided, it takes
+	// precedence over the individual host/port/username/password fields.
+	dsn := env.GetString(KEY_DB_DSN)
+
+	// Table prefix
+	//
+	// Optional prefix applied to table names by the ORM/query layer.
+	prefix := env.GetString(KEY_DB_PREFIX)
 
 	// Connection Pool - Max Open Connections
 	//
@@ -89,6 +105,12 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Example: UTC, America/New_York, Europe/London
 	timezone := env.GetStringOrDefault(KEY_DB_TIMEZONE, "UTC")
 
+	// SSL mode default for non-SQLite drivers
+	sslMode := env.GetStringOrDefault(KEY_DB_SSL_MODE, "require")
+	if driver == driverSQLite {
+		sslMode = ""
+	}
+
 	if driver != driverSQLite {
 		env.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
 		env.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
@@ -96,33 +118,117 @@ func databaseConfig(env *envValidator) databaseSettings {
 		env.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
 	}
 
+	defaultConn := databaseConnectionSettings{
+		name:     defaultConnection,
+		driver:   driver,
+		host:     host,
+		port:     port,
+		database: name,
+		username: user,
+		password: pass,
+		sslMode:  sslMode,
+		charset:  charset,
+		timezone: timezone,
+		dsn:      dsn,
+		prefix:   prefix,
+	}
+
+	connections := map[string]DatabaseConnectionConfigInterface{
+		defaultConnection: &defaultConn,
+	}
+
 	return databaseSettings{
-		driver:          driver,
-		host:            host,
-		port:            port,
-		name:            name,
-		user:            user,
-		pass:            pass,
-		maxOpenConns:    maxOpenConns,
-		maxIdleConns:    maxIdleConns,
-		connMaxLifetime: connMaxLifetime,
-		connMaxIdleTime: connMaxIdleTime,
-		charset:         charset,
-		timezone:        timezone,
+		defaultConnection: defaultConnection,
+		connections:       connections,
+		driver:            driver,
+		host:              host,
+		port:              port,
+		name:              name,
+		user:              user,
+		pass:              pass,
+		sslMode:           sslMode,
+		maxOpenConns:      maxOpenConns,
+		maxIdleConns:      maxIdleConns,
+		connMaxLifetime:   connMaxLifetime,
+		connMaxIdleTime:   connMaxIdleTime,
+		charset:           charset,
+		timezone:          timezone,
+		dsn:               dsn,
+		prefix:            prefix,
 	}
 }
 
-type databaseSettings struct {
-	driver          string
-	host            string
-	port            string
-	name            string
-	user            string
-	pass            string
-	maxOpenConns    int
-	maxIdleConns    int
-	connMaxLifetime time.Duration
-	connMaxIdleTime time.Duration
-	charset         string
-	timezone        string
+// databaseConnectionSettings represents a single database connection.
+type databaseConnectionSettings struct {
+	name     string
+	driver   string
+	host     string
+	port     string
+	database string
+	username string
+	password string
+	sslMode  string
+	charset  string
+	timezone string
+	dsn      string
+	prefix   string
 }
+
+// databaseSettings holds the database configuration.
+// It keeps the legacy single-database fields for backward compatibility and
+// stores the Laravel-style connection map used by the neat database layer.
+type databaseSettings struct {
+	defaultConnection string
+	connections       map[string]DatabaseConnectionConfigInterface
+	driver            string
+	host              string
+	port              string
+	name              string
+	user              string
+	pass              string
+	sslMode           string
+	maxOpenConns      int
+	maxIdleConns      int
+	connMaxLifetime   time.Duration
+	connMaxIdleTime   time.Duration
+	charset           string
+	timezone          string
+	dsn               string
+	prefix            string
+}
+
+// GetName returns the connection name.
+func (c *databaseConnectionSettings) GetName() string { return c.name }
+
+// GetDriver returns the connection driver.
+func (c *databaseConnectionSettings) GetDriver() string { return c.driver }
+
+// GetHost returns the connection host.
+func (c *databaseConnectionSettings) GetHost() string { return c.host }
+
+// GetPort returns the connection port as a string.
+func (c *databaseConnectionSettings) GetPort() string { return c.port }
+
+// GetDatabase returns the database name.
+func (c *databaseConnectionSettings) GetDatabase() string { return c.database }
+
+// GetUsername returns the connection username.
+func (c *databaseConnectionSettings) GetUsername() string { return c.username }
+
+// GetPassword returns the connection password.
+func (c *databaseConnectionSettings) GetPassword() string { return c.password }
+
+// GetSSLMode returns the SSL mode.
+func (c *databaseConnectionSettings) GetSSLMode() string { return c.sslMode }
+
+// GetCharset returns the connection charset.
+func (c *databaseConnectionSettings) GetCharset() string { return c.charset }
+
+// GetTimezone returns the connection timezone.
+func (c *databaseConnectionSettings) GetTimezone() string { return c.timezone }
+
+// GetDSN returns the direct DSN override.
+func (c *databaseConnectionSettings) GetDSN() string { return c.dsn }
+
+// GetPrefix returns the table prefix.
+func (c *databaseConnectionSettings) GetPrefix() string { return c.prefix }

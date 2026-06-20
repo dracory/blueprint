@@ -116,7 +116,7 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *te
 		t.Fatalf("Handle() expected true, got false")
 	}
 
-	details := handler.QueuedTask().Details()
+	details := handler.QueuedTask().GetDetails()
 	if details == "" {
 		t.Fatalf("Details() should not be empty after successful Handle")
 	}

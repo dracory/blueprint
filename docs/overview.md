@@ -31,7 +31,7 @@ features rapidly while keeping operational risk low.
 ## Application Summary
 - Root entrypoint `cmd/server/main.go` wires configuration, datastore initialization, routing, background tasks, and
   graceful shutdown handling.
-- `/internal/registry` owns runtime dependencies, including database access, caching, and store wiring.
+- `/internal/app` owns runtime dependencies, including database access, caching, and store wiring.
 - `/internal/routes` (and feature subpackages) collect HTTP handlers, middlewares, and view composition for
   the MVC layer.
 - `/internal/tasks` and `/internal/schedules` coordinate asynchronous work, cron-like jobs, and task queue

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive comparison between **Goravel** (a Laravel-inspired Go framework) and **Blueprint** (a modular MVC web application framework built on specialized packages).
+This document provides a comprehensive comparison between **Goravel** (a Laravel-inspired Go framework) and **Blueprint** (a rapid application development (RAD) starter template built on the Dracory framework with specialized packages).
 
 ## Framework Philosophy
 
@@ -139,7 +139,7 @@ Blueprint is built on a modular ecosystem of specialized packages:
 
 ### 6. **Package Reusability**
 - **Goravel**: Components are tightly coupled to the framework
-- **Blueprint**: Each package (rtr, database, base, auth, etc.) is standalone and can be used in any Go project without the full Blueprint framework
+- **Blueprint**: Each package (rtr, database, base, auth, etc.) is standalone and can be used in any Go project without the full Blueprint starter template
 
 ### 7. **Routing Capabilities**
 - **Goravel**: Chi-based routing with Laravel-like syntax

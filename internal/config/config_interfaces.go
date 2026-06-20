@@ -97,10 +97,34 @@ type AuthConfigInterface interface {
 }
 
 // ============================================================================
+// Database Connection Config Interface
+// ============================================================================
+
+// DatabaseConnectionConfigInterface defines a single database connection.
+// It provides a Laravel-like connection configuration while keeping
+// compatibility with the existing single-database getters.
+type DatabaseConnectionConfigInterface interface {
+	GetName() string
+	GetDriver() string
+	GetHost() string
+	GetPort() string
+	GetDatabase() string
+	GetUsername() string
+	GetPassword() string
+	GetSSLMode() string
+	GetCharset() string
+	GetTimezone() string
+	GetDSN() string
+	GetPrefix() string
+}
+
+// ============================================================================
 // Database Config Interface
 // ============================================================================
 
 // DatabaseConfigInterface defines database configuration methods.
+// It supports the existing single-database getters/setters as well as
+// multi-connection configuration via DatabaseConnectionConfigInterface.
 type DatabaseConfigInterface interface {
 	SetDatabaseDriver(string)
 	GetDatabaseDriver() string
@@ -140,6 +164,18 @@ type DatabaseConfigInterface interface {
 
 	SetDatabaseTimezone(string)
 	GetDatabaseTimezone() string
+
+	SetDatabaseDSN(string)
+	GetDatabaseDSN() string
+
+	SetDatabasePrefix(string)
+	GetDatabasePrefix() string
+
+	SetDatabaseDefaultConnection(string)
+	GetDatabaseDefaultConnection() string
+
+	GetDatabaseConnections() []DatabaseConnectionConfigInterface
+	GetDatabaseConnectionByName(name string) DatabaseConnectionConfigInterface
 }
 
 // ============================================================================

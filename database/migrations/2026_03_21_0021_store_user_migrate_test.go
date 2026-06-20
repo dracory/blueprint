@@ -1,37 +1,22 @@
 package migrations
 
-import (
-	"context"
-	"testing"
-
-	"github.com/dromara/carbon/v2"
-)
+import "testing"
 
 func TestStoreUserMigrate_InterfaceMethods(t *testing.T) {
 	migration := &StoreUserMigrate{}
 
-	if migration.ID() != "2026_03_21_0021_store_user_migrate" {
-		t.Errorf("Expected ID '2026_03_21_0021_store_user_migrate', got '%s'", migration.ID())
+	if migration.Signature() != "2026_03_21_0021_store_user_migrate" {
+		t.Errorf("Expected signature '2026_03_21_0021_store_user_migrate', got '%s'", migration.Signature())
 	}
 
 	if migration.Description() != "Run user store MigrateUp to create user tables" {
 		t.Errorf("Expected description 'Run user store MigrateUp to create user tables', got '%s'", migration.Description())
 	}
-
-	createdAt := migration.CreatedAt()
-	if createdAt.IsZero() {
-		t.Error("Expected CreatedAt to return a non-zero time")
-	}
-
-	expectedTime := carbon.Parse("2026-03-21 00:21:00", "UTC").StdTime()
-	if !createdAt.Equal(expectedTime) {
-		t.Errorf("Expected CreatedAt to be %v, got %v", expectedTime, createdAt)
-	}
 }
 
-func TestStoreUserMigrate_UpWithNilRegistry(t *testing.T) {
+func TestStoreUserMigrate_UpWithNilApp(t *testing.T) {
 	migration := &StoreUserMigrate{}
-	err := migration.Up(context.Background(), nil)
+	err := migration.Up()
 	if err == nil {
 		t.Error("Expected error when app is nil")
 	}
@@ -40,7 +25,7 @@ func TestStoreUserMigrate_UpWithNilRegistry(t *testing.T) {
 	}
 }
 
-func TestStoreUserMigrate_DownWithNilRegistry(t *testing.T) {
+func TestStoreUserMigrate_DownWithNilApp(t *testing.T) {
 	migration := &StoreUserMigrate{}
 	defer func() {
 		if r := recover(); r != nil {
@@ -49,5 +34,5 @@ func TestStoreUserMigrate_DownWithNilRegistry(t *testing.T) {
 			t.Error("Expected panic when app is nil")
 		}
 	}()
-	migration.Down(context.Background(), nil)
+	migration.Down()
 }

@@ -52,10 +52,10 @@ func migrateStores(registry registry.RegistryInterface) error {
 - If you have custom migration files that define a local `RegistryInterface`, update them to use `registry.RegistryInterface` from the registry package
 - Add the import: `import "project/internal/registry"`
 - Update function signatures to use `registry.RegistryInterface`
-- The Blueprint framework's migration files have been updated automatically
+- The Blueprint rapid application development (RAD) starter template's migration files have been updated automatically
 
 **Files to Check**:
-- `database/migrations/migrate.go` (already updated in framework)
+- `database/migrations/migrate.go` (already updated in template)
 - Any custom migration files in your project that use `RegistryInterface`
 
 **Migration Command**:
@@ -98,7 +98,7 @@ if (data.status === 'success') {
 **Action Required**:
 - Update any custom JavaScript that checks `data.success` to use `data.status === 'success'`
 - This affects all admin UI JavaScript files that interact with AJAX endpoints
-- The Blueprint framework's admin UI files have been updated automatically
+- The Blueprint rapid application development (RAD) starter template's admin UI files have been updated automatically
 
 **Files to Check**:
 - Any custom JavaScript files in your admin packages
@@ -157,7 +157,7 @@ Notiflix.Confirm.show(
 **Action Required**:
 - Update any custom JavaScript that uses SweetAlert2 to use Notiflix
 - Add Notiflix CSS and JS to your layout if you have custom admin pages
-- The Blueprint framework's admin UI files have been updated automatically
+- The Blueprint rapid application development (RAD) starter template's admin UI files have been updated automatically
 
 **CDN Dependencies**:
 ```html
@@ -211,7 +211,7 @@ func TestSomething(t *testing.T) {
 - Run `go mod tidy` to add testify and related dependencies
 - If you migrated away from testify in v0.26.0, you can optionally use it again
 - This is not a breaking change - standard library assertions still work
-- The Blueprint framework now uses testify in new test files
+- The Blueprint rapid application development (RAD) starter template now uses testify in new test files
 
 **Migration Command**:
 ```bash
@@ -241,7 +241,7 @@ go mod tidy
 **Action Required**:
 - If you have custom admin pages using HTMX, consider migrating to Vue.js
 - If you have custom AJAX handlers, ensure they return the correct response format
-- The Blueprint framework's admin packages have been migrated automatically
+- The Blueprint rapid application development (RAD) starter template's admin packages have been migrated automatically
 
 **Impact**:
 - `pkg/shopadmin/order_manager/` - Migrated to Vue.js

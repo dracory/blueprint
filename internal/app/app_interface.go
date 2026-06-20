@@ -19,6 +19,7 @@ import (
 	"github.com/dracory/geostore"
 	"github.com/dracory/logstore"
 	"github.com/dracory/metastore"
+	neatdatabase "github.com/dracory/neat/database"
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
@@ -57,6 +58,11 @@ type AppInterface interface {
 	// DB
 	GetDatabase() *sql.DB
 	SetDatabase(db *sql.DB)
+
+	GetNeatDatabase() *neatdatabase.Database
+	SetNeatDatabase(db *neatdatabase.Database)
+
+	GetDatabaseConnection(name string) *sql.DB
 
 	// ========================================================================
 	// == Stores (all specific data stores)

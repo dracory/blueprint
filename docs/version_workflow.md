@@ -1,10 +1,10 @@
 # Version Workflow
 
-This document describes the version workflow for the Blueprint framework.
+This document describes the version workflow for the Blueprint rapid application development (RAD) starter template.
 
 ## Overview
 
-Blueprint uses a hardcoded version constant in `internal/config/version.go` to track the framework version. This enables AI tools and upgrade scripts to easily identify the current version and determine the appropriate migration path.
+Blueprint uses a hardcoded version constant in `internal/config/version.go` to track the template version. This enables AI tools and upgrade scripts to easily identify the current version and determine the appropriate migration path.
 
 ## Version Constant
 

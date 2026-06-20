@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreEntityMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreEntityMigrate)(nil)
 
 type StoreEntityMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreEntityMigrate) ID() string {
+func (m *StoreEntityMigrate) Signature() string {
 	return "2026_03_21_0010_store_entity_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreEntityMigrate) Description() string {
 	return "Run entity store MigrateUp to create entity tables"
 }
 
-func (m *StoreEntityMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreEntityMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreEntityMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("entity store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreEntityMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreEntityMigrate) Down() error {
 	store := m.app.GetEntityStore()
 	if store == nil {
 		return errors.New("entity store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreEntityMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:10:00", "UTC").StdTime()
-}

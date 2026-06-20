@@ -67,6 +67,9 @@ const KEY_DB_PASSWORD = "DB_PASSWORD"
 const KEY_DB_SSL_MODE = "DB_SSL_MODE"
 const KEY_DB_CHARSET = "DB_CHARSET"
 const KEY_DB_TIMEZONE = "DB_TIMEZONE"
+const KEY_DB_DSN = "DB_DSN"
+const KEY_DB_PREFIX = "DB_PREFIX"
+const KEY_DB_DEFAULT_CONNECTION = "DB_DEFAULT_CONNECTION"
 const KEY_DB_MAX_OPEN_CONNS = "DB_MAX_OPEN_CONNS"
 const KEY_DB_MAX_IDLE_CONNS = "DB_MAX_IDLE_CONNS"
 const KEY_DB_CONN_MAX_LIFETIME_SECONDS = "DB_CONN_MAX_LIFETIME_SECONDS"
@@ -91,7 +94,6 @@ const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 // ============================================================================
 // == END: Mail Configurations
 // ============================================================================
-
 
 // ============================================================================
 // == START: Auth Configurations

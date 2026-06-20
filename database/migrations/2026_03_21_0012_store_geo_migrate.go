@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreGeoMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreGeoMigrate)(nil)
 
 type StoreGeoMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreGeoMigrate) ID() string {
+func (m *StoreGeoMigrate) Signature() string {
 	return "2026_03_21_0012_store_geo_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreGeoMigrate) Description() string {
 	return "Run geo store MigrateUp to create geo tables"
 }
 
-func (m *StoreGeoMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreGeoMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,22 +34,19 @@ func (m *StoreGeoMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("geo store is not initialized")
 	}
 
-	if err := store.MigrateUp(ctx); err != nil {
+	if err := store.MigrateUp(context.Background()); err != nil {
 		return err
 	}
 
 	// Seed geolocation data (countries, states, timezones)
-	return store.Seed(ctx)
+	return store.Seed(context.Background())
 }
 
-func (m *StoreGeoMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreGeoMigrate) Down() error {
 	store := m.app.GetGeoStore()
 	if store == nil {
 		return errors.New("geo store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreGeoMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:12:00", "UTC").StdTime()
-}

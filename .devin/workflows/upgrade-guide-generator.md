@@ -4,7 +4,7 @@ description: Generate comprehensive upgrade guide between two Blueprint versions
 
 # Upgrade Guide Generator
 
-This skill generates comprehensive upgrade guides for Blueprint framework versions.
+This skill generates comprehensive upgrade guides for Blueprint rapid application development (RAD) starter template versions.
 
 ## When to Use
 

@@ -35,7 +35,7 @@ var ipLookupHTTPClient = &http.Client{
 // =================================================================
 type statsVisitorEnhanceTask struct {
 	taskstore.TaskHandlerBase
-	app   app.AppInterface
+	app        app.AppInterface
 	httpClient *http.Client // Injectable for testing
 }
 
@@ -86,10 +86,10 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 	}
 
 	ctx := context.Background()
-	unprocessedEntries, err := t.app.GetStatsStore().VisitorList(ctx, statsstore.VisitorQueryOptions{
-		Country: "empty",
-		Limit:   10,
-	})
+	query := statsstore.NewVisitorQuery().
+		SetCountry("empty").
+		SetLimit(10)
+	unprocessedEntries, err := t.app.GetStatsStore().VisitorList(ctx, query)
 
 	if err != nil {
 		t.LogError("Task StatsVisitorEnhance. Error: " + err.Error())
@@ -118,7 +118,7 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 		t.LogError("Task StatsVisitorEnhance. Store is nil")
 		return false
 	}
-	ua := useragent.Parse(visitor.UserAgent())
+	ua := useragent.Parse(visitor.GetUserAgent())
 	userOs := ua.OS
 	userOsVersion := ua.OSVersion
 	userDevice := ua.Device
@@ -140,7 +140,7 @@ func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor st
 		userDeviceType = "bot"
 	}
 
-	country := t.findCountryByIp(ctx, visitor.IpAddress())
+	country := t.findCountryByIp(ctx, visitor.GetIpAddress())
 
 	visitor.SetCountry(country)
 	visitor.SetUserBrowser(userBrowser)

@@ -169,7 +169,7 @@ go test ./pkg/shopadmin/...
 
 ## Dependencies
 
-- `project/internal/registry` - Registry interface
+- `project/internal/app` - App interface
 - `project/internal/layouts` - Layout rendering
 - `project/internal/links` - URL generation
 - `project/internal/helpers` - Helper functions

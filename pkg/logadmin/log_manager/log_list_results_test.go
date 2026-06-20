@@ -26,11 +26,11 @@ func (s *fakeLogStore) LogList(ctx context.Context, q logstore.LogQueryInterface
 	return s.logsToReturn, nil
 }
 
-func (s *fakeLogStore) LogCount(ctx context.Context, q logstore.LogQueryInterface) (int, error) {
+func (s *fakeLogStore) LogCount(ctx context.Context, q logstore.LogQueryInterface) (int64, error) {
 	if s.countErr != nil {
 		return 0, s.countErr
 	}
-	return s.count, nil
+	return int64(s.count), nil
 }
 
 func TestListLogs_NilApp_ReturnsEmptyNoError(t *testing.T) {

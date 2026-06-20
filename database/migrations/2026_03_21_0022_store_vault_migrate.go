@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreVaultMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreVaultMigrate)(nil)
 
 type StoreVaultMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreVaultMigrate) ID() string {
+func (m *StoreVaultMigrate) Signature() string {
 	return "2026_03_21_0022_store_vault_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreVaultMigrate) Description() string {
 	return "Run vault store MigrateUp to create vault tables"
 }
 
-func (m *StoreVaultMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreVaultMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreVaultMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("vault store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreVaultMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreVaultMigrate) Down() error {
 	store := m.app.GetVaultStore()
 	if store == nil {
 		return errors.New("vault store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreVaultMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:22:00", "UTC").StdTime()
-}

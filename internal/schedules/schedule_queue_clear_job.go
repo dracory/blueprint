@@ -42,7 +42,7 @@ func queueClearJob(app app.AppInterface) {
 	queuedTasks, err := app.GetTaskStore().TaskQueueList(
 		context.Background(),
 		taskstore.TaskQueueQuery().
-			SetTaskID(taskDefinition.ID()).
+			SetTaskID(taskDefinition.GetID()).
 			SetStatus(taskstore.TaskQueueStatusSuccess))
 
 	if err != nil {

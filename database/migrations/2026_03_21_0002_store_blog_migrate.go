@@ -2,23 +2,21 @@ package migrations
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"time"
 
 	"project/internal/app"
 
-	"github.com/dracory/migrate"
-	"github.com/dromara/carbon/v2"
+	"github.com/dracory/neat/database/migrator"
 )
 
-var _ migrate.MigrationInterface = (*StoreBlogMigrate)(nil)
+var _ migrator.MigrationInterface = (*StoreBlogMigrate)(nil)
 
 type StoreBlogMigrate struct {
+	migrator.BaseMigration
 	app app.AppInterface
 }
 
-func (m *StoreBlogMigrate) ID() string {
+func (m *StoreBlogMigrate) Signature() string {
 	return "2026_03_21_0002_store_blog_migrate"
 }
 
@@ -26,7 +24,7 @@ func (m *StoreBlogMigrate) Description() string {
 	return "Run blog store MigrateUp to create blog tables"
 }
 
-func (m *StoreBlogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreBlogMigrate) Up() error {
 	if m.app == nil {
 		return errors.New("app is nil")
 	}
@@ -36,17 +34,14 @@ func (m *StoreBlogMigrate) Up(ctx context.Context, tx *sql.Tx) error {
 		return errors.New("blog store is not initialized")
 	}
 
-	return store.MigrateUp(ctx)
+	return store.MigrateUp(context.Background())
 }
 
-func (m *StoreBlogMigrate) Down(ctx context.Context, tx *sql.Tx) error {
+func (m *StoreBlogMigrate) Down() error {
 	store := m.app.GetBlogStore()
 	if store == nil {
 		return errors.New("blog store is not initialized")
 	}
-	return store.MigrateDown(ctx, tx)
+	return store.MigrateDown(context.Background())
 }
 
-func (m *StoreBlogMigrate) CreatedAt() time.Time {
-	return carbon.Parse("2026-03-21 00:02:00", "UTC").StdTime()
-}
