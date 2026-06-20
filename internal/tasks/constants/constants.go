@@ -1,9 +1,9 @@
-// Package taskconstants defines task alias constants used throughout the
+// Package constants defines task alias constants used throughout the
 // application for task registration and enqueueing via TaskDefinitionEnqueueByAlias.
 //
 // Using these constants instead of string literals provides compile-time safety,
 // a single source of truth, and makes it easy to find all usages of a given task.
-package taskconstants
+package constants
 
 const (
 	// BlindIndexRebuildTaskAlias is the alias for the blind index rebuild task.

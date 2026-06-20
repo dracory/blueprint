@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/app"
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 	"slices"
 	"strconv"
 	"strings"
@@ -61,7 +61,7 @@ func NewBlindIndexRebuildTask(app app.AppInterface) *blindIndexRebuildTask {
 // == IMPLEMENTATION ==========================================================
 
 func (task *blindIndexRebuildTask) Alias() string {
-	return taskconstants.BlindIndexRebuildTaskAlias
+	return constants.BlindIndexRebuildTaskAlias
 }
 
 func (task *blindIndexRebuildTask) Title() string {

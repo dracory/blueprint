@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"project/internal/app"
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 	"strings"
 	"time"
 
@@ -69,7 +69,7 @@ func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.TaskQueueInterface, error
 }
 
 func (t *statsVisitorEnhanceTask) Alias() string {
-	return taskconstants.StatsVisitorEnhanceTaskAlias
+	return constants.StatsVisitorEnhanceTaskAlias
 }
 
 func (t *statsVisitorEnhanceTask) Title() string {

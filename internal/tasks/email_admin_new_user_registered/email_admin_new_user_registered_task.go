@@ -5,7 +5,7 @@ import (
 	"errors"
 	"project/internal/app"
 	"project/internal/emails"
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 
 	"github.com/dracory/taskstore"
 )
@@ -32,7 +32,7 @@ type emailToAdminOnNewUserRegisteredTaskHandler struct {
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewUserRegisteredTaskHandler)(nil) // verify it extends the task interface
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Alias() string {
-	return taskconstants.EmailToAdminOnNewUserRegisteredTaskAlias
+	return constants.EmailToAdminOnNewUserRegisteredTaskAlias
 }
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Title() string {

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 	"project/internal/testutils"
 )
 
@@ -30,7 +30,7 @@ func TestHelloWorldTask_Metadata(t *testing.T) {
 	app := testutils.Setup()
 	handler := NewHelloWorldTask(app)
 
-	if got, want := handler.Alias(), taskconstants.HelloWorldTaskAlias; got != want {
+	if got, want := handler.Alias(), constants.HelloWorldTaskAlias; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
 	}
 

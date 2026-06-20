@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
@@ -33,7 +33,7 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Metadata(t *testing.T)
 	app := testutils.Setup()
 	handler := NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app)
 
-	if got, want := handler.Alias(), taskconstants.EmailToAdminOnNewContactFormSubmittedTaskAlias; got != want {
+	if got, want := handler.Alias(), constants.EmailToAdminOnNewContactFormSubmittedTaskAlias; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
 	}
 

@@ -25,7 +25,7 @@ import (
 	"errors"
 	"project/internal/app"
 	"project/internal/emails"
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 
 	"github.com/dracory/taskstore"
 )
@@ -52,7 +52,7 @@ type emailTestTask struct {
 // Alias returns the unique identifier for this task handler
 // Used when enqueuing and processing tasks
 func (handler *emailTestTask) Alias() string {
-	return taskconstants.EmailTestTaskAlias
+	return constants.EmailTestTaskAlias
 }
 
 // Title returns a human-readable title for this task

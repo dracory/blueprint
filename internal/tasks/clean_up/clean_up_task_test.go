@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"project/internal/tasks/taskconstants"
+	"project/internal/tasks/constants"
 	"project/internal/testutils"
 )
 
@@ -32,7 +32,7 @@ func TestCleanUpTask_Metadata(t *testing.T) {
 	app := testutils.Setup()
 	handler := NewCleanUpTask(app)
 
-	if got, want := handler.Alias(), taskconstants.CleanUpTaskAlias; got != want {
+	if got, want := handler.Alias(), constants.CleanUpTaskAlias; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
 	}
 
