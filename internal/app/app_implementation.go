@@ -23,6 +23,7 @@ import (
 	"github.com/dracory/geostore"
 	"github.com/dracory/logstore"
 	"github.com/dracory/metastore"
+	neatdatabase "github.com/dracory/neat/database"
 	"github.com/dracory/sessionstore"
 	"github.com/dracory/settingstore"
 	"github.com/dracory/shopstore"
@@ -42,7 +43,10 @@ import (
 // It encapsulates configuration and database (container removed).
 type appImplementation struct {
 	cfg config.ConfigInterface
-	db  *sql.DB
+
+	// Database
+	neatDB *neatdatabase.Database
+	db     *sql.DB
 
 	// Loggers
 	databaseLogger *slog.Logger
@@ -99,7 +103,12 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	consoleLogger := slog.New(tint.NewHandler(os.Stdout, nil))
 
 	// Database open
-	db, err := databaseOpen(cfg)
+	neatDB, err := databaseOpen(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := neatDB.DB()
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +119,7 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	app.SetLogger(consoleLogger)
 	app.SetMemoryCache(memoryCache)
 	app.SetFileCache(fileCache)
+	app.SetNeatDatabase(neatDB)
 	app.SetDatabase(db)
 
 	// Initialize stores
@@ -134,11 +144,12 @@ func (r *appImplementation) Close() error {
 		return nil
 	}
 
-	if r.db == nil {
+	if r.neatDB == nil {
 		return nil
 	}
 
-	err := r.db.Close()
+	err := r.neatDB.Close()
+	r.neatDB = nil
 	r.db = nil
 	return err
 }
@@ -163,6 +174,36 @@ func (r *appImplementation) GetDatabase() *sql.DB {
 // SetDatabase sets the app database
 func (r *appImplementation) SetDatabase(db *sql.DB) {
 	r.db = db
+}
+
+// GetNeatDatabase returns the neat database instance.
+func (r *appImplementation) GetNeatDatabase() *neatdatabase.Database {
+	return r.neatDB
+}
+
+// SetNeatDatabase sets the neat database instance.
+func (r *appImplementation) SetNeatDatabase(db *neatdatabase.Database) {
+	r.neatDB = db
+}
+
+// GetDatabaseConnection returns the underlying *sql.DB for the named connection.
+// If the name is empty, it returns the default connection.
+func (r *appImplementation) GetDatabaseConnection(name string) *sql.DB {
+	if r == nil || r.neatDB == nil {
+		return nil
+	}
+	if name == "" || name == r.cfg.GetDatabaseDefaultConnection() {
+		return r.db
+	}
+	conn, err := r.neatDB.Connection(name)
+	if err != nil || conn == nil {
+		return nil
+	}
+	db, err := conn.DB()
+	if err != nil {
+		return nil
+	}
+	return db
 }
 
 // Logger accessors (delegate to package-level logger singletons)

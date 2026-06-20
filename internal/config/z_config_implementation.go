@@ -24,6 +24,8 @@ type configImplementation struct {
 	appDebug bool
 
 	// Database configuration
+	databaseDefaultConnection      string
+	databaseConnections            map[string]DatabaseConnectionConfigInterface
 	databaseDriver                 string
 	databaseHost                   string
 	databasePort                   string
@@ -33,6 +35,8 @@ type configImplementation struct {
 	databaseSSLMode                string
 	databaseCharset                string
 	databaseTimezone               string
+	databaseDSN                    string
+	databasePrefix                 string
 	databaseMaxOpenConns           int
 	databaseMaxIdleConns           int
 	databaseConnMaxLifetimeSeconds int
@@ -313,19 +317,61 @@ func (c *configImplementation) GetEmailsAllowedAccess() []string {
 // ============================================================================
 
 func (c *configImplementation) setDatabaseConfig(s databaseSettings) {
+	c.databaseDefaultConnection = s.defaultConnection
+	c.databaseConnections = s.connections
 	c.databaseDriver = s.driver
 	c.databaseHost = s.host
 	c.databasePort = s.port
 	c.databaseName = s.name
 	c.databaseUsername = s.user
 	c.databasePassword = s.pass
-	c.databaseSSLMode = "require"
+	c.databaseSSLMode = s.sslMode
 	c.databaseCharset = s.charset
 	c.databaseTimezone = s.timezone
+	c.databaseDSN = s.dsn
+	c.databasePrefix = s.prefix
 	c.databaseMaxOpenConns = int(s.maxOpenConns)
 	c.databaseMaxIdleConns = int(s.maxIdleConns)
 	c.databaseConnMaxLifetimeSeconds = int(s.connMaxLifetime.Seconds())
 	c.databaseConnMaxIdleTimeSeconds = int(s.connMaxIdleTime.Seconds())
+}
+
+// defaultConnection returns the default database connection configuration.
+// It falls back to nil if no connections are configured.
+func (c *configImplementation) defaultConnection() DatabaseConnectionConfigInterface {
+	if c == nil {
+		return nil
+	}
+	if conn, ok := c.databaseConnections[c.databaseDefaultConnection]; ok && conn != nil {
+		return conn
+	}
+	return nil
+}
+
+func (c *configImplementation) SetDatabaseDefaultConnection(v string) {
+	c.databaseDefaultConnection = v
+}
+
+func (c *configImplementation) GetDatabaseDefaultConnection() string {
+	return c.databaseDefaultConnection
+}
+
+func (c *configImplementation) GetDatabaseConnections() []DatabaseConnectionConfigInterface {
+	if c == nil || len(c.databaseConnections) == 0 {
+		return nil
+	}
+	conns := make([]DatabaseConnectionConfigInterface, 0, len(c.databaseConnections))
+	for _, conn := range c.databaseConnections {
+		conns = append(conns, conn)
+	}
+	return conns
+}
+
+func (c *configImplementation) GetDatabaseConnectionByName(name string) DatabaseConnectionConfigInterface {
+	if c == nil || c.databaseConnections == nil {
+		return nil
+	}
+	return c.databaseConnections[name]
 }
 
 func (c *configImplementation) SetDatabaseDriver(v string) {
@@ -333,6 +379,9 @@ func (c *configImplementation) SetDatabaseDriver(v string) {
 }
 
 func (c *configImplementation) GetDatabaseDriver() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetDriver()
+	}
 	return c.databaseDriver
 }
 
@@ -341,6 +390,9 @@ func (c *configImplementation) SetDatabaseHost(v string) {
 }
 
 func (c *configImplementation) GetDatabaseHost() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetHost()
+	}
 	return c.databaseHost
 }
 
@@ -349,6 +401,9 @@ func (c *configImplementation) SetDatabasePort(v string) {
 }
 
 func (c *configImplementation) GetDatabasePort() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetPort()
+	}
 	return c.databasePort
 }
 
@@ -357,6 +412,9 @@ func (c *configImplementation) SetDatabaseName(v string) {
 }
 
 func (c *configImplementation) GetDatabaseName() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetDatabase()
+	}
 	return c.databaseName
 }
 
@@ -365,6 +423,9 @@ func (c *configImplementation) SetDatabaseUsername(v string) {
 }
 
 func (c *configImplementation) GetDatabaseUsername() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetUsername()
+	}
 	return c.databaseUsername
 }
 
@@ -373,6 +434,9 @@ func (c *configImplementation) SetDatabasePassword(v string) {
 }
 
 func (c *configImplementation) GetDatabasePassword() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetPassword()
+	}
 	return c.databasePassword
 }
 
@@ -381,6 +445,9 @@ func (c *configImplementation) SetDatabaseSSLMode(v string) {
 }
 
 func (c *configImplementation) GetDatabaseSSLMode() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetSSLMode()
+	}
 	return c.databaseSSLMode
 }
 
@@ -421,6 +488,9 @@ func (c *configImplementation) SetDatabaseCharset(v string) {
 }
 
 func (c *configImplementation) GetDatabaseCharset() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetCharset()
+	}
 	return c.databaseCharset
 }
 
@@ -429,7 +499,32 @@ func (c *configImplementation) SetDatabaseTimezone(v string) {
 }
 
 func (c *configImplementation) GetDatabaseTimezone() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetTimezone()
+	}
 	return c.databaseTimezone
+}
+
+func (c *configImplementation) SetDatabaseDSN(v string) {
+	c.databaseDSN = v
+}
+
+func (c *configImplementation) GetDatabaseDSN() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetDSN()
+	}
+	return c.databaseDSN
+}
+
+func (c *configImplementation) SetDatabasePrefix(v string) {
+	c.databasePrefix = v
+}
+
+func (c *configImplementation) GetDatabasePrefix() string {
+	if conn := c.defaultConnection(); conn != nil {
+		return conn.GetPrefix()
+	}
+	return c.databasePrefix
 }
 
 // ============================================================================

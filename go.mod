@@ -8,8 +8,6 @@ go 1.26.3
 
 // replace github.com/dracory/rtr => ../../_modules_dracory/rtr
 
-// replace github.com/dracory/database => ../../_modules_dracory/database
-
 // replace github.com/dracory/cmsstore => ../../_modules_dracory/cmsstore
 
 require (
@@ -20,52 +18,51 @@ require (
 	github.com/dracory/auditstore v1.5.0
 	github.com/dracory/auth v0.29.0
 	github.com/dracory/base v0.37.0
-	github.com/dracory/blindindexstore v1.11.0
+	github.com/dracory/blindindexstore v1.12.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.24.0
+	github.com/dracory/blogstore v1.25.0
 	github.com/dracory/bs v0.16.0
-	github.com/dracory/cachestore v1.5.0
+	github.com/dracory/cachestore v1.6.0
 	github.com/dracory/cdn v1.11.0
-	github.com/dracory/chatstore v1.0.0
+	github.com/dracory/chatstore v1.1.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.32.0
+	github.com/dracory/cmsstore v1.33.0
 	github.com/dracory/crud/v2 v2.0.0-20260318082437-20bdfa2008c2
 	github.com/dracory/csrf v0.2.0
-	github.com/dracory/customstore v1.9.0
+	github.com/dracory/customstore v1.10.0
 	github.com/dracory/dashboard v1.11.0
-	github.com/dracory/database v0.8.0
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
-	github.com/dracory/entitystore v1.9.0
+	github.com/dracory/entitystore v1.10.0
 	github.com/dracory/env v1.2.0
 	github.com/dracory/envenc v1.4.1
-	github.com/dracory/feedstore v1.0.0
+	github.com/dracory/feedstore v1.1.0
 	github.com/dracory/filesystem v1.3.0
 	github.com/dracory/form v0.23.0
-	github.com/dracory/geostore v1.4.0
+	github.com/dracory/geostore v1.5.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.3.0
-	github.com/dracory/logstore v1.17.0
-	github.com/dracory/metastore v1.6.0
-	github.com/dracory/neat v0.20.0
+	github.com/dracory/logstore v1.18.0
+	github.com/dracory/metastore v1.7.0
+	github.com/dracory/neat v0.23.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
 	github.com/dracory/sb v0.26.0
 	github.com/dracory/sessionstore v1.14.0
-	github.com/dracory/settingstore v1.8.0
-	github.com/dracory/shopstore v1.16.0
-	github.com/dracory/statsstore v1.1.0
+	github.com/dracory/settingstore v1.9.0
+	github.com/dracory/shopstore v1.17.0
+	github.com/dracory/statsstore v1.2.0
 	github.com/dracory/str v0.18.0
-	github.com/dracory/subscriptionstore v1.1.0
-	github.com/dracory/taskstore v1.23.0
+	github.com/dracory/subscriptionstore v1.2.0
+	github.com/dracory/taskstore v1.25.0
 	github.com/dracory/test v0.10.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/userstore v1.14.0
-	github.com/dracory/vaultstore v1.1.0
-	github.com/dracory/versionstore v1.3.0
+	github.com/dracory/userstore v1.15.0
+	github.com/dracory/vaultstore v1.2.0
+	github.com/dracory/versionstore v1.5.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dracory/wf v0.6.0
 	github.com/dromara/carbon/v2 v2.6.16
@@ -116,11 +113,11 @@ require (
 	github.com/dave/dst v0.27.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/davidmz/go-pageant v1.0.2 // indirect
-	github.com/doug-martin/goqu/v9 v9.19.0 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
+	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
-	github.com/dracory/sqlfilestore v1.5.0 // indirect
+	github.com/dracory/sqlfilestore v1.6.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
@@ -156,22 +153,22 @@ require (
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.69.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.68.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/metric v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20260611194520-c48552f49976 // indirect
-	golang.org/x/image v0.41.0 // indirect
+	golang.org/x/image v0.43.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/api v0.285.0 // indirect
 	google.golang.org/genai v1.61.0 // indirect
-	google.golang.org/genproto v0.0.0-20260615183401-62b3387ff324 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260615183401-62b3387ff324 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260615183401-62b3387ff324 // indirect
+	google.golang.org/genproto v0.0.0-20260618152121-87f3d3e198d3 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260618152121-87f3d3e198d3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260618152121-87f3d3e198d3 // indirect
 	google.golang.org/grpc v1.81.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
@@ -187,7 +184,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/samber/lo v1.53.0

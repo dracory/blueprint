@@ -1,60 +1,26 @@
 package app
 
 import (
-	"database/sql"
 	"errors"
-	"strings"
-	"time"
 
 	"project/internal/config"
 
-	"github.com/dracory/database"
+	neatdatabase "github.com/dracory/neat/database"
 	// "gorm.io/driver/postgres"
 	// "gorm.io/driver/sqlite"
 	// "gorm.io/gorm"
 )
 
-// databaseOpen opens the database connection using the provided config and returns it.
-// The database package now includes SQLite optimizations and connection pool settings automatically.
-func databaseOpen(cfg config.ConfigInterface) (*sql.DB, error) {
+// databaseOpen opens the database connection using the provided config and returns the
+// neat database instance. The underlying *sql.DB is derived from the neat instance so
+// existing stores continue to receive a standard *sql.DB handle.
+func databaseOpen(cfg config.ConfigInterface) (*neatdatabase.Database, error) {
 	if cfg == nil {
 		return nil, errors.New("databaseOpen: cfg is nil")
 	}
 
-	options := database.Options().
-		SetDatabaseType(cfg.GetDatabaseDriver()).
-		SetDatabaseHost(cfg.GetDatabaseHost()).
-		SetDatabasePort(cfg.GetDatabasePort()).
-		SetDatabaseName(cfg.GetDatabaseName()).
-		SetCharset(cfg.GetDatabaseCharset()).
-		SetTimeZone(cfg.GetDatabaseTimezone()).
-		SetUserName(cfg.GetDatabaseUsername()).
-		SetPassword(cfg.GetDatabasePassword())
-
-	if v := cfg.GetDatabaseMaxOpenConns(); v > 0 {
-		options = options.SetMaxOpenConns(v)
-	}
-	if v := cfg.GetDatabaseMaxIdleConns(); v > 0 {
-		options = options.SetMaxIdleConns(v)
-	}
-	if v := cfg.GetDatabaseConnMaxLifetimeSeconds(); v > 0 {
-		options = options.SetConnMaxLifetime(time.Duration(v) * time.Second)
-	}
-	if v := cfg.GetDatabaseConnMaxIdleTimeSeconds(); v > 0 {
-		options = options.SetConnMaxIdleTime(time.Duration(v) * time.Second)
-	}
-
-	// Set SSL mode for non-SQLite databases
-	isSQLite := strings.Contains(strings.ToLower(cfg.GetDatabaseDriver()), "sqlite")
-	if !isSQLite {
-		sslMode := cfg.GetDatabaseSSLMode()
-		if sslMode == "" {
-			sslMode = "require"
-		}
-		options = options.SetSSLMode(sslMode)
-	}
-
-	return database.Open(options)
+	neatCfg := config.DatabaseNeatConfig(cfg)
+	return neatdatabase.New(neatCfg)
 }
 
 // Enable, if you want to use GORM

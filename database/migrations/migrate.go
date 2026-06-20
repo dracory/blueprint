@@ -7,7 +7,6 @@ import (
 	"project/internal/app"
 	"project/internal/config"
 
-	neatdb "github.com/dracory/neat/database"
 	"github.com/dracory/neat/database/migrator"
 )
 
@@ -19,14 +18,9 @@ func MigrateAll(app app.AppInterface) error {
 		return errors.New("app is nil")
 	}
 
-	db := app.GetDatabase()
-	if db == nil {
-		return errors.New("database is nil")
-	}
-
-	neatDB, err := neatdb.NewFromSQLDB(db)
-	if err != nil {
-		return fmt.Errorf("failed to create neat database: %w", err)
+	neatDB := app.GetNeatDatabase()
+	if neatDB == nil {
+		return errors.New("neat database is nil")
 	}
 
 	m := migrator.NewMigrator(neatDB)
