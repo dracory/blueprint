@@ -10,6 +10,8 @@ go 1.26.3
 
 // replace github.com/dracory/cmsstore => ../../_modules_dracory/cmsstore
 
+// replace github.com/dracory/rule => ../../_modules_dracory/rule
+
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/aws/smithy-go v1.27.2
@@ -48,6 +50,7 @@ require (
 	github.com/dracory/neat v0.23.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
+	github.com/dracory/rule v0.8.0
 	github.com/dracory/sb v0.26.0
 	github.com/dracory/sessionstore v1.15.0
 	github.com/dracory/settingstore v1.9.0

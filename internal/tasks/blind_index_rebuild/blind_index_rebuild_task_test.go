@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"project/internal/taskconstants"
 	"project/internal/testutils"
 )
 
@@ -28,7 +29,7 @@ func TestBlindIndexRebuildTask_Metadata(t *testing.T) {
 	app := testutils.Setup()
 	task := NewBlindIndexRebuildTask(app)
 
-	if got, want := task.Alias(), "BlindIndexUpdate"; got != want {
+	if got, want := task.Alias(), taskconstants.BlindIndexRebuildTaskAlias; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/app"
+	"project/internal/taskconstants"
 	"slices"
 	"strconv"
 	"strings"
@@ -52,7 +53,7 @@ var _ taskstore.TaskHandlerInterface = (*blindIndexRebuildTask)(nil) // verify i
 
 func NewBlindIndexRebuildTask(app app.AppInterface) *blindIndexRebuildTask {
 	return &blindIndexRebuildTask{
-		app:       app,
+		app:            app,
 		allowedIndexes: []string{BlindIndexAll, BlindIndexEmail, BlindIndexFirstName, BlindIndexLastName},
 	}
 }
@@ -60,7 +61,7 @@ func NewBlindIndexRebuildTask(app app.AppInterface) *blindIndexRebuildTask {
 // == IMPLEMENTATION ==========================================================
 
 func (task *blindIndexRebuildTask) Alias() string {
-	return "BlindIndexUpdate"
+	return taskconstants.BlindIndexRebuildTaskAlias
 }
 
 func (task *blindIndexRebuildTask) Title() string {
