@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/app"
-	"project/internal/taskconstants"
+	"project/internal/tasks/constants"
 
 	"github.com/dracory/taskstore"
 )
@@ -23,7 +23,7 @@ type helloWorldTask struct {
 var _ taskstore.TaskHandlerInterface = (*helloWorldTask)(nil) // verify it extends the task interface
 
 func (handler *helloWorldTask) Alias() string {
-	return taskconstants.HelloWorldTaskAlias
+	return constants.HelloWorldTaskAlias
 }
 
 func (handler *helloWorldTask) Title() string {

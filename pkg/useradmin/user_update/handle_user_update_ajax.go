@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"project/internal/ext"
-	"project/internal/taskconstants"
+	"project/internal/tasks/constants"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/api"
@@ -145,7 +145,7 @@ func (controller *userUpdateController) handleUserUpdateAjax(w http.ResponseWrit
 				_, err := controller.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
 					r.Context(),
 					taskstore.DefaultQueueName,
-					taskconstants.BlindIndexRebuildTaskAlias,
+					constants.BlindIndexRebuildTaskAlias,
 					map[string]any{
 						"index":    "email",
 						"truncate": "no",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/app"
-	"project/internal/taskconstants"
+	"project/internal/tasks/constants"
 
 	"github.com/dracory/taskstore"
 	"github.com/dromara/carbon/v2"
@@ -25,7 +25,7 @@ type cleanUpTask struct {
 var _ taskstore.TaskHandlerInterface = (*cleanUpTask)(nil) // verify it extends the task interface
 
 func (t *cleanUpTask) Alias() string {
-	return taskconstants.CleanUpTaskAlias
+	return constants.CleanUpTaskAlias
 }
 
 func (t *cleanUpTask) Title() string {
