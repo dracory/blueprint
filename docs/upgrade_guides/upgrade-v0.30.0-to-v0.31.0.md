@@ -260,11 +260,13 @@ if formValidation.Fails() {
 
 ### Step 5: Run `go mod tidy`
 
-The new `github.com/dracory/rule` dependency has been added. Run tidy to ensure your module graph is clean:
+The new `github.com/dracory/rule v0.8.0` dependency has been added. Run tidy to ensure your module graph is clean:
 
 ```bash
 go mod tidy
 ```
+
+If you had a local replace directive for `github.com/dracory/rule`, comment it out so `go mod tidy` resolves the published `v0.8.0` version.
 
 ---
 
@@ -366,7 +368,7 @@ Then navigate to `http://127.0.0.1:34756` to verify auto-login works.
 
 **Symptom**: Compile error like `cannot find module providing package github.com/dracory/rule`.
 
-**Solution**: The `github.com/dracory/rule` dependency was added in this release. Run `go mod tidy` to download it. If you have a local replace directive, ensure the path `../../_modules_dracory/rule` exists.
+**Solution**: The `github.com/dracory/rule` dependency was added in this release. Run `go mod tidy` to download it. The published version is `v0.8.0` — ensure your `go.mod` requires `github.com/dracory/rule v0.8.0` (not the placeholder `v0.0.0-00010101000000-000000000000` which results from a local replace directive). If you had a local replace directive (`replace github.com/dracory/rule => ../../_modules_dracory/rule`), comment it out and use the published version instead.
 
 ### Issue 4: Register form validation behavior changed
 
