@@ -22,8 +22,9 @@ package email_admin
 import (
 	"context"
 	"errors"
-	"project/internal/emails"
 	"project/internal/app"
+	"project/internal/emails"
+	"project/internal/taskconstants"
 
 	"github.com/dracory/taskstore"
 )
@@ -44,13 +45,13 @@ func NewEmailToAdminTask(app app.AppInterface) taskstore.TaskHandlerInterface {
 // emailToAdminTask send a notification email to admin
 type emailToAdminTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	app                  app.AppInterface
+	app                       app.AppInterface
 }
 
 // Alias returns the unique identifier for this task handler
 // Used when enqueuing and processing tasks
 func (handler *emailToAdminTask) Alias() string {
-	return "EmailToAdminTask"
+	return taskconstants.EmailToAdminTaskAlias
 }
 
 // Title returns a human-readable title for this task

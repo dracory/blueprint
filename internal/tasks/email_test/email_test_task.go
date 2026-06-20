@@ -23,8 +23,9 @@ package email_test
 import (
 	"context"
 	"errors"
-	"project/internal/emails"
 	"project/internal/app"
+	"project/internal/emails"
+	"project/internal/taskconstants"
 
 	"github.com/dracory/taskstore"
 )
@@ -45,13 +46,13 @@ func NewEmailTestTask(app app.AppInterface) taskstore.TaskHandlerInterface {
 // emailTestTask send a notification email to admin
 type emailTestTask struct {
 	taskstore.TaskHandlerBase // Embedded base handler for common task operations
-	app                  app.AppInterface
+	app                       app.AppInterface
 }
 
 // Alias returns the unique identifier for this task handler
 // Used when enqueuing and processing tasks
 func (handler *emailTestTask) Alias() string {
-	return "EmailTestTask"
+	return taskconstants.EmailTestTaskAlias
 }
 
 // Title returns a human-readable title for this task

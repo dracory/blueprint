@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"project/internal/emails"
+	"project/internal/taskconstants"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
@@ -32,7 +33,7 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Metadata(t *testing.T) {
 	app := testutils.Setup()
 	handler := NewEmailToAdminOnNewUserRegisteredTaskHandler(app)
 
-	if got, want := handler.Alias(), "email-to-admin-on-new-user-registered"; got != want {
+	if got, want := handler.Alias(), taskconstants.EmailToAdminOnNewUserRegisteredTaskAlias; got != want {
 		t.Fatalf("Alias() = %q, want %q", got, want)
 	}
 

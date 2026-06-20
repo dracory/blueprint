@@ -88,6 +88,7 @@ type configImplementation struct {
 	// Authentication
 	registrationEnabled bool
 	emailsAllowedAccess []string
+	passwordAuthEnabled bool
 
 	// i18n / Translation
 	translationLanguageDefault string
@@ -294,6 +295,7 @@ func (c *configImplementation) IsEnvTesting() bool {
 func (c *configImplementation) setAuthConfig(s authSettings) {
 	c.registrationEnabled = s.registrationEnabled
 	c.emailsAllowedAccess = s.emailsAllowedAccess
+	c.passwordAuthEnabled = s.passwordAuthEnabled
 }
 
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
@@ -310,6 +312,14 @@ func (c *configImplementation) SetEmailsAllowedAccess(v []string) {
 
 func (c *configImplementation) GetEmailsAllowedAccess() []string {
 	return c.emailsAllowedAccess
+}
+
+func (c *configImplementation) SetPasswordAuthEnabled(v bool) {
+	c.passwordAuthEnabled = v
+}
+
+func (c *configImplementation) GetPasswordAuthEnabled() bool {
+	return c.passwordAuthEnabled
 }
 
 // ============================================================================

@@ -3,8 +3,9 @@ package email_admin_new_user_registered
 import (
 	"context"
 	"errors"
-	"project/internal/emails"
 	"project/internal/app"
+	"project/internal/emails"
+	"project/internal/taskconstants"
 
 	"github.com/dracory/taskstore"
 )
@@ -31,7 +32,7 @@ type emailToAdminOnNewUserRegisteredTaskHandler struct {
 var _ taskstore.TaskHandlerInterface = (*emailToAdminOnNewUserRegisteredTaskHandler)(nil) // verify it extends the task interface
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Alias() string {
-	return "email-to-admin-on-new-user-registered"
+	return taskconstants.EmailToAdminOnNewUserRegisteredTaskAlias
 }
 
 func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Title() string {

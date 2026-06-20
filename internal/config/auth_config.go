@@ -36,13 +36,21 @@ func authConfig() authSettings {
 		}
 	}
 
+	// Password Authentication
+	//
+	// Controls whether email/password authentication is enabled.
+	// When false, authentication is handled exclusively by external providers.
+	passwordAuthEnabled := env.GetBool(KEY_AUTH_PASSWORD_AUTH_ENABLED)
+
 	return authSettings{
 		registrationEnabled: registrationEnabled,
 		emailsAllowedAccess: emailsAllowedAccess,
+		passwordAuthEnabled: passwordAuthEnabled,
 	}
 }
 
 type authSettings struct {
 	registrationEnabled bool
 	emailsAllowedAccess []string
+	passwordAuthEnabled bool
 }

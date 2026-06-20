@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"project/internal/taskconstants"
 	"project/internal/testutils"
 )
 
@@ -30,8 +31,8 @@ func TestStatsVisitorEnhanceTask_Alias(t *testing.T) {
 	task := NewStatsVisitorEnhanceTask(app)
 
 	alias := task.Alias()
-	if alias != "StatsVisitorEnhanceTask" {
-		t.Errorf("Alias() = %q, want %q", alias, "StatsVisitorEnhanceTask")
+	if alias != taskconstants.StatsVisitorEnhanceTaskAlias {
+		t.Errorf("Alias() = %q, want %q", alias, taskconstants.StatsVisitorEnhanceTaskAlias)
 	}
 }
 

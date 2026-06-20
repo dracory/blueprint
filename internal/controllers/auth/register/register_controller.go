@@ -5,10 +5,11 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
+	authrules "project/internal/rules/auth"
 	"strings"
 
 	"github.com/dracory/bs"
@@ -24,7 +25,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type registerController struct {
-	app                               app.AppInterface
+	app                                    app.AppInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formFirstName                          string
 	formLastName                           string
@@ -39,7 +40,7 @@ type registerController struct {
 
 func NewRegisterController(app app.AppInterface) *registerController {
 	return &registerController{
-		app:                               app,
+		app:                                    app,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",
 		formCountry:                            "country",
 		formTimezone:                           "timezone",
@@ -54,8 +55,9 @@ func NewRegisterController(app app.AppInterface) *registerController {
 // == PUBLIC METHODS ==========================================================
 
 func (controller *registerController) Handler(w http.ResponseWriter, r *http.Request) string {
-	if !controller.app.GetConfig().GetRegistrationEnabled() {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `Registrations are currently disabled`, links.Website().Home(), 10)
+	canRegister := authrules.NewCanRegisterRule(controller.app, "")
+	if canRegister.Fails() {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, canRegister.FailMessageFirst(), links.Website().Home(), 10)
 	}
 
 	if controller.app.GetUserStore() == nil {
@@ -126,23 +128,15 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 		return controller.formRegister(ctx, data).ToHTML()
 	}
 
-	if data.firstName == "" {
-		data.formErrorMessage = "First name is required field"
-		return controller.formRegister(ctx, data).ToHTML()
-	}
-
-	if data.lastName == "" {
-		data.formErrorMessage = "Last name is required field"
-		return controller.formRegister(ctx, data).ToHTML()
-	}
-
-	if data.country == "" {
-		data.formErrorMessage = "Country is required field"
-		return controller.formRegister(ctx, data).ToHTML()
-	}
-
-	if data.timezone == "" {
-		data.formErrorMessage = "Timezone is required field"
+	formValidation := authrules.NewRegisterFormValidationRule(authrules.RegisterFormData{
+		FirstName: data.firstName,
+		LastName:  data.lastName,
+		Email:     data.email,
+		Country:   data.country,
+		Timezone:  data.timezone,
+	})
+	if formValidation.Fails() {
+		data.formErrorMessage = formValidation.Message()
 		return controller.formRegister(ctx, data).ToHTML()
 	}
 
