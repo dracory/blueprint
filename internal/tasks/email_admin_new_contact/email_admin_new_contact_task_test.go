@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/taskconstants"
+	"project/internal/tasks/taskconstants"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"

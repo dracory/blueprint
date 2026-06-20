@@ -25,7 +25,7 @@ import (
 	"errors"
 	"project/internal/app"
 	"project/internal/emails"
-	"project/internal/taskconstants"
+	"project/internal/tasks/taskconstants"
 
 	"github.com/dracory/taskstore"
 )

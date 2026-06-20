@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"project/internal/app"
-	"project/internal/taskconstants"
+	"project/internal/tasks/taskconstants"
 	"slices"
 	"strconv"
 	"strings"

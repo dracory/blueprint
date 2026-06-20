@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"project/internal/ext"
-	"project/internal/taskconstants"
+	"project/internal/tasks/taskconstants"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/dracory/api"

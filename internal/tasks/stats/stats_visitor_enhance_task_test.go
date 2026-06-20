@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"project/internal/taskconstants"
+	"project/internal/tasks/taskconstants"
 	"project/internal/testutils"
 )
 
