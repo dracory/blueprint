@@ -1,13 +1,14 @@
 package routes
 
 import (
+	"project/internal/app"
 	"project/internal/controllers/admin"
 	"project/internal/controllers/auth"
 	"project/internal/controllers/liveflux"
 	"project/internal/controllers/shared"
 	"project/internal/controllers/user"
 	"project/internal/controllers/website"
-	"project/internal/app"
+	"project/internal/middlewares"
 	"project/internal/widgets"
 
 	"github.com/dracory/rtr"
@@ -41,6 +42,28 @@ func Router(app app.AppInterface) rtr.RouterInterface {
 	r.AddBeforeMiddlewares(globalMiddlewareList)
 
 	// Add all routes
+	for _, route := range routeList {
+		r.AddRoute(route)
+	}
+
+	return r
+}
+
+// AiBrowserRouter wraps Router with the AI browser auto-login middleware prepended.
+// It must only be used by cmd/ai-browser — never in production.
+func AiBrowserRouter(app app.AppInterface) rtr.RouterInterface {
+	r := rtr.NewRouter()
+
+	globalMiddlewareList, routeList := RoutesList(app)
+
+	// Prepend auto-login so every unauthenticated request gets a session before
+	// the standard AuthMiddleware runs.
+	globalMiddlewareList = append([]rtr.MiddlewareInterface{
+		middlewares.AiBrowserAutoLoginMiddleware(app),
+	}, globalMiddlewareList...)
+
+	r.AddBeforeMiddlewares(globalMiddlewareList)
+
 	for _, route := range routeList {
 		r.AddRoute(route)
 	}
