@@ -17,55 +17,55 @@ require (
 	github.com/aws/smithy-go v1.27.2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.7.0
-	github.com/dracory/auditstore v1.5.0
+	github.com/dracory/auditstore v1.8.0
 	github.com/dracory/auth v0.29.0
 	github.com/dracory/base v0.37.0
-	github.com/dracory/blindindexstore v1.12.0
+	github.com/dracory/blindindexstore v1.14.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.25.0
+	github.com/dracory/blogstore v1.27.0
 	github.com/dracory/bs v0.16.0
-	github.com/dracory/cachestore v1.6.0
+	github.com/dracory/cachestore v1.7.0
 	github.com/dracory/cdn v1.11.0
-	github.com/dracory/chatstore v1.1.0
+	github.com/dracory/chatstore v1.2.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.33.0
+	github.com/dracory/cmsstore v1.34.0
 	github.com/dracory/crud/v2 v2.0.0-20260318082437-20bdfa2008c2
 	github.com/dracory/csrf v0.2.0
-	github.com/dracory/customstore v1.10.0
+	github.com/dracory/customstore v1.11.0
 	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
-	github.com/dracory/entitystore v1.10.0
+	github.com/dracory/entitystore v1.11.0
 	github.com/dracory/env v1.2.0
 	github.com/dracory/envenc v1.4.1
-	github.com/dracory/feedstore v1.1.0
+	github.com/dracory/feedstore v1.2.0
 	github.com/dracory/filesystem v1.3.0
 	github.com/dracory/form v0.23.0
-	github.com/dracory/geostore v1.5.0
+	github.com/dracory/geostore v1.6.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.3.0
-	github.com/dracory/logstore v1.18.0
-	github.com/dracory/metastore v1.7.0
-	github.com/dracory/neat v0.23.0
+	github.com/dracory/logstore v1.19.0
+	github.com/dracory/metastore v1.8.0
+	github.com/dracory/neat v0.26.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sb v0.26.0
-	github.com/dracory/sessionstore v1.15.0
+	github.com/dracory/sessionstore v1.16.0
 	github.com/dracory/settingstore v1.9.0
-	github.com/dracory/shopstore v1.17.0
-	github.com/dracory/statsstore v1.2.0
+	github.com/dracory/shopstore v1.18.0
+	github.com/dracory/statsstore v1.3.0
 	github.com/dracory/str v0.18.0
-	github.com/dracory/subscriptionstore v1.2.0
-	github.com/dracory/taskstore v1.25.0
+	github.com/dracory/subscriptionstore v1.3.0
+	github.com/dracory/taskstore v1.26.0
 	github.com/dracory/test v0.10.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/userstore v1.15.0
-	github.com/dracory/vaultstore v1.2.0
-	github.com/dracory/versionstore v1.5.0
+	github.com/dracory/userstore v1.16.0
+	github.com/dracory/vaultstore v1.3.0
+	github.com/dracory/versionstore v1.6.0
 	github.com/dracory/websrv v0.1.0
 	github.com/dracory/wf v0.6.0
 	github.com/dromara/carbon/v2 v2.6.16
