@@ -7,18 +7,18 @@ import (
 	"net/http"
 	"project/internal/controllers/admin/shop/shared"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/form"
 	"github.com/dracory/hb"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 	"github.com/dracory/shopstore"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -359,10 +359,10 @@ func (controller *productManagerController) tableProducts(data productManagerCon
 func (controller *productManagerController) sortableColumnLabel(data productManagerControllerData, columnLabel string, columnSortKey string) hb.TagInterface {
 	isSelected := strings.EqualFold(data.sortBy, columnSortKey)
 
-	changeDirection := sb.ASC
+	changeDirection := neat.SortAsc
 
 	if isSelected {
-		changeDirection = lo.If(data.sortOrder == sb.ASC, sb.DESC).Else(sb.ASC)
+		changeDirection = lo.If(strings.EqualFold(data.sortOrder, neat.SortAsc), neat.SortDesc).Else(neat.SortAsc)
 	}
 
 	link := shared.NewLinks().Products(map[string]string{
@@ -383,8 +383,8 @@ func (controller *productManagerController) sortableColumnLabel(data productMana
 func (controller *productManagerController) sortingIndicator(columnSortKey string, sortByColumnKey string, sortOrder string) hb.TagInterface {
 	isSelected := strings.EqualFold(sortByColumnKey, columnSortKey)
 
-	direction := lo.If(isSelected && sortOrder == "asc", "up").
-		ElseIf(isSelected && sortOrder == "desc", "down").
+	direction := lo.If(isSelected && strings.EqualFold(sortOrder, neat.SortAsc), "up").
+		ElseIf(isSelected && strings.EqualFold(sortOrder, neat.SortDesc), "down").
 		Else("none")
 
 	sortingIndicator := hb.Span().
@@ -486,7 +486,7 @@ func (controller *productManagerController) prepareData(r *http.Request) (data p
 	data.page = req.GetStringTrimmedOr(r, "page", "0")
 	data.pageInt = cast.ToInt(data.page)
 	data.perPage = cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
-	data.sortOrder = req.GetStringTrimmedOr(r, "sort", sb.DESC)
+	data.sortOrder = req.GetStringTrimmedOr(r, "sort", neat.SortDesc)
 	data.sortBy = req.GetStringTrimmedOr(r, "by", shopstore.COLUMN_CREATED_AT)
 	data.formProductID = req.GetStringTrimmed(r, "filter_product_id")
 	data.formTitle = req.GetStringTrimmed(r, "filter_title")
@@ -516,8 +516,8 @@ func (controller *productManagerController) fetchProductList(data productManager
 
 	productIDs := []string{}
 
-	if !lo.Contains([]string{sb.DESC, sb.ASC}, data.sortOrder) {
-		data.sortOrder = sb.ASC
+	if !lo.Contains([]string{neat.SortDesc, neat.SortAsc}, data.sortOrder) {
+		data.sortOrder = neat.SortAsc
 	}
 
 	if !lo.Contains([]string{

@@ -1,16 +1,17 @@
 package products
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"log/slog"
 	"net/http"
 	"strings"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/bs"
@@ -21,7 +22,7 @@ import (
 )
 
 type productUpdateController struct {
-	app       app.AppInterface
+	app            app.AppInterface
 	fileManagerURL string
 }
 
@@ -41,6 +42,8 @@ func (controller *productUpdateController) Handler(w http.ResponseWriter, r *htt
 			return controller.handleLoadMedia(w, r, productID)
 		case "save-media":
 			return controller.handleSaveMedia(w, r, productID)
+		case "upload-media":
+			return controller.handleUploadMedia(w, r, productID)
 		case "load-metadata":
 			return controller.handleLoadMetadata(w, r, productID)
 		case "save-metadata":
@@ -336,6 +339,100 @@ func (controller *productUpdateController) handleSaveMedia(w http.ResponseWriter
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"status":"success","message":"Media saved successfully"}`))
+	return ""
+}
+
+func (controller *productUpdateController) handleUploadMedia(w http.ResponseWriter, r *http.Request, productID string) string {
+	ctx := r.Context()
+
+	shopStore := controller.app.GetShopStore()
+	if shopStore == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"error","message":"Shop store not available"}`))
+		return ""
+	}
+
+	if err := r.ParseMultipartForm(50 << 20); err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"error","message":"Failed to parse upload: ` + err.Error() + `"}`))
+		return ""
+	}
+
+	files := r.MultipartForm.File["files[]"]
+	if len(files) == 0 {
+		files = r.MultipartForm.File["upload_file"]
+	}
+	if len(files) == 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"error","message":"No files uploaded"}`))
+		return ""
+	}
+
+	mediaQuery := shopstore.NewMediaQuery()
+	mediaQuery.SetEntityID(productID)
+	mediaQuery.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
+	existingMedias, _ := shopStore.MediaList(ctx, mediaQuery)
+	startSequence := len(existingMedias)
+
+	uploaded := []map[string]any{}
+
+	for i, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"status":"error","message":"Failed to open file: ` + err.Error() + `"}`))
+			return ""
+		}
+
+		data, err := io.ReadAll(file)
+		file.Close()
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"status":"error","message":"Failed to read file: ` + err.Error() + `"}`))
+			return ""
+		}
+
+		contentType := fileHeader.Header.Get("Content-Type")
+		if contentType == "" {
+			contentType = "application/octet-stream"
+		}
+
+		dataURI := "data:" + contentType + ";base64," + base64.StdEncoding.EncodeToString(data)
+
+		media := shopstore.NewMedia()
+		media.SetEntityID(productID)
+		media.SetTitle(fileHeader.Filename)
+		media.SetURL(dataURI)
+		media.SetType(contentType)
+		media.SetStatus(shopstore.MEDIA_STATUS_ACTIVE)
+		media.SetSequence(startSequence + i)
+
+		err = shopStore.MediaCreate(ctx, media)
+		if err != nil {
+			slog.Error("Failed to create media", "error", err)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`{"status":"error","message":"Failed to save file record: ` + err.Error() + `"}`))
+			return ""
+		}
+
+		uploaded = append(uploaded, map[string]any{
+			"id":       media.GetID(),
+			"fileName": media.GetTitle(),
+			"url":      media.GetURL(),
+			"type":     media.GetType(),
+			"sequence": media.GetSequence(),
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	jsonBytes, _ := json.Marshal(map[string]any{
+		"status":  "success",
+		"message": "Files uploaded successfully",
+		"data": map[string]any{
+			"media": uploaded,
+		},
+	})
+	w.Write(jsonBytes)
 	return ""
 }
 

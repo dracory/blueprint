@@ -3,8 +3,8 @@ package admin
 import (
 	"errors"
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
@@ -16,6 +16,9 @@ import (
 	shopProducts "project/internal/controllers/admin/shop/products"
 	"project/internal/controllers/admin/shop/products/productupdate"
 	"project/internal/controllers/admin/shop/shared"
+
+	orderDetails "project/pkg/shopadmin/order_details"
+	orderManager "project/pkg/shopadmin/order_manager"
 )
 
 func ShopRoutes(app app.AppInterface) ([]rtr.RouteInterface, error) {
@@ -58,7 +61,11 @@ func ShopRoutes(app app.AppInterface) ([]rtr.RouteInterface, error) {
 		}
 
 		if controller == shared.CONTROLLER_ORDERS {
-			return NewOrderManagerController().Handler(w, r)
+			return orderManager.NewOrderManagerController(app).Handler(w, r)
+		}
+
+		if controller == shared.CONTROLLER_ORDER_DETAILS {
+			return orderDetails.NewOrderDetailsController(app).Handler(w, r)
 		}
 
 		return NewHomeController(app).Handler(w, r)

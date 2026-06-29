@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dracory/api"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dracory/shopstore"
 )
 
@@ -45,7 +45,7 @@ func (controller *productManagerController) handleLoadProducts(w http.ResponseWr
 		reqBody.SortBy = shopstore.COLUMN_CREATED_AT
 	}
 	if reqBody.Sort == "" {
-		reqBody.Sort = sb.DESC
+		reqBody.Sort = neat.SortDesc
 	}
 
 	query := shopstore.NewProductQuery().

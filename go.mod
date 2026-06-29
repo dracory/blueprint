@@ -47,7 +47,7 @@ require (
 	github.com/dracory/llm v1.3.0
 	github.com/dracory/logstore v1.19.0
 	github.com/dracory/metastore v1.8.0
-	github.com/dracory/neat v0.26.0
+	github.com/dracory/neat v0.27.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.6.0
 	github.com/dracory/rule v0.8.0

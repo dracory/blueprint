@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/dracory/api"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dracory/shopstore"
 	"github.com/dracory/userstore"
 )
@@ -53,7 +53,7 @@ func (controller *orderManagerController) handleOrdersLoadAjax(w http.ResponseWr
 		reqBody.SortBy = shopstore.COLUMN_CREATED_AT
 	}
 	if reqBody.Sort == "" {
-		reqBody.Sort = sb.DESC
+		reqBody.Sort = neat.SortDesc
 	}
 
 	query := shopstore.NewOrderQuery().

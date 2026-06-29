@@ -1,4 +1,4 @@
-package productupdate
+﻿package productupdate
 
 import (
 	"context"
@@ -72,7 +72,6 @@ func TestHandler_RenderDetailsView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -105,7 +104,6 @@ func TestHandler_RenderMediaView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -137,7 +135,6 @@ func TestHandler_RenderTagsView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -169,7 +166,6 @@ func TestHandler_RenderMetadataView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -201,7 +197,6 @@ func TestHandler_DefaultView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()

@@ -10,6 +10,9 @@ function initMediaApp() {
     data() {
         return {
             loading: false,
+            uploading: false,
+            uploadProgress: 0,
+            isDragOver: false,
             mediaItems: [],
             newMediaUrl: '',
             newMediaFileName: '',
@@ -123,6 +126,97 @@ function initMediaApp() {
 
             // Auto-save after adding
             this.saveMedia();
+        },
+
+        handleFileSelect(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                this.uploadFiles(files);
+            }
+            event.target.value = '';
+        },
+
+        handleDrop(event) {
+            this.isDragOver = false;
+            const files = event.dataTransfer.files;
+            if (files && files.length > 0) {
+                this.uploadFiles(files);
+            }
+        },
+
+        async uploadFiles(files) {
+            this.uploading = true;
+            this.uploadProgress = 0;
+
+            const formData = new FormData();
+            formData.append('product_id', productId);
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+
+            try {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', urlMediaUpload);
+
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        this.uploadProgress = Math.round((e.loaded / e.total) * 100);
+                    }
+                };
+
+                xhr.onload = () => {
+                    try {
+                        const data = JSON.parse(xhr.responseText);
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: 'Files uploaded successfully',
+                                position: 'top-end',
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false
+                            });
+                            this.loadMedia();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Failed to upload files'
+                            });
+                        }
+                    } catch (e) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to parse upload response'
+                        });
+                    }
+                    this.uploading = false;
+                    if (this.showAddModal) {
+                        this.showAddModal = false;
+                    }
+                };
+
+                xhr.onerror = () => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to upload files'
+                    });
+                    this.uploading = false;
+                };
+
+                xhr.send(formData);
+            } catch (error) {
+                console.error('Error uploading files:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to upload files'
+                });
+                this.uploading = false;
+            }
         },
 
         removeMedia(index) {

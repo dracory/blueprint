@@ -1,4 +1,4 @@
-package productupdate
+﻿package productupdate
 
 import (
 	"context"
@@ -17,7 +17,6 @@ func TestHandleRenderPage_DetailsView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -52,7 +51,6 @@ func TestHandleRenderPage_MediaView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -86,7 +84,6 @@ func TestHandleRenderPage_TagsView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -120,7 +117,6 @@ func TestHandleRenderPage_MetadataView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -154,7 +150,6 @@ func TestHandleRenderPage_DefaultView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -187,7 +182,6 @@ func TestHandleRenderPage_InvalidView(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -220,7 +214,6 @@ func TestHandleRenderPage_ContainsBreadcrumbs(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()
@@ -257,7 +250,6 @@ func TestHandleRenderPage_ContainsTabs(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 		testutils.WithShopStore(true),
-		testutils.WithCmsStore(true, "test-template"),
 	)
 
 	product := shopstore.NewProduct()

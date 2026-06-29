@@ -19,7 +19,7 @@ import (
 var mediaEmbed embed.FS
 
 type productMediaComponent struct {
-	app       app.AppInterface
+	app            app.AppInterface
 	request        *http.Request
 	product        shopstore.ProductInterface
 	productID      string
@@ -124,11 +124,17 @@ func (c *productMediaComponent) Render() hb.TagInterface {
 		"product_id": c.productID,
 	})
 
+	urlMediaUpload := shared.NewLinks("/admin/shop").ProductUpdate(map[string]string{
+		"action":     "upload-media",
+		"product_id": c.productID,
+	})
+
 	// Initialize script with URLs and product ID
 	initScript := `
 		const productId = "` + c.productID + `";
 		const urlMediaLoad = "` + urlMediaLoad + `";
 		const urlMediaSave = "` + urlMediaSave + `";
+		const urlMediaUpload = "` + urlMediaUpload + `";
 	`
 
 	return hb.Div().

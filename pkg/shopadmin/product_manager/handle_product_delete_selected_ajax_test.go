@@ -8,7 +8,6 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleProductDeleteSelectedAjax_RequiresPOST(t *testing.T) {
@@ -22,8 +21,12 @@ func TestHandleProductDeleteSelectedAjax_RequiresPOST(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 }
 
 func TestHandleProductDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
@@ -36,8 +39,12 @@ func TestHandleProductDeleteSelectedAjax_RequiresShopStore(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 }
 
 func TestHandleProductDeleteSelectedAjax_DeletesSelectedProducts(t *testing.T) {
@@ -51,6 +58,10 @@ func TestHandleProductDeleteSelectedAjax_DeletesSelectedProducts(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 }

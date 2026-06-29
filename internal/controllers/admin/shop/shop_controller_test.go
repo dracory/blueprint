@@ -39,22 +39,3 @@ func TestHomeController_NilRegistry(t *testing.T) {
 	}
 }
 
-func TestNewOrderManagerController(t *testing.T) {
-	controller := NewOrderManagerController()
-
-	if controller == nil {
-		t.Error("NewOrderManagerController() should not return nil")
-	}
-}
-
-func TestOrderManagerController_Handler(t *testing.T) {
-	controller := NewOrderManagerController()
-
-	req := httptest.NewRequest("GET", "/admin/shop/orders", nil)
-	w := httptest.NewRecorder()
-
-	result := controller.Handler(w, req)
-	if result != "Order Manager" {
-		t.Errorf("Handler() = %q, want %q", result, "Order Manager")
-	}
-}

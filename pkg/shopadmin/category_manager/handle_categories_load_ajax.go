@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/dracory/api"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dracory/shopstore"
 )
 
@@ -40,7 +40,7 @@ func (controller *categoryManagerController) handleLoadCategories(w http.Respons
 		reqBody.SortBy = shopstore.COLUMN_CREATED_AT
 	}
 	if reqBody.Sort == "" {
-		reqBody.Sort = sb.DESC
+		reqBody.Sort = neat.SortDesc
 	}
 
 	query := shopstore.NewCategoryQuery().

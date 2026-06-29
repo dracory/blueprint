@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"project/internal/app"
 	"project/internal/controllers/admin/shop/shared"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	crud "github.com/dracory/crud/v2"
@@ -209,28 +209,16 @@ func (discountController *discountController) FuncUpdate(r *http.Request, entity
 	status := data["status"]
 	discountType := data["type"]
 
-	if title == "" {
-		return errors.New("title is required")
-	}
-
-	if status == "" {
-		return errors.New("status is required")
-	}
-
-	if code == "" {
-		return errors.New("code is required")
-	}
-
-	if discountType == "" {
-		return errors.New("discount type is required")
-	}
-
-	if startsAt == "" {
-		return errors.New("starts_at is required")
-	}
-
-	if endsAt == "" {
-		return errors.New("ends_at is required")
+	validationRule := NewDiscountFormValidationRule(DiscountFormData{
+		Title:        title,
+		Status:       status,
+		Code:         code,
+		DiscountType: discountType,
+		StartsAt:     startsAt,
+		EndsAt:       endsAt,
+	})
+	if validationRule.Fails() {
+		return errors.New(validationRule.Message())
 	}
 
 	if amountStr == "" {
