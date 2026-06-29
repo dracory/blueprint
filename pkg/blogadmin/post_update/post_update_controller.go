@@ -21,8 +21,8 @@ import (
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 	"github.com/dracory/versionstore"
 )
 
@@ -84,6 +84,17 @@ func (controller *postUpdateController) Handler(w http.ResponseWriter, r *http.R
 			return controller.handleLoadVersionDetail(w, r)
 		case "restore-version-attributes":
 			return controller.handleRestoreVersionAttributes(w, r)
+		// Media component actions
+		case "load-media":
+			return newPostMediaComponent(controller.app).HandleLoad(w, r)
+		case "upload-media":
+			return newPostMediaComponent(controller.app).HandleUpload(w, r)
+		case "save-media":
+			return newPostMediaComponent(controller.app).HandleSave(w, r)
+		case "delete-media":
+			return newPostMediaComponent(controller.app).HandleDelete(w, r)
+		case "add-media":
+			return newPostMediaComponent(controller.app).HandleAdd(w, r)
 		}
 	}
 
@@ -224,7 +235,15 @@ func (controller *postUpdateController) page(r *http.Request, post blogstore.Pos
 					"post_id": post.GetID(),
 					"view":    "seo",
 				})).
-				HTML("SEO")))
+				HTML("SEO"))).
+		Child(bs.NavItem().
+			Child(bs.NavLink().
+				ClassIf(view == "media", "active").
+				Href(shared.NewLinks("/admin/blog").PostUpdate(map[string]string{
+					"post_id": post.GetID(),
+					"view":    "media",
+				})).
+				HTML("Media")))
 
 	postTitle := hb.Heading2().
 		Class("mb-3").
@@ -244,6 +263,8 @@ func (controller *postUpdateController) page(r *http.Request, post blogstore.Pos
 		body = controller.renderTagsView(r, post)
 	case "seo":
 		body = controller.renderSEOView(r, post)
+	case "media":
+		body = controller.renderMediaView(r, post)
 	default:
 		body = hb.Div().Text("Not implemented yet")
 	}
@@ -259,6 +280,7 @@ func (controller *postUpdateController) page(r *http.Request, post blogstore.Pos
 					HTMLIf(view == "categories", "Post Categories").
 					HTMLIf(view == "tags", "Post Tags").
 					HTMLIf(view == "seo", "Post SEO").
+					HTMLIf(view == "media", "Post Media").
 					Style("margin-bottom:0;display:inline-block;")),
 		).
 		Child(
@@ -279,7 +301,7 @@ func (controller *postUpdateController) page(r *http.Request, post blogstore.Pos
 		Child(versioningModal)
 }
 
-func (controller *postUpdateController) renderCategoriesView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderCategoriesView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_categories.html")
 	if err != nil {
 		slog.Error("Failed to read post categories HTML template", "error", err)
@@ -313,7 +335,7 @@ func (controller *postUpdateController) renderCategoriesView(_ *http.Request, po
 	return vueContainer
 }
 
-func (controller *postUpdateController) handleLoadCategories(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadCategories(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -368,7 +390,7 @@ func (controller *postUpdateController) handleLoadCategories(_ http.ResponseWrit
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleAddCategory(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleAddCategory(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -403,7 +425,7 @@ func (controller *postUpdateController) handleAddCategory(_ http.ResponseWriter,
 	return api.Success("Category added to post successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRemoveCategory(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRemoveCategory(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -438,7 +460,7 @@ func (controller *postUpdateController) handleRemoveCategory(_ http.ResponseWrit
 	return api.Success("Category removed from post successfully").ToString()
 }
 
-func (controller *postUpdateController) renderTagsView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderTagsView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_tags.html")
 	if err != nil {
 		slog.Error("Failed to read post tags HTML template", "error", err)
@@ -472,7 +494,7 @@ func (controller *postUpdateController) renderTagsView(_ *http.Request, post blo
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderDetailsView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderDetailsView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_details.html")
 	if err != nil {
 		slog.Error("Failed to read post details HTML template", "error", err)
@@ -492,6 +514,7 @@ func (controller *postUpdateController) renderDetailsView(_ *http.Request, post 
 		const urlDetailsLoad = '` + shared.NewLinks("/admin/blog").PostUpdate(map[string]string{"post_id": post.GetID(), "action": "load-details"}) + `';
 		const urlDetailsSave = '` + shared.NewLinks("/admin/blog").PostUpdate(map[string]string{"post_id": post.GetID(), "action": "save-details"}) + `';
 		const urlRegenerateImage = '` + shared.NewLinks("/admin/blog").PostUpdate(map[string]string{"post_id": post.GetID(), "action": "regenerate-image"}) + `';
+		const urlMediaLoad = '` + shared.NewLinks("/admin/blog").PostUpdate(map[string]string{"post_id": post.GetID(), "action": "load-media"}) + `';
 	`)
 
 	htmlTemplate := hb.Wrap().HTML(string(htmlContent))
@@ -506,7 +529,7 @@ func (controller *postUpdateController) renderDetailsView(_ *http.Request, post 
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderContentView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderContentView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_content.html")
 	if err != nil {
 		slog.Error("Failed to read post content HTML template", "error", err)
@@ -540,7 +563,7 @@ func (controller *postUpdateController) renderContentView(_ *http.Request, post 
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderSEOView(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderSEOView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_seo.html")
 	if err != nil {
 		slog.Error("Failed to read post SEO HTML template", "error", err)
@@ -573,7 +596,7 @@ func (controller *postUpdateController) renderSEOView(_ *http.Request, post blog
 	return vueContainer
 }
 
-func (controller *postUpdateController) renderVersioningModal(_ *http.Request, post blogstore.PostInterface) hb.TagInterface {
+func (controller *postUpdateController) renderVersioningModal(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
 	htmlContent, err := postCategoriesFiles.ReadFile("post_versioning.html")
 	if err != nil {
 		slog.Error("Failed to read post versioning HTML template", "error", err)
@@ -616,7 +639,7 @@ func (controller *postUpdateController) renderVersioningModal(_ *http.Request, p
 	return vueContainer
 }
 
-func (controller *postUpdateController) handleLoadTags(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadTags(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -670,7 +693,7 @@ func (controller *postUpdateController) handleLoadTags(_ http.ResponseWriter, r 
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleAddTag(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleAddTag(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -705,7 +728,7 @@ func (controller *postUpdateController) handleAddTag(_ http.ResponseWriter, r *h
 	return api.Success("Tag added to post successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRemoveTag(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRemoveTag(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -741,7 +764,7 @@ func (controller *postUpdateController) handleRemoveTag(_ http.ResponseWriter, r
 }
 
 // Details component handlers
-func (controller *postUpdateController) handleLoadDetails(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadDetails(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -769,7 +792,7 @@ func (controller *postUpdateController) handleLoadDetails(_ http.ResponseWriter,
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveDetails(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveDetails(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -838,7 +861,7 @@ func (controller *postUpdateController) handleSaveDetails(_ http.ResponseWriter,
 	return api.Success("Post saved successfully").ToString()
 }
 
-func (controller *postUpdateController) handleRegenerateImage(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRegenerateImage(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -893,7 +916,7 @@ func (controller *postUpdateController) handleRegenerateImage(_ http.ResponseWri
 }
 
 // Content component handlers
-func (controller *postUpdateController) handleLoadContent(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadContent(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -919,7 +942,7 @@ func (controller *postUpdateController) handleLoadContent(_ http.ResponseWriter,
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveContent(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveContent(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -968,14 +991,14 @@ func (controller *postUpdateController) handleSaveContent(_ http.ResponseWriter,
 	return api.Success("Post saved successfully").ToString()
 }
 
-func (controller *postUpdateController) handleBlockEditorHandle(_ http.ResponseWriter, _ *http.Request) string {
+func (controller *postUpdateController) handleBlockEditorHandle(w http.ResponseWriter, r *http.Request) string {
 	// This is a placeholder for BlockEditor handling
 	// The actual implementation would depend on the BlockEditor library
 	return api.Error("BlockEditor handle not implemented").ToString()
 }
 
 // SEO component handlers
-func (controller *postUpdateController) handleLoadSEO(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadSEO(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	postID := req.GetStringTrimmed(r, "post_id")
@@ -1003,7 +1026,7 @@ func (controller *postUpdateController) handleLoadSEO(_ http.ResponseWriter, r *
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleSaveSEO(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleSaveSEO(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -1058,7 +1081,7 @@ func (controller *postUpdateController) handleSaveSEO(_ http.ResponseWriter, r *
 }
 
 // Versioning component handlers
-func (controller *postUpdateController) handleLoadVersions(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadVersions(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	var reqData struct {
@@ -1089,7 +1112,7 @@ func (controller *postUpdateController) handleLoadVersions(_ http.ResponseWriter
 	query.SetEntityType(blogstore.VERSIONING_TYPE_POST)
 	query.SetEntityID(reqData.PostID)
 	query.SetOrderBy(versionstore.COLUMN_CREATED_AT)
-	query.SetSortOrder(sb.DESC)
+	query.SetSortOrder(neat.SortDesc)
 	query.SetLimit(50)
 
 	controller.app.GetLogger().Info("Loading versions for post", "post_id", reqData.PostID)
@@ -1128,7 +1151,7 @@ func (controller *postUpdateController) handleLoadVersions(_ http.ResponseWriter
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleLoadVersionDetail(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleLoadVersionDetail(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	var reqData struct {
@@ -1197,7 +1220,7 @@ func (controller *postUpdateController) handleLoadVersionDetail(_ http.ResponseW
 	}).ToString()
 }
 
-func (controller *postUpdateController) handleRestoreVersionAttributes(_ http.ResponseWriter, r *http.Request) string {
+func (controller *postUpdateController) handleRestoreVersionAttributes(w http.ResponseWriter, r *http.Request) string {
 	ctx := r.Context()
 
 	if r.Method != http.MethodPost {
@@ -1268,6 +1291,10 @@ func (controller *postUpdateController) handleRestoreVersionAttributes(_ http.Re
 	}
 
 	return api.Success("Selected attributes restored successfully").ToString()
+}
+
+func (controller *postUpdateController) renderMediaView(r *http.Request, post blogstore.PostInterface) hb.TagInterface {
+	return newPostMediaComponent(controller.app).Render(r, post)
 }
 
 // Helper function to get content type from editor

@@ -6,18 +6,19 @@ import (
 	"log/slog"
 	"net/http"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
+	"project/internal/rules"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/blogstore"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 	"github.com/dromara/carbon/v2"
 	"github.com/spf13/cast"
 )
@@ -151,7 +152,7 @@ func (controller *postManagerController) handleLoadPosts(w http.ResponseWriter, 
 	// Read parameters from query string for GET requests
 	page := cast.ToInt(req.GetStringTrimmedOr(r, "page", "0"))
 	perPage := cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
-	sortOrder := req.GetStringTrimmedOr(r, "sort_order", sb.DESC)
+	sortOrder := req.GetStringTrimmedOr(r, "sort_order", neat.SortDesc)
 	sortBy := req.GetStringTrimmedOr(r, "sort_by", blogstore.COLUMN_CREATED_AT)
 	status := req.GetStringTrimmed(r, "status")
 	search := req.GetStringTrimmed(r, "search")
@@ -186,7 +187,7 @@ func (controller *postManagerController) handleLoadPosts(w http.ResponseWriter, 
 			"created_at":   post.GetCreatedAt(),
 			"updated_at":   post.GetUpdatedAt(),
 			"slug":         post.GetSlug(),
-			"image_url":    post.GetImageUrl(),
+			"image_url":    rules.PostImageURL(ctx, blogStore, post),
 		})
 	}
 
@@ -346,7 +347,7 @@ func (controller *postManagerController) prepareData(r *http.Request) (data post
 	data.page = req.GetStringTrimmed(r, "page")
 	data.pageInt = cast.ToInt(data.page)
 	data.perPage = cast.ToInt(req.GetStringTrimmedOr(r, "per_page", "10"))
-	data.sortOrder = req.GetStringTrimmedOr(r, "sort_order", sb.DESC)
+	data.sortOrder = req.GetStringTrimmedOr(r, "sort_order", neat.SortDesc)
 	data.sortBy = req.GetStringTrimmedOr(r, "by", blogstore.COLUMN_CREATED_AT)
 	data.status = req.GetStringTrimmed(r, "status")
 	data.search = req.GetStringTrimmed(r, "search")

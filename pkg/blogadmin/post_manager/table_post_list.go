@@ -9,6 +9,7 @@ import (
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
 	"github.com/dracory/hb"
+	"github.com/dracory/neat"
 	"github.com/samber/lo"
 )
 
@@ -124,10 +125,10 @@ func tablePostList(data postManagerControllerData) hb.TagInterface {
 func sortableColumnLabel(data postManagerControllerData, tableLabel string, columnName string) hb.TagInterface {
 	isSelected := strings.EqualFold(data.sortBy, columnName)
 
-	direction := lo.If(data.sortOrder == "asc", "desc").Else("asc")
+	direction := lo.If(strings.EqualFold(data.sortOrder, neat.SortAsc), neat.SortDesc).Else(neat.SortAsc)
 
 	if !isSelected {
-		direction = "asc"
+		direction = neat.SortAsc
 	}
 
 	link := shared.NewLinks("/admin/blog").PostManager(map[string]string{
@@ -150,8 +151,8 @@ func sortableColumnLabel(data postManagerControllerData, tableLabel string, colu
 func sortingIndicator(columnName string, sortByColumnName string, sortOrder string) hb.TagInterface {
 	isSelected := strings.EqualFold(sortByColumnName, columnName)
 
-	direction := lo.If(isSelected && sortOrder == "asc", "up").
-		ElseIf(isSelected && sortOrder == "desc", "down").
+	direction := lo.If(isSelected && strings.EqualFold(sortOrder, neat.SortAsc), "up").
+		ElseIf(isSelected && strings.EqualFold(sortOrder, neat.SortDesc), "down").
 		Else("none")
 
 	sortingIndicator := hb.Span().

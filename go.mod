@@ -22,7 +22,7 @@ require (
 	github.com/dracory/base v0.37.0
 	github.com/dracory/blindindexstore v1.14.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.27.0
+	github.com/dracory/blogstore v1.29.0
 	github.com/dracory/bs v0.16.0
 	github.com/dracory/cachestore v1.7.0
 	github.com/dracory/cdn v1.11.0
@@ -83,7 +83,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.19.0
 	github.com/yuin/goldmark v1.8.2
-	modernc.org/sqlite v1.52.0
+	modernc.org/sqlite v1.53.0
 )
 
 require (
@@ -176,7 +176,7 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.73.4 // indirect
+	modernc.org/libc v1.73.5 // indirect
 )
 
 require (

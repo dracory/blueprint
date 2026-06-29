@@ -7,6 +7,9 @@ const PostDetailsApp = {
       saving: false,
       regenerating: false,
       showAdvancedTools: false,
+      showImagePicker: false,
+      loadingMedia: false,
+      mediaImages: [],
       postId: '',
       editorOptions: [
         // { value: 'blockarea', label: 'BlockArea' },
@@ -200,6 +203,33 @@ const PostDetailsApp = {
 
     toggleAdvancedTools() {
       this.showAdvancedTools = !this.showAdvancedTools;
+    },
+
+    async openImagePicker() {
+      this.showImagePicker = true;
+      this.loadingMedia = true;
+      this.mediaImages = [];
+      try {
+        const response = await fetch(urlMediaLoad, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ post_id: this.postId })
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+          const allFiles = data.data?.files || [];
+          this.mediaImages = allFiles.filter(f => f.type && f.type.startsWith('image/'));
+        }
+      } catch (error) {
+        console.error('Error loading media:', error);
+      } finally {
+        this.loadingMedia = false;
+      }
+    },
+
+    selectImage(url) {
+      this.form.imageUrl = url;
+      this.showImagePicker = false;
     },
 
     formatDateTimeForInput(datetimeStr) {

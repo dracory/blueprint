@@ -1,14 +1,22 @@
 package shared
 
 import (
-	"project/internal/links"
+	"context"
 	"project/internal/app"
+	"project/internal/links"
+	"project/internal/rules"
 
 	"github.com/dracory/blogstore"
 )
 
-func SizedThumbnailURL(app app.AppInterface, post blogstore.PostInterface, width, height, quality string) string {
-	postImageURL := post.GetImageUrlOrDefault()
+func SizedThumbnailURL(ctx context.Context, app app.AppInterface, post blogstore.PostInterface, width, height, quality string) string {
+	var postImageURL string
+	if app != nil && app.GetBlogStore() != nil {
+		postImageURL = rules.PostImageURL(ctx, app.GetBlogStore(), post)
+	} else {
+		postImageURL = post.GetImageUrlOrDefault()
+	}
+
 	extension := ImageExtension(postImageURL)
 
 	if app == nil {

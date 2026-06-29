@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"log/slog"
+
 	"github.com/dracory/llm"
-	"github.com/mingrammer/cfmt"
 	"github.com/samber/lo"
 	"github.com/tidwall/gjson"
 )
@@ -87,7 +88,7 @@ Topic: %s
 		return nil, err
 	}
 
-	_, _ = cfmt.Successln("Response: ", response)
+	slog.Info("Response: ", "response", response)
 
 	titlesResponse := gjson.Get(response, "titles").Array()
 

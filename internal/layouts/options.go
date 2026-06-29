@@ -4,7 +4,7 @@ import (
 	"github.com/dracory/hb"
 )
 
-// Options defines the options for the layout
+// Options defines the options for the layout.
 type Options struct {
 	AppName         string
 	WebsiteSection  string
@@ -18,4 +18,5 @@ type Options struct {
 	MetaKeywords    string
 	ImageURL        string
 	CanonicalURL    string
+	DisableNavbar   bool
 }

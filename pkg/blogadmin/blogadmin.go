@@ -12,11 +12,6 @@ import (
 	"project/internal/app"
 )
 
-// LLMEngineInterface defines the interface for LLM operations
-type LLMEngineInterface interface {
-	GenerateText(systemPrompt string, userPrompt string) (string, error)
-}
-
 // AdminOptions contains all dependencies and configuration for the blog admin
 type AdminOptions struct {
 	// Store is the blog store instance
@@ -30,12 +25,6 @@ type AdminOptions struct {
 
 	// AuthUserID returns the authenticated user ID from the request
 	AuthUserID func(r *http.Request) string
-
-	// LLMEngine is the AI/LLM engine for generating content (optional)
-	LLMEngine LLMEngineInterface
-
-	// BlogTopic is the topic for AI-generated content (optional)
-	BlogTopic string
 
 	// Registry provides access to all stores and services
 	Registry app.AppInterface

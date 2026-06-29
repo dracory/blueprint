@@ -1,6 +1,8 @@
 package home
 
 import (
+	"context"
+	"project/internal/app"
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/links"
 
@@ -9,101 +11,64 @@ import (
 	"github.com/samber/lo"
 )
 
-func cardPost(post blogstore.PostInterface) hb.TagInterface {
+func cardPost(ctx context.Context, app app.AppInterface, post blogstore.PostInterface) hb.TagInterface {
 
 	publishedAt := lo.Ternary(post.GetPublishedAt() == "", "", post.GetPublishedAtCarbon().Format("d M, Y"))
 
 	postURL := links.Website().BlogPost(post.GetID(), post.GetSlug())
 
 	postTitle := hb.Heading5().
-		Class("card-title").
-		Style("font-size: 16px; color: #224b8e; margin-bottom: 10px; text-align: left; font-weight: 800;").
+		Class("card-title fw-black text-uppercase mb-2").
+		Style("font-size: 1rem; text-align: left; letter-spacing: -0.5px;").
 		Text(post.GetTitle())
 
-	postPublished := hb.Paragraph().
-		Style("font-size: 12px;	color: #6c757d;	margin-bottom: 20px; text-align: right;").
+	postPublished := hb.Span().
+		Class("badge bg-dark fw-black small").
 		Text(publishedAt)
 
-	// postPublished := hb.Span().
-	// 	Class(`small`).
-	// 	Style(`font-size:12px;color:#666;display:inline-block;padding-right:10px;padding-top:10px;`).
-	// 	HTML(publishedAt)
-
-	// postImage := hb.Div().Class(`overflow-hidden rounded-3`).Children([]hb.TagInterface{
-	// 	hb.Image().
-	// 		Class(`card-img`).
-	// 		Style(`object-fit:cover;max-height:180px;`).
-	// 		Src(postImageURL).
-	// 		Alt("course image").
-	// 		Attr("loading", "lazy"),
-	// 	hb.Div().
-	// 		Class(`bg-overlay bg-dark opacity-4`),
-	// 	// Badge
-	// 	// bs.CardImageTop().Class(`d-flex align-items-start`).Children([]hb.TagInterface{
-	// 	// 	hb.Div().Class(`badge text-bg-danger`).Style(`position:absolute;top:10px;left:10px;`).HTML("Student life"),
-	// 	// }),
-	// })
-
 	postSummary := hb.Paragraph().
-		Class("card-text").
+		Class("card-text text-secondary fw-bold small mb-0").
 		Text(post.GetSummary()).
 		Style(`text-align: left;`).
-		Style(`font-size: 14px;`).
-		Style(`font-weight: 400;`).
 		Style(`overflow: hidden;`).
 		Style(`text-overflow: ellipsis;`).
 		Style(`display: -webkit-box;`).
-		Style(`-webkit-line-clamp: 2;`).
+		Style(`-webkit-line-clamp: 3;`).
 		Style(`-webkit-box-orient: vertical;`)
 
-	separator := hb.HR().
-		Style(`width: 80%`).
-		Style(`margin: 0 auto`).
-		Style(`border: 0`).
-		Style(`height: 2px`).
-		Style(`background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0))`).
-		Style(`opacity: 0.25`).
-		Style(`margin-bottom: 20px`)
-
 	card := hb.Div().
-		Class("card").
-		Style("border: none; margin-bottom: 20px;").
-		Child(postImage(post)).
+		Class("card rounded-4 h-100 overflow-hidden").
+		Child(postImage(ctx, app, post)).
 		Child(hb.Div().
-			Class("card-body").
-			Style(`padding: 20px 10px;`).
+			Class("card-body p-4").
 			Child(postTitle).
 			Child(postSummary)).
 		Child(hb.Div().
-			Class("card-footer").
-			Style(`background: none;border: none;padding: 0px;`).
-			Child(postPublished).
-			Child(separator))
+			Class("card-footer border-0 bg-transparent p-4 pt-0").
+			Child(postPublished))
 
 	link := hb.Hyperlink().
 		Href(postURL).
-		Target("_blank").
 		Style("text-decoration: none; color: inherit;").
 		Style("display: flex; height: 100%;").
 		Child(card)
 
 	return hb.Div().
-		Class("col-md-3 col-sm-6 d-flex align-items-stretch").
+		Class("col-md-6 col-lg-4 d-flex align-items-stretch").
 		Child(link)
 
 }
 
-func postImage(post blogstore.PostInterface) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(nil, post, "300", "200", "80")
+func postImage(ctx context.Context, app app.AppInterface, post blogstore.PostInterface) *hb.Tag {
+	thumbnailURL := shared.SizedThumbnailURL(ctx, app, post, "300", "200", "80")
 
 	postImage := hb.Image(``).
-		Class("card-img-top rounded-3").
+		Class("card-img-top").
 		Class(`slazy-placeholder`).
 		Class(`slazy-resize`).
 		Style("object-fit: cover;").
-		Style("max-height: 180px;").
+		Style("height: 200px;").
 		Style("aspect-ratio: 9/6;").
-		Style("border-radius: 0.5rem").
 		Attr("data-slazy-src", thumbnailURL).
 		Attr("loading", "lazy").
 		Alt("")

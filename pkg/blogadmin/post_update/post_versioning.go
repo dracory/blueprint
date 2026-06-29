@@ -7,7 +7,7 @@ import (
 	"project/internal/app"
 
 	"github.com/dracory/blogstore"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dracory/versionstore"
 	"github.com/samber/lo"
 )
@@ -32,7 +32,7 @@ func createPostVersioning(ctx context.Context, app app.AppInterface, post blogst
 		SetEntityType(blogstore.VERSIONING_TYPE_POST).
 		SetEntityID(post.GetID()).
 		SetOrderBy(versionstore.COLUMN_CREATED_AT).
-		SetSortOrder(sb.DESC).
+		SetSortOrder(neat.SortDesc).
 		SetLimit(1))
 	if err != nil {
 		return err

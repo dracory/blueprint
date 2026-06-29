@@ -177,15 +177,9 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 func TestBlogPostController_Handler_PostPublished_Success(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
 	cfg.SetCacheStoreUsed(true)
 
 	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
 
 	post := blogstore.NewPost()
 	post.SetTitle("Published Post")
@@ -275,8 +269,6 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
 	cfg.SetCacheStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
@@ -286,10 +278,6 @@ func TestBlogPostController_Handler_AdminAccessUnpublished(t *testing.T) {
 		testutils.WithUserStore(true),
 		testutils.WithSessionStore(true),
 	)
-
-	if err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template"); err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
 
 	post := blogstore.NewPost()
 	post.SetTitle("Draft Post")

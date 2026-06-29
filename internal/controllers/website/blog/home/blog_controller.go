@@ -1,13 +1,14 @@
 package home
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
+	"project/internal/app"
 	"project/internal/controllers/website/blog/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -46,26 +47,24 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 	options := layouts.Options{
 		WebsiteSection: "Blog",
 		Title:          "Recent Posts",
-		Content:        hb.Wrap().HTML(controller.page(data)),
+		Content:        hb.Wrap().HTML(controller.page(r, data)),
 		ScriptURLs: []string{
 			cdn.Slazy_0_5_0(),
 		},
 	}
 
-	if controller.app.GetConfig().GetCmsStoreUsed() {
-		return layouts.NewCmsLayout(
-			controller.app,
-			r,
-			options).ToHTML()
-	} else {
-		return layouts.NewBlankLayout(
-			controller.app,
-			r,
-			options).ToHTML()
-	}
+	return layouts.NewPageLayout(
+		controller.app,
+		r,
+		options).ToHTML()
 }
 
-func (controller *blogController) page(data blogControllerData) string {
+func (controller *blogController) page(r *http.Request, data blogControllerData) string {
+	ctx := context.Background()
+	if r != nil {
+		ctx = r.Context()
+	}
+
 	url := links.Website().Blog(map[string]string{
 		"page": "",
 	})
@@ -79,18 +78,18 @@ func (controller *blogController) page(data blogControllerData) string {
 	})
 
 	columnCards := lo.Map(data.postList, func(post blogstore.PostInterface, index int) hb.TagInterface {
-		return cardPost(post)
+		return cardPost(ctx, controller.app, post)
 	})
 
 	section := hb.Section().
-		Style("background:#fff;padding-top:40px; padding-bottom: 40px;").
+		Style("padding-top:20px; padding-bottom: 60px;").
 		Child(hb.Div().
 			Class(`container`).
 			Child(hb.Div().
 				Class(`row g-4`).
 				Children(columnCards)).
 			Child(hb.Div().
-				Class(`d-flex justify-content-center mt-5 pagination-primary-soft rounded mb-0`).
+				Class(`d-flex justify-content-center mt-5 mb-0`).
 				HTML(pagination)))
 
 	return hb.Wrap().Children([]hb.TagInterface{

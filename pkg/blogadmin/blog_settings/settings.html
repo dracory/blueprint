@@ -1,0 +1,35 @@
+<div id="blog-settings-app">
+  <template v-if="mounted">
+    <div v-if="infoMessage" class="alert alert-info d-flex align-items-center gap-2 mb-3" role="alert">
+      <i class="bi bi-info-circle-fill"></i>
+      <span>{{ infoMessage }}</span>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold" for="blog_topic">Blog Topic</label>
+      <textarea class="form-control" id="blog_topic" v-model="form.blogTopic" placeholder="e.g. Contract review insights" rows="5" :readonly="isEnvOverride" :disabled="isEnvOverride"></textarea>
+      <small class="form-text text-muted">This is the topic of your blog. It will be used by the AI to generate titles and content for your blog.</small>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <a :href="returnUrl" class="btn btn-secondary">
+        <i class="bi bi-chevron-left me-2"></i> Cancel
+      </a>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-primary" :disabled="saving || isEnvOverride" @click="save('apply')">
+          <i class="bi bi-check2 me-2"></i> Apply
+          <span v-if="savingApply" class="spinner-border spinner-border-sm ms-2" role="status"></span>
+        </button>
+        <button type="button" class="btn btn-success" :disabled="saving || isEnvOverride" @click="save('save_close')">
+          <i class="bi bi-check2-all me-2"></i> Save &amp; Close
+          <span v-if="savingClose" class="spinner-border spinner-border-sm ms-2" role="status"></span>
+        </button>
+      </div>
+    </div>
+  </template>
+  <template v-else>
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  </template>
+</div>

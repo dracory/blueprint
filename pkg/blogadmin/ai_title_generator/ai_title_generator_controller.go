@@ -1,6 +1,7 @@
 package aititlegenerator
 
 import (
+	"embed"
 	"fmt"
 	"net/http"
 	"project/internal/helpers"
@@ -16,9 +17,12 @@ import (
 	"github.com/dracory/cdn"
 	"github.com/dracory/customstore"
 	"github.com/dracory/hb"
-	"github.com/dracory/liveflux"
 	"github.com/dracory/req"
 )
+
+//go:embed settings_modal.html
+//go:embed settings_modal.js
+var settingsModalFiles embed.FS
 
 const (
 	ACTION_ADD_TITLE       = "add_title"
@@ -27,6 +31,8 @@ const (
 	ACTION_REJECT_TITLE    = "reject_title"
 	ACTION_GENERATE_POST   = "generate_post"
 	ACTION_DELETE_TITLE    = "delete_title"
+	ACTION_SETTINGS_FETCH  = "settings-fetch-data"
+	ACTION_SETTINGS_SUBMIT = "settings-submit"
 )
 
 type AiTitleGeneratorController struct {
@@ -67,6 +73,10 @@ func (c *AiTitleGeneratorController) Handler(w http.ResponseWriter, r *http.Requ
 			return c.onRejectTitle(r)
 		case ACTION_DELETE_TITLE:
 			return c.onDeleteTitle(r)
+		case ACTION_SETTINGS_FETCH:
+			return c.handleSettingsFetchData(r)
+		case ACTION_SETTINGS_SUBMIT:
+			return c.handleSettingsSubmit(r)
 		}
 	}
 
@@ -76,9 +86,6 @@ func (c *AiTitleGeneratorController) Handler(w http.ResponseWriter, r *http.Requ
 		ScriptURLs: []string{
 			cdn.Htmx_2_0_0(),
 			cdn.Sweetalert2_11(),
-		},
-		Scripts: []string{
-			liveflux.Script().ToHTML(),
 		},
 		Styles: []string{
 			htmx.HxHideIndicatorCSS(),
@@ -106,26 +113,23 @@ func (c *AiTitleGeneratorController) view(data pageData) *hb.Tag {
 		},
 	})
 
-	settingsComponent := NewTitleGeneratorSettingsModal(c.app)
-	settingsSSR := liveflux.SSR(settingsComponent, map[string]string{
-		"return_url": shared.NewLinks("/admin/blog").AiTitleGenerator(),
-	})
+	settingsModalHTML, _ := settingsModalFiles.ReadFile("settings_modal.html")
+	settingsModalJS, _ := settingsModalFiles.ReadFile("settings_modal.js")
 
-	settingsButtonSpinner := hb.Span().
-		Class("spinner spinner-border spinner-border-sm align-middle ms-2").
-		Attr("role", "status").
-		Style(`display: none;`).
-		Child(hb.Span().Class("visually-hidden").Text("Loading"))
+	vueCDN := hb.Script("").Src("https://unpkg.com/vue@3/dist/vue.global.js")
 
-	settingsButton := hb.Button().
-		Class("btn btn-outline-secondary btn-sm").
-		Attr(liveflux.DataFluxAction, "open").
-		Attr(liveflux.DataFluxTargetKind, settingsComponent.GetKind()).
-		Attr(liveflux.DataFluxTargetID, settingsComponent.GetID()).
-		Attr(liveflux.DataFluxIndicator, "this, .spinner").
-		Child(hb.I().Class("bi bi-gear me-1")).
-		Child(hb.Span().Text("Settings")).
-		Child(settingsButtonSpinner)
+	initScript := hb.Script(`
+		const urlTitleSettingsFetchData = '` + shared.NewLinks("/admin/blog").AiTitleGenerator(map[string]string{"action": ACTION_SETTINGS_FETCH}) + `';
+		const urlTitleSettingsSubmit = '` + shared.NewLinks("/admin/blog").AiTitleGenerator(map[string]string{"action": ACTION_SETTINGS_SUBMIT}) + `';
+	`)
+
+	settingsVueContainer := hb.Div().
+		Child(vueCDN).
+		Child(hb.Wrap().HTML(string(settingsModalHTML))).
+		Child(initScript).
+		Child(hb.Script(string(settingsModalJS)))
+
+	settingsButton := hb.Div().Class("d-inline-block").Child(settingsVueContainer)
 
 	card := hb.Div().
 		Class("card shadow-sm w-100 mb-5")
@@ -180,7 +184,7 @@ func (c *AiTitleGeneratorController) view(data pageData) *hb.Tag {
 					hb.Div().Class("text-start").
 						Child(tableGeneratedTitles(data)),
 				).
-				Child(settingsSSR),
+				Child(settingsButton),
 		)
 
 	return hb.Div().

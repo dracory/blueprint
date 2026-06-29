@@ -1,0 +1,440 @@
+/* ==========================================================================
+   Brutalski Bootstrap 5 Theme
+   A neo-brutalist override theme for CourseFlow.
+   Include AFTER bootstrap.min.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS Custom Properties (Bootstrap variable overrides)
+   -------------------------------------------------------------------------- */
+:root {
+  --bs-body-bg: #f8fafc;
+  --bs-body-color: #0f172a;
+  --bs-primary: #4f46e5;
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-border-color: #0f172a;
+  --bs-border-width: 3px;
+  --bs-border-radius: 0;
+  --bs-border-radius-sm: 0;
+  --bs-border-radius-lg: 0;
+  --bs-border-radius-xl: 0;
+  --bs-box-shadow: 4px 4px 0px 0px #0f172a;
+  --bs-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bs-font-monospace: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* CourseFlow palette */
+  --cf-black: #0f172a;
+  --cf-indigo: #4f46e5;
+  --cf-slate: #64748b;
+  --cf-bg: #f8fafc;
+  --cf-cyan: #22d3ee;
+  --cf-amber: #fbbf24;
+  --cf-shadow: 4px 4px 0px 0px var(--cf-black);
+  --cf-shadow-lg: 8px 8px 0px 0px var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   2. Base & Typography
+   -------------------------------------------------------------------------- */
+body {
+  background-color: var(--cf-bg);
+  font-family: var(--bs-font-sans-serif);
+  color: var(--cf-black);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.mono {
+  font-family: var(--bs-font-monospace);
+  letter-spacing: -0.02em;
+}
+
+.fw-black {
+  font-weight: 900 !important;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+.tracking-widest {
+  letter-spacing: 0.1em;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   3. Buttons (all .btn look brutalist by default)
+   -------------------------------------------------------------------------- */
+.btn {
+  border: 3px solid var(--cf-black);
+  box-shadow: var(--cf-shadow);
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  border-radius: 0;
+}
+
+.btn:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 8px 8px 0px var(--cf-black);
+  border-color: var(--cf-black);
+}
+
+.btn:active,
+.btn:focus {
+  transform: translate(0px, 0px);
+  box-shadow: none !important;
+  border-color: var(--cf-black);
+}
+
+.btn-primary {
+  background-color: var(--cf-indigo);
+  border-color: var(--cf-black);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: var(--cf-indigo);
+  border-color: var(--cf-black);
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: var(--cf-black);
+  border-color: var(--cf-black);
+  color: #fff;
+}
+
+.btn-dark:hover {
+  background-color: var(--cf-black);
+  border-color: var(--cf-black);
+  color: #fff;
+}
+
+.btn-outline-dark {
+  color: var(--cf-black);
+  border-color: var(--cf-black);
+}
+
+.btn-outline-dark:hover {
+  background-color: var(--cf-black);
+  color: #fff;
+  border-color: var(--cf-black);
+}
+
+.btn-sm {
+  border-width: 2px;
+  box-shadow: 3px 3px 0px var(--cf-black);
+}
+
+.btn-sm:hover {
+  box-shadow: 6px 6px 0px var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   4. Cards
+   -------------------------------------------------------------------------- */
+.card {
+  border: 3px solid var(--cf-black);
+  box-shadow: var(--cf-shadow-lg);
+  background-color: #fff;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 10px 10px 0px var(--cf-black);
+}
+
+.card-header {
+  border-bottom: 3px solid var(--cf-black);
+  background-color: #fff;
+}
+
+.card-footer {
+  border-top: 3px solid var(--cf-black);
+  background-color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   5. Forms
+   -------------------------------------------------------------------------- */
+.form-group {
+  margin-bottom: 1.125rem;
+}
+
+.form-control {
+  border: 2px solid var(--cf-black);
+  box-shadow: 4px 4px 0px rgba(15, 23, 42, 0.1);
+  transition: all 0.2s;
+  border-radius: 0;
+  font-weight: 700;
+}
+
+.form-control:focus {
+  box-shadow: 4px 4px 0px var(--cf-black);
+  transform: translate(-1px, -1px);
+  border-color: var(--cf-black);
+  background-color: #fff;
+}
+
+.form-control-lg {
+  border-width: 3px;
+  box-shadow: 6px 6px 0px rgba(15, 23, 42, 0.1);
+}
+
+.form-control-lg:focus {
+  box-shadow: 6px 6px 0px var(--cf-black);
+}
+
+.input-group .form-control {
+  border-right: none;
+}
+
+.input-group .btn {
+  border-left: none;
+}
+
+/* --------------------------------------------------------------------------
+   6. Progress
+   -------------------------------------------------------------------------- */
+.progress {
+  border: 3px solid var(--cf-black);
+  border-radius: 8px;
+  background-color: #e2e8f0;
+  box-shadow: 2px 2px 0px var(--cf-black);
+  overflow: hidden;
+  height: 24px;
+}
+
+.progress-bar {
+  border-radius: 0;
+  font-weight: 900;
+  font-size: 0.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   7. Dropdowns
+   -------------------------------------------------------------------------- */
+.dropdown-menu {
+  border: 3px solid var(--cf-black);
+  box-shadow: 4px 4px 0px var(--cf-black);
+  border-radius: 0;
+}
+
+.dropdown-item {
+  font-weight: 700;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.dropdown-divider {
+  border-top: 2px solid var(--cf-black);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   8. Navbar
+   -------------------------------------------------------------------------- */
+.navbar {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.navbar-toggler {
+  border: 3px solid var(--cf-black);
+  box-shadow: 2px 2px 0px var(--cf-black);
+  border-radius: 0;
+}
+
+.navbar-brand {
+  font-weight: 900;
+}
+
+/* --------------------------------------------------------------------------
+   9. Badges
+   -------------------------------------------------------------------------- */
+.badge {
+  border-radius: 0;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --------------------------------------------------------------------------
+   10. Alerts
+   -------------------------------------------------------------------------- */
+.alert {
+  border: 3px solid var(--cf-black);
+  box-shadow: var(--cf-shadow);
+  border-radius: 0;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   11. Tables
+   -------------------------------------------------------------------------- */
+.table {
+  border: 3px solid var(--cf-black);
+}
+
+.table thead th {
+  border-bottom: 3px solid var(--cf-black);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td,
+.table th {
+  border-top: 2px solid var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   12. Modal
+   -------------------------------------------------------------------------- */
+.modal-content {
+  border: 3px solid var(--cf-black);
+  box-shadow: var(--cf-shadow-lg);
+  border-radius: 0;
+}
+
+.modal-header {
+  border-bottom: 3px solid var(--cf-black);
+}
+
+.modal-footer {
+  border-top: 3px solid var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   13. List Group
+   -------------------------------------------------------------------------- */
+.list-group-item {
+  border: 2px solid var(--cf-black);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   14. Pagination
+   -------------------------------------------------------------------------- */
+.page-link {
+  border: 3px solid var(--cf-black);
+  font-weight: 900;
+  color: var(--cf-black);
+}
+
+.page-link:hover {
+  background-color: var(--cf-black);
+  color: #fff;
+  border-color: var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   15. Brand icon (used in navbar logo)
+   -------------------------------------------------------------------------- */
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  background: var(--cf-indigo);
+  border: 2px solid var(--cf-black);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0px var(--cf-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   16. Layout helpers
+   -------------------------------------------------------------------------- */
+.cf-main {
+  flex: 1 0 auto;
+}
+
+.cf-footer {
+  border-top: 3px solid var(--cf-black);
+  background: #fff;
+  box-shadow: 0px -4px 0px var(--cf-black);
+}
+
+/* --------------------------------------------------------------------------
+   17. Dark mode
+   -------------------------------------------------------------------------- */
+[data-bs-theme="dark"] {
+  --bs-body-bg: #0f172a;
+  --bs-body-color: #f8fafc;
+  --bs-primary: #6366f1;
+  --bs-primary-rgb: 99, 102, 241;
+}
+
+[data-bs-theme="dark"] body {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .card {
+  background-color: #1e293b;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .card-header,
+[data-bs-theme="dark"] .card-footer {
+  background-color: #1e293b;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .cf-footer {
+  background-color: #1e293b;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .form-control {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark {
+  color: #f8fafc;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .btn-outline-dark:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+  background-color: #1e293b;
+  border-color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+  color: #f8fafc;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background-color: #334155;
+}
+
+/* --------------------------------------------------------------------------
+   18. Legacy .brutalist compatibility (alias to theme defaults)
+   -------------------------------------------------------------------------- */
+.brutalist {
+  /* No-op: theme already makes everything brutalist by default.
+     This class is kept for backward compatibility during transition. */
+}

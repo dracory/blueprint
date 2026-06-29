@@ -7,18 +7,6 @@ import (
 )
 
 func SectionBanner() *hb.Tag {
-	style := hb.Style(`
-.fill-success {
-	fill: #0cbc87 !important;
-}
-.fill-orange {
-	fill: #fd7e14 !important;
-}
-.fill-purple {
-	fill: #6f42c1 !important;
-}
-	`)
-
 	nav := hb.Nav().
 		Class("breadcrumb mb-0").
 		Attr("aria-label", "breadcrumb").
@@ -28,6 +16,7 @@ func SectionBanner() *hb.Tag {
 				Class("breadcrumb-item").
 				Child(hb.A().
 					Href(links.Website().Home()).
+					Class("text-secondary fw-bold text-decoration-none").
 					HTML("Home"),
 				)).
 			Child(hb.LI().
@@ -35,51 +24,36 @@ func SectionBanner() *hb.Tag {
 				Attr("aria-current", "page").
 				Child(hb.A().
 					Href(links.Website().Blog()).
+					Class("text-secondary fw-bold text-decoration-none").
 					HTML("Blog"),
 				),
 			))
 
 	section := hb.Section().
-		Style("background:#1C1626;").
-		Style("padding: 30px 0px;").
+		Style("padding: 40px 0 30px;").
 		Child(hb.Div().
 			Class("container").
 			Child(hb.Div().
-				Class("row").
+				Class("card rounded-5 p-4 p-md-5 overflow-hidden text-center mx-auto").
 				Child(hb.Div().
-					//HTML(decorationCross).
-					Class("col-lg-10 mx-auto text-center").
-					Style(`position: relative;`).
-					Child(hb.I().Class("bi bi-crosshair").
-						Style("color: magenta;").
-						Style(`position: absolute; top: 0px; left: 0px;`).
-						Style(`font-size: 30px; margin-left: 10px;`)).
-					Child(hb.I().Class("bi bi-asterisk").
-						Style("color: magenta;").
-						Style(`position: absolute; bottom: -10px; left: 100px;`).
-						Style(`font-size: 30px; margin-right: 10px; transform: rotate(180deg);`)).
-					Child(hb.I().Class("bi bi-star").
-						Style("color: magenta;").
-						Style(`position: absolute; top: 10px; right: 35px;`).
-						Style(`font-size: 30px; margin-left: 10px;`)).
-					Child(hb.I().Class("bi bi-star").
-						Style("color: magenta;").
-						Style(`position: absolute; top: 15px; right: 0px;`).
-						Style(`font-size: 30px; margin-left: 10px;`)).
-					Child(hb.I().Class("bi bi-star").
-						Style("color: magenta;").
-						Style(`position: absolute; top: 40px; right: 17px;`).
-						Style(`font-size: 30px; margin-left: 10px;`)).
-					Child(hb.H1().Style("color:white;").HTML("Blog")).
+					Class("card-body py-4").
 					Child(hb.Div().
-						Class("d-flex justify-content-center position-relative").
-						Child(nav),
-					),
+						Class("d-flex align-items-center justify-content-center mx-auto mb-3 rounded-4").
+						Style("width: 56px; height: 56px; background-color: var(--cf-cyan);").
+						Child(hb.I().Class("bi bi-journal-text fs-4"))).
+					Child(hb.H1().
+						Class("fw-black text-uppercase mb-3").
+						Style("font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -1px;").
+						HTML("Blog")).
+					Child(hb.P().
+						Class("text-secondary fw-bold mb-3").
+						HTML("Insights on email-native learning, productivity, and skill development")).
+					Child(hb.Div().
+						Class("d-flex justify-content-center").
+						Child(nav)),
 				),
 			),
 		)
 
-	return hb.Wrap().
-		Child(style).
-		Child(section)
+	return section
 }

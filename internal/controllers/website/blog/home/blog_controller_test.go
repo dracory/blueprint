@@ -16,15 +16,7 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	// --- Setup ---
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
 
 	controller := NewBlogController(app)
 
@@ -32,7 +24,7 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Post 1")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
-	err = app.GetBlogStore().PostCreate(context.Background(), post1)
+	err := app.GetBlogStore().PostCreate(context.Background(), post1)
 	if err != nil {
 		t.Fatalf("Failed to create test post 1: %v", err)
 	}
@@ -76,8 +68,8 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	if strings.Contains(html, "Draft Post") {
 		t.Errorf("Expected HTML to NOT contain 'Draft Post'")
 	}
-	if !strings.Contains(html, "pagination-primary-soft") {
-		t.Errorf("Expected HTML to contain 'pagination-primary-soft'")
+	if !strings.Contains(html, "page-link") {
+		t.Errorf("Expected HTML to contain pagination 'page-link'")
 	}
 
 	// Ensure the flash error redirect was not triggered
@@ -112,15 +104,8 @@ func TestBlogController_Handler_PostListError(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
 	app.SetBlogStore(&fakeBlogStore{
 		StoreInterface: app.GetBlogStore(),
 		postListError:  errors.New("simulated database error"),
@@ -173,15 +158,8 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetBlogStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
-	cfg.SetCmsStoreUsed(true)
-	cfg.SetCmsStoreTemplateID("test-template")
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	// Create a test template
-	err := testutils.SeedTemplate(app.GetCmsStore(), "test-site", "test-template")
-	if err != nil {
-		t.Fatalf("Failed to create test template: %v", err)
-	}
 	// This fake store will only error on PostCount
 	app.SetBlogStore(&fakeBlogStore{
 		StoreInterface: app.GetBlogStore(),
@@ -236,13 +214,13 @@ func TestBlogController_PageRendering(t *testing.T) {
 		postList: []blogstore.PostInterface{
 			blogstore.NewPost().SetID("1").SetTitle("My First Post").SetSummary("A summary.").SetImageUrl("http://example.com/img.png"),
 		},
-		postCount: 10,
+		postCount: 25,
 		page:      0,
 		perPage:   12,
 	}
 
 	// --- Execute ---
-	html := controller.page(data)
+	html := controller.page(nil, data)
 
 	// --- Assert ---
 	if html == "" {
@@ -258,7 +236,7 @@ func TestBlogController_PageRendering(t *testing.T) {
 	if !strings.Contains(html, "/th/png/300x200/80/http/example.com/img.png") {
 		t.Errorf("Expected thumbnail URL to be in the HTML")
 	}
-	if !strings.Contains(html, `pagination-primary-soft`) {
+	if !strings.Contains(html, `page-link`) {
 		t.Errorf("Expected pagination to be rendered")
 	}
 }
