@@ -1,4 +1,4 @@
-package products
+package product_update
 
 import (
 	"context"

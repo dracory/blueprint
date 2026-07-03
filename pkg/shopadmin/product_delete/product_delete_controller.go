@@ -1,11 +1,11 @@
-package products
+package product_delete
 
 import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/helpers"
 	"project/internal/app"
+	"project/internal/helpers"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/bs"

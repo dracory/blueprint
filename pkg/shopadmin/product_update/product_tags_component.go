@@ -1,4 +1,4 @@
-package products
+package product_update
 
 import (
 	"embed"
@@ -15,7 +15,7 @@ import (
 var tagsEmbed embed.FS
 
 type productTagsComponent struct {
-	app  app.AppInterface
+	app       app.AppInterface
 	request   *http.Request
 	product   shopstore.ProductInterface
 	productID string

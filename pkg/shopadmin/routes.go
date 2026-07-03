@@ -3,19 +3,22 @@ package shopadmin
 import (
 	"errors"
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/req"
 	"github.com/dracory/rtr"
 
+	"project/pkg/shopadmin/category_create"
 	"project/pkg/shopadmin/category_manager"
+	"project/pkg/shopadmin/category_update"
 	"project/pkg/shopadmin/discount_manager"
 	"project/pkg/shopadmin/home"
 	"project/pkg/shopadmin/order_details"
 	"project/pkg/shopadmin/order_manager"
+	"project/pkg/shopadmin/product_delete"
 	"project/pkg/shopadmin/product_manager"
-	"project/pkg/shopadmin/products"
+	"project/pkg/shopadmin/product_update"
 	"project/pkg/shopadmin/shared"
 )
 
@@ -36,15 +39,15 @@ func Routes(app app.AppInterface, opts ...AdminOptions) ([]rtr.RouteInterface, e
 		case shared.CONTROLLER_PRODUCTS:
 			return product_manager.NewProductManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_PRODUCT_UPDATE:
-			return products.NewProductUpdateController(app, options.FileManagerURL).Handler(w, r)
+			return product_update.NewProductUpdateController(app, options.FileManagerURL).Handler(w, r)
 		case shared.CONTROLLER_PRODUCT_DELETE:
-			return products.NewProductDeleteController(app).Handler(w, r)
+			return product_delete.NewProductDeleteController(app).Handler(w, r)
 		case shared.CONTROLLER_CATEGORIES:
 			return category_manager.NewCategoryManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_CATEGORY_CREATE:
-			return category_manager.NewCategoryManagerController(app).Handler(w, r)
+			return category_create.NewCategoryCreateController(app).Handler(w, r)
 		case shared.CONTROLLER_CATEGORY_UPDATE:
-			return category_manager.NewCategoryManagerController(app).Handler(w, r)
+			return category_update.NewCategoryUpdateController(app).Handler(w, r)
 		case shared.CONTROLLER_DISCOUNTS:
 			return discount_manager.NewDiscountManagerController(app).Handler(w, r)
 		case shared.CONTROLLER_ORDERS:

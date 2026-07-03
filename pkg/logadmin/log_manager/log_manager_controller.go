@@ -7,18 +7,18 @@ import (
 	"net/http"
 	"strings"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/logadmin/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
 	"github.com/dracory/logstore"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 )
 
 //go:embed *.html
@@ -173,7 +173,7 @@ func (controller *logManagerController) handleLoadLogs(w http.ResponseWriter, r 
 
 	page := getInt(reqBody.Page, 0)
 	perPage := getInt(reqBody.PerPage, 100)
-	sortOrder := getStringTrimmed(reqBody.SortOrder, sb.DESC)
+	sortOrder := getStringTrimmed(reqBody.SortOrder, neat.SortDesc)
 	sortBy := getStringTrimmed(reqBody.SortBy, logstore.COLUMN_TIME)
 	level := getStringTrimmed(reqBody.Level, "")
 	searchMessage := getStringTrimmed(reqBody.SearchMessage, "")

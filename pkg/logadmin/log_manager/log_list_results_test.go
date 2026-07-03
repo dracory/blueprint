@@ -14,7 +14,7 @@ type fakeLogStore struct {
 	logstore.StoreInterface
 
 	logsToReturn []logstore.LogInterface
-	count        int
+	count        int64
 	listErr      error
 	countErr     error
 }
@@ -30,7 +30,7 @@ func (s *fakeLogStore) LogCount(ctx context.Context, q logstore.LogQueryInterfac
 	if s.countErr != nil {
 		return 0, s.countErr
 	}
-	return int64(s.count), nil
+	return s.count, nil
 }
 
 func TestListLogs_NilApp_ReturnsEmptyNoError(t *testing.T) {
