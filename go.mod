@@ -49,7 +49,7 @@ require (
 	github.com/dracory/metastore v1.8.0
 	github.com/dracory/neat v0.27.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.6.0
+	github.com/dracory/rtr v1.7.0
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sb v0.26.0
 	github.com/dracory/sessionstore v1.16.0
@@ -76,7 +76,6 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/mileusna/useragent v1.3.5
-	github.com/mingrammer/cfmt v1.1.0
 	github.com/robertkrimen/otto v0.5.1
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
 	github.com/spf13/cast v1.10.0
@@ -142,6 +141,7 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect
+	github.com/mingrammer/cfmt v1.1.0 // indirect
 	github.com/mocktools/go-smtp-mock v1.10.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pkg/sftp v1.13.10 // indirect

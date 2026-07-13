@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"project/internal/config"
 	"project/internal/testutils"
+	"strings"
 	"testing"
 
 	"github.com/dracory/auth"
@@ -25,7 +26,7 @@ func TestAuthHandler_NoSessionKey(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := AuthMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -60,7 +61,7 @@ func TestAuthHandler_SessionNotFoundError(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	// Create the middleware handler
-	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := AuthMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -123,7 +124,7 @@ func TestAuthHandler_SessionExpired(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := AuthMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -190,7 +191,7 @@ func TestAuthHandler_UserNotFound(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := AuthMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) != nil {
 			t.Fatal("User should not be set in context")
 		}
@@ -252,7 +253,7 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 
 	responseRecorder := httptest.NewRecorder()
 
-	handler := authHandler(app, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := AuthMiddleware(app).GetHandler()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Context().Value(config.AuthenticatedUserContextKey{}) == nil {
 			t.Fatal("User should be set in context")
 		}
@@ -270,7 +271,8 @@ func TestAuthHandler_SessionSuccess(t *testing.T) {
 }
 
 func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
-	// Configure app with session store disabled
+	// When session store is disabled, it won't be initialized, so the middleware
+	// will return a config error about SessionStore being required.
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(false)
 
@@ -283,14 +285,14 @@ func TestAuthHandler_SessionStoreNotEnabled(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(app, next)
+	handler := AuthMiddleware(app).GetHandler()(next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
 	}
-	if rr.Body.String() != "session store not enabled" {
-		t.Errorf("Expected body 'session store not enabled', got '%s'", rr.Body.String())
+	if !strings.Contains(rr.Body.String(), "auth middleware: SessionStore is required") {
+		t.Errorf("Expected body to contain 'auth middleware: SessionStore is required', got '%s'", rr.Body.String())
 	}
 }
 
@@ -310,21 +312,20 @@ func TestAuthHandler_SessionStoreEnabledButNotInitialized(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(app, next)
+	handler := AuthMiddleware(app).GetHandler()(next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
 	}
-	if rr.Body.String() != "session store not initialized" {
-		t.Errorf("Expected body 'session store not initialized', got '%s'", rr.Body.String())
+	if !strings.Contains(rr.Body.String(), "auth middleware: SessionStore is required") {
+		t.Errorf("Expected body to contain 'auth middleware: SessionStore is required', got '%s'", rr.Body.String())
 	}
 }
 
 func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T) {
-	// According to current implementation, if user store is marked as used,
-	// the middleware returns an error message "user store not enabled".
-	// Set both session and user stores to used so we pass earlier guards.
+	// When user store is disabled, it won't be initialized, so the middleware
+	// will return a config error about UserStore being required.
 	cfg := testutils.DefaultConf()
 	cfg.SetUserStoreUsed(false)
 	cfg.SetSessionStoreUsed(true)
@@ -338,21 +339,20 @@ func TestAuthHandler_UserStoreUsed_ReturnsUserStoreNotEnabledError(t *testing.T)
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(app, next)
+	handler := AuthMiddleware(app).GetHandler()(next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
 	}
-	if rr.Body.String() != "user store not enabled" {
-		t.Errorf("Expected body 'user store not enabled', got '%s'", rr.Body.String())
+	if !strings.Contains(rr.Body.String(), "auth middleware: UserStore is required") {
+		t.Errorf("Expected body to contain 'auth middleware: UserStore is required', got '%s'", rr.Body.String())
 	}
 }
 
 func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
-	// Set session store used and initialized, but user store marked as not used
-	// and remains nil, which should trigger the "user store not initialized" error
-	// per the current guard sequence.
+	// Set session store used and initialized, but user store nil,
+	// which should trigger the "UserStore is required" config error.
 	cfg := testutils.DefaultConf()
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
@@ -369,13 +369,13 @@ func TestAuthHandler_UserStoreNotInitialized(t *testing.T) {
 		w.WriteHeader(http.StatusTeapot)
 	})
 
-	handler := authHandler(app, next)
+	handler := AuthMiddleware(app).GetHandler()(next)
 	handler.ServeHTTP(rr, req)
 
 	if rr.Code != http.StatusInternalServerError {
 		t.Errorf("Expected status %d, got %d", http.StatusInternalServerError, rr.Code)
 	}
-	if rr.Body.String() != "user store not initialized" {
-		t.Errorf("Expected body 'user store not initialized', got '%s'", rr.Body.String())
+	if !strings.Contains(rr.Body.String(), "auth middleware: UserStore is required") {
+		t.Errorf("Expected body to contain 'auth middleware: UserStore is required', got '%s'", rr.Body.String())
 	}
 }
