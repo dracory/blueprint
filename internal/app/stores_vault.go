@@ -20,6 +20,7 @@ func vaultStoreInitialize(app AppInterface) error {
 	if store, err := newVaultStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetVaultStore(store)
 	}
 

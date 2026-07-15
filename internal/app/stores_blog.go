@@ -15,6 +15,7 @@ func blogStoreInitialize(app AppInterface) error {
 	if store, err := newBlogStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetBlogStore(store)
 	}
 

@@ -15,6 +15,7 @@ func cacheStoreInitialize(app AppInterface) error {
 	if store, err := newCacheStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetCacheStore(store)
 	}
 

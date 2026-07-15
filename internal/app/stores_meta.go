@@ -20,6 +20,7 @@ func metaStoreInitialize(app AppInterface) error {
 	if store, err := newMetaStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetMetaStore(store)
 	}
 

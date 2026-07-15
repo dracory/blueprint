@@ -20,6 +20,7 @@ func shopStoreInitialize(app AppInterface) error {
 	if store, err := newShopStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetShopStore(store)
 	}
 

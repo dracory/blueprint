@@ -36,6 +36,7 @@ import (
 	"github.com/faabiosr/cachego/file"
 	"github.com/jellydator/ttlcache/v3"
 	"github.com/lmittmann/tint"
+	"github.com/samber/lo"
 	// "gorm.io/gorm"
 )
 
@@ -100,7 +101,9 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	}
 	fileCache := file.New(cacheDir)
 
-	consoleLogger := slog.New(tint.NewHandler(os.Stdout, nil))
+	consoleLogger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		Level: lo.Ternary(cfg.GetAppDebug(), slog.LevelDebug, slog.LevelInfo),
+	}))
 
 	// Database open
 	neatDB, err := databaseOpen(cfg)

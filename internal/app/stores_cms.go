@@ -15,6 +15,7 @@ func cmsStoreInitialize(app AppInterface) error {
 	if store, err := newCmsStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetCmsStore(store)
 	}
 
