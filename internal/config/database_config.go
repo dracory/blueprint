@@ -290,6 +290,7 @@ func DatabaseNeatConfig(cfg ConfigInterface) db.DBConfig {
 		Default:     defaultConnection,
 		Connections: connections,
 		Pool:        pool,
+		Debug:       cfg.GetAppDebug(),
 	}
 }
 

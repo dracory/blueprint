@@ -20,6 +20,7 @@ func logStoreInitialize(app AppInterface) error {
 	if store, err := newLogStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetLogStore(store)
 	}
 

@@ -20,6 +20,7 @@ func taskStoreInitialize(app AppInterface) error {
 	if store, err := newTaskStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetTaskStore(store)
 	}
 

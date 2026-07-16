@@ -20,6 +20,7 @@ func sessionStoreInitialize(app AppInterface) error {
 	if store, err := newSessionStore(app.GetDatabase(), app); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetSessionStore(store)
 	}
 

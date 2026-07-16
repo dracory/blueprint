@@ -20,6 +20,7 @@ func customStoreInitialize(app AppInterface) error {
 	if store, err := newCustomStore(app.GetDatabase()); err != nil {
 		return err
 	} else {
+		store.EnableDebug(app.GetConfig().GetAppDebug())
 		app.SetCustomStore(store)
 	}
 
