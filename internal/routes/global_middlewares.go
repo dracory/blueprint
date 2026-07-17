@@ -7,9 +7,9 @@ import (
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
 
+	"project/internal/app"
 	"project/internal/middlewares"
 	"project/internal/middlewares/httpsredirect"
-	"project/internal/app"
 )
 
 // Rate limit constants
@@ -101,6 +101,7 @@ func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 		middlewares.NewSecurityHeadersMiddleware(app),
 		middlewares.ThemeMiddleware(),
 		middlewares.AuthMiddleware(app),
+		middlewares.NewStatsMiddleware(app),
 	)
 
 	return globalMiddlewares

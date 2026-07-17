@@ -95,6 +95,9 @@ type AuthConfigInterface interface {
 	SetEmailsAllowedAccess([]string)
 	GetEmailsAllowedAccess() []string
 
+	SetCsrfSecret(string)
+	GetCsrfSecret() string
+
 	SetPasswordAuthEnabled(bool)
 	GetPasswordAuthEnabled() bool
 }

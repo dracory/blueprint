@@ -88,6 +88,7 @@ type configImplementation struct {
 	// Authentication
 	registrationEnabled bool
 	emailsAllowedAccess []string
+	csrfSecret          string
 	passwordAuthEnabled bool
 
 	// i18n / Translation
@@ -295,6 +296,7 @@ func (c *configImplementation) IsEnvTesting() bool {
 func (c *configImplementation) setAuthConfig(s authSettings) {
 	c.registrationEnabled = s.registrationEnabled
 	c.emailsAllowedAccess = s.emailsAllowedAccess
+	c.csrfSecret = s.csrfSecret
 	c.passwordAuthEnabled = s.passwordAuthEnabled
 }
 
@@ -312,6 +314,14 @@ func (c *configImplementation) SetEmailsAllowedAccess(v []string) {
 
 func (c *configImplementation) GetEmailsAllowedAccess() []string {
 	return c.emailsAllowedAccess
+}
+
+func (c *configImplementation) SetCsrfSecret(v string) {
+	c.csrfSecret = v
+}
+
+func (c *configImplementation) GetCsrfSecret() string {
+	return c.csrfSecret
 }
 
 func (c *configImplementation) SetPasswordAuthEnabled(v bool) {
@@ -665,10 +675,6 @@ func (c *configImplementation) SetTranslationLanguageList(v map[string]string) {
 func (c *configImplementation) GetTranslationLanguageList() map[string]string {
 	return c.translationLanguageList
 }
-
-// ============================================================================
-// LLM Config Implementation
-// ============================================================================
 
 // ============================================================================
 // LLM Config Implementation
