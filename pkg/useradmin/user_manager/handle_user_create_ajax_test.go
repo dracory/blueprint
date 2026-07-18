@@ -8,7 +8,6 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestHandleUserCreateAjax_RequiresPOST(t *testing.T) {
@@ -22,8 +21,8 @@ func TestHandleUserCreateAjax_RequiresPOST(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil { t.Errorf("unexpected error: %v", err) }
+	if http.StatusOK != response.StatusCode { t.Errorf("expected %v, got %v", http.StatusOK, response.StatusCode) }
 }
 
 func TestHandleUserCreateAjax_RequiresUserStore(t *testing.T) {
@@ -36,8 +35,8 @@ func TestHandleUserCreateAjax_RequiresUserStore(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil { t.Errorf("unexpected error: %v", err) }
+	if http.StatusOK != response.StatusCode { t.Errorf("expected %v, got %v", http.StatusOK, response.StatusCode) }
 }
 
 func TestHandleUserCreateAjax_RequiresFields(t *testing.T) {
@@ -51,6 +50,6 @@ func TestHandleUserCreateAjax_RequiresFields(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil { t.Errorf("unexpected error: %v", err) }
+	if http.StatusOK != response.StatusCode { t.Errorf("expected %v, got %v", http.StatusOK, response.StatusCode) }
 }

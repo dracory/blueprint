@@ -12,7 +12,6 @@ import (
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUserUpdateController_RequiresUserID(t *testing.T) {
@@ -25,13 +24,13 @@ func TestUserUpdateController_RequiresUserID(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
+	if err != nil { t.Errorf("Handler should not return error: %v", err) }
+	if http.StatusSeeOther != response.StatusCode { t.Errorf("Should redirect with error: expected %v, got %v", http.StatusSeeOther, response.StatusCode) }
 
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-	assert.NoError(t, err, "Should find flash message")
-	assert.Equal(t, "User ID is required", flash.Message, "Should show correct error message")
+	if err != nil { t.Errorf("Should find flash message: %v", err) }
+	if "User ID is required" != flash.Message { t.Errorf("Should show correct error message: expected %v, got %v", "User ID is required", flash.Message) }
 }
 
 func TestUserUpdateController_InvalidUserID(t *testing.T) {
@@ -46,13 +45,13 @@ func TestUserUpdateController_InvalidUserID(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusSeeOther, response.StatusCode, "Should redirect with error")
+	if err != nil { t.Errorf("Handler should not return error: %v", err) }
+	if http.StatusSeeOther != response.StatusCode { t.Errorf("Should redirect with error: expected %v, got %v", http.StatusSeeOther, response.StatusCode) }
 
 	// Verify flash message was set
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-	assert.NoError(t, err, "Should find flash message")
-	assert.Equal(t, "User not found", flash.Message, "Should show correct error message")
+	if err != nil { t.Errorf("Should find flash message: %v", err) }
+	if "User not found" != flash.Message { t.Errorf("Should show correct error message: expected %v, got %v", "User not found", flash.Message) }
 }
 
 func TestUserUpdateController_ShowsPage(t *testing.T) {
@@ -64,10 +63,10 @@ func TestUserUpdateController_ShowsPage(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "Edit User", "Should show page heading")
-	assert.Contains(t, responseHTML, "User:", "Should show user label")
+	if err != nil { t.Errorf("Handler should not return error: %v", err) }
+	if http.StatusOK != response.StatusCode { t.Errorf("Should return 200 status: expected %v, got %v", http.StatusOK, response.StatusCode) }
+	if !strings.Contains(responseHTML, "Edit User") { t.Errorf("Should show page heading: expected %q to contain %q", responseHTML, "Edit User") }
+	if !strings.Contains(responseHTML, "User:") { t.Errorf("Should show user label: expected %q to contain %q", responseHTML, "User:") }
 }
 
 func setupControllerAppAndUser(t *testing.T) (app.AppInterface, userstore.UserInterface) {

@@ -10,7 +10,7 @@ import (
 
 	"github.com/dracory/api"
 	"github.com/dracory/blindindexstore"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dracory/userstore"
 )
 
@@ -61,7 +61,7 @@ func (controller *userManagerController) handleUsersFetchAjax(w http.ResponseWri
 
 	page := getInt(reqBody.Page, 0)
 	perPage := getInt(reqBody.PerPage, 10)
-	sortOrder := getStringTrimmed(reqBody.SortOrder, sb.DESC)
+	sortOrder := getStringTrimmed(reqBody.SortOrder, neat.SortDesc)
 	sortBy := getStringTrimmed(reqBody.SortBy, userstore.COLUMN_CREATED_AT)
 	status := getStringTrimmed(reqBody.Status, "")
 	firstName := getStringTrimmed(reqBody.FirstName, "")

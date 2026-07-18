@@ -1,8 +1,8 @@
 package file_manager
 
 import (
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 
 	_ "modernc.org/sqlite"
 )

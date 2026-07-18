@@ -12,7 +12,6 @@ import (
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestUserManagerController_ShowsPage(t *testing.T) {
@@ -25,9 +24,9 @@ func TestUserManagerController_ShowsPage(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err, "Handler should not return error")
-	assert.Equal(t, http.StatusOK, response.StatusCode, "Should return 200 status")
-	assert.Contains(t, responseHTML, "Users", "Should show page heading")
+	if err != nil { t.Errorf("Handler should not return error: %v", err) }
+	if http.StatusOK != response.StatusCode { t.Errorf("Should return 200 status: expected %v, got %v", http.StatusOK, response.StatusCode) }
+	if !strings.Contains(responseHTML, "Users") { t.Errorf("Should show page heading: expected %q to contain %q", responseHTML, "Users") }
 }
 
 func TestActionConstants(t *testing.T) {

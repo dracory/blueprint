@@ -5,8 +5,8 @@ import (
 
 	"github.com/dracory/api"
 	"github.com/dracory/geostore"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 )
 
 func (controller *userUpdateController) handleTimezonesFetchAjax(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +29,7 @@ func (controller *userUpdateController) handleTimezonesFetchAjax(w http.Response
 	}
 
 	timezoneList, err := controller.app.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
-		SortOrder:   sb.ASC,
+		SortOrder:   neat.SortAsc,
 		OrderBy:     geostore.COLUMN_TIMEZONE,
 		CountryCode: countryCode,
 	})

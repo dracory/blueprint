@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/shopadmin/shared"
 
 	"github.com/dracory/api"
@@ -28,7 +28,7 @@ const (
 // == CONT ==============================================================
 
 type homeController struct {
-	app       app.AppInterface
+	app            app.AppInterface
 	fileManagerURL string
 }
 

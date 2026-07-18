@@ -8,8 +8,8 @@ import (
 
 	"github.com/dracory/api"
 	"github.com/dracory/geostore"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 )
 
 func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +87,7 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 	}
 
 	countryList, err := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
-		SortOrder: sb.ASC,
+		SortOrder: neat.SortAsc,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 	if err != nil {
@@ -106,7 +106,7 @@ func (controller *userUpdateController) handleUserFetchAjax(w http.ResponseWrite
 	}
 
 	timezoneList, err := controller.app.GetGeoStore().TimezoneList(r.Context(), geostore.TimezoneQueryOptions{
-		SortOrder:   sb.ASC,
+		SortOrder:   neat.SortAsc,
 		OrderBy:     geostore.COLUMN_TIMEZONE,
 		CountryCode: country,
 	})
