@@ -4,7 +4,7 @@ This guide helps LLMs and developers upgrade Blueprint applications from v0.34.0
 
 ## Overview
 
-This release consolidates all datastore initialization into a single config-driven file, moves store builder functions into the `config` package, introduces CSRF secret configuration with automatic generation for non-production environments, adds the Stats middleware to the global middleware chain, and removes the placeholder category manager controller.
+This release consolidates all datastore initialization into a single config-driven file, moves store builder functions into the `config` package, introduces CSRF secret configuration with automatic generation for non-production environments, replaces all individual admin shop controllers with a single delegation controller, removes the `testify` test dependency in favor of standard library assertions, adds Stripe payment support, refactors the file manager code organization, and adds the Stats middleware to the global middleware chain.
 
 **Key Changes:**
 - 20+ individual `internal/app/stores_*.go` files deleted — replaced by single `internal/app/datastores.go` with config-driven setup
@@ -14,6 +14,14 @@ This release consolidates all datastore initialization into a single config-driv
 - Modified `internal/config/auth_config.go` — CSRF secret logic added with `authSettings` struct gaining `csrfSecret` field
 - New `GetCsrfSecret()` / `SetCsrfSecret()` methods on `AuthConfigInterface`
 - `middlewares.NewStatsMiddleware(app)` added to global middleware chain
+- All individual admin shop controllers deleted (categories, discounts, products, productupdate, shared) — replaced by single `shopAdminController` delegating to `pkg/shopadmin`
+- `github.com/stretchr/testify` dependency removed — all tests refactored to use standard library assertions
+- `github.com/dracory/crud/v2` dependency removed
+- `github.com/stripe/stripe-go/v73` dependency added for Stripe payment support
+- New website shop cart controller, helpers (`cart_util.go`, `payment_code.go`, `stripe.go`), and shop cart link constants
+- `pkg/blogai/database.go` deleted (was dead/commented code)
+- File manager `handleLoadFilesAjax` extracted to separate file `load_files_ajax.go`
+- Import order standardized: `project/internal/app` placed before other internal packages
 - `pkg/shopadmin/categories/category_manager_controller.go` deleted (was placeholder)
 
 ---
@@ -314,6 +322,288 @@ globalMiddlewares := append(globalMiddlewares,
 
 ---
 
+### 6. Admin Shop Controllers Replaced by Single Delegation Controller
+
+**Change**: All individual admin shop controllers in `internal/controllers/admin/shop/` have been deleted and replaced by a single `shopAdminController` that delegates all shop admin requests to the `pkg/shopadmin` package. The old route handler that dispatched to individual controllers based on a `controller` query parameter has been replaced with a simple two-route setup (base + catchall) that routes everything through `shopAdminController`.
+
+**Deleted Directories and Files**:
+- `internal/controllers/admin/shop/categories/` (entire directory)
+  - `category_create_controller.go` and test
+  - `categorymanager/` (entire subdirectory)
+  - `categoryupdate/` (entire subdirectory)
+- `internal/controllers/admin/shop/discounts/` (entire directory)
+  - `discount_controller.go`, `discount_form_validation_rule.go` and tests
+- `internal/controllers/admin/shop/home_controller.go`
+- `internal/controllers/admin/shop/products/` (entire directory)
+  - `product_create_controller.go`, `product_delete_controller.go`, `product_manager_controller.go` and tests
+  - `productupdate/` (entire subdirectory with all components: details, media, metadata, tags)
+- `internal/controllers/admin/shop/shared/` (entire directory)
+  - `constants.go`, `header.go`, `links.go` and tests
+
+**New File**:
+- `internal/controllers/admin/shop/shop_controller.go` — `shopAdminController` struct with `NewShopAdminController(app)` constructor and `Handler(w, r)` method
+
+**Old Usage**:
+```go
+// v0.34.0 — internal/controllers/admin/shop/routes.go
+handler := func(w http.ResponseWriter, r *http.Request) string {
+	controller := req.GetStringTrimmed(r, "controller")
+
+	if controller == shared.CONTROLLER_CATEGORIES {
+		return categorymanager.NewCategoryManagerController(app).Handler(w, r)
+	}
+	if controller == shared.CONTROLLER_CATEGORY_CREATE {
+		return categories.NewCategoryCreateController(app).Handler(w, r)
+	}
+	if controller == shared.CONTROLLER_PRODUCT_UPDATE {
+		return productupdate.NewProductUpdateController(app).Handler(w, r)
+	}
+	// ... many more controller dispatches
+	return NewHomeController(app).Handler(w, r)
+}
+
+shopOrders := rtr.NewRoute().
+	SetName("Admin > Shop > Orders").
+	SetPath(links.ADMIN_SHOP).
+	SetHTMLHandler(handler)
+```
+
+**New Usage**:
+```go
+// v0.35.0 — internal/controllers/admin/shop/routes.go
+shop := rtr.NewRoute().
+	SetName("Admin > Shop").
+	SetPath(links.ADMIN_SHOP).
+	SetHandler(NewShopAdminController(app).Handler)
+
+shopCatchAll := rtr.NewRoute().
+	SetName("Admin > Shop > Catchall").
+	SetPath(links.ADMIN_SHOP + links.CATCHALL).
+	SetHandler(NewShopAdminController(app).Handler)
+```
+
+**Action Required**:
+- If you imported any of the deleted controller packages (e.g., `project/internal/controllers/admin/shop/categories`, `project/internal/controllers/admin/shop/products`, `project/internal/controllers/admin/shop/discounts`, `project/internal/controllers/admin/shop/shared`), remove those imports and use `NewShopAdminController(app)` instead
+- If you had custom routes pointing to individual shop controllers, route them through `NewShopAdminController(app).Handler` instead
+- The `pkg/shopadmin` package now handles all shop admin routing internally — the `shopAdminController` is a thin wrapper that initializes `shopadmin.New()` with `AdminOptions` and delegates to `admin.Handle(w, r)`
+- The route handler type changed from `SetHTMLHandler` (returning string) to `SetHandler` (standard `http.HandlerFunc`) — update any custom route registrations accordingly
+
+---
+
+### 7. testify Dependency Removed
+
+**Change**: `github.com/stretchr/testify` has been removed from `go.mod`. All tests that previously used `testify/assert` or `testify/require` have been refactored to use standard library assertions and error checking patterns.
+
+**Affected Files**:
+- `go.mod` — `github.com/stretchr/testify` removed from require block; `github.com/davecgh/go-spew`, `github.com/pmezard/go-difflib`, `gopkg.in/yaml.v3` removed from indirect dependencies
+- `pkg/useradmin/user_update/handle_timezones_fetch_ajax_test.go`
+- `pkg/useradmin/user_update/handle_user_fetch_ajax_test.go`
+- `pkg/useradmin/user_update/handle_user_update_ajax_test.go`
+- `pkg/useradmin/user_update/user_update_page_test.go`
+
+**Old Usage**:
+```go
+// v0.34.0 — using testify
+import "github.com/stretchr/testify/assert"
+
+func TestSomething(t *testing.T) {
+	result := doSomething()
+	assert.True(t, result)
+	assert.Equal(t, expected, actual)
+	assert.NoError(t, err)
+}
+```
+
+**New Usage**:
+```go
+// v0.35.0 — using standard library
+func TestSomething(t *testing.T) {
+	result := doSomething()
+	if !result {
+		t.Errorf("expected true, got false")
+	}
+	if expected != actual {
+		t.Errorf("expected %v, got %v", expected, actual)
+	}
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+```
+
+**Action Required**:
+- If your custom tests use `testify`, either keep the dependency in your `go.mod` or refactor to standard library assertions
+- If you relied on testify being a transitive dependency from Blueprint, add it explicitly to your `go.mod`:
+```bash
+go get github.com/stretchr/testify@v1.11.1
+```
+- Run `go mod tidy` after updating
+
+---
+
+### 8. New Stripe Dependency Added
+
+**Change**: `github.com/stripe/stripe-go/v73` has been added as a direct dependency for Stripe payment integration support.
+
+**New Files**:
+- `internal/helpers/stripe.go` — `GenerateStripePaymentsCheckoutURL()` function and `GenerateStripePaymentsCheckoutURLOptions` / `LineItem` types
+- `internal/helpers/payment_code.go` — `PaymentCodeData` struct, `GetPaymentCodeData()`, `SetPaymentCodeData()`, `DeletePaymentCodeData()` functions for cache-based payment code management
+- `internal/helpers/cart_util.go` — `GenerateCartCacheKey()` for guest cart cache key generation
+
+**New go.mod Entry**:
+```
+github.com/stripe/stripe-go/v73 v73.16.0
+```
+
+**Action Required**:
+- Run `go mod tidy` to pick up the new Stripe dependency
+- If you don't use Stripe payments, the dependency is still required for compilation but the helpers are not called unless you explicitly use them
+- If you implement Stripe payment flows, use `helpers.GenerateStripePaymentsCheckoutURL()` to create checkout sessions
+
+---
+
+### 9. New Website Shop Cart Routes and Link Constants
+
+**Change**: New shop cart routes, link constants, and a cart controller have been added to the website controllers. The cart routes are **commented out by default** in the website routes file.
+
+**New Files**:
+- `internal/controllers/website/shop/cart/cart_controller.go` — `CartController` with `NewCartController(app)` and `Handler(w, r)`
+- `internal/controllers/website/shop/cart/routes.go` — `Routes(app)` returning cart API route
+
+**New Link Constants** (`internal/links/constants.go`):
+```go
+const SHOP_CART = SHOP + "/cart"
+const SHOP_CART_ADD = SHOP_CART + "/add"
+const SHOP_CART_REMOVE = SHOP_CART + "/remove"
+const SHOP_CART_UPDATE = SHOP_CART + "/update"
+const SHOP_CART_API = SHOP_CART + "/api"
+const SHOP_CHECKOUT = SHOP + "/checkout"
+const SHOP_PRODUCT = SHOP + "/product"
+```
+
+**New Website Link Methods** (`internal/links/website_links.go`):
+- `ShopCart()`, `ShopCartAdd()`, `ShopCartRemove()`, `ShopCartUpdate()`, `ShopCartAPI()`
+- `ShopCheckout()`, `ShopProduct()`
+
+**Old Usage**:
+```go
+// v0.34.0 — No shop cart routes or link constants existed
+```
+
+**New Usage**:
+```go
+// v0.35.0 — internal/controllers/website/routes.go (commented out by default)
+// websiteRoutes = append(websiteRoutes, cart.Routes(app)...)
+
+// Using link helpers
+url := links.Website().ShopCart()
+url := links.Website().ShopCheckout()
+url := links.Website().ShopProduct(productID, productSlug, nil)
+```
+
+**Action Required**:
+- No action required if you don't use shop cart functionality — routes are commented out by default
+- To enable cart routes, uncomment `cart.Routes(app)` in `internal/controllers/website/routes.go`
+- If you have custom shop link constants, verify they don't conflict with the new `SHOP_CART*`, `SHOP_CHECKOUT`, and `SHOP_PRODUCT` constants
+
+---
+
+### 10. blogai/database.go Deleted
+
+**Change**: `pkg/blogai/database.go` has been deleted. This file contained only commented-out code (a dead `Initialize()` function that was never active).
+
+**Action Required**:
+- If you imported `pkg/blogai` and referenced `blogai.Initialize()` or `blogai.customStore`, remove those references — they were never functional
+- No functional impact — the file was entirely commented out
+
+---
+
+### 11. File Manager Code Organization Refactored
+
+**Change**: The `handleLoadFilesAjax` method has been extracted from `pkg/fileadmin/file_manager/file_manager_controller.go` into a separate file `pkg/fileadmin/file_manager/load_files_ajax.go`. A new test file `load_files_ajax_test.go` was also added.
+
+**Old Usage**:
+```go
+// v0.34.0 — handleLoadFilesAjax was a method inside file_manager_controller.go
+func (controller *FileManagerController) handleLoadFilesAjax(r *http.Request) string {
+	// ... implementation inline in controller file
+}
+```
+
+**New Usage**:
+```go
+// v0.35.0 — handleLoadFilesAjax is now in load_files_ajax.go (same package, same method)
+// No API change — the method signature and behavior are identical
+// The controller file is now ~86 lines smaller
+```
+
+**Action Required**:
+- No code changes required — the method is in the same package and has the same signature
+- If you have local modifications to `file_manager_controller.go`, be aware that `handleLoadFilesAjax` is now in a separate file
+
+---
+
+### 12. Import Order Standardized
+
+**Change**: Import order has been standardized across the codebase to place `project/internal/app` before other `project/internal/*` packages. This is a style-only change with no functional impact.
+
+**Affected Files** (28 files across controllers, middlewares, widgets, emails, testutils, and pkg packages):
+- `internal/emails/admin_email_contact_form_submitted.go`
+- `internal/emails/admin_email_new_user_registered.go`
+- `internal/emails/user_email_invite_friend.go`
+- `internal/middlewares/api_auth_middleware.go`
+- `internal/middlewares/cms_layout_middleware.go`
+- `internal/middlewares/email_allowlist_middleware.go`
+- `internal/middlewares/log_request_mIddleware.go`
+- `internal/middlewares/subscription_middleware.go`
+- `internal/testutils/login_as.go`
+- `internal/testutils/setup.go`
+- `internal/widgets/authenticated_widget.go` (and 5 other widget files)
+- `pkg/blogadmin/` (8 files)
+- `pkg/fileadmin/routes.go`
+- `pkg/logadmin/routes.go`
+- `pkg/shopadmin/home/home_controller.go`
+- `pkg/useradmin/` (6 files)
+
+**Old Usage**:
+```go
+// v0.34.0 — internal/app was mixed with other internal packages
+import (
+	"project/internal/helpers"
+	"project/internal/links"
+	"project/internal/app"
+)
+```
+
+**New Usage**:
+```go
+// v0.35.0 — internal/app comes before other internal packages
+import (
+	"project/internal/app"
+	"project/internal/helpers"
+	"project/internal/links"
+)
+```
+
+**Action Required**:
+- Run `gofmt -w .` to automatically standardize import order in your code
+- No functional impact — this is purely a style change
+
+---
+
+### 13. crud/v2 Dependency Removed
+
+**Change**: `github.com/dracory/crud/v2` has been removed from `go.mod` as it was no longer used by any code in the project.
+
+**Action Required**:
+- If your custom code depends on `github.com/dracory/crud/v2`, add it explicitly to your `go.mod`:
+```bash
+go get github.com/dracory/crud/v2
+```
+- Run `go mod tidy` to clean up unused dependencies
+
+---
+
 ## 🔄 Migration Steps
 
 ### Step 1: Update Version Constant
@@ -371,14 +661,33 @@ rm internal/app/stores_vault.go
 ### Step 4: Verify Datastore Initialization
 Ensure `internal/app/datastores.go` and `internal/config/store_builders.go` are present. If you have custom stores, add them to the `stores` slice in `dataStoresInitialize()` and create a builder function in `store_builders.go`.
 
-### Step 5: Remove Category Manager Controller References
-Search for and remove any references to the deleted category manager controller:
+### Step 5: Remove Deleted Admin Shop Controller References
+Search for and remove any references to the deleted admin shop controllers:
 ```bash
-# Find references
-grep -r "NewCategoryManagerController\|NewCategoryCreateController\|NewCategoryUpdateController" .
+# Find references to deleted controllers
+grep -r "NewCategoryManagerController\|NewCategoryCreateController\|NewCategoryUpdateController\|NewProductCreateController\|NewProductDeleteController\|NewProductManagerController\|NewProductUpdateController\|NewDiscountController\|shop/shared" .
+```
+Replace all admin shop routes with `NewShopAdminController(app).Handler`.
+
+### Step 6: Update Dependencies
+```bash
+# Remove unused dependencies
+go mod tidy
+
+# If you use testify in your own tests, add it explicitly
+go get github.com/stretchr/testify@v1.11.1
+
+# If you use crud/v2 in your own code, add it explicitly
+go get github.com/dracory/crud/v2
 ```
 
-### Step 6: Verify Build
+### Step 7: Standardize Import Order
+Run gofmt to standardize import order:
+```bash
+gofmt -w .
+```
+
+### Step 8: Verify Build
 ```bash
 go build ./...
 ```
@@ -406,6 +715,18 @@ go test ./...
 - Verify visitor tracking works when stats store is enabled
 - Verify no errors when stats store is disabled or nil
 
+### 5. Verify Admin Shop Routes
+- Verify `/admin/shop` routes through `NewShopAdminController`
+- Verify all sub-paths (categories, products, discounts, orders) are handled by `pkg/shopadmin`
+- Verify no 404s for previously working shop admin pages
+
+### 6. Verify No testify Dependencies
+```bash
+# Check if testify is still referenced
+grep -r "stretchr/testify" . --include="*.go"
+# If found in your own tests, either keep the dependency or refactor
+```
+
 ---
 
 ## 📝 Additional Notes
@@ -414,11 +735,19 @@ go test ./...
 - **CSRF Secret Configuration**: Centralized CSRF secret management with environment-aware behavior (required in production, auto-generated in development)
 - **Config-Driven Store Initialization**: Store initialization is now driven by a single config-driven list, making it easier to add, remove, or reorder stores
 - **Exported Store Builders**: Store construction functions are now exported from the `config` package, enabling reuse in tests and other contexts
+- **Unified Admin Shop Controller**: All admin shop routes now delegate to `pkg/shopadmin` through a single `shopAdminController`, eliminating the need for individual controller packages
+- **Stripe Payment Support**: New `helpers.GenerateStripePaymentsCheckoutURL()` and payment code cache helpers for Stripe checkout integration
+- **Shop Cart Link Constants**: New `SHOP_CART*`, `SHOP_CHECKOUT`, and `SHOP_PRODUCT` link constants with corresponding `websiteLinks` methods
+- **Standard Library Tests**: Tests no longer depend on `testify` — all assertions use standard library patterns
 
 ### Removed Features
 - `pkg/shopadmin/categories/category_manager_controller.go` — placeholder controller deleted
+- All individual admin shop controllers in `internal/controllers/admin/shop/` (categories, discounts, products, productupdate, shared) — replaced by single `shopAdminController`
+- `pkg/blogai/database.go` — dead/commented code removed
 - All private `new*Store` functions in `internal/app/` — replaced by exported `config.New*Store` functions
 - All individual `*StoreInitialize` functions in `internal/app/` — replaced by `setup*Store` functions in `datastores.go`
+- `github.com/stretchr/testify` dependency removed
+- `github.com/dracory/crud/v2` dependency removed
 
 ### Behavior Changes
 - **Nil store checks removed from builders**: The old `new*Store` functions in `internal/app/` included `if st == nil { return nil, errors.New("xxx.NewStore returned a nil store") }` checks. The new `config.New*Store` functions do NOT include these checks — they rely on the underlying store package's `NewStore()` to return an error on failure.
@@ -427,11 +756,16 @@ go test ./...
 - **EnableDebug now called inside store builders**: In v0.34.0, `EnableDebug(app.GetConfig().GetAppDebug())` was called in the `*StoreInitialize` function after store creation. In v0.35.0, `EnableDebug(debug)` is called inside `config.New*Store` builder functions. This means if you call `config.New*Store` directly (e.g., in tests), debug mode is already enabled based on the `debug` parameter you pass.
 - **Import order fixed in `global_middlewares.go`**: `project/internal/app` import moved before `project/internal/middlewares` to fix import ordering.
 - **`AUTH_CSRF_SECRET` not added to `.env.example`**: The new environment variable was added to constants and config logic but was not added to the `.env.example` template file. You should add it manually to your `.env` files.
+- **Shop cart routes commented out by default**: The new `cart.Routes(app)` call in `internal/controllers/website/routes.go` is commented out. Uncomment to enable.
+- **Route handler type changed for admin shop**: Changed from `SetHTMLHandler` (returning string) to `SetHandler` (standard `http.HandlerFunc`) for admin shop routes.
+- **Stripe currency hardcoded to GBP**: The `GenerateStripePaymentsCheckoutURL` helper currently hardcodes `priceCurrency = "GBP"`. Modify the helper if you need a different currency.
 
 ### Architecture Improvements
 - **Single source of truth for store construction**: All table names and store options are now defined in `internal/config/store_builders.go`
 - **Cleaner separation of concerns**: Store construction (config package) vs. store wiring (app package)
 - **Reduced file count**: 24 files consolidated into 2 (`datastores.go` + `store_builders.go`)
+- **Admin shop controller consolidation**: 70+ files in `internal/controllers/admin/shop/` replaced by single `shop_controller.go` delegating to `pkg/shopadmin`
+- **Standardized import order**: `project/internal/app` consistently placed before other internal packages across 28+ files
 
 ---
 
@@ -474,11 +808,28 @@ func (c *yourConfig) GetCsrfSecret() string {
 }
 ```
 
-### Issue 5: Category Manager Controller Not Found
-**Symptom**: Build error: `undefined: categories.NewCategoryManagerController`
-**Solution**: Remove all references to the deleted controller. The package `pkg/shopadmin/categories` no longer has these controller constructors.
+### Issue 5: Admin Shop Controller Build Errors
+**Symptom**: Build errors like `undefined: categories.NewCategoryManagerController`, `undefined: shopProducts.NewProductCreateController`, `undefined: shopDiscounts.NewDiscountController`, `undefined: shared.CONTROLLER_CATEGORIES`
+**Solution**: All individual admin shop controllers have been deleted. Replace all references with `NewShopAdminController(app).Handler`:
+```go
+// Old
+import "project/internal/controllers/admin/shop/products"
+handler := shopProducts.NewProductCreateController(app).Handler
 
-### Issue 6: Nil Store Returned Without Error
+// New
+import admin "project/internal/controllers/admin/shop"
+handler := admin.NewShopAdminController(app).Handler
+```
+
+### Issue 6: testify Not Found
+**Symptom**: Build error: `cannot find package "github.com/stretchr/testify"` in your tests
+**Solution**: Add testify explicitly to your `go.mod` if your own tests use it:
+```bash
+go get github.com/stretchr/testify@v1.11.1
+```
+Or refactor your tests to use standard library assertions.
+
+### Issue 7: Nil Store Returned Without Error
 **Symptom**: Store is nil but no error is returned (previously would return `"xxx.NewStore returned a nil store"` error)
 **Solution**: The new `config.New*Store` builder functions do not include nil store checks. If a store package's `NewStore()` returns nil without an error, it will be set on the app without detection. If you rely on nil store checks, add them manually after calling `config.New*Store`:
 ```go
