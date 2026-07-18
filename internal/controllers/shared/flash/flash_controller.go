@@ -3,9 +3,9 @@ package flash
 import (
 	"net/http"
 	"project/internal/app"
+	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"strings"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
