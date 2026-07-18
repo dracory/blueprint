@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"

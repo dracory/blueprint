@@ -3,9 +3,9 @@ package widgets
 import (
 	"log/slog"
 	"net/http"
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/app"
 	"strings"
 
 	"github.com/dracory/base/cfmt"

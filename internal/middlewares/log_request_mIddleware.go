@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 	"slices"
 	"strings"
 

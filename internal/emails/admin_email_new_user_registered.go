@@ -1,8 +1,8 @@
 package emails
 
 import (
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/email"
 	"github.com/dracory/hb"

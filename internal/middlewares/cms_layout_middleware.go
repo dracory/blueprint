@@ -4,8 +4,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"project/internal/layouts"
 	"project/internal/app"
+	"project/internal/layouts"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/hb"

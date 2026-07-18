@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 	"project/internal/testutils"
 
 	"github.com/dracory/blogstore"

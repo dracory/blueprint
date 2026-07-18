@@ -3,9 +3,9 @@ package ai_tools
 import (
 	"net/http"
 
+	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/dracory/cdn"

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 
 	"github.com/dracory/api"
 	"github.com/dracory/rtr"

@@ -2,9 +2,9 @@ package aitest
 
 import (
 	"net/http"
+	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"project/pkg/blogadmin/shared"
 
 	"github.com/aws/smithy-go/ptr"

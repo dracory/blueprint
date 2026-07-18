@@ -4,10 +4,10 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"project/internal/app"
 	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/subscriptionstore"
 

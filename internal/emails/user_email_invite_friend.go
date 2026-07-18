@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"html"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/email"
 	"github.com/dracory/hb"
@@ -18,7 +18,7 @@ func NewInviteFriendEmail(app app.AppInterface, us userstore.StoreInterface) *in
 }
 
 type inviteFriendEmail struct {
-	app  app.AppInterface
+	app       app.AppInterface
 	userStore userstore.StoreInterface
 }
 

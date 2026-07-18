@@ -2,9 +2,9 @@ package widgets
 
 import (
 	"net/http"
+	"project/internal/app"
 	"project/internal/config"
 	"project/internal/helpers"
-	"project/internal/app"
 	"slices"
 
 	"github.com/samber/lo"

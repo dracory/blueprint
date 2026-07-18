@@ -2,8 +2,8 @@ package widgets
 
 import (
 	"net/http"
-	"project/internal/helpers"
 	"project/internal/app"
+	"project/internal/helpers"
 )
 
 var _ Widget = (*unauthenticatedWidget)(nil) // verify it extends the interface
