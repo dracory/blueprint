@@ -1,18 +1,18 @@
 package admin
 
 import (
-	adminBlog "project/internal/controllers/admin/blog"
+	"project/internal/app"
 	adminCms "project/internal/controllers/admin/cms"
 	adminFiles "project/internal/controllers/admin/files"
-	adminLogs "project/internal/controllers/admin/logs"
 	adminMedia "project/internal/controllers/admin/media"
-	adminShop "project/internal/controllers/admin/shop"
 	adminStats "project/internal/controllers/admin/stats"
 	adminTasks "project/internal/controllers/admin/tasks"
 	adminUsers "project/internal/controllers/admin/users"
 	"project/internal/links"
 	"project/internal/middlewares"
-	"project/internal/app"
+	"project/pkg/blogadmin"
+	"project/pkg/logadmin"
+	"project/pkg/shopadmin"
 
 	"github.com/dracory/rtr"
 )
@@ -31,7 +31,12 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 
 	adminRoutes := []rtr.RouteInterface{}
 
-	blogRoutes, err := adminBlog.Routes(app)
+	blogRoutes, err := blogadmin.Routes(app, blogadmin.AdminOptions{
+		Store:        app.GetBlogStore(),
+		AdminHomeURL: links.Admin().Home(),
+		BlogAdminURL: links.Admin().Blog(),
+		Registry:     app,
+	})
 	if err == nil {
 		adminRoutes = append(adminRoutes, blogRoutes...)
 	}
@@ -46,7 +51,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		adminRoutes = append(adminRoutes, fileRoutes...)
 	}
 
-	logRoutes, err := adminLogs.Routes(app)
+	logRoutes, err := logadmin.Routes(app)
 	if err == nil {
 		adminRoutes = append(adminRoutes, logRoutes...)
 	}
@@ -56,7 +61,12 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		adminRoutes = append(adminRoutes, mediaRoutes...)
 	}
 
-	shopRoutes, err := adminShop.ShopRoutes(app)
+	shopRoutes, err := shopadmin.Routes(app, shopadmin.AdminOptions{
+		Registry:       app,
+		AdminHomeURL:   links.Admin().Home(),
+		ShopAdminURL:   links.Admin().Shop(),
+		FileManagerURL: links.Admin().FileManager(),
+	})
 	if err == nil {
 		adminRoutes = append(adminRoutes, shopRoutes...)
 	}

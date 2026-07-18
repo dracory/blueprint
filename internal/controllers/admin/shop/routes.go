@@ -2,87 +2,28 @@ package admin
 
 import (
 	"errors"
-	"net/http"
 	"project/internal/app"
 	"project/internal/links"
 
-	"github.com/dracory/req"
 	"github.com/dracory/rtr"
-
-	"project/internal/controllers/admin/shop/categories"
-	"project/internal/controllers/admin/shop/categories/categorymanager"
-	categoryupdate "project/internal/controllers/admin/shop/categories/categoryupdate"
-	shopDiscounts "project/internal/controllers/admin/shop/discounts"
-	shopProducts "project/internal/controllers/admin/shop/products"
-	"project/internal/controllers/admin/shop/products/productupdate"
-	"project/internal/controllers/admin/shop/shared"
-
-	orderDetails "project/pkg/shopadmin/order_details"
-	orderManager "project/pkg/shopadmin/order_manager"
 )
 
 func ShopRoutes(app app.AppInterface) ([]rtr.RouteInterface, error) {
 	if app == nil {
 		return nil, errors.New("app cannot be nil")
 	}
-	handler := func(w http.ResponseWriter, r *http.Request) string {
-		controller := req.GetStringTrimmed(r, "controller")
-
-		if controller == shared.CONTROLLER_CATEGORIES {
-			return categorymanager.NewCategoryManagerController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_CATEGORY_CREATE {
-			return categories.NewCategoryCreateController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_CATEGORY_UPDATE {
-			return categoryupdate.NewCategoryUpdateController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_DISCOUNTS {
-			return shopDiscounts.NewDiscountController(app).AnyIndex(w, r)
-		}
-
-		if controller == shared.CONTROLLER_PRODUCT_CREATE {
-			return shopProducts.NewProductCreateController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_PRODUCT_DELETE {
-			return shopProducts.NewProductDeleteController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_PRODUCTS {
-			return shopProducts.NewProductManagerController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_PRODUCT_UPDATE {
-			return productupdate.NewProductUpdateController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_ORDERS {
-			return orderManager.NewOrderManagerController(app).Handler(w, r)
-		}
-
-		if controller == shared.CONTROLLER_ORDER_DETAILS {
-			return orderDetails.NewOrderDetailsController(app).Handler(w, r)
-		}
-
-		return NewHomeController(app).Handler(w, r)
-	}
-
-	shopOrders := rtr.NewRoute().
-		SetName("Admin > Shop > Orders").
+	shop := rtr.NewRoute().
+		SetName("Admin > Shop").
 		SetPath(links.ADMIN_SHOP).
-		SetHTMLHandler(handler)
+		SetHandler(NewShopAdminController(app).Handler)
 
 	shopCatchAll := rtr.NewRoute().
 		SetName("Admin > Shop > Catchall").
 		SetPath(links.ADMIN_SHOP + links.CATCHALL).
-		SetHTMLHandler(handler)
+		SetHandler(NewShopAdminController(app).Handler)
 
 	return []rtr.RouteInterface{
-		shopOrders,
+		shop,
 		shopCatchAll,
 	}, nil
 }

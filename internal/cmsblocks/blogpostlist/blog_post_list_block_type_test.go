@@ -118,8 +118,8 @@ func TestBlogPostListBlockType_SaveAdminFields(t *testing.T) {
 	}
 }
 
-// TestExtractTagSlugFromURL_URLWithTag tests URL with tag
-func TestExtractTagSlugFromURL_URLWithTag(t *testing.T) {
+// TestExtractTagSlugFromURL tests the tag extraction from URL
+func TestExtractTagSlugFromURL(t *testing.T) {
 	app := testutils.Setup(
 		testutils.WithBlogStore(true),
 	)

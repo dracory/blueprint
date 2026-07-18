@@ -6,9 +6,6 @@ import (
 	"project/internal/config"
 
 	neatdatabase "github.com/dracory/neat/database"
-	// "gorm.io/driver/postgres"
-	// "gorm.io/driver/sqlite"
-	// "gorm.io/gorm"
 )
 
 // databaseOpen opens the database connection using the provided config and returns the

@@ -7,8 +7,8 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 )
 
 func TestNew_SetsDefaultLogger(t *testing.T) {

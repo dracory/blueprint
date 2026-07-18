@@ -2,9 +2,9 @@ package cli
 
 import (
 	"fmt"
+	"project/internal/app"
 	"project/internal/cmds"
 	"project/internal/emails"
-	"project/internal/app"
 	"project/internal/routes"
 
 	baseCfmt "github.com/dracory/base/cfmt"

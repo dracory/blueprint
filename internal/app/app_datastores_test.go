@@ -9,8 +9,8 @@ import (
 	_ "modernc.org/sqlite"
 
 	"project/database/migrations"
-	"project/internal/config"
 	"project/internal/app"
+	"project/internal/config"
 )
 
 // newTestApp creates a new Application with a unique in-memory SQLite DSN via cfg
@@ -127,170 +127,44 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	}
 
 	// Verify some key tables exist
+	mustHaveTables := []string{
+		"snv_chat_chats",
+		"snv_chat_messages",
+		"snv_users_user",
+		"snv_sessions_session",
+		"snv_caches_cache",
+		"snv_blogs_post",
+		"snv_blogs_version",
+		"snv_files_file",
+		"snv_logs_log",
+		"snv_metas_meta",
+		"snv_stats_visitor",
+		"snv_tasks_schedule",
+		"snv_tasks_task_definition",
+		"snv_tasks_task_queue",
+		"snv_subscriptions_plan",
+		"snv_subscriptions_subscription",
+		"snv_vault_vault",
+		"snv_bindx_email",
+		"snv_bindx_first_name",
+		"snv_bindx_last_name",
+	}
+
 	db := a.GetDatabase()
 	if db == nil {
 		t.Fatal("Database should not be nil")
 	}
-
-	var name string
-	err := db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_chat_chats").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_chat_chats to exist, got error: %v", err)
-	}
-	if name != "snv_chat_chats" {
-		t.Fatalf("expected table name snv_chat_chats, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_chat_messages").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_chat_messages to exist, got error: %v", err)
-	}
-	if name != "snv_chat_messages" {
-		t.Fatalf("expected table name snv_chat_messages, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_users_user").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_users_user to exist, got error: %v", err)
-	}
-	if name != "snv_users_user" {
-		t.Fatalf("expected table name snv_users_user, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_sessions_session").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_sessions_session to exist, got error: %v", err)
-	}
-	if name != "snv_sessions_session" {
-		t.Fatalf("expected table name snv_sessions_session, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_caches_cache").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_caches_cache to exist, got error: %v", err)
-	}
-	if name != "snv_caches_cache" {
-		t.Fatalf("expected table name snv_caches_cache, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_blogs_post").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_blogs_post to exist, got error: %v", err)
-	}
-	if name != "snv_blogs_post" {
-		t.Fatalf("expected table name snv_blogs_post, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_blogs_version").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_blogs_version to exist, got error: %v", err)
-	}
-	if name != "snv_blogs_version" {
-		t.Fatalf("expected table name snv_blogs_version, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_files_file").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_files_file to exist, got error: %v", err)
-	}
-	if name != "snv_files_file" {
-		t.Fatalf("expected table name snv_files_file, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_logs_log").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_logs_log to exist, got error: %v", err)
-	}
-	if name != "snv_logs_log" {
-		t.Fatalf("expected table name snv_logs_log, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_metas_meta").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_metas_meta to exist, got error: %v", err)
-	}
-	if name != "snv_metas_meta" {
-		t.Fatalf("expected table name snv_metas_meta, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_stats_visitor").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_stats_visitor to exist, got error: %v", err)
-	}
-	if name != "snv_stats_visitor" {
-		t.Fatalf("expected table name snv_stats_visitor, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_tasks_schedule").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_tasks_schedule to exist, got error: %v", err)
-	}
-	if name != "snv_tasks_schedule" {
-		t.Fatalf("expected table name snv_tasks_schedule, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_tasks_task_definition").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_tasks_task_definition to exist, got error: %v", err)
-	}
-	if name != "snv_tasks_task_definition" {
-		t.Fatalf("expected table name snv_tasks_task_definition, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_tasks_task_queue").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_tasks_task_queue to exist, got error: %v", err)
-	}
-	if name != "snv_tasks_task_queue" {
-		t.Fatalf("expected table name snv_tasks_task_queue, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_subscriptions_plan").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_subscriptions_plan to exist, got error: %v", err)
-	}
-	if name != "snv_subscriptions_plan" {
-		t.Fatalf("expected table name snv_subscriptions_plan, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_subscriptions_subscription").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_subscriptions_subscription to exist, got error: %v", err)
-	}
-	if name != "snv_subscriptions_subscription" {
-		t.Fatalf("expected table name snv_subscriptions_subscription, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_vault_vault").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_vault_vault to exist, got error: %v", err)
-	}
-	if name != "snv_vault_vault" {
-		t.Fatalf("expected table name snv_vault_vault, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_bindx_email").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_bindx_email to exist, got error: %v", err)
-	}
-	if name != "snv_bindx_email" {
-		t.Fatalf("expected table name snv_bindx_email, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_bindx_first_name").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_bindx_first_name to exist, got error: %v", err)
-	}
-	if name != "snv_bindx_first_name" {
-		t.Fatalf("expected table name snv_bindx_first_name, got %s", name)
-	}
-
-	err = db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", "snv_bindx_last_name").Scan(&name)
-	if err != nil {
-		t.Fatalf("expected table snv_bindx_last_name to exist, got error: %v", err)
-	}
-	if name != "snv_bindx_last_name" {
-		t.Fatalf("expected table name snv_bindx_last_name, got %s", name)
+	for _, tbl := range mustHaveTables {
+		t.Run("has_"+tbl, func(t *testing.T) {
+			var name string
+			err := db.QueryRowContext(ctx, "SELECT name FROM sqlite_master WHERE type='table' AND name=?", tbl).Scan(&name)
+			if err != nil {
+				t.Fatalf("expected table %s to exist, got error: %v", tbl, err)
+			}
+			if name != tbl {
+				t.Fatalf("expected table name %s, got %s", tbl, name)
+			}
+		})
 	}
 }
 

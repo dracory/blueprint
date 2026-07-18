@@ -293,7 +293,3 @@ func setupVaultStore(app AppInterface) error {
 	app.SetVaultStore(st)
 	return nil
 }
-
-// ============================================================================
-// == END: Data Stores Initialization
-// ============================================================================

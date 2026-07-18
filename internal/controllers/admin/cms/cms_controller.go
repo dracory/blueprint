@@ -2,9 +2,9 @@ package admin
 
 import (
 	"net/http"
+	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/base/webtheme"
 

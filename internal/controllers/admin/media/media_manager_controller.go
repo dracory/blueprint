@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"strings"
 	"time"
 
@@ -41,7 +41,7 @@ func NewMediaManagerController(app app.AppInterface) *mediaManagerController {
 
 	return &mediaManagerController{
 		rootDirPath: rootDirPath,
-		app:    app,
+		app:         app,
 	}
 }
 
@@ -58,7 +58,7 @@ type FileEntry struct {
 type mediaManagerController struct {
 	// rootDir if not empty will be used as the root/top directory
 	rootDirPath string
-	app    app.AppInterface
+	app         app.AppInterface
 	funcLayout  func(content string) string
 	storage     filesystem.StorageInterface
 }

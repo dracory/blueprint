@@ -2,8 +2,8 @@ package admin
 
 import (
 	"errors"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/rtr"
 )
