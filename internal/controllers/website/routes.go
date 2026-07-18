@@ -50,6 +50,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 
 	// Comment if you do not use the payment routes
 	// websiteRoutes = append(websiteRoutes, paymentRoutes...)
+	// websiteRoutes = append(websiteRoutes, cart.Routes(app)...)
 	websiteRoutes = append(websiteRoutes, seo.Routes(app)...)
 	websiteRoutes = append(websiteRoutes, swagger.Routes()...)
 

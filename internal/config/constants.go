@@ -202,6 +202,9 @@ const KEY_CMS_STORE_TEMPLATE_ID = "CMS_STORE_TEMPLATE_ID"
 // is enabled.
 const KEY_VAULT_STORE_KEY = "VAULT_STORE_KEY"
 
+// USER_META_CART is the metadata key for storing the user's shopping cart.
+const USER_META_CART = "cart"
+
 // ============================================================================
 // == END: Store Configurations
 // ============================================================================

@@ -2,9 +2,9 @@ package logout
 
 import (
 	"net/http"
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/auth"
 )

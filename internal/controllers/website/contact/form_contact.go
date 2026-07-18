@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 	"project/internal/tasks/email_admin_new_contact"
 
 	"github.com/dracory/bs"
@@ -25,7 +25,7 @@ import (
 
 type formContact struct {
 	liveflux.Base
-	app        app.AppInterface
+	app             app.AppInterface
 	UserID          string
 	Email           string
 	FirstName       string

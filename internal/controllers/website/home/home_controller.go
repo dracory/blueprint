@@ -2,8 +2,8 @@ package home
 
 import (
 	"net/http"
-	"project/internal/layouts"
 	"project/internal/app"
+	"project/internal/layouts"
 
 	"github.com/dracory/hb"
 )

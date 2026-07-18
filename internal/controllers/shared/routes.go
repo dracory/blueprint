@@ -2,6 +2,7 @@ package shared
 
 import (
 	"net/http"
+	"project/internal/app"
 	"project/internal/controllers/shared/cdn"
 	"project/internal/controllers/shared/file"
 	"project/internal/controllers/shared/flash"
@@ -10,7 +11,6 @@ import (
 	"project/internal/controllers/shared/resource"
 	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/dashboard"
 	"github.com/dracory/rtr"

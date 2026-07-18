@@ -29,7 +29,6 @@ require (
 	github.com/dracory/chatstore v1.3.0
 	github.com/dracory/cmd v0.2.0
 	github.com/dracory/cmsstore v1.35.0
-	github.com/dracory/crud/v2 v2.0.0-20260318082437-20bdfa2008c2
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.12.0
 	github.com/dracory/dashboard v1.11.0
@@ -79,6 +78,7 @@ require (
 	github.com/robertkrimen/otto v0.5.1
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
 	github.com/spf13/cast v1.10.0
+	github.com/stripe/stripe-go/v73 v73.16.0
 	github.com/tidwall/gjson v1.19.0
 	github.com/yuin/goldmark v1.8.4
 	modernc.org/sqlite v1.53.0

@@ -82,6 +82,32 @@ func (l *websiteLinks) Shop(params ...map[string]string) string {
 	return URL(SHOP, p)
 }
 
+func (l *websiteLinks) ShopCart(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	return URL(SHOP_CART, p)
+}
+
+func (l *websiteLinks) ShopCartAdd(params map[string]string) string {
+	return URL(SHOP_CART_ADD, params)
+}
+
+func (l *websiteLinks) ShopCartRemove(params map[string]string) string {
+	return URL(SHOP_CART_REMOVE, params)
+}
+
+func (l *websiteLinks) ShopCartUpdate(params map[string]string) string {
+	return URL(SHOP_CART_UPDATE, params)
+}
+
+func (l *websiteLinks) ShopCartAPI(params map[string]string) string {
+	return URL(SHOP_CART_API, params)
+}
+
+func (l *websiteLinks) ShopCheckout(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	return URL(SHOP_CHECKOUT, p)
+}
+
 func (l *websiteLinks) ShopProduct(productID string, productSlug string, params map[string]string) string {
 	uri := SHOP_PRODUCT
 	uri += "/" + productID

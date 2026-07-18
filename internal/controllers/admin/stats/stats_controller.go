@@ -4,10 +4,10 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/hb"
 
@@ -16,14 +16,14 @@ import (
 )
 
 type statsController struct {
-	logger   *slog.Logger
-	app app.AppInterface
+	logger *slog.Logger
+	app    app.AppInterface
 }
 
 func NewStatsController(app app.AppInterface) *statsController {
 	return &statsController{
-		logger:   app.GetLogger(),
-		app: app,
+		logger: app.GetLogger(),
+		app:    app,
 	}
 }
 

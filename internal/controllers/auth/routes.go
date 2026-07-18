@@ -1,12 +1,12 @@
 package auth
 
 import (
+	"project/internal/app"
 	"project/internal/controllers/auth/authentication"
 	"project/internal/controllers/auth/login"
 	"project/internal/controllers/auth/logout"
 	"project/internal/controllers/auth/register"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"

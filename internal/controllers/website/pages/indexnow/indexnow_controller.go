@@ -3,8 +3,8 @@ package indexnow
 import (
 	"net/http"
 	// "project/internal/controllers/website/shared"
-	"project/internal/layouts"
 	"project/internal/app"
+	"project/internal/layouts"
 
 	"github.com/dracory/hb"
 )

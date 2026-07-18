@@ -16,8 +16,8 @@ import (
 	"github.com/dracory/cdn"
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
+	"github.com/dracory/neat"
 	"github.com/dracory/req"
-	"github.com/dracory/sb"
 	"github.com/dracory/userstore"
 	"github.com/samber/lo"
 )
@@ -363,7 +363,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 
 func (controller *registerController) selectTimezoneByCountry(ctx context.Context, country string, selectedTimezone string) hb.TagInterface {
 	query := geostore.TimezoneQueryOptions{
-		SortOrder: sb.ASC,
+		SortOrder: neat.SortAsc,
 		OrderBy:   geostore.COLUMN_TIMEZONE,
 	}
 

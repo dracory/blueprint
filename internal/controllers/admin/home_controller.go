@@ -323,11 +323,10 @@ func (c *homeController) visitorsData() (dates []string, visits []int64, err err
 
 	ctx := context.Background()
 	for _, date := range datesInRange {
-		query := statsstore.NewVisitorQuery().
-			SetCreatedAtGte(date + " 00:00:00").
-			SetCreatedAtLte(date + " 23:59:59").
-			SetDistinct(statsstore.COLUMN_IP_ADDRESS)
-		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, query)
+		visitorCount, err := c.app.GetStatsStore().VisitorCount(ctx, statsstore.VisitorQuery().
+			SetCreatedAtGte(date+" 00:00:00").
+			SetCreatedAtLte(date+" 23:59:59").
+			SetDistinct(statsstore.COLUMN_IP_ADDRESS))
 
 		if err != nil {
 			return nil, nil, err

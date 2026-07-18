@@ -89,6 +89,12 @@ const PAYMENT_SUCCESS = "/payment/success"
 const RESOURCES = HOME + "resources" + CATCHALL
 
 const SHOP = "/shop"
+const SHOP_CART = SHOP + "/cart"
+const SHOP_CART_ADD = SHOP_CART + "/add"
+const SHOP_CART_REMOVE = SHOP_CART + "/remove"
+const SHOP_CART_UPDATE = SHOP_CART + "/update"
+const SHOP_CART_API = SHOP_CART + "/api"
+const SHOP_CHECKOUT = SHOP + "/checkout"
 const SHOP_PRODUCT = SHOP + "/product"
 const SHOP_PRODUCT_WITH_REGEX = SHOP_PRODUCT + "/{id:[0-9]+}"
 const SHOP_PRODUCT_WITH_REGEX2 = SHOP_PRODUCT + "/{id:[0-9]+}/{title}"

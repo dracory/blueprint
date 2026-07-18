@@ -6,10 +6,10 @@ import (
 	"log"
 	"log/slog"
 
+	"project/internal/app"
 	"project/internal/cmsblocks"
 	"project/internal/emails"
 	"project/internal/middlewares"
-	"project/internal/app"
 	"project/internal/schedules"
 	"project/internal/widgets"
 
@@ -50,9 +50,9 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 				// Run the default task queue worker loop using the updated TaskQueue API
 				// 10 workers, 2-second polling interval
 				runner := taskstore.NewTaskQueueRunner(ts, taskstore.TaskQueueRunnerOptions{
+					QueueName:       taskstore.DefaultQueueName,
 					IntervalSeconds: 2,
 					UnstuckMinutes:  2,
-					QueueName:       taskstore.DefaultQueueName,
 					MaxConcurrency:  10,
 					Logger:          log.Default(),
 				})

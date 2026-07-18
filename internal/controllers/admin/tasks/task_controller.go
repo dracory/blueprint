@@ -3,8 +3,8 @@ package admin
 import (
 	"log/slog"
 	"net/http"
-	"project/internal/layouts"
 	"project/internal/app"
+	"project/internal/layouts"
 
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
@@ -14,14 +14,14 @@ import (
 
 func NewTaskController(app app.AppInterface) *taskController {
 	return &taskController{
-		app: app,
-		logger:   app.GetLogger(),
+		app:    app,
+		logger: app.GetLogger(),
 	}
 }
 
 type taskController struct {
-	app app.AppInterface
-	logger   *slog.Logger
+	app    app.AppInterface
+	logger *slog.Logger
 }
 
 func (c *taskController) Handler(w http.ResponseWriter, r *http.Request) string {
