@@ -9,7 +9,6 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
-	"github.com/stretchr/testify/assert"
 )
 
 // TestHandleGetTimezonesAjaxMethodCheck verifies that handleTimezonesFetchAjax rejects non-POST requests
@@ -26,13 +25,23 @@ func TestHandleGetTimezonesAjaxMethodCheck(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Method not allowed", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Method not allowed" {
+		t.Errorf("expected message 'Method not allowed', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleGetTimezonesAjaxCountryCodeValidation verifies that handleTimezonesFetchAjax requires country_code
@@ -49,13 +58,23 @@ func TestHandleGetTimezonesAjaxCountryCodeValidation(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Country code is required", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Country code is required" {
+		t.Errorf("expected message 'Country code is required', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleGetTimezonesAjaxGeoStoreNilCheck verifies that handleTimezonesFetchAjax requires GeoStore
@@ -72,13 +91,23 @@ func TestHandleGetTimezonesAjaxGeoStoreNilCheck(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "GeoStore is not configured", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "GeoStore is not configured" {
+		t.Errorf("expected message 'GeoStore is not configured', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleGetTimezonesAjaxTimezoneList verifies that handleTimezonesFetchAjax returns timezones
@@ -96,16 +125,30 @@ func TestHandleGetTimezonesAjaxTimezoneList(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "success", apiResponse["status"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
 
 	data, ok := apiResponse["data"].(map[string]any)
-	assert.True(t, ok, "response data should be a map")
+	if !ok {
+		t.Fatal("response data should be a map")
+	}
 	timezones, ok := data[FieldTimezones].([]any)
-	assert.True(t, ok, "response should contain timezones array")
-	assert.NotEmpty(t, timezones, "timezones should be loaded from geo store")
+	if !ok {
+		t.Fatal("response should contain timezones array")
+	}
+	if len(timezones) == 0 {
+		t.Error("timezones should be loaded from geo store")
+	}
 }

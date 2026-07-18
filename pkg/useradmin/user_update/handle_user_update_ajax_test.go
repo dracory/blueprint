@@ -14,7 +14,6 @@ import (
 	"github.com/dracory/taskstore"
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 // updateTestPayload mirrors the JSON body expected by handleUserUpdateAjax
@@ -52,7 +51,9 @@ func callUpdateAjax(t *testing.T, controller *userUpdateController, method strin
 	}
 
 	body, response, err := test.CallStringEndpoint(method, controller.Handler, opts)
-	assert.NoError(t, err)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
 	return body, response
 }
 
@@ -60,7 +61,9 @@ func callUpdateAjax(t *testing.T, controller *userUpdateController, method strin
 func parseApiResponse(t *testing.T, body string) map[string]any {
 	t.Helper()
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
 	return apiResponse
 }
 
@@ -75,10 +78,16 @@ func TestHandleUserUpdateAjaxMethodCheck(t *testing.T) {
 	controller := NewUserUpdateController(app)
 	body, response := callUpdateAjax(t, controller, http.MethodPost, "not-valid-json", nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Invalid request body", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Invalid request body" {
+		t.Errorf("expected message 'Invalid request body', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxPayloadValidation verifies that handleUserUpdateAjax requires user_id
@@ -92,10 +101,16 @@ func TestHandleUserUpdateAjaxPayloadValidation(t *testing.T) {
 	controller := NewUserUpdateController(app)
 	body, response := callUpdateAjax(t, controller, http.MethodPost, updateTestPayload{}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "User ID is required", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "User ID is required" {
+		t.Errorf("expected message 'User ID is required', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxUserIDValidation verifies that handleUserUpdateAjax reports unknown users
@@ -109,10 +124,16 @@ func TestHandleUserUpdateAjaxUserIDValidation(t *testing.T) {
 	controller := NewUserUpdateController(app)
 	body, response := callUpdateAjax(t, controller, http.MethodPost, updateTestPayload{UserID: "non-existent-id"}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "User not found", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "User not found" {
+		t.Errorf("expected message 'User not found', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxUserLookup verifies that handleUserUpdateAjax validates required fields
@@ -129,10 +150,16 @@ func TestHandleUserUpdateAjaxUserLookup(t *testing.T) {
 	controller := NewUserUpdateController(app)
 	body, response := callUpdateAjax(t, controller, http.MethodPost, updateTestPayload{UserID: user.GetID()}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Status is required", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Status is required" {
+		t.Errorf("expected message 'Status is required', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxFieldValidation verifies that handleUserUpdateAjax requires first/last name and email
@@ -151,10 +178,16 @@ func TestHandleUserUpdateAjaxFieldValidation(t *testing.T) {
 		Status: userstore.USER_STATUS_ACTIVE,
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "First name is required", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "First name is required" {
+		t.Errorf("expected message 'First name is required', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxRoleValidation verifies that handleUserUpdateAjax rejects invalid role values
@@ -179,10 +212,16 @@ func TestHandleUserUpdateAjaxRoleValidation(t *testing.T) {
 		Role:      "super-admin",
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Invalid role value", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Invalid role value" {
+		t.Errorf("expected message 'Invalid role value', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxEmailValidation verifies that handleUserUpdateAjax rejects invalid emails
@@ -206,10 +245,16 @@ func TestHandleUserUpdateAjaxEmailValidation(t *testing.T) {
 		Timezone:  "America/New_York",
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Invalid email address", apiResponse["message"])
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Invalid email address" {
+		t.Errorf("expected message 'Invalid email address', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserUpdateAjaxUserUpdate verifies that handleUserUpdateAjax updates a user successfully
@@ -236,19 +281,37 @@ func TestHandleUserUpdateAjaxUserUpdate(t *testing.T) {
 		Memo:      "updated memo",
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "success", apiResponse["status"])
-	assert.Equal(t, "User saved successfully", apiResponse["message"])
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "User saved successfully" {
+		t.Errorf("expected message 'User saved successfully', got %v", apiResponse["message"])
+	}
 
 	// Verify the user was actually updated in the database
 	updated, err := app.GetUserStore().UserFindByID(context.Background(), user.GetID())
-	assert.NoError(t, err)
-	assert.Equal(t, "Updated", updated.GetFirstName())
-	assert.Equal(t, "Name", updated.GetLastName())
-	assert.Equal(t, "updated@example.com", updated.GetEmail())
-	assert.Equal(t, userstore.USER_ROLE_ADMINISTRATOR, updated.GetRole())
-	assert.Equal(t, "updated memo", updated.GetMemo())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if updated.GetFirstName() != "Updated" {
+		t.Errorf("expected first name 'Updated', got %q", updated.GetFirstName())
+	}
+	if updated.GetLastName() != "Name" {
+		t.Errorf("expected last name 'Name', got %q", updated.GetLastName())
+	}
+	if updated.GetEmail() != "updated@example.com" {
+		t.Errorf("expected email 'updated@example.com', got %q", updated.GetEmail())
+	}
+	if updated.GetRole() != userstore.USER_ROLE_ADMINISTRATOR {
+		t.Errorf("expected role %q, got %q", userstore.USER_ROLE_ADMINISTRATOR, updated.GetRole())
+	}
+	if updated.GetMemo() != "updated memo" {
+		t.Errorf("expected memo 'updated memo', got %q", updated.GetMemo())
+	}
 }
 
 // TestHandleUserUpdateAjaxVaultTokenization verifies that handleUserUpdateAjax tokenizes fields
@@ -275,14 +338,22 @@ func TestHandleUserUpdateAjaxVaultTokenization(t *testing.T) {
 		Timezone:  "America/New_York",
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "success", apiResponse["status"])
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
 
 	// The stored first name should be a token, not the plaintext value
 	updated, err := app.GetUserStore().UserFindByID(context.Background(), user.GetID())
-	assert.NoError(t, err)
-	assert.NotEqual(t, "Vaulted", updated.GetFirstName(), "first name should be tokenized in storage")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if updated.GetFirstName() == "Vaulted" {
+		t.Error("first name should be tokenized in storage")
+	}
 }
 
 // TestHandleUserUpdateAjaxBlindIndexUpdate verifies that handleUserUpdateAjax enqueues a blind index
@@ -315,14 +386,22 @@ func TestHandleUserUpdateAjaxBlindIndexUpdate(t *testing.T) {
 		Timezone:  "America/New_York",
 	}, nil)
 
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 	apiResponse := parseApiResponse(t, body)
-	assert.Equal(t, "success", apiResponse["status"])
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
 
 	// Verify a blind index rebuild task was enqueued
 	tasks, err := app.GetTaskStore().TaskQueueList(context.Background(), taskstore.TaskQueueQuery())
-	assert.NoError(t, err)
-	assert.NotEmpty(t, tasks, "a blind index rebuild task should have been enqueued")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(tasks) == 0 {
+		t.Error("a blind index rebuild task should have been enqueued")
+	}
 }
 
 // seedUpdateTestUser creates a test user in the in-memory database and returns it

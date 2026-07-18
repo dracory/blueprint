@@ -12,7 +12,6 @@ import (
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 // TestHandleUserFetchAjaxMethodCheck verifies that handleUserFetchAjax rejects non-POST requests
@@ -30,13 +29,23 @@ func TestHandleUserFetchAjaxMethodCheck(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "Method not allowed", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "Method not allowed" {
+		t.Errorf("expected message 'Method not allowed', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserFetchAjaxUserIDValidation verifies that handleUserFetchAjax requires user_id
@@ -54,13 +63,23 @@ func TestHandleUserFetchAjaxUserIDValidation(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "User ID is required", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "User ID is required" {
+		t.Errorf("expected message 'User ID is required', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserFetchAjaxUserLookup verifies that handleUserFetchAjax reports unknown users
@@ -79,13 +98,23 @@ func TestHandleUserFetchAjaxUserLookup(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "User not found", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "User not found" {
+		t.Errorf("expected message 'User not found', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserFetchAjaxGeoStoreNilCheck verifies that handleUserFetchAjax requires GeoStore
@@ -105,13 +134,23 @@ func TestHandleUserFetchAjaxGeoStoreNilCheck(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "error", apiResponse["status"])
-	assert.Equal(t, "GeoStore is not configured", apiResponse["message"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "error" {
+		t.Errorf("expected status error, got %v", apiResponse["status"])
+	}
+	if apiResponse["message"] != "GeoStore is not configured" {
+		t.Errorf("expected message 'GeoStore is not configured', got %v", apiResponse["message"])
+	}
 }
 
 // TestHandleUserFetchAjaxGeoStoreErrorHandling verifies that handleUserFetchAjax returns user data
@@ -133,18 +172,32 @@ func TestHandleUserFetchAjaxGeoStoreErrorHandling(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "success", apiResponse["status"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
 
 	data, ok := apiResponse["data"].(map[string]any)
-	assert.True(t, ok, "response data should be a map")
+	if !ok {
+		t.Fatal("response data should be a map")
+	}
 	countries, ok := data[FieldCountries].([]any)
-	assert.True(t, ok, "response should contain countries array")
-	assert.NotEmpty(t, countries, "countries should be loaded from geo store")
+	if !ok {
+		t.Fatal("response should contain countries array")
+	}
+	if len(countries) == 0 {
+		t.Error("countries should be loaded from geo store")
+	}
 }
 
 // TestHandleUserFetchAjaxFieldStatusIncludesRole verifies that field_status includes the role field
@@ -165,19 +218,35 @@ func TestHandleUserFetchAjaxFieldStatusIncludesRole(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
 
 	var apiResponse map[string]any
-	assert.NoError(t, json.Unmarshal([]byte(body), &apiResponse))
-	assert.Equal(t, "success", apiResponse["status"])
+	if err := json.Unmarshal([]byte(body), &apiResponse); err != nil {
+		t.Fatalf("failed to unmarshal response: %v", err)
+	}
+	if apiResponse["status"] != "success" {
+		t.Errorf("expected status success, got %v", apiResponse["status"])
+	}
 
 	data, ok := apiResponse["data"].(map[string]any)
-	assert.True(t, ok, "response data should be a map")
+	if !ok {
+		t.Fatal("response data should be a map")
+	}
 	fieldStatus, ok := data[FieldStatusField].(map[string]any)
-	assert.True(t, ok, "response should contain field_status map")
-	assert.Contains(t, fieldStatus, "role")
-	assert.Equal(t, true, fieldStatus["role"])
+	if !ok {
+		t.Fatal("response should contain field_status map")
+	}
+	if _, ok := fieldStatus["role"]; !ok {
+		t.Error("field_status should contain role")
+	}
+	if fieldStatus["role"] != true {
+		t.Errorf("expected role to be true, got %v", fieldStatus["role"])
+	}
 }
 
 // seedFetchTestUser creates a test user in the in-memory database and returns it

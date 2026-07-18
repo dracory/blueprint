@@ -4,13 +4,13 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"project/internal/testutils"
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
-	"github.com/stretchr/testify/assert"
 )
 
 // TestRenderPageUserIDValidation verifies that renderPage redirects when user_id is missing
@@ -25,12 +25,20 @@ func TestRenderPageUserIDValidation(t *testing.T) {
 		GetValues: url.Values{},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusSeeOther, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusSeeOther {
+		t.Errorf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
+	}
 
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-	assert.NoError(t, err)
-	assert.Equal(t, "User ID is required", flash.Message)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if flash.Message != "User ID is required" {
+		t.Errorf("expected message 'User ID is required', got %q", flash.Message)
+	}
 }
 
 // TestRenderPageUserStoreNilCheck verifies that renderPage redirects when UserStore is not configured
@@ -46,12 +54,20 @@ func TestRenderPageUserStoreNilCheck(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusSeeOther, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusSeeOther {
+		t.Errorf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
+	}
 
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-	assert.NoError(t, err)
-	assert.Equal(t, "User store is not configured", flash.Message)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if flash.Message != "User store is not configured" {
+		t.Errorf("expected message 'User store is not configured', got %q", flash.Message)
+	}
 }
 
 // TestRenderPageUserLookup verifies that renderPage redirects when the user is not found
@@ -68,12 +84,20 @@ func TestRenderPageUserLookup(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusSeeOther, response.StatusCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusSeeOther {
+		t.Errorf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
+	}
 
 	flash, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-	assert.NoError(t, err)
-	assert.Equal(t, "User not found", flash.Message)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if flash.Message != "User not found" {
+		t.Errorf("expected message 'User not found', got %q", flash.Message)
+	}
 }
 
 // TestRenderPageVaultUntokenization verifies that renderPage untokenizes vault-stored fields
@@ -102,10 +126,15 @@ func TestRenderPageVaultUntokenization(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
-	// The page should render without error and show the edit heading
-	assert.Contains(t, html, "Edit User")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
+	if !strings.Contains(html, "Edit User") {
+		t.Errorf("expected HTML to contain 'Edit User'")
+	}
 }
 
 // TestRenderPageHTMLGeneration verifies that renderPage generates the expected HTML
@@ -132,10 +161,22 @@ func TestRenderPageHTMLGeneration(t *testing.T) {
 		},
 	})
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Contains(t, html, "Edit User", "should show page heading")
-	assert.Contains(t, html, "User: Page Render", "should show display name")
-	assert.Contains(t, html, "app-user-update", "should render the Vue app container")
-	assert.Contains(t, html, "vue.global.js", "should include Vue.js CDN")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if response.StatusCode != http.StatusOK {
+		t.Errorf("expected status %d, got %d", http.StatusOK, response.StatusCode)
+	}
+	if !strings.Contains(html, "Edit User") {
+		t.Error("should show page heading")
+	}
+	if !strings.Contains(html, "User: Page Render") {
+		t.Error("should show display name")
+	}
+	if !strings.Contains(html, "app-user-update") {
+		t.Error("should render the Vue app container")
+	}
+	if !strings.Contains(html, "vue.global.js") {
+		t.Error("should include Vue.js CDN")
+	}
 }
