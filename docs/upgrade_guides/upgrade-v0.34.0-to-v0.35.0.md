@@ -32,33 +32,37 @@ This release consolidates all datastore initialization into a single config-driv
 
 ### 1. Datastore Initialization Consolidated into Single File
 
-**Change**: All 20+ individual store initialization files (`internal/app/stores_*.go`) and `internal/app/app_datastores_initialize.go` have been deleted. Store initialization is now consolidated into a single `internal/app/datastores.go` file with a config-driven approach that filters stores by their `Used` config flags.
+**Change**: All 20+ individual store initialization files (`internal/app/stores_*.go`), their corresponding test files (`internal/app/stores_*_test.go`), and `internal/app/app_datastores_initialize.go` have been deleted. Store initialization is now consolidated into a single `internal/app/datastores.go` file with a config-driven approach that filters stores by their `Used` config flags. All store initialization tests are consolidated into a single `internal/app/datastores_test.go` file.
 
 **Deleted Files**:
 - `internal/app/app_datastores_initialize.go`
-- `internal/app/stores_audit.go`
+- `internal/app/stores_audit.go` + `internal/app/stores_audit_test.go`
 - `internal/app/stores_blindindex_email.go`
 - `internal/app/stores_blindindex_first_name.go`
 - `internal/app/stores_blindindex_last_name.go`
-- `internal/app/stores_blog.go`
-- `internal/app/stores_cache.go`
-- `internal/app/stores_chat.go`
-- `internal/app/stores_cms.go`
-- `internal/app/stores_custom.go`
-- `internal/app/stores_entity.go`
-- `internal/app/stores_feed.go`
-- `internal/app/stores_geo.go`
-- `internal/app/stores_log.go`
-- `internal/app/stores_meta.go`
-- `internal/app/stores_session.go`
-- `internal/app/stores_setting.go`
-- `internal/app/stores_shop.go`
+- `internal/app/stores_blog.go` + `internal/app/stores_blog_test.go`
+- `internal/app/stores_cache.go` + `internal/app/stores_cache_test.go`
+- `internal/app/stores_chat.go` + `internal/app/stores_chat_test.go`
+- `internal/app/stores_cms.go` + `internal/app/stores_cms_test.go`
+- `internal/app/stores_custom.go` + `internal/app/stores_custom_test.go`
+- `internal/app/stores_entity.go` + `internal/app/stores_entity_test.go`
+- `internal/app/stores_feed.go` + `internal/app/stores_feed_test.go`
+- `internal/app/stores_geo.go` + `internal/app/stores_geo_test.go`
+- `internal/app/stores_log.go` + `internal/app/stores_log_test.go`
+- `internal/app/stores_meta.go` + `internal/app/stores_meta_test.go`
+- `internal/app/stores_session.go` + `internal/app/stores_session_test.go`
+- `internal/app/stores_setting.go` + `internal/app/stores_setting_test.go`
+- `internal/app/stores_shop.go` + `internal/app/stores_shop_test.go`
 - `internal/app/stores_sqlfile.go`
-- `internal/app/stores_stats.go`
-- `internal/app/stores_subscription.go`
-- `internal/app/stores_task.go`
-- `internal/app/stores_user.go`
-- `internal/app/stores_vault.go`
+- `internal/app/stores_stats.go` + `internal/app/stores_stats_test.go`
+- `internal/app/stores_subscription.go` + `internal/app/stores_subscription_test.go`
+- `internal/app/stores_task.go` + `internal/app/stores_task_test.go`
+- `internal/app/stores_user.go` + `internal/app/stores_user_test.go`
+- `internal/app/stores_vault.go` + `internal/app/stores_vault_test.go`
+
+**New Files**:
+- `internal/app/datastores.go` — consolidated `dataStoresInitialize()` with config-driven store list + `setup*Store` functions
+- `internal/app/datastores_test.go` — 19 test functions covering each store's `_Success` and `_NotUsed` initialization cases using `testutils.Setup()`
 
 **Old Usage**:
 ```go
@@ -634,32 +638,51 @@ Delete the old individual store initializer files if you have local modification
 ```bash
 rm internal/app/app_datastores_initialize.go
 rm internal/app/stores_audit.go
+rm internal/app/stores_audit_test.go
 rm internal/app/stores_blindindex_email.go
 rm internal/app/stores_blindindex_first_name.go
 rm internal/app/stores_blindindex_last_name.go
 rm internal/app/stores_blog.go
+rm internal/app/stores_blog_test.go
 rm internal/app/stores_cache.go
+rm internal/app/stores_cache_test.go
 rm internal/app/stores_chat.go
+rm internal/app/stores_chat_test.go
 rm internal/app/stores_cms.go
+rm internal/app/stores_cms_test.go
 rm internal/app/stores_custom.go
+rm internal/app/stores_custom_test.go
 rm internal/app/stores_entity.go
+rm internal/app/stores_entity_test.go
 rm internal/app/stores_feed.go
+rm internal/app/stores_feed_test.go
 rm internal/app/stores_geo.go
+rm internal/app/stores_geo_test.go
 rm internal/app/stores_log.go
+rm internal/app/stores_log_test.go
 rm internal/app/stores_meta.go
+rm internal/app/stores_meta_test.go
 rm internal/app/stores_session.go
+rm internal/app/stores_session_test.go
 rm internal/app/stores_setting.go
+rm internal/app/stores_setting_test.go
 rm internal/app/stores_shop.go
+rm internal/app/stores_shop_test.go
 rm internal/app/stores_sqlfile.go
 rm internal/app/stores_stats.go
+rm internal/app/stores_stats_test.go
 rm internal/app/stores_subscription.go
+rm internal/app/stores_subscription_test.go
 rm internal/app/stores_task.go
+rm internal/app/stores_task_test.go
 rm internal/app/stores_user.go
+rm internal/app/stores_user_test.go
 rm internal/app/stores_vault.go
+rm internal/app/stores_vault_test.go
 ```
 
 ### Step 4: Verify Datastore Initialization
-Ensure `internal/app/datastores.go` and `internal/config/store_builders.go` are present. If you have custom stores, add them to the `stores` slice in `dataStoresInitialize()` and create a builder function in `store_builders.go`.
+Ensure `internal/app/datastores.go`, `internal/app/datastores_test.go`, and `internal/config/store_builders.go` are present. If you have custom stores, add them to the `stores` slice in `dataStoresInitialize()` and create a builder function in `store_builders.go`. Add corresponding `_Success` and `_NotUsed` test cases in `datastores_test.go` following the existing pattern.
 
 ### Step 5: Remove Deleted Admin Shop Controller References
 Search for and remove any references to the deleted admin shop controllers:
