@@ -28,6 +28,9 @@ go.work
 .env
 .env.vault
 
+# Maintenance mode state file
+maintenance_mode_state.json
+
 # Temp files
 *.tmp
 tmp/

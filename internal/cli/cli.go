@@ -13,10 +13,11 @@ import (
 
 // Constants for command names
 const (
-	CommandTask    = "task"
-	CommandJob     = "job"
-	CommandRoutes  = "routes"
-	SubcommandList = "list"
+	CommandTask        = "task"
+	CommandJob         = "job"
+	CommandRoutes      = "routes"
+	CommandMaintenance = "maintenance"
+	SubcommandList     = "list"
 )
 
 // NewDispatcher creates a new CLI dispatcher with blueprint-specific commands registered.
@@ -27,6 +28,7 @@ func NewDispatcher() *cli.Dispatcher[app.AppInterface] {
 	dispatcher.RegisterCommand(CommandTask, "Execute a task by alias", handleTaskCommand)
 	dispatcher.RegisterCommand(CommandJob, "Execute a job with arguments", handleJobCommand)
 	dispatcher.RegisterCommand(CommandRoutes, "List all registered routes", handleRoutesCommand)
+	dispatcher.RegisterCommand(CommandMaintenance, "Manage maintenance mode", handleMaintenanceCommand)
 
 	return dispatcher
 }

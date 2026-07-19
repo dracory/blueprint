@@ -34,6 +34,7 @@ Blueprint is a rapid application development (RAD) starter template built on the
 - Jail bots middleware (IP-based bot protection)
 - Email allowlist middleware
 - HTTPS redirect middleware
+- Maintenance mode middleware (file-based, CLI toggleable)
 - Blind Index for searchable encrypted data
 - Vault to securely store secrets
 
@@ -177,6 +178,30 @@ Run job:
 ```bash
 go run ./cmd/server job run ...
 ```
+
+Maintenance mode:
+
+```bash
+# Enable maintenance mode with defaults
+go run ./cmd/server maintenance enable
+
+# Enable with custom message and retry interval (seconds)
+go run ./cmd/server maintenance enable --message="Database migration in progress" --retry=120
+
+# Enable with excluded IPs (admin bypass)
+go run ./cmd/server maintenance enable --ips="203.0.113.5,198.51.100.10"
+
+# Enable with excluded paths
+go run ./cmd/server maintenance enable --exclude="/admin/*,/api/health,/liveflux/*"
+
+# Disable maintenance mode
+go run ./cmd/server maintenance disable
+
+# Check maintenance status
+go run ./cmd/server maintenance status
+```
+
+Aliases: `on`/`down` for enable, `off`/`up` for disable.
 
 ## License
 

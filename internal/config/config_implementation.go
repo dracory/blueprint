@@ -106,6 +106,10 @@ type configImplementation struct {
 	// CMS MCP
 	cmsMcpApiKey string
 
+	// Maintenance mode
+	appMaintenanceEnabled  bool
+	appMaintenanceFilePath string
+
 	// Store flags
 	auditStoreUsed        bool
 	blogStoreUsed         bool
@@ -211,6 +215,8 @@ func (c *configImplementation) setAppConfig(s appSettings) {
 	c.appEnv = s.env
 	c.appDebug = s.debug
 	c.cmsMcpApiKey = s.cmsMcpApiKey
+	c.appMaintenanceEnabled = s.maintenanceEnabled
+	c.appMaintenanceFilePath = s.maintenanceFilePath
 }
 
 func (c *configImplementation) SetAppName(appName string) {
@@ -287,6 +293,25 @@ func (c *configImplementation) IsEnvStaging() bool {
 
 func (c *configImplementation) IsEnvTesting() bool {
 	return c.appEnv == "testing"
+}
+
+func (c *configImplementation) SetAppMaintenanceEnabled(v bool) {
+	c.appMaintenanceEnabled = v
+}
+
+func (c *configImplementation) GetAppMaintenanceEnabled() bool {
+	return c.appMaintenanceEnabled
+}
+
+func (c *configImplementation) SetAppMaintenanceFilePath(v string) {
+	c.appMaintenanceFilePath = v
+}
+
+func (c *configImplementation) GetAppMaintenanceFilePath() string {
+	if c.appMaintenanceFilePath == "" {
+		return "maintenance_mode_state.json"
+	}
+	return c.appMaintenanceFilePath
 }
 
 // ============================================================================

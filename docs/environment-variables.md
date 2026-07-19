@@ -20,6 +20,8 @@ Complete reference of all environment variables used by Blueprint.
 | APP_HOST | Yes | - | Server host address |
 | APP_PORT | Yes | - | Server port |
 | APP_DEBUG | No | false | Enable debug mode |
+| APP_MAINTENANCE_ENABLED | No | false | Enable maintenance mode via env var (returns 503 for all requests except excluded IPs/paths) |
+| APP_MAINTENANCE_FILE_PATH | No | maintenance_mode_state.json | Path to the maintenance state JSON file |
 
 ### Database
 

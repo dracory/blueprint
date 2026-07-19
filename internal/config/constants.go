@@ -50,6 +50,9 @@ const KEY_APP_HOST = "APP_HOST"
 const KEY_APP_PORT = "APP_PORT"
 const KEY_MCP_API_KEY = "MCP_API_KEY"
 
+const KEY_APP_MAINTENANCE_ENABLED = "APP_MAINTENANCE_ENABLED"
+const KEY_APP_MAINTENANCE_FILE_PATH = "APP_MAINTENANCE_FILE_PATH"
+
 // ============================================================================
 // == END: App Configurations
 // ============================================================================

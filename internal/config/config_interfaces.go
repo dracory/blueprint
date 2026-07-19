@@ -81,6 +81,13 @@ type AppConfigInterface interface {
 	IsEnvProduction() bool
 	IsEnvStaging() bool
 	IsEnvTesting() bool
+
+	// Maintenance mode
+	SetAppMaintenanceEnabled(bool)
+	GetAppMaintenanceEnabled() bool
+
+	SetAppMaintenanceFilePath(string)
+	GetAppMaintenanceFilePath() string
 }
 
 // ============================================================================

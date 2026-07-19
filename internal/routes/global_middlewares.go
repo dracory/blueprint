@@ -42,6 +42,8 @@ func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 	perSec, perMin, perHour := getRateLimits(app)
 
 	globalMiddlewares := []rtr.MiddlewareInterface{
+		// Maintenance mode check first — blocks all processing if active
+		middlewares.NewMaintenanceMiddleware(app),
 		// Exclude generic patterns that could match legit routes like /user/news
 		rtrMiddleware.JailBotsMiddleware(rtrMiddleware.JailBotsConfig{
 			Exclude: []string{"/new"},

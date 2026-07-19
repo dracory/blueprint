@@ -43,23 +43,34 @@ func appConfig(env *envValidator) appSettings {
 	// Leave empty to disable CMS MCP integration.
 	cmsMcpApiKey := env.GetString(KEY_MCP_API_KEY)
 
+	// Maintenance Mode
+	//
+	// When enabled, the app returns 503 Service Unavailable for all requests.
+	// This can also be toggled via CLI: go run ./cmd/server maintenance down/up
+	maintenanceEnabled := env.GetBool(KEY_APP_MAINTENANCE_ENABLED)
+	maintenanceFilePath := env.GetStringOrDefault(KEY_APP_MAINTENANCE_FILE_PATH, "maintenance_mode_state.json")
+
 	return appSettings{
-		name:         name,
-		url:          url,
-		host:         host,
-		port:         port,
-		env:          appEnv,
-		debug:        debug,
-		cmsMcpApiKey: cmsMcpApiKey,
+		name:                name,
+		url:                 url,
+		host:                host,
+		port:                port,
+		env:                 appEnv,
+		debug:               debug,
+		cmsMcpApiKey:        cmsMcpApiKey,
+		maintenanceEnabled:  maintenanceEnabled,
+		maintenanceFilePath: maintenanceFilePath,
 	}
 }
 
 type appSettings struct {
-	name         string
-	url          string
-	host         string
-	port         string
-	env          string
-	debug        bool
-	cmsMcpApiKey string
+	name                string
+	url                 string
+	host                string
+	port                string
+	env                 string
+	debug               bool
+	cmsMcpApiKey        string
+	maintenanceEnabled  bool
+	maintenanceFilePath string
 }
