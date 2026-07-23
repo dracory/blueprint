@@ -45,6 +45,8 @@ func NewSecurityHeadersMiddleware(app app.AppInterface) rtr.MiddlewareInterface 
 				"https://sfs.ams3.digitaloceanspaces.com",
 				"https://lesichkov.ams3.digitaloceanspaces.com",
 				"https://provedexpert.gitlab.io",
+				"https://picsum.photos",
+				"https://fastly.picsum.photos",
 			},
 			UpgradeInsecureRequests: !isDevelopment,
 		},
