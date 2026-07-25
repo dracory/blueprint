@@ -13,8 +13,8 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Database Driver
 	//
 	// The database driver to use for the application.
-	// Supported values: sqlite, postgres, mysql
-	driver := env.GetStringOrError(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, postgres)")
+	// Supported values: sqlite, turso, postgres, mysql
+	driver := env.GetStringOrError(KEY_DB_DRIVER, "select the database driver (e.g., sqlite, turso, postgres)")
 
 	// Default connection name
 	//
@@ -24,14 +24,14 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Database Host
 	//
 	// The hostname or IP address of the database server.
-	// Not required when using sqlite.
+	// Not required when using sqlite or turso.
 	host := env.GetString(KEY_DB_HOST)
 
 	// Database Port
 	//
 	// The port the database server is listening on.
 	// Common defaults: postgres=5432, mysql=3306
-	// Not required when using sqlite.
+	// Not required when using sqlite or turso.
 	port := env.GetString(KEY_DB_PORT)
 
 	// Database Name
@@ -43,13 +43,13 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Database Username
 	//
 	// The username for authenticating with the database server.
-	// Not required when using sqlite.
+	// Not required when using sqlite or turso.
 	user := env.GetString(KEY_DB_USERNAME)
 
 	// Database Password
 	//
 	// The password for authenticating with the database server.
-	// Not required when using sqlite.
+	// Not required when using sqlite or turso.
 	pass := env.GetString(KEY_DB_PASSWORD)
 
 	// Direct DSN override
@@ -69,7 +69,7 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// SQLite should stay at 1 to avoid concurrent write issues.
 	// For postgres/mysql, 25 is a reasonable default for most apps.
 	maxOpenConns := env.GetIntOrDefault(KEY_DB_MAX_OPEN_CONNS, 25)
-	if driver == driverSQLite {
+	if driver == driverSQLite || driver == driverTurso {
 		maxOpenConns = 1
 	}
 
@@ -78,7 +78,7 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Maximum number of idle connections kept in the pool.
 	// Should be less than or equal to MaxOpenConns.
 	maxIdleConns := env.GetIntOrDefault(KEY_DB_MAX_IDLE_CONNS, 5)
-	if driver == driverSQLite {
+	if driver == driverSQLite || driver == driverTurso {
 		maxIdleConns = 1
 	}
 
@@ -88,7 +88,7 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// are closed and replaced. 0 means no limit.
 	// Unit: seconds. Default: 300 (5 minutes)
 	connMaxLifetime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_LIFETIME_SECONDS, 300)) * time.Second
-	if driver == driverSQLite {
+	if driver == driverSQLite || driver == driverTurso {
 		connMaxLifetime = 30 * time.Second
 	}
 
@@ -111,17 +111,17 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Example: UTC, America/New_York, Europe/London
 	timezone := env.GetStringOrDefault(KEY_DB_TIMEZONE, "UTC")
 
-	// SSL mode default for non-SQLite drivers
+	// SSL mode default for non-file-based drivers
 	sslMode := env.GetStringOrDefault(KEY_DB_SSL_MODE, "require")
-	if driver == driverSQLite {
+	if driver == driverSQLite || driver == driverTurso {
 		sslMode = ""
 	}
 
-	if driver != driverSQLite {
-		env.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite", host)
-		env.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite", port)
-		env.RequireWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite", user)
-		env.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite", pass)
+	if driver != driverSQLite && driver != driverTurso {
+		env.RequireWhen(true, KEY_DB_HOST, "required when `DB_DRIVER` is not sqlite or turso", host)
+		env.RequireWhen(true, KEY_DB_PORT, "required when `DB_DRIVER` is not sqlite or turso", port)
+		env.RequireWhen(true, KEY_DB_USERNAME, "required when `DB_DRIVER` is not sqlite or turso", user)
+		env.RequireWhen(true, KEY_DB_PASSWORD, "required when `DB_DRIVER` is not sqlite or turso", pass)
 	}
 
 	defaultConn := databaseConnectionSettings{

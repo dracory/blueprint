@@ -5,6 +5,7 @@ package app
 
 import (
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	// _ "github.com/lib/pq"
 	// _ "modernc.org/sqlite"
 )
