@@ -33,6 +33,7 @@ const APP_ENVIRONMENT_STAGING = "staging"
 const APP_ENVIRONMENT_TESTING = "testing"
 
 const driverSQLite = "sqlite"
+const driverTurso = "turso"
 
 // ============================================================================
 // == END: AppEnvironment constants

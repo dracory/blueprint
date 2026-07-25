@@ -4,7 +4,11 @@ This guide helps LLMs and developers upgrade Blueprint applications from v0.35.0
 
 ## Overview
 
-This release introduces a **Maintenance Mode** feature — a file-based, CLI-toggleable maintenance mode that returns `503 Service Unavailable` for all requests except excluded IPs and paths. The middleware is added as the **first** item in the global middleware chain so it short-circuits all processing when active.
+This release introduces two major features: **Maintenance Mode** and **Turso Database Support**. It also includes updates to 15 dracory store dependencies.
+
+**Maintenance Mode** — A file-based, CLI-toggleable maintenance mode that returns `503 Service Unavailable` for all requests except excluded IPs and paths. The middleware is added as the **first** item in the global middleware chain so it short-circuits all processing when active.
+
+**Turso Database Support** — Turso (libSQL) is now a supported database driver alongside SQLite, MySQL, and PostgreSQL. Turso is treated as SQLite-compatible — same connection pool constraints, same GORM dialector, same SSL behavior. Connections use `DB_DSN` rather than host/port/user/password.
 
 **Key Changes:**
 - New `maintenance` CLI command (`go run ./cmd/server maintenance enable|disable|status`) with aliases `on`/`down`/`off`/`up`
@@ -14,6 +18,11 @@ This release introduces a **Maintenance Mode** feature — a file-based, CLI-tog
 - New files: `internal/middlewares/maintenance_middleware.go`, `internal/cli/maintenance_handler.go` (+ test files)
 - `maintenance_mode_state.json` added to `.gitignore`
 - README and `docs/environment-variables.md` updated with maintenance mode documentation
+- New `driverTurso` constant in `internal/config/constants.go`
+- New libSQL driver import in `internal/app/dbdrivers.go`
+- `database_config.go` updated to treat `turso` identically to `sqlite` (pool settings, SSL mode, required fields)
+- New dependency: `github.com/tursodatabase/libsql-client-go`
+- 15 dracory store dependencies updated to latest versions
 
 ---
 
@@ -213,6 +222,105 @@ func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 
 ---
 
+### 4. Turso Database Driver Support
+
+**Change**: A new `turso` database driver is now supported. This required adding a new `driverTurso` constant, a new libSQL driver import, and updating all SQLite-specific checks in `database_config.go` to also handle `turso`. The `DB_DRIVER` environment variable now accepts `turso` as a valid value.
+
+**Old Code**:
+```go
+// v0.35.0 — internal/config/constants.go
+const driverSQLite = "sqlite"
+
+// v0.35.0 — internal/app/dbdrivers.go
+import (
+	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/lib/pq"
+	// _ "modernc.org/sqlite"
+)
+
+// v0.35.0 — internal/config/database_config.go
+if driver == driverSQLite {
+	maxOpenConns = 1
+}
+```
+
+**New Code**:
+```go
+// v0.36.0 — internal/config/constants.go
+const driverSQLite = "sqlite"
+const driverTurso = "turso"
+
+// v0.36.0 — internal/app/dbdrivers.go
+import (
+	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	// _ "github.com/lib/pq"
+	// _ "modernc.org/sqlite"
+)
+
+// v0.36.0 — internal/config/database_config.go
+if driver == driverSQLite || driver == driverTurso {
+	maxOpenConns = 1
+}
+```
+
+**Action Required**:
+- If you use SQLite or MySQL, no changes needed — existing drivers continue to work.
+- To use Turso, set `DB_DRIVER="turso"` and provide a libSQL DSN via `DB_DSN`.
+- If you have custom code that checks `driver == "sqlite"`, consider also checking for `"turso"` since Turso is SQLite-compatible.
+- If you have GORM-based stores with driver switches, add `"turso"` to the `"sqlite"` case:
+
+```go
+// Old
+switch driver {
+case "sqlite":
+	gdb, err = gorm.Open(sqlite.Dialector{Conn: opts.DB}, gcfg)
+
+// New
+switch driver {
+case "sqlite", "turso":
+	gdb, err = gorm.Open(sqlite.Dialector{Conn: opts.DB}, gcfg)
+```
+
+**Migration Command**:
+```bash
+# Find all SQLite-only driver checks that may need turso support
+grep -rn 'case "sqlite"' --include="*.go" . | grep -v _test.go
+```
+
+---
+
+### 5. Updated Dracory Store Dependencies
+
+**Change**: 15 dracory store dependencies were updated to their latest versions. This is a non-breaking change for most applications, but if you use replace directives for local development, you may need to update your local module versions to match.
+
+**Updated Dependencies**:
+
+| Package | Old Version | New Version |
+|---------|------------|-------------|
+| `github.com/dracory/auditstore` | v1.9.0 | v1.10.0 |
+| `github.com/dracory/auth` | v0.34.0 | v0.35.0 |
+| `github.com/dracory/blindindexstore` | v1.15.0 | v1.16.0 |
+| `github.com/dracory/blogstore` | v1.29.0 | v1.33.0 |
+| `github.com/dracory/cmsstore` | v1.35.0 | v1.40.0 |
+| `github.com/dracory/customstore` | v1.12.0 | v1.13.0 |
+| `github.com/dracory/entitystore` | v1.12.0 | v1.13.0 |
+| `github.com/dracory/feedstore` | v1.3.0 | v1.4.0 |
+| `github.com/dracory/geostore` | v1.8.0 | v1.9.0 |
+| `github.com/dracory/logstore` | v1.20.0 | v1.22.0 |
+| `github.com/dracory/metastore` | v1.9.0 | v1.10.0 |
+| `github.com/dracory/neat` | v0.31.0 | v0.33.0 |
+| `github.com/dracory/sessionstore` | v1.17.0 | v1.18.0 |
+| `github.com/dracory/sqlfilestore` | v1.8.0 | v1.9.0 |
+| `github.com/dracory/statsstore` | v1.9.0 | v1.14.0 |
+
+**Action Required**:
+- Run `go mod tidy` to sync indirect dependencies.
+- Run `go build ./...` to verify compatibility.
+- If you have replace directives pointing to local copies, ensure your local modules are compatible with the new versions.
+
+---
+
 ## 🔄 Migration Steps
 
 ### Step 1: Update Custom `AppConfigInterface` Implementations
@@ -250,7 +358,32 @@ If missing, add:
 maintenance_mode_state.json
 ```
 
-### Step 4: Verify Build
+### Step 4: Add Turso Driver Dependency (If Using Turso)
+
+If you plan to use Turso, ensure the libSQL driver is available:
+
+```bash
+go get github.com/tursodatabase/libsql-client-go/libsql
+```
+
+Then set in your `.env`:
+```bash
+DB_DRIVER="turso"
+DB_DSN="libsql://your-database-url"
+DB_DATABASE="your-database-name"
+```
+
+Note: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, and `DB_PASSWORD` are **not required** when using Turso.
+
+### Step 5: Update Store Dependencies
+
+Run `go mod tidy` to sync all updated store dependencies:
+
+```bash
+go mod tidy
+```
+
+### Step 6: Verify Build
 
 ```bash
 go build ./...
@@ -306,6 +439,14 @@ go run ./cmd/server maintenance up
 4. Remove the env var or set to `false`
 5. Verify normal traffic resumes
 
+### 5. Test Turso Database Connection (If Using Turso)
+
+1. Set `DB_DRIVER="turso"` and `DB_DSN="libsql://your-database-url"` in your `.env`
+2. Run `go build ./...` to verify compilation
+3. Start the server: `go run ./cmd/server`
+4. Verify database operations work (migrations, queries, etc.)
+5. Verify connection pool settings (maxOpenConns=1, maxIdleConns=1)
+
 ---
 
 ## 📝 Additional Notes
@@ -347,6 +488,18 @@ go run ./cmd/server maintenance up
 |----------|----------|---------|-------------|
 | `APP_MAINTENANCE_ENABLED` | No | `false` | Enable maintenance mode via env var (returns 503 for all requests except excluded IPs/paths) |
 | `APP_MAINTENANCE_FILE_PATH` | No | `maintenance_mode_state.json` | Path to the maintenance state JSON file |
+| `DB_DRIVER` | Yes | `sqlite` | Now accepts `turso` as a valid value (in addition to `sqlite`, `mysql`, `postgres`) |
+
+### Turso Driver Details
+
+- **Driver name**: `turso`
+- **Go SQL driver**: `github.com/tursodatabase/libsql-client-go/libsql` (registered via blank import in `internal/app/dbdrivers.go`)
+- **Connection**: Uses `DB_DSN` with `libsql://` scheme (e.g., `libsql://your-db.turso.io`)
+- **Connection pool**: Same as SQLite (maxOpenConns=1, maxIdleConns=1, connMaxLifetime=30s)
+- **SSL mode**: Empty (not applicable)
+- **Required env vars**: `DB_DRIVER`, `DB_DATABASE` (or `DB_DSN`)
+- **Not required**: `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`
+- **GORM compatibility**: Turso uses the SQLite GORM dialector (libSQL is SQLite-compatible)
 
 ---
 
@@ -386,6 +539,35 @@ cannot use &myConfig{} as config.AppConfigInterface in assignment:
 - `/api/health` matches only the exact path `/api/health`
 - `/api/*` matches all paths under `/api/`
 
+### Issue 5: Turso Driver Not Found
+
+**Symptom**: After setting `DB_DRIVER="turso"`, you get a connection error like `driver: bad connection` or `unknown driver`.
+
+**Solution**:
+1. Verify the libSQL driver is imported in `internal/app/dbdrivers.go`:
+   ```go
+   import (
+       _ "github.com/tursodatabase/libsql-client-go/libsql"
+   )
+   ```
+2. Run `go mod tidy` to ensure the dependency is downloaded.
+3. Verify `DB_DSN` is set to a valid `libsql://` URL.
+
+### Issue 6: GORM Store Fails with Turso Driver
+
+**Symptom**: A GORM-based store returns an error like `unsupported driver: turso`.
+
+**Solution**: Update the driver switch in the store to include `"turso"` in the `"sqlite"` case:
+```go
+// Old
+case "sqlite":
+	gdb, err = gorm.Open(sqlite.Dialector{Conn: opts.DB}, gcfg)
+
+// New
+case "sqlite", "turso":
+	gdb, err = gorm.Open(sqlite.Dialector{Conn: opts.DB}, gcfg)
+```
+
 ---
 
 ## Support
@@ -394,4 +576,6 @@ For issues or questions about this upgrade:
 - Review the maintenance mode proposal: `docs/proposals/maintenance-mode.md`
 - Check the maintenance middleware source: `internal/middlewares/maintenance_middleware.go`
 - Check the CLI handler source: `internal/cli/maintenance_handler.go`
+- Check the Turso driver registration: `internal/app/dbdrivers.go`
+- Check the database config: `internal/config/database_config.go`
 - Open an issue on the [Blueprint repository](https://github.com/dracory/blueprint)
