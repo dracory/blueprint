@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"time"
 
 	"project/internal/cache"
 	"project/internal/config"
@@ -115,6 +116,15 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Explicitly apply connection pool settings to the *sql.DB.
+	// This guarantees the pool config is applied regardless of whether
+	// the neat package applies it internally. Critical for Turso/libsql
+	// where stale HTTP/2 connections cause "stream is closed" errors.
+	db.SetMaxOpenConns(cfg.GetDatabaseMaxOpenConns())
+	db.SetMaxIdleConns(cfg.GetDatabaseMaxIdleConns())
+	db.SetConnMaxLifetime(time.Duration(cfg.GetDatabaseConnMaxLifetimeSeconds()) * time.Second)
+	db.SetConnMaxIdleTime(time.Duration(cfg.GetDatabaseConnMaxIdleTimeSeconds()) * time.Second)
 
 	// Build app instance
 	app := &appImplementation{cfg: cfg}
