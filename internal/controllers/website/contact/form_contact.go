@@ -386,7 +386,7 @@ func cryptoRandIntn(n int) int {
 		return 0
 	}
 	v := binary.BigEndian.Uint64(buf[:])
-	return int(v % uint64(n))
+	return int(v % uint64(n)) // #nosec G115 -- n is bounded to 5, no overflow risk
 }
 
 func init() {

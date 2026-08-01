@@ -46,7 +46,7 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
 
-	data, err := os.ReadFile(filePath) // #nosec G304 -- filePath is from SaveToTempDir, not user-controlled
+	data, err := os.ReadFile(filePath) // #nosec G703 G304 -- filePath is from SaveToTempDir, not user-controlled
 	if err != nil {
 		return api.Error(err.Error()).ToString()
 	}
