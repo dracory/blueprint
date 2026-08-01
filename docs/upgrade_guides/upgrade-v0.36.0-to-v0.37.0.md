@@ -4,15 +4,17 @@ This guide helps LLMs and developers upgrade Blueprint applications from v0.36.0
 
 ## Overview
 
-This release focuses on **Turso connection pool stability** and **security hardening**. There are no new features, environment variables, or interface changes — the upgrade is low-risk and mostly behavioral.
+This release focuses on **Turso connection pool stability**, **security hardening**, and a **Go version bump**. There are no new features, environment variables, or interface changes — the upgrade is low-risk and mostly behavioral.
 
-**Turso Pool Refinement** — Turso (libSQL) no longer shares SQLite's restrictive pool settings. It now gets its own tuned profile (`maxOpenConns=5`, `maxIdleConns=0`, `connMaxLifetime=10s`, `connMaxIdleTime=2s`) suited to Turso's HTTP/2-backed connections. Additionally, the app bootstrap now **explicitly applies** the configured pool settings to the underlying `*sql.DB`, guaranteeing they take effect regardless of whether the `neat` ORM package applies them internally. This fixes intermittent `stream is closed` errors on Turso.
+**Turso Pool Refinement** — Turso (libSQL) no longer shares SQLite's restrictive pool settings. It now gets its own tuned profile (`maxOpenConns=5`, `maxIdleConns=0`, `connMaxLifetime=10s`, `connMaxIdleTime=2s`) suited to Turso's HTTP/2-backed connections. Additionally, the app bootstrap now **explicitly applies** the configured pool settings to the underlying `*sql.DB`, guaranteeing they take effect regardless of whether the `neat` ORM package applies them internally. This fixes intermittent `stream is closed` errors on Turso. The explicit application also defaults SQLite pool settings to 1 when unset (zero), which fixes in-memory SQLite test failures where the DB vanishes between queries.
 
 **Security Hardening** — A pass over gosec findings added justified `#nosec` suppressions, tightened file permissions, switched the contact-form captcha from `math/rand` to `crypto/rand`, added `Secure`/`SameSite` flags to the AI browser auto-login cookie, escaped a user-influenced string in the CDN controller, and replaced manual JSON string concatenation in the shop admin with a safe `writeJSONError` helper. The `gosec` task now runs at `-severity medium`, and a new `govulncheck` task scans dependencies against the Go vulnerability database.
 
 **Key Changes:**
+- Go version bumped from `1.26.3` to `1.26.5` in `go.mod`
 - Turso gets distinct connection pool settings in `internal/config/database_config.go`
-- `internal/app/app_implementation.go` explicitly applies pool settings to `*sql.DB` after `databaseOpen`
+- `internal/app/app_implementation.go` explicitly applies pool settings to `*sql.DB` after `databaseOpen`, with SQLite zero-default fallback
+- All dependencies updated to latest versions (`go get -u ./...`)
 - `github.com/dracory/llm` bumped from `v1.3.0` to `v1.4.0`
 - Contact-form captcha uses `crypto/rand` via new `cryptoRandIntn` helper
 - AI browser auto-login cookie gains `Secure: true` and `SameSite: http.SameSiteLaxMode`
@@ -104,6 +106,8 @@ grep -rn "driverSQLite || driver == driverTurso" --include="*.go" .
 
 **Change**: `internal/app/app_implementation.go` now calls `db.SetMaxOpenConns`, `db.SetMaxIdleConns`, `db.SetConnMaxLifetime`, and `db.SetConnMaxIdleTime` directly on the `*sql.DB` returned by `neatDB.DB()`, immediately after opening the database. Previously, the app relied on the `neat` package to apply these settings internally. This guarantees the configured pool is always in effect, which is critical for Turso/libSQL where stale HTTP/2 connections cause `stream is closed` errors.
 
+Additionally, when the driver is SQLite and pool settings are unset (0), `app.New()` defaults `MaxOpenConns` and `MaxIdleConns` to 1. This is important for tests: `config.New()` (used in test setups) doesn't run `databaseConfig()` and leaves pool settings at zero. With `MaxIdleConns=0`, every returned connection is closed immediately, causing in-memory SQLite (`mode=memory&cache=shared`) to be destroyed between queries — migrations fail with `no such table: migration_tracker`. The zero-default fallback fixes this automatically for all callers of `app.New()`.
+
 **Old Code**:
 ```go
 // v0.36.0 — internal/app/app_implementation.go
@@ -128,8 +132,25 @@ if err != nil {
 // This guarantees the pool config is applied regardless of whether
 // the neat package applies it internally. Critical for Turso/libsql
 // where stale HTTP/2 connections cause "stream is closed" errors.
-db.SetMaxOpenConns(cfg.GetDatabaseMaxOpenConns())
-db.SetMaxIdleConns(cfg.GetDatabaseMaxIdleConns())
+//
+// SQLite defaults: when pool settings are unset (0), default to a single
+// connection. In-memory SQLite (mode=memory&cache=shared) is destroyed
+// when the last connection closes, so MaxIdleConns=0 (no retained idle
+// connections) causes the DB to vanish between queries. This is
+// especially relevant for tests using config.New() which doesn't run
+// databaseConfig() and leaves pool settings at zero.
+maxOpen := cfg.GetDatabaseMaxOpenConns()
+maxIdle := cfg.GetDatabaseMaxIdleConns()
+if strings.EqualFold(cfg.GetDatabaseDriver(), "sqlite") {
+	if maxOpen == 0 {
+		maxOpen = 1
+	}
+	if maxIdle == 0 {
+		maxIdle = 1
+	}
+}
+db.SetMaxOpenConns(maxOpen)
+db.SetMaxIdleConns(maxIdle)
 db.SetConnMaxLifetime(time.Duration(cfg.GetDatabaseConnMaxLifetimeSeconds()) * time.Second)
 db.SetConnMaxIdleTime(time.Duration(cfg.GetDatabaseConnMaxIdleTimeSeconds()) * time.Second)
 
@@ -138,9 +159,10 @@ app := &appImplementation{cfg: cfg}
 ```
 
 **Action Required**:
-- If you use the built-in `app.New()`, no action needed.
-- If you have a **custom** app constructor or bypass `app.New()` (e.g., you open the database and build the app instance manually), add the four `db.Set*` calls after obtaining the `*sql.DB`. This requires importing the `time` package if not already imported.
+- If you use the built-in `app.New()`, no action needed — the explicit pool application and SQLite zero-default fallback are already in place.
+- If you have a **custom** app constructor or bypass `app.New()` (e.g., you open the database and build the app instance manually), add the pool-setting logic above after obtaining the `*sql.DB`. This requires importing the `time` and `strings` packages if not already imported.
 - The config interface methods used (`GetDatabaseMaxOpenConns`, `GetDatabaseMaxIdleConns`, `GetDatabaseConnMaxLifetimeSeconds`, `GetDatabaseConnMaxIdleTimeSeconds`) already existed in v0.36.0, so no interface changes are required.
+- **Test setups**: If you have test helpers that call `app.New()` with SQLite and previously pinned pool settings manually (e.g., `cfg.SetDatabaseMaxOpenConns(1)` / `cfg.SetDatabaseMaxIdleConns(1)`), you can remove those manual pins — `app.New()` now handles it automatically.
 
 ---
 
@@ -263,6 +285,47 @@ http.SetCookie(w, &http.Cookie{
 
 ---
 
+### 6. Go Version Bumped to 1.26.5
+
+**Change**: The `go` directive in `go.mod` was bumped from `1.26.3` to `1.26.5`. This aligns with the Go toolchain used to build and test this release.
+
+**Old `go.mod`**:
+```go
+go 1.26.3
+```
+
+**New `go.mod`**:
+```go
+go 1.26.5
+```
+
+**Action Required**:
+- Ensure you have Go 1.26.5 or later installed (`go version`).
+- Update your `go.mod` directive:
+  ```bash
+  go mod edit -go=1.26.5
+  ```
+  Or manually edit `go.mod` and change the `go` line.
+- If your CI pipeline pins a specific Go version, update it to 1.26.5 or later.
+
+---
+
+### 7. All Dependencies Updated to Latest
+
+**Change**: All dependencies in `go.mod` were updated to their latest versions via `go get -u ./...` followed by `go mod tidy`. This includes the `github.com/dracory/llm` bump (v1.3.0 → v1.4.0) documented in Breaking Change #3, plus updates to many `dracory/*` store packages, `modernc.org/sqlite`, Google Cloud libraries, and other indirect dependencies.
+
+**Action Required**:
+- Update all dependencies:
+  ```bash
+  go get -u ./...
+  go mod tidy
+  ```
+- Review the resulting `go.mod` / `go.sum` diff for any unexpected version jumps.
+- If your application code directly imports any of the updated packages, verify it still compiles and tests pass.
+- If you maintain a vendored copy of dependencies, regenerate it after updating.
+
+---
+
 ## 🔄 Migration Steps
 
 ### Step 1: Update the version constant
@@ -273,10 +336,16 @@ Update `internal/config/version.go`:
 const Version = "0.37.0"
 ```
 
-### Step 2: Update dependencies
+### Step 2: Update Go version and dependencies
 
+Update the `go` directive in `go.mod`:
 ```bash
-go get github.com/dracory/llm@v1.4.0
+go mod edit -go=1.26.5
+```
+
+Update all dependencies to latest:
+```bash
+go get -u ./...
 go mod tidy
 ```
 
@@ -296,10 +365,23 @@ If you have a custom `databaseConfig()` or any code that groups `driverTurso` wi
 If you bypass `app.New()`, add after obtaining the `*sql.DB`:
 
 ```go
-import "time"
+import (
+	"strings"
+	"time"
+)
 
-db.SetMaxOpenConns(cfg.GetDatabaseMaxOpenConns())
-db.SetMaxIdleConns(cfg.GetDatabaseMaxIdleConns())
+maxOpen := cfg.GetDatabaseMaxOpenConns()
+maxIdle := cfg.GetDatabaseMaxIdleConns()
+if strings.EqualFold(cfg.GetDatabaseDriver(), "sqlite") {
+	if maxOpen == 0 {
+		maxOpen = 1
+	}
+	if maxIdle == 0 {
+		maxIdle = 1
+	}
+}
+db.SetMaxOpenConns(maxOpen)
+db.SetMaxIdleConns(maxIdle)
 db.SetConnMaxLifetime(time.Duration(cfg.GetDatabaseConnMaxLifetimeSeconds()) * time.Second)
 db.SetConnMaxIdleTime(time.Duration(cfg.GetDatabaseConnMaxIdleTimeSeconds()) * time.Second)
 ```
@@ -396,7 +478,17 @@ go test ./...
 
 All existing tests should pass without modification — this release contains no interface or API signature changes.
 
-### 2. Test Turso Connection Pool (If Using Turso)
+### 2. Test SQLite In-Memory Database (Tests)
+
+The SQLite zero-default fallback in `app.New()` ensures in-memory SQLite databases stay alive between queries in tests. If you previously had manual `cfg.SetDatabaseMaxOpenConns(1)` / `cfg.SetDatabaseMaxIdleConns(1)` calls in your test helpers, you can remove them — `app.New()` now handles this automatically.
+
+```bash
+go test ./...
+```
+
+Verify no `no such table: migration_tracker` or `no such table: snv_files_file` errors appear.
+
+### 3. Test Turso Connection Pool (If Using Turso)
 
 1. Set `DB_DRIVER="turso"` and `DB_DSN="libsql://your-database-url"` in your `.env`.
 2. Start the server: `go run ./cmd/server`.
@@ -408,14 +500,14 @@ All existing tests should pass without modification — this release contains no
    fmt.Println("maxOpen:", db.Stats().MaxOpenConnections)
    ```
 
-### 3. Test AI Browser Auto-Login Over HTTPS
+### 4. Test AI Browser Auto-Login Over HTTPS
 
 1. Run the server behind HTTPS (e.g., `mkcert localhost` + TLS config, or `ngrok http 8080`).
 2. Trigger the AI browser auto-login flow.
 3. Verify the session cookie is set in the browser (check DevTools → Application → Cookies; `Secure` and `SameSite=Lax` should be present).
 4. Confirm the cookie is **not** set when accessing over plain `http://` (expected behavior with `Secure: true`).
 
-### 4. Test Contact Form Captcha
+### 5. Test Contact Form Captcha
 
 1. Load the contact form page.
 2. Verify the math captcha renders (e.g., "3 + 5 =").
@@ -423,12 +515,12 @@ All existing tests should pass without modification — this release contains no
 4. Submit with the wrong answer — should fail with a captcha error.
 5. Submit multiple times — verify the captcha values vary (crypto/rand produces different values each render).
 
-### 5. Test CDN Error Escaping
+### 6. Test CDN Error Escaping
 
 1. Request a CDN URL with an unsupported extension containing HTML characters, e.g. `/cdn/file.<script>`.
 2. Verify the response body contains the escaped string `Extension &lt;script&gt; not supported` and **not** raw `<script>`.
 
-### 6. Run Security Scans
+### 7. Run Security Scans
 
 ```bash
 # Install govulncheck if not present
@@ -473,6 +565,8 @@ Turso connects over HTTP/2 to a remote edge database. SQLite's `maxOpenConns=1` 
 ### Why Pool Settings Are Now Applied Explicitly
 
 The `neat` ORM wrapper may or may not forward pool settings to the underlying `*sql.DB` depending on its version and configuration. By calling `db.Set*` directly in `app.New()`, Blueprint removes that uncertainty. This is especially important for Turso, where the wrong pool settings manifest as intermittent runtime errors rather than compile-time failures.
+
+The SQLite zero-default fallback (defaulting `MaxOpenConns` and `MaxIdleConns` to 1 when unset) was added as part of this explicit application. It addresses a test-only issue: `config.New()` (used in test setups) doesn't run `databaseConfig()` and leaves pool settings at zero, which causes in-memory SQLite databases to be destroyed between queries. Centralizing the fix in `app.New()` means all test setups — including future ones — automatically get the correct behavior without needing to remember to pin pool settings manually.
 
 ---
 
@@ -524,15 +618,37 @@ The `neat` ORM wrapper may or may not forward pool settings to the underlying `*
 
 **Solution**: Review the [llm changelog](https://github.com/dracory/llm) for breaking changes between v1.3.0 and v1.4.0 and update your call sites accordingly. Blueprint itself does not directly use llm APIs in a way that broke, so if you only consume llm through Blueprint-provided wrappers, no changes should be needed. Run `go mod tidy` to ensure the dependency graph is consistent.
 
+### Issue 6: Tests Fail with `no such table: migration_tracker` on SQLite
+
+**Symptom**: After upgrading, tests that use in-memory SQLite fail with errors like `no such table: migration_tracker` or `no such table: snv_files_file`.
+
+**Solution**: This happens when a test setup bypasses `app.New()` or uses a custom app constructor that doesn't include the SQLite zero-default fallback. The in-memory SQLite database (`mode=memory&cache=shared`) is destroyed when the last connection closes, and with `MaxIdleConns=0` (the default from `config.New()`), every returned connection is closed immediately.
+
+1. If your test calls `app.New()`, ensure you're using the updated `app.New()` which includes the SQLite zero-default fallback.
+2. If you have a **custom** app constructor, add the SQLite zero-default logic (see Breaking Change #2 / Step 4):
+   ```go
+   if strings.EqualFold(cfg.GetDatabaseDriver(), "sqlite") {
+       if maxOpen == 0 { maxOpen = 1 }
+       if maxIdle == 0 { maxIdle = 1 }
+   }
+   ```
+3. Alternatively, pin the pool settings manually in your test config:
+   ```go
+   cfg.SetDatabaseMaxOpenConns(1)
+   cfg.SetDatabaseMaxIdleConns(1)
+   ```
+   (This is what `app.New()` does automatically — only needed if you bypass it.)
+
 ---
 
 ## Support
 
 For issues or questions about this upgrade:
 - Check the Turso pool config: `internal/config/database_config.go`
-- Check the explicit pool application: `internal/app/app_implementation.go`
+- Check the explicit pool application with SQLite defaults: `internal/app/app_implementation.go`
 - Check the contact-form captcha helper: `internal/controllers/website/contact/form_contact.go`
 - Check the AI browser auto-login cookie: `internal/middlewares/ai_browser_auto_login.go`
 - Check the shop admin JSON error helper: `pkg/shopadmin/product_update/product_update_controller.go`
 - Check the security task definitions: `taskfile.yml`
+- Check the Go version and dependencies: `go.mod`
 - Open an issue on the [Blueprint repository](https://github.com/dracory/blueprint)

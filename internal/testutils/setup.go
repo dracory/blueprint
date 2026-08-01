@@ -349,7 +349,7 @@ func Setup(options ...SetupOption) app.AppInterface {
 // 		LogToStdout:       false, // enable if you have errors sending emails
 // 		LogServerActivity: true,
 // 		PortNumber:        32435,
-// 		HostAddress:       "127.0.0.1",
+// 		HostAddress:        "127.0.0.1",
 // 	})
 
 // 	if err := mailServer.Start(); err != nil {
