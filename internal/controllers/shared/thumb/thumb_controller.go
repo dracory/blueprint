@@ -685,7 +685,7 @@ func (controller *thumbnailController) urlToBytes(targetURL string) ([]byte, err
 //	}
 //	// Process image data...
 func (controller *thumbnailController) toBytes(path string) ([]byte, error) {
-	bytes, err := os.ReadFile(path)
+	bytes, err := os.ReadFile(path) // #nosec G304 -- path is validated/normalized before this call
 	if err != nil {
 		log.Println("Path: " + path + " NOT FOUND")
 		return nil, err

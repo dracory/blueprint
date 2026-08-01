@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"project/internal/cache"
 	"project/internal/config"
@@ -96,7 +98,7 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	// Caches (instance-scoped)
 	memoryCache := ttlcache.New[string, any]()
 	cacheDir := cacheDirectory()
-	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(cacheDir, 0750); err != nil {
 		return nil, err
 	}
 	fileCache := file.New(cacheDir)
@@ -115,6 +117,32 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Explicitly apply connection pool settings to the *sql.DB.
+	// This guarantees the pool config is applied regardless of whether
+	// the neat package applies it internally. Critical for Turso/libsql
+	// where stale HTTP/2 connections cause "stream is closed" errors.
+	//
+	// SQLite defaults: when pool settings are unset (0), default to a single
+	// connection. In-memory SQLite (mode=memory&cache=shared) is destroyed
+	// when the last connection closes, so MaxIdleConns=0 (no retained idle
+	// connections) causes the DB to vanish between queries. This is
+	// especially relevant for tests using config.New() which doesn't run
+	// databaseConfig() and leaves pool settings at zero.
+	maxOpen := cfg.GetDatabaseMaxOpenConns()
+	maxIdle := cfg.GetDatabaseMaxIdleConns()
+	if strings.EqualFold(cfg.GetDatabaseDriver(), "sqlite") {
+		if maxOpen == 0 {
+			maxOpen = 1
+		}
+		if maxIdle == 0 {
+			maxIdle = 1
+		}
+	}
+	db.SetMaxOpenConns(maxOpen)
+	db.SetMaxIdleConns(maxIdle)
+	db.SetConnMaxLifetime(time.Duration(cfg.GetDatabaseConnMaxLifetimeSeconds()) * time.Second)
+	db.SetConnMaxIdleTime(time.Duration(cfg.GetDatabaseConnMaxIdleTimeSeconds()) * time.Second)
 
 	// Build app instance
 	app := &appImplementation{cfg: cfg}

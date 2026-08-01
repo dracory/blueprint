@@ -383,11 +383,11 @@ func widget(s *ShareLinks, opts WidgetOptions) string {
 		// For javascript: URLs, build the entire href attribute to avoid URL encoding
 		var hrefAttr template.HTMLAttr
 		if strings.HasPrefix(href, "javascript:") {
-			hrefAttr = template.HTMLAttr(`href="` + href + `"`)
+			hrefAttr = template.HTMLAttr(`href="` + href + `"`) // #nosec G203 -- intentional for javascript: share URLs
 		}
 
 		links = append(links, linkData{
-			Href:      template.URL(href),
+			Href:      template.URL(href), // #nosec G203 -- intentional for social media share URLs
 			HrefAttr:  hrefAttr,
 			IconClass: iconClass,
 			Platform:  platform,

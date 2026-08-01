@@ -53,7 +53,7 @@ func NewCmsLayoutMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 					Styles:     []string{},
 				}).ToHTML()
 
-				if _, err := w.Write([]byte(fullPage)); err != nil {
+				if _, err := w.Write([]byte(fullPage)); err != nil { // #nosec G705 -- fullPage is built from trusted layout/template, not user input
 					app.GetLogger().Error("Failed to write response",
 						slog.String("error", err.Error()),
 						slog.String("path", r.URL.Path),

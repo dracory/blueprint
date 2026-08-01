@@ -79,7 +79,7 @@ func handleMaintenanceEnable(app app.AppInterface, args []string) error {
 		return fmt.Errorf("failed to marshal maintenance state: %w", err)
 	}
 
-	if err := os.WriteFile(filePath, data, 0644); err != nil {
+	if err := os.WriteFile(filePath, data, 0600); err != nil {
 		return fmt.Errorf("failed to write maintenance file '%s': %w", filePath, err)
 	}
 
@@ -119,7 +119,7 @@ func handleMaintenanceDisable(app app.AppInterface) error {
 func handleMaintenanceStatus(app app.AppInterface) error {
 	filePath := getMaintenanceFilePath(app)
 
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(filePath) // #nosec G304 -- filePath is from getMaintenanceFilePath, not user input
 	if err != nil {
 		if os.IsNotExist(err) {
 			fmt.Println("Maintenance mode: OFF")

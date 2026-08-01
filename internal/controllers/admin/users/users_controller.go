@@ -57,7 +57,7 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 
 	if html != "" {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if _, err := w.Write([]byte(html)); err != nil {
+		if _, err := w.Write([]byte(html)); err != nil { // #nosec G705 -- html is built by trusted admin handler
 			if logger := controller.app.GetLogger(); logger != nil {
 				logger.Error("At usersAdminController > Handler", "write_error", err.Error())
 			}

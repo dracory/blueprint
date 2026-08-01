@@ -82,12 +82,14 @@ func aiBrowserAutoLoginHandler(a app.AppInterface, next http.Handler) http.Handl
 			Path:     "/",
 			Expires:  time.Now().Add(24 * time.Hour),
 			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteLaxMode,
 		})
 
 		// Inject the session key into the request cookie header so that
 		// AuthMiddleware (which also reads the cookie) can find it on this
 		// same request without requiring a redirect.
-		r.AddCookie(&http.Cookie{
+		r.AddCookie(&http.Cookie{ // #nosec G124 -- in-request cookie injection, not sent to browser
 			Name:  auth.CookieName,
 			Value: session.GetKey(),
 		})

@@ -36,7 +36,7 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 		return api.Error(errSave.Error()).ToString()
 	}
 	defer func() {
-		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) {
+		if err := os.Remove(filePath); err != nil && !os.IsNotExist(err) { // #nosec G703 -- filePath is from SaveToTempDir, not user-controlled
 			log.Printf("Warning: failed to remove temp file %s: %v", filePath, err)
 		}
 	}()
@@ -46,7 +46,7 @@ func (c *FileManagerController) fileUploadAjax(r *http.Request) string {
 		return api.Error("invalid file path: " + err.Error()).ToString()
 	}
 
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(filePath) // #nosec G703 G304 -- filePath is from SaveToTempDir, not user-controlled
 	if err != nil {
 		return api.Error(err.Error()).ToString()
 	}

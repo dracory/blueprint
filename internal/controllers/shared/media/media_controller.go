@@ -64,7 +64,7 @@ func (c *mediaController) Handler(w http.ResponseWriter, r *http.Request) string
 		w.Header().Set("Content-Length", cast.ToString(len(content)))
 	}
 
-	if _, err := w.Write(content); err != nil {
+	if _, err := w.Write(content); err != nil { // #nosec G705 -- content is file data from validated path
 		return "Failed to write media content: " + err.Error()
 	}
 

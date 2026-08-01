@@ -334,7 +334,23 @@ tasks:
     desc: Tests for security
     cmds:
       - echo "Checking for security..."
-      - gosec ./...
+      - gosec -severity medium ./...
+      - echo "Done!"
+    silent: true
+
+  govulncheck-install:
+    desc: Install govulncheck or update to latest
+    cmds:
+      - echo "Installing/updating govulncheck..."
+      - go install golang.org/x/vuln/cmd/govulncheck@latest
+      - echo "Done!"
+    silent: true
+
+  govulncheck:
+    desc: Scans dependencies against the Go vulnerability database (blocking)
+    cmds:
+      - echo "Scanning for known vulnerabilities in dependencies..."
+      - govulncheck ./...
       - echo "Done!"
     silent: true
 

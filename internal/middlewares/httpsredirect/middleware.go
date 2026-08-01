@@ -137,7 +137,7 @@ func NewHTTPSRedirectMiddlewareWithConfig(config Config) rtr.MiddlewareInterface
 				}
 
 				target := "https://" + r.Host + r.URL.RequestURI()
-				http.Redirect(w, r, target, http.StatusMovedPermanently)
+				http.Redirect(w, r, target, http.StatusMovedPermanently) // #nosec G710 -- redirecting to HTTPS of same host is intended
 			})
 		})
 }

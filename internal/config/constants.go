@@ -105,7 +105,7 @@ const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 
 const KEY_AUTH_REGISTRATION_ENABLED = "AUTH_REGISTRATION_ENABLED"
 const KEY_AUTH_EMAILS_ALLOWED_ACCESS = "AUTH_EMAILS_ALLOWED_ACCESS"
-const KEY_AUTH_CSRF_SECRET = "AUTH_CSRF_SECRET"
+const KEY_AUTH_CSRF_SECRET = "AUTH_CSRF_SECRET" // #nosec G101 -- this is an env var key name, not a credential
 const KEY_AUTH_PASSWORD_AUTH_ENABLED = "AUTH_PASSWORD_AUTH_ENABLED"
 
 // ============================================================================

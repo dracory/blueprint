@@ -160,14 +160,14 @@ func (c *mediaManagerController) fileUploadAjax(r *http.Request) string {
 		return api.Error(errSave.Error()).ToString()
 	}
 	defer func() {
-		if removeErr := os.Remove(filePath); removeErr != nil {
+		if removeErr := os.Remove(filePath); removeErr != nil { // #nosec G703 -- filePath is from SaveToTempDir, not user-controlled
 			log.Println(removeErr.Error())
 		}
 	}() // Cleanup
 
 	remoteFilePath := currentDir + "/" + fileHeader.Filename
 
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(filePath) // #nosec G703 G304 -- filePath is from SaveToTempDir, not user-controlled
 	if err != nil {
 		return api.Error(err.Error()).ToString()
 	}

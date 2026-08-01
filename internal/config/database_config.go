@@ -69,8 +69,11 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// SQLite should stay at 1 to avoid concurrent write issues.
 	// For postgres/mysql, 25 is a reasonable default for most apps.
 	maxOpenConns := env.GetIntOrDefault(KEY_DB_MAX_OPEN_CONNS, 25)
-	if driver == driverSQLite || driver == driverTurso {
+	if driver == driverSQLite {
 		maxOpenConns = 1
+	}
+	if driver == driverTurso {
+		maxOpenConns = 5
 	}
 
 	// Connection Pool - Max Idle Connections
@@ -78,8 +81,11 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// Maximum number of idle connections kept in the pool.
 	// Should be less than or equal to MaxOpenConns.
 	maxIdleConns := env.GetIntOrDefault(KEY_DB_MAX_IDLE_CONNS, 5)
-	if driver == driverSQLite || driver == driverTurso {
+	if driver == driverSQLite {
 		maxIdleConns = 1
+	}
+	if driver == driverTurso {
+		maxIdleConns = 0
 	}
 
 	// Connection Pool - Max Connection Lifetime
@@ -88,8 +94,11 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// are closed and replaced. 0 means no limit.
 	// Unit: seconds. Default: 300 (5 minutes)
 	connMaxLifetime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_LIFETIME_SECONDS, 300)) * time.Second
-	if driver == driverSQLite || driver == driverTurso {
+	if driver == driverSQLite {
 		connMaxLifetime = 30 * time.Second
+	}
+	if driver == driverTurso {
+		connMaxLifetime = 10 * time.Second
 	}
 
 	// Connection Pool - Max Connection Idle Time
@@ -98,6 +107,9 @@ func databaseConfig(env *envValidator) databaseSettings {
 	// 0 means no limit.
 	// Unit: seconds. Default: 5
 	connMaxIdleTime := time.Duration(env.GetIntOrDefault(KEY_DB_CONN_MAX_IDLE_TIME_SECONDS, 5)) * time.Second
+	if driver == driverTurso {
+		connMaxIdleTime = 2 * time.Second
+	}
 
 	// Database Charset
 	//

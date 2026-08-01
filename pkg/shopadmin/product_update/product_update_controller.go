@@ -342,6 +342,15 @@ func (controller *productUpdateController) handleSaveMedia(w http.ResponseWriter
 	return ""
 }
 
+// writeJSONError writes a JSON error response with proper escaping to prevent XSS.
+func writeJSONError(w http.ResponseWriter, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	payload := map[string]string{"status": "error", "message": message}
+	if data, err := json.Marshal(payload); err == nil {
+		w.Write(data)
+	}
+}
+
 func (controller *productUpdateController) handleUploadMedia(w http.ResponseWriter, r *http.Request, productID string) string {
 	ctx := r.Context()
 
@@ -352,9 +361,8 @@ func (controller *productUpdateController) handleUploadMedia(w http.ResponseWrit
 		return ""
 	}
 
-	if err := r.ParseMultipartForm(50 << 20); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"status":"error","message":"Failed to parse upload: ` + err.Error() + `"}`))
+	if err := r.ParseMultipartForm(50 << 20); err != nil { // #nosec G120 -- bounded to 50MB
+		writeJSONError(w, "Failed to parse upload: "+err.Error())
 		return ""
 	}
 
@@ -379,16 +387,14 @@ func (controller *productUpdateController) handleUploadMedia(w http.ResponseWrit
 	for i, fileHeader := range files {
 		file, err := fileHeader.Open()
 		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"status":"error","message":"Failed to open file: ` + err.Error() + `"}`))
+			writeJSONError(w, "Failed to open file: "+err.Error())
 			return ""
 		}
 
 		data, err := io.ReadAll(file)
 		file.Close()
 		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"status":"error","message":"Failed to read file: ` + err.Error() + `"}`))
+			writeJSONError(w, "Failed to read file: "+err.Error())
 			return ""
 		}
 
@@ -410,8 +416,7 @@ func (controller *productUpdateController) handleUploadMedia(w http.ResponseWrit
 		err = shopStore.MediaCreate(ctx, media)
 		if err != nil {
 			slog.Error("Failed to create media", "error", err)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"status":"error","message":"Failed to save file record: ` + err.Error() + `"}`))
+			writeJSONError(w, "Failed to save file record: "+err.Error())
 			return ""
 		}
 

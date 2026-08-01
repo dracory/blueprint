@@ -2,15 +2,15 @@ package contact
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
 	"log"
-	"math/rand"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"project/internal/app"
 	"project/internal/links"
@@ -70,9 +70,8 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	c.CanUpdateLast = true
 
 	// Initialize simple math captcha (e.g. "6 + 2 =")
-	rand.Seed(time.Now().UnixNano())
-	a := rand.Intn(5) + 1 // 1-5
-	b := rand.Intn(5) + 1 // 1-5
+	a := cryptoRandIntn(5) + 1 // 1-5
+	b := cryptoRandIntn(5) + 1 // 1-5
 	sum := a + b
 	sumStr := strconv.Itoa(sum)
 	c.CaptchaQuestion = strconv.Itoa(a) + " + " + strconv.Itoa(b) + " ="
@@ -374,6 +373,20 @@ func (c *formContact) Render(ctx context.Context) hb.TagInterface {
 func hashCaptchaValue(value string) string {
 	h := sha256.Sum256([]byte(value))
 	return hex.EncodeToString(h[:])
+}
+
+// cryptoRandIntn returns a non-negative pseudo-random int in [0, n) using crypto/rand.
+// It falls back to 0 if an error occurs.
+func cryptoRandIntn(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	var buf [8]byte
+	if _, err := rand.Read(buf[:]); err != nil {
+		return 0
+	}
+	v := binary.BigEndian.Uint64(buf[:])
+	return int(v % uint64(n)) // #nosec G115 -- n is bounded to 5, no overflow risk
 }
 
 func init() {

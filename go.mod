@@ -1,6 +1,6 @@
 module project
 
-go 1.26.3
+go 1.26.5
 
 // replace github.com/dracory/base => ../../_modules_dracory/base
 
@@ -43,7 +43,7 @@ require (
 	github.com/dracory/geostore v1.9.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
-	github.com/dracory/llm v1.3.0
+	github.com/dracory/llm v1.4.0
 	github.com/dracory/logstore v1.22.0
 	github.com/dracory/metastore v1.10.0
 	github.com/dracory/neat v0.33.0
@@ -132,7 +132,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.19 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.18 // indirect
 	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
 	github.com/gookit/color v1.6.1 // indirect
 	github.com/goravel/framework v1.18.0 // indirect

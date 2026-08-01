@@ -26,7 +26,7 @@ func BuildExecutable(pathExec string) error {
 	newEnv = append(newEnv, "GOARCH=amd64")
 	newEnv = append(newEnv, "CGO_ENABLED=0")
 
-	cmd := exec.Command("go", "build", "-ldflags", "-s -w", "-v", "-o", pathExec, "./cmd/server")
+	cmd := exec.Command("go", "build", "-ldflags", "-s -w", "-v", "-o", pathExec, "./cmd/server") // #nosec G204 -- "go" is hardcoded, pathExec is a local build target
 	cmd.Env = newEnv
 	out, err := cmd.CombinedOutput()
 
