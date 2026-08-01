@@ -97,7 +97,7 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	// Caches (instance-scoped)
 	memoryCache := ttlcache.New[string, any]()
 	cacheDir := cacheDirectory()
-	if err := os.MkdirAll(cacheDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(cacheDir, 0750); err != nil {
 		return nil, err
 	}
 	fileCache := file.New(cacheDir)

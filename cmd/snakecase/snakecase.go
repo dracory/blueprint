@@ -103,7 +103,7 @@ func renameGoFiles(root string, dryRun bool, verbose bool) error {
 				fmt.Printf("[DRY RUN] Would rename: %s -> %s\n", path, newPath)
 			} else {
 				fmt.Printf("Renaming %s -> %s\n", path, newPath)
-				if err := os.Rename(path, newPath); err != nil {
+				if err := os.Rename(path, newPath); err != nil { // #nosec G122 -- CLI utility for local file renaming, not web-facing
 					return fmt.Errorf("failed to rename %s to %s: %w", path, newPath, err)
 				}
 			}

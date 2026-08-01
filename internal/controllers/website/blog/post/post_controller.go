@@ -293,7 +293,7 @@ func (c *postController) recommendationsSection(post blogstore.PostInterface) hb
 		return hb.Div()
 	}
 
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r := rand.New(rand.NewSource(time.Now().UnixNano())) // #nosec G404 -- cosmetic shuffle for display order, not security-sensitive
 	r.Shuffle(len(filtered), func(i, j int) {
 		filtered[i], filtered[j] = filtered[j], filtered[i]
 	})

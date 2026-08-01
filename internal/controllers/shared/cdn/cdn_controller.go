@@ -2,6 +2,7 @@ package cdn
 
 import (
 	"compress/gzip"
+	"html"
 	"net/http"
 	"strings"
 
@@ -27,7 +28,7 @@ func (c cdnController) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !lo.Contains([]string{"css", "js"}, extension) {
-		if _, err := w.Write([]byte("Extension " + extension + " not supported")); err != nil {
+		if _, err := w.Write([]byte("Extension " + html.EscapeString(extension) + " not supported")); err != nil { // #nosec G705 -- extension is escaped
 			http.Error(w, "Failed to write response", http.StatusInternalServerError)
 		}
 		return

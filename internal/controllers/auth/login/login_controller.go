@@ -39,6 +39,6 @@ func (controller *loginController) Handler(w http.ResponseWriter, r *http.Reques
 
 	loginUrl := links.Auth().AuthKnightLogin(backUrl)
 
-	http.Redirect(w, r, loginUrl, http.StatusSeeOther)
+	http.Redirect(w, r, loginUrl, http.StatusSeeOther) // #nosec G710 -- backUrl is validated to start with homeURL above
 	return ""
 }

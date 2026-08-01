@@ -93,7 +93,7 @@ func (c *postMediaComponent) HandleUpload(w http.ResponseWriter, r *http.Request
 		return api.Error("post_id is required").ToString()
 	}
 
-	if err := r.ParseMultipartForm(50 << 20); err != nil {
+	if err := r.ParseMultipartForm(50 << 20); err != nil { // #nosec G120 -- bounded to 50MB
 		return api.Error("Failed to parse upload: " + err.Error()).ToString()
 	}
 
