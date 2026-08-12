@@ -6,14 +6,14 @@ import (
 	"net/url"
 	"strings"
 
+	"project/internal/app"
 	"project/internal/ext"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
 	"github.com/dracory/liveflux"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/samber/lo"
 )
 
@@ -21,7 +21,7 @@ import (
 
 type formProfileUpdate struct {
 	liveflux.Base
-	app               app.AppInterface
+	app                    app.AppInterface
 	UserID                 string
 	ReturnURL              string
 	FormEmail              string
@@ -97,7 +97,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 	}
 
 	countryList, err := c.app.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
-		SortOrder: sb.ASC,
+		SortOrder: neat.SortAsc,
 		OrderBy:   geostore.COLUMN_NAME,
 	})
 	if err != nil {
@@ -293,7 +293,7 @@ func (c *formProfileUpdate) handleUpdate(ctx context.Context, action string, dat
 
 func (c *formProfileUpdate) refreshTimezones(ctx context.Context) {
 	query := geostore.TimezoneQueryOptions{
-		SortOrder: sb.ASC,
+		SortOrder: neat.SortAsc,
 		OrderBy:   geostore.COLUMN_TIMEZONE,
 	}
 

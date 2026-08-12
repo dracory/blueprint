@@ -50,7 +50,6 @@ require (
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.7.0
 	github.com/dracory/rule v0.8.0
-	github.com/dracory/sb v0.26.0
 	github.com/dracory/sessionstore v1.18.0
 	github.com/dracory/settingstore v1.11.0
 	github.com/dracory/shopstore v1.24.0
@@ -120,6 +119,7 @@ require (
 	github.com/dracory/arr v0.2.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
 	github.com/dracory/database v0.8.0 // indirect
+	github.com/dracory/sb v0.26.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.9.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
