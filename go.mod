@@ -64,7 +64,7 @@ require (
 	github.com/dracory/userstore v1.17.0
 	github.com/dracory/vaultstore v1.4.0
 	github.com/dracory/versionstore v1.7.0
-	github.com/dracory/websrv v0.1.0
+	github.com/dracory/websrv v0.2.0
 	github.com/dracory/wf v0.6.0
 	github.com/dromara/carbon/v2 v2.6.17
 	github.com/faabiosr/cachego v0.26.0
@@ -141,7 +141,6 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
-	github.com/mingrammer/cfmt v1.1.0 // indirect
 	github.com/mocktools/go-smtp-mock v1.10.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pkg/sftp v1.13.10 // indirect
@@ -183,8 +182,6 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible // indirect
-	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
-	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/samber/lo v1.53.0
