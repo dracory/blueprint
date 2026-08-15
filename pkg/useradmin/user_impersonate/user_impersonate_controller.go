@@ -42,7 +42,14 @@ func (c *userImpersonateController) Handler(w http.ResponseWriter, r *http.Reque
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "User ID not found", links.Admin().Users(), 15)
 	}
 
-	err := Impersonate(c.app.GetSessionStore(), w, r, userID)
+	// In development (HTTP), use insecure cookie so the browser sends it
+	// back over plain HTTP. In production (HTTPS), use Secure cookie.
+	secure := true
+	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
+		secure = false
+	}
+
+	err := Impersonate(c.app.GetSessionStore(), w, r, userID, secure)
 
 	if err != nil {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Users(), 15)
