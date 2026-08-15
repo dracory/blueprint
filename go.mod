@@ -48,7 +48,7 @@ require (
 	github.com/dracory/metastore v1.10.0
 	github.com/dracory/neat v0.39.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.7.0
+	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sessionstore v1.18.0
 	github.com/dracory/settingstore v1.11.0
@@ -64,7 +64,7 @@ require (
 	github.com/dracory/userstore v1.17.0
 	github.com/dracory/vaultstore v1.4.0
 	github.com/dracory/versionstore v1.7.0
-	github.com/dracory/websrv v0.2.0
+	github.com/dracory/websrv v0.4.0
 	github.com/dracory/wf v0.6.0
 	github.com/dromara/carbon/v2 v2.6.17
 	github.com/faabiosr/cachego v0.26.0
@@ -124,9 +124,6 @@ require (
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
-	github.com/go-chi/chi/v5 v5.3.0 // indirect
-	github.com/go-chi/cors v1.2.2 // indirect
-	github.com/go-chi/httprate v0.15.0 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -137,7 +134,6 @@ require (
 	github.com/goravel/framework v1.18.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.8.3 // indirect
-	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/mattn/go-runewidth v0.0.27 // indirect
@@ -151,7 +147,6 @@ require (
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.69.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0 // indirect
