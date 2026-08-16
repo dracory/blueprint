@@ -41,8 +41,6 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
-		ResponseWriter:    w,
-		Request:           r,
 		Logger:            c.app.GetLogger(),
 		Store:             c.app.GetStatsStore(),
 		Layout:            &adminLayout{app: c.app},
