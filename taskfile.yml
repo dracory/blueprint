@@ -12,6 +12,8 @@ vars:
   APPNAME: The Dracory Blueprint Project
   DATETIME: '{{now | date "20060102_150405"}}'
   LIVEURL: https://dracory.com
+  # Uncomment and set your Dokploy webhook URL to use deploy-dokploy task
+  # DEPLOY_WEBHOOK_URL: https://your-dokploy-server/api/deploy/YOUR_WEBHOOK_TOKEN
 
 tasks:
   # ======================================================================== #
@@ -71,6 +73,36 @@ tasks:
       - cmd: xdg-open {{.LIVEURL}}
         platforms: [linux]
       - echo "Open {{.LIVEURL}} to view the app"
+      - echo "Done!"
+    silent: true
+
+  # Alternative deployment via Dokploy webhook (Hetzner).
+  # To use: uncomment DEPLOY_WEBHOOK_URL in vars above and set your webhook URL.
+  deploy-dokploy:
+    desc: Triggers a deployment via Dokploy webhook (Hetzner)
+    cmds:
+      - echo "Triggering Dokploy deployment webhook..."
+      - cmd: echo "Note - webhook acknowledgement only confirms the build was triggered."
+      - cmd: echo "Docker image build + container rollout takes ~5 minutes after trigger."
+      - cmd: echo ""
+      - cmd: echo "-------------------------------------"
+      - cmd: echo "--- Dokploy server response below ---"
+      - cmd: echo "-------------------------------------"
+      - cmd: echo ""
+      - cmd: powershell -Command "Invoke-RestMethod -Method Post -Uri '{{.DEPLOY_WEBHOOK_URL}}' -ContentType 'application/json' -Headers @{'X-GitHub-Event'='push'} -Body '{\"ref\":\"refs/heads/main\"}' | Out-String"
+        platforms: [windows]
+      - cmd: >-
+          curl -X POST -fsS '{{.DEPLOY_WEBHOOK_URL}}'
+          -H 'Content-Type: application/json'
+          -H 'X-GitHub-Event: push'
+          -d '{"ref":"refs/heads/main"}'
+        platforms: [linux, darwin]
+      - cmd: echo ""
+      - cmd: echo "-----------------------------------"
+      - cmd: echo "--- End Dokploy server response ---"
+      - cmd: echo "-----------------------------------"
+      - cmd: echo ""
+      - cmd: echo "Build triggered. Not yet live - Docker build is now running (~5 min)."
       - echo "Done!"
     silent: true
 

@@ -4,12 +4,12 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 	"strings"
 
 	"github.com/dracory/blogstore"
-	"github.com/dracory/sb"
+	"github.com/dracory/neat"
 	"github.com/dromara/carbon/v2"
 	"github.com/samber/lo"
 )
@@ -85,7 +85,7 @@ func (c sitemapXmlController) blogPostLocations() []string {
 	postList, err := c.app.GetBlogStore().PostList(context.Background(), blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		OrderBy:   "title",
-		SortOrder: sb.DESC,
+		SortOrder: neat.SortDesc,
 		Limit:     1000,
 	})
 

@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/dracory/auth"
+	"github.com/dracory/auth/types"
 	"github.com/dracory/req"
 	"github.com/dracory/sessionstore"
 	"github.com/dromara/carbon/v2"
 )
 
-func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.Request, userID string) error {
+func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.Request, userID string, secure bool) error {
 	if ss == nil {
 		return errors.New("session store is nil")
 	}
@@ -27,7 +28,7 @@ func Impersonate(ss sessionstore.StoreInterface, w http.ResponseWriter, r *http.
 		return err
 	}
 
-	auth.AuthCookieSet(w, r, session.GetKey())
+	auth.AuthCookieSet(w, r, session.GetKey(), types.WithSecure(secure))
 
 	return nil
 }

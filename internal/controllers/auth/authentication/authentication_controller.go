@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/dracory/auth"
+	"github.com/dracory/auth/types"
 	basehttp "github.com/dracory/base/http"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/req"
@@ -125,7 +126,14 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
 	}
 
-	auth.AuthCookieSet(w, r, session.GetKey())
+	// In development (HTTP), the Secure flag must be disabled so the
+	// browser sends the cookie back over plain HTTP.
+	cookieOpts := []types.CookieOption{}
+	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
+		cookieOpts = append(cookieOpts, types.WithSecure(false))
+	}
+
+	auth.AuthCookieSet(w, r, session.GetKey(), cookieOpts...)
 
 	redirectUrl := c.calculateRedirectURL(user)
 
