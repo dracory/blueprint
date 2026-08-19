@@ -6,6 +6,7 @@ import (
 	adminBlog "project/internal/controllers/admin/blog"
 	adminCms "project/internal/controllers/admin/cms"
 	adminFiles "project/internal/controllers/admin/files"
+	adminLogs "project/internal/controllers/admin/logs"
 	adminMedia "project/internal/controllers/admin/media"
 	adminShop "project/internal/controllers/admin/shop"
 	adminStats "project/internal/controllers/admin/stats"
@@ -13,7 +14,6 @@ import (
 	adminUsers "project/internal/controllers/admin/users"
 	"project/internal/links"
 	"project/internal/middlewares"
-	"project/pkg/logadmin"
 
 	"github.com/dracory/rtr"
 )
@@ -59,7 +59,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		adminRoutes = append(adminRoutes, fileRoutes...)
 	}
 
-	logRoutes, err := logadmin.Routes(app)
+	logRoutes, err := adminLogs.Routes(app)
 	if err == nil {
 		adminRoutes = append(adminRoutes, logRoutes...)
 	}

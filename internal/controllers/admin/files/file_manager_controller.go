@@ -2,14 +2,18 @@ package admin
 
 import (
 	"net/http"
+	"strings"
 
 	"project/internal/app"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/pkg/fileadmin"
+
+	fileadmin "github.com/dracory/fileadmin"
 )
 
-// FileManagerController wraps the pkg/fileadmin package
+// FileManagerController wraps the external github.com/dracory/fileadmin package
+// for integration with the blueprint admin interface.
 type FileManagerController struct {
 	app app.AppInterface
 }
@@ -21,8 +25,18 @@ func NewFileManagerController(app app.AppInterface) *FileManagerController {
 
 // Handler processes file manager requests
 func (c *FileManagerController) Handler(w http.ResponseWriter, r *http.Request) {
+	cfg := c.app.GetConfig()
+
+	// Derive root dir path from config (same logic as the old pkg/fileadmin)
+	rootDirPath := strings.TrimSpace(cfg.GetMediaRoot())
+	rootDirPath = strings.Trim(rootDirPath, "/")
+	rootDirPath = strings.Trim(rootDirPath, ".")
+	rootDirPath = "/" + rootDirPath
+
 	admin, err := fileadmin.New(fileadmin.AdminOptions{
-		Registry:     c.app,
+		Storage:      c.app.GetSqlFileStorage(),
+		RootDirPath:  rootDirPath,
+		FuncLayout:   adapters.NewLayoutFunc(c.app),
 		AdminHomeURL: links.Admin().Home(),
 		FileAdminURL: links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
@@ -47,14 +61,5 @@ func (c *FileManagerController) Handler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	html := admin.Handle(w, r)
-
-	if html != "" {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if _, err := w.Write([]byte(html)); err != nil { // #nosec G705 -- html is built by trusted admin handler
-			if logger := c.app.GetLogger(); logger != nil {
-				logger.Error("At FileManagerController > Handler", "write_error", err.Error())
-			}
-		}
-	}
+	admin.Handle(w, r)
 }

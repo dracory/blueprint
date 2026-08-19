@@ -12,12 +12,19 @@ func Routes(app app.AppInterface) ([]rtr.RouteInterface, error) {
 	if app == nil {
 		return nil, errors.New("app cannot be nil")
 	}
+
 	fileManager := rtr.NewRoute().
 		SetName("Admin > File Manager").
 		SetPath(links.ADMIN_FILE_MANAGER).
 		SetHandler(NewFileManagerController(app).Handler)
 
+	fileManagerCatchAll := rtr.NewRoute().
+		SetName("Admin > File Manager > Catchall").
+		SetPath(links.ADMIN_FILE_MANAGER + links.CATCHALL).
+		SetHandler(NewFileManagerController(app).Handler)
+
 	return []rtr.RouteInterface{
 		fileManager,
+		fileManagerCatchAll,
 	}, nil
 }

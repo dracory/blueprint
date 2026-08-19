@@ -131,6 +131,8 @@ github.com/dracory/envenc v1.5.0 h1:2RIHRDDFEVKa96vRrpnjClcYYpOmXwraCx8a5IbBF0E=
 github.com/dracory/envenc v1.5.0/go.mod h1:v16CzloqLM0BBU/4m8u3LeWh3TevUUG7QMQY4xjKpQs=
 github.com/dracory/feedstore v1.5.0 h1:jDv7M0SwcZTzY5gtZLDrY3VypgWKubRZ7bJWqoSwfsM=
 github.com/dracory/feedstore v1.5.0/go.mod h1:u2vyHtaMLwvxmE1yUEMh5hkvGdV0uuwlfN+eg2QBqII=
+github.com/dracory/fileadmin v0.1.0 h1:t3hLzc6G21El7nfHiJxIGS10urYvD92M5/0JhNkzTlc=
+github.com/dracory/fileadmin v0.1.0/go.mod h1:vNcmi77WzqRgOYdYKziCQbQ8XF7mSCYl/2RwKaF0WLQ=
 github.com/dracory/filesystem v1.4.0 h1:DavrWbv7OWeU783D932GGYOSiq3RMDuHpdVEFDA5qnU=
 github.com/dracory/filesystem v1.4.0/go.mod h1:QqMDYvVNyhxyGWy7UaRtlUKe2za91wevfn+LuEHLQ2s=
 github.com/dracory/form v0.23.0 h1:3RtiChGyApSfZ0vH8nvfSfiOU3Os3f0RoXt3RZ/s440=
@@ -143,6 +145,8 @@ github.com/dracory/liveflux v0.26.0 h1:pqMBFXBm+bcpUomo08iVVazIBirPhT9Iz2U00elgX
 github.com/dracory/liveflux v0.26.0/go.mod h1:Ro5agi3PU47f1XjCbeNrhCs08IwuvwmM3MxR2ll4gPY=
 github.com/dracory/llm v1.4.0 h1:gNS59Ttigco1pWifyR8nqc5apLCuW8jsCf4sI91/1AI=
 github.com/dracory/llm v1.4.0/go.mod h1:4o6jHPVlBCfhs8mUoZ42IEUrClL9l4883+pIT3VxzxE=
+github.com/dracory/logadmin v0.1.0 h1:JfJ8aFiYKBRV8BhfomwCte07CUa3ywpGKLzo/rwASGc=
+github.com/dracory/logadmin v0.1.0/go.mod h1:S5Rp3WwMXul+0+wfgJ549JyxElvKK1itOkK37l03wEQ=
 github.com/dracory/logstore v1.22.1 h1:3Li4uWQEsM6MDfdcdu+z9oCRI/O4CfAOh+czjfd8QrY=
 github.com/dracory/logstore v1.22.1/go.mod h1:uYrf6UFjydNCqieUEruq++zgi2zV3E5Fd8UOJsxpjYk=
 github.com/dracory/metastore v1.11.0 h1:0RrxiTIBZnLLbhi5mge6TC/XrEHV0XpwTAFMg/bNiz8=

@@ -39,12 +39,14 @@ require (
 	github.com/dracory/env v1.2.0
 	github.com/dracory/envenc v1.5.0
 	github.com/dracory/feedstore v1.5.0
+	github.com/dracory/fileadmin v0.1.0
 	github.com/dracory/filesystem v1.4.0
 	github.com/dracory/form v0.23.0
 	github.com/dracory/geostore v1.10.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.4.0
+	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.1
 	github.com/dracory/metastore v1.11.0
 	github.com/dracory/neat v0.39.0

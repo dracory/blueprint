@@ -18,7 +18,13 @@ func Routes(app app.AppInterface) ([]rtr.RouteInterface, error) {
 		SetPath(links.ADMIN_LOGS).
 		SetHandler(NewLogsAdminController(app).Handler)
 
+	logsCatchAll := rtr.NewRoute().
+		SetName("Admin > Logs > Catchall").
+		SetPath(links.ADMIN_LOGS + links.CATCHALL).
+		SetHandler(NewLogsAdminController(app).Handler)
+
 	return []rtr.RouteInterface{
 		logs,
+		logsCatchAll,
 	}, nil
 }

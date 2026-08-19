@@ -50,8 +50,8 @@ func TestLogsRoutesReturnsRoutes(t *testing.T) {
 		t.Errorf("Routes() returned error: %v", err)
 	}
 
-	// Should return logs route
-	if len(routes) != 1 {
-		t.Errorf("Expected 1 route (logs), got %d", len(routes))
+	// Should return logs route + catchall
+	if len(routes) != 2 {
+		t.Errorf("Expected 2 routes (logs + catchall), got %d", len(routes))
 	}
 }

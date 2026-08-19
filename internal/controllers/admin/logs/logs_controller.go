@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 	"project/internal/app"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
 
-	logadmin "project/pkg/logadmin"
+	logadmin "github.com/dracory/logadmin"
 )
 
-// logsAdminController wraps the pkg/logadmin package for integration
+// logsAdminController wraps the external github.com/dracory/logadmin package
+// for integration with the blueprint admin interface.
 type logsAdminController struct {
 	app app.AppInterface
 }
@@ -22,9 +24,12 @@ func NewLogsAdminController(app app.AppInterface) *logsAdminController {
 // Handler processes logs admin requests
 func (controller *logsAdminController) Handler(w http.ResponseWriter, r *http.Request) {
 	admin, err := logadmin.New(logadmin.AdminOptions{
-		Registry:     controller.app,
-		AdminHomeURL: links.Admin().Home(),
-		LogAdminURL:  links.Admin().Logs(),
+		Store:          controller.app.GetLogStore(),
+		Logger:         controller.app.GetLogger(),
+		FuncLayout:     adapters.NewLayoutFunc(controller.app),
+		AdminHomeURL:   links.Admin().Home(),
+		LogAdminURL:    links.Admin().Logs(),
+		FileManagerURL: links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
 			user := helpers.GetAuthUser(r)
 			if user == nil {

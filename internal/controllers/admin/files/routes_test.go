@@ -40,6 +40,9 @@ func TestRoutesReturnsRoutes(t *testing.T) {
 	if len(routes) == 0 {
 		t.Error("Routes(app) should return at least one route")
 	}
+	if len(routes) != 2 {
+		t.Errorf("Routes(app) should return 2 routes (file manager + catchall), got %d", len(routes))
+	}
 }
 
 // TestRoutesRouteName verifies route has correct name
