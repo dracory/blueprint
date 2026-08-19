@@ -12,9 +12,11 @@ import (
 	"project/internal/layouts"
 	"project/internal/links"
 	"project/internal/rules"
-	"project/pkg/blogadmin/post_update"
 	"strings"
+
 	"time"
+
+	"github.com/dracory/blogadmin/post_update"
 
 	"github.com/dracory/base/blogtheme"
 	"github.com/dracory/blogstore"

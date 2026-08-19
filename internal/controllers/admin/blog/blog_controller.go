@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 	"project/internal/app"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
 
-	blogadmin "project/pkg/blogadmin"
+	blogadmin "github.com/dracory/blogadmin"
 )
 
-// blogAdminController wraps the pkg/blogadmin package for integration
+// blogAdminController wraps the external github.com/dracory/blogadmin package
+// for integration with the blueprint admin interface.
 type blogAdminController struct {
 	app app.AppInterface
 }
@@ -22,9 +24,15 @@ func NewBlogAdminController(app app.AppInterface) *blogAdminController {
 // Handler processes blog admin requests
 func (controller *blogAdminController) Handler(w http.ResponseWriter, r *http.Request) {
 	admin, err := blogadmin.New(blogadmin.AdminOptions{
-		Store:        controller.app.GetBlogStore(),
-		AdminHomeURL: links.Admin().Home(),
-		BlogAdminURL: links.Admin().Blog(),
+		Store:          controller.app.GetBlogStore(),
+		Logger:         controller.app.GetLogger(),
+		CustomStore:    controller.app.GetCustomStore(),
+		SettingStore:   controller.app.GetSettingStore(),
+		LlmFactory:     adapters.NewLlmFactory(controller.app),
+		FuncLayout:     adapters.NewLayoutFunc(controller.app),
+		AdminHomeURL:   links.Admin().Home(),
+		BlogAdminURL:   links.Admin().Blog(),
+		FileManagerURL: links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
 			user := helpers.GetAuthUser(r)
 			if user == nil {
@@ -32,7 +40,6 @@ func (controller *blogAdminController) Handler(w http.ResponseWriter, r *http.Re
 			}
 			return user.GetID()
 		},
-		Registry: controller.app,
 	})
 
 	if err != nil {

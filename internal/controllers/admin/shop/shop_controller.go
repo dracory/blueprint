@@ -3,13 +3,15 @@ package admin
 import (
 	"net/http"
 	"project/internal/app"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
 
-	shopadmin "project/pkg/shopadmin"
+	shopadmin "github.com/dracory/shopadmin"
 )
 
-// shopAdminController wraps the pkg/shopadmin package for integration
+// shopAdminController wraps the external github.com/dracory/shopadmin package
+// for integration with the blueprint admin interface.
 type shopAdminController struct {
 	app app.AppInterface
 }
@@ -22,10 +24,13 @@ func NewShopAdminController(app app.AppInterface) *shopAdminController {
 // Handler processes shop admin requests
 func (controller *shopAdminController) Handler(w http.ResponseWriter, r *http.Request) {
 	admin, err := shopadmin.New(shopadmin.AdminOptions{
-		Registry:       controller.app,
-		AdminHomeURL:   links.Admin().Home(),
-		ShopAdminURL:   links.Admin().Shop(),
-		FileManagerURL: links.Admin().FileManager(),
+		Store:            controller.app.GetShopStore(),
+		Logger:           controller.app.GetLogger(),
+		CustomerResolver: adapters.NewUserStoreCustomerResolver(controller.app.GetUserStore()),
+		FuncLayout:       adapters.NewLayoutFunc(controller.app),
+		AdminHomeURL:     links.Admin().Home(),
+		ShopAdminURL:     links.Admin().Shop(),
+		FileManagerURL:   links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
 			user := helpers.GetAuthUser(r)
 			if user == nil {

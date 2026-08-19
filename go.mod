@@ -22,7 +22,8 @@ require (
 	github.com/dracory/base v0.39.0
 	github.com/dracory/blindindexstore v1.17.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogstore v1.34.0
+	github.com/dracory/blogadmin v0.2.0
+	github.com/dracory/blogstore v1.35.0
 	github.com/dracory/bs v0.16.0
 	github.com/dracory/cachestore v1.9.0
 	github.com/dracory/cdn v1.11.0
@@ -52,7 +53,8 @@ require (
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sessionstore v1.19.0
 	github.com/dracory/settingstore v1.12.0
-	github.com/dracory/shopstore v1.25.0
+	github.com/dracory/shopadmin v0.3.0
+	github.com/dracory/shopstore v1.26.0
 	github.com/dracory/statsstore v1.27.0
 	github.com/dracory/str v0.18.0
 	github.com/dracory/subscriptionstore v1.5.0
@@ -63,12 +65,9 @@ require (
 	github.com/dracory/uncdn v0.9.0
 	github.com/dracory/userstore v1.18.0
 	github.com/dracory/vaultstore v1.4.1
-	github.com/dracory/versionstore v1.7.1
 	github.com/dracory/websrv v0.4.0
-	github.com/dracory/wf v0.6.0
 	github.com/dromara/carbon/v2 v2.6.17
 	github.com/faabiosr/cachego v0.26.0
-	github.com/flosch/pongo2/v6 v6.1.0
 	github.com/go-co-op/gocron v1.37.0
 	github.com/go-sql-driver/mysql v1.10.0
 	github.com/jellydator/ttlcache/v3 v3.4.1
@@ -121,14 +120,17 @@ require (
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.10.0 // indirect
+	github.com/dracory/versionstore v1.7.1 // indirect
+	github.com/dracory/wf v0.6.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
+	github.com/flosch/pongo2/v6 v6.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.15 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.20 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.21 // indirect
 	github.com/googleapis/gax-go/v2 v2.23.0 // indirect
 	github.com/gookit/color v1.6.1 // indirect
 	github.com/goravel/framework v1.18.0 // indirect
@@ -162,9 +164,9 @@ require (
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/api v0.293.0 // indirect
 	google.golang.org/genai v1.68.0 // indirect
-	google.golang.org/genproto v0.0.0-20260810153831-ec0a7760b754 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260810153831-ec0a7760b754 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260810153831-ec0a7760b754 // indirect
+	google.golang.org/genproto v0.0.0-20260817212433-ac3dfec99bb1 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260817212433-ac3dfec99bb1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260817212433-ac3dfec99bb1 // indirect
 	google.golang.org/grpc v1.83.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
