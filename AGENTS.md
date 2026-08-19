@@ -29,6 +29,7 @@
 - **internal/cli/** - CLI dispatcher using github.com/dracory/base/cli
 - **internal/routes/** - Router setup using github.com/dracory/rtr
 - **internal/controllers/** - HTTP controllers (admin, auth, liveflux, user, webhook, website)
+- **internal/controllers/admin/adapters/** - Adapters bridging external blogadmin/shopadmin packages to blueprint services (admin layout, LLM factory, customer resolver)
 - **internal/middlewares/** - HTTP middlewares
 - **internal/emails/** - Email templates and sending logic
 - **internal/tasks/** - Background task definitions
@@ -42,6 +43,7 @@
 - **internal/rules/** - Business rule definitions
 - **internal/ext/** - External integrations
 - `/pkg` - Public libraries that can be used by external applications
+- **External admin packages** - `github.com/dracory/blogadmin` and `github.com/dracory/shopadmin` are standalone modules integrated via `internal/controllers/admin/adapters/`
 
 ## Common Tasks
 - To add a new package: Create a new directory under `/pkg` with appropriate `go.mod`
