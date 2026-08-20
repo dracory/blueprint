@@ -14,7 +14,6 @@ go 1.26.5
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/aws/smithy-go v1.27.8
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.11.0
@@ -57,6 +56,7 @@ require (
 	github.com/dracory/settingstore v1.12.0
 	github.com/dracory/shopadmin v0.3.0
 	github.com/dracory/shopstore v1.26.0
+	github.com/dracory/social v0.1.0
 	github.com/dracory/statsstore v1.27.0
 	github.com/dracory/str v0.18.0
 	github.com/dracory/subscriptionstore v1.5.0
@@ -79,7 +79,6 @@ require (
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
 	github.com/spf13/cast v1.10.0
 	github.com/stripe/stripe-go/v73 v73.16.0
-	github.com/tidwall/gjson v1.19.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
 	github.com/yuin/goldmark v1.8.5
 	modernc.org/sqlite v1.57.0
@@ -111,6 +110,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.37 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.38 // indirect
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.2 // indirect
+	github.com/aws/smithy-go v1.27.8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/coder/websocket v1.8.15 // indirect
@@ -148,6 +148,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sashabaranov/go-openai v1.42.0 // indirect
 	github.com/teambition/rrule-go v1.8.2 // indirect
+	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/xo/terminfo v1.0.0 // indirect

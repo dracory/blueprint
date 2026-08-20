@@ -3,12 +3,12 @@ package blogpost
 import (
 	"fmt"
 	"project/internal/links"
-	"project/pkg/social"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/social"
 )
 
 // renderBlogPostHTML renders a single blog post
