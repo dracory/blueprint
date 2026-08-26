@@ -293,69 +293,72 @@ func (r *GeoResolver) Timezones(ctx context.Context, countryCode ...string) ([]u
 }
 
 // NewOnUserSearchFunc returns an OnUserSearch callback that searches
-// the blueprint's blind index stores. It intersects results across
-// active filters (AND semantics). When ExactMatch is true, uses
-// SEARCH_TYPE_EQUALS; otherwise SEARCH_TYPE_CONTAINS.
+// the blueprint's blind index stores. It maps each SearchCondition to
+// the corresponding blind index store and search type, then combines
+// results: AND conditions intersect, OR conditions union.
 func NewOnUserSearchFunc(app app.AppInterface) useradmin.OnUserSearchFunc {
-	return func(ctx context.Context, event useradmin.UserSearchEvent) ([]string, error) {
-		if app == nil {
+	return func(ctx context.Context, conditions []useradmin.SearchCondition) ([]string, error) {
+		if app == nil || len(conditions) == 0 {
 			return nil, nil
 		}
 
-		searchType := blindindexstore.SEARCH_TYPE_CONTAINS
-		if event.ExactMatch {
-			searchType = blindindexstore.SEARCH_TYPE_EQUALS
-		}
+		var result []string
+		for i, cond := range conditions {
+			var store blindindexstore.StoreInterface
+			switch cond.Field {
+			case useradmin.SearchFieldFirstName:
+				store = app.GetBlindIndexStoreFirstName()
+			case useradmin.SearchFieldLastName:
+				store = app.GetBlindIndexStoreLastName()
+			case useradmin.SearchFieldEmail:
+				store = app.GetBlindIndexStoreEmail()
+			default:
+				continue
+			}
+			if store == nil {
+				continue
+			}
 
-		var idSets [][]string
+			searchType := blindindexstore.SEARCH_TYPE_CONTAINS
+			if cond.Op == useradmin.SearchOpEquals {
+				searchType = blindindexstore.SEARCH_TYPE_EQUALS
+			}
 
-		if event.FirstName != "" {
-			store := app.GetBlindIndexStoreFirstName()
-			if store != nil {
-				ids, err := store.Search(ctx, event.FirstName, searchType)
-				if err != nil {
-					return nil, err
-				}
-				if len(ids) == 0 {
-					return nil, nil
-				}
-				idSets = append(idSets, ids)
+			ids, err := store.Search(ctx, cond.Value, searchType)
+			if err != nil {
+				return nil, err
+			}
+
+			if i == 0 {
+				result = ids
+			} else if cond.CombineWith == useradmin.SearchOr {
+				result = unionIDSets(result, ids)
+			} else {
+				result = intersectIDSets([][]string{result, ids})
 			}
 		}
 
-		if event.LastName != "" {
-			store := app.GetBlindIndexStoreLastName()
-			if store != nil {
-				ids, err := store.Search(ctx, event.LastName, searchType)
-				if err != nil {
-					return nil, err
-				}
-				if len(ids) == 0 {
-					return nil, nil
-				}
-				idSets = append(idSets, ids)
-			}
-		}
-
-		if event.Email != "" {
-			store := app.GetBlindIndexStoreEmail()
-			if store != nil {
-				ids, err := store.Search(ctx, event.Email, searchType)
-				if err != nil {
-					return nil, err
-				}
-				if len(ids) == 0 {
-					return nil, nil
-				}
-				idSets = append(idSets, ids)
-			}
-		}
-
-		if len(idSets) == 0 {
-			return nil, nil
-		}
-		return intersectIDSets(idSets), nil
+		return result, nil
 	}
+}
+
+// unionIDSets merges two ID slices, removing duplicates.
+func unionIDSets(a, b []string) []string {
+	seen := make(map[string]bool, len(a)+len(b))
+	result := make([]string, 0, len(a)+len(b))
+	for _, id := range a {
+		if !seen[id] {
+			seen[id] = true
+			result = append(result, id)
+		}
+	}
+	for _, id := range b {
+		if !seen[id] {
+			seen[id] = true
+			result = append(result, id)
+		}
+	}
+	return result
 }
 
 // intersectIDSets computes the intersection of multiple ID slices.
