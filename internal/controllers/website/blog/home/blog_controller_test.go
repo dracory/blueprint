@@ -1,6 +1,7 @@
 package home
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"errors"
 	"net/http"
@@ -134,7 +135,7 @@ func TestBlogController_Handler_PostListError(t *testing.T) {
 	}
 
 	// Check that the flash message was set correctly.
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -186,7 +187,7 @@ func TestBlogController_Handler_PostCountError(t *testing.T) {
 	}
 
 	// Check that the flash message was set correctly.
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)

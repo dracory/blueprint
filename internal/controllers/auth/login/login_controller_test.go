@@ -1,6 +1,7 @@
 package login
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -34,7 +35,7 @@ func TestLoginControllerHandler_UserStoreNotUsed(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +81,7 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, recorder.Code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}

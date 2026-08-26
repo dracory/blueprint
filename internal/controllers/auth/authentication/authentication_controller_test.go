@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -38,7 +39,7 @@ func TestAuthControllerOnceIsRequired(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -87,7 +88,7 @@ func TestAuthControllerOnceMustBeValid(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -135,7 +136,7 @@ func TestAuthControllerOnceSuccessWithNewUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)
@@ -206,7 +207,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 
 	if err != nil {
 		t.Fatal(err)

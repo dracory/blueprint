@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -48,7 +49,7 @@ func TestAdminMiddleware_NoUserRedirectsToLogin(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -114,7 +115,7 @@ func TestAdminMiddleware_RequiresRegisteredUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -190,7 +191,7 @@ func TestAdminMiddleware_RequiresActiveUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)
@@ -269,7 +270,7 @@ func TestAdminMiddleware_RequiresAdminUser(t *testing.T) {
 		t.Fatalf("Expected response to contain '/flash?message_id=', got %s", body)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 
 	if err != nil {
 		t.Fatal(err)

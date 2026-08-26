@@ -1,6 +1,7 @@
 package logout
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/links"
@@ -57,7 +58,7 @@ func TestLogoutControllerHandler_SuccessfulLogout(t *testing.T) {
 	}
 
 	// Verify flash message
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +105,7 @@ func TestLogoutControllerHandler_LogoutWithoutCookie(t *testing.T) {
 	}
 
 	// Verify flash message still works even without existing cookie
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,6 +1,7 @@
 package post
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -36,7 +37,7 @@ func TestBlogPostController_Handler_MissingPostID(t *testing.T) {
 		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -67,7 +68,7 @@ func TestBlogPostController_Handler_PostNotFound(t *testing.T) {
 		t.Fatalf("Expected status %d but got %d", http.StatusSeeOther, resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -108,7 +109,7 @@ func TestBlogPostController_Handler_PostNotPublished_NoAuth(t *testing.T) {
 		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -164,7 +165,7 @@ func TestBlogPostController_Handler_PostNotPublished_WithAuth(t *testing.T) {
 		t.Fatalf("Expected redirect status, got %d", resp.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), resp)
 	if err != nil {
 		t.Fatalf("Failed to read flash message: %v", err)
 	}
@@ -248,7 +249,7 @@ func TestBlogPostController_Handler_WrongSlug_Redirect(t *testing.T) {
 		t.Fatalf("Expected status code %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}

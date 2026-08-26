@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -37,7 +38,7 @@ func Test_HomeController_RedirectsIfUserNotLoggedIn(t *testing.T) {
 		t.Fatal(`Response MUST be 303`, code)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)

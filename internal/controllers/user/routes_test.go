@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -229,7 +230,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 
 	body := rr.Body.String()
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
 
 	if err != nil {
 		t.Fatal(err)

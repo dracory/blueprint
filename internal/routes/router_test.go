@@ -1,6 +1,7 @@
 package routes_test
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -60,7 +61,7 @@ func TestRoutes_HTTPWorkflows_UserHomeRedirectsUnauthenticatedUsers(t *testing.T
 		t.Fatalf("expected redirect Location header to be set")
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), rr.Result())
 	if err != nil {
 		t.Fatalf("failed to fetch flash message: %v", err)
 	}

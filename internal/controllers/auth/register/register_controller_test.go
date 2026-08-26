@@ -1,6 +1,7 @@
 package register
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/url"
 	"project/internal/config"
@@ -49,7 +50,7 @@ func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T)
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -98,7 +99,7 @@ func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
 		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +157,7 @@ func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 
 	if err != nil {
 		t.Fatal(err)

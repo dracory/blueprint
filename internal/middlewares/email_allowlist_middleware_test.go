@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -39,7 +40,7 @@ func TestEmailAllowlistMiddleware_UnauthenticatedRedirectsToLogin(t *testing.T) 
 		t.Fatalf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,7 +105,7 @@ func TestEmailAllowlistMiddleware_BlockedEmail(t *testing.T) {
 		t.Fatalf("expected status %d, got %d", http.StatusSeeOther, response.StatusCode)
 	}
 
-	msg, err := testutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
+	msg, err := basetestutils.FlashMessageFindFromBody(app.GetCacheStore(), body)
 	if err != nil {
 		t.Fatal(err)
 	}

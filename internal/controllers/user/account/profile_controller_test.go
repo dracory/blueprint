@@ -1,6 +1,7 @@
 package account
 
 import (
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/url"
 	"project/internal/config"
@@ -48,7 +49,7 @@ func TestProfileController_RequiresAuthenticatedUser(t *testing.T) {
 		}
 	}
 
-	flashMessage, err := testutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
 	if err != nil {
 		t.Fatal(err)
 	}
