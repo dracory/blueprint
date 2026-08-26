@@ -373,42 +373,29 @@ func intersectIDSets(sets [][]string) []string {
 	return result
 }
 
-// SessionResolver implements useradmin.SessionResolverInterface using
-// the blueprint's sessionstore and auth cookie helpers. It absorbs the
-// session creation, expiry policy, and cookie setting logic that
-// previously lived in useradmin/user_impersonate/impersonate.go.
-type SessionResolver struct {
-	sessionStore sessionstore.StoreInterface
-}
+// NewOnUserImpersonateFunc returns an OnUserImpersonate callback that
+// creates a session in the blueprint's sessionstore and sets the auth
+// cookie. The host owns the session store, cookie format, and expiry
+// policy.
+func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateFunc {
+	return func(w http.ResponseWriter, httpReq *http.Request, event useradmin.UserImpersonateEvent) error {
+		if app == nil || app.GetSessionStore() == nil {
+			return errors.New("session store is nil")
+		}
 
-// NewSessionResolver creates a SessionResolver backed by the
-// blueprint's sessionstore.
-func NewSessionResolver(sessionStore sessionstore.StoreInterface) *SessionResolver {
-	return &SessionResolver{sessionStore: sessionStore}
-}
+		session := sessionstore.NewSession().
+			SetUserID(event.UserID).
+			SetUserAgent(httpReq.UserAgent()).
+			SetIPAddress(req.GetIP(httpReq)).
+			SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
-// Compile-time assertion that SessionResolver satisfies useradmin.SessionResolverInterface.
-var _ useradmin.SessionResolverInterface = (*SessionResolver)(nil)
+		if err := app.GetSessionStore().SessionCreate(httpReq.Context(), session); err != nil {
+			return err
+		}
 
-// Create creates a new session for the given user ID and sets the auth
-// cookie on the response. The session expires after 2 hours.
-func (r *SessionResolver) Create(w http.ResponseWriter, httpReq *http.Request, userID string, secure bool) error {
-	if r.sessionStore == nil {
-		return errors.New("session store is nil")
+		auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(event.Secure))
+		return nil
 	}
-
-	session := sessionstore.NewSession().
-		SetUserID(userID).
-		SetUserAgent(httpReq.UserAgent()).
-		SetIPAddress(req.GetIP(httpReq)).
-		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
-
-	if err := r.sessionStore.SessionCreate(httpReq.Context(), session); err != nil {
-		return err
-	}
-
-	auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(secure))
-	return nil
 }
 
 // NewOnUserUpdateFunc returns an OnUserUpdate callback that enqueues a
