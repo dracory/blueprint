@@ -401,13 +401,13 @@ func intersectIDSets(sets [][]string) []string {
 // cookie. The host owns the session store, cookie format, and expiry
 // policy.
 func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateFunc {
-	return func(w http.ResponseWriter, httpReq *http.Request, event useradmin.UserImpersonateEvent) error {
+	return func(w http.ResponseWriter, httpReq *http.Request, userID string) error {
 		if app == nil || app.GetSessionStore() == nil {
 			return errors.New("session store is nil")
 		}
 
 		session := sessionstore.NewSession().
-			SetUserID(event.UserID).
+			SetUserID(userID).
 			SetUserAgent(httpReq.UserAgent()).
 			SetIPAddress(req.GetIP(httpReq)).
 			SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
@@ -423,10 +423,12 @@ func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateF
 }
 
 // NewOnUserUpdateFunc returns an OnUserUpdate callback that enqueues a
-// blind index rebuild task when a user's email changes. It bridges
-// useradmin's event-based hook to the blueprint's taskstore.
+// blind index rebuild task after a user is updated. The host can load
+// the user by event.UserID and decide whether a rebuild is needed.
+// For simplicity, it enqueues unconditionally — the rebuild is
+// idempotent.
 func NewOnUserUpdateFunc(app app.AppInterface, taskAlias string) useradmin.OnUserUpdateFunc {
-	return func(ctx context.Context, event useradmin.UserUpdateEvent) {
+	return func(ctx context.Context, userID string) {
 		if app == nil || app.GetTaskStore() == nil || taskAlias == "" {
 			return
 		}
@@ -437,6 +439,7 @@ func NewOnUserUpdateFunc(app app.AppInterface, taskAlias string) useradmin.OnUse
 			map[string]any{
 				"index":    "email",
 				"truncate": "no",
+				"user_id":  userID,
 			},
 		)
 		if err != nil && app.GetLogger() != nil {
