@@ -52,14 +52,6 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		AdminHomeURL:      links.Admin().Home(),
 		UserAdminURL:      links.Admin().Users(),
 		UserHomeURL:       links.User().Home(),
-		AuthUserID: func(r *http.Request) string {
-			user := helpers.GetAuthUser(r)
-			if user == nil {
-				return ""
-			}
-			return user.GetID()
-		},
-		AuthUser: helpers.GetAuthUser,
 	})
 
 	if err != nil {
