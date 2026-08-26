@@ -6,12 +6,14 @@ import (
 	"net/http"
 	"net/url"
 
+	basesession "github.com/dracory/base/session"
+
+	"project/internal/app"
 	"project/internal/controllers/user/partials"
 	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/geostore"
@@ -24,7 +26,7 @@ import (
 // == CONTROLLER ==============================================================
 
 type profileController struct {
-	app                               app.AppInterface
+	app                                    app.AppInterface
 	actionOnCountrySelectedTimezoneOptions string
 	formCountry                            string
 	formTimezone                           string
@@ -34,7 +36,7 @@ type profileController struct {
 
 func NewProfileController(app app.AppInterface) *profileController {
 	return &profileController{
-		app:                               app,
+		app:                                    app,
 		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",
 		formCountry:                            "country",
 		formTimezone:                           "timezone",
@@ -122,7 +124,7 @@ func (controller *profileController) onCountrySelectedTimezoneOptions(data profi
 }
 
 func (controller *profileController) prepareData(r *http.Request) (data profileControllerData, errorMessage string) {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	if authUser == nil {
 		return profileControllerData{}, "User not found"

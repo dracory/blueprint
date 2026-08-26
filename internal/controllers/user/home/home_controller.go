@@ -3,12 +3,14 @@ package user
 import (
 	"log/slog"
 	"net/http"
+	"project/internal/app"
 	"project/internal/ext"
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
-	"project/internal/app"
 	"strings"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/userstore"
 
@@ -54,7 +56,7 @@ func (controller *homeController) view(data homeControllerData) hb.TagInterface 
 
 func (controller *homeController) prepareData(r *http.Request) (data homeControllerData, errorMessage string) {
 	var err error
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	if authUser == nil {
 		return data, "User not found"

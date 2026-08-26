@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"project/internal/app"
 	"project/internal/controllers/admin/adapters"
-	"project/internal/helpers"
 	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	blogadmin "github.com/dracory/blogadmin"
 )
@@ -34,7 +35,7 @@ func (controller *blogAdminController) Handler(w http.ResponseWriter, r *http.Re
 		BlogAdminURL:   links.Admin().Blog(),
 		FileManagerURL: links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
-			user := helpers.GetAuthUser(r)
+			user := basesession.GetAuthUser(r)
 			if user == nil {
 				return ""
 			}

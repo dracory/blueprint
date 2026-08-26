@@ -3,9 +3,10 @@ package flash
 import (
 	"net/http"
 	"project/internal/app"
-	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -29,7 +30,7 @@ func NewFlashController(app app.AppInterface) *flashController {
 // == PUBLIC METHODS ==========================================================
 
 func (controller flashController) Handler(w http.ResponseWriter, r *http.Request) string {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	title := "System Message"
 	html := controller.pageHTML(r)

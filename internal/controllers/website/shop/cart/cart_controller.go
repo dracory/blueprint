@@ -10,6 +10,8 @@ import (
 	"project/internal/config"
 	"project/internal/helpers"
 
+	basesession "github.com/dracory/base/session"
+
 	"github.com/dracory/api"
 	"github.com/dracory/shopstore"
 	"github.com/dracory/userstore"
@@ -212,7 +214,7 @@ func (controller *cartController) Handler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	// Check if user is authenticated
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	// Handle different actions based on method
 	switch r.Method {

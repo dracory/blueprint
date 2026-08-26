@@ -3,8 +3,9 @@ package layouts
 import (
 	"net/http"
 	"project/internal/app"
-	"project/internal/helpers"
 	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
@@ -12,7 +13,7 @@ import (
 
 // userLayoutNavbar builds the neo-brutalist navbar for the user layout.
 func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 	firstName := ""
 	if authUser != nil {
 		fn, _, _ := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())

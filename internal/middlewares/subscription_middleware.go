@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"project/internal/app"
 	"project/internal/config"
-	"project/internal/helpers"
 	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/subscriptionstore"
 
@@ -32,7 +33,7 @@ func NewSubscriptionOnlyMiddleware(app app.AppInterface) rtr.MiddlewareInterface
 func subscriptionOnlyMiddlewareHandler(app app.AppInterface) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authUser := helpers.GetAuthUser(r)
+			authUser := basesession.GetAuthUser(r)
 
 			if authUser == nil {
 				api.Respond(w, r, api.Unauthenticated("user id empty"))

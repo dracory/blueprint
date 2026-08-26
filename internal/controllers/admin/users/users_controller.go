@@ -3,9 +3,10 @@ package users
 import (
 	"net/http"
 
+	basesession "github.com/dracory/base/session"
+
 	"project/internal/app"
 	"project/internal/controllers/admin/adapters"
-	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/tasks/constants"
 
@@ -25,7 +26,7 @@ func NewUsersAdminController(app app.AppInterface) *usersAdminController {
 
 // Handler processes users admin requests
 func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.Request) {
-	user := helpers.GetAuthUser(r)
+	user := basesession.GetAuthUser(r)
 	if user == nil {
 		http.Redirect(w, r, links.Admin().Home(), http.StatusSeeOther)
 		return
@@ -37,7 +38,7 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		Logger:            controller.app.GetLogger(),
 		OnUserImpersonate: adapters.NewOnUserImpersonateFunc(controller.app),
 		OnUserSearch:      adapters.NewOnUserSearchFunc(controller.app),
-		OnUserUpdated:      adapters.NewOnUserUpdatedFunc(controller.app, constants.BlindIndexRebuildTaskAlias),
+		OnUserUpdated:     adapters.NewOnUserUpdatedFunc(controller.app, constants.BlindIndexRebuildTaskAlias),
 		UserPiiSeal:       adapters.NewUserPiiSealFunc(controller.app),
 		UserPiiUnseal:     adapters.NewUserPiiUnsealFunc(controller.app),
 		UsersPiiUnseal:    adapters.NewUsersPiiUnsealFunc(controller.app),

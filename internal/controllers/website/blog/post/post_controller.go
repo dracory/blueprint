@@ -14,6 +14,8 @@ import (
 	"project/internal/rules"
 	"strings"
 
+	basesession "github.com/dracory/base/session"
+
 	"time"
 
 	"github.com/dracory/blogadmin/post_update"
@@ -106,7 +108,7 @@ func (controller *postController) accessAllowed(r *http.Request, post blogstore.
 		return true // everyone can access published posts
 	}
 
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	// If the user is not logged in, they can't access unpublished posts
 	if authUser == nil {

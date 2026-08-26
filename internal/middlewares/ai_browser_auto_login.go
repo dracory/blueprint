@@ -34,7 +34,7 @@ func AiBrowserAutoLoginMiddleware(a app.AppInterface) rtr.MiddlewareInterface {
 
 func aiBrowserAutoLoginHandler(a app.AppInterface, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Check for an existing auth cookie directly — do NOT use helpers.GetAuthUser(r)
+		// Check for an existing auth cookie directly — do NOT use basesession.GetAuthUser(r)
 		// because GetAuthUser reads from the request context, which is populated by
 		// AuthMiddleware. Since this middleware runs before AuthMiddleware, the context
 		// value will always be nil here.

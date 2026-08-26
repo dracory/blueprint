@@ -6,6 +6,8 @@ import (
 	"project/internal/helpers"
 	"project/internal/links"
 
+	basesession "github.com/dracory/base/session"
+
 	"github.com/dracory/rtr"
 )
 
@@ -14,7 +16,7 @@ func NewEmailAllowlistMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 		SetName("Email Allowlist Middleware").
 		SetHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				user := helpers.GetAuthUser(r)
+				user := basesession.GetAuthUser(r)
 
 				// if the user is not authenticated, redirect to login
 				if user == nil {

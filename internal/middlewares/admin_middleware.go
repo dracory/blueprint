@@ -6,6 +6,8 @@ import (
 	"project/internal/helpers"
 	"project/internal/links"
 
+	basesession "github.com/dracory/base/session"
+
 	"github.com/dracory/rtr"
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
 	"github.com/dracory/userstore"
@@ -55,7 +57,7 @@ func (a *adminUserAdapter) HasRole(role string) bool {
 func NewAdminMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	return rtrMiddleware.UserMiddleware(rtrMiddleware.UserMiddlewareConfig{
 		GetUser: func(r *http.Request) rtrMiddleware.UserMiddlewareUser {
-			user := helpers.GetAuthUser(r)
+			user := basesession.GetAuthUser(r)
 			if user == nil {
 				return nil
 			}

@@ -3,7 +3,8 @@ package widgets
 import (
 	"net/http"
 	"project/internal/app"
-	"project/internal/helpers"
+
+	basesession "github.com/dracory/base/session"
 )
 
 var _ Widget = (*authenticatedWidget)(nil) // verify it extends the interface
@@ -44,7 +45,7 @@ func (w *authenticatedWidget) Description() string {
 
 // Render implements the shortcode interface.
 func (w *authenticatedWidget) Render(req *http.Request, content string, data map[string]string) string {
-	authUser := helpers.GetAuthUser(req)
+	authUser := basesession.GetAuthUser(req)
 
 	if authUser != nil {
 		return content

@@ -1,6 +1,10 @@
 package helpers
 
-import "net/http"
+import (
+	"net/http"
+
+	basesession "github.com/dracory/base/session"
+)
 
 // TimezoneFromRequest returns the timezone from the authenticated user
 // or the default timezone (UTC) if the user is not authenticated.
@@ -12,7 +16,7 @@ import "net/http"
 //   - string: the timezone
 func TimezoneFromRequest(r *http.Request) string {
 	defaultTimezone := "UTC"
-	user := GetAuthUser(r)
+	user := basesession.GetAuthUser(r)
 
 	if user == nil {
 		return defaultTimezone

@@ -12,6 +12,8 @@ import (
 	authrules "project/internal/rules/auth"
 	"strings"
 
+	basesession "github.com/dracory/base/session"
+
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/geostore"
@@ -301,7 +303,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 	}
 
 	action := req.GetStringTrimmed(r, "action")
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	if authUser == nil {
 		return registerControllerData{}, "You must be logged in to access this page"

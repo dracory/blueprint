@@ -3,8 +3,9 @@ package contact
 import (
 	"net/http"
 	"project/internal/app"
-	"project/internal/helpers"
 	"project/internal/layouts"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -24,7 +25,7 @@ func NewContactController(app app.AppInterface) *contactController {
 }
 
 func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Request) string {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 	userID := ""
 	if authUser != nil {
 		userID = authUser.GetID()

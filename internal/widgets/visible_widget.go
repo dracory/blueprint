@@ -4,8 +4,9 @@ import (
 	"net/http"
 	"project/internal/app"
 	"project/internal/config"
-	"project/internal/helpers"
 	"slices"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/samber/lo"
 )
@@ -118,7 +119,7 @@ func (w *visibleWidget) isAuthMatch(req *http.Request, authenticated string) boo
 		return false
 	}
 
-	authUser := helpers.GetAuthUser(req)
+	authUser := basesession.GetAuthUser(req)
 
 	isAuth := lo.Ternary(authUser != nil, true, false)
 

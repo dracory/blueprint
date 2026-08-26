@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strings"
 
+	basesession "github.com/dracory/base/session"
+
 	"project/internal/app"
 	"project/internal/controllers/admin/adapters"
-	"project/internal/helpers"
 	"project/internal/links"
 
 	fileadmin "github.com/dracory/fileadmin"
@@ -40,7 +41,7 @@ func (c *FileManagerController) Handler(w http.ResponseWriter, r *http.Request) 
 		AdminHomeURL: links.Admin().Home(),
 		FileAdminURL: links.Admin().FileManager(),
 		AuthUserID: func(r *http.Request) string {
-			user := helpers.GetAuthUser(r)
+			user := basesession.GetAuthUser(r)
 			if user == nil {
 				return ""
 			}

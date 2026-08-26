@@ -2,9 +2,10 @@ package layouts
 
 import (
 	"net/http"
-	"project/internal/helpers"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/dashboard"
@@ -25,7 +26,7 @@ func NewAdminLayout(app app.AppInterface, r *http.Request, options Options) dash
 // Returns:
 // - a dashboardTypes.DashboardInterface object representing the generated dashboard.
 func adminLayout(app app.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	dashboardUser := dashboardTypes.User{}
 	if authUser != nil {

@@ -4,8 +4,9 @@ import (
 	_ "embed"
 	"net/http"
 	"project/internal/app"
-	"project/internal/helpers"
 	"project/internal/links"
+
+	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -35,7 +36,7 @@ type pageLayout struct {
 // The navbar is shown by default and adapts to the user's auth state.
 // Set Options.DisableNavbar to true for pages that provide their own navigation.
 func NewPageLayout(app app.AppInterface, r *http.Request, options Options) LayoutInterface {
-	authUser := helpers.GetAuthUser(r)
+	authUser := basesession.GetAuthUser(r)
 
 	titlePostfix := " | " + lo.Ternary(authUser == nil, "Guest", "User")
 	if app.GetConfig().GetAppName() != "" {
