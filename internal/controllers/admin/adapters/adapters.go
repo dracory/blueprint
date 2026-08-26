@@ -1,11 +1,13 @@
-// Package adapters bridges the external blogadmin and shopadmin packages
-// to the blueprint's internal services (admin layout, LLM config, userstore
-// for customer resolution).
+// Package adapters bridges the external blogadmin, shopadmin, and
+// useradmin packages to the blueprint's internal services (admin
+// layout, LLM config, userstore for customer resolution, vault
+// tokenization, flash redirects).
 //
 // The external packages are decoupled from any specific host project, so
 // they accept callback functions and interfaces (FuncLayout, LlmFactory,
-// CustomerResolverInterface). This package provides concrete adapters
-// wired to the blueprint's app.AppInterface.
+// CustomerResolverInterface, VaultTokenizer, FlashRedirectFunc). This
+// package provides concrete adapters wired to the blueprint's
+// app.AppInterface.
 package adapters
 
 import (
@@ -14,10 +16,13 @@ import (
 	"strings"
 
 	"project/internal/app"
+	"project/internal/ext"
+	"project/internal/helpers"
 	"project/internal/layouts"
 
 	"github.com/dracory/hb"
 	"github.com/dracory/llm"
+	"github.com/dracory/useradmin/shared"
 	"github.com/dracory/userstore"
 )
 
@@ -116,4 +121,77 @@ func (r *UserStoreCustomerResolver) SearchIDs(ctx context.Context, name, email s
 		ids[i] = u.GetID()
 	}
 	return ids, nil
+}
+
+// VaultTokenizerAdapter implements useradmin/shared.VaultTokenizer
+// using the blueprint's ext.UserTokenize / ext.UserUntokenize helpers.
+// It is only active when the blueprint's config has vault store enabled;
+// otherwise it returns plain-text passthrough so useradmin treats user
+// fields as plain text.
+type VaultTokenizerAdapter struct {
+	app app.AppInterface
+}
+
+// NewVaultTokenizerAdapter creates a VaultTokenizer backed by the
+// blueprint's vault store. The adapter checks config.GetVaultStoreUsed()
+// on every call so toggling vault at runtime is respected.
+func NewVaultTokenizerAdapter(app app.AppInterface) *VaultTokenizerAdapter {
+	return &VaultTokenizerAdapter{app: app}
+}
+
+// Tokenize upserts vault tokens for the given user fields and returns
+// the resulting token strings. When vault is disabled, it returns the
+// input values unchanged.
+func (a *VaultTokenizerAdapter) Tokenize(
+	ctx context.Context,
+	user userstore.UserInterface,
+	firstName, lastName, email, phone, businessName string,
+) (string, string, string, string, string, error) {
+	if a.app == nil || a.app.GetConfig() == nil || !a.app.GetConfig().GetVaultStoreUsed() || a.app.GetVaultStore() == nil {
+		return firstName, lastName, email, phone, businessName, nil
+	}
+	return ext.UserTokenize(
+		ctx,
+		a.app.GetVaultStore(),
+		a.app.GetConfig().GetVaultStoreKey(),
+		user,
+		firstName, lastName, email, phone, businessName,
+	)
+}
+
+// Untokenize resolves the tokenized fields on the given user back to
+// their plain-text values. When vault is disabled, it returns the
+// user's stored field values unchanged.
+func (a *VaultTokenizerAdapter) Untokenize(
+	ctx context.Context,
+	user userstore.UserInterface,
+) (string, string, string, string, string, error) {
+	if a.app == nil || a.app.GetConfig() == nil || !a.app.GetConfig().GetVaultStoreUsed() || a.app.GetVaultStore() == nil {
+		if user == nil {
+			return "", "", "", "", "", nil
+		}
+		return user.GetFirstName(), user.GetLastName(), user.GetEmail(), user.GetPhone(), user.GetBusinessName(), nil
+	}
+	return ext.UserUntokenize(ctx, a.app, a.app.GetConfig().GetVaultStoreKey(), user)
+}
+
+// NewFlashRedirectFunc returns a FlashRedirectFunc adapter that bridges
+// the useradmin/shared.FlashRedirectFunc signature to the blueprint's
+// helpers.ToFlash* helpers. It uses the blueprint's cache store and
+// links.Website().Flash() route.
+func NewFlashRedirectFunc(app app.AppInterface) shared.FlashRedirectFunc {
+	return func(w http.ResponseWriter, r *http.Request, messageType, message, redirectURL string, seconds int) string {
+		switch messageType {
+		case "error":
+			return helpers.ToFlashError(app.GetCacheStore(), w, r, message, redirectURL, seconds)
+		case "success":
+			return helpers.ToFlashSuccess(app.GetCacheStore(), w, r, message, redirectURL, seconds)
+		case "info":
+			return helpers.ToFlashInfo(app.GetCacheStore(), w, r, message, redirectURL, seconds)
+		case "warning":
+			return helpers.ToFlashWarning(app.GetCacheStore(), w, r, message, redirectURL, seconds)
+		default:
+			return helpers.ToFlashError(app.GetCacheStore(), w, r, message, redirectURL, seconds)
+		}
+	}
 }

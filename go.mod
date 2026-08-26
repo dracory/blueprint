@@ -12,8 +12,9 @@ go 1.26.5
 
 // replace github.com/dracory/rule => ../../_modules_dracory/rule
 
+replace github.com/dracory/useradmin => ../../_modules_dracory/useradmin
+
 require (
-	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.11.0
@@ -65,6 +66,7 @@ require (
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
+	github.com/dracory/useradmin v0.1.0
 	github.com/dracory/userstore v1.18.0
 	github.com/dracory/vaultstore v1.4.1
 	github.com/dracory/websrv v0.4.0
@@ -99,6 +101,7 @@ require (
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/LumenResearch/uasurfer v0.3.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.43.6 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.18 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.36 // indirect

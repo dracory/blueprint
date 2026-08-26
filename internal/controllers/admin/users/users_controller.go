@@ -4,12 +4,16 @@ import (
 	"net/http"
 
 	"project/internal/app"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
-	"project/pkg/useradmin"
+	"project/internal/tasks/constants"
+
+	useradmin "github.com/dracory/useradmin"
 )
 
-// usersAdminController wraps the pkg/useradmin package for integration
+// usersAdminController wraps the external github.com/dracory/useradmin
+// package for integration with the blueprint admin interface.
 type usersAdminController struct {
 	app app.AppInterface
 }
@@ -27,10 +31,30 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// Secure cookie is only false in development (HTTP). In production
+	// (HTTPS) the impersonation cookie must be marked Secure.
+	secure := true
+	if controller.app.GetConfig() != nil && controller.app.GetConfig().IsEnvDevelopment() {
+		secure = false
+	}
+
 	admin, err := useradmin.New(useradmin.AdminOptions{
-		Registry:     controller.app,
-		AdminHomeURL: links.Admin().Home(),
-		UserAdminURL: links.Admin().Users(),
+		UserStore:                  controller.app.GetUserStore(),
+		GeoStore:                   controller.app.GetGeoStore(),
+		Logger:                     controller.app.GetLogger(),
+		SessionStore:               controller.app.GetSessionStore(),
+		BlindIndexFirstName:        controller.app.GetBlindIndexStoreFirstName(),
+		BlindIndexLastName:         controller.app.GetBlindIndexStoreLastName(),
+		BlindIndexEmail:            controller.app.GetBlindIndexStoreEmail(),
+		TaskStore:                  controller.app.GetTaskStore(),
+		BlindIndexRebuildTaskAlias: constants.BlindIndexRebuildTaskAlias,
+		VaultTokenizer:             adapters.NewVaultTokenizerAdapter(controller.app),
+		FuncLayout:                 adapters.NewLayoutFunc(controller.app),
+		FlashRedirect:              adapters.NewFlashRedirectFunc(controller.app),
+		SecureCookie:               secure,
+		AdminHomeURL:               links.Admin().Home(),
+		UserAdminURL:               links.Admin().Users(),
+		UserHomeURL:                links.User().Home(),
 		AuthUserID: func(r *http.Request) string {
 			user := helpers.GetAuthUser(r)
 			if user == nil {
@@ -38,6 +62,7 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 			}
 			return user.GetID()
 		},
+		AuthUser: helpers.GetAuthUser,
 	})
 
 	if err != nil {
@@ -53,14 +78,5 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	html := admin.Handle(w, r)
-
-	if html != "" {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if _, err := w.Write([]byte(html)); err != nil { // #nosec G705 -- html is built by trusted admin handler
-			if logger := controller.app.GetLogger(); logger != nil {
-				logger.Error("At usersAdminController > Handler", "write_error", err.Error())
-			}
-		}
-	}
+	admin.Handle(w, r)
 }
