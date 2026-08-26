@@ -422,12 +422,12 @@ func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateF
 	}
 }
 
-// NewOnUserUpdateFunc returns an OnUserUpdate callback that enqueues a
+// NewOnUserUpdatedFunc returns an OnUserUpdated callback that enqueues a
 // blind index rebuild task after a user is updated. The host can load
 // the user by event.UserID and decide whether a rebuild is needed.
 // For simplicity, it enqueues unconditionally — the rebuild is
 // idempotent.
-func NewOnUserUpdateFunc(app app.AppInterface, taskAlias string) useradmin.OnUserUpdateFunc {
+func NewOnUserUpdatedFunc(app app.AppInterface, taskAlias string) useradmin.OnUserUpdatedFunc {
 	return func(ctx context.Context, userID string) {
 		if app == nil || app.GetTaskStore() == nil || taskAlias == "" {
 			return
@@ -443,7 +443,7 @@ func NewOnUserUpdateFunc(app app.AppInterface, taskAlias string) useradmin.OnUse
 			},
 		)
 		if err != nil && app.GetLogger() != nil {
-			app.GetLogger().Error("adapters.NewOnUserUpdateFunc enqueue failed", slog.String("error", err.Error()))
+			app.GetLogger().Error("adapters.NewOnUserUpdatedFunc enqueue failed", slog.String("error", err.Error()))
 		}
 	}
 }

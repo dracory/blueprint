@@ -37,7 +37,7 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		Logger:            controller.app.GetLogger(),
 		OnUserImpersonate: adapters.NewOnUserImpersonateFunc(controller.app),
 		OnUserSearch:      adapters.NewOnUserSearchFunc(controller.app),
-		OnUserUpdate:      adapters.NewOnUserUpdateFunc(controller.app, constants.BlindIndexRebuildTaskAlias),
+		OnUserUpdated:      adapters.NewOnUserUpdatedFunc(controller.app, constants.BlindIndexRebuildTaskAlias),
 		UserPiiSeal:       adapters.NewUserPiiSealFunc(controller.app),
 		UserPiiUnseal:     adapters.NewUserPiiUnsealFunc(controller.app),
 		UsersPiiUnseal:    adapters.NewUsersPiiUnsealFunc(controller.app),
