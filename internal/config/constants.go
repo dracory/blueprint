@@ -2,21 +2,31 @@
 
 package config
 
+import basesession "github.com/dracory/base/session"
+
 // ============================================================================
 // == START: Types
 // ============================================================================
+//
+// Context key types are type aliases of github.com/dracory/base/session so
+// that values set via base/session.SetAuthUser (or any middleware using
+// base/session keys) can be read by code referencing config.*ContextKey and
+// vice versa. Previously these were independently defined struct{} types,
+// which meant a value stored under one type could not be retrieved under the
+// other — a latent bug.
+//
 
 // AuthenticatedUserContextKey is a context key for the authenticated user.
-type AuthenticatedUserContextKey struct{}
+type AuthenticatedUserContextKey = basesession.AuthenticatedUserContextKey
 
 // AuthenticatedSessionContextKey is a context key for the authenticated session.
-type AuthenticatedSessionContextKey struct{}
+type AuthenticatedSessionContextKey = basesession.AuthenticatedSessionContextKey
 
 // APIAuthenticatedUserContextKey is a context key for API authenticated user.
-type APIAuthenticatedUserContextKey struct{}
+type APIAuthenticatedUserContextKey = basesession.APIAuthenticatedUserContextKey
 
 // APIAuthenticatedSessionContextKey is a context key for API authenticated session.
-type APIAuthenticatedSessionContextKey struct{}
+type APIAuthenticatedSessionContextKey = basesession.APIAuthenticatedSessionContextKey
 
 // ============================================================================
 // == END: Types

@@ -2,7 +2,7 @@ module project
 
 go 1.26.5
 
-// replace github.com/dracory/base => ../../_modules_dracory/base
+replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
 
@@ -49,7 +49,7 @@ require (
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.1
 	github.com/dracory/metastore v1.11.0
-	github.com/dracory/neat v0.40.0
+	github.com/dracory/neat v0.41.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0

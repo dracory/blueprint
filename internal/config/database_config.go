@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	neatcontracts "github.com/dracory/neat/contracts/database"
 	"github.com/dracory/neat/database/db"
 )
 
@@ -317,7 +318,7 @@ func connectionNeatConfig(conn DatabaseConnectionConfigInterface) db.ConnectionC
 	driver := strings.ToLower(strings.TrimSpace(conn.GetDriver()))
 
 	nc := db.ConnectionConfig{
-		Driver:   driver,
+		Driver:   neatcontracts.Driver(driver),
 		Dsn:      conn.GetDSN(),
 		Host:     conn.GetHost(),
 		Database: conn.GetDatabase(),
