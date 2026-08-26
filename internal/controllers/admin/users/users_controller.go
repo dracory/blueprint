@@ -40,7 +40,7 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 
 	admin, err := useradmin.New(useradmin.AdminOptions{
 		UserStore:                  controller.app.GetUserStore(),
-		GeoStore:                   controller.app.GetGeoStore(),
+		GeoResolver:                adapters.NewGeoResolver(controller.app.GetGeoStore()),
 		Logger:                     controller.app.GetLogger(),
 		SessionStore:               controller.app.GetSessionStore(),
 		BlindIndexFirstName:        controller.app.GetBlindIndexStoreFirstName(),

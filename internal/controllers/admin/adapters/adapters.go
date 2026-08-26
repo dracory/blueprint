@@ -20,9 +20,11 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 
+	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
 	"github.com/dracory/llm"
-	"github.com/dracory/useradmin/shared"
+	"github.com/dracory/neat"
+	"github.com/dracory/useradmin"
 	"github.com/dracory/userstore"
 )
 
@@ -123,7 +125,7 @@ func (r *UserStoreCustomerResolver) SearchIDs(ctx context.Context, name, email s
 	return ids, nil
 }
 
-// VaultTokenizerAdapter implements useradmin/shared.VaultTokenizer
+// VaultTokenizerAdapter implements useradmin.VaultTokenizer
 // using the blueprint's ext.UserTokenize / ext.UserUntokenize helpers.
 // It is only active when the blueprint's config has vault store enabled;
 // otherwise it returns plain-text passthrough so useradmin treats user
@@ -176,10 +178,10 @@ func (a *VaultTokenizerAdapter) Untokenize(
 }
 
 // NewFlashRedirectFunc returns a FlashRedirectFunc adapter that bridges
-// the useradmin/shared.FlashRedirectFunc signature to the blueprint's
+// the useradmin.FlashRedirectFunc signature to the blueprint's
 // helpers.ToFlash* helpers. It uses the blueprint's cache store and
 // links.Website().Flash() route.
-func NewFlashRedirectFunc(app app.AppInterface) shared.FlashRedirectFunc {
+func NewFlashRedirectFunc(app app.AppInterface) useradmin.FlashRedirectFunc {
 	return func(w http.ResponseWriter, r *http.Request, messageType, message, redirectURL string, seconds int) string {
 		switch messageType {
 		case "error":
@@ -194,4 +196,66 @@ func NewFlashRedirectFunc(app app.AppInterface) shared.FlashRedirectFunc {
 			return helpers.ToFlashError(app.GetCacheStore(), w, r, message, redirectURL, seconds)
 		}
 	}
+}
+
+// GeoResolver implements useradmin.GeoResolverInterface using the
+// blueprint's geostore. It adapts the geostore's query-option-based API
+// to the simpler GeoResolverInterface shape (no query structs, no column
+// constants leaked into useradmin).
+type GeoResolver struct {
+	geoStore geostore.StoreInterface
+}
+
+// Compile-time assertion that GeoResolver satisfies useradmin.GeoResolverInterface.
+var _ useradmin.GeoResolverInterface = (*GeoResolver)(nil)
+
+// NewGeoResolver creates a GeoResolver backed by the blueprint's geostore.
+func NewGeoResolver(geoStore geostore.StoreInterface) *GeoResolver {
+	return &GeoResolver{geoStore: geoStore}
+}
+
+// Countries returns all countries sorted by name ascending.
+func (r *GeoResolver) Countries(ctx context.Context) ([]useradmin.Country, error) {
+	if r.geoStore == nil {
+		return nil, nil
+	}
+	list, err := r.geoStore.CountryList(ctx, geostore.CountryQueryOptions{
+		SortOrder: neat.SortAsc,
+		OrderBy:   geostore.COLUMN_NAME,
+	})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]useradmin.Country, 0, len(list))
+	for _, c := range list {
+		out = append(out, useradmin.Country{
+			IsoCode2: c.IsoCode2(),
+			Name:     c.Name(),
+		})
+	}
+	return out, nil
+}
+
+// Timezones returns timezones for the given country code, sorted by
+// timezone ascending. Returns an empty list when no country code is
+// provided (no country selected means no timezones to show).
+func (r *GeoResolver) Timezones(ctx context.Context, countryCode ...string) ([]useradmin.Timezone, error) {
+	if r.geoStore == nil || len(countryCode) == 0 || countryCode[0] == "" {
+		return nil, nil
+	}
+	list, err := r.geoStore.TimezoneList(ctx, geostore.TimezoneQueryOptions{
+		SortOrder:   neat.SortAsc,
+		OrderBy:     geostore.COLUMN_TIMEZONE,
+		CountryCode: countryCode[0],
+	})
+	if err != nil {
+		return nil, err
+	}
+	out := make([]useradmin.Timezone, 0, len(list))
+	for _, tz := range list {
+		out = append(out, useradmin.Timezone{
+			Code: tz.Timezone(),
+		})
+	}
+	return out, nil
 }
