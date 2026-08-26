@@ -20,6 +20,7 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 
+	"github.com/dracory/blindindexstore"
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
 	"github.com/dracory/llm"
@@ -258,4 +259,30 @@ func (r *GeoResolver) Timezones(ctx context.Context, countryCode ...string) ([]u
 		})
 	}
 	return out, nil
+}
+
+// BlindIndexResolver implements useradmin.BlindIndexResolverInterface
+// using the blueprint's blindindexstore. It maps useradmin's
+// BlindIndexSearchType constants to blindindexstore's search type
+// constants.
+type BlindIndexResolver struct {
+	store blindindexstore.StoreInterface
+}
+
+// NewBlindIndexResolver creates a BlindIndexResolver backed by the
+// blueprint's blindindexstore.
+func NewBlindIndexResolver(store blindindexstore.StoreInterface) *BlindIndexResolver {
+	return &BlindIndexResolver{store: store}
+}
+
+// Compile-time assertion that BlindIndexResolver satisfies useradmin.BlindIndexResolverInterface.
+var _ useradmin.BlindIndexResolverInterface = (*BlindIndexResolver)(nil)
+
+// Search returns user IDs whose indexed field matches the given value
+// according to the search type.
+func (r *BlindIndexResolver) Search(ctx context.Context, value string, searchType useradmin.BlindIndexSearchType) ([]string, error) {
+	if r.store == nil {
+		return nil, nil
+	}
+	return r.store.Search(ctx, value, string(searchType))
 }
