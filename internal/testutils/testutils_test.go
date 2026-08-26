@@ -223,7 +223,7 @@ func TestSeedSession_NilStore(t *testing.T) {
 	defer func() { _ = app.GetDatabase().Close() }()
 
 	user, _ := SeedUser(app.GetUserStore(), "test-user")
-	r, _ := NewRequest("GET", "/", NewRequestOptions{})
+	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	session, err := SeedSession(nil, r, user, 10)
 	if err == nil {
@@ -240,7 +240,7 @@ func TestSeedSession_Success(t *testing.T) {
 	defer func() { _ = app.GetDatabase().Close() }()
 
 	user, _ := SeedUser(app.GetUserStore(), "test-user")
-	r, _ := NewRequest("GET", "/", NewRequestOptions{})
+	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	session, err := SeedSession(app.GetSessionStore(), r, user, 10)
 	if err != nil {
@@ -273,7 +273,7 @@ func TestSeedUserAndSession_Success(t *testing.T) {
 	app := Setup(WithUserStore(true), WithSessionStore(true))
 	defer func() { _ = app.GetDatabase().Close() }()
 
-	r, _ := NewRequest("GET", "/", NewRequestOptions{})
+	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 	user, session, err := SeedUserAndSession(app.GetUserStore(), app.GetSessionStore(), "test-user", r, 10)
 	if err != nil {
 		t.Fatalf("Failed to seed user and session: %v", err)
@@ -295,7 +295,7 @@ func TestLoginAs_Success(t *testing.T) {
 	defer func() { _ = app.GetDatabase().Close() }()
 
 	user, _ := SeedUser(app.GetUserStore(), "test-user")
-	r, _ := NewRequest("GET", "/", NewRequestOptions{})
+	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	authenticatedReq, err := LoginAs(app, r, user)
 	if err != nil {
@@ -308,7 +308,7 @@ func TestLoginAs_Success(t *testing.T) {
 
 func TestNewRequest_DefaultURL(t *testing.T) {
 	t.Parallel()
-	req, err := NewRequest("GET", "", NewRequestOptions{})
+	req, err := test.NewRequest("GET", "", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -320,7 +320,7 @@ func TestNewRequest_DefaultURL(t *testing.T) {
 func TestNewRequest_WithBody(t *testing.T) {
 	t.Parallel()
 	body := "test body content"
-	req, err := NewRequest("POST", "/test", NewRequestOptions{Body: body})
+	req, err := test.NewRequest("POST", "/test", test.NewRequestOptions{Body: body})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -334,7 +334,7 @@ func TestNewRequest_WithBody(t *testing.T) {
 func TestNewRequest_WithJSONData(t *testing.T) {
 	t.Parallel()
 	data := map[string]string{"key": "value"}
-	req, err := NewRequest("POST", "/test", NewRequestOptions{JSONData: data})
+	req, err := test.NewRequest("POST", "/test", test.NewRequestOptions{JSONData: data})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -348,7 +348,7 @@ func TestNewRequest_WithFormValues(t *testing.T) {
 	formValues := url.Values{}
 	formValues.Set("field1", "value1")
 	formValues.Set("field2", "value2")
-	req, err := NewRequest("POST", "/test", NewRequestOptions{FormValues: formValues})
+	req, err := test.NewRequest("POST", "/test", test.NewRequestOptions{FormValues: formValues})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -362,7 +362,7 @@ func TestNewRequest_WithQueryParams(t *testing.T) {
 	queryParams := url.Values{}
 	queryParams.Set("param1", "value1")
 	queryParams.Set("param2", "value2")
-	req, err := NewRequest("GET", "/test", NewRequestOptions{QueryParams: queryParams})
+	req, err := test.NewRequest("GET", "/test", test.NewRequestOptions{QueryParams: queryParams})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -377,7 +377,7 @@ func TestNewRequest_WithHeaders(t *testing.T) {
 		"X-Custom-Header": "custom-value",
 		"Authorization":   "Bearer token",
 	}
-	req, err := NewRequest("GET", "/test", NewRequestOptions{Headers: headers})
+	req, err := test.NewRequest("GET", "/test", test.NewRequestOptions{Headers: headers})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -394,7 +394,7 @@ func TestNewRequest_WithContext(t *testing.T) {
 	ctxKey := "context-key"
 	ctxValue := "context-value"
 	ctx := map[any]any{ctxKey: ctxValue}
-	req, err := NewRequest("GET", "/test", NewRequestOptions{Context: ctx})
+	req, err := test.NewRequest("GET", "/test", test.NewRequestOptions{Context: ctx})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
@@ -405,7 +405,7 @@ func TestNewRequest_WithContext(t *testing.T) {
 
 func TestNewRequest_RequestURI(t *testing.T) {
 	t.Parallel()
-	req, err := NewRequest("GET", "/test/path", NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/test/path", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}

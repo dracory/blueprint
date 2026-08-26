@@ -8,6 +8,7 @@ import (
 	"project/internal/testutils"
 
 	"github.com/dracory/cmsstore"
+	"github.com/dracory/test"
 )
 
 // TestSearchBlockType_BasicProperties tests basic properties
@@ -174,7 +175,7 @@ func TestSearchBlockType_Render_EmptyQuery(t *testing.T) {
 	block.SetMeta("show_posts", "true")
 
 	// Create request without query
-	req, _ := testutils.NewRequest("GET", "/search", testutils.NewRequestOptions{})
+	req, _ := test.NewRequest("GET", "/search", test.NewRequestOptions{})
 	ctx := cmsstore.RequestToContext(req.Context(), req)
 
 	html, err := blockType.Render(ctx, block)
@@ -207,7 +208,7 @@ func TestSearchBlockType_Render_WithQuery(t *testing.T) {
 	block.SetMeta("show_posts", "true")
 
 	// Create request with search query
-	req, _ := testutils.NewRequest("GET", "/search", testutils.NewRequestOptions{
+	req, _ := test.NewRequest("GET", "/search", test.NewRequestOptions{
 		QueryParams: map[string][]string{"q": {"test"}},
 	})
 	ctx := cmsstore.RequestToContext(req.Context(), req)

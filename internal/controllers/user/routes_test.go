@@ -285,7 +285,7 @@ func TestUserHomePage_RedirectsNonLoggedUser(t *testing.T) {
 // 		t.Fatal(err)
 // 	}
 
-// 	req, err := testutils.NewRequest(http.MethodGet, links.User().Home(), testutils.NewRequestOptions{
+// 	req, err := test.NewRequest(http.MethodGet, links.User().Home(), test.NewRequestOptions{
 // 		Context: map[any]any{
 // 			config.AuthenticatedUserContextKey{}:    user,
 // 			config.AuthenticatedSessionContextKey{}: session,
@@ -351,7 +351,7 @@ func TestUserHomePage(t *testing.T) {
 	// 	t.Fatal(err)
 	// }
 
-	req, err := testutils.NewRequest(http.MethodGet, links.User().Home(), testutils.NewRequestOptions{
+	req, err := test.NewRequest(http.MethodGet, links.User().Home(), test.NewRequestOptions{
 		Context: map[any]any{
 			config.AuthenticatedUserContextKey{}:    user,
 			config.AuthenticatedSessionContextKey{}: session,

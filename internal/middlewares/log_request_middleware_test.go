@@ -8,6 +8,8 @@ import (
 	"project/internal/testutils"
 	"strings"
 	"testing"
+
+	"github.com/dracory/test"
 )
 
 func TestLogRequestMiddleware(t *testing.T) {
@@ -24,7 +26,7 @@ func TestLogRequestMiddleware(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/test-path", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/test-path", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,7 +67,7 @@ func TestLogRequestMiddleware_Filtered(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/style.css", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/style.css", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +102,7 @@ func TestLogRequestMiddleware_Filtered_JS(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/script.js", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/script.js", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +137,7 @@ func TestLogRequestMiddleware_Filtered_Image(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/image.png", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/image.png", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +172,7 @@ func TestLogRequestMiddleware_Filtered_Favicon(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/favicon.ico", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/favicon.ico", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +207,7 @@ func TestLogRequestMiddleware_Filtered_Health(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/health", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/health", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +242,7 @@ func TestLogRequestMiddleware_Filtered_Ping(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/ping", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/ping", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -275,7 +277,7 @@ func TestLogRequestMiddleware_Filtered_AssetsFolder(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/assets/image.jpg", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/assets/image.jpg", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -310,7 +312,7 @@ func TestLogRequestMiddleware_Filtered_StaticFolder(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
-	req, err := testutils.NewRequest("GET", "/static/style.css", testutils.NewRequestOptions{})
+	req, err := test.NewRequest("GET", "/static/style.css", test.NewRequestOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
