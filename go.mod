@@ -12,7 +12,7 @@ go 1.26.5
 
 // replace github.com/dracory/rule => ../../_modules_dracory/rule
 
-replace github.com/dracory/useradmin => ../../_modules_dracory/useradmin
+// replace github.com/dracory/useradmin => ../../_modules_dracory/useradmin
 
 require (
 	github.com/disintegration/imaging v1.6.2
@@ -66,7 +66,7 @@ require (
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uid v1.9.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/useradmin v0.1.0
+	github.com/dracory/useradmin v0.2.0
 	github.com/dracory/userstore v1.18.0
 	github.com/dracory/vaultstore v1.4.1
 	github.com/dracory/websrv v0.4.0
