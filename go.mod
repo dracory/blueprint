@@ -19,7 +19,7 @@ require (
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.11.0
 	github.com/dracory/auth v0.35.0
-	github.com/dracory/base v0.42.0
+	github.com/dracory/base v0.42.2
 	github.com/dracory/blindindexstore v1.17.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.2.0
@@ -80,7 +80,6 @@ require (
 	github.com/robertkrimen/otto v0.5.1
 	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
 	github.com/spf13/cast v1.10.0
-	github.com/stripe/stripe-go/v73 v73.16.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
 	github.com/yuin/goldmark v1.8.5
 	modernc.org/sqlite v1.57.0
@@ -150,6 +149,7 @@ require (
 	github.com/pterm/pterm v0.12.83 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sashabaranov/go-openai v1.42.0 // indirect
+	github.com/stripe/stripe-go/v86 v86.3.0 // indirect
 	github.com/teambition/rrule-go v1.8.2 // indirect
 	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect

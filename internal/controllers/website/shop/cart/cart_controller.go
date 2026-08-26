@@ -9,7 +9,7 @@ import (
 	"project/internal/app"
 	"project/internal/config"
 
-	basehttp "github.com/dracory/base/http"
+	basepayment "github.com/dracory/base/payment"
 	basesession "github.com/dracory/base/session"
 
 	"github.com/dracory/api"
@@ -77,7 +77,7 @@ func (controller *cartController) getCartFromCache(ctx context.Context, r *http.
 		return Cart{Items: []CartItem{}}
 	}
 
-	cacheKey := basehttp.GenerateCartCacheKey(r)
+	cacheKey := basepayment.GenerateCartCacheKey(r)
 	controller.app.GetLogger().Info("getCartFromCache: Generated cache key", slog.String("cache_key", cacheKey))
 
 	var cart Cart
@@ -114,7 +114,7 @@ func (controller *cartController) saveCartToCache(ctx context.Context, r *http.R
 		return fmt.Errorf("cache store not available")
 	}
 
-	cacheKey := basehttp.GenerateCartCacheKey(r)
+	cacheKey := basepayment.GenerateCartCacheKey(r)
 	err := controller.app.GetCacheStore().SetJSON(cacheKey, cart, 30*24*60*60) // 30 days in seconds
 	if err != nil {
 		return err
@@ -198,7 +198,7 @@ func (controller *cartController) ClearCart(ctx context.Context, r *http.Request
 
 	// Clear from cache
 	if controller.app.GetCacheStore() != nil {
-		cacheKey := basehttp.GenerateCartCacheKey(r)
+		cacheKey := basepayment.GenerateCartCacheKey(r)
 		controller.app.GetCacheStore().SetJSON(cacheKey, Cart{Items: []CartItem{}}, 30*24*60*60)
 	}
 
@@ -755,7 +755,7 @@ func (controller *cartController) saveCartToUserWithCache(ctx context.Context, r
 
 	// Sync with cache for guest users or when cache is available
 	if controller.app.GetCacheStore() != nil {
-		cacheKey := basehttp.GenerateCartCacheKey(r)
+		cacheKey := basepayment.GenerateCartCacheKey(r)
 		if err := controller.app.GetCacheStore().SetJSON(cacheKey, cart, 30*24*60*60); err != nil {
 			controller.app.GetLogger().Warn("Failed to sync cart to cache", slog.String("error", err.Error()))
 		}
