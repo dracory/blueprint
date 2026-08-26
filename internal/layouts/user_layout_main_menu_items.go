@@ -32,7 +32,6 @@ func userLayoutMainMenuItems(user userstore.UserInterface) []dashboardTypes.Menu
 		Title: "Login",
 		URL:   loginLink,
 	}
-	
 
 	profileMenuItem := dashboardTypes.MenuItem{
 		Icon:  hb.I().Class("bi bi-person").Style("margin-right:10px;").ToHTML(),

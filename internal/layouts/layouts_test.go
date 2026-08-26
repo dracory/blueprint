@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"strings"
 	"testing"
@@ -62,7 +63,7 @@ func TestFaviconURL(t *testing.T) {
 
 func TestOptions(t *testing.T) {
 	content := hb.Paragraph().Text("Test content")
-	opts := Options{
+	opts := baselayouts.Options{
 		AppName:         "TestApp",
 		WebsiteSection:  "test",
 		Title:           "Test Title",
@@ -150,7 +151,7 @@ func TestAdminPage(t *testing.T) {
 func TestNewBlankLayout(t *testing.T) {
 	app := testutils.Setup()
 	r := &http.Request{}
-	opts := Options{
+	opts := baselayouts.Options{
 		AppName:    "TestApp",
 		Title:      "Test",
 		Content:    hb.Div().Text("Test content"),
@@ -179,8 +180,8 @@ func TestNewBlankLayout(t *testing.T) {
 }
 
 func TestBreadcrumb(t *testing.T) {
-	// Test single breadcrumb
-	bc := Breadcrumb{Name: "Home", URL: "/"}
+	// Test single baselayouts.Breadcrumb
+	bc := baselayouts.Breadcrumb{Name: "Home", URL: "/"}
 	if bc.Name != "Home" {
 		t.Errorf("Name = %q, want %q", bc.Name, "Home")
 	}
@@ -192,7 +193,7 @@ func TestBreadcrumb(t *testing.T) {
 func TestNewAdminLayout(t *testing.T) {
 	app := testutils.Setup()
 	r := &http.Request{}
-	opts := Options{
+	opts := baselayouts.Options{
 		Title:   "Admin Test",
 		Content: hb.Div().Text("Admin content"),
 	}
@@ -214,7 +215,7 @@ func TestNewAdminLayout(t *testing.T) {
 func TestNewUserLayout(t *testing.T) {
 	app := testutils.Setup()
 	r := &http.Request{}
-	opts := Options{
+	opts := baselayouts.Options{
 		Title:   "User Test",
 		Content: hb.Div().Text("User content"),
 	}

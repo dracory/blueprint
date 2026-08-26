@@ -1,6 +1,7 @@
 package post
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"bytes"
 	"context"
 	"log/slog"
@@ -87,7 +88,7 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		canonicalURL = links.Website().BlogPost(post.GetID(), post.GetSlug())
 	}
 
-	options := layouts.Options{
+	options := baselayouts.Options{
 		WebsiteSection: "Blog",
 		Title:          post.GetTitle(),
 		ScriptURLs: []string{

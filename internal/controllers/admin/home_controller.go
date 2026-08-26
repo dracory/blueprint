@@ -1,6 +1,7 @@
 package admin
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"encoding/json"
 	"errors"
@@ -42,7 +43,7 @@ func NewHomeController(app app.AppInterface) *homeController {
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(controller.app, r, layouts.Options{
+	return layouts.NewAdminLayout(controller.app, r, baselayouts.Options{
 		Title:   "Home",
 		Content: controller.view(),
 		ScriptURLs: []string{

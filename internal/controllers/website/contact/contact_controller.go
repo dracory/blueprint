@@ -1,6 +1,7 @@
 package contact
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/layouts"
@@ -51,7 +52,7 @@ func (controller *contactController) AnyIndex(w http.ResponseWriter, r *http.Req
 				Child(rendered),
 		)
 
-	return layouts.NewUserLayout(controller.app, r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
 		Title:   "Contact",
 		Content: page,
 		ScriptURLs: []string{

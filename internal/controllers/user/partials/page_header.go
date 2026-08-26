@@ -1,7 +1,7 @@
 package partials
 
 import (
-	"project/internal/layouts"
+	baselayouts "github.com/dracory/base/layouts"
 	"project/internal/links"
 
 	"github.com/dracory/hb"
@@ -10,9 +10,9 @@ import (
 	"github.com/samber/lo"
 )
 
-func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcrumb) *hb.Tag {
+func PageHeader(iconName string, title string, breadcrumbs ...[]baselayouts.Breadcrumb) *hb.Tag {
 	// Breadcrumb first or (default to Dashboard)
-	b := lo.FirstOr(breadcrumbs, []layouts.Breadcrumb{
+	b := lo.FirstOr(breadcrumbs, []baselayouts.Breadcrumb{
 		{
 			Name: "Dashboard",
 			URL:  links.User().Home(),
@@ -21,14 +21,14 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]layouts.Breadcru
 
 	// If first is not Dashboard, add Dashboard
 	if len(b) > 0 && b[0].Name != "Dashboard" {
-		b = append([]layouts.Breadcrumb{
+		b = append([]baselayouts.Breadcrumb{
 			{
 				Name: "Dashboard",
 				URL:  links.User().Home(),
 			},
 		}, b...)
 	}
-	breadcrumbsTag := layouts.Breadcrumbs(b)
+	breadcrumbsTag := baselayouts.Breadcrumbs(b)
 
 	// Icon
 	icon := hb.NewDiv().

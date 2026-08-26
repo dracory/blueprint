@@ -1,9 +1,10 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -24,7 +25,7 @@ func adminCrudLayout(app app.AppInterface, r *http.Request, title string, conten
 		cdn.JqueryUiCss_1_13_1(),
 	}, styleURLs...)
 	// cfmt.Infoln(styleURLs)
-	dashboard := NewAdminLayout(app, r, Options{
+	dashboard := NewAdminLayout(app, r, baselayouts.Options{
 		Title:      title,
 		Content:    hb.Raw(content),
 		Scripts:    []string{js},

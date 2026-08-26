@@ -1,6 +1,7 @@
 package admin
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
@@ -80,7 +81,7 @@ func (a *adminLayout) SetStyles(styles []string) {
 }
 
 func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(a.app, r, layouts.Options{
+	return layouts.NewAdminLayout(a.app, r, baselayouts.Options{
 		Title:      a.title,
 		Content:    hb.Raw(a.body),
 		ScriptURLs: a.scriptURLs,

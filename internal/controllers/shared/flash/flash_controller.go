@@ -1,6 +1,7 @@
 package flash
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/layouts"
@@ -36,7 +37,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 	html := controller.pageHTML(r)
 
 	if authUser != nil && authUser.IsRegistrationCompleted() {
-		return layouts.NewUserLayout(controller.app, r, layouts.Options{
+		return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
 			Title:      title,
 			Content:    html,
 			ScriptURLs: []string{},
@@ -51,7 +52,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		return layouts.NewCmsLayout(
 			controller.app,
 			r,
-			layouts.Options{
+			baselayouts.Options{
 				Title:   title,
 				Content: html,
 				Styles:  []string{`.Center > div{padding:0px !important;margin:0px !important;}`},
@@ -61,7 +62,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 			},
 		).ToHTML()
 	} else {
-		return layouts.NewUserLayout(controller.app, r, layouts.Options{
+		return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
 			Title:   title,
 			Content: html,
 			StyleURLs: []string{

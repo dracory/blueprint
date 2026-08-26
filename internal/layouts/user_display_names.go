@@ -3,8 +3,8 @@ package layouts
 import (
 	"errors"
 	"net/http"
-	"project/internal/ext"
 	"project/internal/app"
+	"project/internal/ext"
 
 	"github.com/dracory/userstore"
 )

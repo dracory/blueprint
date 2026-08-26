@@ -1,6 +1,7 @@
 package account
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"log/slog"
 	"net/http"
@@ -69,7 +70,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error rendering profile form", links.User().Home(), 10)
 	}
 
-	pageHeader := partials.PageHeader("bi-person", "My Account", []layouts.Breadcrumb{
+	pageHeader := partials.PageHeader("bi-person", "My Account", []baselayouts.Breadcrumb{
 		{Name: "Dashboard", Icon: "bi-speedometer2", URL: links.User().Home()},
 		{Name: "My Account", URL: links.User().Profile()},
 	})
@@ -87,7 +88,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 				Child(hb.BR()),
 		)
 
-	return layouts.NewUserLayout(controller.app, r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
 		Title:   "My Account",
 		Content: hb.NewDiv().Class("p-3").Child(page),
 		ScriptURLs: []string{

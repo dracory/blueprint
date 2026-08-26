@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/links"
@@ -13,7 +14,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func NewAdminLayout(app app.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+func NewAdminLayout(app app.AppInterface, r *http.Request, options baselayouts.Options) dashboardTypes.DashboardInterface {
 	return adminLayout(app, r, options)
 }
 
@@ -25,7 +26,7 @@ func NewAdminLayout(app app.AppInterface, r *http.Request, options Options) dash
 //
 // Returns:
 // - a dashboardTypes.DashboardInterface object representing the generated dashboard.
-func adminLayout(app app.AppInterface, r *http.Request, options Options) dashboardTypes.DashboardInterface {
+func adminLayout(app app.AppInterface, r *http.Request, options baselayouts.Options) dashboardTypes.DashboardInterface {
 	authUser := basesession.GetAuthUser(r)
 
 	dashboardUser := dashboardTypes.User{}

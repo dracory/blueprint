@@ -1,9 +1,8 @@
 package partials
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"testing"
-
-	"project/internal/layouts"
 )
 
 func TestPageHeader(t *testing.T) {
@@ -14,7 +13,7 @@ func TestPageHeader(t *testing.T) {
 	}
 
 	// Test with icon, title, and breadcrumbs
-	breadcrumbs := []layouts.Breadcrumb{
+	breadcrumbs := []baselayouts.Breadcrumb{
 		{Name: "Home", URL: "/"},
 		{Name: "Test", URL: "/test"},
 	}

@@ -1,6 +1,7 @@
 package home
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/layouts"
@@ -210,7 +211,7 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 		`,
 	}
 
-	options := layouts.Options{
+	options := baselayouts.Options{
 		Title:   "Home",
 		AppName: appName,
 		Content: page,

@@ -1,6 +1,7 @@
 package home
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"log/slog"
 	"net/http"
@@ -44,7 +45,7 @@ func (controller *blogController) Handler(w http.ResponseWriter, r *http.Request
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
 	}
 
-	options := layouts.Options{
+	options := baselayouts.Options{
 		WebsiteSection: "Blog",
 		Title:          "Recent Posts",
 		Content:        hb.Wrap().HTML(controller.page(r, data)),

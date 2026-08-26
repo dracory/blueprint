@@ -1,6 +1,7 @@
 package register
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"errors"
 	"log/slog"
@@ -99,7 +100,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 	return layouts.NewBlankLayout(
 		controller.app,
 		r,
-		layouts.Options{
+		baselayouts.Options{
 			Title: "Register",
 			// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
 			Content:    controller.pageHTML(r.Context(), data),

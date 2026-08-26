@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
@@ -12,7 +13,7 @@ import (
 func NewCmsLayout(
 	app app.AppInterface,
 	r *http.Request,
-	options Options,
+	options baselayouts.Options,
 ) *cmsLayout {
 	layout := &cmsLayout{}
 	layout.app = app
@@ -27,7 +28,7 @@ func NewCmsLayout(
 }
 
 type cmsLayout struct {
-	app   app.AppInterface
+	app        app.AppInterface
 	request    *http.Request
 	title      string
 	content    hb.TagInterface

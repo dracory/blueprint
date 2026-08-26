@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -46,7 +47,7 @@ func NewCmsLayoutMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 				next.ServeHTTP(rec, r)
 				finalContent := rec.Body.String()
 
-				fullPage := layouts.NewUserLayout(app, r, layouts.Options{
+				fullPage := layouts.NewUserLayout(app, r, baselayouts.Options{
 					Title:      title,
 					Content:    hb.Raw(finalContent),
 					ScriptURLs: []string{},

@@ -1,6 +1,7 @@
 package indexnow
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	// "project/internal/controllers/website/shared"
 	"project/internal/app"
@@ -20,7 +21,7 @@ func NewIndexNowController(app app.AppInterface) *indexNowController {
 }
 
 func (controller *indexNowController) Handler(w http.ResponseWriter, r *http.Request) string {
-	options := layouts.Options{
+	options := baselayouts.Options{
 		WebsiteSection: "IndexNow",
 		Title:          "IndexNow",
 		Content:        hb.Wrap().HTML(controller.page()),
@@ -44,7 +45,7 @@ func (controller *indexNowController) page() string {
 	return hb.Wrap().Children([]hb.TagInterface{
 		// shared.PageHeader(
 		// 	"IndexNow",
-		// 	[]layouts.Breadcrumb{
+		// 	[]baselayouts.Breadcrumb{
 		// 		{
 		// 			Name: "IndexNow",
 		// 			URL:  links.Website().IndexNow(),

@@ -11,6 +11,7 @@
 package adapters
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"errors"
 	"log/slog"
@@ -56,7 +57,7 @@ type LayoutOptions = struct {
 // blogadmin.AdminOptions.FuncLayout and shopadmin.AdminOptions.FuncLayout.
 func NewLayoutFunc(app app.AppInterface) func(w http.ResponseWriter, r *http.Request, title string, body string, options LayoutOptions) string {
 	return func(w http.ResponseWriter, r *http.Request, title string, body string, options LayoutOptions) string {
-		return layouts.NewAdminLayout(app, r, layouts.Options{
+		return layouts.NewAdminLayout(app, r, baselayouts.Options{
 			Title:      title,
 			Content:    hb.Raw(body),
 			ScriptURLs: options.ScriptURLs,

@@ -1,6 +1,7 @@
 package user
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
@@ -38,7 +39,7 @@ func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.User().Home(map[string]string{}), 10)
 	}
 
-	return layouts.NewUserLayout(controller.app, r, layouts.Options{
+	return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
 		Title:   "Home",
 		Content: controller.view(data),
 	}).ToHTML()

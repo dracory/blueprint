@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 
@@ -18,7 +19,7 @@ import (
 // NOTE: It is used for the registration page, which only has a
 // registration form and no navigation
 type blankLayout struct {
-	app   app.AppInterface
+	app        app.AppInterface
 	r          *http.Request
 	title      string
 	content    hb.TagInterface
@@ -31,7 +32,7 @@ type blankLayout struct {
 // == CONSTRUCTOR =============================================================
 
 // NewBlankLayout creates a new guest layout
-func NewBlankLayout(app app.AppInterface, r *http.Request, options Options) *blankLayout {
+func NewBlankLayout(app app.AppInterface, r *http.Request, options baselayouts.Options) *blankLayout {
 	layout := &blankLayout{}
 	layout.app = app
 	layout.r = r

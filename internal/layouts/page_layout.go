@@ -1,6 +1,7 @@
 package layouts
 
 import (
+	baselayouts "github.com/dracory/base/layouts"
 	_ "embed"
 	"net/http"
 	"project/internal/app"
@@ -34,8 +35,8 @@ type pageLayout struct {
 
 // NewPageLayout creates a unified page layout with neo-brutalist styling.
 // The navbar is shown by default and adapts to the user's auth state.
-// Set Options.DisableNavbar to true for pages that provide their own navigation.
-func NewPageLayout(app app.AppInterface, r *http.Request, options Options) LayoutInterface {
+// Set options.DisableNavbar to true for pages that provide their own navigation.
+func NewPageLayout(app app.AppInterface, r *http.Request, options baselayouts.Options) baselayouts.LayoutInterface {
 	authUser := basesession.GetAuthUser(r)
 
 	titlePostfix := " | " + lo.Ternary(authUser == nil, "Guest", "User")
