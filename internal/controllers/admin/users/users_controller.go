@@ -31,13 +31,6 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Secure cookie is only false in development (HTTP). In production
-	// (HTTPS) the impersonation cookie must be marked Secure.
-	secure := true
-	if controller.app.GetConfig() != nil && controller.app.GetConfig().IsEnvDevelopment() {
-		secure = false
-	}
-
 	admin, err := useradmin.New(useradmin.AdminOptions{
 		UserStore:         controller.app.GetUserStore(),
 		GeoResolver:       adapters.NewGeoResolver(controller.app.GetGeoStore()),
@@ -48,7 +41,6 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 		VaultTokenizer:    adapters.NewVaultTokenizerAdapter(controller.app),
 		FuncLayout:        adapters.NewLayoutFunc(controller.app),
 		FlashRedirect:     adapters.NewFlashRedirectFunc(controller.app),
-		SecureCookie:      secure,
 		AdminHomeURL:      links.Admin().Home(),
 		UserAdminURL:      links.Admin().Users(),
 		UserHomeURL:       links.User().Home(),

@@ -393,7 +393,8 @@ func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateF
 			return err
 		}
 
-		auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(event.Secure))
+		// Mark the cookie Secure when the request is over HTTPS.
+		auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(httpReq.TLS != nil))
 		return nil
 	}
 }
