@@ -39,22 +39,19 @@ func (controller *usersAdminController) Handler(w http.ResponseWriter, r *http.R
 	}
 
 	admin, err := useradmin.New(useradmin.AdminOptions{
-		UserStore:                  controller.app.GetUserStore(),
-		GeoResolver:                adapters.NewGeoResolver(controller.app.GetGeoStore()),
-		Logger:                     controller.app.GetLogger(),
-		SessionResolver:            adapters.NewSessionResolver(controller.app.GetSessionStore()),
-		BlindIndexFirstName:        adapters.NewBlindIndexResolver(controller.app.GetBlindIndexStoreFirstName()),
-		BlindIndexLastName:         adapters.NewBlindIndexResolver(controller.app.GetBlindIndexStoreLastName()),
-		BlindIndexEmail:            adapters.NewBlindIndexResolver(controller.app.GetBlindIndexStoreEmail()),
-		TaskStore:                  controller.app.GetTaskStore(),
-		BlindIndexRebuildTaskAlias: constants.BlindIndexRebuildTaskAlias,
-		VaultTokenizer:             adapters.NewVaultTokenizerAdapter(controller.app),
-		FuncLayout:                 adapters.NewLayoutFunc(controller.app),
-		FlashRedirect:              adapters.NewFlashRedirectFunc(controller.app),
-		SecureCookie:               secure,
-		AdminHomeURL:               links.Admin().Home(),
-		UserAdminURL:               links.Admin().Users(),
-		UserHomeURL:                links.User().Home(),
+		UserStore:       controller.app.GetUserStore(),
+		GeoResolver:     adapters.NewGeoResolver(controller.app.GetGeoStore()),
+		Logger:          controller.app.GetLogger(),
+		SessionResolver: adapters.NewSessionResolver(controller.app.GetSessionStore()),
+		OnUserSearch:    adapters.NewOnUserSearchFunc(controller.app),
+		OnUserUpdate:    adapters.NewOnUserUpdateFunc(controller.app, constants.BlindIndexRebuildTaskAlias),
+		VaultTokenizer:  adapters.NewVaultTokenizerAdapter(controller.app),
+		FuncLayout:      adapters.NewLayoutFunc(controller.app),
+		FlashRedirect:   adapters.NewFlashRedirectFunc(controller.app),
+		SecureCookie:    secure,
+		AdminHomeURL:    links.Admin().Home(),
+		UserAdminURL:    links.Admin().Users(),
+		UserHomeURL:     links.User().Home(),
 		AuthUserID: func(r *http.Request) string {
 			user := helpers.GetAuthUser(r)
 			if user == nil {

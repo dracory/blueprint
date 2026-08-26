@@ -49,7 +49,7 @@ require (
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.1
 	github.com/dracory/metastore v1.11.0
-	github.com/dracory/neat v0.39.0
+	github.com/dracory/neat v0.40.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0
@@ -162,7 +162,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.45.0 // indirect
 	go.opentelemetry.io/otel/trace v1.45.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
-	golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297 // indirect
+	golang.org/x/exp v0.0.0-20260824195058-e88cd73687aa // indirect
 	golang.org/x/image v0.45.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
@@ -176,7 +176,7 @@ require (
 	google.golang.org/grpc v1.83.1 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	modernc.org/libc v1.75.3 // indirect
+	modernc.org/libc v1.75.5 // indirect
 )
 
 require (
@@ -193,5 +193,5 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.41.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.12.0 // indirect
+	modernc.org/memory v1.12.1 // indirect
 )

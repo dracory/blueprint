@@ -13,6 +13,7 @@ package adapters
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -30,6 +31,7 @@ import (
 	"github.com/dracory/neat"
 	"github.com/dracory/req"
 	"github.com/dracory/sessionstore"
+	"github.com/dracory/taskstore"
 	"github.com/dracory/useradmin"
 	"github.com/dracory/userstore"
 	"github.com/dromara/carbon/v2"
@@ -267,30 +269,108 @@ func (r *GeoResolver) Timezones(ctx context.Context, countryCode ...string) ([]u
 	return out, nil
 }
 
-// BlindIndexResolver implements useradmin.BlindIndexResolverInterface
-// using the blueprint's blindindexstore. It maps useradmin's
-// BlindIndexSearchType constants to blindindexstore's search type
-// constants.
-type BlindIndexResolver struct {
-	store blindindexstore.StoreInterface
-}
+// NewOnUserSearchFunc returns an OnUserSearch callback that searches
+// the blueprint's blind index stores. It intersects results across
+// active filters (AND semantics). When ExactMatch is true, uses
+// SEARCH_TYPE_EQUALS; otherwise SEARCH_TYPE_CONTAINS.
+func NewOnUserSearchFunc(app app.AppInterface) useradmin.OnUserSearchFunc {
+	return func(ctx context.Context, event useradmin.UserSearchEvent) ([]string, error) {
+		if app == nil {
+			return nil, nil
+		}
 
-// NewBlindIndexResolver creates a BlindIndexResolver backed by the
-// blueprint's blindindexstore.
-func NewBlindIndexResolver(store blindindexstore.StoreInterface) *BlindIndexResolver {
-	return &BlindIndexResolver{store: store}
-}
+		searchType := blindindexstore.SEARCH_TYPE_CONTAINS
+		if event.ExactMatch {
+			searchType = blindindexstore.SEARCH_TYPE_EQUALS
+		}
 
-// Compile-time assertion that BlindIndexResolver satisfies useradmin.BlindIndexResolverInterface.
-var _ useradmin.BlindIndexResolverInterface = (*BlindIndexResolver)(nil)
+		var idSets [][]string
 
-// Search returns user IDs whose indexed field matches the given value
-// according to the search type.
-func (r *BlindIndexResolver) Search(ctx context.Context, value string, searchType useradmin.BlindIndexSearchType) ([]string, error) {
-	if r.store == nil {
-		return nil, nil
+		if event.FirstName != "" {
+			store := app.GetBlindIndexStoreFirstName()
+			if store != nil {
+				ids, err := store.Search(ctx, event.FirstName, searchType)
+				if err != nil {
+					return nil, err
+				}
+				if len(ids) == 0 {
+					return nil, nil
+				}
+				idSets = append(idSets, ids)
+			}
+		}
+
+		if event.LastName != "" {
+			store := app.GetBlindIndexStoreLastName()
+			if store != nil {
+				ids, err := store.Search(ctx, event.LastName, searchType)
+				if err != nil {
+					return nil, err
+				}
+				if len(ids) == 0 {
+					return nil, nil
+				}
+				idSets = append(idSets, ids)
+			}
+		}
+
+		if event.Email != "" {
+			store := app.GetBlindIndexStoreEmail()
+			if store != nil {
+				ids, err := store.Search(ctx, event.Email, searchType)
+				if err != nil {
+					return nil, err
+				}
+				if len(ids) == 0 {
+					return nil, nil
+				}
+				idSets = append(idSets, ids)
+			}
+		}
+
+		if len(idSets) == 0 {
+			return nil, nil
+		}
+		return intersectIDSets(idSets), nil
 	}
-	return r.store.Search(ctx, value, string(searchType))
+}
+
+// intersectIDSets computes the intersection of multiple ID slices.
+// Returns IDs that appear in ALL input slices. If any slice is empty,
+// the result is empty. Order follows the first slice.
+func intersectIDSets(sets [][]string) []string {
+	if len(sets) == 0 {
+		return nil
+	}
+	if len(sets) == 1 {
+		return sets[0]
+	}
+
+	counts := make(map[string]int, len(sets[0]))
+	order := make([]string, 0, len(sets[0]))
+	for _, id := range sets[0] {
+		if counts[id] == 0 {
+			order = append(order, id)
+		}
+		counts[id]++
+	}
+	for _, s := range sets[1:] {
+		seen := make(map[string]bool, len(s))
+		for _, id := range s {
+			if !seen[id] {
+				seen[id] = true
+				counts[id]++
+			}
+		}
+	}
+
+	result := make([]string, 0, len(order))
+	for _, id := range order {
+		if counts[id] == len(sets) {
+			result = append(result, id)
+		}
+	}
+	return result
 }
 
 // SessionResolver implements useradmin.SessionResolverInterface using
@@ -329,4 +409,27 @@ func (r *SessionResolver) Create(w http.ResponseWriter, httpReq *http.Request, u
 
 	auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(secure))
 	return nil
+}
+
+// NewOnUserUpdateFunc returns an OnUserUpdate callback that enqueues a
+// blind index rebuild task when a user's email changes. It bridges
+// useradmin's event-based hook to the blueprint's taskstore.
+func NewOnUserUpdateFunc(app app.AppInterface, taskAlias string) useradmin.OnUserUpdateFunc {
+	return func(ctx context.Context, event useradmin.UserUpdateEvent) {
+		if app == nil || app.GetTaskStore() == nil || taskAlias == "" {
+			return
+		}
+		_, err := app.GetTaskStore().TaskDefinitionEnqueueByAlias(
+			ctx,
+			taskstore.DefaultQueueName,
+			taskAlias,
+			map[string]any{
+				"index":    "email",
+				"truncate": "no",
+			},
+		)
+		if err != nil && app.GetLogger() != nil {
+			app.GetLogger().Error("adapters.NewOnUserUpdateFunc enqueue failed", slog.String("error", err.Error()))
+		}
+	}
 }
