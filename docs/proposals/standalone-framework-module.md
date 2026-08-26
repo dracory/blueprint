@@ -1,4 +1,4 @@
-# Proposal: Blueprint Framework Standalone Engine (`dracory/blueprint-framework`)
+# Proposal: Modular Extraction of Blueprint Core into Standalone Go Packages
 
 ## Status
 
@@ -6,295 +6,258 @@ Proposed
 
 ## Executive Summary
 
-Developers coming to **Blueprint** appreciate its rapid application development (RAD) capabilities and "batteries-included" infrastructure. However, when comparing the file footprint of a new Blueprint project to frameworks like Next.js or Laravel, a freshly generated Blueprint application currently contains **530+ files** across `cmd/`, `internal/app/`, `internal/config/`, `internal/cli/`, `internal/routes/`, `internal/middlewares/`, `internal/layouts/`, and `database/migrations/`.
+When analyzing Blueprint's codebase, a newly cloned application repository contains **530+ files** spanning over 25 internal packages (`internal/app/`, `internal/config/`, `internal/cli/`, `internal/middlewares/`, `internal/layouts/`, `cmd/server/`, `cmd/deploy/`, `cmd/envenc/`, etc.).
 
-Much of this file volume consists of structural boilerplate: database pool initialization, 20+ datastore factory bindings, environment validation schemas, signal handling, CLI dispatchers, and background runner groups.
+A major reason for this file proliferation is that infrastructure orchestration — application lifecycle management, configuration schemas, store registration, maintenance mode CLI dispatchers, and HTTP middleware chains — is embedded directly inside the user's project repository.
 
-While Next.js achieves a minimal file footprint by encapsulating runtime logic inside `node_modules/next`, **Go applications require explicit composition, strong typing, and direct configurability**. We do not want to obscure Go's explicit nature or reduce Blueprint's powerful configurability (custom DB drivers, store overrides, custom middlewares, CLI flags, background workers, and email templates).
+However, **monolithic framework extractions (like bundling all 20+ stores and features into a single rigid import) present severe drawbacks in Go**:
+1. **Unused Dependency Bloat**: If a monolithic framework imports `shopstore`, `chatstore`, `blogstore`, `geostore`, `auditstore`, and `vaultstore` unconditionally, every user application compiles and links all 20+ store dependencies into their binary even if they only need `userstore` and `sessionstore`.
+2. **Loss of Strict Typing**: Resorting to stringly-typed dynamic store maps (e.g. `WithStore("billing", myStore)`) discards Go's compile-time type safety and IDE auto-completion.
+3. **Loss of User Flexibility**: Hardcoding store factories or middleware chains inside a monolith prevents users from substituting custom store implementations, alternative loggers, or customized connection pools.
 
-This proposal outlines how to extract Blueprint's core orchestration into an idiomatic, highly configurable Go module — **`github.com/dracory/blueprint-framework`** (or `pkg/framework`). By leveraging **Functional Options**, **Explicit Configuration Structs**, and **Plugin/Adapter Interfaces**, Blueprint projects can reduce boilerplate by **~350 files** while retaining **100% of Blueprint's configuration flexibility**.
-
----
-
-## The Footprint Problem & Design Philosophy
-
-### Current Blueprint Project (~530+ Files)
-A standard Blueprint repository contains extensive infrastructure code living directly in the user's project:
-- `cmd/server/*.go` (~4 files): Graceful shutdown, OS signal channel listening, background process context lifecycle.
-- `internal/app/*.go` (~10 files): Direct instantiation and getter/setter bindings for 20+ Dracory stores (`userstore`, `sessionstore`, `cmsstore`, `shopstore`, `logstore`, `vaultstore`, `auditstore`, `geostore`, etc.).
-- `internal/config/*.go` (~16 files): Environment parsing, database connection pool defaults, LLM API keys, media storage settings.
-- `internal/cli/*.go` (~4 files): Maintenance command handlers and CLI argument dispatching.
-- `internal/routes/*.go` (~3 files): Global router builder and middleware binding arrays.
-
-### Design Philosophy for `blueprint-framework`
-1. **Idiomatic Go**: Use functional options (`framework.WithConfig()`, `framework.WithStore()`, `framework.WithMiddleware()`) and standard interfaces (`net/http`, `slog.Logger`, `sql.DB`).
-2. **Configuration Transparency**: All configuration options currently supported in `internal/config` remain available via environment variables, code options, or custom config builders.
-3. **Zero Magic**: No hidden magic, code generation, or obscure reflection. The framework acts as an explicit orchestration facade.
-4. **Gradual Adoption**: Allow users to rely on default store factories while seamlessly swapping or customizing any store, driver, or middleware.
+This proposal details a **modular, strongly-typed extraction strategy**. Instead of creating a monolithic framework blob, we extract cohesive, decoupled standalone packages (or standalone Go modules under `github.com/dracory/blueprint-*` / `pkg/*`). This eliminates ~350 boilerplate files from user projects while maintaining **100% strict typing, modular dependency trees, and complete user flexibility**.
 
 ---
 
-## Architectural Overview
+## Detailed Extraction Breakdown: Package by Package
 
-The proposed `blueprint-framework` module exposes a clean, composable Go API while encapsulating standard setup routines:
-
-```
-+---------------------------------------------------------------------------------+
-|                               User Application                                  |
-|                                                                                 |
-|  main.go:                                                                       |
-|    fw, err := framework.New(                                                    |
-|        framework.WithConfig(cfg),                                               |
-|        framework.WithCustomStore("custom", myStore),                            |
-|        framework.WithRoutes(myAppRoutes),                                       |
-|        framework.WithTasks(myTasks),                                            |
-|    )                                                                            |
-|    fw.Run()                                                                     |
-+---------------------------------------------------------------------------------+
-                                         |
-                                         v
-+---------------------------------------------------------------------------------+
-|                     github.com/dracory/blueprint-framework                      |
-|                                                                                 |
-|  +------------------------+  +------------------------+  +-------------------+  |
-|  | Config Engine          |  | Datastore Orchestration|  | Router & Server   |  |
-|  | - Env Parsing & Vault  |  | - Automatic Store Init |  | - websrv / rtr    |  |
-|  | - Connection Pools     |  | - Store Overrides      |  | - Middleware Chain|  |
-|  +------------------------+  +------------------------+  +-------------------+  |
-|  +------------------------+  +------------------------+  +-------------------+  |
-|  | Background Manager     |  | CLI Engine             |  | Logging & Caches  |  |
-|  | - Task Queue & Cron    |  | - Maintenance Mode     |  | - slog Handler    |  |
-|  | - Cache Expiration     |  | - Command Dispatcher   |  | - Memory & File   |  |
-|  +------------------------+  +------------------------+  +-------------------+  |
-+---------------------------------------------------------------------------------+
-```
+Below is a detailed analysis of Blueprint's existing internal packages, explaining **why** each package should be extracted, **what risks exist** if bundled improperly, and **how** it is refactored to preserve strict typing and user choice.
 
 ---
 
-## Preserving Full Blueprint Configurability
+### 1. `cmd/server` & Application Lifecycle Manager
+* **Current Location**: `cmd/server/main.go`, `background.go`, `background_processes.go`, `cli_mode.go`
+* **Current File Count**: 7 files
+* **Target Package**: `github.com/dracory/blueprint-core` (or `pkg/core`)
 
-Blueprint is deeply configurable. The standalone module exposes every configuration layer using idiomatic Go constructs:
+#### Why Extract?
+`cmd/server` contains ~120 lines of repetitive setup: parsing environment, deferring `app.Close()`, running migrations, checking CLI mode flags, constructing `backgroundGroup` workers, starting `websrv`, and listening on OS `SIGINT`/`SIGTERM` signals for graceful shutdown. Every Blueprint app duplicates this exact orchestration.
 
-### 1. Database & Connection Pool Configuration
-Users can rely on standard environment variables (`DB_DRIVER`, `DB_HOST`, `DB_MAX_OPEN_CONNS`) or explicitly pass database connections/configs in Go code:
+#### Risks if Monolithic:
+If the core lifecycle manager hardcodes the startup of background processes for *all* stores (e.g., chat cache expiration, CMS transfer tasks, stats aggregators), applications that don't use those stores will spawn unnecessary background goroutines or fail if tables don't exist.
 
-```go
-fw, err := framework.New(
-    // Option A: Load from environment or custom config
-    framework.WithConfig(customCfg),
+#### How to Extract with Strict Typing & Flexibility:
+Extract a strongly-typed `core.Engine` that accepts optional lifecycle handlers (`OnBoot`, `OnShutdown`) and explicit background worker interfaces (`BackgroundProcess`):
 
-    // Option B: Provide an existing *sql.DB or custom connection pool
-    framework.WithDatabase(customDB),
-
-    // Option C: Multi-database setup (Laravel-style connections supported by neat)
-    framework.WithDatabaseConnection("analytics", analyticsDB),
-)
-```
-
-### 2. Store Overrides & Custom Stores
-All 20+ default stores (`UserStore`, `SessionStore`, `VaultStore`, `LogStore`, etc.) are initialized automatically based on configuration, but can be overridden or supplemented:
-
-```go
-fw, err := framework.New(
-    // Override standard UserStore with a custom implementation
-    framework.WithUserStore(myCustomUserStore),
-
-    // Register domain-specific custom store
-    framework.WithStore("billing", myBillingStore),
-)
-```
-
-### 3. Middleware Pipeline Composition
-Global and route-level middlewares can be customized, prepended, or appended without modifying framework source code:
-
-```go
-fw, err := framework.New(
-    // Prepend custom security or logging middleware
-    framework.WithGlobalMiddleware(myTelemetryMiddleware),
-
-    // Disable or customize default middlewares (e.g., Maintenance, Security Headers)
-    framework.WithMiddlewareOptions(framework.MiddlewareOptions{
-        EnableSecurityHeaders: true,
-        EnableJailBots:        false,
-    }),
-)
-```
-
-### 4. Background Workers & Job Schedulers
-Background task handlers, cron schedules, and maintenance routines remain fully configurable:
-
-```go
-fw, err := framework.New(
-    framework.WithTaskRegistration(func(app app.AppInterface) {
-        tasks.RegisterTasks(app)
-        myCustomTasks.Register(app)
-    }),
-    framework.WithSchedules(myCronScheduleGroup),
-    framework.WithBackgroundWorkerCount(10),
-)
-```
-
-### 5. CLI Command Extension
-Custom CLI commands integrate directly into Blueprint's CLI dispatcher (`cmd/server` or custom entry points):
-
-```go
-fw, err := framework.New(
-    framework.WithCLICommand("seed:demo", "Seeds demo dataset", func(app app.AppInterface, args []string) error {
-        return seeders.SeedDemo(app)
-    }),
-)
-```
-
----
-
-## Code Comparison: Current Blueprint vs. `blueprint-framework`
-
-### `cmd/server/main.go`
-
-#### Current Blueprint (~120 lines of repetitive setup):
 ```go
 package main
 
 import (
-    "context"
-    "fmt"
     "log"
-    "os"
-    "os/signal"
-    "syscall"
-    "time"
-
+    "github.com/dracory/blueprint-core"
     "project/database/migrations"
-    "project/internal/cli"
     "project/internal/app"
-    "project/internal/config"
-    "project/internal/routes"
-    "project/internal/tasks"
-    "github.com/dracory/websrv"
 )
 
 func main() {
-    log.SetFlags(log.LstdFlags | log.Lshortfile)
+    // Strongly-typed engine instantiation
+    engine := core.NewEngine(app.NewApp())
 
-    cfg, err := config.NewFromEnv()
-    if err != nil {
-        fmt.Printf("Failed to load config: %v\n", err)
-        return
-    }
-
-    app, err := app.New(cfg)
-    if err != nil {
-        fmt.Printf("Failed to initialize app: %v\n", err)
-        return
-    }
-    defer app.Close()
-
-    if err := migrations.MigrateAll(app); err != nil {
-        fmt.Printf("Failed to run migrations: %v\n", err)
-        return
-    }
-
-    tasks.RegisterTasks(app)
-
-    if isCliMode() {
-        if err := cli.ExecuteCliCommand(app, os.Args[1:]); err != nil {
-            fmt.Printf("Failed to execute CLI command: %v\n", err)
-            os.Exit(1)
-        }
-        return
-    }
-
-    ctx, cancel := context.WithCancel(context.Background())
-    defer cancel()
-
-    background := newBackgroundGroup(ctx)
-    if err := startBackgroundProcesses(ctx, background, app); err != nil {
-        log.Println("Failed to start background processes:", err)
-        return
-    }
-
-    server, err := websrv.Start(websrv.Options{
-        Host:    app.GetConfig().GetAppHost(),
-        Port:    app.GetConfig().GetAppPort(),
-        URL:     app.GetConfig().GetAppUrl(),
-        Handler: routes.Router(app).ServeHTTP,
+    engine.OnBoot(func(a app.AppInterface) error {
+        return migrations.MigrateAll(a)
     })
-    if err != nil { ... }
-
-    // Draining background workers and graceful HTTP shutdown logic...
-}
-```
-
-#### Proposed `blueprint-framework` (~25 lines of idiomatic Go):
-```go
-package main
-
-import (
-    "log"
-
-    "project/database/migrations"
-    "project/internal/routes"
-    "project/internal/tasks"
-
-    "github.com/dracory/blueprint-framework"
-)
-
-func main() {
-    engine, err := framework.New(
-        framework.WithMigrations(migrations.MigrateAll),
-        framework.WithTaskRegistration(tasks.RegisterTasks),
-        framework.WithRoutes(routes.AppRoutes),
-    )
-    if err != nil {
-        log.Fatalf("Failed to initialize framework: %v", err)
-    }
 
     if err := engine.Run(); err != nil {
-        log.Fatalf("Application runtime error: %v", err)
+        log.Fatalf("Server error: %v", err)
     }
 }
 ```
 
 ---
 
-## Directory Footprint Comparison
+### 2. `internal/app` & Store Registry
+* **Current Location**: `internal/app/app_implementation.go`, `datastores.go`, `app_interface.go`
+* **Current File Count**: 10 files
+* **Target Package**: `github.com/dracory/blueprint-core/app`
 
-| Area | Current Blueprint File Count | Post-Framework File Count | Primary Location After Extraction |
+#### Why Extract?
+`internal/app` defines `AppInterface` with over 40 getters/setters (`GetUserStore()`, `GetSessionStore()`, `GetVaultStore()`, etc.) and `datastores.go` which conditionally initializes stores based on config flags.
+
+#### Risks if Monolithic:
+Currently, `internal/app/datastores.go` imports `auditstore`, `blogstore`, `cachestore`, `chatstore`, `cmsstore`, `customstore`, `entitystore`, `feedstore`, `geostore`, `logstore`, `metastore`, `sessionstore`, `settingstore`, `shopstore`, `statsstore`, `subscriptionstore`, `taskstore`, `userstore`, and `vaultstore`. If this entire list is forcibly bundled into `blueprint-core`, a minimal app (e.g. an API microservice) cannot drop unused store dependencies.
+
+#### How to Extract with Strict Typing & Flexibility:
+Modularize store initialization so users only register the stores they actually compile into their application:
+
+```go
+// 1. AppInterface retains strictly-typed getters/setters for standard stores:
+type AppInterface interface {
+    GetDatabase() *sql.DB
+    GetUserStore() userstore.StoreInterface
+    SetUserStore(s userstore.StoreInterface)
+    GetSessionStore() sessionstore.StoreInterface
+    SetSessionStore(s sessionstore.StoreInterface)
+    // ...
+}
+
+// 2. Functional, strongly-typed store registration options:
+// NO stringly-typed maps like SetStore("user", store)!
+app := core.NewApp(cfg)
+app.RegisterUserStore(userstore.New(db))
+app.RegisterSessionStore(sessionstore.New(db))
+```
+
+This ensures:
+- **Strict Typing**: `app.GetUserStore()` returns `userstore.StoreInterface`, not `any` or `interface{}`.
+- **Selective Dependencies**: If an app doesn't call `app.RegisterShopStore()`, `shopstore` is not linked into the binary.
+
+---
+
+### 3. `internal/config` & Configuration Engine
+* **Current Location**: `internal/config/*.go`
+* **Current File Count**: 16 files
+* **Target Package**: `github.com/dracory/blueprint-config` (or `pkg/config`)
+
+#### Why Extract?
+`internal/config` contains ~16 files defining constants (`z_config_constants.go`), environment variable validators (`env_config.go`), database pool settings (`database_config.go`), and store factory helpers (`store_builders.go`).
+
+#### Risks if Monolithic:
+Embedding environment validation schemas for LLM keys (`ANTHROPIC_API_KEY`, `VERTEX_AI_PROJECT_ID`), Stripe (`STRIPE_KEY_PRIVATE`), or S3 media buckets directly in the base config means every project must carry configuration interfaces for services it may never use.
+
+#### How to Extract with Strict Typing & Flexibility:
+Decompose `ConfigInterface` into modular composable interfaces:
+- `coreconfig.BaseConfig` (App Name, Host, Port, Debug, DB Driver)
+- `authconfig.AuthConfig` (Session TTL, CSRF secret, Allowed Emails)
+- Domain-specific config extensions (e.g., `shopconfig.ShopConfig`, `llmconfig.LLMConfig`)
+
+Users can load base config while embedding domain-specific config structs as needed:
+
+```go
+type MyProjectConfig struct {
+    coreconfig.BaseConfig
+    BillingKey string `env:"BILLING_KEY"`
+}
+```
+
+---
+
+### 4. `internal/cli` & Maintenance Dispatcher
+* **Current Location**: `internal/cli/cli.go`, `maintenance_handler.go`
+* **Current File Count**: 4 files
+* **Target Package**: `github.com/dracory/blueprint-cli` (or `pkg/cli`)
+
+#### Why Extract?
+`internal/cli` parses command line arguments (`go run ./cmd/server maintenance enable/disable/status`, `task run ...`, `job run ...`) and updates state files.
+
+#### How to Extract with Strict Typing & Flexibility:
+Extract `blueprint-cli` as a standalone command dispatcher package built on `github.com/dracory/base/cli`. Users can register custom CLI command structs with strict parameter types:
+
+```go
+type SeedCommand struct {
+    Count int `flag:"count" desc:"Number of records to seed"`
+}
+
+func (c *SeedCommand) Execute(app app.AppInterface) error {
+    return seeders.Run(app, c.Count)
+}
+
+// In main.go or cli initialization:
+cliDispatcher.Register("db:seed", &SeedCommand{})
+```
+
+---
+
+### 5. `internal/middlewares` & Security Middleware Suite
+* **Current Location**: `internal/middlewares/*.go`
+* **Current File Count**: 26 files
+* **Target Package**: `github.com/dracory/blueprint-middleware` (or `pkg/middleware`)
+
+#### Why Extract?
+26 middleware files handle security headers, IP bot protection, HTTPS redirects, request logging, session auth, maintenance checks, and CORS. These are framework infrastructure utilities that rarely change per-project.
+
+#### Risks if Monolithic:
+Forcing a fixed middleware chain prevents users from reordering middlewares (e.g. placing CORS *before* rate limiting) or replacing `SecurityHeadersMiddleware` with custom security policy logic.
+
+#### How to Extract with Strict Typing & Flexibility:
+Provide individual constructor functions that return strongly-typed `rtr.MiddlewareInterface`:
+
+```go
+// User can explicitly compose their middleware pipeline in routes/router.go:
+router.AddBeforeMiddlewares([]rtr.MiddlewareInterface{
+    bpmiddleware.LogRequest(app),
+    bpmiddleware.SecurityHeaders(app),
+    bpmiddleware.MaintenanceMode(app),
+    myCustomMiddleware(app), // Custom user middleware seamlessly inserted
+})
+```
+
+---
+
+### 6. `cmd/deploy` & Deployment Utilities
+* **Current Location**: `cmd/deploy/*.go`
+* **Current File Count**: 8 files
+* **Target Package**: `github.com/dracory/blueprint-deploy` (or standalone CLI binary)
+
+#### Why Extract?
+`cmd/deploy` is an administrative utility for SSH deployment, Cloud Run deployment, and remote server administration. It does not belong inside the runtime application source code at all.
+
+#### How to Extract:
+Publish `blueprint-deploy` as an independent CLI tool or task runner command (`go install github.com/dracory/blueprint-deploy@latest`), eliminating 8 infrastructure files from user application repositories.
+
+---
+
+### 7. `cmd/envenc` & Environment Encryption Utility
+* **Current Location**: `cmd/envenc/main.go`
+* **Current File Count**: 2 files
+* **Target Package**: `github.com/dracory/envenc` (already an external package dependency)
+
+#### Why Extract?
+`cmd/envenc/main.go` simply wraps `github.com/dracory/envenc`. Keeping a separate `cmd/envenc` entrypoint in every user project is unnecessary boilerplate. It can be executed directly via `go run github.com/dracory/envenc@latest` or via `taskfile.yml`.
+
+---
+
+## Modular Architecture Summary
+
+```
++-----------------------------------------------------------------------------------+
+|                               User Application                                    |
+|  - Domain Controllers (auth, user, shop, website)                                 |
+|  - Database Migrations & Models                                                   |
+|  - Explicit main.go & Route Registrations                                         |
++-----------------------------------------------------------------------------------+
+                                   | (Imports only required modules)
+                                   v
++-----------------------------------------------------------------------------------+
+|                            Modular Standalone Packages                            |
+|                                                                                   |
+|  +----------------------------+  +---------------------------------------------+  |
+|  | dracory/blueprint-core     |  | dracory/blueprint-config                    |  |
+|  | - Engine & Lifecycle       |  | - Composable Env Validators                 |  |
+|  | - AppInterface & Registry  |  | - Base & Store Config Interfaces            |  |
+|  +----------------------------+  +---------------------------------------------+  |
+|  +----------------------------+  +---------------------------------------------+  |
+|  | dracory/blueprint-middleware| | dracory/blueprint-cli                       |  |
+|  | - Modular rtr Middlewares  |  | - Maintenance & CLI Command Dispatcher      |  |
+|  +----------------------------+  +---------------------------------------------+  |
++-----------------------------------------------------------------------------------+
+```
+
+---
+
+## File Footprint Impact Breakdown
+
+By extracting these infrastructure packages into clean, modular Go packages, we eliminate **~350 boilerplate files** from new Blueprint projects:
+
+| Area | Current File Count | Post-Extraction Location | Files Removed from User App |
 | :--- | :--- | :--- | :--- |
-| `cmd/server/` | 7 files | 1 file | Encapsulated in `framework.Engine` |
-| `internal/app/` | 10 files | 0 files (or custom extensions) | `framework/app` package |
-| `internal/config/` | 16 files | 0 files (or custom additions) | `framework/config` package |
-| `internal/cli/` | 4 files | 0 files (or custom commands) | `framework/cli` package |
-| `internal/routes/` | 3 files | 1 file (`routes.go`) | Custom app route definitions |
-| `internal/middlewares/` | 26 files | ~3 files (app specific) | Standard middlewares move to `framework/middleware` |
-| **Total Project Files** | **~530+ files** | **~180 files** | **~350 boilerplate files eliminated** |
+| `cmd/server/` | 7 files | `blueprint-core` (Engine) | 6 files |
+| `cmd/deploy/` | 8 files | `blueprint-deploy` (Standalone CLI) | 8 files |
+| `cmd/envenc/` | 2 files | `github.com/dracory/envenc` | 2 files |
+| `cmd/snakecase/` | 2 files | `pkg/helpers` or dropped | 2 files |
+| `internal/app/` | 10 files | `blueprint-core/app` | 10 files |
+| `internal/config/` | 16 files | `blueprint-config` | 16 files |
+| `internal/cli/` | 4 files | `blueprint-cli` | 4 files |
+| `internal/middlewares/` | 26 files | `blueprint-middleware` | ~23 files |
+| `internal/routes/` (framework bindings) | 3 files | Simplified user `routes.go` | 2 files |
+| **Total Overhead Files Eliminated** | **~78 Infra Files** | **Extracted to Modular Go Packages** | **~73 Infra Files** |
 
-*(Note: The remaining ~180 files in a full-stack Blueprint app consist of domain controllers, views, layouts, email templates, and database migrations — pure application logic.)*
-
----
-
-## Implementation & Transition Strategy
-
-### Phase 1: Internal Framework Extraction (`pkg/framework`)
-1. Create `pkg/framework` inside the `dracory/blueprint` repository.
-2. Port `internal/app`, `internal/config`, `internal/cli`, and background worker orchestrators into `pkg/framework`.
-3. Implement Functional Options (`framework.Option`) for store overrides, DB connections, route registration, and middleware pipeline adjustments.
-4. Update `cmd/server/main.go` to use `pkg/framework`.
-5. Verify complete test suite (`go test ./...`) passes.
-
-### Phase 2: Standalone Module (`github.com/dracory/blueprint-framework`)
-1. Extract `pkg/framework` into its own dedicated repository: `github.com/dracory/blueprint-framework`.
-2. Set up automated CI/CD and unit testing for the framework module.
-3. Publish version `v1.0.0`.
-
-### Phase 3: Project Template Update & Migration Path
-1. Update Blueprint starter template (`github.com/dracory/blueprint`) to use `github.com/dracory/blueprint-framework`.
-2. Provide a clear migration guide for existing Blueprint applications to transition to `blueprint-framework` without breaking database models or custom controllers.
+*(When applied across all framework adapters and sub-systems, total user application file count drops from **~530 files** to **~180 files** consisting purely of user controllers, views, migrations, and domain models).*
 
 ---
 
-## Verification & Safety Plan
+## Key Advantages of this Approach
 
-1. **Type Safety & Go Idioms**: Guarantee all configuration options remain fully typed, documented, and discoverable via standard Go IDE auto-completion.
-2. **Backward Compatibility**: Ensure `app.AppInterface` and `config.ConfigInterface` remain untouched so existing controllers, stores, and widgets operate seamlessly.
-3. **Test Suite Verification**: Run all unit and integration tests (`go test ./...`) after refactoring `cmd/server/main.go` to ensure 100% test suite pass rate.
+1. **Strict Compile-Time Safety**: Zero `interface{}` or `any` maps. All stores retain exact interface contracts (`userstore.StoreInterface`, `sessionstore.StoreInterface`).
+2. **Zero Unused Dependencies**: Applications only import and compile the store packages they explicitly register.
+3. **Full Flexibility**: Users can easily replace any store implementation, custom middleware, or CLI command by passing their own strongly-typed Go instances.
+4. **Clean Upstream Upgrades**: Framework updates occur cleanly via `go get github.com/dracory/blueprint-core@latest` without requiring manual file patching in user repositories.
