@@ -2,7 +2,7 @@ module project
 
 go 1.26.5
 
-replace github.com/dracory/base => ../../_modules_dracory/base
+// replace github.com/dracory/base => ../../_modules_dracory/base
 
 // replace github.com/dracory/test => ../../_modules_dracory/test
 
@@ -19,7 +19,7 @@ require (
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.11.0
 	github.com/dracory/auth v0.35.0
-	github.com/dracory/base v0.39.0
+	github.com/dracory/base v0.40.0
 	github.com/dracory/blindindexstore v1.17.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.2.0
