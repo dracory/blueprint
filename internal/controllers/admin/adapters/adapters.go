@@ -134,56 +134,79 @@ func (r *UserStoreCustomerResolver) SearchIDs(ctx context.Context, name, email s
 	return ids, nil
 }
 
-// VaultTokenizerAdapter implements useradmin.VaultTokenizer
-// using the blueprint's ext.UserTokenize / ext.UserUntokenize helpers.
-// It is only active when the blueprint's config has vault store enabled;
-// otherwise it returns plain-text passthrough so useradmin treats user
-// fields as plain text.
-type VaultTokenizerAdapter struct {
-	app app.AppInterface
-}
-
-// NewVaultTokenizerAdapter creates a VaultTokenizer backed by the
-// blueprint's vault store. The adapter checks config.GetVaultStoreUsed()
-// on every call so toggling vault at runtime is respected.
-func NewVaultTokenizerAdapter(app app.AppInterface) *VaultTokenizerAdapter {
-	return &VaultTokenizerAdapter{app: app}
-}
-
-// Tokenize upserts vault tokens for the given user fields and returns
-// the resulting token strings. When vault is disabled, it returns the
-// input values unchanged.
-func (a *VaultTokenizerAdapter) Tokenize(
-	ctx context.Context,
-	user userstore.UserInterface,
-	firstName, lastName, email, phone, businessName string,
-) (string, string, string, string, string, error) {
-	if a.app == nil || a.app.GetConfig() == nil || !a.app.GetConfig().GetVaultStoreUsed() || a.app.GetVaultStore() == nil {
-		return firstName, lastName, email, phone, businessName, nil
-	}
-	return ext.UserTokenize(
-		ctx,
-		a.app.GetVaultStore(),
-		a.app.GetConfig().GetVaultStoreKey(),
-		user,
-		firstName, lastName, email, phone, businessName,
-	)
-}
-
-// Untokenize resolves the tokenized fields on the given user back to
-// their plain-text values. When vault is disabled, it returns the
-// user's stored field values unchanged.
-func (a *VaultTokenizerAdapter) Untokenize(
-	ctx context.Context,
-	user userstore.UserInterface,
-) (string, string, string, string, string, error) {
-	if a.app == nil || a.app.GetConfig() == nil || !a.app.GetConfig().GetVaultStoreUsed() || a.app.GetVaultStore() == nil {
+// NewUserPiiUnsealFunc returns a UserPiiUnseal callback that
+// detokenizes/decrypts user fields for display. When vault is
+// disabled, the user is returned unchanged (plain text).
+func NewUserPiiUnsealFunc(app app.AppInterface) useradmin.UserPiiUnsealFunc {
+	return func(ctx context.Context, user userstore.UserInterface) (userstore.UserInterface, error) {
 		if user == nil {
-			return "", "", "", "", "", nil
+			return nil, nil
 		}
-		return user.GetFirstName(), user.GetLastName(), user.GetEmail(), user.GetPhone(), user.GetBusinessName(), nil
+		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.GetVaultStore() == nil {
+			return user, nil
+		}
+		fn, ln, em, bn, ph, err := ext.UserUntokenize(ctx, app, app.GetConfig().GetVaultStoreKey(), user)
+		if err != nil {
+			return nil, err
+		}
+		user.SetFirstName(fn)
+		user.SetLastName(ln)
+		user.SetEmail(em)
+		user.SetBusinessName(bn)
+		user.SetPhone(ph)
+		return user, nil
 	}
-	return ext.UserUntokenize(ctx, a.app, a.app.GetConfig().GetVaultStoreKey(), user)
+}
+
+// NewUsersPiiUnsealFunc returns a UsersPiiUnseal callback that
+// detokenizes/decrypts a batch of users. It loops over the single-
+// user unseal — replace with a batch vault call when available.
+func NewUsersPiiUnsealFunc(app app.AppInterface) useradmin.UsersPiiUnsealFunc {
+	single := NewUserPiiUnsealFunc(app)
+	return func(ctx context.Context, users []userstore.UserInterface) ([]userstore.UserInterface, error) {
+		for i, user := range users {
+			unsealed, err := single(ctx, user)
+			if err != nil {
+				return nil, err
+			}
+			users[i] = unsealed
+		}
+		return users, nil
+	}
+}
+
+// NewUserPiiSealFunc returns a UserPiiSeal callback that
+// tokenizes/encrypts user fields for storage. When vault is disabled,
+// the user is returned unchanged (plain text).
+func NewUserPiiSealFunc(app app.AppInterface) useradmin.UserPiiSealFunc {
+	return func(ctx context.Context, user userstore.UserInterface) (userstore.UserInterface, error) {
+		if user == nil {
+			return nil, nil
+		}
+		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.GetVaultStore() == nil {
+			return user, nil
+		}
+		fn, ln, em, ph, bn, err := ext.UserTokenize(
+			ctx,
+			app.GetVaultStore(),
+			app.GetConfig().GetVaultStoreKey(),
+			user,
+			user.GetFirstName(),
+			user.GetLastName(),
+			user.GetEmail(),
+			user.GetPhone(),
+			user.GetBusinessName(),
+		)
+		if err != nil {
+			return nil, err
+		}
+		user.SetFirstName(fn)
+		user.SetLastName(ln)
+		user.SetEmail(em)
+		user.SetPhone(ph)
+		user.SetBusinessName(bn)
+		return user, nil
+	}
 }
 
 // NewFlashRedirectFunc returns a FlashRedirectFunc adapter that bridges
