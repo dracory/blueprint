@@ -12,6 +12,7 @@ package adapters
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -20,13 +21,18 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 
+	"github.com/dracory/auth"
+	"github.com/dracory/auth/types"
 	"github.com/dracory/blindindexstore"
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
 	"github.com/dracory/llm"
 	"github.com/dracory/neat"
+	"github.com/dracory/req"
+	"github.com/dracory/sessionstore"
 	"github.com/dracory/useradmin"
 	"github.com/dracory/userstore"
+	"github.com/dromara/carbon/v2"
 )
 
 // LayoutOptions is the anonymous struct used by the external blogadmin
@@ -285,4 +291,42 @@ func (r *BlindIndexResolver) Search(ctx context.Context, value string, searchTyp
 		return nil, nil
 	}
 	return r.store.Search(ctx, value, string(searchType))
+}
+
+// SessionResolver implements useradmin.SessionResolverInterface using
+// the blueprint's sessionstore and auth cookie helpers. It absorbs the
+// session creation, expiry policy, and cookie setting logic that
+// previously lived in useradmin/user_impersonate/impersonate.go.
+type SessionResolver struct {
+	sessionStore sessionstore.StoreInterface
+}
+
+// NewSessionResolver creates a SessionResolver backed by the
+// blueprint's sessionstore.
+func NewSessionResolver(sessionStore sessionstore.StoreInterface) *SessionResolver {
+	return &SessionResolver{sessionStore: sessionStore}
+}
+
+// Compile-time assertion that SessionResolver satisfies useradmin.SessionResolverInterface.
+var _ useradmin.SessionResolverInterface = (*SessionResolver)(nil)
+
+// Create creates a new session for the given user ID and sets the auth
+// cookie on the response. The session expires after 2 hours.
+func (r *SessionResolver) Create(w http.ResponseWriter, httpReq *http.Request, userID string, secure bool) error {
+	if r.sessionStore == nil {
+		return errors.New("session store is nil")
+	}
+
+	session := sessionstore.NewSession().
+		SetUserID(userID).
+		SetUserAgent(httpReq.UserAgent()).
+		SetIPAddress(req.GetIP(httpReq)).
+		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
+
+	if err := r.sessionStore.SessionCreate(httpReq.Context(), session); err != nil {
+		return err
+	}
+
+	auth.AuthCookieSet(w, httpReq, session.GetKey(), types.WithSecure(secure))
+	return nil
 }
