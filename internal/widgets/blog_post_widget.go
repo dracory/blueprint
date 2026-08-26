@@ -1,6 +1,7 @@
 package widgets
 
 import (
+	"github.com/dracory/base/blogblocks"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
@@ -159,7 +160,7 @@ func (w *blogPostWidget) css() string {
 
 func (w *blogPostWidget) processContent(content string, editor string) string {
 	if editor == "BlockArea" {
-		return helpers.BlogPostBlocksToString(content)
+		return blogblocks.BlocksToString(content)
 	}
 	return content
 }

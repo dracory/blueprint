@@ -19,7 +19,7 @@ require (
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.11.0
 	github.com/dracory/auth v0.35.0
-	github.com/dracory/base v0.42.2
+	github.com/dracory/base v0.42.3
 	github.com/dracory/blindindexstore v1.17.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.2.0

@@ -1,6 +1,7 @@
 package post
 
 import (
+	"github.com/dracory/base/blogblocks"
 	baselayouts "github.com/dracory/base/layouts"
 	"bytes"
 	"context"
@@ -183,7 +184,7 @@ func (controller *postController) processContent(content string, editor string, 
 	// blocks content type
 	if contentType == blogstore.POST_CONTENT_TYPE_BLOCKS {
 		if editor == blogstore.POST_EDITOR_BLOCKAREA {
-			return helpers.BlogPostBlocksToString(content), ""
+			return blogblocks.BlocksToString(content), ""
 		}
 		if editor == blogstore.POST_EDITOR_BLOCKEDITOR {
 			theme, err := blogtheme.New(content)
@@ -212,7 +213,7 @@ func (controller *postController) processContent(content string, editor string, 
 	// Fallback to editor-based processing for backward compatibility
 	// blockarea
 	if editor == blogstore.POST_EDITOR_BLOCKAREA {
-		return helpers.BlogPostBlocksToString(content), ""
+		return blogblocks.BlocksToString(content), ""
 	}
 
 	// blockeditor
