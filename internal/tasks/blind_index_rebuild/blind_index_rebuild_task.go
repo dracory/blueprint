@@ -73,7 +73,7 @@ func (task *blindIndexRebuildTask) Description() string {
 }
 
 func (task *blindIndexRebuildTask) Enqueue(index string) (queuedTask taskstore.TaskQueueInterface, err error) {
-	if task.app.GetTaskStore() == nil {
+	if task.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 
@@ -129,14 +129,14 @@ func (task *blindIndexRebuildTask) Handle() bool {
 func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding email index:")
 
-	if task.app.GetUserStore() == nil {
+	if task.app.IsDisabledUserStore() {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table...")
-		if task.app.GetBlindIndexStoreEmail() == nil {
+		if task.app.IsDisabledBlindIndexStoreEmail() {
 			task.LogError("BlindIndexStoreEmail is nil. Aborted.")
 			return false
 		}
@@ -170,14 +170,14 @@ func (task *blindIndexRebuildTask) rebuildEmailIndex(ctx context.Context) bool {
 func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding first name index:")
 
-	if task.app.GetUserStore() == nil {
+	if task.app.IsDisabledUserStore() {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table")
-		if task.app.GetBlindIndexStoreFirstName() == nil {
+		if task.app.IsDisabledBlindIndexStoreFirstName() {
 			task.LogError("BlindIndexStoreFirstName is nil. Aborted.")
 			return false
 		}
@@ -214,14 +214,14 @@ func (task *blindIndexRebuildTask) rebuildFirstNameIndex(ctx context.Context) bo
 func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) bool {
 	task.LogInfo("Rebuilding last name index:")
 
-	if task.app.GetUserStore() == nil {
+	if task.app.IsDisabledUserStore() {
 		task.LogError("User store is nil. Aborted.")
 		return false
 	}
 
 	if task.truncate {
 		task.LogInfo(" - Truncating blind index table")
-		if task.app.GetBlindIndexStoreLastName() == nil {
+		if task.app.IsDisabledBlindIndexStoreLastName() {
 			task.LogError("BlindIndexStoreLastName is nil. Aborted.")
 			return false
 		}
@@ -253,7 +253,7 @@ func (task *blindIndexRebuildTask) rebuildLastNameIndex(ctx context.Context) boo
 }
 
 func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user userstore.UserInterface) bool {
-	if task.app.GetBlindIndexStoreEmail() == nil {
+	if task.app.IsDisabledBlindIndexStoreEmail() {
 		task.LogError("BlindIndexStoreEmail is nil. Aborted.")
 		return false
 	}
@@ -325,7 +325,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 }
 
 func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, user userstore.UserInterface) bool {
-	if task.app.GetBlindIndexStoreFirstName() == nil {
+	if task.app.IsDisabledBlindIndexStoreFirstName() {
 		task.LogError("BlindIndexStoreFirstName is nil. Aborted.")
 		return false
 	}
@@ -398,7 +398,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 }
 
 func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, user userstore.UserInterface) bool {
-	if task.app.GetBlindIndexStoreLastName() == nil {
+	if task.app.IsDisabledBlindIndexStoreLastName() {
 		task.LogError("BlindIndexStoreLastName is nil. Aborted.")
 		return false
 	}

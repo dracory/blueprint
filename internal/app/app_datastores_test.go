@@ -64,65 +64,65 @@ func TestAppNew_InitializesStoresAndCreatesTables(t *testing.T) {
 	ctx := context.Background()
 
 	// Verify all stores are wired (non-nil)
-	if a.GetAuditStore() == nil {
+	if a.IsDisabledAuditStore() {
 		t.Fatal("AuditStore should not be nil")
 	}
-	if a.GetBlogStore() == nil {
+	if a.IsDisabledBlogStore() {
 		t.Fatal("BlogStore should not be nil")
 	}
-	if a.GetChatStore() == nil {
+	if a.IsDisabledChatStore() {
 		t.Fatal("ChatStore should not be nil")
 	}
-	if a.GetCacheStore() == nil {
+	if a.IsDisabledCacheStore() {
 		t.Fatal("CacheStore should not be nil")
 	}
-	if a.GetCmsStore() == nil {
+	if a.IsDisabledCmsStore() {
 		t.Fatal("CmsStore should not be nil")
 	}
-	if a.GetCustomStore() == nil {
+	if a.IsDisabledCustomStore() {
 		t.Fatal("CustomStore should not be nil")
 	}
-	if a.GetEntityStore() == nil {
+	if a.IsDisabledEntityStore() {
 		t.Fatal("EntityStore should not be nil")
 	}
-	if a.GetFeedStore() == nil {
+	if a.IsDisabledFeedStore() {
 		t.Fatal("FeedStore should not be nil")
 	}
-	if a.GetGeoStore() == nil {
+	if a.IsDisabledGeoStore() {
 		t.Fatal("GeoStore should not be nil")
 	}
 	// MetaStore getter isn't exposed on AppInterface; table check below covers it
-	if a.GetSessionStore() == nil {
+	if a.IsDisabledSessionStore() {
 		t.Fatal("SessionStore should not be nil")
 	}
-	if a.GetShopStore() == nil {
+	if a.IsDisabledShopStore() {
 		t.Fatal("ShopStore should not be nil")
 	}
-	if a.GetSqlFileStorage() == nil {
+	if a.IsDisabledSqlFileStorage() {
 		t.Fatal("SqlFileStorage should not be nil")
 	}
-	if a.GetStatsStore() == nil {
+	if a.IsDisabledStatsStore() {
 		t.Fatal("StatsStore should not be nil")
 	}
-	if a.GetTaskStore() == nil {
+	if a.IsDisabledTaskStore() {
 		t.Fatal("TaskStore should not be nil")
 	}
-	if a.GetUserStore() == nil {
+	if a.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
-	if a.GetVaultStore() == nil {
+	if a.IsDisabledVaultStore() {
 		t.Fatal("VaultStore should not be nil")
 	}
-	if a.GetSubscriptionStore() == nil {
+	if a.IsDisabledSubscriptionStore() {
 		t.Fatal("SubscriptionStore should not be nil")
 	}
-	if a.GetBlindIndexStoreEmail() == nil {
+	if a.IsDisabledBlindIndexStoreEmail() {
 		t.Fatal("BlindIndexStoreEmail should not be nil")
 	}
-	if a.GetBlindIndexStoreFirstName() == nil {
+	if a.IsDisabledBlindIndexStoreFirstName() {
 		t.Fatal("BlindIndexStoreFirstName should not be nil")
 	}
-	if a.GetBlindIndexStoreLastName() == nil {
+	if a.IsDisabledBlindIndexStoreLastName() {
 		t.Fatal("BlindIndexStoreLastName should not be nil")
 	}
 

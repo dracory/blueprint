@@ -71,92 +71,138 @@ type AppInterface interface {
 	// Audit store
 	GetAuditStore() auditstore.StoreInterface
 	SetAuditStore(s auditstore.StoreInterface)
+	IsEnabledAuditStore() bool
+	IsDisabledAuditStore() bool
 
 	// Blog store
 	GetBlogStore() blogstore.StoreInterface
 	SetBlogStore(s blogstore.StoreInterface)
+	IsEnabledBlogStore() bool
+	IsDisabledBlogStore() bool
 
 	// Chat store
 	GetChatStore() chatstore.StoreInterface
 	SetChatStore(s chatstore.StoreInterface)
+	IsEnabledChatStore() bool
+	IsDisabledChatStore() bool
 
 	// Blind index store
 	GetBlindIndexStoreEmail() blindindexstore.StoreInterface
 	SetBlindIndexStoreEmail(s blindindexstore.StoreInterface)
+	IsEnabledBlindIndexStoreEmail() bool
+	IsDisabledBlindIndexStoreEmail() bool
 
 	// Blind index store
 	GetBlindIndexStoreFirstName() blindindexstore.StoreInterface
 	SetBlindIndexStoreFirstName(s blindindexstore.StoreInterface)
+	IsEnabledBlindIndexStoreFirstName() bool
+	IsDisabledBlindIndexStoreFirstName() bool
 
 	// Blind index store
 	GetBlindIndexStoreLastName() blindindexstore.StoreInterface
 	SetBlindIndexStoreLastName(s blindindexstore.StoreInterface)
+	IsEnabledBlindIndexStoreLastName() bool
+	IsDisabledBlindIndexStoreLastName() bool
 
 	// Cache store
 	GetCacheStore() cachestore.StoreInterface
 	SetCacheStore(s cachestore.StoreInterface)
+	IsEnabledCacheStore() bool
+	IsDisabledCacheStore() bool
 
 	// CMS store
 	GetCmsStore() cmsstore.StoreInterface
 	SetCmsStore(s cmsstore.StoreInterface)
+	IsEnabledCmsStore() bool
+	IsDisabledCmsStore() bool
 
 	// Custom store
 	GetCustomStore() customstore.StoreInterface
 	SetCustomStore(s customstore.StoreInterface)
+	IsEnabledCustomStore() bool
+	IsDisabledCustomStore() bool
 
 	// Entity store
 	GetEntityStore() entitystore.StoreInterface
 	SetEntityStore(s entitystore.StoreInterface)
+	IsEnabledEntityStore() bool
+	IsDisabledEntityStore() bool
 
 	// Feed store
 	GetFeedStore() feedstore.StoreInterface
 	SetFeedStore(s feedstore.StoreInterface)
+	IsEnabledFeedStore() bool
+	IsDisabledFeedStore() bool
 
 	// Geo store
 	GetGeoStore() geostore.StoreInterface
 	SetGeoStore(s geostore.StoreInterface)
+	IsEnabledGeoStore() bool
+	IsDisabledGeoStore() bool
 
 	// Log store
 	GetLogStore() logstore.StoreInterface
 	SetLogStore(s logstore.StoreInterface)
+	IsEnabledLogStore() bool
+	IsDisabledLogStore() bool
 
 	// Meta store
 	GetMetaStore() metastore.StoreInterface
 	SetMetaStore(s metastore.StoreInterface)
+	IsEnabledMetaStore() bool
+	IsDisabledMetaStore() bool
 
 	// Session store
 	GetSessionStore() sessionstore.StoreInterface
 	SetSessionStore(s sessionstore.StoreInterface)
+	IsEnabledSessionStore() bool
+	IsDisabledSessionStore() bool
 
 	// Setting store
 	GetSettingStore() settingstore.StoreInterface
 	SetSettingStore(s settingstore.StoreInterface)
+	IsEnabledSettingStore() bool
+	IsDisabledSettingStore() bool
 
 	// Shop store
 	GetShopStore() shopstore.StoreInterface
 	SetShopStore(s shopstore.StoreInterface)
+	IsEnabledShopStore() bool
+	IsDisabledShopStore() bool
 
 	// SQL file storage
 	GetSqlFileStorage() filesystem.StorageInterface
 	SetSqlFileStorage(s filesystem.StorageInterface)
+	IsEnabledSqlFileStorage() bool
+	IsDisabledSqlFileStorage() bool
 
 	// Stats store
 	GetStatsStore() statsstore.StoreInterface
 	SetStatsStore(s statsstore.StoreInterface)
+	IsEnabledStatsStore() bool
+	IsDisabledStatsStore() bool
 
 	// Subscription store
 	GetSubscriptionStore() subscriptionstore.StoreInterface
 	SetSubscriptionStore(s subscriptionstore.StoreInterface)
+	IsEnabledSubscriptionStore() bool
+	IsDisabledSubscriptionStore() bool
 
 	// Task store
 	GetTaskStore() taskstore.StoreInterface
 	SetTaskStore(s taskstore.StoreInterface)
+	IsEnabledTaskStore() bool
+	IsDisabledTaskStore() bool
 
 	// User store
 	GetUserStore() userstore.StoreInterface
 	SetUserStore(s userstore.StoreInterface)
+	IsEnabledUserStore() bool
+	IsDisabledUserStore() bool
 
 	// Vault store
 	GetVaultStore() vaultstore.StoreInterface
 	SetVaultStore(s vaultstore.StoreInterface)
+	IsEnabledVaultStore() bool
+	IsDisabledVaultStore() bool
 }

@@ -109,7 +109,7 @@ func Routes(
 				return
 			}
 
-			if app == nil || app.GetBlogStore() == nil {
+			if app == nil || app.IsDisabledBlogStore() {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(`{"error":"Blog store not available","message":"Blog store is not initialized"}`))

@@ -67,7 +67,7 @@ func TestHelloWorldTask_Enqueue_TaskStoreNil(t *testing.T) {
 func TestHelloWorldTask_Handle_EnqueuedTask(t *testing.T) {
 	app := testutils.Setup(testutils.WithTaskStore(true))
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 

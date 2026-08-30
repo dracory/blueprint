@@ -22,10 +22,10 @@ const aiBrowserDefaultEmail = "ai-browser@blueprint.local"
 func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error {
 	ctx := context.Background()
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		return fmt.Errorf("user store is not initialized")
 	}
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		return fmt.Errorf("session store is not initialized")
 	}
 
@@ -44,7 +44,7 @@ func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error 
 		cfmt.Successln("Found existing user:", email)
 	}
 
-	if app.GetSubscriptionStore() != nil {
+	if app.IsEnabledSubscriptionStore() {
 		if err := seedSubscription(ctx, app, user.GetID()); err != nil {
 			return fmt.Errorf("failed to seed subscription: %w", err)
 		}
@@ -80,7 +80,7 @@ func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error 
 
 func findUserByEmail(ctx context.Context, app app.AppInterface, email string) (userstore.UserInterface, error) {
 	if app.GetConfig().GetUserStoreVaultEnabled() {
-		if app.GetBlindIndexStoreEmail() == nil {
+		if app.IsDisabledBlindIndexStoreEmail() {
 			return nil, fmt.Errorf("blind index store email is not initialized")
 		}
 
@@ -125,7 +125,7 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 	}
 
 	if app.GetConfig().GetUserStoreVaultEnabled() {
-		if app.GetVaultStore() == nil {
+		if app.IsDisabledVaultStore() {
 			return nil, fmt.Errorf("vault store is not initialized")
 		}
 
@@ -177,7 +177,7 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 }
 
 func seedSubscription(ctx context.Context, app app.AppInterface, userID string) error {
-	if app.GetSubscriptionStore() == nil {
+	if app.IsDisabledSubscriptionStore() {
 		return nil
 	}
 

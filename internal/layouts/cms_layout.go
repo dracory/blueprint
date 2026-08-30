@@ -1,10 +1,11 @@
 package layouts
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/cmsstore/frontend"
 	"github.com/dracory/hb"
@@ -51,7 +52,7 @@ func (layout *cmsLayout) ToHTML() string {
 	// if layout.app.GetConfig().GetCmsStoreTemplateID() == "" {
 	// 	return "Cms store template is not set"
 	// }
-	if layout.app.GetCmsStore() == nil {
+	if layout.app.IsDisabledCmsStore() {
 		return "Cms store is not initialized"
 	}
 

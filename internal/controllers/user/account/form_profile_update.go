@@ -71,7 +71,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 		c.ReturnURL = links.User().Profile()
 	}
 
-	if c.app.GetUserStore() == nil {
+	if c.app.IsDisabledUserStore() {
 		c.app.GetLogger().Error("User store not initialized")
 		c.FormError = "Error getting user"
 		return nil
@@ -90,7 +90,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 		return nil
 	}
 
-	if c.app.GetGeoStore() == nil {
+	if c.app.IsDisabledGeoStore() {
 		c.app.GetLogger().Error("Geo store not initialized")
 		c.FormError = "Error listing countries"
 		return nil
@@ -107,7 +107,7 @@ func (c *formProfileUpdate) Mount(ctx context.Context, params map[string]string)
 	}
 	c.Countries = countryList
 
-	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetVaultStore() != nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.IsEnabledVaultStore() {
 		firstName, lastName, email, businessName, phone, err := ext.UserUntokenize(
 			ctx,
 			c.app,
@@ -223,7 +223,7 @@ func (c *formProfileUpdate) handleUpdate(ctx context.Context, action string, dat
 		return nil
 	}
 
-	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetVaultStore() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.IsDisabledVaultStore() {
 		c.FormError = "We are very sorry vault store is not configured. Saving the details not possible."
 		c.FormSuccess = ""
 		return nil
@@ -264,7 +264,7 @@ func (c *formProfileUpdate) handleUpdate(ctx context.Context, action string, dat
 	user.SetCountry(c.FormCountry)
 	user.SetTimezone(c.FormTimezone)
 
-	if c.app.GetUserStore() == nil {
+	if c.app.IsDisabledUserStore() {
 		c.app.GetLogger().Warn("At formProfileUpdate > handleUpdate. UserStore is nil.")
 		c.FormError = "Saving profile failed. Please try again later."
 		c.FormSuccess = ""

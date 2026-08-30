@@ -27,10 +27,10 @@ func TestStartBackgroundProcesses(t *testing.T) {
 		t.Fatalf("startBackgroundProcesses returned error: %v", err)
 	}
 
-	if app.GetCacheStore() == nil {
+	if app.IsDisabledCacheStore() {
 		t.Errorf("Cache store should not be nil after starting background processes")
 	}
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Errorf("Session store should not be nil after starting background processes")
 	}
 }
@@ -196,13 +196,13 @@ func TestStartBackgroundProcesses_AllStoresEnabled(t *testing.T) {
 	}
 
 	// Verify all stores are initialized
-	if app.GetCacheStore() == nil {
+	if app.IsDisabledCacheStore() {
 		t.Error("Cache store should be initialized")
 	}
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Error("Session store should be initialized")
 	}
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Error("Task store should be initialized")
 	}
 }
@@ -223,7 +223,7 @@ func TestStartBackgroundProcesses_OnlyTaskStore(t *testing.T) {
 		t.Fatalf("startBackgroundProcesses with task store returned error: %v", err)
 	}
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Error("Task store should be initialized")
 	}
 }
@@ -244,7 +244,7 @@ func TestStartBackgroundProcesses_OnlyCacheStore(t *testing.T) {
 		t.Fatalf("startBackgroundProcesses with cache store returned error: %v", err)
 	}
 
-	if app.GetCacheStore() == nil {
+	if app.IsDisabledCacheStore() {
 		t.Error("Cache store should be initialized")
 	}
 }
@@ -265,7 +265,7 @@ func TestStartBackgroundProcesses_OnlySessionStore(t *testing.T) {
 		t.Fatalf("startBackgroundProcesses with session store returned error: %v", err)
 	}
 
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Error("Session store should be initialized")
 	}
 }
@@ -287,10 +287,10 @@ func TestStartBackgroundProcesses_TaskAndCacheStores(t *testing.T) {
 		t.Fatalf("startBackgroundProcesses with task and cache stores returned error: %v", err)
 	}
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Error("Task store should be initialized")
 	}
-	if app.GetCacheStore() == nil {
+	if app.IsDisabledCacheStore() {
 		t.Error("Cache store should be initialized")
 	}
 }

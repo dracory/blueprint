@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +10,8 @@ import (
 	"project/internal/testutils"
 	"strings"
 	"testing"
+
+	basetestutils "github.com/dracory/base/testutils"
 
 	"github.com/dracory/test"
 	"github.com/dracory/userstore"
@@ -78,11 +79,11 @@ func TestUserMiddleware_RequiresRegisteredUser(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Fatal("SessionStore should not be nil")
 	}
 
@@ -156,11 +157,11 @@ func TestUserMiddleware_RegistrationDisabledAllowsAccess(t *testing.T) {
 	cfg.SetRegistrationEnabled(false)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Fatal("SessionStore should not be nil")
 	}
 
@@ -211,11 +212,11 @@ func TestUserMiddleware_RequiresActiveUser(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Fatal("SessionStore should not be nil")
 	}
 
@@ -303,11 +304,11 @@ func TestUserMiddleware_Success(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
 
-	if app.GetSessionStore() == nil {
+	if app.IsDisabledSessionStore() {
 		t.Fatal("SessionStore should not be nil")
 	}
 

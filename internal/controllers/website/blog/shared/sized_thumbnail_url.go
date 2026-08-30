@@ -11,7 +11,7 @@ import (
 
 func SizedThumbnailURL(ctx context.Context, app app.AppInterface, post blogstore.PostInterface, width, height, quality string) string {
 	var postImageURL string
-	if app != nil && app.GetBlogStore() != nil {
+	if app != nil && app.IsEnabledBlogStore() {
 		postImageURL = rules.PostImageURL(ctx, app.GetBlogStore(), post)
 	} else {
 		postImageURL = post.GetImageUrlOrDefault()

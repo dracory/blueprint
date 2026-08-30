@@ -93,7 +93,7 @@ func TestEmailToAdminOnNewContactFormSubmittedTaskHandler_Handle_SendEmail(t *te
 
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 

@@ -2,8 +2,8 @@ package website
 
 import (
 	"net/http"
-	"project/internal/links"
 	"project/internal/app"
+	"project/internal/links"
 
 	"github.com/dracory/rtr"
 
@@ -54,7 +54,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 	websiteRoutes = append(websiteRoutes, seo.Routes(app)...)
 	websiteRoutes = append(websiteRoutes, swagger.Routes()...)
 
-	isCmsUsed := app.GetConfig().GetCmsStoreUsed() && app.GetCmsStore() != nil
+	isCmsUsed := app.GetConfig().GetCmsStoreUsed() && app.IsEnabledCmsStore()
 
 	if isCmsUsed {
 		websiteRoutes = append(websiteRoutes, cms.Routes(app)...)

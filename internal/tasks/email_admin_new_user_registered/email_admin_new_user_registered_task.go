@@ -48,7 +48,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Enqueue(userID string
 		return nil, errors.New("app/config is nil")
 	}
 
-	if handler.app.GetTaskStore() == nil {
+	if handler.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 
@@ -68,7 +68,7 @@ func (handler *emailToAdminOnNewUserRegisteredTaskHandler) Handle() bool {
 		return false
 	}
 
-	if handler.app.GetUserStore() == nil {
+	if handler.app.IsDisabledUserStore() {
 		handler.LogError("User store is nil. Aborted.")
 		return false
 	}

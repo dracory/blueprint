@@ -1,13 +1,14 @@
 package authentication
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"project/internal/testutils"
 	"testing"
+
+	basetestutils "github.com/dracory/base/testutils"
 
 	"github.com/dracory/test"
 )
@@ -163,7 +164,7 @@ func TestAuthControllerOnceSuccessWithExistingUser(t *testing.T) {
 	cfg.SetUserStoreUsed(true)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("UserStore should not be nil")
 	}
 

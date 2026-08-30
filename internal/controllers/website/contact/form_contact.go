@@ -78,7 +78,7 @@ func (c *formContact) Mount(ctx context.Context, params map[string]string) error
 	c.CaptchaExpected = hashCaptchaValue(sumStr)
 	c.CaptchaAnswer = ""
 
-	if c.UserID == "" || c.app == nil || c.app.GetUserStore() == nil {
+	if c.UserID == "" || c.app == nil || c.app.IsDisabledUserStore() {
 		return nil
 	}
 
@@ -183,7 +183,7 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		return nil
 	}
 
-	if c.app == nil || c.app.GetCustomStore() == nil {
+	if c.app == nil || c.app.IsDisabledCustomStore() {
 		c.ErrorMessage = "System error occurred. Please try again later."
 		c.SuccessMessage = ""
 		return nil
@@ -200,7 +200,7 @@ func (c *formContact) Handle(ctx context.Context, action string, data url.Values
 		c.app.GetLogger().Error("At formContact.Handle. Enqueue EmailToAdminOnNewContactFormSubmittedTask", "error", err.Error())
 	}
 
-	if c.UserID != "" && c.app != nil && c.app.GetUserStore() != nil {
+	if c.UserID != "" && c.app != nil && c.app.IsEnabledUserStore() {
 		user, err := c.app.GetUserStore().UserFindByID(ctx, c.UserID)
 		if err == nil && user != nil {
 			if c.CanUpdateFirst {

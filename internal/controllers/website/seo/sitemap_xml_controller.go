@@ -77,7 +77,7 @@ func (c sitemapXmlController) blogPostLocations() []string {
 		return []string{}
 	}
 
-	if c.app.GetBlogStore() == nil {
+	if c.app.IsDisabledBlogStore() {
 		slog.Warn("At sitemapXmlController > blogPostLocations", slog.String("reason", "blog store is not configured"))
 		return []string{}
 	}

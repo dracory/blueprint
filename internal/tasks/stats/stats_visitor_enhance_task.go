@@ -57,7 +57,7 @@ var _ taskstore.TaskHandlerInterface = (*statsVisitorEnhanceTask)(nil) // verify
 // == PUBLIC METHODS ==========================================================
 
 func (t *statsVisitorEnhanceTask) Enqueue() (taskstore.TaskQueueInterface, error) {
-	if t.app == nil || t.app.GetTaskStore() == nil {
+	if t.app == nil || t.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 	return t.app.GetTaskStore().TaskDefinitionEnqueueByAlias(
@@ -81,7 +81,7 @@ func (t *statsVisitorEnhanceTask) Description() string {
 }
 
 func (t *statsVisitorEnhanceTask) Handle() bool {
-	if t.app == nil || t.app.GetStatsStore() == nil {
+	if t.app == nil || t.app.IsDisabledStatsStore() {
 		t.LogError("Task StatsVisitorEnhance. Store is nil")
 		return false
 	}
@@ -115,7 +115,7 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 // == PRIVATE METHODS =========================================================
 
 func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor statsstore.VisitorInterface) bool {
-	if t.app == nil || t.app.GetStatsStore() == nil {
+	if t.app == nil || t.app.IsDisabledStatsStore() {
 		t.LogError("Task StatsVisitorEnhance. Store is nil")
 		return false
 	}

@@ -85,7 +85,7 @@ func TestCleanUpTask_Handle_TaskStoreNil(t *testing.T) {
 func TestCleanUpTask_Handle_Success(t *testing.T) {
 	app := testutils.Setup(testutils.WithTaskStore(true))
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 

@@ -1,12 +1,13 @@
 package login
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"project/internal/testutils"
 	"testing"
+
+	basetestutils "github.com/dracory/base/testutils"
 
 	"github.com/dracory/test"
 )
@@ -61,7 +62,7 @@ func TestLoginControllerHandler_VaultStoreNotUsed(t *testing.T) {
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// Ensure user store exists but vault store is required and missing
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatal("user store should be initialized in test setup")
 	}
 	app.GetConfig().SetVaultStoreUsed(true)

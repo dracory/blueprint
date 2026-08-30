@@ -11,12 +11,13 @@
 package adapters
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"project/internal/app"
 	"project/internal/ext"
@@ -143,7 +144,7 @@ func NewUserPiiUnsealFunc(app app.AppInterface) useradmin.UserPiiUnsealFunc {
 		if user == nil {
 			return nil, nil
 		}
-		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.GetVaultStore() == nil {
+		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.IsDisabledVaultStore() {
 			return user, nil
 		}
 		fn, ln, em, bn, ph, err := ext.UserUntokenize(ctx, app, app.GetConfig().GetVaultStoreKey(), user)
@@ -184,7 +185,7 @@ func NewUserPiiSealFunc(app app.AppInterface) useradmin.UserPiiSealFunc {
 		if user == nil {
 			return nil, nil
 		}
-		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.GetVaultStore() == nil {
+		if app == nil || app.GetConfig() == nil || !app.GetConfig().GetVaultStoreUsed() || app.IsDisabledVaultStore() {
 			return user, nil
 		}
 		fn, ln, em, ph, bn, err := ext.UserTokenize(
@@ -406,7 +407,7 @@ func intersectIDSets(sets [][]string) []string {
 // policy.
 func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateFunc {
 	return func(w http.ResponseWriter, httpReq *http.Request, userID string) error {
-		if app == nil || app.GetSessionStore() == nil {
+		if app == nil || app.IsDisabledSessionStore() {
 			return errors.New("session store is nil")
 		}
 
@@ -433,7 +434,7 @@ func NewOnUserImpersonateFunc(app app.AppInterface) useradmin.OnUserImpersonateF
 // idempotent.
 func NewOnUserUpdatedFunc(app app.AppInterface, taskAlias string) useradmin.OnUserUpdatedFunc {
 	return func(ctx context.Context, userID string) {
-		if app == nil || app.GetTaskStore() == nil || taskAlias == "" {
+		if app == nil || app.IsDisabledTaskStore() || taskAlias == "" {
 			return
 		}
 		_, err := app.GetTaskStore().TaskDefinitionEnqueueByAlias(

@@ -23,7 +23,7 @@ import (
 // Returns:
 // - none
 func RegisterTasks(app app.AppInterface) {
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		return
 	}
 

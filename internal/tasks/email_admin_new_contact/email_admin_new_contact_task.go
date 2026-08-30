@@ -48,7 +48,7 @@ func (handler *emailToAdminOnNewContactFormSubmittedTaskHandler) Enqueue() (task
 		return nil, errors.New("app is nil")
 	}
 
-	if handler.app.GetTaskStore() == nil {
+	if handler.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(

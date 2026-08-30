@@ -14,7 +14,7 @@ func scheduleCleanUpTask(app app.AppInterface) {
 		return
 	}
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		cfmt.Warningln("CleanUp scheduling skipped; task store not configured.")
 		return
 	}

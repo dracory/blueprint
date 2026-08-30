@@ -98,7 +98,7 @@ func TestEmailTestTask_Handle_SendEmail(t *testing.T) {
 	emails.InitEmailSender(app)
 
 	// Register task so that queued tasks can be processed if needed
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 

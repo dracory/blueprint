@@ -41,7 +41,7 @@ func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 		return nil, errors.New("app is nil")
 	}
 
-	if t.app.GetTaskStore() == nil {
+	if t.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 
@@ -55,7 +55,7 @@ func (t *cleanUpTask) Enqueue() (task taskstore.TaskQueueInterface, err error) {
 
 func (t *cleanUpTask) Handle() bool {
 	// Defensive: if TaskStore isn't initialized (e.g., during early DI cutover), skip work gracefully
-	if t.app.GetTaskStore() == nil {
+	if t.app.IsDisabledTaskStore() {
 		t.LogInfo("TaskStore not configured; skipping CleanUpTask run.")
 		return true
 	}

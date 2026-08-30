@@ -1,7 +1,6 @@
 package admin
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,6 +8,8 @@ import (
 	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
@@ -313,7 +314,7 @@ func (c *homeController) datesInRange(timeStart, timeEnd *carbon.Carbon) []strin
 }
 
 func (c *homeController) visitorsData() (dates []string, visits []int64, err error) {
-	if c.app.GetStatsStore() == nil {
+	if c.app.IsDisabledStatsStore() {
 		return nil, nil, errors.New("statsstore is nil")
 	}
 

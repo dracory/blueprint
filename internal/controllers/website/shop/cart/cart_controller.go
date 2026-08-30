@@ -40,7 +40,7 @@ const (
 // validateProductAndGetPrice validates that a product exists and returns its actual price
 // This prevents price manipulation by ensuring the price comes from the shop store
 func (controller *cartController) validateProductAndGetPrice(ctx context.Context, productID string) (string, string, string, error) {
-	if controller.app.GetShopStore() == nil {
+	if controller.app.IsDisabledShopStore() {
 		return "", "", "", fmt.Errorf("shop store not available")
 	}
 
@@ -72,7 +72,7 @@ func (controller *cartController) validateProductAndGetPrice(ctx context.Context
 
 // getCartFromCache retrieves cart from cache for guest users
 func (controller *cartController) getCartFromCache(ctx context.Context, r *http.Request) Cart {
-	if controller.app.GetCacheStore() == nil {
+	if controller.app.IsDisabledCacheStore() {
 		controller.app.GetLogger().Warn("getCartFromCache: Cache store not available")
 		return Cart{Items: []CartItem{}}
 	}
@@ -110,7 +110,7 @@ func (controller *cartController) getCartFromCache(ctx context.Context, r *http.
 
 // saveCartToCache saves cart to cache for guest users
 func (controller *cartController) saveCartToCache(ctx context.Context, r *http.Request, cart Cart) error {
-	if controller.app.GetCacheStore() == nil {
+	if controller.app.IsDisabledCacheStore() {
 		return fmt.Errorf("cache store not available")
 	}
 
@@ -125,7 +125,7 @@ func (controller *cartController) saveCartToCache(ctx context.Context, r *http.R
 
 // TransferCacheToUser transfers cart from cache to user metadata
 func (controller *cartController) TransferCacheToUser(ctx context.Context, r *http.Request, user userstore.UserInterface) error {
-	if controller.app.GetCacheStore() == nil {
+	if controller.app.IsDisabledCacheStore() {
 		return fmt.Errorf("cache store not available")
 	}
 
@@ -197,7 +197,7 @@ func (controller *cartController) ClearCart(ctx context.Context, r *http.Request
 	}
 
 	// Clear from cache
-	if controller.app.GetCacheStore() != nil {
+	if controller.app.IsEnabledCacheStore() {
 		cacheKey := basepayment.GenerateCartCacheKey(r)
 		controller.app.GetCacheStore().SetJSON(cacheKey, Cart{Items: []CartItem{}}, 30*24*60*60)
 	}
@@ -754,7 +754,7 @@ func (controller *cartController) saveCartToUserWithCache(ctx context.Context, r
 	}
 
 	// Sync with cache for guest users or when cache is available
-	if controller.app.GetCacheStore() != nil {
+	if controller.app.IsEnabledCacheStore() {
 		cacheKey := basepayment.GenerateCartCacheKey(r)
 		if err := controller.app.GetCacheStore().SetJSON(cacheKey, cart, 30*24*60*60); err != nil {
 			controller.app.GetLogger().Warn("Failed to sync cart to cache", slog.String("error", err.Error()))

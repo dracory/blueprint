@@ -1,11 +1,12 @@
 package flash
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/layouts"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -48,7 +49,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 		}).ToHTML()
 	}
 
-	if controller.app.GetCmsStore() != nil && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreTemplateID() != "" {
+	if controller.app.IsEnabledCmsStore() && controller.app.GetConfig() != nil && controller.app.GetConfig().GetCmsStoreTemplateID() != "" {
 		return layouts.NewCmsLayout(
 			controller.app,
 			r,

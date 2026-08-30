@@ -96,11 +96,11 @@ func TestEmailToAdminOnNewUserRegisteredTaskHandler_Handle_SendEmail(t *testing.
 
 	emails.InitEmailSender(app)
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 
-	if app.GetUserStore() == nil {
+	if app.IsDisabledUserStore() {
 		t.Fatalf("expected user store to be initialized")
 	}
 

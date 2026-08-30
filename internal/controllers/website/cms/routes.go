@@ -5,9 +5,9 @@ import (
 	"crypto/subtle"
 	"io"
 	"net/http"
+	"project/internal/app"
 	"project/internal/links"
 	"project/internal/middlewares"
-	"project/internal/app"
 	"strings"
 	"time"
 
@@ -106,7 +106,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 					return
 				}
 
-				if app == nil || app.GetCmsStore() == nil {
+				if app == nil || app.IsDisabledCmsStore() {
 					w.Header().Set("Content-Type", "application/json")
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte(`{"error":"CMS store not available","message":"CMS store is not initialized"}`))

@@ -1,10 +1,10 @@
 package cmsblocks
 
 import (
+	"project/internal/app"
 	"project/internal/cmsblocks/blogpost"
 	"project/internal/cmsblocks/blogpostlist"
 	"project/internal/cmsblocks/search"
-	"project/internal/app"
 
 	"github.com/dracory/cmsstore"
 )
@@ -27,12 +27,12 @@ func CmsAddBlockTypes(app app.AppInterface) {
 		return
 	}
 
-	if app.GetCmsStore() == nil {
+	if app.IsDisabledCmsStore() {
 		return
 	}
 
 	// Register the Blog Post List block type as a custom block
-	if app.GetBlogStore() != nil {
+	if app.IsEnabledBlogStore() {
 		blogPostListBlock := blogpostlist.NewBlogPostListBlockType(app.GetBlogStore())
 		cmsstore.RegisterCustomBlockType(blogPostListBlock)
 

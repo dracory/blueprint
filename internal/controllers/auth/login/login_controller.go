@@ -22,11 +22,11 @@ func (controller *loginController) Handler(w http.ResponseWriter, r *http.Reques
 	homeURL := links.Website().Home()
 	userURL := links.User().Home()
 
-	if controller.app.GetUserStore() == nil {
+	if controller.app.IsDisabledUserStore() {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
-	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.GetVaultStore() == nil {
+	if controller.app.GetConfig().GetVaultStoreUsed() && controller.app.IsDisabledVaultStore() {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
 	}
 

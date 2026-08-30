@@ -31,21 +31,21 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 		return errors.New("startBackgroundProcesses called with nil db")
 	}
 
-	if app.GetConfig().GetTaskStoreUsed() && app.GetTaskStore() == nil {
+	if app.GetConfig().GetTaskStoreUsed() && app.IsDisabledTaskStore() {
 		return errors.New("startBackgroundProcesses task store is enabled but not initialized")
 	}
 
-	if app.GetConfig().GetCacheStoreUsed() && app.GetCacheStore() == nil {
+	if app.GetConfig().GetCacheStoreUsed() && app.IsDisabledCacheStore() {
 		return errors.New("startBackgroundProcesses cache store is enabled but not initialized")
 	}
 
-	if app.GetConfig().GetSessionStoreUsed() && app.GetSessionStore() == nil {
+	if app.GetConfig().GetSessionStoreUsed() && app.IsDisabledSessionStore() {
 		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
 	}
 
 	if app.GetConfig().GetTaskStoreUsed() {
-		ts := app.GetTaskStore()
-		if ts != nil {
+		if app.IsEnabledTaskStore() {
+			ts := app.GetTaskStore()
 			group.Go(func(ctx context.Context) {
 				// Run the default task queue worker loop using the updated TaskQueue API
 				// 10 workers, 2-second polling interval
@@ -61,8 +61,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 		}
 	}
 	if app.GetConfig().GetCacheStoreUsed() {
-		cs := app.GetCacheStore()
-		if cs != nil {
+		if app.IsEnabledCacheStore() {
+			cs := app.GetCacheStore()
 			group.Go(func(ctx context.Context) {
 				if err := cs.ExpireCacheGoroutine(ctx); err != nil {
 					slog.Error("Cache expiration goroutine failed", "error", err)
@@ -72,8 +72,8 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 	}
 
 	if app.GetConfig().GetSessionStoreUsed() {
-		ss := app.GetSessionStore()
-		if ss != nil {
+		if app.IsEnabledSessionStore() {
+			ss := app.GetSessionStore()
 			group.Go(func(ctx context.Context) {
 				if err := ss.SessionExpiryGoroutine(ctx); err != nil {
 					slog.Error("Session expiry goroutine failed", "error", err)

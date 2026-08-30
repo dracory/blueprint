@@ -24,7 +24,7 @@ func CmsAddShortcodes(app app.AppInterface) {
 		return
 	}
 
-	if app.GetCmsStore() == nil {
+	if app.IsDisabledCmsStore() {
 		return
 	}
 

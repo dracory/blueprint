@@ -1,7 +1,6 @@
 package register
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"errors"
 	"log/slog"
@@ -12,6 +11,8 @@ import (
 	"project/internal/links"
 	authrules "project/internal/rules/auth"
 	"strings"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -63,11 +64,11 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, canRegister.FailMessageFirst(), links.Website().Home(), 10)
 	}
 
-	if controller.app.GetUserStore() == nil {
+	if controller.app.IsDisabledUserStore() {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
 	}
 
-	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.GetVaultStore() == nil {
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.IsDisabledVaultStore() {
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, links.Website().Home(), 5)
 	}
 
@@ -126,7 +127,7 @@ func (controller *registerController) Handler(w http.ResponseWriter, r *http.Req
 // == PRIVATE METHODS =========================================================
 
 func (controller *registerController) postUpdate(ctx context.Context, data registerControllerData) string {
-	if controller.app.GetUserStore() == nil {
+	if controller.app.IsDisabledUserStore() {
 		data.formErrorMessage = "We are very sorry user store is not configured. Saving the details not possible."
 		return controller.formRegister(ctx, data).ToHTML()
 	}
@@ -144,7 +145,7 @@ func (controller *registerController) postUpdate(ctx context.Context, data regis
 	}
 
 	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
-		if controller.app.GetVaultStore() == nil {
+		if controller.app.IsDisabledVaultStore() {
 			data.formErrorMessage = "We are very sorry vault store is not configured. Saving the details not possible."
 			return controller.formRegister(ctx, data).ToHTML()
 		}
@@ -239,7 +240,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 		return email, firstName, lastName, businessName, phone, nil
 	}
 
-	if controller.app.GetVaultStore() == nil {
+	if controller.app.IsDisabledVaultStore() {
 		return "", "", "", "", "", errors.New("vault store is nil")
 	}
 
@@ -299,7 +300,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 }
 
 func (controller *registerController) prepareData(r *http.Request) (data registerControllerData, errorMessage string) {
-	if controller.app.GetUserStore() == nil {
+	if controller.app.IsDisabledUserStore() {
 		return registerControllerData{}, "User store is nil"
 	}
 
@@ -310,7 +311,7 @@ func (controller *registerController) prepareData(r *http.Request) (data registe
 		return registerControllerData{}, "You must be logged in to access this page"
 	}
 
-	if controller.app.GetGeoStore() == nil {
+	if controller.app.IsDisabledGeoStore() {
 		return registerControllerData{}, "Geo store is nil"
 	}
 

@@ -70,21 +70,21 @@ func NewAuthenticationController(application app.AppInterface) *authenticationCo
 // - string: the result of the authentication request.
 func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
-	if c.app.GetUserStore() == nil {
+	if c.app.IsDisabledUserStore() {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
 
 	if c.app.GetConfig().GetUserStoreVaultEnabled() {
-		if c.app.GetVaultStore() == nil {
+		if c.app.IsDisabledVaultStore() {
 			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `vault store is required`, homeURL, 5)
 		}
 	}
 
-	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetBlindIndexStoreEmail() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.IsDisabledBlindIndexStoreEmail() {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `blind index store is required`, homeURL, 5)
 	}
 
-	if c.app.GetSessionStore() == nil {
+	if c.app.IsDisabledSessionStore() {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `session store is required`, homeURL, 5)
 	}
 
@@ -393,11 +393,11 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		SetStatus(status).
 		SetEmail(email)
 
-	if c.app.GetUserStore() == nil {
+	if c.app.IsDisabledUserStore() {
 		return nil, errors.New("user store is nil")
 	}
 
-	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.GetVaultStore() == nil {
+	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.IsDisabledVaultStore() {
 		return nil, errors.New(`vault store is nil`)
 	}
 
@@ -411,7 +411,7 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 		return user, nil
 	}
 
-	if c.app.GetVaultStore() == nil {
+	if c.app.IsDisabledVaultStore() {
 		return nil, errors.New(`vault store is nil`)
 	}
 
@@ -462,12 +462,12 @@ func (c *authenticationController) userCreate(ctx context.Context, email string,
 //   - userstore.UserInterface: The user object.
 //   - error: An error object if an error occurred during the operation.
 func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, email string, status string) (userstore.UserInterface, error) {
-	if c.app.GetUserStore() == nil {
+	if c.app.IsDisabledUserStore() {
 		return nil, errors.New("user store is nil")
 	}
 
 	if c.app.GetConfig().GetUserStoreVaultEnabled() {
-		if c.app.GetVaultStore() == nil {
+		if c.app.IsDisabledVaultStore() {
 			return nil, errors.New(`vault store is nil`)
 		}
 

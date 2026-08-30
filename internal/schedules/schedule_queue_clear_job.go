@@ -17,7 +17,7 @@ func queueClearJob(app app.AppInterface) {
 		return
 	}
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		cfmt.Warningln("QueueClearJob skipped; task store not configured.")
 		return
 	}

@@ -45,7 +45,7 @@ func aiBrowserAutoLoginHandler(a app.AppInterface, next http.Handler) http.Handl
 			return
 		}
 
-		if a.GetUserStore() == nil || a.GetSessionStore() == nil {
+		if a.IsDisabledUserStore() || a.IsDisabledSessionStore() {
 			slog.Warn("AiBrowserAutoLoginMiddleware: user or session store not initialized, skipping auto-login")
 			next.ServeHTTP(w, r)
 			return

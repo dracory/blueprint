@@ -46,12 +46,14 @@ func (l *authLoggerAdapter) Error(msg string, args ...any) {
 // AuthMiddleware creates the auth middleware using the shared rtr implementation
 func AuthMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 	var sessionStore rtrMiddleware.AuthSessionStore
-	if s := app.GetSessionStore(); s != nil {
+	if app.IsEnabledSessionStore() {
+		s := app.GetSessionStore()
 		sessionStore = &authSessionStoreAdapter{store: s}
 	}
 
 	var userStore rtrMiddleware.AuthUserStore
-	if u := app.GetUserStore(); u != nil {
+	if app.IsEnabledUserStore() {
+		u := app.GetUserStore()
 		userStore = &authUserStoreAdapter{store: u}
 	}
 

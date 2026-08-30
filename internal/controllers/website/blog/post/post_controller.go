@@ -1,8 +1,6 @@
 package post
 
 import (
-	"github.com/dracory/base/blogblocks"
-	baselayouts "github.com/dracory/base/layouts"
 	"bytes"
 	"context"
 	"log/slog"
@@ -15,6 +13,9 @@ import (
 	"project/internal/links"
 	"project/internal/rules"
 	"strings"
+
+	"github.com/dracory/base/blogblocks"
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -269,7 +270,7 @@ func (c *postController) sectionPost(post blogstore.PostInterface) *hb.Tag {
 }
 
 func (c *postController) recommendationsSection(post blogstore.PostInterface) hb.TagInterface {
-	if c.app == nil || c.app.GetBlogStore() == nil {
+	if c.app == nil || c.app.IsDisabledBlogStore() {
 		return hb.Div()
 	}
 

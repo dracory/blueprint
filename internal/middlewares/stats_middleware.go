@@ -31,7 +31,7 @@ func (m statsMiddleware) Handler(application app.AppInterface, next http.Handler
 			return
 		}
 
-		if application.GetStatsStore() == nil {
+		if application.IsDisabledStatsStore() {
 			application.GetLogger().Error("stats_middleware", "error", "stats store is marked as used but is nil")
 			next.ServeHTTP(w, r)
 			return

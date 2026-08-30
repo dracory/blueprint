@@ -31,7 +31,7 @@ func UserUntokenize(
 	phone string,
 	err error,
 ) {
-	if app.GetVaultStore() == nil {
+	if app.IsDisabledVaultStore() {
 		return "", "", "", "", "", errors.New("user_untokenized: vaultstore is nil")
 	}
 
@@ -112,7 +112,7 @@ func UserUntokenizeFieldByField(
 	phone string,
 	status UserUntokenizeFieldStatus,
 ) {
-	if app.GetVaultStore() == nil {
+	if app.IsDisabledVaultStore() {
 		return user.GetFirstName(), user.GetLastName(), user.GetEmail(), user.GetBusinessName(), user.GetPhone(), UserUntokenizeFieldStatus{}
 	}
 

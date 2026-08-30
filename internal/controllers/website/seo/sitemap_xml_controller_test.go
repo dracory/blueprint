@@ -46,7 +46,7 @@ func TestSitemapXmlController_WithBlogStore(t *testing.T) {
 	if !app.GetConfig().GetBlogStoreUsed() {
 		t.Fatal("expected blog store to be enabled")
 	}
-	if app.GetBlogStore() == nil {
+	if app.IsDisabledBlogStore() {
 		t.Fatal("expected blog store to be initialized")
 	}
 

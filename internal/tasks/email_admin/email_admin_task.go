@@ -79,7 +79,7 @@ func (handler *emailToAdminTask) Enqueue(html string) (task taskstore.TaskQueueI
 		return nil, errors.New("app/config is nil")
 	}
 
-	if handler.app.GetTaskStore() == nil {
+	if handler.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 

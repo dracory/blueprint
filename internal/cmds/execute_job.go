@@ -30,7 +30,7 @@ func ExecuteJob(app app.AppInterface, args []string) {
 		return
 	}
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		log.Println("TaskStore is nil")
 		return
 	}

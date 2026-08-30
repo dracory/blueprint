@@ -35,7 +35,7 @@ func TestExecuteCliCommand_TaskExecution(t *testing.T) {
 	// Test task execution with TaskStore not nil
 	os.Args = []string{"main", "task", "testTask"}
 	// Ensure TaskStore is not nil (testutils.Setup should handle this, or mock it)
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Skip("Skipping test: TaskStore is nil, cannot test task execution.") // Or setup a mock TaskStore here
 	}
 	err := ExecuteCliCommand(app, os.Args[1:])

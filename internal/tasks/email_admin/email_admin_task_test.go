@@ -106,7 +106,7 @@ func TestEmailToAdminTask_Handle_SendEmail(t *testing.T) {
 
 	emails.InitEmailSender(app)
 
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		t.Fatalf("expected task store to be initialized")
 	}
 

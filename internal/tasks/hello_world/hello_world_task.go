@@ -38,7 +38,7 @@ func (handler *helloWorldTask) Enqueue() (task taskstore.TaskQueueInterface, err
 	if handler.app == nil {
 		return nil, errors.New("app is nil")
 	}
-	if handler.app.GetTaskStore() == nil {
+	if handler.app.IsDisabledTaskStore() {
 		return nil, errors.New("task store is nil")
 	}
 	return handler.app.GetTaskStore().TaskDefinitionEnqueueByAlias(

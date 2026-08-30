@@ -50,7 +50,7 @@ func (t *testimonialsWidget) Description() string {
 
 // Render implements the shortcode interface.
 func (t *testimonialsWidget) Render(r *http.Request, content string, params map[string]string) string {
-	if t.app.GetEntityStore() == nil {
+	if t.app.IsDisabledEntityStore() {
 		return "Error: Testimonials store is not initialized"
 	}
 

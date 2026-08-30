@@ -158,7 +158,7 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 		return nil, err
 	}
 
-	if app.GetLogStore() != nil {
+	if app.IsEnabledLogStore() {
 		app.SetLogger(slog.New(logstore.NewSlogHandler(app.GetLogStore())))
 	}
 
@@ -496,4 +496,238 @@ func (r *appImplementation) GetBlindIndexStoreLastName() blindindexstore.StoreIn
 }
 func (r *appImplementation) SetBlindIndexStoreLastName(s blindindexstore.StoreInterface) {
 	r.blindIndexLastName = s
+}
+
+// ============================================================================
+// == Store enabled/disabled accessors
+// ============================================================================
+
+// IsEnabledAuditStore reports whether the audit store is configured.
+func (r *appImplementation) IsEnabledAuditStore() bool {
+	return r != nil && r.auditStore != nil
+}
+
+// IsDisabledAuditStore reports whether the audit store is not configured.
+func (r *appImplementation) IsDisabledAuditStore() bool {
+	return !r.IsEnabledAuditStore()
+}
+
+// IsEnabledBlogStore reports whether the blog store is configured.
+func (r *appImplementation) IsEnabledBlogStore() bool {
+	return r != nil && r.blogStore != nil
+}
+
+// IsDisabledBlogStore reports whether the blog store is not configured.
+func (r *appImplementation) IsDisabledBlogStore() bool {
+	return !r.IsEnabledBlogStore()
+}
+
+// IsEnabledChatStore reports whether the chat store is configured.
+func (r *appImplementation) IsEnabledChatStore() bool {
+	return r != nil && r.chatStore != nil
+}
+
+// IsDisabledChatStore reports whether the chat store is not configured.
+func (r *appImplementation) IsDisabledChatStore() bool {
+	return !r.IsEnabledChatStore()
+}
+
+// IsEnabledBlindIndexStoreEmail reports whether the email blind index store is configured.
+func (r *appImplementation) IsEnabledBlindIndexStoreEmail() bool {
+	return r != nil && r.blindIndexEmail != nil
+}
+
+// IsDisabledBlindIndexStoreEmail reports whether the email blind index store is not configured.
+func (r *appImplementation) IsDisabledBlindIndexStoreEmail() bool {
+	return !r.IsEnabledBlindIndexStoreEmail()
+}
+
+// IsEnabledBlindIndexStoreFirstName reports whether the first name blind index store is configured.
+func (r *appImplementation) IsEnabledBlindIndexStoreFirstName() bool {
+	return r != nil && r.blindIndexFirstName != nil
+}
+
+// IsDisabledBlindIndexStoreFirstName reports whether the first name blind index store is not configured.
+func (r *appImplementation) IsDisabledBlindIndexStoreFirstName() bool {
+	return !r.IsEnabledBlindIndexStoreFirstName()
+}
+
+// IsEnabledBlindIndexStoreLastName reports whether the last name blind index store is configured.
+func (r *appImplementation) IsEnabledBlindIndexStoreLastName() bool {
+	return r != nil && r.blindIndexLastName != nil
+}
+
+// IsDisabledBlindIndexStoreLastName reports whether the last name blind index store is not configured.
+func (r *appImplementation) IsDisabledBlindIndexStoreLastName() bool {
+	return !r.IsEnabledBlindIndexStoreLastName()
+}
+
+// IsEnabledCacheStore reports whether the cache store is configured.
+func (r *appImplementation) IsEnabledCacheStore() bool {
+	return r != nil && r.cacheStore != nil
+}
+
+// IsDisabledCacheStore reports whether the cache store is not configured.
+func (r *appImplementation) IsDisabledCacheStore() bool {
+	return !r.IsEnabledCacheStore()
+}
+
+// IsEnabledCmsStore reports whether the CMS store is configured.
+func (r *appImplementation) IsEnabledCmsStore() bool {
+	return r != nil && r.cmsStore != nil
+}
+
+// IsDisabledCmsStore reports whether the CMS store is not configured.
+func (r *appImplementation) IsDisabledCmsStore() bool {
+	return !r.IsEnabledCmsStore()
+}
+
+// IsEnabledCustomStore reports whether the custom store is configured.
+func (r *appImplementation) IsEnabledCustomStore() bool {
+	return r != nil && r.customStore != nil
+}
+
+// IsDisabledCustomStore reports whether the custom store is not configured.
+func (r *appImplementation) IsDisabledCustomStore() bool {
+	return !r.IsEnabledCustomStore()
+}
+
+// IsEnabledEntityStore reports whether the entity store is configured.
+func (r *appImplementation) IsEnabledEntityStore() bool {
+	return r != nil && r.entityStore != nil
+}
+
+// IsDisabledEntityStore reports whether the entity store is not configured.
+func (r *appImplementation) IsDisabledEntityStore() bool {
+	return !r.IsEnabledEntityStore()
+}
+
+// IsEnabledFeedStore reports whether the feed store is configured.
+func (r *appImplementation) IsEnabledFeedStore() bool {
+	return r != nil && r.feedStore != nil
+}
+
+// IsDisabledFeedStore reports whether the feed store is not configured.
+func (r *appImplementation) IsDisabledFeedStore() bool {
+	return !r.IsEnabledFeedStore()
+}
+
+// IsEnabledGeoStore reports whether the geo store is configured.
+func (r *appImplementation) IsEnabledGeoStore() bool {
+	return r != nil && r.geoStore != nil
+}
+
+// IsDisabledGeoStore reports whether the geo store is not configured.
+func (r *appImplementation) IsDisabledGeoStore() bool {
+	return !r.IsEnabledGeoStore()
+}
+
+// IsEnabledLogStore reports whether the log store is configured.
+func (r *appImplementation) IsEnabledLogStore() bool {
+	return r != nil && r.logStore != nil
+}
+
+// IsDisabledLogStore reports whether the log store is not configured.
+func (r *appImplementation) IsDisabledLogStore() bool {
+	return !r.IsEnabledLogStore()
+}
+
+// IsEnabledMetaStore reports whether the meta store is configured.
+func (r *appImplementation) IsEnabledMetaStore() bool {
+	return r != nil && r.metaStore != nil
+}
+
+// IsDisabledMetaStore reports whether the meta store is not configured.
+func (r *appImplementation) IsDisabledMetaStore() bool {
+	return !r.IsEnabledMetaStore()
+}
+
+// IsEnabledSessionStore reports whether the session store is configured.
+func (r *appImplementation) IsEnabledSessionStore() bool {
+	return r != nil && r.sessionStore != nil
+}
+
+// IsDisabledSessionStore reports whether the session store is not configured.
+func (r *appImplementation) IsDisabledSessionStore() bool {
+	return !r.IsEnabledSessionStore()
+}
+
+// IsEnabledSettingStore reports whether the setting store is configured.
+func (r *appImplementation) IsEnabledSettingStore() bool {
+	return r != nil && r.settingStore != nil
+}
+
+// IsDisabledSettingStore reports whether the setting store is not configured.
+func (r *appImplementation) IsDisabledSettingStore() bool {
+	return !r.IsEnabledSettingStore()
+}
+
+// IsEnabledShopStore reports whether the shop store is configured.
+func (r *appImplementation) IsEnabledShopStore() bool {
+	return r != nil && r.shopStore != nil
+}
+
+// IsDisabledShopStore reports whether the shop store is not configured.
+func (r *appImplementation) IsDisabledShopStore() bool {
+	return !r.IsEnabledShopStore()
+}
+
+// IsEnabledSqlFileStorage reports whether the SQL file storage is configured.
+func (r *appImplementation) IsEnabledSqlFileStorage() bool {
+	return r != nil && r.sqlFileStorage != nil
+}
+
+// IsDisabledSqlFileStorage reports whether the SQL file storage is not configured.
+func (r *appImplementation) IsDisabledSqlFileStorage() bool {
+	return !r.IsEnabledSqlFileStorage()
+}
+
+// IsEnabledStatsStore reports whether the stats store is configured.
+func (r *appImplementation) IsEnabledStatsStore() bool {
+	return r != nil && r.statsStore != nil
+}
+
+// IsDisabledStatsStore reports whether the stats store is not configured.
+func (r *appImplementation) IsDisabledStatsStore() bool {
+	return !r.IsEnabledStatsStore()
+}
+
+// IsEnabledSubscriptionStore reports whether the subscription store is configured.
+func (r *appImplementation) IsEnabledSubscriptionStore() bool {
+	return r != nil && r.subscriptionStore != nil
+}
+
+// IsDisabledSubscriptionStore reports whether the subscription store is not configured.
+func (r *appImplementation) IsDisabledSubscriptionStore() bool {
+	return !r.IsEnabledSubscriptionStore()
+}
+
+// IsEnabledTaskStore reports whether the task store is configured.
+func (r *appImplementation) IsEnabledTaskStore() bool {
+	return r != nil && r.taskStore != nil
+}
+
+// IsDisabledTaskStore reports whether the task store is not configured.
+func (r *appImplementation) IsDisabledTaskStore() bool {
+	return !r.IsEnabledTaskStore()
+}
+
+// IsEnabledUserStore reports whether the user store is configured.
+func (r *appImplementation) IsEnabledUserStore() bool {
+	return r != nil && r.userStore != nil
+}
+
+// IsDisabledUserStore reports whether the user store is not configured.
+func (r *appImplementation) IsDisabledUserStore() bool {
+	return !r.IsEnabledUserStore()
+}
+
+// IsEnabledVaultStore reports whether the vault store is configured.
+func (r *appImplementation) IsEnabledVaultStore() bool {
+	return r != nil && r.vaultStore != nil
+}
+
+// IsDisabledVaultStore reports whether the vault store is not configured.
+func (r *appImplementation) IsDisabledVaultStore() bool {
+	return !r.IsEnabledVaultStore()
 }

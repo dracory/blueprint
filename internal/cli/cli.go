@@ -54,7 +54,7 @@ func handleTaskCommand(app app.AppInterface, args []string) error {
 	if len(args) == 0 {
 		return fmt.Errorf("missing task alias for command '%s'", CommandTask)
 	}
-	if app.GetTaskStore() == nil {
+	if app.IsDisabledTaskStore() {
 		err := fmt.Errorf("task store is nil")
 		baseCfmt.Errorln(err.Error())
 		return err
