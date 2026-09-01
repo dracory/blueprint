@@ -17,13 +17,6 @@ import (
 )
 
 func Routes(app app.AppInterface) []rtr.RouteInterface {
-	adsTxt := rtr.NewRoute().
-		SetName("Shared > ads.txt").
-		SetPath("/ads.txt").
-		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
-			return "google.com, pub-8821108004642146, DIRECT, f08c47fec0942fa0"
-		})
-
 	cdnRoute := rtr.NewRoute().
 		SetName("Shared > CDN Controller").
 		SetPath("/cdn/:name").
@@ -78,7 +71,6 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		SetHTMLHandler(page_not_found.PageNotFoundController().Handler)
 
 	return []rtr.RouteInterface{
-		adsTxt,
 		cdnRoute,
 		files,
 		flash,

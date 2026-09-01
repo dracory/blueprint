@@ -1,10 +1,9 @@
 package seo
 
 import (
-	"net/http"
+	"project/internal/app"
 	"project/internal/controllers/website/pages/indexnow"
 	"project/internal/links"
-	"project/internal/app"
 
 	"github.com/dracory/rtr"
 )
@@ -13,10 +12,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 	adsRoute := rtr.NewRoute().
 		SetName("Website > ads.txt").
 		SetPath("/ads.txt").
-		SetStringHandler(func(w http.ResponseWriter, r *http.Request) string {
-			//return "google.com, pub-8821108004642146, DIRECT, f08c47fec0942fa0"
-			return "google.com, pub-YOURNUMBER, DIRECT, YOURSTRING"
-		})
+		SetStringHandler(NewAdsTxtController().Handler)
 
 	robotsRoute := rtr.NewRoute().
 		SetName("Website > RobotsTxt").
