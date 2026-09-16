@@ -11,8 +11,8 @@ The project is a web application that follows the pattern set by Blueprint.
 1. **Read the project's current version**:
    - Check the file: `<project_path>/internal/config/version.go`
    - Read the `Version` constant to determine the current version
-   - If the version is not found, consider the project to be at version 0.16.0
-   - Example: `const Version = "0.22.0"`
+   - If the version is not found, consider the project to be at version 0.30.0
+   - Example: `const Version = "0.30.0"`
 
 2. **Read the latest Blueprint version**:
    - Check the file: `D:\PROJECTs\dracory.com\blueprint\internal/config/version.go`
