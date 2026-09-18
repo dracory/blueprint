@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project Setup
-- Use Go 1.26 or later
+- Use Go 1.27 or later
 - Install dependencies: `go mod download`
 - Run the application: `go run ./cmd/server`
 - Run tests: `go test ./...`
