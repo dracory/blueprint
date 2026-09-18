@@ -58,3 +58,4 @@ google-cloud-sdk/
 
 old/
 __debug_bin*
+.playwright-mcp/
