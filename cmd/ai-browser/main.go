@@ -32,6 +32,16 @@ func main() {
 
 	setHardcodedEnv()
 
+	email := withUser
+	if email == "" {
+		email = aiBrowserDefaultEmail
+	}
+
+	// The allowlist falls back to hardcoded emails when empty, so the seeded
+	// email must be set before the config is loaded or
+	// EmailAllowlistMiddleware blocks it.
+	os.Setenv("AUTH_EMAILS_ALLOWED_ACCESS", email)
+
 	cfg, err := config.NewFromEnv()
 	if err != nil {
 		fmt.Printf("Failed to load config: %v\n", err)
@@ -58,11 +68,6 @@ func main() {
 	if err := migrations.MigrateAll(appInstance); err != nil {
 		fmt.Printf("Failed to migrate database: %v\n", err)
 		return
-	}
-
-	email := withUser
-	if email == "" {
-		email = aiBrowserDefaultEmail
 	}
 
 	if err := seedUserAndSession(appInstance, email, isAdmin || withUser == ""); err != nil {

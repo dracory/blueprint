@@ -55,6 +55,17 @@
 - View coverage: `go tool cover -html=coverage.out`
 - Run integration tests: `go test -tags=integration ./...`
 
+## AI Browser Sandbox
+Agents with browser automation access (Playwright / Chrome DevTools MCP) can run a
+sandboxed, auto-authenticated instance of the app for UI testing:
+
+```bash
+go run ./cmd/ai-browser    # serves http://127.0.0.1:34756, auto-login enabled
+```
+
+It uses a disposable SQLite DB (`tmp/ai-browser.db`), disables all external APIs,
+and never touches real data. See `cmd/ai-browser/AGENTS.md` for details.
+
 ## Git Workflow
 - Branch naming: `feature/your-feature-name` or `bugfix/description`
 - Write clear, concise commit messages

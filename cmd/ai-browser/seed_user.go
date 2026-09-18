@@ -19,6 +19,11 @@ import (
 
 const aiBrowserDefaultEmail = "ai-browser@blueprint.local"
 
+// aiBrowserUserID must match the fixed ID looked up by
+// middlewares.AiBrowserAutoLoginMiddleware, otherwise auto-login silently
+// does nothing.
+const aiBrowserUserID = "ai-browser-user"
+
 func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error {
 	ctx := context.Background()
 
@@ -108,6 +113,7 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 	}
 
 	user := userstore.NewUser().
+		SetID(aiBrowserUserID).
 		SetEmail(email).
 		SetStatus(userstore.USER_STATUS_ACTIVE).
 		SetRole(role).
