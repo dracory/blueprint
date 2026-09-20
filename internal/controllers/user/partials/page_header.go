@@ -1,11 +1,12 @@
 package partials
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"project/internal/links"
 
+	baselayouts "github.com/dracory/base/layouts"
+	"github.com/dracory/neat"
+
 	"github.com/dracory/hb"
-	"github.com/dracory/uid"
 
 	"github.com/samber/lo"
 )
@@ -56,7 +57,7 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]baselayouts.Brea
 			hb.BORDER_LAYOUT_ALIGN_LEFT,
 			hb.BORDER_LAYOUT_ALIGN_MIDDLE)
 
-	id := "PageHeader" + uid.HumanUid()
+	id := "PageHeader" + neat.GenerateID()
 
 	style := hb.NewStyle(`
 		#` + id + ` .breadcrumb{
