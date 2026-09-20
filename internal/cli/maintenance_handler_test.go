@@ -8,7 +8,7 @@ import (
 
 func TestHandleMaintenanceEnable_CreatesFile(t *testing.T) {
 	path := "test_maintenance_enable.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	opts := maintenanceEnableOptions{
 		message:    "Test maintenance",
@@ -52,7 +52,7 @@ func TestHandleMaintenanceEnable_CreatesFile(t *testing.T) {
 
 func TestHandleMaintenanceEnable_WritesValidJSON(t *testing.T) {
 	path := getMaintenanceFilePath(nil)
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	err := handleMaintenanceEnable(nil, []string{
 		"--message=Handler test",
@@ -93,7 +93,7 @@ func TestHandleMaintenanceEnable_WritesValidJSON(t *testing.T) {
 
 func TestHandleMaintenanceDisable_RemovesFile(t *testing.T) {
 	path := getMaintenanceFilePath(nil)
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	if err := os.WriteFile(path, []byte(`{"message":"test"}`), 0644); err != nil {
 		t.Fatalf("failed to write file: %v", err)
@@ -110,8 +110,8 @@ func TestHandleMaintenanceDisable_RemovesFile(t *testing.T) {
 
 func TestHandleMaintenanceDisable_NoFile_IsNoOp(t *testing.T) {
 	path := getMaintenanceFilePath(nil)
-	os.Remove(path)
-	defer os.Remove(path)
+	_ = os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	if err := handleMaintenanceDisable(nil); err != nil {
 		t.Fatalf("handleMaintenanceDisable should not error when file doesn't exist: %v", err)
@@ -120,8 +120,8 @@ func TestHandleMaintenanceDisable_NoFile_IsNoOp(t *testing.T) {
 
 func TestHandleMaintenanceStatus_NoFile_ReportsOff(t *testing.T) {
 	path := getMaintenanceFilePath(nil)
-	os.Remove(path)
-	defer os.Remove(path)
+	_ = os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	if err := handleMaintenanceStatus(nil); err != nil {
 		t.Fatalf("handleMaintenanceStatus failed: %v", err)
@@ -130,7 +130,7 @@ func TestHandleMaintenanceStatus_NoFile_ReportsOff(t *testing.T) {
 
 func TestHandleMaintenanceStatus_FileExists_ReportsOn(t *testing.T) {
 	path := getMaintenanceFilePath(nil)
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	state := maintenanceState{
 		Message:           "Status test",

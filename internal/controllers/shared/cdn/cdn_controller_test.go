@@ -24,7 +24,7 @@ func TestHandlerEmptyRequest(t *testing.T) {
 	controller.Handler(w, req)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", resp.StatusCode)
@@ -47,7 +47,7 @@ func TestHandlerNoExtension(t *testing.T) {
 	controller.Handler(w, req)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	body := w.Body.String()
 	expected := "No extension provided"
@@ -66,7 +66,7 @@ func TestHandlerUnsupportedExtension(t *testing.T) {
 	controller.Handler(w, req)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", resp.StatusCode)
@@ -89,7 +89,7 @@ func TestHandlerJSRequest(t *testing.T) {
 	controller.Handler(w, req)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", resp.StatusCode)
@@ -121,7 +121,7 @@ func TestHandlerCSSRequest(t *testing.T) {
 	controller.Handler(w, req)
 
 	resp := w.Result()
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("Expected status 200, got %d", resp.StatusCode)

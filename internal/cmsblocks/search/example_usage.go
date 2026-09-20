@@ -53,12 +53,12 @@ func ExampleRendering(cmsStore cmsstore.StoreInterface, blogStore blogstore.Stor
 // ExampleConfiguration demonstrates how to configure the search block
 func ExampleConfiguration(block cmsstore.BlockInterface) {
 	// Set placeholder text for the search input
-	block.SetMeta("placeholder", "Search articles, pages...")
+	_ = block.SetMeta("placeholder", "Search articles, pages...")
 
 	// Set number of results per page
-	block.SetMeta("results_per_page", "10")
+	_ = block.SetMeta("results_per_page", "10")
 
 	// Enable/disable content types in search
-	block.SetMeta("show_pages", "true") // Include CMS pages
-	block.SetMeta("show_posts", "true") // Include blog posts
+	_ = block.SetMeta("show_pages", "true") // Include CMS pages
+	_ = block.SetMeta("show_posts", "true") // Include blog posts
 }

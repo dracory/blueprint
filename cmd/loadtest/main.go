@@ -122,7 +122,7 @@ func main() {
 							errorCounts[fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)]++
 							mu.Unlock()
 						}
-						resp.Body.Close()
+						_ = resp.Body.Close()
 					}
 
 					atomic.AddInt64(&totalDuration, reqDuration)

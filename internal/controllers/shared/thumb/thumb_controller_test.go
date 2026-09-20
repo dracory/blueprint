@@ -851,8 +851,8 @@ func TestPrepareDataSizeParsing_WidthAndHeight(t *testing.T) {
 	parts := strings.Split(body, "|")
 	if len(parts) >= 2 {
 		var w, h int64
-		fmt.Sscanf(parts[0], "%d", &w)
-		fmt.Sscanf(parts[1], "%d", &h)
+		_, _ = fmt.Sscanf(parts[0], "%d", &w)
+		_, _ = fmt.Sscanf(parts[1], "%d", &h)
 		if w != 300 || h != 200 {
 			t.Errorf("Expected 300x200, got %dx%d", w, h)
 		}
@@ -880,8 +880,8 @@ func TestPrepareDataSizeParsing_WidthOnly(t *testing.T) {
 	parts := strings.Split(body, "|")
 	if len(parts) >= 2 {
 		var w, h int64
-		fmt.Sscanf(parts[0], "%d", &w)
-		fmt.Sscanf(parts[1], "%d", &h)
+		_, _ = fmt.Sscanf(parts[0], "%d", &w)
+		_, _ = fmt.Sscanf(parts[1], "%d", &h)
 		if w != 500 || h != 0 {
 			t.Errorf("Expected 500x0, got %dx%d", w, h)
 		}
@@ -909,8 +909,8 @@ func TestPrepareDataSizeParsing_ZeroDimensions(t *testing.T) {
 	parts := strings.Split(body, "|")
 	if len(parts) >= 2 {
 		var w, h int64
-		fmt.Sscanf(parts[0], "%d", &w)
-		fmt.Sscanf(parts[1], "%d", &h)
+		_, _ = fmt.Sscanf(parts[0], "%d", &w)
+		_, _ = fmt.Sscanf(parts[1], "%d", &h)
 		if w != 0 || h != 0 {
 			t.Errorf("Expected 0x0, got %dx%d", w, h)
 		}
@@ -938,8 +938,8 @@ func TestPrepareDataSizeParsing_LargeDimensions(t *testing.T) {
 	parts := strings.Split(body, "|")
 	if len(parts) >= 2 {
 		var w, h int64
-		fmt.Sscanf(parts[0], "%d", &w)
-		fmt.Sscanf(parts[1], "%d", &h)
+		_, _ = fmt.Sscanf(parts[0], "%d", &w)
+		_, _ = fmt.Sscanf(parts[1], "%d", &h)
 		if w != 4000 || h != 3000 {
 			t.Errorf("Expected 4000x3000, got %dx%d", w, h)
 		}
@@ -1204,7 +1204,7 @@ func TestPrepareDataQualityParsing_LowQuality(t *testing.T) {
 
 	body := rr.Body.String()
 	var q int64
-	fmt.Sscanf(body, "%d", &q)
+	_, _ = fmt.Sscanf(body, "%d", &q)
 	if q != 30 {
 		t.Errorf("Expected quality 30, got %d", q)
 	}
@@ -1229,7 +1229,7 @@ func TestPrepareDataQualityParsing_MediumQuality(t *testing.T) {
 
 	body := rr.Body.String()
 	var q int64
-	fmt.Sscanf(body, "%d", &q)
+	_, _ = fmt.Sscanf(body, "%d", &q)
 	if q != 70 {
 		t.Errorf("Expected quality 70, got %d", q)
 	}
@@ -1254,7 +1254,7 @@ func TestPrepareDataQualityParsing_HighQuality(t *testing.T) {
 
 	body := rr.Body.String()
 	var q int64
-	fmt.Sscanf(body, "%d", &q)
+	_, _ = fmt.Sscanf(body, "%d", &q)
 	if q != 95 {
 		t.Errorf("Expected quality 95, got %d", q)
 	}
@@ -1279,7 +1279,7 @@ func TestPrepareDataQualityParsing_ZeroQuality(t *testing.T) {
 
 	body := rr.Body.String()
 	var q int64
-	fmt.Sscanf(body, "%d", &q)
+	_, _ = fmt.Sscanf(body, "%d", &q)
 	if q != 0 {
 		t.Errorf("Expected quality 0, got %d", q)
 	}
@@ -1304,7 +1304,7 @@ func TestPrepareDataQualityParsing_InvalidQuality(t *testing.T) {
 
 	body := rr.Body.String()
 	var q int64
-	fmt.Sscanf(body, "%d", &q)
+	_, _ = fmt.Sscanf(body, "%d", &q)
 	if q != 0 {
 		t.Errorf("Expected quality 0, got %d", q)
 	}

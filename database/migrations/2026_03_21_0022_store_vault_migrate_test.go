@@ -34,5 +34,5 @@ func TestStoreVaultMigrate_DownWithNilApp(t *testing.T) {
 			t.Error("Expected panic when app is nil")
 		}
 	}()
-	migration.Down()
+	_ = migration.Down()
 }

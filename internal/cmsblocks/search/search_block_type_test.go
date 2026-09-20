@@ -51,22 +51,22 @@ func TestSearchBlockType_GetPreview(t *testing.T) {
 	}
 
 	// Test with only pages
-	block.SetMeta("show_posts", "false")
+	_ = block.SetMeta("show_posts", "false")
 	preview = blockType.GetPreview(block)
 	if preview != "Search (Pages)" {
 		t.Errorf("Expected preview 'Search (Pages)', got '%s'", preview)
 	}
 
 	// Test with only posts
-	block.SetMeta("show_pages", "false")
-	block.SetMeta("show_posts", "true")
+	_ = block.SetMeta("show_pages", "false")
+	_ = block.SetMeta("show_posts", "true")
 	preview = blockType.GetPreview(block)
 	if preview != "Search (Blog Posts)" {
 		t.Errorf("Expected preview 'Search (Blog Posts)', got '%s'", preview)
 	}
 
 	// Test with none selected
-	block.SetMeta("show_posts", "false")
+	_ = block.SetMeta("show_posts", "false")
 	preview = blockType.GetPreview(block)
 	if preview != "Search (no content types selected)" {
 		t.Errorf("Expected preview 'Search (no content types selected)', got '%s'", preview)
@@ -104,10 +104,10 @@ func TestSearchBlockType_AdminFields(t *testing.T) {
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
-	block.SetMeta("placeholder", "Find articles...")
-	block.SetMeta("results_per_page", "20")
-	block.SetMeta("show_pages", "true")
-	block.SetMeta("show_posts", "true")
+	_ = block.SetMeta("placeholder", "Find articles...")
+	_ = block.SetMeta("results_per_page", "20")
+	_ = block.SetMeta("show_pages", "true")
+	_ = block.SetMeta("show_posts", "true")
 
 	req := httptest.NewRequest("GET", "/test", nil)
 	fields := blockType.GetAdminFields(block, req)
@@ -169,10 +169,10 @@ func TestSearchBlockType_Render_EmptyQuery(t *testing.T) {
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
-	block.SetMeta("placeholder", "Search...")
-	block.SetMeta("results_per_page", "10")
-	block.SetMeta("show_pages", "true")
-	block.SetMeta("show_posts", "true")
+	_ = block.SetMeta("placeholder", "Search...")
+	_ = block.SetMeta("results_per_page", "10")
+	_ = block.SetMeta("show_pages", "true")
+	_ = block.SetMeta("show_posts", "true")
 
 	// Create request without query
 	req, _ := test.NewRequest("GET", "/search", test.NewRequestOptions{})
@@ -202,10 +202,10 @@ func TestSearchBlockType_Render_WithQuery(t *testing.T) {
 
 	block := cmsstore.NewBlock()
 	block.SetType("search")
-	block.SetMeta("placeholder", "Search...")
-	block.SetMeta("results_per_page", "10")
-	block.SetMeta("show_pages", "true")
-	block.SetMeta("show_posts", "true")
+	_ = block.SetMeta("placeholder", "Search...")
+	_ = block.SetMeta("results_per_page", "10")
+	_ = block.SetMeta("show_pages", "true")
+	_ = block.SetMeta("show_posts", "true")
 
 	// Create request with search query
 	req, _ := test.NewRequest("GET", "/search", test.NewRequestOptions{

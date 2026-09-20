@@ -49,7 +49,7 @@ func TestBlogPostBlockType_GetPreview(t *testing.T) {
 	}
 
 	// Test with post ID
-	block.SetMeta("post_id", "post-123")
+	_ = block.SetMeta("post_id", "post-123")
 	preview = blockType.GetPreview(block)
 	if !strings.Contains(preview, "post-123") {
 		t.Errorf("Expected preview to contain post ID, got '%s'", preview)
@@ -85,12 +85,12 @@ func TestBlogPostBlockType_AdminFields(t *testing.T) {
 
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post")
-	block.SetMeta("post_id", "post-123")
-	block.SetMeta("show_image", "true")
-	block.SetMeta("show_title", "true")
-	block.SetMeta("show_date", "true")
-	block.SetMeta("show_author", "true")
-	block.SetMeta("show_summary", "true")
+	_ = block.SetMeta("post_id", "post-123")
+	_ = block.SetMeta("show_image", "true")
+	_ = block.SetMeta("show_title", "true")
+	_ = block.SetMeta("show_date", "true")
+	_ = block.SetMeta("show_author", "true")
+	_ = block.SetMeta("show_summary", "true")
 
 	req := httptest.NewRequest("GET", "/test", nil)
 	fields := blockType.GetAdminFields(block, req)
@@ -206,13 +206,13 @@ func TestBlogPostBlockType_Render(t *testing.T) {
 	// Create block referencing the post
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post")
-	block.SetMeta("post_id", post.GetID())
-	block.SetMeta("show_title", "true")
-	block.SetMeta("show_image", "true")
-	block.SetMeta("show_date", "false")
-	block.SetMeta("show_author", "false")
-	block.SetMeta("show_summary", "false")
-	block.SetMeta("show_prev_next", "false")
+	_ = block.SetMeta("post_id", post.GetID())
+	_ = block.SetMeta("show_title", "true")
+	_ = block.SetMeta("show_image", "true")
+	_ = block.SetMeta("show_date", "false")
+	_ = block.SetMeta("show_author", "false")
+	_ = block.SetMeta("show_summary", "false")
+	_ = block.SetMeta("show_prev_next", "false")
 
 	// Render
 	req := httptest.NewRequest("GET", "/blog/test-post-123/test-post-slug", nil)
@@ -291,13 +291,13 @@ func TestBlogPostBlockType_RenderWithNoTags(t *testing.T) {
 	// Create block
 	block := cmsstore.NewBlock()
 	block.SetType("blog_post")
-	block.SetMeta("post_id", post.GetID())
-	block.SetMeta("show_title", "true")
-	block.SetMeta("show_image", "false")
-	block.SetMeta("show_date", "false")
-	block.SetMeta("show_author", "false")
-	block.SetMeta("show_summary", "false")
-	block.SetMeta("show_prev_next", "false")
+	_ = block.SetMeta("post_id", post.GetID())
+	_ = block.SetMeta("show_title", "true")
+	_ = block.SetMeta("show_image", "false")
+	_ = block.SetMeta("show_date", "false")
+	_ = block.SetMeta("show_author", "false")
+	_ = block.SetMeta("show_summary", "false")
+	_ = block.SetMeta("show_prev_next", "false")
 
 	// Render
 	req := httptest.NewRequest("GET", "/blog/test-post-no-tags/post-without-tags", nil)

@@ -199,7 +199,7 @@ func (controller *cartController) ClearCart(ctx context.Context, r *http.Request
 	// Clear from cache
 	if controller.app.IsEnabledCacheStore() {
 		cacheKey := basepayment.GenerateCartCacheKey(r)
-		controller.app.GetCacheStore().SetJSON(cacheKey, Cart{Items: []CartItem{}}, 30*24*60*60)
+		_ = controller.app.GetCacheStore().SetJSON(cacheKey, Cart{Items: []CartItem{}}, 30*24*60*60)
 	}
 
 	return nil
@@ -241,7 +241,7 @@ func (controller *cartController) Handler(w http.ResponseWriter, r *http.Request
 	default:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte(`{"status":"error","message":"Method not allowed"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Method not allowed"}`))
 		return ""
 	}
 }
@@ -254,7 +254,7 @@ func (controller *cartController) handleGetCart(ctx context.Context, w http.Resp
 	response := api.SuccessWithData("Cart retrieved successfully", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -266,7 +266,7 @@ func (controller *cartController) handleGetCartGuest(ctx context.Context, w http
 	response := api.SuccessWithData("Cart retrieved successfully", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -280,12 +280,12 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 		ImageURL    string `json:"image_url"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
@@ -293,7 +293,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 	if reqBody.ProductID == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
 		return ""
 	}
 
@@ -303,7 +303,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 	if reqBody.Quantity > maxQuantity {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 		return ""
 	}
 
@@ -312,7 +312,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid product"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid product"}`))
 		return ""
 	}
 
@@ -335,7 +335,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 			if newQuantity > maxQuantity {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+				_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 				return ""
 			}
 			cart.Items[i].Quantity = newQuantity
@@ -349,7 +349,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 		if len(cart.Items) >= maxItems {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"status":"error","message":"Cart has reached maximum item limit"}`))
+			_, _ = w.Write([]byte(`{"status":"error","message":"Cart has reached maximum item limit"}`))
 			return ""
 		}
 		cart.Items = append(cart.Items, CartItem{
@@ -365,7 +365,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 	if err := controller.saveCartToUserWithCache(ctx, r, authUser, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -373,7 +373,7 @@ func (controller *cartController) handleAddToCart(ctx context.Context, w http.Re
 	response := api.SuccessWithData("Item added to cart", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -387,12 +387,12 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 		ImageURL    string `json:"image_url"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
@@ -400,7 +400,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 	if reqBody.ProductID == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
 		return ""
 	}
 
@@ -410,7 +410,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 	if reqBody.Quantity > maxQuantity {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 		return ""
 	}
 
@@ -419,7 +419,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid product"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid product"}`))
 		return ""
 	}
 
@@ -442,7 +442,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 			if newQuantity > maxQuantity {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+				_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 				return ""
 			}
 			cart.Items[i].Quantity = newQuantity
@@ -456,7 +456,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 		if len(cart.Items) >= maxItems {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(`{"status":"error","message":"Cart has reached maximum item limit"}`))
+			_, _ = w.Write([]byte(`{"status":"error","message":"Cart has reached maximum item limit"}`))
 			return ""
 		}
 		cart.Items = append(cart.Items, CartItem{
@@ -472,7 +472,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 	if err := controller.saveCartToCache(ctx, r, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -480,7 +480,7 @@ func (controller *cartController) handleAddToCartGuest(ctx context.Context, w ht
 	response := api.SuccessWithData("Item added to cart", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -490,19 +490,19 @@ func (controller *cartController) handleRemoveFromCart(ctx context.Context, w ht
 		ProductID string `json:"product_id"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
 	if reqBody.ProductID == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
 		return ""
 	}
 
@@ -522,7 +522,7 @@ func (controller *cartController) handleRemoveFromCart(ctx context.Context, w ht
 	if err := controller.saveCartToUserWithCache(ctx, r, authUser, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -530,7 +530,7 @@ func (controller *cartController) handleRemoveFromCart(ctx context.Context, w ht
 	response := api.SuccessWithData("Item removed from cart", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -540,19 +540,19 @@ func (controller *cartController) handleRemoveFromCartGuest(ctx context.Context,
 		ProductID string `json:"product_id"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
 	if reqBody.ProductID == "" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID is required"}`))
 		return ""
 	}
 
@@ -572,7 +572,7 @@ func (controller *cartController) handleRemoveFromCartGuest(ctx context.Context,
 	if err := controller.saveCartToCache(ctx, r, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -580,7 +580,7 @@ func (controller *cartController) handleRemoveFromCartGuest(ctx context.Context,
 	response := api.SuccessWithData("Item removed from cart", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -591,25 +591,25 @@ func (controller *cartController) handleUpdateCart(ctx context.Context, w http.R
 		Quantity  int    `json:"quantity"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
 	if reqBody.ProductID == "" || reqBody.Quantity < 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID and quantity are required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID and quantity are required"}`))
 		return ""
 	}
 	if reqBody.Quantity > maxQuantity {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 		return ""
 	}
 
@@ -635,7 +635,7 @@ func (controller *cartController) handleUpdateCart(ctx context.Context, w http.R
 	if err := controller.saveCartToUserWithCache(ctx, r, authUser, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -643,7 +643,7 @@ func (controller *cartController) handleUpdateCart(ctx context.Context, w http.R
 	response := api.SuccessWithData("Cart updated", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 
@@ -654,25 +654,25 @@ func (controller *cartController) handleUpdateCartGuest(ctx context.Context, w h
 		Quantity  int    `json:"quantity"`
 	}
 
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	r.Body = http.MaxBytesReader(nil, r.Body, maxBodySize)
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Invalid request body"}`))
 		return ""
 	}
 
 	if reqBody.ProductID == "" || reqBody.Quantity < 0 {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Product ID and quantity are required"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Product ID and quantity are required"}`))
 		return ""
 	}
 	if reqBody.Quantity > maxQuantity {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Quantity exceeds maximum limit"}`))
 		return ""
 	}
 
@@ -698,7 +698,7 @@ func (controller *cartController) handleUpdateCartGuest(ctx context.Context, w h
 	if err := controller.saveCartToCache(ctx, r, cart); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
+		_, _ = w.Write([]byte(`{"status":"error","message":"Failed to save cart"}`))
 		return ""
 	}
 
@@ -706,7 +706,7 @@ func (controller *cartController) handleUpdateCartGuest(ctx context.Context, w h
 	response := api.SuccessWithData("Cart updated", map[string]any{
 		"cart": cart,
 	})
-	w.Write([]byte(response.ToString()))
+	_, _ = w.Write([]byte(response.ToString()))
 	return ""
 }
 

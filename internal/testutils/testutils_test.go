@@ -334,7 +334,7 @@ func TestNewRequest_WithBody(t *testing.T) {
 		t.Fatalf("Failed to create request: %v", err)
 	}
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(req.Body)
+	_, _ = buf.ReadFrom(req.Body)
 	if buf.String() != body {
 		t.Errorf("Expected request body to be '%s', got '%s'", body, buf.String())
 	}

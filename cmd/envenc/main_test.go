@@ -193,7 +193,7 @@ func TestHydrateEnvFromFile(t *testing.T) {
 	}
 
 	// Ensure the env var is not set before hydration
-	os.Unsetenv(keyName)
+	_ = os.Unsetenv(keyName)
 
 	// Hydrate environment
 	err = envenc.HydrateEnvFromFile(vaultPath, password)
@@ -207,5 +207,5 @@ func TestHydrateEnvFromFile(t *testing.T) {
 	}
 
 	// Cleanup
-	os.Unsetenv(keyName)
+	_ = os.Unsetenv(keyName)
 }

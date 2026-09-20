@@ -295,12 +295,14 @@ func (t *SearchBlockType) GetAdminFields(block cmsstore.BlockInterface, r *http.
 
 // SaveAdminFields processes form submission and updates the block
 func (t *SearchBlockType) SaveAdminFields(r *http.Request, block cmsstore.BlockInterface) error {
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
 
-	block.SetMeta("placeholder", r.FormValue("placeholder"))
-	block.SetMeta("results_per_page", r.FormValue("results_per_page"))
-	block.SetMeta("show_pages", r.FormValue("show_pages"))
-	block.SetMeta("show_posts", r.FormValue("show_posts"))
+	_ = block.SetMeta("placeholder", r.FormValue("placeholder"))
+	_ = block.SetMeta("results_per_page", r.FormValue("results_per_page"))
+	_ = block.SetMeta("show_pages", r.FormValue("show_pages"))
+	_ = block.SetMeta("show_posts", r.FormValue("show_posts"))
 
 	return nil
 }

@@ -62,7 +62,7 @@ func (c cdnController) writeGzip(
 	w.Header().Set("Content-Encoding", "gzip")
 
 	gz := gzip.NewWriter(w)
-	defer gz.Close()
+	defer func() { _ = gz.Close() }()
 
 	if _, err := gz.Write([]byte(body)); err != nil {
 		return err
@@ -178,14 +178,14 @@ func (c cdnController) writeGzipJSResponse(w http.ResponseWriter, _ *http.Reques
 	w.Header().Set("Content-Type", "application/javascript")
 	w.Header().Set("Content-Encoding", "gzip")
 	gz := gzip.NewWriter(w)
-	defer gz.Close()
-	gz.Write([]byte(content))
+	defer func() { _ = gz.Close() }()
+	_, _ = gz.Write([]byte(content))
 }
 
 func (c cdnController) writeGzipCSSResponse(w http.ResponseWriter, _ *http.Request, content string) {
 	w.Header().Set("Content-Type", "text/css")
 	w.Header().Set("Content-Encoding", "gzip")
 	gz := gzip.NewWriter(w)
-	defer gz.Close()
-	gz.Write([]byte(content))
+	defer func() { _ = gz.Close() }()
+	_, _ = gz.Write([]byte(content))
 }

@@ -315,15 +315,17 @@ func (t *BlogPostBlockType) GetAdminFields(block cmsstore.BlockInterface, r *htt
 
 // SaveAdminFields processes form submission and updates the block
 func (t *BlogPostBlockType) SaveAdminFields(r *http.Request, block cmsstore.BlockInterface) error {
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
 
-	block.SetMeta("post_id", r.FormValue("post_id"))
-	block.SetMeta("show_image", r.FormValue("show_image"))
-	block.SetMeta("show_title", r.FormValue("show_title"))
-	block.SetMeta("show_date", r.FormValue("show_date"))
-	block.SetMeta("show_author", r.FormValue("show_author"))
-	block.SetMeta("show_summary", r.FormValue("show_summary"))
-	block.SetMeta("show_prev_next", r.FormValue("show_prev_next"))
+	_ = block.SetMeta("post_id", r.FormValue("post_id"))
+	_ = block.SetMeta("show_image", r.FormValue("show_image"))
+	_ = block.SetMeta("show_title", r.FormValue("show_title"))
+	_ = block.SetMeta("show_date", r.FormValue("show_date"))
+	_ = block.SetMeta("show_author", r.FormValue("show_author"))
+	_ = block.SetMeta("show_summary", r.FormValue("show_summary"))
+	_ = block.SetMeta("show_prev_next", r.FormValue("show_prev_next"))
 
 	return nil
 }

@@ -46,7 +46,7 @@ func NewEmailAllowlistMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 						if err == nil {
 							email = untokenizedEmail
 							// Cache for 5 minutes
-							app.GetCacheStore().SetJSON(cacheKey, email, 5*60)
+							_ = app.GetCacheStore().SetJSON(cacheKey, email, 5*60)
 						}
 					}
 				}

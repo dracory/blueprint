@@ -366,7 +366,7 @@ func TestHandlerPathVariations_NoPrefix(t *testing.T) {
 // TestHandlerWithRealStorage tests the Handler with real SQL file storage
 func TestHandlerWithRealStorage(t *testing.T) {
 	app := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
-	defer app.GetDatabase().Close()
+	defer func() { _ = app.GetDatabase().Close() }()
 
 	// Create SQL file storage
 	db := app.GetDatabase()
@@ -412,7 +412,7 @@ func TestHandlerFileNotFound(t *testing.T) {
 // TestHandlerWithEmptyExtension tests file with no extension
 func TestHandlerWithEmptyExtension(t *testing.T) {
 	app := testutils.Setup(testutils.WithUserStore(true), testutils.WithSessionStore(true))
-	defer app.GetDatabase().Close()
+	defer func() { _ = app.GetDatabase().Close() }()
 
 	db := app.GetDatabase()
 	if db == nil {

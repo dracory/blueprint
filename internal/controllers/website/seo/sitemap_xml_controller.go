@@ -26,7 +26,7 @@ func NewSitemapXmlController(app app.AppInterface) *sitemapXmlController {
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
 	w.Header().Set("Content-Type", "text/xml")
 	body := c.buildSitemapXML(w, r)
-	w.Write([]byte(body))
+	_, _ = w.Write([]byte(body))
 	return ""
 }
 

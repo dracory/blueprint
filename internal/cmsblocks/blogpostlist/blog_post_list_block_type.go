@@ -281,15 +281,17 @@ func (t *BlogPostListBlockType) GetAdminFields(block cmsstore.BlockInterface, r 
 
 // SaveAdminFields processes form submission and updates the block
 func (t *BlogPostListBlockType) SaveAdminFields(r *http.Request, block cmsstore.BlockInterface) error {
-	r.ParseForm()
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
 
-	block.SetMeta("posts_per_page", r.FormValue("posts_per_page"))
-	block.SetMeta("columns", r.FormValue("columns"))
-	block.SetMeta("show_pagination", r.FormValue("show_pagination"))
-	block.SetMeta("show_images", r.FormValue("show_images"))
-	block.SetMeta("show_summary", r.FormValue("show_summary"))
-	block.SetMeta("show_date", r.FormValue("show_date"))
-	block.SetMeta("excerpt_length", r.FormValue("excerpt_length"))
+	_ = block.SetMeta("posts_per_page", r.FormValue("posts_per_page"))
+	_ = block.SetMeta("columns", r.FormValue("columns"))
+	_ = block.SetMeta("show_pagination", r.FormValue("show_pagination"))
+	_ = block.SetMeta("show_images", r.FormValue("show_images"))
+	_ = block.SetMeta("show_summary", r.FormValue("show_summary"))
+	_ = block.SetMeta("show_date", r.FormValue("show_date"))
+	_ = block.SetMeta("excerpt_length", r.FormValue("excerpt_length"))
 
 	return nil
 }

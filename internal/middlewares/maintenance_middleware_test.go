@@ -47,7 +47,7 @@ func TestMaintenanceMiddleware_NoFile_PassesThrough(t *testing.T) {
 
 func TestMaintenanceMiddleware_FileExists_Returns503(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		Message:           "Down for maintenance",
@@ -82,7 +82,7 @@ func TestMaintenanceMiddleware_FileExists_Returns503(t *testing.T) {
 
 func TestMaintenanceMiddleware_ExcludedPath_PassesThrough(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		ExcludePaths: []string{"/admin/*"},
@@ -114,7 +114,7 @@ func TestMaintenanceMiddleware_ExcludedPath_PassesThrough(t *testing.T) {
 
 func TestMaintenanceMiddleware_ExcludedIP_PassesThrough(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		ExcludeIPs: []string{"203.0.113.5"},
@@ -146,7 +146,7 @@ func TestMaintenanceMiddleware_ExcludedIP_PassesThrough(t *testing.T) {
 
 func TestMaintenanceMiddleware_ExcludedIP_XForwardedFor(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		ExcludeIPs: []string{"198.51.100.10"},
@@ -176,7 +176,7 @@ func TestMaintenanceMiddleware_ExcludedIP_XForwardedFor(t *testing.T) {
 
 func TestMaintenanceMiddleware_NonExcludedIP_Returns503(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		ExcludeIPs: []string{"203.0.113.5"},
@@ -207,7 +207,7 @@ func TestMaintenanceMiddleware_NonExcludedIP_Returns503(t *testing.T) {
 
 func TestMaintenanceMiddleware_RetryAfterHeader(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		RetryAfterSeconds: 120,
@@ -232,7 +232,7 @@ func TestMaintenanceMiddleware_RetryAfterHeader(t *testing.T) {
 
 func TestMaintenanceMiddleware_CustomMessage(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		Message: "Database migration in progress",
@@ -258,7 +258,7 @@ func TestMaintenanceMiddleware_CustomMessage(t *testing.T) {
 
 func TestMaintenanceMiddleware_FileCache(t *testing.T) {
 	path := "test_maintenance_state.json"
-	defer os.Remove(path)
+	defer func() { _ = os.Remove(path) }()
 
 	writeMaintenanceFile(t, path, MaintenanceState{
 		Message: "First message",

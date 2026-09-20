@@ -99,20 +99,20 @@ func Routes(
 			if strings.TrimSpace(expectedKey) == "" {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusServiceUnavailable)
-				w.Write([]byte(`{"error":"MCP API key not configured","message":"Set MCP_API_KEY environment variable"}`))
+				_, _ = w.Write([]byte(`{"error":"MCP API key not configured","message":"Set MCP_API_KEY environment variable"}`))
 				return
 			}
 			if subtle.ConstantTimeCompare([]byte(apiKey), []byte(expectedKey)) != 1 {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(`{"error":"Invalid API key","message":"Check X-MCP-API-Key header"}`))
+				_, _ = w.Write([]byte(`{"error":"Invalid API key","message":"Check X-MCP-API-Key header"}`))
 				return
 			}
 
 			if app == nil || app.IsDisabledBlogStore() {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(`{"error":"Blog store not available","message":"Blog store is not initialized"}`))
+				_, _ = w.Write([]byte(`{"error":"Blog store not available","message":"Blog store is not initialized"}`))
 				return
 			}
 

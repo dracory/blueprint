@@ -11,7 +11,7 @@ import (
 func TestLoadTestWithMockServer(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "OK")
+		_, _ = fmt.Fprint(w, "OK")
 	}))
 	defer server.Close()
 
@@ -38,7 +38,7 @@ func TestLoadTestWithMockServer(t *testing.T) {
 		if resp.StatusCode == http.StatusOK {
 			successRequests++
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 
 	if totalRequests != 100 {
@@ -54,7 +54,7 @@ func TestLoadTestWithSlowServer(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(100 * time.Millisecond)
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "OK")
+		_, _ = fmt.Fprint(w, "OK")
 	}))
 	defer server.Close()
 
@@ -71,7 +71,7 @@ func TestLoadTestWithSlowServer(t *testing.T) {
 		if resp == nil {
 			t.Fatal("Response is nil")
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 	duration := time.Since(startTime)
 
@@ -84,7 +84,7 @@ func TestLoadTestWithSlowServer(t *testing.T) {
 func TestLoadTestWithFailingServer(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Error")
+		_, _ = fmt.Fprint(w, "Error")
 	}))
 	defer server.Close()
 
@@ -112,7 +112,7 @@ func TestLoadTestWithFailingServer(t *testing.T) {
 		if resp.StatusCode >= 400 {
 			failedRequests++
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 	}
 
 	if totalRequests != 50 {
@@ -152,7 +152,7 @@ func TestLoadTestWithTimeout(t *testing.T) {
 func TestResponseTimeTracking(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "OK")
+		_, _ = fmt.Fprint(w, "OK")
 	}))
 	defer server.Close()
 
@@ -174,7 +174,7 @@ func TestResponseTimeTracking(t *testing.T) {
 		if resp == nil {
 			t.Fatal("Response is nil")
 		}
-		resp.Body.Close()
+		_ = resp.Body.Close()
 
 		if reqDuration < minDuration {
 			minDuration = reqDuration
@@ -196,7 +196,7 @@ func TestResponseTimeTracking(t *testing.T) {
 func TestConcurrentRequests(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "OK")
+		_, _ = fmt.Fprint(w, "OK")
 	}))
 	defer server.Close()
 
@@ -212,7 +212,7 @@ func TestConcurrentRequests(t *testing.T) {
 			resp, err := client.Get(server.URL)
 			if err == nil && resp != nil && resp.StatusCode == http.StatusOK {
 				successCount++
-				resp.Body.Close()
+				_ = resp.Body.Close()
 			}
 			done <- true
 		}()

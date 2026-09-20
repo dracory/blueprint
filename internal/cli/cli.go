@@ -25,10 +25,10 @@ func NewDispatcher() *cli.Dispatcher[app.AppInterface] {
 	dispatcher := cli.NewDispatcher[app.AppInterface]()
 
 	// Register blueprint-specific commands
-	dispatcher.RegisterCommand(CommandTask, "Execute a task by alias", handleTaskCommand)
-	dispatcher.RegisterCommand(CommandJob, "Execute a job with arguments", handleJobCommand)
-	dispatcher.RegisterCommand(CommandRoutes, "List all registered routes", handleRoutesCommand)
-	dispatcher.RegisterCommand(CommandMaintenance, "Manage maintenance mode", handleMaintenanceCommand)
+	_ = dispatcher.RegisterCommand(CommandTask, "Execute a task by alias", handleTaskCommand)
+	_ = dispatcher.RegisterCommand(CommandJob, "Execute a job with arguments", handleJobCommand)
+	_ = dispatcher.RegisterCommand(CommandRoutes, "List all registered routes", handleRoutesCommand)
+	_ = dispatcher.RegisterCommand(CommandMaintenance, "Manage maintenance mode", handleMaintenanceCommand)
 
 	return dispatcher
 }
