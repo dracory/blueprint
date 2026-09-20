@@ -119,7 +119,13 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
 	}
 
-	err = c.app.GetSessionStore().SessionCreate(r.Context(), session)
+	sessionStore := c.app.GetSessionStore()
+	if sessionStore == nil {
+		c.app.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", "session store is nil"))
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
+	}
+
+	err = sessionStore.SessionCreate(r.Context(), session)
 
 	if err != nil {
 		c.app.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", err.Error()))

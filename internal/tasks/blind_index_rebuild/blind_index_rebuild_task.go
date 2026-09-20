@@ -265,13 +265,11 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 		return false
 	}
 
-	isIndexed := searchValue != nil
-
 	emailToken := user.GetEmail()
 
 	// No need to index an empty email
 	if emailToken == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreEmail().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -294,7 +292,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 	email := m["email"]
 
 	if email == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreEmail().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -304,7 +302,7 @@ func (task *blindIndexRebuildTask) insertEmailForUser(ctx context.Context, user 
 	}
 
 	// Upsert
-	if isIndexed {
+	if searchValue != nil {
 		searchValue.SetSearchValue(email)
 		err = task.app.GetBlindIndexStoreEmail().SearchValueUpdate(ctx, searchValue)
 		if err != nil {
@@ -337,13 +335,11 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 		return false
 	}
 
-	isIndexed := searchValue != nil
-
 	firstNameToken := user.GetFirstName()
 
 	// No need to index an empty first name
 	if firstNameToken == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreFirstName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -367,7 +363,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 
 	// No need to index an empty first name
 	if firstName == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreFirstName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -377,7 +373,7 @@ func (task *blindIndexRebuildTask) insertFirstNameForUser(ctx context.Context, u
 	}
 
 	// Upsert the search value
-	if isIndexed {
+	if searchValue != nil {
 		searchValue.SetSearchValue(firstName)
 		err = task.app.GetBlindIndexStoreFirstName().SearchValueUpdate(ctx, searchValue)
 		if err != nil {
@@ -409,13 +405,11 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 		return false
 	}
 
-	isIndexed := searchValue != nil
-
 	lastNameToken := user.GetLastName()
 
 	// No need to index an empty last name
 	if lastNameToken == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreLastName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -439,7 +433,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 
 	// No need to index an empty last name
 	if lastName == "" {
-		if isIndexed {
+		if searchValue != nil {
 			err = task.app.GetBlindIndexStoreLastName().SearchValueDelete(ctx, searchValue)
 			if err != nil {
 				task.LogError("Error deleting blind index for user: " + user.GetID() + " - " + err.Error())
@@ -449,7 +443,7 @@ func (task *blindIndexRebuildTask) insertLastNameForUser(ctx context.Context, us
 	}
 
 	// Upsert the search value
-	if isIndexed {
+	if searchValue != nil {
 		searchValue.SetSearchValue(lastName)
 		err = task.app.GetBlindIndexStoreLastName().SearchValueUpdate(ctx, searchValue)
 		if err != nil {

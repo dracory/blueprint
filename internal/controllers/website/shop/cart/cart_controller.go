@@ -144,7 +144,7 @@ func (controller *cartController) TransferCacheToUser(ctx context.Context, r *ht
 
 	// Merge carts (cache cart takes precedence for quantities)
 	// Use slice for deterministic ordering
-	var mergedItems []CartItem
+	mergedItems := []CartItem{}
 	itemMap := make(map[string]int) // Maps productID to index in mergedItems
 
 	// Add user cart items first

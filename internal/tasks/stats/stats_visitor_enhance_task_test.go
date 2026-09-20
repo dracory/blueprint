@@ -61,7 +61,7 @@ func TestStatsVisitorEnhanceTask_Enqueue(t *testing.T) {
 	task := &statsVisitorEnhanceTask{app: nil}
 	_, err := task.Enqueue()
 	if err == nil {
-		t.Error("Enqueue() with nil app should return error")
+		t.Fatal("Enqueue() with nil app should return error")
 	}
 	if err.Error() != "task store is nil" {
 		t.Errorf("Enqueue() error = %q, want 'task store is nil'", err.Error())
@@ -72,7 +72,7 @@ func TestStatsVisitorEnhanceTask_Enqueue(t *testing.T) {
 	task = NewStatsVisitorEnhanceTask(app)
 	_, err = task.Enqueue()
 	if err == nil {
-		t.Error("Enqueue() without task store should return error")
+		t.Fatal("Enqueue() without task store should return error")
 	}
 	if err.Error() != "task store is nil" {
 		t.Errorf("Enqueue() error = %q, want 'task store is nil'", err.Error())

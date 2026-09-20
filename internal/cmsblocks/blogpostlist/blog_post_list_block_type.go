@@ -44,6 +44,10 @@ func (t *BlogPostListBlockType) TypeLabel() string {
 
 // Render renders the blog post list block for frontend display
 func (t *BlogPostListBlockType) Render(ctx context.Context, block cmsstore.BlockInterface, options ...cmsstore.RenderOption) (string, error) {
+	if block == nil {
+		return "", fmt.Errorf("block is nil")
+	}
+
 	// Get configuration
 	postsPerPage := 12
 	if val := block.Meta("posts_per_page"); val != "" {

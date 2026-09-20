@@ -115,8 +115,8 @@ func (t *statsVisitorEnhanceTask) Handle() bool {
 // == PRIVATE METHODS =========================================================
 
 func (t *statsVisitorEnhanceTask) processVisitor(ctx context.Context, visitor statsstore.VisitorInterface) bool {
-	if t.app == nil || t.app.IsDisabledStatsStore() {
-		t.LogError("Task StatsVisitorEnhance. Store is nil")
+	if t.app == nil || t.app.IsDisabledStatsStore() || visitor == nil {
+		t.LogError("Task StatsVisitorEnhance. Store or visitor is nil")
 		return false
 	}
 	ua := useragent.Parse(visitor.GetUserAgent())

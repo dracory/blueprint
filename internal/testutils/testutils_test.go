@@ -222,7 +222,10 @@ func TestSeedSession_NilStore(t *testing.T) {
 	app := Setup(WithUserStore(true))
 	defer func() { _ = app.GetDatabase().Close() }()
 
-	user, _ := SeedUser(app.GetUserStore(), "test-user")
+	user, err := SeedUser(app.GetUserStore(), "test-user")
+	if err != nil {
+		t.Fatalf("Failed to seed user: %v", err)
+	}
 	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	session, err := SeedSession(nil, r, user, 10)
@@ -239,7 +242,10 @@ func TestSeedSession_Success(t *testing.T) {
 	app := Setup(WithUserStore(true), WithSessionStore(true))
 	defer func() { _ = app.GetDatabase().Close() }()
 
-	user, _ := SeedUser(app.GetUserStore(), "test-user")
+	user, err := SeedUser(app.GetUserStore(), "test-user")
+	if err != nil {
+		t.Fatalf("Failed to seed user: %v", err)
+	}
 	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	session, err := SeedSession(app.GetSessionStore(), r, user, 10)
@@ -294,7 +300,10 @@ func TestLoginAs_Success(t *testing.T) {
 	app := Setup(WithUserStore(true), WithSessionStore(true))
 	defer func() { _ = app.GetDatabase().Close() }()
 
-	user, _ := SeedUser(app.GetUserStore(), "test-user")
+	user, err := SeedUser(app.GetUserStore(), "test-user")
+	if err != nil {
+		t.Fatalf("Failed to seed user: %v", err)
+	}
 	r, _ := test.NewRequest("GET", "/", test.NewRequestOptions{})
 
 	authenticatedReq, err := LoginAs(app, r, user)

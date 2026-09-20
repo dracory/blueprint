@@ -31,6 +31,10 @@ func TestLoadTestWithMockServer(t *testing.T) {
 			continue
 		}
 
+		if resp == nil {
+			continue
+		}
+
 		if resp.StatusCode == http.StatusOK {
 			successRequests++
 		}
@@ -64,6 +68,9 @@ func TestLoadTestWithSlowServer(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Request failed: %v", err)
 		}
+		if resp == nil {
+			t.Fatal("Response is nil")
+		}
 		resp.Body.Close()
 	}
 	duration := time.Since(startTime)
@@ -93,6 +100,11 @@ func TestLoadTestWithFailingServer(t *testing.T) {
 		totalRequests++
 
 		if err != nil {
+			failedRequests++
+			continue
+		}
+
+		if resp == nil {
 			failedRequests++
 			continue
 		}
@@ -159,6 +171,9 @@ func TestResponseTimeTracking(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Request failed: %v", err)
 		}
+		if resp == nil {
+			t.Fatal("Response is nil")
+		}
 		resp.Body.Close()
 
 		if reqDuration < minDuration {
@@ -195,7 +210,7 @@ func TestConcurrentRequests(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		go func() {
 			resp, err := client.Get(server.URL)
-			if err == nil && resp.StatusCode == http.StatusOK {
+			if err == nil && resp != nil && resp.StatusCode == http.StatusOK {
 				successCount++
 				resp.Body.Close()
 			}

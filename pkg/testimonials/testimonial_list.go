@@ -7,9 +7,8 @@ import (
 )
 
 func TestimonialList(store entitystore.StoreInterface) ([]Testimonial, error) {
-	result, err := store.EntityList(context.Background(), entitystore.EntityQueryOptions{
-		EntityType: ENTITY_TYPE,
-	})
+	result, err := store.EntityList(context.Background(), entitystore.EntityQuery().
+		WithEntityType(ENTITY_TYPE))
 
 	if err != nil {
 		return nil, err

@@ -72,7 +72,11 @@ func TestAiBrowserAutoLoginHandler_WithCookie_PassesThrough(t *testing.T) {
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(24).ToDateTimeString(carbon.UTC))
 
-	if err := app.GetSessionStore().SessionCreate(context.Background(), session); err != nil {
+	sessionStore := app.GetSessionStore()
+	if sessionStore == nil {
+		t.Fatal("session store is nil")
+	}
+	if err := sessionStore.SessionCreate(context.Background(), session); err != nil {
 		t.Fatal("failed to create session:", err)
 	}
 
@@ -89,7 +93,7 @@ func TestAiBrowserAutoLoginHandler_WithCookie_PassesThrough(t *testing.T) {
 		t.Errorf("expected status 200, got %d", rr.Code)
 	}
 
-	sessionList, err := app.GetSessionStore().SessionList(context.Background(),
+	sessionList, err := sessionStore.SessionList(context.Background(),
 		sessionstore.NewSessionQuery().SetUserID(user.GetID()))
 	if err != nil {
 		t.Fatal(err)

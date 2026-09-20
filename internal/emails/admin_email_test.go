@@ -262,7 +262,7 @@ func TestInviteFriendEmail_Send(t *testing.T) {
 	email = NewInviteFriendEmail(app, nil)
 	err = email.Send("user-123", "Hello!", "friend@example.com", "Friend")
 	if err == nil {
-		t.Error("Send() with nil userStore should return error")
+		t.Fatal("Send() with nil userStore should return error")
 	}
 	if err.Error() != "user store not configured" {
 		t.Errorf("Send() error = %q, want %q", err.Error(), "user store not configured")

@@ -1,11 +1,12 @@
 package admin
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
 	"project/internal/layouts"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/hb"
 	"github.com/samber/lo"
@@ -14,9 +15,13 @@ import (
 )
 
 func NewTaskController(app app.AppInterface) *taskController {
+	var logger *slog.Logger
+	if app != nil {
+		logger = app.GetLogger()
+	}
 	return &taskController{
 		app:    app,
-		logger: app.GetLogger(),
+		logger: logger,
 	}
 }
 

@@ -15,6 +15,10 @@ func SeedSession(sessionStore sessionstore.StoreInterface, r *http.Request, user
 		return nil, errors.New("session store is nil")
 	}
 
+	if user == nil {
+		return nil, errors.New("user is nil")
+	}
+
 	session := sessionstore.NewSession().
 		SetUserID(user.GetID()).
 		SetUserAgent(r.UserAgent()).

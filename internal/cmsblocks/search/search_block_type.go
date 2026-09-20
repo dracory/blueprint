@@ -39,6 +39,10 @@ func (t *SearchBlockType) TypeLabel() string {
 
 // Render renders the search block for frontend display
 func (t *SearchBlockType) Render(ctx context.Context, block cmsstore.BlockInterface, options ...cmsstore.RenderOption) (string, error) {
+	if block == nil {
+		return "", fmt.Errorf("block is nil")
+	}
+
 	// Get configuration
 	resultsPerPage := 10
 	if val := block.Meta("results_per_page"); val != "" {
@@ -90,7 +94,7 @@ type SearchResult struct {
 
 // performSearch searches across pages and blog posts
 func (t *SearchBlockType) performSearch(ctx context.Context, query string, showPages, showPosts bool, pageNum, resultsPerPage int) ([]SearchResult, int) {
-	var allResults []SearchResult
+	allResults := []SearchResult{}
 	searchLower := strings.ToLower(query)
 
 	// Search pages if enabled and cmsStore is available

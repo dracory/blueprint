@@ -1,7 +1,6 @@
 package stats
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -9,6 +8,8 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/hb"
 
@@ -22,8 +23,12 @@ type statsController struct {
 }
 
 func NewStatsController(app app.AppInterface) *statsController {
+	var logger *slog.Logger
+	if app != nil {
+		logger = app.GetLogger()
+	}
 	return &statsController{
-		logger: app.GetLogger(),
+		logger: logger,
 		app:    app,
 	}
 }

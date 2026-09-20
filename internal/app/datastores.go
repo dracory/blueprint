@@ -87,6 +87,16 @@ func (app *appImplementation) dataStoresInitialize() error {
 //
 // ============================================================================
 
+func appDebugEnabled(app AppInterface) bool {
+	cfg := app.GetConfig()
+	return cfg != nil && cfg.GetAppDebug()
+}
+
+func appEnvDevelopment(app AppInterface) bool {
+	cfg := app.GetConfig()
+	return cfg != nil && cfg.IsEnvDevelopment()
+}
+
 func setupAuditStore(app AppInterface) error {
 	st, err := config.NewAuditStore(app.GetDatabase())
 	if err != nil {
@@ -97,7 +107,7 @@ func setupAuditStore(app AppInterface) error {
 }
 
 func setupBlogStore(app AppInterface) error {
-	st, err := config.NewBlogStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewBlogStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -133,7 +143,7 @@ func setupBlindIndexLastNameStore(app AppInterface) error {
 }
 
 func setupCacheStore(app AppInterface) error {
-	st, err := config.NewCacheStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewCacheStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -151,7 +161,7 @@ func setupChatStore(app AppInterface) error {
 }
 
 func setupCmsStore(app AppInterface) error {
-	st, err := config.NewCmsStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewCmsStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -160,7 +170,7 @@ func setupCmsStore(app AppInterface) error {
 }
 
 func setupCustomStore(app AppInterface) error {
-	st, err := config.NewCustomStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewCustomStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -196,7 +206,7 @@ func setupGeoStore(app AppInterface) error {
 }
 
 func setupLogStore(app AppInterface) error {
-	st, err := config.NewLogStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewLogStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -205,7 +215,7 @@ func setupLogStore(app AppInterface) error {
 }
 
 func setupMetaStore(app AppInterface) error {
-	st, err := config.NewMetaStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewMetaStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -214,7 +224,7 @@ func setupMetaStore(app AppInterface) error {
 }
 
 func setupSessionStore(app AppInterface) error {
-	st, err := config.NewSessionStore(app.GetDatabase(), app.GetConfig().GetAppDebug(), app.GetConfig().IsEnvDevelopment())
+	st, err := config.NewSessionStore(app.GetDatabase(), appDebugEnabled(app), appEnvDevelopment(app))
 	if err != nil {
 		return err
 	}
@@ -232,7 +242,7 @@ func setupSettingStore(app AppInterface) error {
 }
 
 func setupShopStore(app AppInterface) error {
-	st, err := config.NewShopStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewShopStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -250,7 +260,7 @@ func setupSqlFileStorage(app AppInterface) error {
 }
 
 func setupStatsStore(app AppInterface) error {
-	st, err := config.NewStatsStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewStatsStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -268,7 +278,7 @@ func setupSubscriptionStore(app AppInterface) error {
 }
 
 func setupTaskStore(app AppInterface) error {
-	st, err := config.NewTaskStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewTaskStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}
@@ -286,7 +296,7 @@ func setupUserStore(app AppInterface) error {
 }
 
 func setupVaultStore(app AppInterface) error {
-	st, err := config.NewVaultStore(app.GetDatabase(), app.GetConfig().GetAppDebug())
+	st, err := config.NewVaultStore(app.GetDatabase(), appDebugEnabled(app))
 	if err != nil {
 		return err
 	}

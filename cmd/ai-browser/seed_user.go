@@ -235,7 +235,12 @@ func seedSubscription(ctx context.Context, app app.AppInterface, userID string) 
 }
 
 func findOrCreateSession(ctx context.Context, app app.AppInterface, user userstore.UserInterface) (sessionstore.SessionInterface, error) {
-	sessions, err := app.GetSessionStore().SessionList(ctx, sessionstore.NewSessionQuery().
+	sessionStore := app.GetSessionStore()
+	if sessionStore == nil {
+		return nil, fmt.Errorf("session store is nil")
+	}
+
+	sessions, err := sessionStore.SessionList(ctx, sessionstore.NewSessionQuery().
 		SetUserID(user.GetID()).
 		SetExpiresAtGte(carbon.Now(carbon.UTC).ToDateTimeString(carbon.UTC)))
 	if err != nil {
@@ -248,7 +253,10 @@ func findOrCreateSession(ctx context.Context, app app.AppInterface, user usersto
 		}
 	}
 
-	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
 	req.Header.Set("User-Agent", "AI-Browser")
 
 	session := sessionstore.NewSession().
@@ -257,7 +265,7 @@ func findOrCreateSession(ctx context.Context, app app.AppInterface, user usersto
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(24).ToDateTimeString(carbon.UTC))
 
-	if err := app.GetSessionStore().SessionCreate(ctx, session); err != nil {
+	if err := sessionStore.SessionCreate(ctx, session); err != nil {
 		return nil, err
 	}
 

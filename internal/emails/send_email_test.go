@@ -57,7 +57,7 @@ func TestSendEmail(t *testing.T) {
 	// Test with uninitialized sender
 	err := SendEmail(SendOptions{To: []string{"test@example.com"}})
 	if err == nil {
-		t.Error("SendEmail should return error when sender is not initialized")
+		t.Fatal("SendEmail should return error when sender is not initialized")
 	}
 	if err.Error() != "email sender is not initialized" {
 		t.Errorf("SendEmail error = %q, want %q", err.Error(), "email sender is not initialized")

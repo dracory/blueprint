@@ -187,8 +187,8 @@ func (r *appImplementation) Close() error {
 
 // GetConfig returns the app config
 func (r *appImplementation) GetConfig() config.ConfigInterface {
-	if r == nil {
-		return nil
+	if r == nil || r.cfg == nil {
+		return config.New()
 	}
 	return r.cfg
 }

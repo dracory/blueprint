@@ -119,7 +119,11 @@ func TestAPIAuthMiddleware_SessionMissingUser(t *testing.T) {
 		SetIPAddress("127.0.0.1").
 		SetExpiresAt(time.Now().Add(time.Hour).UTC().Format("2006-01-02 15:04:05"))
 
-	if err := app.GetSessionStore().SessionCreate(baseReq.Context(), session); err != nil {
+	sessionStore := app.GetSessionStore()
+	if sessionStore == nil {
+		t.Fatal("session store is nil")
+	}
+	if err := sessionStore.SessionCreate(baseReq.Context(), session); err != nil {
 		t.Fatalf("failed to create session: %v", err)
 	}
 

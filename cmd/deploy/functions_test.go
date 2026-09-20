@@ -570,7 +570,7 @@ func TestValidateCommandWithDangerousCharacters_Ampersand(t *testing.T) {
 	cmd := "ls & rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '&' should be rejected")
+		t.Fatal("Command with '&' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -581,7 +581,7 @@ func TestValidateCommandWithDangerousCharacters_Pipe(t *testing.T) {
 	cmd := "ls | rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '|' should be rejected")
+		t.Fatal("Command with '|' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -592,7 +592,7 @@ func TestValidateCommandWithDangerousCharacters_Backtick(t *testing.T) {
 	cmd := "ls `rm -rf /`"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '`' should be rejected")
+		t.Fatal("Command with '`' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -603,7 +603,7 @@ func TestValidateCommandWithDangerousCharacters_Dollar(t *testing.T) {
 	cmd := "ls $ rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '$' should be rejected")
+		t.Fatal("Command with '$' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -614,7 +614,7 @@ func TestValidateCommandWithDangerousCharacters_LeftParen(t *testing.T) {
 	cmd := "ls ( rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '(' should be rejected")
+		t.Fatal("Command with '(' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -625,7 +625,7 @@ func TestValidateCommandWithDangerousCharacters_RightParen(t *testing.T) {
 	cmd := "ls ) rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with ')' should be rejected")
+		t.Fatal("Command with ')' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -636,7 +636,7 @@ func TestValidateCommandWithDangerousCharacters_LessThan(t *testing.T) {
 	cmd := "ls < rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '<' should be rejected")
+		t.Fatal("Command with '<' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -647,7 +647,7 @@ func TestValidateCommandWithDangerousCharacters_GreaterThan(t *testing.T) {
 	cmd := "ls > rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with '>' should be rejected")
+		t.Fatal("Command with '>' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)
@@ -658,7 +658,7 @@ func TestValidateCommandWithDangerousCharacters_SingleQuote(t *testing.T) {
 	cmd := "ls ' rm -rf /"
 	err := validateCommand(cmd)
 	if err == nil {
-		t.Error("Command with ''' should be rejected")
+		t.Fatal("Command with ''' should be rejected")
 	}
 	if !strings.Contains(err.Error(), "dangerous character") {
 		t.Errorf("Error should mention dangerous character, got: %v", err)

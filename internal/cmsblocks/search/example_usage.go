@@ -28,6 +28,10 @@ func ExampleRendering(cmsStore cmsstore.StoreInterface, blogStore blogstore.Stor
 		log.Printf("Failed to find block: %v", err)
 		return
 	}
+	if block == nil {
+		log.Printf("Block not found: %s", blockID)
+		return
+	}
 
 	// Get the block type
 	blockType := cmsstore.GetBlockType(block.Type())

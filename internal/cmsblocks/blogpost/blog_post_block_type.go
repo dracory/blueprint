@@ -55,6 +55,10 @@ func (t *BlogPostBlockType) TypeLabel() string {
 
 // Render renders the single blog post block for frontend display
 func (t *BlogPostBlockType) Render(ctx context.Context, block cmsstore.BlockInterface, options ...cmsstore.RenderOption) (string, error) {
+	if block == nil {
+		return "", fmt.Errorf("block is nil")
+	}
+
 	// Get post ID from block meta
 	postID := block.Meta("post_id")
 

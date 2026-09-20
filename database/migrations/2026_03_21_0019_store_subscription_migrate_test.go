@@ -18,7 +18,7 @@ func TestStoreSubscriptionMigrate_UpWithNilApp(t *testing.T) {
 	migration := &StoreSubscriptionMigrate{}
 	err := migration.Up()
 	if err == nil {
-		t.Error("Expected error when app is nil")
+		t.Fatal("Expected error when app is nil")
 	}
 	if err.Error() != "app is nil" {
 		t.Errorf("Expected error 'app is nil', got '%s'", err.Error())
@@ -29,7 +29,7 @@ func TestStoreSubscriptionMigrate_DownWithNilApp(t *testing.T) {
 	migration := &StoreSubscriptionMigrate{}
 	err := migration.Down()
 	if err == nil {
-		t.Error("Expected error when app is nil")
+		t.Fatal("Expected error when app is nil")
 	}
 	if err.Error() != "app is nil" {
 		t.Errorf("Expected error 'app is nil', got '%s'", err.Error())
