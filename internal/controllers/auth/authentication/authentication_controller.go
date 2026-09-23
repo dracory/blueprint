@@ -10,28 +10,16 @@ import (
 	"net/http"
 	"net/url"
 	"project/internal/app"
+	"project/internal/controllers/auth/shared"
 	"project/internal/helpers"
 	"project/internal/links"
 	"project/internal/testutils"
 	"strings"
 	"time"
 
-	"github.com/dracory/auth"
-	"github.com/dracory/auth/types"
 	basehttp "github.com/dracory/base/http"
-	"github.com/dracory/blindindexstore"
 	"github.com/dracory/req"
-	"github.com/dracory/sessionstore"
-	"github.com/dracory/userstore"
-	"github.com/dromara/carbon/v2"
 	"github.com/samber/lo"
-)
-
-// Authentication error messages
-const (
-	msgAccountNotFound  = `Your account may have been deactivated or deleted. Please contact our support team for assistance.`
-	msgAccountNotActive = `Your account is not active. Please contact our support team for assistance.`
-	msgUserNotFound     = `An unexpected error has occurred trying to find your account. The support team has been notified.`
 )
 
 // == CONTROLLER ==============================================================
@@ -70,6 +58,7 @@ func NewAuthenticationController(application app.AppInterface) *authenticationCo
 // - string: the result of the authentication request.
 func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
+
 	if c.app.IsDisabledUserStore() {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `user store is required`, homeURL, 5)
 	}
@@ -94,79 +83,16 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
 	}
 
-	user, err := c.userFindByEmailOrCreate(r.Context(), email, userstore.USER_STATUS_ACTIVE)
+	redirectUrl, _, errorMessage := shared.SessionLogin(c.app, w, r, email, backUrl)
 
-	if err != nil {
-		c.app.GetLogger().Error("At Auth Controller > AnyIndex > User Create Error", slog.String("error", err.Error()))
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgUserNotFound, homeURL, 5)
-	}
-
-	if user == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgAccountNotFound, homeURL, 5)
-	}
-
-	if !user.IsActive() {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, msgAccountNotActive, homeURL, 5)
-	}
-
-	session := sessionstore.NewSession().
-		SetUserID(user.GetID()).
-		SetUserAgent(r.UserAgent()).
-		SetIPAddress(req.GetIP(r)).
-		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
-
-	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
-		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
-	}
-
-	sessionStore := c.app.GetSessionStore()
-	if sessionStore == nil {
-		c.app.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", "session store is nil"))
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
-	}
-
-	err = sessionStore.SessionCreate(r.Context(), session)
-
-	if err != nil {
-		c.app.GetLogger().Error("At Auth Controller > AnyIndex > Session Store Error", slog.String("error", err.Error()))
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Error creating session", homeURL, 5)
-	}
-
-	// In development (HTTP), the Secure flag must be disabled so the
-	// browser sends the cookie back over plain HTTP.
-	cookieOpts := []types.CookieOption{}
-	if c.app.GetConfig() != nil && c.app.GetConfig().IsEnvDevelopment() {
-		cookieOpts = append(cookieOpts, types.WithSecure(false))
-	}
-
-	auth.AuthCookieSet(w, r, session.GetKey(), cookieOpts...)
-
-	redirectUrl := c.calculateRedirectURL(user)
-
-	if backUrl != "" {
-		redirectUrl = backUrl
+	if errorMessage != "" {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, homeURL, 5)
 	}
 
 	return helpers.ToFlashSuccess(c.app.GetCacheStore(), w, r, "Login was successful", redirectUrl, 5)
 }
 
 // == PRIVATE METHODS =========================================================
-
-func (c *authenticationController) findUserIDInBlindIndex(ctx context.Context, email string) (userID string, err error) {
-	recordsFound, err := c.app.GetBlindIndexStoreEmail().SearchValueList(ctx, blindindexstore.NewSearchValueQuery().
-		SetSearchValue(email).
-		SetSearchType(blindindexstore.SEARCH_TYPE_EQUALS))
-
-	if err != nil {
-		return "", err
-	}
-
-	if len(recordsFound) < 1 {
-		return "", nil
-	}
-
-	return recordsFound[0].SourceReferenceID(), nil
-}
 
 func (c *authenticationController) emailAndBackUrlFromAuthKnightRequest(r *http.Request) (email, backUrl, errorMessage string) {
 	once := strings.TrimSpace(req.GetStringTrimmed(r, "once"))
@@ -306,211 +232,4 @@ func (c *authenticationController) callAuthKnight(ctx context.Context, once stri
 	}
 
 	return response, nil
-}
-
-// calculateRedirectURL calculates the redirect URL based on the user's role and profile completeness.
-//
-// 1. By default all users redirect to home
-// 2. If user is manager or admin, redirect to admin panel
-// 3. If user does not have any names, redirect to profile
-//
-// Parameters:
-// - user (models.User): The user object.
-//
-// Returns:
-// - string: The redirect URL.
-func (c *authenticationController) calculateRedirectURL(user userstore.UserInterface) string {
-	// 1. By default all users redirect to home
-	redirectUrl := links.User().Home()
-
-	// 2. If user is manager or admin, redirect to admin panel
-	if user.IsManager() || user.IsAdministrator() || user.IsSuperuser() {
-		redirectUrl = links.Admin().Home()
-	}
-
-	// 3. If user does not have any names, redirect to profile
-	if !user.IsRegistrationCompleted() {
-		redirectUrl = links.Auth().Register()
-		redirectUrl = helpers.ToFlashInfoURL(c.app.GetCacheStore(), "Thank you for logging in. Please complete your data to finish your registration", redirectUrl, 5)
-	}
-
-	return redirectUrl
-}
-
-// userCreate creates a new user with privacy-first email encryption and blind indexing.
-//
-// ## Privacy & Security Architecture:
-//
-// This function implements a sophisticated privacy protection system that ensures
-// user email addresses are never stored in plaintext in the main database.
-//
-// ## User Creation Flow:
-//
-// 1. **Initial User Creation**: Creates user object with provided email (temporary)
-// 2. **Privacy Check**: Determines if vault store encryption is enabled
-// 3. **Email Encryption Path** (when vault enabled):
-//   - Creates encrypted email token using vault store
-//   - Token length: 20 characters with vault-specific encryption
-//   - Replaces plaintext email with encrypted token in database
-//   - Stores mapping in blind index for future lookups
-//
-// 4. **Standard Path** (when vault disabled):
-//   - Stores email directly in database (less secure)
-//   - Skips encryption and blind indexing steps
-//
-// ## Blind Index System:
-//
-// The blind index allows email-based user lookups without storing plaintext:
-// - Index Key: Hashed representation of the email
-// - Index Value: User ID reference for database lookup
-// - Search Method: Exact match with SEARCH_TYPE_EQUALS
-// - Privacy Benefit: No email addresses stored in searchable form
-//
-// ## Security Considerations:
-//   - Email tokens are encrypted using vault store key
-//   - Blind index prevents email enumeration attacks
-//   - All database operations use provided context for cancellation
-//   - Proper error handling prevents partial data corruption
-//
-// ## Error Handling:
-//   - Validates required stores (user store, vault store) before operations
-//   - Returns descriptive errors for missing configurations
-//   - Ensures atomic operations to prevent inconsistent state
-//
-// Parameters:
-//   - ctx: Context for database operations and cancellation
-//   - email: User's email address (will be encrypted if vault enabled)
-//   - status: Initial user status (e.g., userstore.USER_STATUS_ACTIVE)
-//
-// Returns:
-//   - userstore.UserInterface: Created user object with encrypted/plaintext email
-//   - error: Error if user creation, encryption, or indexing fails
-//
-// Example Usage:
-//
-//	user, err := c.userCreate(ctx, "user@example.com", userstore.USER_STATUS_ACTIVE)
-//	if err != nil {
-//		return nil, fmt.Errorf("failed to create user: %w", err)
-//	}
-//	// User.ID() contains the generated user ID
-//	// User.Email() contains either encrypted token or plaintext email
-func (c *authenticationController) userCreate(ctx context.Context, email string, status string) (userstore.UserInterface, error) {
-	user := userstore.NewUser().
-		SetStatus(status).
-		SetEmail(email)
-
-	if c.app.IsDisabledUserStore() {
-		return nil, errors.New("user store is nil")
-	}
-
-	if c.app.GetConfig().GetUserStoreVaultEnabled() && c.app.IsDisabledVaultStore() {
-		return nil, errors.New(`vault store is nil`)
-	}
-
-	err := c.app.GetUserStore().UserCreate(ctx, user)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if !c.app.GetConfig().GetUserStoreVaultEnabled() {
-		return user, nil
-	}
-
-	if c.app.IsDisabledVaultStore() {
-		return nil, errors.New(`vault store is nil`)
-	}
-
-	emailToken, err := c.app.GetVaultStore().TokenCreate(ctx, email, c.app.GetConfig().GetVaultStoreKey(), 20)
-
-	if err != nil {
-		return nil, err
-	}
-
-	user.SetEmail(emailToken)
-
-	err = c.app.GetUserStore().UserUpdate(ctx, user)
-
-	if err != nil {
-		return nil, err
-	}
-
-	searchValue := blindindexstore.NewSearchValue().
-		SetSourceReferenceID(user.GetID()).
-		SetSearchValue(email)
-
-	err = c.app.GetBlindIndexStoreEmail().SearchValueCreate(ctx, searchValue)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
-// userFindByEmailOrCreate finds or creates a user based on the provided email.
-//
-// Business Logic:
-//  1. If VultStore is used:
-//     a. Check if the email is in the blind index, and get the user ID.
-//     b. If the user ID is not found, create a new user.
-//     c. Find the user by ID.
-//  2. If VultStore is not used:
-//     a. Find the user by email.
-//     b. If the user is not found, create a new user.
-//
-// Parameters:
-//   - ctx: The context for the request.
-//   - email: The email address of the user.
-//   - status: The status of the user.
-//
-// Returns:
-//   - userstore.UserInterface: The user object.
-//   - error: An error object if an error occurred during the operation.
-func (c *authenticationController) userFindByEmailOrCreate(ctx context.Context, email string, status string) (userstore.UserInterface, error) {
-	if c.app.IsDisabledUserStore() {
-		return nil, errors.New("user store is nil")
-	}
-
-	if c.app.GetConfig().GetUserStoreVaultEnabled() {
-		if c.app.IsDisabledVaultStore() {
-			return nil, errors.New(`vault store is nil`)
-		}
-
-		userID, err := c.findUserIDInBlindIndex(ctx, email)
-		if err != nil {
-			return nil, err
-		}
-
-		if userID == "" {
-			return c.userCreate(ctx, email, status)
-		}
-
-		user, err := c.app.GetUserStore().UserFindByID(ctx, userID)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if user == nil {
-			c.app.GetLogger().Warn("At Auth Controller > userFindByEmailOrCreate",
-				slog.String("error", "User not found, even though email was found in the blind index, and user ID returned successfully"),
-				slog.String("user", userID))
-			return nil, nil
-		}
-
-		return user, nil
-	}
-
-	user, err := c.app.GetUserStore().UserFindByEmail(ctx, email)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if user == nil {
-		return c.userCreate(ctx, email, status)
-	}
-
-	return user, nil
 }

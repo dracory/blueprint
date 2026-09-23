@@ -1,0 +1,43 @@
+:root {
+    --brand-indigo: #667eea;
+}
+body {
+    background-color: #f8f9fa;
+}
+.text-brand {
+    color: var(--brand-indigo);
+}
+.btn-brand {
+    background-color: var(--brand-indigo);
+    color: white;
+    border: none;
+}
+.btn-brand:hover {
+    background-color: #5a6fd6;
+    color: white;
+}
+.login-card {
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.icon-circle {
+    width: 64px;
+    height: 64px;
+    background-color: #eef2ff;
+    color: var(--brand-indigo);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1.5rem;
+}
+.otp-input {
+    height: 3.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 0.75rem;
+}

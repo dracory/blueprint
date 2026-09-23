@@ -4,6 +4,41 @@
 
 The Blueprint authentication system implements a sophisticated privacy-first architecture that prioritizes user data protection while maintaining robust security controls. This document outlines the complete authentication flow, security measures, and architectural decisions.
 
+## Login Methods
+
+Blueprint ships with two login mechanisms. The active method is selected by the
+`config.LOGIN_METHOD` constant in `internal/config/auth_config.go` — a
+compile-time, one-time developer decision (not an environment variable).
+
+- **`LOGIN_METHOD_OTP` (default)** — in-house email one-time-password login.
+  `auth/login` renders a self-contained page; `POST ?action=otp-send-ajax`
+  issues a 6-digit code (stored in the memory cache under a 128-bit nonce,
+  15-minute TTL, max 5 verify attempts, max 3 sends per email per window) and
+  enqueues `EmailOTPTask` for delivery; `POST ?action=otp-verify-ajax` verifies
+  with a constant-time compare. Fully self-contained, no external services.
+- **`LOGIN_METHOD_AUTHKNIGHT`** — delegates to the external AuthKnight
+  service: `auth/login` redirects to `authknight.com`, `auth/auth` exchanges
+  the `once` token for the user email. Only in this mode is the `AUTH_AUTH`
+  callback route registered.
+
+Both methods converge on the shared post-auth pipeline in
+`internal/controllers/auth/shared` (`SessionLogin`): find-or-create user
+(vault + blind index aware), session creation, auth cookie, redirect.
+
+### Removing a Method
+
+Because `LOGIN_METHOD` is a constant, deleting the unused method's package
+produces a compile error pointing at the branch to remove in
+`internal/controllers/auth/routes.go`.
+
+- Remove OTP: set `LOGIN_METHOD = LOGIN_METHOD_AUTHKNIGHT`, then delete
+  `internal/controllers/auth/login_otp/`, `internal/tasks/email_otp/`,
+  `internal/emails/user_email_otp.go`, and the `EmailOTPTask`
+  registration/alias.
+- Remove AuthKnight: set `LOGIN_METHOD = LOGIN_METHOD_OTP`, then delete
+  `internal/controllers/auth/login/`, `internal/controllers/auth/authentication/`,
+  `links.authLinks.AuthKnightLogin`, and the `AUTH_AUTH` route/constant.
+
 ## Architecture Components
 
 ### 1. Authentication Controller (`internal/controllers/auth/`)

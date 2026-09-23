@@ -23,13 +23,14 @@ func TestRoutesConfiguration(t *testing.T) {
 
 	routes := Routes(app)
 
-	// Should return at least 3 routes (auth, login, logout)
-	if len(routes) < 3 {
-		t.Errorf("Expected at least 3 routes, got %d", len(routes))
+	// Should return at least 2 routes (login, logout) in OTP mode
+	if len(routes) < 2 {
+		t.Errorf("Expected at least 2 routes, got %d", len(routes))
 	}
 
-	// Verify auth route exists with correct path
-	foundAuth := false
+	// Verify login route exists with correct path.
+	// With LOGIN_METHOD_OTP (the default) the AuthKnight callback
+	// route (AUTH_AUTH) must NOT be registered.
 	foundLogin := false
 	foundLogout := false
 
@@ -37,10 +38,7 @@ func TestRoutesConfiguration(t *testing.T) {
 		path := route.GetPath()
 		switch path {
 		case links.AUTH_AUTH:
-			foundAuth = true
-			if !containsIgnoreCase(route.GetName(), "auth") {
-				t.Errorf("Expected auth route name to contain 'auth', got '%s'", route.GetName())
-			}
+			t.Error("Auth route should not be present when LOGIN_METHOD is otp")
 		case links.AUTH_LOGIN:
 			foundLogin = true
 			if !containsIgnoreCase(route.GetName(), "login") {
@@ -54,9 +52,6 @@ func TestRoutesConfiguration(t *testing.T) {
 		}
 	}
 
-	if !foundAuth {
-		t.Error("Auth route not found")
-	}
 	if !foundLogin {
 		t.Error("Login route not found")
 	}
@@ -75,9 +70,9 @@ func TestRoutesWithRegistrationEnabled(t *testing.T) {
 
 	routes := Routes(app)
 
-	// Should have at least 4 routes with registration enabled (auth, login, logout, register)
-	if len(routes) < 4 {
-		t.Errorf("Expected at least 4 routes with registration enabled, got %d", len(routes))
+	// Should have at least 3 routes with registration enabled (login, logout, register)
+	if len(routes) < 3 {
+		t.Errorf("Expected at least 3 routes with registration enabled, got %d", len(routes))
 	}
 
 	// Verify register route exists
@@ -110,7 +105,6 @@ func TestRoutesWithRegistrationDisabled(t *testing.T) {
 	routes := Routes(app)
 
 	// Verify core routes are still present
-	foundAuth := false
 	foundLogin := false
 	foundLogout := false
 
@@ -118,7 +112,7 @@ func TestRoutesWithRegistrationDisabled(t *testing.T) {
 	for _, route := range routes {
 		switch route.GetPath() {
 		case links.AUTH_AUTH:
-			foundAuth = true
+			t.Error("Auth route should not be present when LOGIN_METHOD is otp")
 		case links.AUTH_LOGIN:
 			foundLogin = true
 		case links.AUTH_LOGOUT:
@@ -128,9 +122,6 @@ func TestRoutesWithRegistrationDisabled(t *testing.T) {
 		}
 	}
 
-	if !foundAuth {
-		t.Error("Auth route not found when registration is disabled")
-	}
 	if !foundLogin {
 		t.Error("Login route not found when registration is disabled")
 	}

@@ -2,8 +2,10 @@ package auth
 
 import (
 	"project/internal/app"
+	"project/internal/config"
 	"project/internal/controllers/auth/authentication"
 	"project/internal/controllers/auth/login"
+	"project/internal/controllers/auth/login_otp"
 	"project/internal/controllers/auth/logout"
 	"project/internal/controllers/auth/register"
 	"project/internal/links"
@@ -13,15 +15,30 @@ import (
 )
 
 func Routes(application app.AppInterface) []rtr.RouteInterface {
-	authRoute := rtr.NewRoute().
-		SetName("Auth > Auth Controller").
-		SetPath(links.AUTH_AUTH).
-		SetHTMLHandler(authentication.NewAuthenticationController(application).Handler)
-
 	loginRoute := rtr.NewRoute().
 		SetName("Auth > Login Controller").
-		SetPath(links.AUTH_LOGIN).
-		SetHTMLHandler(login.NewLoginController(application).Handler)
+		SetPath(links.AUTH_LOGIN)
+
+	authRoutes := []rtr.RouteInterface{}
+
+	// Mount the login controller selected by config.LOGIN_METHOD.
+	// In OTP mode the AuthKnight callback route is omitted entirely so no
+	// dead external dependency remains.
+	switch config.LOGIN_METHOD {
+	case config.LOGIN_METHOD_AUTHKNIGHT:
+		loginRoute.SetHTMLHandler(login.NewLoginController(application).Handler)
+
+		authRoutes = append(authRoutes, rtr.NewRoute().
+			SetName("Auth > Auth Controller").
+			SetPath(links.AUTH_AUTH).
+			SetHTMLHandler(authentication.NewAuthenticationController(application).Handler))
+	case config.LOGIN_METHOD_OTP:
+		loginRoute.SetHTMLHandler(login_otp.NewLoginController(application).Handler)
+	default:
+		panic("invalid config.LOGIN_METHOD: " + config.LOGIN_METHOD)
+	}
+
+	authRoutes = append(authRoutes, loginRoute)
 
 	logoutRoute := rtr.NewRoute().
 		SetName("Auth > Logout Controller").
@@ -32,11 +49,6 @@ func Routes(application app.AppInterface) []rtr.RouteInterface {
 		SetName("Auth > Register Controller").
 		SetPath(links.AUTH_REGISTER).
 		SetHTMLHandler(register.NewRegisterController(application).Handler)
-
-	authRoutes := []rtr.RouteInterface{
-		authRoute,
-		loginRoute,
-	}
 
 	// Apply stricter rate limiting to sensitive authentication routes only
 	for i := range authRoutes {

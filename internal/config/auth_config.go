@@ -80,3 +80,26 @@ type authSettings struct {
 	csrfSecret          string
 	passwordAuthEnabled bool
 }
+
+// Login methods available in Blueprint.
+const (
+	// LOGIN_METHOD_AUTHKNIGHT delegates authentication to the external
+	// AuthKnight service (https://authknight.com).
+	LOGIN_METHOD_AUTHKNIGHT = "authknight"
+
+	// LOGIN_METHOD_OTP uses the in-house email one-time-password login.
+	LOGIN_METHOD_OTP = "otp"
+)
+
+// LOGIN_METHOD selects which login mechanism is mounted at links.AUTH_LOGIN.
+//
+// This is a one-time developer decision made when scaffolding the project —
+// the same class of decision as choosing which stores to enable. It is
+// intentionally a code constant, NOT an environment variable: the
+// authentication method must never change between deployments of the same
+// build.
+//
+// Default is OTP: it keeps Blueprint fully self-contained with no reliance
+// on external services. Projects that prefer outsourced auth switch the
+// constant to LOGIN_METHOD_AUTHKNIGHT.
+const LOGIN_METHOD = LOGIN_METHOD_OTP
