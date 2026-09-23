@@ -17,6 +17,7 @@ import (
 	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/links"
+	authrules "project/internal/rules/auth"
 
 	"github.com/dracory/auth"
 	"github.com/dracory/auth/types"
@@ -55,6 +56,15 @@ const (
 //   - needsRegistration: true when the user must complete registration
 //   - errorMessage: user-safe error message ("" on success)
 func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.Request, email, backUrl string) (redirectURL string, needsRegistration bool, errorMessage string) {
+	// Enforce the email allowlist before find-or-create so a non-allowed
+	// email never gets a user record, session, or registration page. The
+	// EmailAllowlistMiddleware only guards /user/* and /admin/* — without
+	// this check a blocked email could fully authenticate.
+	emailAllowed := authrules.NewEmailAllowedRule(application, email)
+	if emailAllowed.Fails() {
+		return "", false, emailAllowed.FailMessageFirst()
+	}
+
 	user, err := userFindByEmailOrCreate(application, r.Context(), email, userstore.USER_STATUS_ACTIVE)
 
 	if err != nil {
@@ -66,7 +76,7 @@ func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.R
 		return "", false, MsgAccountNotFound
 	}
 
-	if !user.IsActive() {
+	if active := authrules.NewUserActiveRule(user); active.Fails() {
 		return "", false, MsgAccountNotActive
 	}
 

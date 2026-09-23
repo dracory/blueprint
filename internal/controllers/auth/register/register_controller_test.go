@@ -348,9 +348,40 @@ func TestRegisterSave_Success(t *testing.T) {
 	}
 }
 
+func TestRegisterSave_DisallowedEmail(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+	// The seeded email (user01@test.com) is not on the allowlist — a session
+	// created before the allowlist was configured must not be able to save.
+	application.GetConfig().SetEmailsAllowedAccess([]string{"allowed@test.com"})
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(nil), ctx)
+
+	if recorder.Code != http.StatusForbidden {
+		t.Fatalf("expected 403, got %d: %s", recorder.Code, recorder.Body.String())
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "error" {
+		t.Fatalf("expected error status, got %v", data)
+	}
+}
+
 func TestRegisterSave_Success_WithVault(t *testing.T) {
 	application := setupApp(t, true)
 	user, ctx := seedAuthUser(t, application)
+
+	// With the vault enabled the stored email is a token — replace the
+	// plaintext seed email with a real vault token.
+	token, err := application.GetVaultStore().TokenCreate(context.Background(),
+		user.GetEmail(), application.GetConfig().GetVaultStoreKey(), 20)
+	if err != nil {
+		t.Fatal(err)
+	}
+	user.SetEmail(token)
+	if err := application.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+		t.Fatal(err)
+	}
 
 	recorder := serve(t, application, http.MethodPost, "/",
 		url.Values{"action": {"save"}}, saveForm(nil), ctx)

@@ -74,6 +74,12 @@ func (controller *registerController) PageHandler(w http.ResponseWriter, r *http
 		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Your account is missing an email address", links.Website().Home(), 10)
 	}
 
+	// The email allowlist is enforced at login, but also check here so a
+	// session created before the allowlist was configured cannot register.
+	if rule := authrules.NewEmailAllowedRule(controller.app, email); rule.Fails() {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, rule.FailMessageFirst(), links.Website().Home(), 10)
+	}
+
 	initialData, _ := json.Marshal(map[string]string{
 		"email":         email,
 		"first_name":    firstName,
@@ -205,6 +211,19 @@ func (controller *registerController) handleSave(w http.ResponseWriter, r *http.
 
 	authUser := basesession.GetAuthUser(r)
 
+	// Enforce the email allowlist on save as well — a session created
+	// before the allowlist was configured must not be able to register.
+	email, err := controller.userEmail(r.Context(), authUser)
+	if err != nil {
+		controller.app.GetLogger().Error("Error reading user email", slog.String("error", err.Error()))
+		controller.sendErrorResponse(w, "Error reading user data", http.StatusInternalServerError)
+		return
+	}
+	if rule := authrules.NewEmailAllowedRule(controller.app, email); rule.Fails() {
+		controller.sendErrorResponse(w, rule.FailMessageFirst(), http.StatusForbidden)
+		return
+	}
+
 	data := registerFormData{
 		firstName:    strings.TrimSpace(req.GetStringTrimmed(r, "first_name")),
 		lastName:     strings.TrimSpace(req.GetStringTrimmed(r, "last_name")),
@@ -333,6 +352,26 @@ func (controller *registerController) countryList(ctx context.Context) ([]geosto
 		SortOrder: "asc",
 		OrderBy:   geostore.COLUMN_NAME,
 	})
+}
+
+// userEmail returns the user's plaintext email, decrypting the vault token
+// when the vault store is enabled.
+func (controller *registerController) userEmail(ctx context.Context, user userstore.UserInterface) (string, error) {
+	if user == nil {
+		return "", errors.New("user is nil")
+	}
+
+	email := user.GetEmail()
+
+	if !controller.app.GetConfig().GetUserStoreVaultEnabled() || email == "" {
+		return email, nil
+	}
+
+	if controller.app.IsDisabledVaultStore() {
+		return "", errors.New("vault store is nil")
+	}
+
+	return controller.app.GetVaultStore().TokenRead(ctx, email, controller.app.GetConfig().GetVaultStoreKey())
 }
 
 // getUserData reads the user profile, decrypting vault-tokenized fields when

@@ -2,6 +2,7 @@ package authrules
 
 import (
 	"project/internal/app"
+	"slices"
 
 	"github.com/dracory/rule"
 )
@@ -33,10 +34,8 @@ func NewEmailAllowedRule(a app.AppInterface, email string) *EmailAllowedRule {
 			return true
 		}
 
-		for _, allowed := range data.allowedEmails {
-			if allowed == data.email {
-				return true
-			}
+		if slices.Contains(data.allowedEmails, data.email) {
+			return true
 		}
 
 		r.AddFailMessage("Your email is not permitted to access this application")

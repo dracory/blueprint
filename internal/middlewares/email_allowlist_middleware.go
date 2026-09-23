@@ -5,6 +5,7 @@ import (
 	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/links"
+	authrules "project/internal/rules/auth"
 
 	basesession "github.com/dracory/base/session"
 
@@ -51,22 +52,13 @@ func NewEmailAllowlistMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 					}
 				}
 
-				found := false
-				for _, allowed := range allowedEmails {
-					if allowed == email {
-						found = true
-						break
-					}
-				}
-
-				// if the email is not in the list, the user is not allowed to access the page
-				if found {
-					next.ServeHTTP(w, r)
+				if rule := authrules.NewEmailAllowedRule(app, email); rule.Fails() {
+					homeURL := links.Website().Home()
+					helpers.ToFlashError(app.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
 					return
 				}
 
-				homeURL := links.Website().Home()
-				helpers.ToFlashError(app.GetCacheStore(), w, r, "Access restricted to authorized emails only", homeURL, 15)
+				next.ServeHTTP(w, r)
 			})
 		})
 }

@@ -22,6 +22,7 @@ import (
 	"project/internal/controllers/auth/shared"
 	"project/internal/layouts"
 	"project/internal/links"
+	authrules "project/internal/rules/auth"
 	"project/internal/tasks/email_otp"
 
 	baselayouts "github.com/dracory/base/layouts"
@@ -177,6 +178,13 @@ func (c *loginController) handleOtpSend(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Enforce the email allowlist before generating a code — a blocked email
+	// should never receive an OTP, consume send quota, or reach verify.
+	if rule := authrules.NewEmailAllowedRule(c.app, email); rule.Fails() {
+		c.sendErrorResponse(w, rule.FailMessageFirst(), http.StatusForbidden)
+		return
+	}
+
 	// Per-email send throttle to prevent email-bombing. Checked before the
 	// fallible operations; recorded only after the email task is enqueued
 	// so failed sends do not consume the quota.
@@ -306,6 +314,14 @@ func (c *loginController) handleOtpVerify(w http.ResponseWriter, r *http.Request
 	// OTP is valid — remove both keys from cache
 	cache.Delete(cacheKey)
 	cache.Delete(attemptsKey)
+
+	// The allowlist may have changed since the OTP was sent — re-check here
+	// so a newly-blocked email cannot complete login. SessionLogin also
+	// enforces this as defense-in-depth for every login method.
+	if rule := authrules.NewEmailAllowedRule(c.app, email); rule.Fails() {
+		c.sendErrorResponse(w, rule.FailMessageFirst(), http.StatusForbidden)
+		return
+	}
 
 	// Shared post-auth pipeline: find-or-create user, session, cookie, redirect
 	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "")

@@ -170,6 +170,24 @@ func TestOtpSend_InvalidEmail(t *testing.T) {
 	}
 }
 
+func TestOtpSend_DisallowedEmail(t *testing.T) {
+	application := setupOtpApp(t)
+	application.GetConfig().SetEmailsAllowedAccess([]string{"allowed@test.com"})
+
+	form := url.Values{}
+	form.Set("email", "blocked@test.com")
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"otp-send-ajax"}}, form)
+
+	if recorder.Code != http.StatusForbidden {
+		t.Fatalf("expected 403, got %d: %s", recorder.Code, recorder.Body.String())
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "error" {
+		t.Fatalf("expected error status, got %v", data)
+	}
+}
+
 func TestOtpSend_Throttle(t *testing.T) {
 	application := setupOtpApp(t)
 	form := url.Values{}
@@ -184,6 +202,24 @@ func TestOtpSend_Throttle(t *testing.T) {
 
 	if last.Code != http.StatusTooManyRequests {
 		t.Fatalf("expected 429 after %d sends, got %d", otpMaxSends+1, last.Code)
+	}
+}
+
+func TestOtpVerify_DisallowedEmail(t *testing.T) {
+	application := setupOtpApp(t)
+
+	// Send the OTP while the email is still allowed, then configure the
+	// allowlist — the verify step must reject the now-blocked email.
+	nonce, otp := sendOtp(t, application, "blocked@test.com")
+	application.GetConfig().SetEmailsAllowedAccess([]string{"allowed@test.com"})
+
+	recorder := verifyOtp(t, application, "blocked@test.com", otp, nonce)
+	if recorder.Code != http.StatusForbidden {
+		t.Fatalf("expected 403, got %d: %s", recorder.Code, recorder.Body.String())
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "error" {
+		t.Fatalf("expected error status, got %v", data)
 	}
 }
 
