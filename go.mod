@@ -39,7 +39,7 @@ require (
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.1
 	github.com/dracory/metastore v1.11.0
-	github.com/dracory/neat v0.50.0
+	github.com/dracory/neat v0.52.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0
@@ -55,8 +55,8 @@ require (
 	github.com/dracory/test v0.10.0
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/useradmin v0.3.0
-	github.com/dracory/userstore v1.19.0
+	github.com/dracory/useradmin v0.4.0
+	github.com/dracory/userstore v1.19.1-0.20260921065042-ff9e22fdfb79
 	github.com/dracory/vaultstore v1.5.0
 	github.com/dracory/websrv v0.4.0
 	github.com/dromara/carbon/v2 v2.6.17
@@ -101,7 +101,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.2 // indirect
 	github.com/aws/smithy-go v1.28.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
@@ -115,7 +115,7 @@ require (
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.10.0 // indirect
-	github.com/dracory/uid v1.9.0 // indirect
+	github.com/dracory/uid v1.10.0 // indirect
 	github.com/dracory/versionstore v1.7.1 // indirect
 	github.com/dracory/wf v0.6.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/google/s2a-go v0.1.10 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.22 // indirect
-	github.com/googleapis/gax-go/v2 v2.24.1 // indirect
+	github.com/googleapis/gax-go/v2 v2.25.0 // indirect
 	github.com/gookit/color v1.6.1 // indirect
 	github.com/goravel/framework v1.18.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -170,15 +170,15 @@ require (
 	golang.org/x/term v0.46.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/api v0.298.0 // indirect
+	google.golang.org/api v0.299.0 // indirect
 	google.golang.org/genai v1.71.0 // indirect
-	google.golang.org/genproto v0.0.0-20260918162117-cecb64721679 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260918162117-cecb64721679 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260918162117-cecb64721679 // indirect
+	google.golang.org/genproto v0.0.0-20260921155816-b14227669459 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260921155816-b14227669459 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260921155816-b14227669459 // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	modernc.org/libc v1.77.0 // indirect
+	modernc.org/libc v1.77.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
