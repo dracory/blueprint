@@ -13,6 +13,7 @@ import (
 	"math/big"
 	"net/http"
 	"net/mail"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -89,7 +90,10 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	verifyAjaxURL := links.AUTH_LOGIN + "?action=otp-verify-ajax"
 	returnURL := r.URL.Query().Get("return")
 	if returnURL != "" && strings.HasPrefix(returnURL, "/") && !strings.HasPrefix(returnURL, "//") {
-		verifyAjaxURL += "&return=" + returnURL
+		// QueryEscape keeps the value intact for the verify handler while
+		// encoding quotes so it cannot break out of the JS string literal
+		// the URL is embedded into below.
+		verifyAjaxURL += "&return=" + url.QueryEscape(returnURL)
 	}
 
 	// Replace placeholders in HTML with the actual app name (escaped —

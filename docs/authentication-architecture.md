@@ -36,7 +36,7 @@ produces a compile error pointing at the branch to remove in
   `internal/emails/user_email_otp.go`, and the `EmailOTPTask`
   registration/alias.
 - Remove AuthKnight: set `LOGIN_METHOD = LOGIN_METHOD_OTP`, then delete
-  `internal/controllers/auth/login/`, `internal/controllers/auth/authentication/`,
+  `internal/controllers/auth/login_authknight/`, `internal/controllers/auth/authentication_authknight/`,
   `links.authLinks.AuthKnightLogin`, and the `AUTH_AUTH` route/constant.
 
 ## Architecture Components

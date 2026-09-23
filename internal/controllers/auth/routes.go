@@ -3,8 +3,8 @@ package auth
 import (
 	"project/internal/app"
 	"project/internal/config"
-	"project/internal/controllers/auth/authentication"
-	"project/internal/controllers/auth/login"
+	"project/internal/controllers/auth/authentication_authknight"
+	"project/internal/controllers/auth/login_authknight"
 	"project/internal/controllers/auth/login_otp"
 	"project/internal/controllers/auth/logout"
 	"project/internal/controllers/auth/register"
@@ -27,12 +27,12 @@ func Routes(application app.AppInterface) []rtr.RouteInterface {
 	// dead external dependency remains.
 	switch config.LOGIN_METHOD {
 	case config.LOGIN_METHOD_AUTHKNIGHT:
-		loginRoute.SetHTMLHandler(login.NewLoginController(application).Handler)
+		loginRoute.SetHTMLHandler(login_authknight.NewLoginController(application).Handler)
 
 		authRoutes = append(authRoutes, rtr.NewRoute().
 			SetName("Auth > Auth Controller").
 			SetPath(links.AUTH_AUTH).
-			SetHTMLHandler(authentication.NewAuthenticationController(application).Handler))
+			SetHTMLHandler(authentication_authknight.NewAuthenticationController(application).Handler))
 	case config.LOGIN_METHOD_OTP:
 		otpController := login_otp.NewLoginController(application)
 		loginRoute.SetHTMLHandler(otpController.PageHandler)

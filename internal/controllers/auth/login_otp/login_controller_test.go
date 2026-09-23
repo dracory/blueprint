@@ -287,6 +287,27 @@ func TestOtpSend_FailureDoesNotConsumeQuota(t *testing.T) {
 
 // TestOtpVerify_ReturnURLValidation verifies the open-redirect protection on
 // the `return` parameter for a fully-registered user.
+// TestLoginPage_ReturnURLCannotBreakJSString verifies that a `return`
+// parameter containing a quote is percent-encoded before being embedded
+// into the VERIFY_AJAX_URL JavaScript string literal (XSS regression).
+func TestLoginPage_ReturnURLCannotBreakJSString(t *testing.T) {
+	application := setupOtpApp(t)
+	recorder := serve(t, application, http.MethodGet, "/",
+		url.Values{"return": {`/";alert(1);//`}}, nil)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("GET expected 200, got %d", recorder.Code)
+	}
+
+	body := recorder.Body.String()
+	if strings.Contains(body, `/";alert(1);//`) {
+		t.Fatal("raw return URL leaked into page — JS string break-out possible")
+	}
+	if !strings.Contains(body, "return=%2F%22") {
+		t.Fatal("expected percent-encoded return URL in page")
+	}
+}
+
 func TestOtpVerify_ReturnURLValidation(t *testing.T) {
 	application := setupOtpApp(t)
 
