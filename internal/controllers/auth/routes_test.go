@@ -32,6 +32,7 @@ func TestRoutesConfiguration(t *testing.T) {
 	// With LOGIN_METHOD_OTP (the default) the AuthKnight callback
 	// route (AUTH_AUTH) must NOT be registered.
 	foundLogin := false
+	foundLoginPost := false
 	foundLogout := false
 
 	for _, route := range routes {
@@ -40,9 +41,14 @@ func TestRoutesConfiguration(t *testing.T) {
 		case links.AUTH_AUTH:
 			t.Error("Auth route should not be present when LOGIN_METHOD is otp")
 		case links.AUTH_LOGIN:
-			foundLogin = true
-			if !containsIgnoreCase(route.GetName(), "login") {
-				t.Errorf("Expected login route name to contain 'login', got '%s'", route.GetName())
+			switch route.GetMethod() {
+			case "GET":
+				foundLogin = true
+				if !containsIgnoreCase(route.GetName(), "login") {
+					t.Errorf("Expected login route name to contain 'login', got '%s'", route.GetName())
+				}
+			case "POST":
+				foundLoginPost = true
 			}
 		case links.AUTH_LOGOUT:
 			foundLogout = true
@@ -54,6 +60,9 @@ func TestRoutesConfiguration(t *testing.T) {
 
 	if !foundLogin {
 		t.Error("Login route not found")
+	}
+	if !foundLoginPost {
+		t.Error("Login POST route not found (OTP AJAX endpoint)")
 	}
 	if !foundLogout {
 		t.Error("Logout route not found")

@@ -17,6 +17,7 @@ import (
 func Routes(application app.AppInterface) []rtr.RouteInterface {
 	loginRoute := rtr.NewRoute().
 		SetName("Auth > Login Controller").
+		SetMethod("GET").
 		SetPath(links.AUTH_LOGIN)
 
 	authRoutes := []rtr.RouteInterface{}
@@ -33,7 +34,10 @@ func Routes(application app.AppInterface) []rtr.RouteInterface {
 			SetPath(links.AUTH_AUTH).
 			SetHTMLHandler(authentication.NewAuthenticationController(application).Handler))
 	case config.LOGIN_METHOD_OTP:
-		loginRoute.SetHTMLHandler(login_otp.NewLoginController(application).Handler)
+		otpController := login_otp.NewLoginController(application)
+		loginRoute.SetHTMLHandler(otpController.PageHandler)
+		authRoutes = append(authRoutes, rtr.PostJSON(links.AUTH_LOGIN, otpController.AjaxHandler).
+			SetName("Auth > Login OTP Ajax Controller"))
 	default:
 		panic("invalid config.LOGIN_METHOD: " + config.LOGIN_METHOD)
 	}

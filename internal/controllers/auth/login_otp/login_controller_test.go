@@ -49,8 +49,15 @@ func serve(t *testing.T, application app.AppInterface, method, path string,
 	}
 
 	recorder := httptest.NewRecorder()
+	controller := NewLoginController(application)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte(NewLoginController(application).Handler(w, r)))
+		var body string
+		if r.Method == http.MethodPost {
+			body = controller.AjaxHandler(w, r)
+		} else {
+			body = controller.PageHandler(w, r)
+		}
+		_, _ = w.Write([]byte(body))
 	})
 	handler.ServeHTTP(recorder, req)
 	return recorder

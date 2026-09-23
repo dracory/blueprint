@@ -56,25 +56,25 @@ func NewLoginController(application app.AppInterface) *loginController {
 	return &loginController{app: application}
 }
 
-func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string {
-	// Handle POST actions
-	if r.Method == http.MethodPost {
-		action := r.URL.Query().Get("action")
-		switch action {
-		case "otp-send-ajax":
-			c.handleOtpSend(w, r)
-			return ""
-		case "otp-verify-ajax":
-			c.handleOtpVerify(w, r)
-			return ""
-		default:
-			c.sendErrorResponse(w, "Invalid action", http.StatusBadRequest)
-			return ""
-		}
-	}
-
-	// GET request - render login page
+// PageHandler renders the login page. Registered via rtr.GetHTML.
+func (c *loginController) PageHandler(w http.ResponseWriter, r *http.Request) string {
 	return c.renderLoginPage(r)
+}
+
+// AjaxHandler dispatches POST actions on the login path. Registered via
+// rtr.PostJSON — it returns a JSON string which rtr writes with the
+// application/json content type.
+func (c *loginController) AjaxHandler(w http.ResponseWriter, r *http.Request) string {
+	action := r.URL.Query().Get("action")
+	switch action {
+	case "otp-send-ajax":
+		c.handleOtpSend(w, r)
+	case "otp-verify-ajax":
+		c.handleOtpVerify(w, r)
+	default:
+		c.sendErrorResponse(w, "Invalid action", http.StatusBadRequest)
+	}
+	return ""
 }
 
 func (c *loginController) renderLoginPage(r *http.Request) string {
