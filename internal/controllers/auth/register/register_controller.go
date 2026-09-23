@@ -2,7 +2,10 @@ package register
 
 import (
 	"context"
+	_ "embed"
+	"encoding/json"
 	"errors"
+	"html"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
@@ -13,218 +16,327 @@ import (
 	"strings"
 
 	baselayouts "github.com/dracory/base/layouts"
-
 	basesession "github.com/dracory/base/session"
-
-	"github.com/dracory/bs"
 	"github.com/dracory/cdn"
 	"github.com/dracory/geostore"
 	"github.com/dracory/hb"
 	"github.com/dracory/neat"
 	"github.com/dracory/req"
 	"github.com/dracory/userstore"
-	"github.com/samber/lo"
 )
+
+//go:embed app.html
+var templateHTML string
+
+//go:embed app.js
+var appJS string
+
+//go:embed app.css
+var appCSS string
 
 // == CONTROLLER ==============================================================
 
 type registerController struct {
-	app                                    app.AppInterface
-	actionOnCountrySelectedTimezoneOptions string
-	formFirstName                          string
-	formLastName                           string
-	formBusinessName                       string
-	formEmail                              string
-	formPhone                              string
-	formCountry                            string
-	formTimezone                           string
+	app app.AppInterface
 }
 
 // == CONSTRUCTOR =============================================================
 
 func NewRegisterController(app app.AppInterface) *registerController {
-	return &registerController{
-		app:                                    app,
-		actionOnCountrySelectedTimezoneOptions: "on-country-selected-timezone-options",
-		formCountry:                            "country",
-		formTimezone:                           "timezone",
-		formPhone:                              "phone",
-		formEmail:                              "email",
-		formFirstName:                          "first_name",
-		formLastName:                           "last_name",
-		formBusinessName:                       "buiness_name",
-	}
+	return &registerController{app: app}
 }
 
 // == PUBLIC METHODS ==========================================================
 
-func (controller *registerController) Handler(w http.ResponseWriter, r *http.Request) string {
-	canRegister := authrules.NewCanRegisterRule(controller.app, "")
-	if canRegister.Fails() {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, canRegister.FailMessageFirst(), links.Website().Home(), 10)
+// PageHandler renders the registration page (GET). Registered via rtr.GetHTML
+// in routes.go. Guard failures redirect through the flash page as before.
+func (controller *registerController) PageHandler(w http.ResponseWriter, r *http.Request) string {
+	if flash := controller.guardFlash(w, r); flash != "" {
+		return flash
 	}
 
-	if controller.app.IsDisabledUserStore() {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `user store is required`, links.Website().Home(), 5)
+	authUser := basesession.GetAuthUser(r)
+
+	countries, err := controller.countryList(r.Context())
+	if err != nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error listing countries", links.Website().Home(), 10)
 	}
 
-	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.IsDisabledVaultStore() {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, `vault store is required`, links.Website().Home(), 5)
+	email, firstName, lastName, businessName, phone, err := controller.getUserData(r.Context(), authUser)
+	if err != nil {
+		controller.app.GetLogger().Error("Error reading user data", slog.String("error", err.Error()))
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Error reading user data", links.Website().Home(), 10)
 	}
 
-	data, errorMessage := controller.prepareData(r)
-
-	if errorMessage != "" {
-		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, errorMessage, links.Website().Home(), 10)
+	// Registration completion only makes sense for users created through an
+	// email-based login. An empty email means the user record is broken.
+	if email == "" {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Your account is missing an email address", links.Website().Home(), 10)
 	}
 
-	if data.action == controller.actionOnCountrySelectedTimezoneOptions {
-		return controller.selectTimezoneByCountry(r.Context(), data.country, data.timezone).ToHTML()
+	initialData, _ := json.Marshal(map[string]string{
+		"email":         email,
+		"first_name":    firstName,
+		"last_name":     lastName,
+		"business_name": businessName,
+		"phone":         phone,
+		"country":       authUser.GetCountry(),
+		"timezone":      authUser.GetTimezone(),
+	})
+
+	type countryOption struct {
+		Code string `json:"code"`
+		Name string `json:"name"`
+	}
+	countryOptions := make([]countryOption, 0, len(countries))
+	for _, c := range countries {
+		countryOptions = append(countryOptions, countryOption{Code: c.IsoCode2(), Name: c.Name()})
+	}
+	countriesJSON, _ := json.Marshal(countryOptions)
+
+	appName := "App"
+	if controller.app.GetConfig() != nil && controller.app.GetConfig().GetAppName() != "" {
+		appName = controller.app.GetConfig().GetAppName()
 	}
 
-	if r.Method == http.MethodPost {
-		return controller.postUpdate(r.Context(), data)
+	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
+
+	script := `
+	const APP_NAME = ` + string(mustJSON(appName)) + `;
+	const REGISTER_AJAX_URL = ` + string(mustJSON(links.Auth().Register(map[string]string{"action": "save"}))) + `;
+	const TIMEZONES_AJAX_URL = ` + string(mustJSON(links.Auth().Register(map[string]string{"action": "timezones"}))) + `;
+	const INITIAL_DATA = ` + string(initialData) + `;
+	const COUNTRIES = ` + string(countriesJSON) + `;
+	` + appJS
+
+	return layouts.NewBlankLayout(controller.app, r, baselayouts.Options{
+		AppName: appName,
+		Title:   "Complete Registration",
+		Content: hb.Div().HTML(htmlContent),
+		StyleURLs: []string{
+			cdn.BootstrapIconsCss_1_11_3(),
+			cdn.Notiflix_3_2_8_CSS(),
+		},
+		ScriptURLs: []string{
+			cdn.VueJs_3_5_32(),
+			cdn.Notiflix_3_2_8(),
+		},
+		Scripts: []string{script},
+		Styles:  []string{appCSS},
+	}).ToHTML()
+}
+
+// AjaxHandler dispatches POST actions on the register path. Registered via
+// rtr.PostJSON — returns a JSON string written with the application/json
+// content type.
+//
+// Actions:
+//   - "save"      → validates and persists the profile, returns redirect
+//   - "timezones" → returns the timezone list for a country code
+func (controller *registerController) AjaxHandler(w http.ResponseWriter, r *http.Request) string {
+	if err := controller.guardError(w); err != "" {
+		controller.sendErrorResponse(w, err, http.StatusForbidden)
+		return ""
 	}
 
-	scripts := []string{}
-	scriptURLs := []string{
-		cdn.BootstrapJs_5_3_3(),
-		cdn.Htmx_2_0_0(),
-		cdn.Sweetalert2_11(),
+	if basesession.GetAuthUser(r) == nil {
+		controller.sendErrorResponse(w, "You must be logged in to access this page", http.StatusUnauthorized)
+		return ""
 	}
 
-	if controller.app.GetConfig().IsEnvProduction() {
-		//scriptURLs = append([]string{helpers.GoogleTagScriptURL()}, scriptURLs...)
-		//scripts = append(scripts, helpers.GoogleTagInitScript(), helpers.GoogleConversionScript())
+	action := r.URL.Query().Get("action")
+	switch action {
+	case "save":
+		controller.handleSave(w, r)
+	case "timezones":
+		controller.handleTimezones(w, r)
+	default:
+		controller.sendErrorResponse(w, "Invalid action", http.StatusBadRequest)
 	}
-
-	return layouts.NewBlankLayout(
-		controller.app,
-		r,
-		baselayouts.Options{
-			Title: "Register",
-			// CanonicalURL: links.NewWebsiteLinks().Flash(map[string]string{}),
-			Content:    controller.pageHTML(r.Context(), data),
-			ScriptURLs: scriptURLs,
-			Scripts:    scripts,
-			StyleURLs:  []string{cdn.BootstrapIconsCss_1_11_3()},
-			Styles: []string{`.Center > div{padding:0px !important;margin:0px !important;}
-		@media (min-width: 576px) {.container.container-xs {max-width: 520px;}}
-		body{background:rgba(128,0,128,0.05);}`,
-				`#CardRegister{border-radius:24px;box-shadow:0 20px 60px rgba(33,37,41,0.08);overflow:hidden;}
-		#CardRegister .card-header{padding:24px;border-bottom:1px solid rgba(0,0,0,0.05);background:#f8f9ff;}
-		#CardRegister .card-header h3{font-size:14px;font-weight:600;letter-spacing:0.08em;color:#4b4b63;text-transform:uppercase;}
-		#CardRegister .card-body{padding:32px;}
-		#CardRegister .form-group{margin-bottom:18px;}
-		#CardRegister .form-group label{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600!important;color:#2b2b3f;text-transform:none;letter-spacing:0.02em;margin-bottom:6px;}
-		#CardRegister .form-group label sup{font-size:12px;font-weight:500;color:#e26d78;margin-left:8px;}
-		#CardRegister .form-control,#CardRegister .form-select{border-radius:14px;border-color:rgba(111,108,212,0.4);padding:12px 15px;transition:box-shadow 0.2s ease,border-color 0.2s ease;}
-		#CardRegister .form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16'%3E%3Cpath fill='%234e73df' d='M4.646 6.146a.5.5 0 0 1 .708 0L8 8.793l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:14px;}
-		#CardRegister .form-control:focus{box-shadow:0 0 0 0.25rem rgba(78,115,223,0.2);border-color:#4e73df;}`},
-		}).ToHTML()
+	return ""
 }
 
 // == PRIVATE METHODS =========================================================
 
-func (controller *registerController) postUpdate(ctx context.Context, data registerControllerData) string {
+// guardFlash runs the shared preconditions and returns a flash-redirect HTML
+// string on failure ("" when everything is OK). Used by PageHandler.
+func (controller *registerController) guardFlash(w http.ResponseWriter, r *http.Request) string {
+	if msg := controller.guardError(w); msg != "" {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, msg, links.Website().Home(), 10)
+	}
+
+	if basesession.GetAuthUser(r) == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r,
+			"You must be logged in to access this page", links.Website().Home(), 10)
+	}
+
+	if controller.app.IsDisabledGeoStore() {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r, "Geo store is nil", links.Website().Home(), 10)
+	}
+
+	return ""
+}
+
+// guardError returns a human-readable error message when a precondition fails
+// ("" when everything is OK). Shared by the page and AJAX paths.
+func (controller *registerController) guardError(w http.ResponseWriter) string {
+	canRegister := authrules.NewCanRegisterRule(controller.app, "")
+	if canRegister.Fails() {
+		return canRegister.FailMessageFirst()
+	}
+
 	if controller.app.IsDisabledUserStore() {
-		data.formErrorMessage = "We are very sorry user store is not configured. Saving the details not possible."
-		return controller.formRegister(ctx, data).ToHTML()
+		return "user store is required"
+	}
+
+	if controller.app.GetConfig().GetUserStoreVaultEnabled() && controller.app.IsDisabledVaultStore() {
+		return "vault store is required"
+	}
+
+	return ""
+}
+
+// handleSave validates the submitted profile and persists it.
+func (controller *registerController) handleSave(w http.ResponseWriter, r *http.Request) {
+	if controller.app.IsDisabledUserStore() {
+		controller.sendErrorResponse(w, "We are very sorry user store is not configured. Saving the details not possible.", http.StatusInternalServerError)
+		return
+	}
+
+	authUser := basesession.GetAuthUser(r)
+
+	data := registerFormData{
+		firstName:    strings.TrimSpace(req.GetStringTrimmed(r, "first_name")),
+		lastName:     strings.TrimSpace(req.GetStringTrimmed(r, "last_name")),
+		businessName: strings.TrimSpace(req.GetStringTrimmed(r, "business_name")),
+		phone:        strings.TrimSpace(req.GetStringTrimmed(r, "phone")),
+		country:      strings.TrimSpace(req.GetStringTrimmed(r, "country")),
+		timezone:     strings.TrimSpace(req.GetStringTrimmed(r, "timezone")),
 	}
 
 	formValidation := authrules.NewRegisterFormValidationRule(authrules.RegisterFormData{
 		FirstName: data.firstName,
 		LastName:  data.lastName,
-		Email:     data.email,
+		Email:     req.GetStringTrimmed(r, "email"),
 		Country:   data.country,
 		Timezone:  data.timezone,
 	})
 	if formValidation.Fails() {
-		data.formErrorMessage = formValidation.Message()
-		return controller.formRegister(ctx, data).ToHTML()
+		controller.sendErrorResponse(w, formValidation.Message(), http.StatusBadRequest)
+		return
 	}
 
-	if controller.app.GetConfig().GetUserStoreVaultEnabled() {
-		if controller.app.IsDisabledVaultStore() {
-			data.formErrorMessage = "We are very sorry vault store is not configured. Saving the details not possible."
-			return controller.formRegister(ctx, data).ToHTML()
-		}
-
-		firstNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.firstName, controller.app.GetConfig().GetVaultStoreKey(), 20)
-
-		if err != nil {
-			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(ctx, data).ToHTML()
-		}
-
-		lastNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.lastName, controller.app.GetConfig().GetVaultStoreKey(), 20)
-
-		if err != nil {
-			controller.app.GetLogger().Error("Error creating last name token", slog.String("error", err.Error()))
-			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(ctx, data).ToHTML()
-		}
-
-		businessNameToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.buinessName, controller.app.GetConfig().GetVaultStoreKey(), 20)
-
-		if err != nil {
-			controller.app.GetLogger().Error("Error creating business name token", slog.String("error", err.Error()))
-			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(ctx, data).ToHTML()
-		}
-
-		phoneToken, err := controller.app.GetVaultStore().TokenCreate(ctx, data.phone, controller.app.GetConfig().GetVaultStoreKey(), 20)
-
-		if err != nil {
-			controller.app.GetLogger().Error("Error creating phone token", slog.String("error", err.Error()))
-			data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-			return controller.formRegister(ctx, data).ToHTML()
-		}
-
-		data.authUser.SetFirstName(firstNameToken)
-		data.authUser.SetLastName(lastNameToken)
-		data.authUser.SetBusinessName(businessNameToken)
-		data.authUser.SetPhone(phoneToken)
-		data.authUser.SetCountry(data.country)
-		data.authUser.SetTimezone(data.timezone)
-	} else {
-		data.authUser.SetFirstName(data.firstName)
-		data.authUser.SetLastName(data.lastName)
-		data.authUser.SetBusinessName(data.buinessName)
-		data.authUser.SetPhone(data.phone)
-		data.authUser.SetCountry(data.country)
-		data.authUser.SetTimezone(data.timezone)
+	if err := controller.applyProfile(r.Context(), authUser, data); err != nil {
+		controller.app.GetLogger().Error("Error saving registration", slog.String("error", err.Error()))
+		controller.sendErrorResponse(w, "We are very sorry. Saving the details failed. Please try again later.", http.StatusInternalServerError)
+		return
 	}
 
-	err := controller.app.GetUserStore().UserUpdate(ctx, data.authUser)
-
-	if err != nil {
+	if err := controller.app.GetUserStore().UserUpdate(r.Context(), authUser); err != nil {
 		controller.app.GetLogger().Error("Error updating user profile", slog.String("error", err.Error()))
-		data.formErrorMessage = "We are very sorry. Saving the details failed. Please try again later."
-		return controller.formRegister(ctx, data).ToHTML()
+		controller.sendErrorResponse(w, "We are very sorry. Saving the details failed. Please try again later.", http.StatusInternalServerError)
+		return
 	}
 
-	data.formSuccessMessage = "Your registration completed successfully. You can now continue browsing the website."
-	data.formRedirectURL = links.User().Home()
-	return controller.formRegister(ctx, data).ToHTML()
+	controller.sendJSONResponse(w, map[string]interface{}{
+		"status":   "success",
+		"message":  "Your registration completed successfully.",
+		"redirect": links.User().Home(),
+	}, http.StatusOK)
 }
 
-func (controller *registerController) pageHTML(ctx context.Context, data registerControllerData) hb.TagInterface {
-	form := controller.formRegister(ctx, data)
-	return hb.Div().
-		Class(`container container-xs text-center`).
-		Child(hb.BR()).
-		Child(hb.BR()).
-		Child(hb.Raw(layouts.LogoHTML())).
-		Child(hb.BR()).
-		Child(hb.BR()).
-		Child(hb.Heading1().Text("Complete registration").Style(`font-size:24px;`)).
-		Child(hb.BR()).
-		Child(form).
-		Child(hb.BR()).
-		Child(hb.BR())
+// handleTimezones returns the timezone list for the given country code.
+func (controller *registerController) handleTimezones(w http.ResponseWriter, r *http.Request) {
+	if controller.app.IsDisabledGeoStore() {
+		controller.sendErrorResponse(w, "Geo store is nil", http.StatusInternalServerError)
+		return
+	}
+
+	country := strings.TrimSpace(req.GetStringTrimmed(r, "country"))
+
+	query := geostore.TimezoneQueryOptions{
+		SortOrder: neat.SortAsc,
+		OrderBy:   geostore.COLUMN_TIMEZONE,
+	}
+	if country != "" {
+		query.CountryCode = country
+	}
+
+	timezones, err := controller.app.GetGeoStore().TimezoneList(r.Context(), query)
+	if err != nil {
+		controller.app.GetLogger().Error("Error listing timezones", slog.String("error", err.Error()))
+		controller.sendErrorResponse(w, "Error listing timezones", http.StatusInternalServerError)
+		return
+	}
+
+	list := make([]string, 0, len(timezones))
+	for _, tz := range timezones {
+		list = append(list, tz.Timezone())
+	}
+
+	controller.sendJSONResponse(w, map[string]interface{}{
+		"status":    "success",
+		"timezones": list,
+	}, http.StatusOK)
 }
 
+// applyProfile sets the profile fields on the user, vault-tokenizing the
+// sensitive fields when the vault store is enabled.
+func (controller *registerController) applyProfile(ctx context.Context, user userstore.UserInterface, data registerFormData) error {
+	if !controller.app.GetConfig().GetUserStoreVaultEnabled() {
+		user.SetFirstName(data.firstName)
+		user.SetLastName(data.lastName)
+		user.SetBusinessName(data.businessName)
+		user.SetPhone(data.phone)
+		user.SetCountry(data.country)
+		user.SetTimezone(data.timezone)
+		return nil
+	}
+
+	if controller.app.IsDisabledVaultStore() {
+		return errors.New("vault store is not configured")
+	}
+
+	tokenize := func(value string) (string, error) {
+		return controller.app.GetVaultStore().TokenCreate(ctx, value, controller.app.GetConfig().GetVaultStoreKey(), 20)
+	}
+
+	firstNameToken, err := tokenize(data.firstName)
+	if err != nil {
+		return err
+	}
+	lastNameToken, err := tokenize(data.lastName)
+	if err != nil {
+		return err
+	}
+	businessNameToken, err := tokenize(data.businessName)
+	if err != nil {
+		return err
+	}
+	phoneToken, err := tokenize(data.phone)
+	if err != nil {
+		return err
+	}
+
+	user.SetFirstName(firstNameToken)
+	user.SetLastName(lastNameToken)
+	user.SetBusinessName(businessNameToken)
+	user.SetPhone(phoneToken)
+	user.SetCountry(data.country)
+	user.SetTimezone(data.timezone)
+	return nil
+}
+
+// countryList returns all countries from the geo store.
+func (controller *registerController) countryList(ctx context.Context) ([]geostore.Country, error) {
+	return controller.app.GetGeoStore().CountryList(ctx, geostore.CountryQueryOptions{
+		SortOrder: "asc",
+		OrderBy:   geostore.COLUMN_NAME,
+	})
+}
+
+// getUserData reads the user profile, decrypting vault-tokenized fields when
+// the vault store is enabled.
 func (controller *registerController) getUserData(ctx context.Context, user userstore.UserInterface) (email string, firstName string, lastName string, businessName string, phone string, err error) {
 	if user == nil {
 		return "", "", "", "", "", errors.New("user is nil")
@@ -299,97 +411,28 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 	return email, firstName, lastName, businessName, phone, nil
 }
 
-func (controller *registerController) prepareData(r *http.Request) (data registerControllerData, errorMessage string) {
-	if controller.app.IsDisabledUserStore() {
-		return registerControllerData{}, "User store is nil"
-	}
-
-	action := req.GetStringTrimmed(r, "action")
-	authUser := basesession.GetAuthUser(r)
-
-	if authUser == nil {
-		return registerControllerData{}, "You must be logged in to access this page"
-	}
-
-	if controller.app.IsDisabledGeoStore() {
-		return registerControllerData{}, "Geo store is nil"
-	}
-
-	countries, errCountries := controller.app.GetGeoStore().CountryList(r.Context(), geostore.CountryQueryOptions{
-		SortOrder: "asc",
-		OrderBy:   geostore.COLUMN_NAME,
-	})
-
-	if errCountries != nil {
-		controller.app.GetLogger().Error("Error listing countries", slog.String("error", errCountries.Error()))
-		return registerControllerData{}, "Error listing countries"
-	}
-
-	email, firstName, lastName, businessName, phone, err := controller.getUserData(r.Context(), authUser)
-
-	if r.Method == http.MethodGet {
-		if err != nil {
-			controller.app.GetLogger().Error("Error reading email", slog.String("error", err.Error()))
-			return registerControllerData{}, "Error reading email"
-		}
-
-		data = registerControllerData{
-			action:      action,
-			authUser:    authUser,
-			email:       email,
-			firstName:   firstName,
-			lastName:    lastName,
-			buinessName: businessName,
-			phone:       phone,
-			timezone:    authUser.GetTimezone(),
-			country:     authUser.GetCountry(),
-			countryList: countries,
-		}
-	}
-
-	if r.Method == http.MethodPost {
-		data = registerControllerData{
-			action:      action,
-			authUser:    authUser,
-			email:       email,
-			firstName:   strings.TrimSpace(req.GetStringTrimmed(r, controller.formFirstName)),
-			lastName:    strings.TrimSpace(req.GetStringTrimmed(r, controller.formLastName)),
-			buinessName: strings.TrimSpace(req.GetStringTrimmed(r, controller.formBusinessName)),
-			phone:       strings.TrimSpace(req.GetStringTrimmed(r, controller.formPhone)),
-			timezone:    strings.TrimSpace(req.GetStringTrimmed(r, controller.formTimezone)),
-			country:     strings.TrimSpace(req.GetStringTrimmed(r, controller.formCountry)),
-			countryList: countries,
-		}
-	}
-
-	return data, ""
+// sendJSONResponse sends a JSON response
+func (controller *registerController) sendJSONResponse(w http.ResponseWriter, data map[string]interface{}, statusCode int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(data)
 }
 
-func (controller *registerController) selectTimezoneByCountry(ctx context.Context, country string, selectedTimezone string) hb.TagInterface {
-	query := geostore.TimezoneQueryOptions{
-		SortOrder: neat.SortAsc,
-		OrderBy:   geostore.COLUMN_TIMEZONE,
+// sendErrorResponse sends a JSON error response
+func (controller *registerController) sendErrorResponse(w http.ResponseWriter, message string, statusCode int) {
+	controller.sendJSONResponse(w, map[string]interface{}{
+		"status":  "error",
+		"message": message,
+	}, statusCode)
+}
+
+// mustJSON marshals a value to JSON, falling back to "null" on error.
+// encoding/json escapes <, > and & by default so the output is safe to embed
+// inside a <script> block.
+func mustJSON(v interface{}) []byte {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return []byte("null")
 	}
-
-	if country != "" {
-		query.CountryCode = country
-	}
-
-	timezones, errZones := controller.app.GetGeoStore().TimezoneList(ctx, query)
-
-	if errZones != nil {
-		controller.app.GetLogger().Error("Error listing timezones", slog.String("error", errZones.Error()))
-		return hb.Text("Error listing timezones")
-	}
-
-	selectTimezones := bs.FormSelect().
-		ID("SelectTimezones").
-		Name("timezone").
-		Child(bs.FormSelectOption("", "")).
-		Children(lo.Map(timezones, func(timezone geostore.Timezone, _ int) hb.TagInterface {
-			return bs.FormSelectOption(timezone.Timezone(), timezone.Timezone()).
-				AttrIf(selectedTimezone == timezone.Timezone(), "selected", "selected")
-		}))
-
-	return selectTimezones
+	return b
 }

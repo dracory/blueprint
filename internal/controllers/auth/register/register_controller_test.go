@@ -1,9 +1,12 @@
 package register
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
+	"context"
+	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"project/internal/app"
 	"project/internal/config"
 	"project/internal/helpers"
 	"project/internal/links"
@@ -11,1094 +14,430 @@ import (
 	"strings"
 	"testing"
 
+	basetestutils "github.com/dracory/base/testutils"
+
 	"github.com/dracory/auth"
 	"github.com/dracory/test"
+	"github.com/dracory/userstore"
 )
 
-func TestRegisterController_RequiresAuthenticatedUser_WithoutVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
+// setupApp builds a test app with all stores the register flow requires.
+// When vault is true the vault store is enabled as well.
+func setupApp(t *testing.T, vault bool) app.AppInterface {
+	t.Helper()
+	cfg := testutils.DefaultConf()
+	cfg.SetCacheStoreUsed(true)
+	cfg.SetGeoStoreUsed(true)
+	cfg.SetSessionStoreUsed(true)
+	cfg.SetUserStoreUsed(true)
+	if vault {
+		cfg.SetVaultStoreUsed(true)
+		cfg.SetUserStoreVaultEnabled(true)
+		// vaultstore requires keys of at least 16 characters
+		cfg.SetVaultStoreKey("test-vault-key-0123456789")
+	}
+	return testutils.Setup(testutils.WithCfg(cfg))
+}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
-		GetValues: url.Values{},
-		Context:   map[any]any{},
-	})
-
+// seedAuthUser creates a user and returns it together with the request
+// context map that marks it as authenticated.
+func seedAuthUser(t *testing.T, application app.AppInterface) (userstore.UserInterface, map[any]any) {
+	t.Helper()
+	user, err := testutils.SeedUser(application.GetUserStore(), test.USER_01)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
+	if user == nil {
+		t.Fatal("user should not be nil")
 	}
-
-	if response.StatusCode != http.StatusSeeOther {
-		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`<a href="/flash?message_id=`,
-		`">See Other</a>`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
+	// Users reaching the register page were created via email login — seed
+	// an email to reflect that.
+	if user.GetEmail() == "" {
+		user.SetEmail("user01@test.com")
+		if err := application.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+			t.Fatal(err)
 		}
 	}
-
-	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if flashMessage == nil {
-		t.Fatal(`Response MUST contain 'flash message'`)
-	}
-
-	if flashMessage.Type != "error" {
-		t.Fatal(`Response be of type 'success', but got: `, flashMessage.Type, flashMessage.Message)
-	}
-
-	expected := "You must be logged in to access this page"
-	if flashMessage.Message != expected {
-		t.Fatal(`Response MUST contain '`, expected, `', but got: `, flashMessage.Message)
+	return user, map[any]any{
+		auth.AuthenticatedUserID{}:           user.GetID(),
+		config.AuthenticatedUserContextKey{}: user,
 	}
 }
 
-func TestRegisterController_DisabledReturnsFlash(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
-	app.GetConfig().SetRegistrationEnabled(false)
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
-		GetValues: url.Values{},
-		Context:   map[any]any{},
+// serve dispatches a request through the register controller the same way the
+// router does: GET → PageHandler, POST → AjaxHandler.
+func serve(t *testing.T, application app.AppInterface, method, path string,
+	query url.Values, form url.Values, ctx map[any]any) *httptest.ResponseRecorder {
+	t.Helper()
+	req, err := test.NewRequest(method, path, test.NewRequestOptions{
+		QueryParams: query,
+		FormValues:  form,
+		Context:     ctx,
 	})
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
+	recorder := httptest.NewRecorder()
+	controller := NewRegisterController(application)
+	if method == http.MethodPost {
+		controller.AjaxHandler(recorder, req)
+	} else {
+		_, _ = recorder.WriteString(controller.PageHandler(recorder, req))
+	}
+	return recorder
+}
+
+func decodeJSON(t *testing.T, recorder *httptest.ResponseRecorder) map[string]any {
+	t.Helper()
+	var data map[string]any
+	if err := json.NewDecoder(recorder.Body).Decode(&data); err != nil {
+		t.Fatalf("failed to decode JSON response %q: %v", recorder.Body.String(), err)
+	}
+	return data
+}
+
+func saveForm(overrides map[string]string) url.Values {
+	form := url.Values{
+		"email":      {"user01@test.com"},
+		"first_name": {"FirstName"},
+		"last_name":  {"LastName"},
+		"country":    {"US"},
+		"timezone":   {"America/New_York"},
+	}
+	for k, v := range overrides {
+		form.Set(k, v)
+	}
+	return form
+}
+
+// == PAGE HANDLER ============================================================
+
+func TestRegisterPage_UnauthenticatedRedirectsToFlash(t *testing.T) {
+	application := setupApp(t, false)
+
+	recorder := serve(t, application, http.MethodGet, "/", nil, nil, map[any]any{})
+
+	if recorder.Code != http.StatusSeeOther {
+		t.Fatalf("expected %d, got %d", http.StatusSeeOther, recorder.Code)
+	}
+	if !strings.Contains(recorder.Body.String(), `/flash?message_id=`) {
+		t.Fatalf("expected flash redirect, got: %s", recorder.Body.String())
 	}
 
-	if response.StatusCode != http.StatusSeeOther {
-		t.Fatalf("Response MUST be %d but was: %d", http.StatusSeeOther, response.StatusCode)
-	}
-
-	if !strings.Contains(responseHTML, `/flash?message_id=`) {
-		t.Fatalf("Response MUST contain flash redirect, got: %s", responseHTML)
-	}
-
-	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if flashMessage == nil {
-		t.Fatal(`Response MUST contain 'flash message'`)
+		t.Fatal("expected flash message")
 	}
-
 	if flashMessage.Type != helpers.FLASH_ERROR {
-		t.Fatalf("Expected flash type %s but got %s", helpers.FLASH_ERROR, flashMessage.Type)
+		t.Fatalf("expected flash type %s, got %s", helpers.FLASH_ERROR, flashMessage.Type)
+	}
+	if flashMessage.Message != "You must be logged in to access this page" {
+		t.Fatalf("unexpected flash message: %s", flashMessage.Message)
+	}
+}
+
+func TestRegisterPage_RegistrationDisabledRedirectsToFlash(t *testing.T) {
+	application := setupApp(t, false)
+	application.GetConfig().SetRegistrationEnabled(false)
+
+	_, ctx := seedAuthUser(t, application)
+	recorder := serve(t, application, http.MethodGet, "/", nil, nil, ctx)
+
+	if recorder.Code != http.StatusSeeOther {
+		t.Fatalf("expected %d, got %d", http.StatusSeeOther, recorder.Code)
 	}
 
-	if flashMessage.Message != "Registrations are currently disabled" {
-		t.Fatalf("Expected message 'Registrations are currently disabled' but got: %s", flashMessage.Message)
+	flashMessage, err := basetestutils.FlashMessageFindFromResponse(application.GetCacheStore(), recorder.Result())
+	if err != nil {
+		t.Fatal(err)
 	}
-
+	if flashMessage == nil || flashMessage.Message != "Registrations are currently disabled" {
+		t.Fatalf("unexpected flash message: %+v", flashMessage)
+	}
 	if flashMessage.Url != links.Website().Home() {
-		t.Fatalf("Expected redirect URL %s but got %s", links.Website().Home(), flashMessage.Url)
+		t.Fatalf("expected redirect to %s, got %s", links.Website().Home(), flashMessage.Url)
 	}
 }
 
-func TestRegisterController_RequiresAuthenticatedUser_WithVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
+func TestRegisterPage_RendersVueApp(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
-		GetValues: url.Values{},
-		Context:   map[any]any{},
-	})
+	recorder := serve(t, application, http.MethodGet, "/", nil, nil, ctx)
 
-	if err != nil {
-		t.Fatal(err)
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Code)
 	}
 
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusSeeOther {
-		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
-	}
-
+	body := recorder.Body.String()
 	expecteds := []string{
-		`<a href="/flash?message_id=`,
-		`">See Other</a>`,
+		`id="app"`,
+		`REGISTER_AJAX_URL`,
+		`TIMEZONES_AJAX_URL`,
+		`INITIAL_DATA`,
+		`COUNTRIES`,
+		`first_name`,
+		`last_name`,
+		`business_name`,
+		`timezone`,
 	}
-
 	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-
-	flashMessage, err := basetestutils.FlashMessageFindFromResponse(app.GetCacheStore(), response)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if flashMessage == nil {
-		t.Fatal(`Response MUST contain 'flash message'`)
-	}
-
-	if flashMessage.Type != "error" {
-		t.Fatal(`Response be of type 'success', but got: `, flashMessage.Type, flashMessage.Message)
-	}
-
-	expected := "You must be logged in to access this page"
-	if flashMessage.Message != expected {
-		t.Fatal(`Response MUST contain '`, expected, `', but got: `, flashMessage.Message)
-	}
-}
-
-func TestRegisterController_ShowsRegisterForm_WithoutVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
-		GetValues: url.Values{},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
+		if !strings.Contains(body, expected) {
+			t.Fatalf("response MUST contain %q", expected)
 		}
 	}
 }
 
-func TestRegisterController_ShowsRegisterForm_WithVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-		testutils.WithVaultStore(true),
-	)
+func TestRegisterPage_RendersVueApp_WithVault(t *testing.T) {
+	application := setupApp(t, true)
+	user, ctx := seedAuthUser(t, application)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
+	// With the vault enabled the stored email is a token — replace the
+	// plaintext seed email with a real vault token.
+	token, err := application.GetVaultStore().TokenCreate(context.Background(),
+		user.GetEmail(), application.GetConfig().GetVaultStoreKey(), 20)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
+	user.SetEmail(token)
+	if err := application.GetUserStore().UserUpdate(context.Background(), user); err != nil {
+		t.Fatal(err)
 	}
 
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodGet, NewRegisterController(app).Handler, test.NewRequestOptions{
-		GetValues: url.Values{},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
+	recorder := serve(t, application, http.MethodGet, "/", nil, nil, ctx)
 
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Code)
+	}
+	if !strings.Contains(recorder.Body.String(), `id="app"`) {
+		t.Fatal("expected Vue app container in response")
+	}
+}
+
+// == AJAX HANDLER ============================================================
+
+func TestRegisterAjax_Unauthenticated(t *testing.T) {
+	application := setupApp(t, false)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(nil), map[any]any{})
+
+	if recorder.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "error" {
+		t.Fatalf("expected error status, got %v", data)
+	}
+}
+
+func TestRegisterAjax_InvalidAction(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"bogus"}}, nil, ctx)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", recorder.Code)
+	}
+}
+
+func TestRegisterSave_RequiresFirstName(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(map[string]string{"first_name": ""}), ctx)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if !strings.Contains(data["message"].(string), "First name") {
+		t.Fatalf("unexpected message: %v", data["message"])
+	}
+}
+
+func TestRegisterSave_RequiresLastName(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(map[string]string{"last_name": ""}), ctx)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if !strings.Contains(data["message"].(string), "Last name") {
+		t.Fatalf("unexpected message: %v", data["message"])
+	}
+}
+
+func TestRegisterSave_RequiresCountry(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(map[string]string{"country": ""}), ctx)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if !strings.Contains(data["message"].(string), "Country") {
+		t.Fatalf("unexpected message: %v", data["message"])
+	}
+}
+
+func TestRegisterSave_RequiresTimezone(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(map[string]string{"timezone": ""}), ctx)
+
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if !strings.Contains(data["message"].(string), "Timezone") {
+		t.Fatalf("unexpected message: %v", data["message"])
+	}
+}
+
+func TestRegisterSave_Success(t *testing.T) {
+	application := setupApp(t, false)
+	user, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(map[string]string{
+			"business_name": "Acme Ltd",
+			"phone":         "+1234567890",
+		}), ctx)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", recorder.Code, recorder.Body.String())
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "success" {
+		t.Fatalf("expected success, got %v", data)
+	}
+	if data["redirect"] != links.User().Home() {
+		t.Fatalf("expected redirect to %s, got %v", links.User().Home(), data["redirect"])
+	}
+
+	// Verify the profile was persisted
+	updated, err := application.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
+		t.Fatal(err)
+	}
+	if updated.GetFirstName() != "FirstName" || updated.GetLastName() != "LastName" {
+		t.Fatalf("name not saved: %q %q", updated.GetFirstName(), updated.GetLastName())
+	}
+	if updated.GetBusinessName() != "Acme Ltd" {
+		t.Fatalf("business name not saved: %q", updated.GetBusinessName())
+	}
+	if updated.GetCountry() != "US" || updated.GetTimezone() != "America/New_York" {
+		t.Fatalf("country/timezone not saved: %q %q", updated.GetCountry(), updated.GetTimezone())
+	}
+}
+
+func TestRegisterSave_Success_WithVault(t *testing.T) {
+	application := setupApp(t, true)
+	user, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"save"}}, saveForm(nil), ctx)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", recorder.Code, recorder.Body.String())
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "success" {
+		t.Fatalf("expected success, got %v", data)
 	}
 
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
+	// Sensitive fields must be stored as vault tokens, not plaintext
+	updated, err := application.GetUserStore().UserFindByID(context.Background(), user.GetID())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated.GetFirstName() == "FirstName" {
+		t.Fatal("expected first name to be vault-tokenized")
+	}
+	if updated.GetCountry() != "US" || updated.GetTimezone() != "America/New_York" {
+		t.Fatalf("country/timezone not saved: %q %q", updated.GetCountry(), updated.GetTimezone())
+	}
+}
+
+func TestRegisterTimezones_FiltersByCountry(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
+
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"timezones"}}, url.Values{"country": {"US"}}, ctx)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Code)
+	}
+	data := decodeJSON(t, recorder)
+	if data["status"] != "success" {
+		t.Fatalf("expected success, got %v", data)
 	}
 
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
+	raw, _ := json.Marshal(data["timezones"])
+	list := string(raw)
 
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
+	for _, expected := range []string{"America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles"} {
+		if !strings.Contains(list, expected) {
+			t.Fatalf("expected timezone %q in list", expected)
+		}
 	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
+	for _, unexpected := range []string{"Europe/London", "Asia/Tokyo", "Australia/Sydney"} {
+		if strings.Contains(list, unexpected) {
+			t.Fatalf("unexpected timezone %q in list", unexpected)
 		}
 	}
 }
 
-func TestRegisterController_RequiresFirstName_WithoutVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
+func TestRegisterTimezones_EmptyCountryReturnsAll(t *testing.T) {
+	application := setupApp(t, false)
+	_, ctx := seedAuthUser(t, application)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"timezones"}}, url.Values{"country": {""}}, ctx)
 
-	if err != nil {
-		t.Fatal(err)
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", recorder.Code)
 	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
+	data := decodeJSON(t, recorder)
+	if data["status"] != "success" {
+		t.Fatalf("expected success, got %v", data)
 	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email": {user.GetEmail()},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`First name is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
+	raw, _ := json.Marshal(data["timezones"])
+	if !strings.Contains(string(raw), "Europe/London") {
+		t.Fatal("expected unfiltered timezone list")
 	}
 }
 
-func TestRegisterController_RequiresFirstName_WithVault(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-		testutils.WithVaultStore(true),
-	)
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email": {user.GetEmail()},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`First name is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresLastName_WithoutVault(t *testing.T) {
+func TestRegisterTimezones_NoGeoStore(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
+	application := testutils.Setup(testutils.WithCfg(cfg))
+	_, ctx := seedAuthUser(t, application)
 
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	recorder := serve(t, application, http.MethodPost, "/",
+		url.Values{"action": {"timezones"}}, url.Values{"country": {"US"}}, ctx)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Last name is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresLastName_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Last name is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresCountry_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Country is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresCountry_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Country is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresTimezone_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-			"country":    {"Country"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Timezone is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_RequiresTimezone_WithVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-			"country":    {"Country"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Timezone is required field`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_Success_WithoutVault(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-			"country":    {"Country"},
-			"timezone":   {"Timezone"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal("Response MUST NOT be nil")
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Your registration completed successfully. You can now continue browsing the website.`,
-		`<script>window.location.href = '` + links.User().Home() + `'</script>`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_SelectTimezoneByCountry_WithValidCountry(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	// Test the timezone selection AJAX endpoint
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"action":  {"on-country-selected-timezone-options"},
-			"country": {"US"}, // United States
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	// Should return a timezone select element with actual timezone options
-	expecteds := []string{
-		`id="SelectTimezones"`,
-		`name="timezone"`,
-		`<select`,
-		`</select>`,
-		// Test for specific US timezone options
-		`America/New_York`,
-		`America/Los_Angeles`,
-		`America/Chicago`,
-		`America/Denver`,
-		`Pacific/Honolulu`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-
-	// Should NOT contain timezones from other countries
-	notExpected := []string{
-		`Europe/London`,    // UK timezone
-		`Asia/Tokyo`,       // Japan timezone
-		`Australia/Sydney`, // Australia timezone
-		`Africa/Cairo`,     // Egypt timezone
-		`America/Toronto`,  // Canada timezone (different country)
-	}
-
-	for _, unexpected := range notExpected {
-		if strings.Contains(responseHTML, unexpected) {
-			t.Fatal(`Response MUST NOT contain`, unexpected, ` but was found in: `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_SelectTimezoneByCountry_WithEmptyCountry(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	// Test with empty country - should return all timezones
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"action":  {"on-country-selected-timezone-options"},
-			"country": {""},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	// Should still return a timezone select element
-	expecteds := []string{
-		`id="SelectTimezones"`,
-		`name="timezone"`,
-		`<select`,
-		`</select>`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
-	}
-}
-
-func TestRegisterController_SelectTimezoneByCountry_WithoutGeoStore(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-		// Note: No GeoStore - should return error
-	)
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	// Test without GeoStore configured
-	_, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"action":  {"on-country-selected-timezone-options"},
-			"country": {"US"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	// Should redirect to error page
-	if response.StatusCode != http.StatusSeeOther {
-		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
-	}
-
-	location := response.Header.Get("Location")
-	if !strings.Contains(location, `/flash?message_id=`) {
-		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
-	}
-}
-
-func TestRegisterController_SelectTimezoneByCountry_RequiresAuthentication(t *testing.T) {
-	app := testutils.Setup(
-		testutils.WithCacheStore(true),
-		testutils.WithGeoStore(true),
-		testutils.WithSessionStore(true),
-		testutils.WithUserStore(true),
-	)
-
-	// Test without authentication
-	_, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"action":  {"on-country-selected-timezone-options"},
-			"country": {"US"},
-		},
-		Context: map[any]any{}, // No authenticated user
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal(`Response MUST not be nil`)
-	}
-
-	// Should redirect to login
-	if response.StatusCode != http.StatusSeeOther {
-		t.Fatal(`Response MUST be `, http.StatusSeeOther, ` but was: `, response.StatusCode)
-	}
-
-	location := response.Header.Get("Location")
-	if !strings.Contains(location, `/flash?message_id=`) {
-		t.Fatalf("Response Location MUST contain flash redirect, got: %s", location)
-	}
-}
-
-func TestRegisterController_Success_WithVaultStore(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetCacheStoreUsed(true)
-	cfg.SetGeoStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetUserStoreUsed(true)
-	cfg.SetVaultStoreUsed(true)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-
-	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if user == nil {
-		t.Fatal("user should not be nil")
-	}
-
-	responseHTML, response, err := test.CallStringEndpoint(http.MethodPost, NewRegisterController(app).Handler, test.NewRequestOptions{
-		PostValues: url.Values{
-			"email":      {user.GetEmail()},
-			"first_name": {"FirstName"},
-			"last_name":  {"LastName"},
-			"country":    {"Country"},
-			"timezone":   {"Timezone"},
-		},
-		Context: map[any]any{
-			auth.AuthenticatedUserID{}:           user.GetID(),
-			config.AuthenticatedUserContextKey{}: user,
-		},
-	})
-
-	if err != nil {
-		t.Fatal("Response MUST NOT trigger error, but was:", err)
-	}
-
-	if response == nil {
-		t.Fatal("Response MUST NOT be nil")
-	}
-
-	if response.StatusCode != http.StatusOK {
-		t.Fatal(`Response MUST be `, http.StatusOK, ` but was: `, response.StatusCode)
-	}
-
-	expecteds := []string{
-		`id="FormRegister"`,
-		`name="email"`,
-		`name="first_name"`,
-		`name="last_name"`,
-		`name="country"`,
-		`name="timezone"`,
-		`Your registration completed successfully. You can now continue browsing the website.`,
-		`<script>window.location.href = '` + links.User().Home() + `'</script>`,
-	}
-
-	for _, expected := range expecteds {
-		if !strings.Contains(responseHTML, expected) {
-			t.Fatal(`Response MUST contain`, expected, ` but was `, responseHTML)
-		}
+	if recorder.Code != http.StatusInternalServerError {
+		t.Fatalf("expected 500, got %d", recorder.Code)
 	}
 }

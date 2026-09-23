@@ -10,16 +10,35 @@ Blueprint ships with two login mechanisms. The active method is selected by the
 `config.LOGIN_METHOD` constant in `internal/config/auth_config.go` — a
 compile-time, one-time developer decision (not an environment variable).
 
-- **`LOGIN_METHOD_OTP` (default)** — in-house email one-time-password login.
-  `auth/login` renders a self-contained page; `POST ?action=otp-send-ajax`
-  issues a 6-digit code (stored in the memory cache under a 128-bit nonce,
-  15-minute TTL, max 5 verify attempts, max 3 sends per email per window) and
-  enqueues `EmailOTPTask` for delivery; `POST ?action=otp-verify-ajax` verifies
-  with a constant-time compare. Fully self-contained, no external services.
+- **`LOGIN_METHOD_OTP` (default)** — in-house email one-time-password login,
+  fully self-contained, no external services. Two routes share the same path:
+  - `GET auth/login` (HTML handler) renders a self-contained page
+    (`app.html`/`app.js`/`app.css` embedded, Vue + Notiflix via CDN).
+  - `POST auth/login` (JSON handler) dispatches on the `action` query param:
+    - `otp-send-ajax` issues a 6-digit `crypto/rand` code plus a 128-bit
+      nonce, stores `email:otp` in the memory cache under the nonce (15-min
+      TTL, max 5 verify attempts, max 3 sends per email per window), and
+      enqueues `EmailOTPTask`. The queued task receives **only the nonce** —
+      the plaintext code is resolved from the memory cache at execution time
+      and is never persisted in the task store. The send quota is consumed
+      only after a successful enqueue, so transient failures don't lock the
+      user out. Counter read-modify-writes are serialized with a mutex.
+    - `otp-verify-ajax` checks the attempt counter before lookup
+      (anti-enumeration), compares with `subtle.ConstantTimeCompare`, then
+      calls the shared pipeline. The `return` param is accepted only if it is
+      a relative path (open-redirect protection).
+- **Registration completion** (`auth/register`) follows the same pattern:
+  `GET` renders a Vue page, `POST` (JSON) exposes `action=save` (profile
+  update, vault-aware) and `action=timezones` (country → timezone list).
 - **`LOGIN_METHOD_AUTHKNIGHT`** — delegates to the external AuthKnight
   service: `auth/login` redirects to `authknight.com`, `auth/auth` exchanges
   the `once` token for the user email. Only in this mode is the `AUTH_AUTH`
-  callback route registered.
+  callback route registered. The echoed `backUrl` from the AuthKnight
+  response is re-validated (must start with the app home URL) before being
+  used as the post-login redirect.
+
+An unrecognized `LOGIN_METHOD` value panics at startup in `routes.go`
+rather than silently defaulting.
 
 Both methods converge on the shared post-auth pipeline in
 `internal/controllers/auth/shared` (`SessionLogin`): find-or-create user
@@ -44,8 +63,11 @@ produces a compile error pointing at the branch to remove in
 ### 1. Authentication Controller (`internal/controllers/auth/`)
 
 **Primary Responsibilities:**
-- Handle external authentication via AuthKnight service
-- Manage user creation and session establishment
+- Route the selected login method (`config.LOGIN_METHOD`): in-house email
+  OTP (`login_otp/`) or external AuthKnight (`login_authknight/` +
+  `authentication_authknight/` callback)
+- Manage user creation and session establishment via the shared pipeline
+  (`auth/shared.SessionLogin`)
 - Implement privacy-first email encryption
 - Coordinate between multiple storage systems
 
@@ -265,6 +287,12 @@ CREATE TABLE blind_index_email (
 2. **Session Creation Fails**: Verify session store initialization
 3. **Rate Limiting Issues**: Review global and specific rate limits
 4. **External Service Timeouts**: Check AuthKnight service availability
+5. **OTP email not arriving**: The task queue runner must be running (it is
+   started by `startBackgroundProcesses` when the task store is enabled).
+   Check the `snv_tasks_task_queue` table — the task `details` column records
+   failures (e.g. `smtp: server doesn't support AUTH` when `MAIL_USERNAME`
+   is set against a server without AUTH, such as Mailpit — leave
+   `MAIL_USERNAME`/`MAIL_PASSWORD` empty for local Mailpit).
 
 ### Debug Information
 - Structured logging with correlation IDs

@@ -1,0 +1,89 @@
+<div id="app" class="min-h-screen d-flex flex-column">
+    <!-- Navigation (Mini) -->
+    <nav class="navbar navbar-light bg-white border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
+                <i class="bi bi-person-plus text-brand me-2"></i>
+                <span>{{ appName }}</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container flex-grow-1 d-flex align-items-center justify-content-center p-4">
+        <div style="max-width: 560px; width: 100%;">
+            <div class="card login-card">
+                <div class="card-header bg-light border-bottom p-5 text-center">
+                    <div class="icon-circle">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h1 class="h3 fw-bold text-dark mb-2">Complete your registration</h1>
+                    <p class="text-muted mb-0">Tell us a little about yourself to finish setting up your account.</p>
+                </div>
+
+                <div class="card-body p-5">
+                    <form @submit.prevent="handleSave">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label for="email" class="form-label small fw-bold text-uppercase tracking-wider">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                                    <input type="email" id="email" v-model="form.email" class="form-control border-start-0 py-2" readonly disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label small fw-bold text-uppercase tracking-wider">First Name <span class="text-danger">*</span></label>
+                                <input type="text" id="first_name" v-model="form.first_name" class="form-control py-2" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label small fw-bold text-uppercase tracking-wider">Last Name <span class="text-danger">*</span></label>
+                                <input type="text" id="last_name" v-model="form.last_name" class="form-control py-2" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="business_name" class="form-label small fw-bold text-uppercase tracking-wider">Company / Business Name</label>
+                                <input type="text" id="business_name" v-model="form.business_name" class="form-control py-2">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label small fw-bold text-uppercase tracking-wider">Phone</label>
+                                <input type="tel" id="phone" v-model="form.phone" class="form-control py-2">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="country" class="form-label small fw-bold text-uppercase tracking-wider">Country <span class="text-danger">*</span></label>
+                                <select id="country" v-model="form.country" class="form-select py-2" required @change="handleCountryChange">
+                                    <option value="">Select country</option>
+                                    <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="timezone" class="form-label small fw-bold text-uppercase tracking-wider">Timezone <span class="text-danger">*</span></label>
+                                <select id="timezone" v-model="form.timezone" class="form-select py-2" required :disabled="timezonesLoading">
+                                    <option value="">{{ timezonesLoading ? 'Loading...' : 'Select timezone' }}</option>
+                                    <option v-for="tz in timezones" :key="tz" :value="tz">{{ tz }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-brand w-100 py-3 fw-bold shadow-sm mt-5" :disabled="isLoading">
+                            <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <i v-else class="bi bi-check-circle me-2"></i>
+                            Save &amp; Continue
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/" class="text-brand text-decoration-none small fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top py-4 text-center mt-auto">
+        <div class="container small text-muted">
+            &copy; {{ appName }}. Secure &amp; Privacy-First.
+        </div>
+    </footer>
+</div>
