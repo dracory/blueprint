@@ -32,17 +32,27 @@ func SeedUser(userStore userstore.StoreInterface, userID string) (userstore.User
 		SetID(userID).
 		SetStatus(userstore.USER_STATUS_ACTIVE)
 
-	if userID == test.USER_01 {
-		user.SetRole(userstore.USER_ROLE_USER)
-	}
-
-	if userID == test.ADMIN_01 {
-		user.SetRole(userstore.USER_ROLE_ADMINISTRATOR)
-	}
-
 	err = userStore.UserCreate(context.Background(), user)
 	if err != nil {
 		return nil, err
+	}
+
+	roleHandle := ""
+	if userID == test.USER_01 {
+		roleHandle = userstore.USER_ROLE_USER
+	}
+	if userID == test.ADMIN_01 {
+		roleHandle = userstore.USER_ROLE_ADMINISTRATOR
+	}
+
+	if roleHandle != "" {
+		role, err := userStore.RoleFindByHandleOrCreate(context.Background(), roleHandle, userstore.ROLE_STATUS_ACTIVE)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := userStore.UserRoleFindByUserIDAndRoleIDOrCreate(context.Background(), user.GetID(), role.GetID()); err != nil {
+			return nil, err
+		}
 	}
 
 	return user, nil

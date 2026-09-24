@@ -16,6 +16,7 @@ import (
 
 	"github.com/dracory/base/blogblocks"
 	baselayouts "github.com/dracory/base/layouts"
+	"github.com/dracory/userstore"
 
 	basesession "github.com/dracory/base/session"
 
@@ -119,7 +120,7 @@ func (controller *postController) accessAllowed(r *http.Request, post blogstore.
 	}
 
 	// If the user is an administrator, they can access unpublished posts
-	if authUser.IsAdministrator() {
+	if helpers.UserHasActiveRole(r.Context(), controller.app, authUser, userstore.USER_ROLE_ADMINISTRATOR) {
 		return true
 	}
 

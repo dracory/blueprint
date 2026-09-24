@@ -1,6 +1,9 @@
 package layouts
 
 import (
+	"context"
+	"project/internal/app"
+	"project/internal/helpers"
 	"project/internal/links"
 
 	"github.com/dracory/dashboard/types"
@@ -14,7 +17,7 @@ import (
 //
 // Returns:
 // - `[]types.MenuItem`: The user menu items.
-func adminLayoutUserMenu(authUser userstore.UserInterface) []types.MenuItem {
+func adminLayoutUserMenu(application app.AppInterface, ctx context.Context, authUser userstore.UserInterface) []types.MenuItem {
 	userDashboardMenuItem := types.MenuItem{
 		Title: "To User Panel",
 		URL:   links.User().Home(),
@@ -27,7 +30,7 @@ func adminLayoutUserMenu(authUser userstore.UserInterface) []types.MenuItem {
 
 	items := []types.MenuItem{}
 
-	if authUser != nil && authUser.IsAdministrator() {
+	if authUser != nil && helpers.UserHasActiveRole(ctx, application, authUser, userstore.USER_ROLE_ADMINISTRATOR) {
 		items = append(items, userDashboardMenuItem)
 	}
 

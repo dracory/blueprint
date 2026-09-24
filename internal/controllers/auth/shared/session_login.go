@@ -114,7 +114,7 @@ func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.R
 
 	needsRegistration = !user.IsRegistrationCompleted()
 
-	redirectURL = calculateRedirectURL(application, user)
+	redirectURL = calculateRedirectURL(application, r.Context(), user)
 
 	// Only honour backUrl when it points back at this application (absolute
 	// same-origin URL or a relative path). Anything else is ignored to
@@ -147,12 +147,15 @@ func isSafeBackURL(application app.AppInterface, backUrl string) bool {
 // 1. By default all users redirect to home
 // 2. If user is manager or admin, redirect to admin panel
 // 3. If user does not have any names, redirect to profile
-func calculateRedirectURL(application app.AppInterface, user userstore.UserInterface) string {
+func calculateRedirectURL(application app.AppInterface, ctx context.Context, user userstore.UserInterface) string {
 	// 1. By default all users redirect to home
 	redirectUrl := links.User().Home()
 
 	// 2. If user is manager or admin, redirect to admin panel
-	if user.IsManager() || user.IsAdministrator() || user.IsSuperuser() {
+	if helpers.UserHasAnyActiveRole(ctx, application, user,
+		userstore.USER_ROLE_MANAGER,
+		userstore.USER_ROLE_ADMINISTRATOR,
+		userstore.USER_ROLE_SUPERUSER) {
 		redirectUrl = links.Admin().Home()
 	}
 
@@ -185,6 +188,10 @@ func userCreate(application app.AppInterface, ctx context.Context, email string,
 	err := application.GetUserStore().UserCreate(ctx, user)
 
 	if err != nil {
+		return nil, err
+	}
+
+	if err := helpers.UserActiveRoleAssign(ctx, application, user.GetID(), userstore.USER_ROLE_USER); err != nil {
 		return nil, err
 	}
 

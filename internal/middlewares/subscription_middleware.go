@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"project/internal/app"
 	"project/internal/config"
+	"project/internal/helpers"
 	"project/internal/links"
 
 	basesession "github.com/dracory/base/session"
@@ -48,7 +49,7 @@ func subscriptionOnlyMiddlewareHandler(app app.AppInterface) func(next http.Hand
 			}
 
 			// Check if user is an admin? Yes => Allow
-			if authUser.IsAdministrator() || authUser.IsSuperuser() {
+			if helpers.UserHasAnyActiveRole(r.Context(), app, authUser, userstore.USER_ROLE_ADMINISTRATOR, userstore.USER_ROLE_SUPERUSER) {
 				next.ServeHTTP(w, r)
 				return
 			}

@@ -302,8 +302,11 @@ func NewTaskStore(db *sql.DB, debug bool) (taskstore.StoreInterface, error) {
 // NewUserStore creates a user store with the configured table name.
 func NewUserStore(db *sql.DB) (userstore.StoreInterface, error) {
 	return userstore.NewStore(userstore.NewStoreOptions{
-		DB:            db,
-		UserTableName: "snv_users_user",
+		DB:                db,
+		RolesEnabled:      true,
+		UserTableName:     "snv_users_user",
+		RoleTableName:     "snv_users_role",
+		UserRoleTableName: "snv_users_user_role",
 	})
 }
 

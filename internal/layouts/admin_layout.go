@@ -1,10 +1,11 @@
 package layouts
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -100,7 +101,7 @@ func adminLayout(app app.AppInterface, r *http.Request, options baselayouts.Opti
 	template.SetTitle(options.Title + titlePostfix)
 	template.SetLoginURL(links.Auth().Login(homeLink))
 	template.SetMenuMainItems(adminLayoutMainMenu(authUser))
-	template.SetMenuUserItems(adminLayoutUserMenu(authUser))
+	template.SetMenuUserItems(adminLayoutUserMenu(app, r.Context(), authUser))
 	//dashboard.SetLogoImageURL("/media/user/dashboard-logo.jpg")
 	//dashboard.SetNavbarBackgroundColorMode("primary")
 	template.SetLogoRawHtml(adminLogoHtml())

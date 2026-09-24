@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"project/internal/app"
 	"project/internal/helpers"
@@ -15,6 +16,8 @@ import (
 
 // adminUserAdapter wraps userstore.UserInterface to satisfy rtrMiddleware.UserWithRole
 type adminUserAdapter struct {
+	app  app.AppInterface
+	ctx  context.Context
 	user userstore.UserInterface
 }
 
@@ -33,17 +36,7 @@ func (a *adminUserAdapter) IsRegistrationCompleted() bool {
 }
 
 func (a *adminUserAdapter) HasRole(role string) bool {
-	if a.user == nil {
-		return false
-	}
-	switch role {
-	case userstore.USER_ROLE_ADMINISTRATOR:
-		return a.user.IsAdministrator()
-	case userstore.USER_ROLE_SUPERUSER:
-		return a.user.IsSuperuser()
-	default:
-		return false
-	}
+	return helpers.UserHasActiveRole(a.ctx, a.app, a.user, role)
 }
 
 // NewAdminMiddleware checks if the user is an administrator or superuser
@@ -61,7 +54,7 @@ func NewAdminMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 			if user == nil {
 				return nil
 			}
-			return &adminUserAdapter{user: user}
+			return &adminUserAdapter{app: app, ctx: r.Context(), user: user}
 		},
 		RegistrationEnabled: true,
 		OnNotAuthenticated: func(w http.ResponseWriter, r *http.Request) {

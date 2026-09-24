@@ -21,7 +21,7 @@ func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 	}
 
 	mainMenuItems := userLayoutMainMenuItems(authUser)
-	userMenuItems := userLayoutUserMenuItems(authUser)
+	userMenuItems := userLayoutUserMenuItems(app, r.Context(), authUser)
 
 	// Brand link
 	brandLink := hb.Hyperlink().

@@ -1,10 +1,11 @@
 package layouts
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -101,7 +102,7 @@ func userLayout(app app.AppInterface, r *http.Request, options baselayouts.Optio
 	dashboard.SetFaviconURL(FaviconURL())
 	dashboard.SetLoginURL(links.Auth().Login(homeLink))
 	dashboard.SetMenuMainItems(userLayoutMainMenuItems(authUser))
-	dashboard.SetMenuUserItems(userLayoutUserMenuItems(authUser))
+	dashboard.SetMenuUserItems(userLayoutUserMenuItems(app, r.Context(), authUser))
 	// dashboard.SetMenuQuickAccessItems(userLayoutQuickAccessMenuItems(authUser))
 	dashboard.SetNavbarBackgroundColorMode("primary")
 	dashboard.SetLogoRawHtml(userLogoHtml())

@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"bytes"
+	"context"
 	"net/url"
 	"project/internal/config"
 	"testing"
@@ -203,8 +204,12 @@ func TestSeedUser_UserRole(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to seed user: %v", err)
 	}
-	if user1.GetRole() != "user" {
-		t.Errorf("Expected USER_01 to have role 'user', got '%s'", user1.GetRole())
+	roles1, err := app.GetUserStore().UserRoles(context.Background(), user1.GetID())
+	if err != nil {
+		t.Fatalf("Failed to list roles: %v", err)
+	}
+	if len(roles1) != 1 || roles1[0].GetHandle() != "user" {
+		t.Errorf("Expected USER_01 to have role 'user', got '%v'", roles1)
 	}
 
 	// Test ADMIN_01 role
@@ -212,8 +217,12 @@ func TestSeedUser_UserRole(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to seed user: %v", err)
 	}
-	if user2.GetRole() != "administrator" {
-		t.Errorf("Expected ADMIN_01 to have role 'administrator', got '%s'", user2.GetRole())
+	roles2, err := app.GetUserStore().UserRoles(context.Background(), user2.GetID())
+	if err != nil {
+		t.Fatalf("Failed to list roles: %v", err)
+	}
+	if len(roles2) != 1 || roles2[0].GetHandle() != "administrator" {
+		t.Errorf("Expected ADMIN_01 to have role 'administrator', got '%v'", roles2)
 	}
 }
 

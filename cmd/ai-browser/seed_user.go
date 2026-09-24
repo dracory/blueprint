@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"project/internal/app"
 	"project/internal/links"
@@ -60,7 +61,13 @@ func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error 
 		return fmt.Errorf("failed to ensure session: %w", err)
 	}
 
-	role := user.GetRole()
+	roleNames := []string{}
+	if roles, err := app.GetUserStore().UserRoles(ctx, user.GetID()); err == nil {
+		for _, r := range roles {
+			roleNames = append(roleNames, r.GetHandle())
+		}
+	}
+	role := strings.Join(roleNames, ",")
 	if role == "" {
 		role = "user"
 	}
@@ -116,7 +123,6 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 		SetID(aiBrowserUserID).
 		SetEmail(email).
 		SetStatus(userstore.USER_STATUS_ACTIVE).
-		SetRole(role).
 		SetFirstName("AI").
 		SetLastName("Browser").
 		SetCountry("US").
@@ -128,6 +134,14 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 
 	if err := app.GetUserStore().UserCreate(ctx, user); err != nil {
 		return nil, err
+	}
+
+	roleRecord, err := app.GetUserStore().RoleFindByHandleOrCreate(ctx, role, userstore.ROLE_STATUS_ACTIVE)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find role: %w", err)
+	}
+	if _, err := app.GetUserStore().UserRoleFindByUserIDAndRoleIDOrCreate(ctx, user.GetID(), roleRecord.GetID()); err != nil {
+		return nil, fmt.Errorf("failed to assign role: %w", err)
 	}
 
 	if app.GetConfig().GetUserStoreVaultEnabled() {
