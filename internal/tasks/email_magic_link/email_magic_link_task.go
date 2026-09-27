@@ -31,15 +31,24 @@ package email_magic_link
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"project/internal/app"
 	"project/internal/emails"
 	"project/internal/links"
 	"project/internal/tasks/constants"
-	"strings"
 
 	"github.com/dracory/taskstore"
 )
+
+// magicLinkCacheValue mirrors the JSON payload written by the login
+// controller under "magiclink:<nonce>" in the memory cache.
+type magicLinkCacheValue struct {
+	Email     string `json:"email"`
+	IP        string `json:"ip,omitempty"`
+	Token     string `json:"token,omitempty"`
+	ReturnURL string `json:"return,omitempty"`
+}
 
 // NewEmailMagicLinkTask creates a new task handler for sending magic link emails.
 //
@@ -174,13 +183,21 @@ func (handler *EmailMagicLinkTask) Handle() bool {
 		return false
 	}
 
+	// The email went out — drop the nonce entry so it does not linger in
+	// the memory cache until expiry.
+	if nonce != "" {
+		if cache := handler.app.GetMemoryCache(); cache != nil {
+			cache.Delete("magiclink:" + nonce)
+		}
+	}
+
 	handler.LogSuccess("Magic link email sent successfully to " + email)
 
 	return true
 }
 
-// resolveFromCache looks up the "email|token|return" value stored by the
-// login controller under "magiclink:<nonce>" in the memory cache.
+// resolveFromCache looks up the JSON "email/token/return" value stored by
+// the login controller under "magiclink:<nonce>" in the memory cache.
 func (handler *EmailMagicLinkTask) resolveFromCache(nonce string) (email, token, returnURL string) {
 	cache := handler.app.GetMemoryCache()
 	if cache == nil {
@@ -197,15 +214,10 @@ func (handler *EmailMagicLinkTask) resolveFromCache(nonce string) (email, token,
 		return "", "", ""
 	}
 
-	parts := strings.SplitN(stored, "|", 3)
-	if len(parts) < 2 {
+	var value magicLinkCacheValue
+	if err := json.Unmarshal([]byte(stored), &value); err != nil {
 		return "", "", ""
 	}
 
-	email, token = parts[0], parts[1]
-	if len(parts) == 3 {
-		returnURL = parts[2]
-	}
-
-	return email, token, returnURL
+	return value.Email, value.Token, value.ReturnURL
 }

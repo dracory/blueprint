@@ -119,7 +119,8 @@ func TestEmailMagicLinkTask_Handle_SendEmail(t *testing.T) {
 
 	// Seed the memory cache the way the login controller does
 	nonce := "testnonce123"
-	app.GetMemoryCache().Set("magiclink:"+nonce, "user@test.com|token123|", 15*time.Minute)
+	app.GetMemoryCache().Set("magiclink:"+nonce,
+		`{"email":"user@test.com","token":"token123"}`, 15*time.Minute)
 
 	handler, ok := NewEmailMagicLinkTask(app).(*EmailMagicLinkTask)
 	if !ok {

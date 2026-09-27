@@ -57,6 +57,17 @@ const (
 	cacheKeyPrefix      = "magiclink:"
 )
 
+// magicLinkCacheValue is the JSON payload stored in the memory cache for
+// magic-link logins. The verify entry ("magiclink:token:<token>") carries
+// Email/IP/ReturnURL; the nonce entry ("magiclink:<nonce>") carries
+// Email/Token/ReturnURL for the email task to resolve.
+type magicLinkCacheValue struct {
+	Email     string `json:"email"`
+	IP        string `json:"ip,omitempty"`
+	Token     string `json:"token,omitempty"`
+	ReturnURL string `json:"return,omitempty"`
+}
+
 type loginController struct {
 	app app.AppInterface
 	// counterMu serializes the read-modify-write on the send-throttle
@@ -112,7 +123,7 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid or missing login token", homeURL, 5)
 	}
 
-	// Look up "email|ip|return" stored under the token key.
+	// Look up the JSON "email/ip/return" value stored under the token key.
 	cache := c.app.GetMemoryCache()
 	tokenKey := tokenCacheKeyPrefix + token
 
@@ -126,15 +137,12 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid or expired login link", homeURL, 5)
 	}
 
-	parts := strings.SplitN(stored, "|", 3)
-	if len(parts) < 2 {
+	var value magicLinkCacheValue
+	if err := json.Unmarshal([]byte(stored), &value); err != nil || value.Email == "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid or expired login link", homeURL, 5)
 	}
 
-	email, boundIP, returnURL := parts[0], parts[1], ""
-	if len(parts) == 3 {
-		returnURL = parts[2]
-	}
+	email, boundIP, returnURL := value.Email, value.IP, value.ReturnURL
 
 	// Verify IP binding BEFORE consuming the token — a link scanner or
 	// prefetcher from a different IP must not burn the link for the real
@@ -150,19 +158,28 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 	// IP matches — consume the token (single-use).
 	cache.Delete(tokenKey)
 
-	redirectURL, _, errorMessage := shared.SessionLogin(c.app, w, r, email, "")
+	// Re-check the email allowlist before logging in — the email may have
+	// been blocked since the link was issued.
+	if rule := authrules.NewEmailAllowedRule(c.app, email); rule.Fails() {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, rule.FailMessageFirst(), homeURL, 5)
+	}
+
+	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "")
 	if errorMessage != "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, homeURL, 5)
 	}
 
 	// Optional return URL: only relative paths are accepted (open-redirect
-	// protection). The value stored at send time takes precedence; the
-	// query parameter is honoured as a fallback.
-	if qReturn := strings.TrimSpace(r.URL.Query().Get("return")); returnURL == "" && qReturn != "" {
-		returnURL = qReturn
-	}
-	if returnURL != "" && strings.HasPrefix(returnURL, "/") && !strings.HasPrefix(returnURL, "//") {
-		redirectURL = returnURL
+	// protection), and only when registration is already complete so a new
+	// user is not sent past the registration step. The value stored at send
+	// time takes precedence; the query parameter is honoured as a fallback.
+	if !needsRegistration {
+		if qReturn := strings.TrimSpace(r.URL.Query().Get("return")); returnURL == "" && qReturn != "" {
+			returnURL = qReturn
+		}
+		if returnURL != "" && strings.HasPrefix(returnURL, "/") && !strings.HasPrefix(returnURL, "//") {
+			redirectURL = returnURL
+		}
 	}
 
 	return helpers.ToFlashSuccess(c.app.GetCacheStore(), w, r, "Login was successful", redirectURL, 5)
@@ -280,10 +297,10 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Per-email send throttle to prevent email-bombing. Checked before the
-	// fallible operations; recorded only after the email task is enqueued
-	// so failed sends do not consume the quota.
-	if !c.canSend(email) {
+	// Per-email send throttle to prevent email-bombing. The quota is
+	// reserved atomically and released if the send setup below fails, so
+	// transient failures do not eat into the user's allowance.
+	if !c.tryAcquireSend(email) {
 		c.sendErrorResponse(w, "Too many links requested, please try again later", http.StatusTooManyRequests)
 		return
 	}
@@ -296,6 +313,7 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 
 	token, err := c.generateToken()
 	if err != nil {
+		c.releaseSend(email)
 		c.sendErrorResponse(w, "Failed to generate login token", http.StatusInternalServerError)
 		c.logError("Failed to generate token", err)
 		return
@@ -303,37 +321,40 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 
 	nonce, err := c.generateNonce()
 	if err != nil {
+		c.releaseSend(email)
 		c.sendErrorResponse(w, "Failed to generate nonce", http.StatusInternalServerError)
 		c.logError("Failed to generate nonce", err)
 		return
 	}
 
-	// Two cache entries:
-	// - "magiclink:<nonce>" = "email|token|return" — read by the email task
-	//   so the token is never persisted in the task queue.
-	// - "magiclink:token:<token>" = "email|ip|return" — the verify path;
+	// Two cache entries (JSON-encoded):
+	// - "magiclink:<nonce>" = {email, token, return} — read by the email
+	//   task so the token is never persisted in the task queue.
+	// - "magiclink:token:<token>" = {email, ip, return} — the verify path;
 	//   deleted on use (single-use).
+	nonceValue, _ := json.Marshal(magicLinkCacheValue{Email: email, Token: token, ReturnURL: returnURL})
+	tokenValue, _ := json.Marshal(magicLinkCacheValue{Email: email, IP: req.GetIP(r), ReturnURL: returnURL})
 	cache := c.app.GetMemoryCache()
-	cache.Set(cacheKeyPrefix+nonce, email+"|"+token+"|"+returnURL, tokenTTL)
-	cache.Set(tokenCacheKeyPrefix+token, email+"|"+req.GetIP(r)+"|"+returnURL, tokenTTL)
+	cache.Set(cacheKeyPrefix+nonce, string(nonceValue), tokenTTL)
+	cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), tokenTTL)
 
 	magicLinkTaskHandler := email_magic_link.NewEmailMagicLinkTask(c.app)
 	magicLinkTask, ok := magicLinkTaskHandler.(*email_magic_link.EmailMagicLinkTask)
 	if !ok {
+		c.releaseSend(email)
 		c.logError("Failed to cast email magic link task handler", nil)
 		c.sendErrorResponse(w, "Failed to send login link", http.StatusInternalServerError)
 		return
 	}
 
 	if _, err = magicLinkTask.Enqueue(nonce); err != nil {
+		c.releaseSend(email)
 		c.logError("Failed to enqueue magic link email task", err)
 		c.sendErrorResponse(w, "Failed to send login link", http.StatusInternalServerError)
 		return
 	}
 
-	c.recordSend(email)
-
-	c.logInfo(fmt.Sprintf("Magic link email task enqueued for %s", email))
+	c.logInfo("Magic link email task enqueued for " + c.sendsKey(email))
 
 	c.sendJSONResponse(w, map[string]interface{}{
 		"status":  "success",
@@ -341,19 +362,31 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 	}, http.StatusOK)
 }
 
-// canSend reports whether another link may be sent to the email within the
-// current throttle window. The quota is consumed separately via recordSend
-// after the email task has been enqueued successfully, so transient failures
-// do not eat into the user's allowance.
-func (c *loginController) canSend(email string) bool {
-	return c.sendCount(email) < magicLinkMaxSends
-}
-
-// recordSend increments the per-email send counter.
-func (c *loginController) recordSend(email string) {
+// tryAcquireSend atomically checks the per-email throttle and, when under
+// the limit, reserves one send slot. Holding counterMu across the
+// check-and-increment closes the check-then-act race between concurrent
+// requests. Callers that subsequently fail must call releaseSend.
+func (c *loginController) tryAcquireSend(email string) bool {
 	c.counterMu.Lock()
 	defer c.counterMu.Unlock()
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", c.sendCountLocked(email)+1), tokenTTL)
+	count := c.sendCountLocked(email)
+	if count >= magicLinkMaxSends {
+		return false
+	}
+	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count+1), tokenTTL)
+	return true
+}
+
+// releaseSend decrements the per-email send counter, undoing a reservation
+// made by tryAcquireSend when the send setup fails.
+func (c *loginController) releaseSend(email string) {
+	c.counterMu.Lock()
+	defer c.counterMu.Unlock()
+	count := c.sendCountLocked(email)
+	if count <= 0 {
+		return
+	}
+	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count-1), tokenTTL)
 }
 
 // sendCount returns the current per-email send count.

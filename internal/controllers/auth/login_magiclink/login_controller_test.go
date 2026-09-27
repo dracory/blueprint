@@ -102,8 +102,8 @@ func sendLink(t *testing.T, application app.AppInterface, email string) (token s
 		}
 		item := cache.Get(k)
 		stored, _ := item.Value().(string)
-		parts := strings.SplitN(stored, "|", 3)
-		if len(parts) >= 1 && parts[0] == email {
+		var value magicLinkCacheValue
+		if err := json.Unmarshal([]byte(stored), &value); err == nil && value.Email == email {
 			return strings.TrimPrefix(k, tokenCacheKeyPrefix)
 		}
 	}
