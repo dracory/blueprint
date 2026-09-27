@@ -5,6 +5,7 @@ import (
 	"project/internal/config"
 	"project/internal/controllers/auth/authentication_authknight"
 	"project/internal/controllers/auth/login_authknight"
+	"project/internal/controllers/auth/login_magiclink"
 	"project/internal/controllers/auth/login_otp"
 	"project/internal/controllers/auth/logout"
 	"project/internal/controllers/auth/register"
@@ -29,6 +30,15 @@ func Routes(application app.AppInterface) []rtr.RouteInterface {
 				SetName("Auth > Auth Controller").
 				SetPath(links.AUTH_AUTH).
 				SetHTMLHandler(authentication_authknight.NewAuthenticationController(application).Handler))
+	case config.LOGIN_METHOD_MAGICLINK:
+		magicLinkController := login_magiclink.NewLoginController(application)
+		authRoutes = append(authRoutes,
+			rtr.GetHTML(links.AUTH_LOGIN, magicLinkController.PageHandler).
+				SetName("Auth > Login Controller"),
+			rtr.PostJSON(links.AUTH_LOGIN, magicLinkController.AjaxHandler).
+				SetName("Auth > Login MagicLink Ajax Controller"),
+			rtr.GetHTML(links.AUTH_AUTH, magicLinkController.Handler).
+				SetName("Auth > MagicLink Controller"))
 	case config.LOGIN_METHOD_OTP:
 		otpController := login_otp.NewLoginController(application)
 		authRoutes = append(authRoutes,

@@ -6,7 +6,7 @@ The Blueprint authentication system implements a sophisticated privacy-first arc
 
 ## Login Methods
 
-Blueprint ships with two login mechanisms. The active method is selected by the
+Blueprint ships with three login mechanisms. The active method is selected by the
 `config.LOGIN_METHOD` constant in `internal/config/auth_config.go` — a
 compile-time, one-time developer decision (not an environment variable).
 
@@ -30,17 +30,26 @@ compile-time, one-time developer decision (not an environment variable).
 - **Registration completion** (`auth/register`) follows the same pattern:
   `GET` renders a Vue page, `POST` (JSON) exposes `action=save` (profile
   update, vault-aware) and `action=timezones` (country → timezone list).
+- **`LOGIN_METHOD_MAGICLINK`** — in-house email magic-link login. The user
+  enters their email at `GET auth/login`, a single-use IP-bound token is
+  generated and a link to `GET auth/auth?token=...` is emailed via
+  `EmailMagicLinkTask` (the queued task receives only a nonce — the token is
+  resolved from the memory cache at execution time and is never persisted in
+  the task store). The verify handler checks the IP binding **before**
+  consuming the token, so email link scanners cannot burn the link for the
+  real user. The `return` (or `back_url`) param is honoured only when it is a
+  relative path (open-redirect protection).
 - **`LOGIN_METHOD_AUTHKNIGHT`** — delegates to the external AuthKnight
   service: `auth/login` redirects to `authknight.com`, `auth/auth` exchanges
-  the `once` token for the user email. Only in this mode is the `AUTH_AUTH`
-  callback route registered. The echoed `backUrl` from the AuthKnight
-  response is re-validated (must start with the app home URL) before being
-  used as the post-login redirect.
+  the `once` token for the user email. The `AUTH_AUTH` callback route is
+  registered in this mode and in magic-link mode. The echoed `backUrl` from
+  the AuthKnight response is re-validated (must start with the app home URL)
+  before being used as the post-login redirect.
 
 An unrecognized `LOGIN_METHOD` value panics at startup in `routes.go`
 rather than silently defaulting.
 
-Both methods converge on the shared post-auth pipeline in
+All methods converge on the shared post-auth pipeline in
 `internal/controllers/auth/shared` (`SessionLogin`): find-or-create user
 (vault + blind index aware), session creation, auth cookie, redirect.
 
@@ -54,6 +63,11 @@ produces a compile error pointing at the branch to remove in
   `internal/controllers/auth/login_otp/`, `internal/tasks/email_otp/`,
   `internal/emails/user_email_otp.go`, and the `EmailOTPTask`
   registration/alias.
+- Remove magic link: set `LOGIN_METHOD` to another method, then delete
+  `internal/controllers/auth/login_magiclink/`,
+  `internal/tasks/email_magic_link/`,
+  `internal/emails/user_email_magic_link.go`, and the `EmailMagicLinkTask`
+  registration/alias.
 - Remove AuthKnight: set `LOGIN_METHOD = LOGIN_METHOD_OTP`, then delete
   `internal/controllers/auth/login_authknight/`, `internal/controllers/auth/authentication_authknight/`,
   `links.authLinks.AuthKnightLogin`, and the `AUTH_AUTH` route/constant.
@@ -64,8 +78,8 @@ produces a compile error pointing at the branch to remove in
 
 **Primary Responsibilities:**
 - Route the selected login method (`config.LOGIN_METHOD`): in-house email
-  OTP (`login_otp/`) or external AuthKnight (`login_authknight/` +
-  `authentication_authknight/` callback)
+  OTP (`login_otp/`), magic link (`login_magiclink/`), or external AuthKnight
+  (`login_authknight/` + `authentication_authknight/` callback)
 - Manage user creation and session establishment via the shared pipeline
   (`auth/shared.SessionLogin`)
 - Implement privacy-first email encryption

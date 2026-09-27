@@ -89,6 +89,10 @@ const (
 
 	// LOGIN_METHOD_OTP uses the in-house email one-time-password login.
 	LOGIN_METHOD_OTP = "otp"
+
+	// LOGIN_METHOD_MAGICLINK uses the in-house email magic-link login:
+	// the user receives a single-use, IP-bound login link by email.
+	LOGIN_METHOD_MAGICLINK = "magiclink"
 )
 
 // LOGIN_METHOD selects which login mechanism is mounted at links.AUTH_LOGIN.
