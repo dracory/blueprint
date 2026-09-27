@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/dracory/cachestore"
-	"github.com/dracory/neat"
+	"github.com/dracory/uid"
 )
 
 const FLASH_ERROR = "error"
@@ -21,7 +21,7 @@ func IsFlashRoute(r *http.Request) bool {
 
 // ToFlashURL return a flash message URL
 func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, message string, url string, seconds int) string {
-	id := neat.GenerateID()
+	id := uid.ShortID()
 
 	if cacheStore == nil {
 		fmt.Println("Flash error: cache store is nil")

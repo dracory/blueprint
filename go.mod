@@ -10,22 +10,22 @@ require (
 	github.com/dracory/auditstore v1.11.0
 	github.com/dracory/auth v0.36.0
 	github.com/dracory/base v0.42.3
-	github.com/dracory/blindindexstore v1.17.0
+	github.com/dracory/blindindexstore v1.18.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.2.0
-	github.com/dracory/blogstore v1.35.1
+	github.com/dracory/blogstore v1.35.2
 	github.com/dracory/bs v0.16.0
-	github.com/dracory/cachestore v1.9.0
+	github.com/dracory/cachestore v1.9.1
 	github.com/dracory/cdn v1.13.0
-	github.com/dracory/chatstore v1.4.0
+	github.com/dracory/chatstore v1.5.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.42.0
+	github.com/dracory/cmsstore v1.42.1
 	github.com/dracory/csrf v0.2.0
-	github.com/dracory/customstore v1.15.0
+	github.com/dracory/customstore v1.15.1
 	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
-	github.com/dracory/entitystore v1.20.0
+	github.com/dracory/entitystore v1.20.1
 	github.com/dracory/env v1.2.0
 	github.com/dracory/envenc v1.5.0
 	github.com/dracory/feedstore v1.10.2
@@ -35,7 +35,7 @@ require (
 	github.com/dracory/geostore v1.10.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
-	github.com/dracory/llm v1.5.0
+	github.com/dracory/llm v1.6.0
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.1
 	github.com/dracory/metastore v1.11.0
@@ -54,9 +54,10 @@ require (
 	github.com/dracory/taskstore v1.32.0
 	github.com/dracory/test v0.10.0
 	github.com/dracory/ui v0.17.0
+	github.com/dracory/uid v1.11.0
 	github.com/dracory/uncdn v0.9.0
-	github.com/dracory/useradmin v0.4.0
-	github.com/dracory/userstore v1.19.1-0.20260921065042-ff9e22fdfb79
+	github.com/dracory/useradmin v0.5.1
+	github.com/dracory/userstore v1.20.0
 	github.com/dracory/vaultstore v1.5.0
 	github.com/dracory/websrv v0.4.0
 	github.com/dromara/carbon/v2 v2.6.17
@@ -80,28 +81,28 @@ require (
 	atomicgo.dev/keyboard v0.2.10 // indirect
 	atomicgo.dev/schedule v0.1.0 // indirect
 	cloud.google.com/go v0.123.0 // indirect
-	cloud.google.com/go/aiplatform v1.126.0 // indirect
-	cloud.google.com/go/auth v0.23.3 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
-	cloud.google.com/go/compute/metadata v0.9.1 // indirect
-	cloud.google.com/go/iam v1.13.0 // indirect
-	cloud.google.com/go/longrunning v1.2.0 // indirect
+	cloud.google.com/go/aiplatform v1.127.0 // indirect
+	cloud.google.com/go/auth v0.24.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
+	cloud.google.com/go/compute/metadata v0.10.0 // indirect
+	cloud.google.com/go/iam v1.14.0 // indirect
+	cloud.google.com/go/longrunning v1.3.0 // indirect
 	cloud.google.com/go/vertexai v0.19.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/LumenResearch/uasurfer v0.3.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.47.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.47.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.20 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.5 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.3 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.3 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.3 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.6 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.19 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.2 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.113.4 // indirect
 	github.com/aws/smithy-go v1.28.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
@@ -115,7 +116,6 @@ require (
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.10.0 // indirect
-	github.com/dracory/uid v1.10.0 // indirect
 	github.com/dracory/versionstore v1.7.1 // indirect
 	github.com/dracory/wf v0.6.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/google/s2a-go v0.1.10 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.22 // indirect
-	github.com/googleapis/gax-go/v2 v2.25.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.26.2 // indirect
 	github.com/gookit/color v1.6.1 // indirect
 	github.com/goravel/framework v1.18.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
