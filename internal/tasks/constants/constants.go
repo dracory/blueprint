@@ -24,6 +24,9 @@ const (
 	// EmailMagicLinkTaskAlias is the alias for the magic link login email task.
 	EmailMagicLinkTaskAlias = "EmailMagicLinkTask"
 
+	// EmailPasswordResetTaskAlias is the alias for the password reset email task.
+	EmailPasswordResetTaskAlias = "EmailPasswordResetTask"
+
 	// EmailToAdminOnNewContactFormSubmittedTaskAlias is the alias for the
 	// contact form submission admin notification task.
 	EmailToAdminOnNewContactFormSubmittedTaskAlias = "email-to-admin-on-new-contact-form-submitted"

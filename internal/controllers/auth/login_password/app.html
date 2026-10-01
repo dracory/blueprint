@@ -1,0 +1,71 @@
+<div id="app" class="min-h-screen d-flex flex-column">
+    <!-- Navigation (Mini) -->
+    <nav class="navbar navbar-light bg-white border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
+                <i class="bi bi-shield-lock text-brand me-2"></i>
+                <span>{{ appName }}</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container flex-grow-1 d-flex align-items-center justify-content-center p-4">
+        <div style="max-width: 450px; width: 100%;">
+            <div class="card login-card">
+                <div class="card-header bg-light border-bottom p-5 text-center">
+                    <div class="icon-circle">
+                        <i class="bi bi-key"></i>
+                    </div>
+                    <h1 class="h3 fw-bold text-dark mb-2">Sign in to {{ appName }}</h1>
+                    <p class="text-muted mb-0">Enter your email and password to continue.</p>
+                </div>
+
+                <div class="card-body p-5">
+                    <form @submit.prevent="handleLogin">
+                        <div class="mb-4">
+                            <label for="email" class="form-label small fw-bold text-uppercase tracking-wider">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                                <input type="email" id="email" v-model="email" class="form-control border-start-0 py-3" placeholder="you@example.com" autocomplete="username" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label small fw-bold text-uppercase tracking-wider">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                                <input type="password" id="password" v-model="password" class="form-control border-start-0 py-3" placeholder="Your password" autocomplete="current-password" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-brand w-100 py-3 fw-bold shadow-sm" :disabled="isLoading">
+                            <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Sign In
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ forgotPasswordUrl }}" class="text-brand text-decoration-none small fw-bold">
+                            Forgot your password?
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ registerUrl }}" class="text-brand text-decoration-none small fw-bold d-block mb-2">
+                    Don't have an account? Register
+                </a>
+                <a href="/" class="text-brand text-decoration-none small fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top py-4 text-center mt-auto">
+        <div class="container small text-muted">
+            &copy; {{ appName }}. Secure &amp; Privacy-First.
+        </div>
+    </footer>
+</div>

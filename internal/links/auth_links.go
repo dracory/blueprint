@@ -23,6 +23,11 @@ func (l *authLinks) AuthKnightLogin(backUrl string) string {
 	return "https://authknight.com/app/login" + query(params)
 }
 
+func (l *authLinks) ForgotPassword(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	return URL(AUTH_FORGOT_PASSWORD, p)
+}
+
 func (l *authLinks) Login(backUrl string, params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 
@@ -36,6 +41,11 @@ func (l *authLinks) Login(backUrl string, params ...map[string]string) string {
 func (l *authLinks) Logout(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	return URL(AUTH_LOGOUT, p)
+}
+
+func (l *authLinks) PasswordReset(params ...map[string]string) string {
+	p := lo.FirstOr(params, map[string]string{})
+	return URL(AUTH_PASSWORD_RESET, p)
 }
 
 func (l *authLinks) Register(params ...map[string]string) string {

@@ -1,0 +1,77 @@
+<div id="app" class="min-h-screen d-flex flex-column">
+    <!-- Navigation (Mini) -->
+    <nav class="navbar navbar-light bg-white border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
+                <i class="bi bi-shield-lock text-brand me-2"></i>
+                <span>{{ appName }}</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container flex-grow-1 d-flex align-items-center justify-content-center p-4">
+        <div style="max-width: 450px; width: 100%;">
+            <div class="card login-card">
+                <div class="card-header bg-light border-bottom p-5 text-center">
+                    <div class="icon-circle">
+                        <i class="bi bi-envelope-paper"></i>
+                    </div>
+                    <h1 class="h3 fw-bold text-dark mb-2">Reset your password</h1>
+                    <p class="text-muted mb-0">We'll email you a link to choose a new password.</p>
+                </div>
+
+                <div class="card-body p-5">
+                    <!-- Step 1: Request reset link -->
+                    <div v-if="step === 1">
+                        <form @submit.prevent="handleSubmit">
+                            <div class="mb-4">
+                                <label for="email" class="form-label small fw-bold text-uppercase tracking-wider">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                                    <input type="email" id="email" v-model="email" class="form-control border-start-0 py-3" placeholder="you@example.com" autocomplete="username" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="firstName" class="form-label small fw-bold text-uppercase tracking-wider">First Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
+                                    <input type="text" id="firstName" v-model="firstName" class="form-control border-start-0 py-3" placeholder="First name on your account" autocomplete="given-name" required>
+                                </div>
+                                <p class="text-muted small mt-2 mb-0">For your security, we also verify the first name on the account.</p>
+                            </div>
+                            <button type="submit" class="btn btn-brand w-100 py-3 fw-bold shadow-sm" :disabled="isLoading">
+                                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Send Reset Link
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Step 2: Submitted -->
+                    <div v-else class="text-center">
+                        <p class="small text-muted mb-4">
+                            If the account details match, we've sent a reset link to <br>
+                            <span class="fw-bold text-dark">{{ email }}</span>
+                        </p>
+                        <a :href="loginUrl" class="btn btn-outline-secondary w-100 py-2 fw-bold">
+                            Back to Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ loginUrl }}" class="text-brand text-decoration-none small fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-top py-4 text-center mt-auto">
+        <div class="container small text-muted">
+            &copy; {{ appName }}. Secure &amp; Privacy-First.
+        </div>
+    </footer>
+</div>

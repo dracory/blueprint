@@ -76,6 +76,23 @@ func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.R
 		return "", false, MsgAccountNotFound
 	}
 
+	return SessionLoginUser(application, w, r, user, backUrl)
+}
+
+// SessionLoginUser performs the shared post-authentication pipeline for an
+// already-resolved user — unlike SessionLogin it never creates a user, so
+// it is the correct entry point for credential-based logins (e.g. email and
+// password) where the account must already exist.
+//
+// Steps: verify the account is active, create a session, set the auth
+// cookie, and calculate the post-login redirect URL.
+//
+// Returns:
+//   - redirectURL: where to send the user on success ("" on failure)
+//   - needsRegistration: true when the user must complete registration
+//   - errorMessage: user-safe error message ("" on success)
+func SessionLoginUser(application app.AppInterface, w http.ResponseWriter, r *http.Request, user userstore.UserInterface, backUrl string) (redirectURL string, needsRegistration bool, errorMessage string) {
+
 	if active := authrules.NewUserActiveRule(user); active.Fails() {
 		return "", false, MsgAccountNotActive
 	}
@@ -96,7 +113,7 @@ func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.R
 		return "", false, MsgSessionError
 	}
 
-	err = sessionStore.SessionCreate(r.Context(), session)
+	err := sessionStore.SessionCreate(r.Context(), session)
 
 	if err != nil {
 		application.GetLogger().Error("At Shared SessionLogin > Session Store Error", slog.String("error", err.Error()))
@@ -286,6 +303,86 @@ func userFindByEmailOrCreate(application app.AppInterface, ctx context.Context, 
 	}
 
 	return user, nil
+}
+
+// UserFindByEmail looks up an existing user by email without creating one.
+// It is vault-aware: when the vault store is enabled the lookup goes through
+// the email blind index, otherwise it queries the user store directly.
+//
+// When duplicate accounts exist for the same email, the record that has a
+// password set is preferred — this keeps login, forgot-password and
+// password-reset resolving to the same user record.
+//
+// Returns (nil, nil) when no user exists for the email.
+func UserFindByEmail(application app.AppInterface, ctx context.Context, email string) (userstore.UserInterface, error) {
+	if application.IsDisabledUserStore() {
+		return nil, errors.New("user store is nil")
+	}
+
+	if application.GetConfig().GetUserStoreVaultEnabled() {
+		if application.IsDisabledVaultStore() {
+			return nil, errors.New(`vault store is nil`)
+		}
+
+		recordsFound, err := application.GetBlindIndexStoreEmail().SearchValueList(ctx, blindindexstore.NewSearchValueQuery().
+			SetSearchValue(email).
+			SetSearchType(blindindexstore.SEARCH_TYPE_EQUALS))
+		if err != nil {
+			return nil, err
+		}
+
+		return findUserWithPassword(application, ctx, recordsFound)
+	}
+
+	users, err := application.GetUserStore().UserList(ctx, userstore.NewUserQuery().
+		SetEmail(email).
+		SetLimit(100))
+	if err != nil {
+		return nil, err
+	}
+	if len(users) == 0 {
+		return nil, nil
+	}
+
+	for _, user := range users {
+		if user.GetPassword() != "" {
+			return user, nil
+		}
+	}
+
+	return users[0], nil
+}
+
+// findUserWithPassword resolves blind index hits to user records and
+// returns the first one that has a password set, or the first hit
+// otherwise.
+func findUserWithPassword(application app.AppInterface, ctx context.Context, recordsFound []blindindexstore.SearchValueInterface) (userstore.UserInterface, error) {
+	var fallbackUser userstore.UserInterface
+
+	for _, record := range recordsFound {
+		user, err := application.GetUserStore().UserFindByID(ctx, record.SourceReferenceID())
+		if err != nil {
+			return nil, err
+		}
+		if user == nil {
+			continue
+		}
+		if fallbackUser == nil {
+			fallbackUser = user
+		}
+		if user.GetPassword() != "" {
+			return user, nil
+		}
+	}
+
+	return fallbackUser, nil
+}
+
+// UserCreate creates a new user with privacy-first email encryption and
+// blind indexing — an exported wrapper around userCreate for flows that
+// create accounts outside of SessionLogin (e.g. password registration).
+func UserCreate(application app.AppInterface, ctx context.Context, email string, status string) (userstore.UserInterface, error) {
+	return userCreate(application, ctx, email, status)
 }
 
 func findUserIDInBlindIndex(application app.AppInterface, ctx context.Context, email string) (userID string, err error) {

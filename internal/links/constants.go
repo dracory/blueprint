@@ -7,8 +7,10 @@ const CATCHALL = "/*"
 // ===========================================================================
 
 const AUTH_AUTH = "/auth/auth"
+const AUTH_FORGOT_PASSWORD = "/auth/forgot-password"
 const AUTH_LOGIN = "/auth/login"
 const AUTH_LOGOUT = "/auth/logout"
+const AUTH_PASSWORD_RESET = "/auth/password-reset"
 const AUTH_REGISTER = "/auth/register"
 
 // ===========================================================================

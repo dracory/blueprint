@@ -93,6 +93,11 @@ const (
 	// LOGIN_METHOD_MAGICLINK uses the in-house email magic-link login:
 	// the user receives a single-use, IP-bound login link by email.
 	LOGIN_METHOD_MAGICLINK = "magiclink"
+
+	// LOGIN_METHOD_PASSWORD uses the in-house email/password login.
+	// Requires AUTH_PASSWORD_AUTH_ENABLED=true at runtime and mounts the
+	// forgot-password and password-reset pages alongside the login page.
+	LOGIN_METHOD_PASSWORD = "password"
 )
 
 // LOGIN_METHOD selects which login mechanism is mounted at links.AUTH_LOGIN.
