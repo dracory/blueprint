@@ -20,9 +20,9 @@ import (
 	baselayouts "github.com/dracory/base/layouts"
 
 	"project/internal/app"
+	adminlayout "project/internal/controllers/admin/layout"
 	"project/internal/ext"
 	"project/internal/helpers"
-	"project/internal/layouts"
 
 	"github.com/dracory/auth"
 	"github.com/dracory/auth/types"
@@ -53,12 +53,12 @@ type LayoutOptions = struct {
 }
 
 // NewLayoutFunc returns a FuncLayout adapter that bridges the external
-// blogadmin/shopadmin FuncLayout signature to the blueprint's
-// layouts.NewAdminLayout. The same function can be passed to both
+// blogadmin/shopadmin FuncLayout signature to the admin section's
+// layout.New. The same function can be passed to both
 // blogadmin.AdminOptions.FuncLayout and shopadmin.AdminOptions.FuncLayout.
 func NewLayoutFunc(app app.AppInterface) func(w http.ResponseWriter, r *http.Request, title string, body string, options LayoutOptions) string {
 	return func(w http.ResponseWriter, r *http.Request, title string, body string, options LayoutOptions) string {
-		return layouts.NewAdminLayout(app, r, baselayouts.Options{
+		return adminlayout.New(app, r, baselayouts.Options{
 			Title:      title,
 			Content:    hb.Raw(body),
 			ScriptURLs: options.ScriptURLs,

@@ -42,7 +42,7 @@ func TestHandlerPrivateResource(t *testing.T) {
 
 	res := c.Handler(rec, req)
 
-	if res != page_not_found.PageNotFoundController().Handler(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/", nil)) {
+	if res != page_not_found.PageNotFoundController(nil).Handler(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/", nil)) {
 		t.Fatalf("expected page-not-found message, got: %q", res)
 	}
 	if rec.Code != http.StatusNotFound {
@@ -59,7 +59,7 @@ func TestHandlerMissingResource(t *testing.T) {
 
 	res := c.Handler(rec, req)
 
-	if res != page_not_found.PageNotFoundController().Handler(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/", nil)) {
+	if res != page_not_found.PageNotFoundController(nil).Handler(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/", nil)) {
 		t.Fatalf("expected page-not-found message, got: %q", res)
 	}
 	if rec.Code != http.StatusNotFound {

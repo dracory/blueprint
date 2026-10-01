@@ -9,7 +9,7 @@ import (
 
 // TestHandlerReturnsNotFound ensures the controller sets 404 and returns message
 func TestHandlerReturnsNotFound(t *testing.T) {
-	c := PageNotFoundController()
+	c := PageNotFoundController(nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/missing", nil)
 	rec := httptest.NewRecorder()
@@ -22,7 +22,7 @@ func TestHandlerReturnsNotFound(t *testing.T) {
 	}
 
 	// Verify HTML content contains key elements
-	if !strings.Contains(res, "<title>404 - Page Not Found</title>") {
+	if !strings.Contains(res, "404 - Page Not Found") {
 		t.Fatal("expected HTML response with title")
 	}
 	if !strings.Contains(res, "Oops! Page Not Found") {

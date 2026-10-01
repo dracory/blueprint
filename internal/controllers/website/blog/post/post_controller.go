@@ -365,7 +365,7 @@ func (c *postController) postCard(post blogstore.PostInterface) hb.TagInterface 
 		Text(c.truncatedSummary(post.GetSummary()))
 
 	button := hb.Hyperlink().
-		Class("btn btn-outline-dark rounded-4 mt-auto w-100 fw-black text-uppercase tracking-wider text-decoration-none").
+		Class("btn btn-outline-secondary rounded-4 mt-auto w-100 fw-black text-uppercase tracking-wider text-decoration-none").
 		Href(postURL).
 		Text("Read This Next")
 

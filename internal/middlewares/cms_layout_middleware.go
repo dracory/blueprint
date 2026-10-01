@@ -1,12 +1,13 @@
 package middlewares
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/app"
 	"project/internal/layouts"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/cmsstore"
 	"github.com/dracory/hb"
@@ -20,7 +21,7 @@ import (
 // as an "after" middleware.
 //
 // The middleware is responsible for rendering the CMS pages. It wraps the
-// original page content with the user dashboard layout, allowing the CMS
+// original page content with the page layout, allowing the CMS
 // pages to become one whole with the overall portal, which includes the
 // navigation header (with login and logout links).
 //
@@ -47,7 +48,7 @@ func NewCmsLayoutMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 				next.ServeHTTP(rec, r)
 				finalContent := rec.Body.String()
 
-				fullPage := layouts.NewUserLayout(app, r, baselayouts.Options{
+				fullPage := layouts.NewPageLayout(app, r, baselayouts.Options{
 					Title:      title,
 					Content:    hb.Raw(finalContent),
 					ScriptURLs: []string{},

@@ -1,9 +1,10 @@
 package layouts
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
@@ -49,7 +50,13 @@ func NewBlankLayout(app app.AppInterface, r *http.Request, options baselayouts.O
 
 // ToHTML generates the HTML for the guest layout
 func (layout *blankLayout) ToHTML() string {
-	layout.styleURLs = append([]string{cdn.BootstrapCss_5_3_3()}, layout.styleURLs...)
+	layout.styleURLs = append([]string{
+		cdn.BootstrapCss_5_3_3(),
+		ThemeStyleURL(ThemeName(layout.r)),
+	}, layout.styleURLs...)
+	// Bootstrap JS first so components (e.g. the theme dropdown) work and
+	// page-level scripts can rely on it.
+	layout.scriptURLs = append([]string{cdn.BootstrapJs_5_3_3()}, layout.scriptURLs...)
 	webpage := hb.Webpage().
 		SetTitle(layout.title).
 		SetFavicon(FaviconURL()).

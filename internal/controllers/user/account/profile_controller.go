@@ -1,11 +1,12 @@
 package account
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"context"
 	"log/slog"
 	"net/http"
 	"net/url"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	basesession "github.com/dracory/base/session"
 
@@ -88,7 +89,7 @@ func (controller *profileController) Handler(w http.ResponseWriter, r *http.Requ
 				Child(hb.BR()),
 		)
 
-	return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
+	return layouts.NewPageLayout(controller.app, r, baselayouts.Options{
 		Title:   "My Account",
 		Content: hb.NewDiv().Class("p-3").Child(page),
 		ScriptURLs: []string{

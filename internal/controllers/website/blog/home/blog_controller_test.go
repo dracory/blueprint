@@ -1,9 +1,9 @@
 package home
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
 	"context"
 	"errors"
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/testutils"

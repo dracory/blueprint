@@ -9,10 +9,10 @@ import (
 	"project/internal/controllers/shared/media"
 	"project/internal/controllers/shared/page_not_found"
 	"project/internal/controllers/shared/resource"
+	"project/internal/controllers/shared/theme"
 	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
 
-	"github.com/dracory/dashboard"
 	"github.com/dracory/rtr"
 )
 
@@ -45,10 +45,10 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		SetPath(links.RESOURCES).
 		SetHTMLHandler(resource.NewResourceController().Handler)
 
-	theme := rtr.NewRoute().
+	themeRoute := rtr.NewRoute().
 		SetName("Shared > Theme Controller").
 		SetPath(links.THEME).
-		SetHandler(dashboard.ThemeHandler)
+		SetHandler(theme.ThemeController)
 
 	thumbRoute := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
@@ -68,7 +68,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 	pageNotFound := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
 		SetPath("/404").
-		SetHTMLHandler(page_not_found.PageNotFoundController().Handler)
+		SetHTMLHandler(page_not_found.PageNotFoundController(app).Handler)
 
 	return []rtr.RouteInterface{
 		cdnRoute,
@@ -76,7 +76,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		flash,
 		media,
 		resources,
-		theme,
+		themeRoute,
 		thumbRoute,
 		thumbRoutePathCarchAll,
 		thumbCatchAll,

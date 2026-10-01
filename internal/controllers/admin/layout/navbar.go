@@ -1,8 +1,9 @@
-package layouts
+package layout
 
 import (
 	"net/http"
 	"project/internal/app"
+	"project/internal/layouts"
 	"project/internal/links"
 
 	basesession "github.com/dracory/base/session"
@@ -11,36 +12,36 @@ import (
 	"github.com/samber/lo"
 )
 
-// userLayoutNavbar builds the neo-brutalist navbar for the user layout.
-func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
+// navbar builds the admin navbar for the admin layout.
+func navbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 	authUser := basesession.GetAuthUser(r)
 	firstName := ""
 	if authUser != nil {
-		fn, _, _ := userDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
+		fn, _, _ := layouts.UserDisplayNames(app, r, authUser, app.GetConfig().GetVaultStoreKey())
 		firstName = fn
 	}
 
-	mainMenuItems := userLayoutMainMenuItems(authUser)
-	userMenuItems := userLayoutUserMenuItems(app, r.Context(), authUser)
+	mainMenuItems := mainMenuItems(authUser)
+	userMenuItems := userMenuItems(app, r, authUser)
 
 	// Brand link
 	brandLink := hb.Hyperlink().
-		Href(links.Website().Home()).
+		Href(links.Admin().Home()).
 		Class("navbar-brand d-flex align-items-center gap-3").
-		HTML(LogoHTML())
+		HTML(layouts.LogoHTML())
 
 	// Navbar collapse toggle for mobile
 	toggleButton := hb.Button().
 		Type("button").
 		Class("navbar-toggler").
 		Attr("data-bs-toggle", "collapse").
-		Attr("data-bs-target", "#userNavbarCollapse").
-		Attr("aria-controls", "userNavbarCollapse").
+		Attr("data-bs-target", "#adminNavbarCollapse").
+		Attr("aria-controls", "adminNavbarCollapse").
 		Attr("aria-expanded", "false").
 		Attr("aria-label", "Toggle navigation").
 		Child(hb.Span().Class("navbar-toggler-icon"))
 
-	// Main nav links (visible on desktop)
+	// Main nav links
 	var navLinks []hb.TagInterface
 	for _, item := range mainMenuItems {
 		link := hb.Hyperlink().
@@ -88,7 +89,7 @@ func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 
 	dropdownToggle := hb.Button().
 		Type("button").
-		Class("btn btn-dark rounded-4 px-3 py-2 fw-black text-uppercase tracking-wider small dropdown-toggle").
+		Class("btn btn-secondary rounded-4 px-3 py-2 fw-black text-uppercase tracking-wider small dropdown-toggle").
 		Attr("data-bs-toggle", "dropdown").
 		Attr("aria-expanded", "false").
 		HTML(`<i class="bi bi-person-circle me-2"></i>` + lo.Ternary(firstName != "", firstName, "Account"))
@@ -102,7 +103,7 @@ func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 	themeToggle := hb.Button().
 		Type("button").
 		ID("themeToggle").
-		Class("btn btn-outline-dark rounded-4 px-3 py-2 fw-black").
+		Class("btn btn-outline-secondary rounded-4 px-3 py-2 fw-black").
 		Attr("title", "Toggle theme").
 		Child(hb.I().Class("bi bi-moon").ID("themeIcon"))
 
@@ -112,6 +113,7 @@ func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 	if authUser != nil {
 		rightSideChildren = append(rightSideChildren, userDropdown)
 	}
+	rightSideChildren = append(rightSideChildren, layouts.ThemeDropdown(app, r))
 	rightSideChildren = append(rightSideChildren, themeToggle)
 
 	rightSide := hb.Div().
@@ -120,15 +122,15 @@ func userLayoutNavbar(app app.AppInterface, r *http.Request) hb.TagInterface {
 
 	// Collapsible content
 	collapse := hb.Div().
-		ID("userNavbarCollapse").
+		ID("adminNavbarCollapse").
 		Class("collapse navbar-collapse").
 		Child(rightSide)
 
 	// Full navbar
-	navbar := hb.Nav().
+	nav := hb.Nav().
 		Class("navbar navbar-expand-lg py-4").
 		Style("max-width: 1200px; margin: 0 auto; width: 100%;").
 		Child(hb.Div().Class("container").Child(brandLink).Child(toggleButton).Child(collapse))
 
-	return hb.Section().ID("SectionNavbar").Child(navbar)
+	return hb.Section().ID("SectionNavbar").Child(nav)
 }

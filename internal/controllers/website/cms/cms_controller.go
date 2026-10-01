@@ -19,7 +19,7 @@ const CMS_ENABLE_CACHE = false
 
 type cmsController struct {
 	frontend cmsFrontend.FrontendInterface
-	app app.AppInterface
+	app      app.AppInterface
 }
 
 // == CONSTRUCTOR ==============================================================

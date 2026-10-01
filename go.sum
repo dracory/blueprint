@@ -115,8 +115,6 @@ github.com/dracory/csrf v0.2.0 h1:hFPX2ge74PRA13+TnX4ZPC764sHFekrlI0SYzFByD/8=
 github.com/dracory/csrf v0.2.0/go.mod h1:Hf3dOdbrLbldFnh1DpmaXe1nUgH1fTHniEi2uBjGpKE=
 github.com/dracory/customstore v1.15.1 h1:wtsKC0/Ex8NU7uk5YAHbXA9lfwS5SqK8mQ40Kbxi+Xo=
 github.com/dracory/customstore v1.15.1/go.mod h1:LjfZTMknluhWe8qKhK8B63sow5DKkdI7EqZfIKVsFYQ=
-github.com/dracory/dashboard v1.11.0 h1:BJXfEG9litaSdDpJJ9IUBoHukh9Q3Lrif1phPkqd04M=
-github.com/dracory/dashboard v1.11.0/go.mod h1:KJYOeO8aAkXK6pHiGPyhV0siqgTghX+CBj6h3qZZ2HY=
 github.com/dracory/database v0.8.0 h1:j4MANJAmhFM7N0zCYcNg0ZD4RzIKQw7rdXy36T2JTq4=
 github.com/dracory/database v0.8.0/go.mod h1:Ye8Osgz1U0kES6alk1nkcRVFDJ+kOG9ZtHTmSm07edU=
 github.com/dracory/dataobject v1.7.0 h1:vbk1SO4sZTmOQruO8XoFSQ1jFC6AbMJ4FmF76ILMzmw=
@@ -177,8 +175,6 @@ github.com/dracory/sqlfilestore v1.10.0 h1:lvYT+eIqNv4LSqBJferHJ4LVP7thfMYGYq2x8
 github.com/dracory/sqlfilestore v1.10.0/go.mod h1:TFpM0iAOu6pA10sNPigsqNaBsXmjzs60oIorcgmPUlk=
 github.com/dracory/statsstore v1.27.0 h1:Yl5r11UdhzgLp7uJ0J96Y/3l7TWqexf5qKCQ5QAD1+0=
 github.com/dracory/statsstore v1.27.0/go.mod h1:jQb5XX0MEnzwMi97dmoVu1t5flg1ZuNVoCopkn1bLSA=
-github.com/dracory/str v0.18.0 h1:YCkim+8ydX3LvtGKHWBfNBSwBxhQ4yd9EUcU1oNKa1k=
-github.com/dracory/str v0.18.0/go.mod h1:uCrCZWzm0h8eDxckF0ydWqF1hM1Ro1kZBqhi4GOff2w=
 github.com/dracory/str v0.19.0 h1:tcQ+znPofNE+OO4mPM0QVDCOYCLkf+DMyVmUBrnoJSw=
 github.com/dracory/str v0.19.0/go.mod h1:uCrCZWzm0h8eDxckF0ydWqF1hM1Ro1kZBqhi4GOff2w=
 github.com/dracory/subscriptionstore v1.5.0 h1:1fjHT0B3g9QHi27RIYTQR1EoS/kehmxx/YhiD4QI64U=

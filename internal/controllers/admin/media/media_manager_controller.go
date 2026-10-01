@@ -1,15 +1,16 @@
 package admin
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"fmt"
 	"path/filepath"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"log"
 	"net/http"
 	"os"
 	"project/internal/app"
-	"project/internal/layouts"
+	adminlayout "project/internal/controllers/admin/layout"
 	"project/internal/links"
 	"strings"
 	"time"
@@ -84,7 +85,7 @@ func (controller *mediaManagerController) init(r *http.Request) string {
 	}
 
 	controller.funcLayout = func(content string) string {
-		return layouts.NewAdminLayout(controller.app, r, baselayouts.Options{
+		return adminlayout.New(controller.app, r, baselayouts.Options{
 			Title:   "Media Manager",
 			Content: hb.Raw(content),
 		}).ToHTML()

@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"project/internal/app"
-	"project/internal/layouts"
+	adminlayout "project/internal/controllers/admin/layout"
 	"project/internal/links"
 
 	baselayouts "github.com/dracory/base/layouts"
@@ -44,7 +44,7 @@ func NewHomeController(app app.AppInterface) *homeController {
 // == PUBLIC METHODS ===========================================================
 
 func (controller *homeController) Handler(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(controller.app, r, baselayouts.Options{
+	return adminlayout.New(controller.app, r, baselayouts.Options{
 		Title:   "Home",
 		Content: controller.view(),
 		ScriptURLs: []string{
@@ -74,7 +74,7 @@ func (c *homeController) view() *hb.Tag {
 			Child(bs.Column(12).
 				Child(c.cardDailyVisitors())))
 
-	return layouts.AdminPage(
+	return adminlayout.Page(
 		header,
 		sectionTiles,
 		sectionDailyVisitors,

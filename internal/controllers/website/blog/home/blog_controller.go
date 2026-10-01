@@ -1,8 +1,8 @@
 package home
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"context"
+	baselayouts "github.com/dracory/base/layouts"
 	"log/slog"
 	"net/http"
 	"project/internal/app"

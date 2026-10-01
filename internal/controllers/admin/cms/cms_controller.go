@@ -1,11 +1,12 @@
 package admin
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"project/internal/app"
-	"project/internal/layouts"
+	adminlayout "project/internal/controllers/admin/layout"
 	"project/internal/links"
+
+	baselayouts "github.com/dracory/base/layouts"
 
 	"github.com/dracory/base/webtheme"
 
@@ -35,7 +36,7 @@ func (controller *cmsNewController) Handler(w http.ResponseWriter, r *http.Reque
 			Scripts    []string
 			ScriptURLs []string
 		}) string {
-			return layouts.NewAdminLayout(controller.app, r, baselayouts.Options{
+			return adminlayout.New(controller.app, r, baselayouts.Options{
 				Title:      pageTitle + " | CMS (NEW)",
 				Content:    hb.Raw(pageContent),
 				ScriptURLs: options.ScriptURLs,

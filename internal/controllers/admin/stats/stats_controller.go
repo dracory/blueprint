@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/app"
+	adminlayout "project/internal/controllers/admin/layout"
 	"project/internal/helpers"
-	"project/internal/layouts"
 	"project/internal/links"
 
 	baselayouts "github.com/dracory/base/layouts"
@@ -109,7 +109,7 @@ func (a *adminLayout) SetCountryNameByIso2(f func(iso2Code string) (string, erro
 }
 
 func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
-	return layouts.NewAdminLayout(a.app, r, baselayouts.Options{
+	return adminlayout.New(a.app, r, baselayouts.Options{
 		Title:      a.title,
 		Content:    hb.Raw(a.body),
 		ScriptURLs: a.scriptURLs,

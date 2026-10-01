@@ -9,7 +9,7 @@ import (
 	"github.com/dracory/userstore"
 )
 
-// userDisplayNames returns the user's display names
+// UserDisplayNames returns the user's display names
 //
 // Business logic:
 // - if authUser is nil, it will return "n/a"
@@ -27,7 +27,7 @@ import (
 // - firstName: the user's first name
 // - lastName: the user's last name
 // - err: the error
-func userDisplayNames(
+func UserDisplayNames(
 	app app.AppInterface,
 	r *http.Request,
 	authUser userstore.UserInterface,

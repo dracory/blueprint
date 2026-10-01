@@ -1,11 +1,13 @@
 package layouts
 
 import (
-	baselayouts "github.com/dracory/base/layouts"
 	"net/http"
 	"strings"
 	"testing"
 
+	baselayouts "github.com/dracory/base/layouts"
+
+	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/hb"
@@ -20,30 +22,8 @@ func TestLogoHTML(t *testing.T) {
 	if !strings.Contains(html, "img") {
 		t.Error("LogoHTML() should contain an img tag")
 	}
-	if !strings.Contains(html, "dracory") {
-		t.Error("LogoHTML() should contain the dracory URL")
-	}
-}
-
-func TestAdminLogoHtml(t *testing.T) {
-	html := adminLogoHtml()
-
-	if html == "" {
-		t.Error("adminLogoHtml() should return non-empty HTML")
-	}
-	if !strings.Contains(html, "img") {
-		t.Error("adminLogoHtml() should contain an img tag")
-	}
-}
-
-func TestUserLogoHtml(t *testing.T) {
-	html := userLogoHtml()
-
-	if html == "" {
-		t.Error("userLogoHtml() should return non-empty HTML")
-	}
-	if !strings.Contains(html, "img") {
-		t.Error("userLogoHtml() should contain an img tag")
+	if !strings.Contains(html, "data:image/svg+xml;base64,") {
+		t.Error("LogoHTML() should embed the logo as a data URI")
 	}
 }
 
@@ -101,53 +81,6 @@ func TestOptions(t *testing.T) {
 	}
 }
 
-func TestAdminPage(t *testing.T) {
-	// Test with no elements
-	result := AdminPage()
-	if result == nil {
-		t.Fatal("AdminPage() with no elements should not return nil")
-	}
-	html := result.ToHTML()
-	if !strings.Contains(html, "container") {
-		t.Error("AdminPage() should contain container class")
-	}
-	if !strings.Contains(html, "py-4") {
-		t.Error("AdminPage() should contain py-4 class")
-	}
-
-	// Test with single element
-	element := hb.Div().Text("Test")
-	result = AdminPage(element)
-	if result == nil {
-		t.Fatal("AdminPage(element) should not return nil")
-	}
-	html = result.ToHTML()
-	if !strings.Contains(html, "Test") {
-		t.Error("AdminPage(element) should contain the element text")
-	}
-
-	// Test with multiple elements
-	element1 := hb.Div().Text("First")
-	element2 := hb.Div().Text("Second")
-	result = AdminPage(element1, element2)
-	if result == nil {
-		t.Fatal("AdminPage(elements) should not return nil")
-	}
-	html = result.ToHTML()
-	if !strings.Contains(html, "First") {
-		t.Error("AdminPage(elements) should contain the first element")
-	}
-	if !strings.Contains(html, "Second") {
-		t.Error("AdminPage(elements) should contain the second element")
-	}
-
-	// Test with nil element
-	result = AdminPage(nil)
-	if result == nil {
-		t.Fatal("AdminPage(nil) should not return nil")
-	}
-}
-
 func TestNewBlankLayout(t *testing.T) {
 	app := testutils.Setup()
 	r := &http.Request{}
@@ -190,59 +123,57 @@ func TestBreadcrumb(t *testing.T) {
 	}
 }
 
-func TestNewAdminLayout(t *testing.T) {
+func TestNewPageLayout(t *testing.T) {
 	app := testutils.Setup()
 	r := &http.Request{}
 	opts := baselayouts.Options{
-		Title:   "Admin Test",
-		Content: hb.Div().Text("Admin content"),
+		Title:   "Page Test",
+		Content: hb.Div().Text("Page content"),
 	}
 
-	layout := NewAdminLayout(app, r, opts)
+	layout := NewPageLayout(app, r, opts)
 	if layout == nil {
-		t.Fatal("NewAdminLayout() should return non-nil")
+		t.Fatal("NewPageLayout() should return non-nil")
 	}
 
 	html := layout.ToHTML()
 	if html == "" {
-		t.Error("NewAdminLayout().ToHTML() should return non-empty HTML")
+		t.Error("NewPageLayout().ToHTML() should return non-empty HTML")
 	}
-	if !strings.Contains(html, "Admin Test") {
-		t.Error("NewAdminLayout() should contain the title")
+	if !strings.Contains(html, "Page Test") {
+		t.Error("NewPageLayout() should contain the title")
+	}
+	if !strings.Contains(html, "Page content") {
+		t.Error("NewPageLayout() should contain the content")
+	}
+	if !strings.Contains(html, "SectionNavbar") {
+		t.Error("NewPageLayout() should render the default navbar")
 	}
 }
 
-func TestNewUserLayout(t *testing.T) {
-	app := testutils.Setup()
+func TestNewPageLayoutWithConfig(t *testing.T) {
+	application := testutils.Setup()
 	r := &http.Request{}
 	opts := baselayouts.Options{
-		Title:   "User Test",
-		Content: hb.Div().Text("User content"),
+		Title:   "Custom Test",
+		Content: hb.Div().Text("Custom content"),
 	}
 
-	layout := NewUserLayout(app, r, opts)
-	if layout == nil {
-		t.Fatal("NewUserLayout() should return non-nil")
-	}
+	layout := NewPageLayoutWithConfig(application, r, opts, PageLayoutConfig{
+		IsAdmin: true,
+		NavbarFn: func(app app.AppInterface, r *http.Request) hb.TagInterface {
+			return hb.Section().ID("CustomNavbar")
+		},
+	})
 
 	html := layout.ToHTML()
 	if html == "" {
-		t.Error("NewUserLayout().ToHTML() should return non-empty HTML")
+		t.Error("NewPageLayoutWithConfig().ToHTML() should return non-empty HTML")
 	}
-	if !strings.Contains(html, "User Test") {
-		t.Error("NewUserLayout() should contain the title")
+	if !strings.Contains(html, "CustomNavbar") {
+		t.Error("NewPageLayoutWithConfig() should render the custom navbar")
 	}
-}
-
-func TestNewAdminCrudLayout(t *testing.T) {
-	app := testutils.Setup()
-	r := &http.Request{}
-
-	html := NewAdminCrudLayout(app, r, "Admin CRUD Test", "<p>Admin CRUD content</p>", []string{}, "", []string{}, "")
-	if html == "" {
-		t.Error("NewAdminCrudLayout() should return non-empty HTML")
-	}
-	if !strings.Contains(html, "Admin CRUD Test") {
-		t.Error("NewAdminCrudLayout() should contain the title")
+	if strings.Contains(html, "<footer") {
+		t.Error("NewPageLayoutWithConfig() with IsAdmin should not render the public footer")
 	}
 }

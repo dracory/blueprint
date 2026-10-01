@@ -22,7 +22,6 @@ require (
 	github.com/dracory/cmsstore v1.42.1
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.15.1
-	github.com/dracory/dashboard v1.11.0
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
 	github.com/dracory/entitystore v1.20.1

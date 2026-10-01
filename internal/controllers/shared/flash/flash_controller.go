@@ -38,7 +38,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 	html := controller.pageHTML(r)
 
 	if authUser != nil && authUser.IsRegistrationCompleted() {
-		return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
+		return layouts.NewPageLayout(controller.app, r, baselayouts.Options{
 			Title:      title,
 			Content:    html,
 			ScriptURLs: []string{},
@@ -63,7 +63,7 @@ func (controller flashController) Handler(w http.ResponseWriter, r *http.Request
 			},
 		).ToHTML()
 	} else {
-		return layouts.NewUserLayout(controller.app, r, baselayouts.Options{
+		return layouts.NewPageLayout(controller.app, r, baselayouts.Options{
 			Title:   title,
 			Content: html,
 			StyleURLs: []string{

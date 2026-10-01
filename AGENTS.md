@@ -30,6 +30,8 @@
 - **internal/routes/** - Router setup using github.com/dracory/rtr
 - **internal/controllers/** - HTTP controllers (admin, auth, liveflux, user, webhook, website)
 - **internal/controllers/admin/adapters/** - Adapters bridging external blogadmin/shopadmin packages to blueprint services (admin layout, LLM factory, customer resolver)
+- **internal/controllers/admin/layout/** - Admin section layout (navbar, menus, CRUD/page helpers) wrapping the shared page scaffold
+- **internal/layouts/** - Shared page scaffold: `NewPageLayout` (auth-aware public pages), `NewBlankLayout` (chrome-less auth pages), `NewCmsLayout` (CMS-rendered pages), `MenuItem`, `UserDisplayNames`
 - **internal/middlewares/** - HTTP middlewares
 - **internal/emails/** - Email templates and sending logic
 - **internal/tasks/** - Background task definitions
@@ -38,7 +40,6 @@
 - **internal/testutils/** - Test utilities and fixtures
 - **internal/resources/** - Static resource handling
 - **internal/widgets/** - UI widget components
-- **internal/layouts/** - Layout templates
 - **internal/links/** - Link management
 - **internal/rules/** - Business rule definitions
 - **internal/ext/** - External integrations

@@ -101,7 +101,6 @@ func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares = append(globalMiddlewares,
 		middlewares.LogRequestMiddleware(app),
 		middlewares.NewSecurityHeadersMiddleware(app),
-		middlewares.ThemeMiddleware(),
 		middlewares.AuthMiddleware(app),
 		middlewares.NewStatsMiddleware(app),
 	)

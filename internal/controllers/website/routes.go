@@ -29,7 +29,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 	pageNotFoundRoute := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
 		SetPath(links.CATCHALL).
-		SetHTMLHandler(page_not_found.PageNotFoundController().Handler)
+		SetHTMLHandler(page_not_found.PageNotFoundController(app).Handler)
 
 	faviconRoute := rtr.NewRoute().
 		SetName("Website Favicon").

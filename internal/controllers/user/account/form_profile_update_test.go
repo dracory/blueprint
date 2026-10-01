@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"project/internal/app"
 	"project/internal/ext"
 	"project/internal/links"
-	"project/internal/app"
 	"project/internal/testutils"
 
 	"github.com/dracory/test"

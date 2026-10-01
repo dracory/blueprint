@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	basetestutils "github.com/dracory/base/testutils"
 	"context"
+	basetestutils "github.com/dracory/base/testutils"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/config"

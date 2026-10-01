@@ -1,51 +1,53 @@
-package layouts
+package layout
 
 import (
+	"project/internal/layouts"
 	"project/internal/links"
 
-	dashboardTypes "github.com/dracory/dashboard/types"
 	"github.com/dracory/hb"
 	"github.com/dracory/userstore"
 )
 
-func adminLayoutMainMenu(user userstore.UserInterface) []dashboardTypes.MenuItem {
+// mainMenuItems generates the main navigation items for the admin navbar.
+// The set differs for guests and authenticated users.
+func mainMenuItems(user userstore.UserInterface) []layouts.MenuItem {
 	websiteHomeLink := links.Website().Home()
 	dashboardLink := links.Admin().Home()
 	loginLink := links.Auth().Login(dashboardLink)
 	logoutLink := links.Auth().Logout()
 
-	homeMenuItem := dashboardTypes.MenuItem{
+	homeMenuItem := layouts.MenuItem{
 		Icon:  hb.I().Class("bi bi-house").Style("margin-right:10px;").ToHTML(),
 		Title: "Home",
 		URL:   websiteHomeLink,
 	}
 
-	loginMenuItem := dashboardTypes.MenuItem{
+	loginMenuItem := layouts.MenuItem{
 		Icon:  hb.I().Class("bi bi-arrow-right").Style("margin-right:10px;").ToHTML(),
 		Title: "Login",
 		URL:   loginLink,
 	}
 
-	websiteMenuItem := dashboardTypes.MenuItem{
+	websiteMenuItem := layouts.MenuItem{
 		Icon:   hb.I().Class("bi bi-globe").Style("margin-right:10px;").ToHTML(),
 		Title:  "To Website",
 		URL:    websiteHomeLink,
 		Target: "_blank",
 	}
 
-	logoutMenuItem := dashboardTypes.MenuItem{
+	logoutMenuItem := layouts.MenuItem{
 		Icon:  hb.I().Class("bi bi-arrow-right").Style("margin-right:10px;").ToHTML(),
 		Title: "Logout",
 		URL:   logoutLink,
 	}
 
-	dashboardMenuItem := dashboardTypes.MenuItem{
+	dashboardMenuItem := layouts.MenuItem{
 		Icon:  hb.I().Class("bi bi-speedometer").Style("margin-right:10px;").ToHTML(),
 		Title: "Dashboard",
 		URL:   dashboardLink,
 	}
 
-	menuItems := []dashboardTypes.MenuItem{}
+	menuItems := []layouts.MenuItem{}
 
 	if user != nil {
 		menuItems = append(menuItems, dashboardMenuItem)

@@ -1,9 +1,10 @@
-package layouts
+package layout
 
 import "github.com/dracory/hb"
 
-// AdminPage wraps admin page content with consistent spacing
-func AdminPage(elements ...hb.TagInterface) *hb.Tag {
+// Page wraps admin page content with consistent spacing.
+// Nil elements are skipped.
+func Page(elements ...hb.TagInterface) *hb.Tag {
 	wrapper := hb.Div().
 		Class("container").
 		Class("py-4")

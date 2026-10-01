@@ -6,34 +6,27 @@ import (
 	"project/internal/helpers"
 	"project/internal/links"
 
-	dashboardTypes "github.com/dracory/dashboard/types"
 	"github.com/dracory/userstore"
 )
 
-// userLayoutUserMenu generates the user menu items for the dashboard.
-//
-// Parameters:
-// - `authUser` (*models.User): The authenticated user.
-//
-// Returns:
-// - `[]dashboard.MenuItem`: The user menu items.
-func userLayoutUserMenuItems(application app.AppInterface, ctx context.Context, authUser userstore.UserInterface) []dashboardTypes.MenuItem {
-	adminDashboardMenuItem := dashboardTypes.MenuItem{
+// pageUserMenuItems generates the account dropdown items for the page navbar.
+func pageUserMenuItems(application app.AppInterface, ctx context.Context, authUser userstore.UserInterface) []MenuItem {
+	adminDashboardMenuItem := MenuItem{
 		Title: "To Admin Dashboard",
 		URL:   links.Admin().Home(),
 	}
 
-	logoutMenuItem := dashboardTypes.MenuItem{
+	logoutMenuItem := MenuItem{
 		Title: "Logout",
 		URL:   links.Auth().Logout(),
 	}
 
-	profileMenuItem := dashboardTypes.MenuItem{
+	profileMenuItem := MenuItem{
 		Title: "My Account",
 		URL:   links.User().Profile(),
 	}
 
-	items := []dashboardTypes.MenuItem{
+	items := []MenuItem{
 		profileMenuItem,
 	}
 

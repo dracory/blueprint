@@ -1,9 +1,9 @@
 package user
 
 import (
+	"project/internal/app"
 	userAccount "project/internal/controllers/user/account"
 	userHome "project/internal/controllers/user/home"
-	"project/internal/app"
 
 	"project/internal/links"
 	"project/internal/middlewares"
