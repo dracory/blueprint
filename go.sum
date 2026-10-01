@@ -179,6 +179,8 @@ github.com/dracory/statsstore v1.27.0 h1:Yl5r11UdhzgLp7uJ0J96Y/3l7TWqexf5qKCQ5QA
 github.com/dracory/statsstore v1.27.0/go.mod h1:jQb5XX0MEnzwMi97dmoVu1t5flg1ZuNVoCopkn1bLSA=
 github.com/dracory/str v0.18.0 h1:YCkim+8ydX3LvtGKHWBfNBSwBxhQ4yd9EUcU1oNKa1k=
 github.com/dracory/str v0.18.0/go.mod h1:uCrCZWzm0h8eDxckF0ydWqF1hM1Ro1kZBqhi4GOff2w=
+github.com/dracory/str v0.19.0 h1:tcQ+znPofNE+OO4mPM0QVDCOYCLkf+DMyVmUBrnoJSw=
+github.com/dracory/str v0.19.0/go.mod h1:uCrCZWzm0h8eDxckF0ydWqF1hM1Ro1kZBqhi4GOff2w=
 github.com/dracory/subscriptionstore v1.5.0 h1:1fjHT0B3g9QHi27RIYTQR1EoS/kehmxx/YhiD4QI64U=
 github.com/dracory/subscriptionstore v1.5.0/go.mod h1:HCwD7lzibbxRKo5MG2o5ZqxB2IRBeIdAEfd5MtFpKR8=
 github.com/dracory/taskstore v1.32.0 h1:OHL60qELFpxD7UCzZVZUSR2Vs0Bgp7LNFU0ERmgR7oA=

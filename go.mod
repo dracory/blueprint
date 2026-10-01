@@ -49,7 +49,7 @@ require (
 	github.com/dracory/shopstore v1.26.0
 	github.com/dracory/social v0.1.0
 	github.com/dracory/statsstore v1.27.0
-	github.com/dracory/str v0.18.0
+	github.com/dracory/str v0.19.0
 	github.com/dracory/subscriptionstore v1.5.0
 	github.com/dracory/taskstore v1.32.0
 	github.com/dracory/test v0.10.0

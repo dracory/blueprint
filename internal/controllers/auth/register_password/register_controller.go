@@ -27,7 +27,6 @@ import (
 
 	"project/internal/app"
 	"project/internal/controllers/auth/shared"
-	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
 	authrules "project/internal/rules/auth"
@@ -35,6 +34,7 @@ import (
 	baselayouts "github.com/dracory/base/layouts"
 	"github.com/dracory/cdn"
 	"github.com/dracory/hb"
+	"github.com/dracory/str"
 	"github.com/dracory/userstore"
 )
 
@@ -180,8 +180,8 @@ func (c *registerController) handleSubmit(w http.ResponseWriter, r *http.Request
 	}
 
 	// Trim inputs and strip HTML tags to prevent stored XSS
-	firstName := helpers.StripHTMLTags(strings.TrimSpace(r.FormValue("first_name")))
-	lastName := helpers.StripHTMLTags(strings.TrimSpace(r.FormValue("last_name")))
+	firstName := str.StripHTMLTags(strings.TrimSpace(r.FormValue("first_name")))
+	lastName := str.StripHTMLTags(strings.TrimSpace(r.FormValue("last_name")))
 	email := strings.TrimSpace(r.FormValue("email"))
 	password := r.FormValue("password")
 	passwordConfirm := r.FormValue("password_confirm")
