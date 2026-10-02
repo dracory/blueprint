@@ -89,7 +89,7 @@ type configImplementation struct {
 	registrationEnabled bool
 	emailsAllowedAccess []string
 	csrfSecret          string
-	loginMethod         string
+	loginMethods        []string
 
 	// i18n / Translation
 	translationLanguageDefault string
@@ -139,7 +139,7 @@ type configImplementation struct {
 // New constructs a new configuration instance.
 func New() ConfigInterface {
 	return &configImplementation{
-		loginMethod: LOGIN_METHOD_OTP,
+		loginMethods: []string{LOGIN_METHOD_OTP},
 	}
 }
 
@@ -324,7 +324,7 @@ func (c *configImplementation) setAuthConfig(s authSettings) {
 	c.registrationEnabled = s.registrationEnabled
 	c.emailsAllowedAccess = s.emailsAllowedAccess
 	c.csrfSecret = s.csrfSecret
-	c.loginMethod = s.loginMethod
+	c.loginMethods = s.loginMethods
 }
 
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
@@ -351,12 +351,28 @@ func (c *configImplementation) GetCsrfSecret() string {
 	return c.csrfSecret
 }
 
+// SetLoginMethod sets a single login method (equivalent to
+// SetLoginMethods with a one-element list). Kept for compatibility.
 func (c *configImplementation) SetLoginMethod(v string) {
-	c.loginMethod = v
+	c.loginMethods = []string{v}
 }
 
+// GetLoginMethod returns the primary login method — the first entry of
+// GetLoginMethods, or an empty string when none is configured.
 func (c *configImplementation) GetLoginMethod() string {
-	return c.loginMethod
+	if len(c.loginMethods) == 0 {
+		return ""
+	}
+	return c.loginMethods[0]
+}
+
+func (c *configImplementation) SetLoginMethods(v []string) {
+	c.loginMethods = v
+}
+
+// GetLoginMethods returns all enabled login methods, primary first.
+func (c *configImplementation) GetLoginMethods() []string {
+	return c.loginMethods
 }
 
 // ============================================================================

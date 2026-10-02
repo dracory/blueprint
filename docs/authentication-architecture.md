@@ -6,10 +6,20 @@ The Blueprint authentication system implements a sophisticated privacy-first arc
 
 ## Login Methods
 
-Blueprint ships with four login mechanisms. The active method is selected by the
-`AUTH_LOGIN_METHOD` environment variable (`internal/config/auth_config.go`),
-validated at startup — an unrecognized value panics before the app serves
-requests.
+Blueprint ships with four login mechanisms. The enabled methods are selected by
+the `AUTH_LOGIN_METHODS` environment variable — a comma-separated list parsed by
+`internal/config/auth_config.go` and validated at startup (invalid entries are
+reported via `NewFromEnv`'s aggregated error). The first entry is the **primary
+method**, rendered at `auth/login`; additional methods are mounted at
+`auth/<method>-login` and offered on the login page as "use X instead"
+alternatives. The deprecated singular `AUTH_LOGIN_METHOD` still works as a
+one-element list.
+
+**Callback paths** are per-method and mounted once, independent of
+primary/secondary position: `auth/magiclink-callback` (magic-link verification)
+and `auth/authknight-callback` (AuthKnight `next_url`). The old shared
+`auth/auth` path was removed — see Migration Notes in
+`docs/proposals/multiple-login-methods.md`.
 
 - **`LOGIN_METHOD_OTP` (default)** — in-house email one-time-password login,
   fully self-contained, no external services. Two routes share the same path:
@@ -17,7 +27,7 @@ requests.
     (`app.html`/`app.js`/`app.css` embedded, Vue + Notiflix via CDN).
   - `POST auth/login` (JSON handler) dispatches on the `action` query param:
     - `otp-send-ajax` issues a 6-digit `crypto/rand` code plus a 128-bit
-      nonce, stores `email:otp` in the memory cache under the nonce (15-min
+      nonce, stores `email:otp` in the memory cache as flat  pathsthe nonce (15-min
       TTL, max 5 verify attempts, max 3 sends per email per window), and
       enqueues `EmailOTPTask`. The queued task receives **only the nonce** —
       the plaintext code is resolved from the memory cache at execution time
@@ -33,7 +43,7 @@ requests.
   update, vault-aware) and `action=timezones` (country → timezone list).
 - **`LOGIN_METHOD_MAGICLINK`** — in-house email magic-link login. The user
   enters their email at `GET auth/login`, a single-use IP-bound token is
-  generated and a link to `GET auth/auth?token=...` is emailed via
+  generated and a link to `GET auth/magiclink-callback?token=...` is emailed via
   `EmailMagicLinkTask` (the queued task receives only a nonce — the token is
   resolved from the memory cache at execution time and is never persisted in
   the task store). The verify handler checks the IP binding **before**
@@ -41,11 +51,12 @@ requests.
   real user. The `return` (or `back_url`) param is honoured only when it is a
   relative path (open-redirect protection).
 - **`LOGIN_METHOD_AUTHKNIGHT`** — delegates to the external AuthKnight
-  service: `auth/login` redirects to `authknight.com`, `auth/auth` exchanges
-  the `once` token for the user email. The `AUTH_AUTH` callback route is
-  registered in this mode and in magic-link mode. The echoed `backUrl` from
-  the AuthKnight response is re-validated (must start with the app home URL)
-  before being used as the post-login redirect.
+  service: `auth/login` redirects to `authknight.com`, and
+  `auth/authknight-callback` exchanges the `once` token for the user email.
+  The echoed `backUrl` from the AuthKnight response is re-validated (must
+  start with the app home URL) before being used as the post-login redirect.
+  When enabled as a secondary method, the login page shows a "Sign in with
+  AuthKnight" button linking to `/auth/authknight-login`.
 
 All methods converge on the shared post-auth pipeline in
 `internal/controllers/auth/shared` (`SessionLogin`): find-or-create user
@@ -54,28 +65,35 @@ All methods converge on the shared post-auth pipeline in
 ### Removing a Method
 
 Deleting an unused method's package produces a compile error pointing at the
-branch to remove in `internal/controllers/auth/routes.go`.
+branch to remove in `internal/controllers/auth/routes.go` (`mountMethod`).
 
-- Remove OTP: set `AUTH_LOGIN_METHOD` to another method, then delete
+- Remove OTP: drop `otp` from `AUTH_LOGIN_METHODS`, then delete
   `internal/controllers/auth/login_otp/`, `internal/tasks/email_otp/`,
   `internal/emails/user_email_otp.go`, and the `EmailOTPTask`
   registration/alias.
-- Remove magic link: set `AUTH_LOGIN_METHOD` to another method, then delete
+- Remove magic link: drop `magiclink` from `AUTH_LOGIN_METHODS`, then delete
   `internal/controllers/auth/login_magiclink/`,
   `internal/tasks/email_magic_link/`,
-  `internal/emails/user_email_magic_link.go`, and the `EmailMagicLinkTask`
-  registration/alias.
-- Remove AuthKnight: set `AUTH_LOGIN_METHOD` to another method, then delete
+  `internal/emails/user_email_magic_link.go`, the `EmailMagicLinkTask`
+  registration/alias, and the `AUTH_CALLBACK_MAGICLINK` route/constant.
+- Remove AuthKnight: drop `authknight` from `AUTH_LOGIN_METHODS`, then delete
   `internal/controllers/auth/login_authknight/`, `internal/controllers/auth/authentication_authknight/`,
-  `links.authLinks.AuthKnightLogin`, and the `AUTH_AUTH` route/constant.
+  `links.authLinks.AuthKnightLogin`, and the `AUTH_CALLBACK_AUTHKNIGHT`
+  route/constant.
+
+**Registration note:** whenever `password` is among the enabled methods, the
+register page uses the password-based sign-up form — even when another method
+is primary. `AUTH_LOGIN_METHODS=otp,password` therefore registers users with
+email + password.
 
 ## Architecture Components
 
 ### 1. Authentication Controller (`internal/controllers/auth/`)
 
 **Primary Responsibilities:**
-- Route the selected login method (`AUTH_LOGIN_METHOD`): in-house email
-  OTP (`login_otp/`), magic link (`login_magiclink/`), or external AuthKnight
+- Route the enabled login methods (`AUTH_LOGIN_METHODS`): in-house email
+  OTP (`login_otp/`), magic link (`login_magiclink/`), email/password
+  (`login_password/`), or external AuthKnight
   (`login_authknight/` + `authentication_authknight/` callback)
 - Manage user creation and session establishment via the shared pipeline
   (`auth/shared.SessionLogin`)

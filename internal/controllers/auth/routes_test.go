@@ -30,8 +30,7 @@ func TestRoutesConfiguration(t *testing.T) {
 	}
 
 	// Verify login route exists with correct path.
-	// With LOGIN_METHOD_OTP (the default) the AuthKnight callback
-	// route (AUTH_AUTH) must NOT be registered.
+	// With LOGIN_METHOD_OTP (the default) no callback route is mounted.
 	foundLogin := false
 	foundLoginPost := false
 	foundLogout := false
@@ -39,8 +38,8 @@ func TestRoutesConfiguration(t *testing.T) {
 	for _, route := range routes {
 		path := route.GetPath()
 		switch path {
-		case links.AUTH_AUTH:
-			t.Error("Auth route should not be present when LOGIN_METHOD is otp")
+		case links.AUTH_CALLBACK_MAGICLINK, links.AUTH_CALLBACK_AUTHKNIGHT:
+			t.Error("Callback route should not be present when LOGIN_METHOD is otp")
 		case links.AUTH_LOGIN:
 			switch route.GetMethod() {
 			case "GET":
@@ -108,7 +107,8 @@ func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
 				{links.AUTH_LOGOUT, "*"},
 			},
 			forbidden: []routeEntry{
-				{links.AUTH_AUTH, "*"},
+				{links.AUTH_CALLBACK_MAGICLINK, "*"},
+				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
 				{links.AUTH_FORGOT_PASSWORD, "*"},
 				{links.AUTH_PASSWORD_RESET, "*"},
 			},
@@ -119,10 +119,11 @@ func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
 			expected: []routeEntry{
 				{links.AUTH_LOGIN, "GET"},
 				{links.AUTH_LOGIN, "POST"},
-				{links.AUTH_AUTH, "*"},
+				{links.AUTH_CALLBACK_MAGICLINK, "*"},
 				{links.AUTH_LOGOUT, "*"},
 			},
 			forbidden: []routeEntry{
+				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
 				{links.AUTH_FORGOT_PASSWORD, "*"},
 				{links.AUTH_PASSWORD_RESET, "*"},
 			},
@@ -140,7 +141,8 @@ func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
 				{links.AUTH_LOGOUT, "*"},
 			},
 			forbidden: []routeEntry{
-				{links.AUTH_AUTH, "*"},
+				{links.AUTH_CALLBACK_MAGICLINK, "*"},
+				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
 			},
 		},
 		{
@@ -148,11 +150,12 @@ func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
 			loginMethod: config.LOGIN_METHOD_AUTHKNIGHT,
 			expected: []routeEntry{
 				{links.AUTH_LOGIN, "GET"},
-				{links.AUTH_AUTH, "*"},
+				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
 				{links.AUTH_LOGOUT, "*"},
 			},
 			forbidden: []routeEntry{
 				{links.AUTH_LOGIN, "POST"},
+				{links.AUTH_CALLBACK_MAGICLINK, "*"},
 				{links.AUTH_FORGOT_PASSWORD, "*"},
 				{links.AUTH_PASSWORD_RESET, "*"},
 			},
@@ -193,6 +196,66 @@ func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// TestRoutesMultipleLoginMethods verifies that enabling several login
+// methods mounts the primary method at AUTH_LOGIN, secondary methods at
+// sub-paths, and each callback path exactly once.
+func TestRoutesMultipleLoginMethods(t *testing.T) {
+	t.Parallel()
+	cfg := testutils.DefaultConf()
+	cfg.SetLoginMethods([]string{config.LOGIN_METHOD_PASSWORD, config.LOGIN_METHOD_MAGICLINK})
+	app := testutils.Setup(testutils.WithCfg(cfg))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+
+	routes := Routes(app)
+
+	expected := []routeEntry{
+		{links.AUTH_LOGIN, "GET"}, // primary: password
+		{links.AUTH_LOGIN, "POST"},
+		{links.AUTH_LOGIN_MAGICLINK, "GET"}, // secondary
+		{links.AUTH_LOGIN_MAGICLINK, "POST"},
+		{links.AUTH_CALLBACK_MAGICLINK, "*"}, // callback mounted once
+		{links.AUTH_FORGOT_PASSWORD, "GET"},  // password enabled
+		{links.AUTH_PASSWORD_RESET, "GET"},
+		{links.AUTH_LOGOUT, "*"},
+	}
+	forbidden := []routeEntry{
+		{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
+	}
+
+	for _, want := range expected {
+		found := false
+		for _, route := range routes {
+			if routeMatches(route, want) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expected route %s %s not mounted", want.method, want.path)
+		}
+	}
+	for _, ban := range forbidden {
+		for _, route := range routes {
+			if routeMatches(route, ban) {
+				t.Errorf("unexpected route %s %s mounted", ban.method, ban.path)
+			}
+		}
+	}
+
+	// Route names must be unique across the table
+	names := map[string]int{}
+	for _, route := range routes {
+		names[route.GetName()]++
+	}
+	for name, count := range names {
+		if count > 1 {
+			t.Errorf("route name %q mounted %d times", name, count)
+		}
 	}
 }
 
@@ -267,8 +330,8 @@ func TestRoutesWithRegistrationDisabled(t *testing.T) {
 	// Verify register route is NOT included
 	for _, route := range routes {
 		switch route.GetPath() {
-		case links.AUTH_AUTH:
-			t.Error("Auth route should not be present when LOGIN_METHOD is otp")
+		case links.AUTH_CALLBACK_MAGICLINK, links.AUTH_CALLBACK_AUTHKNIGHT:
+			t.Error("Callback route should not be present when LOGIN_METHOD is otp")
 		case links.AUTH_LOGIN:
 			foundLogin = true
 		case links.AUTH_LOGOUT:

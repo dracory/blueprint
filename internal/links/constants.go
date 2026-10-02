@@ -6,9 +6,24 @@ const CATCHALL = "/*"
 // == AUTH LINKS
 // ===========================================================================
 
-const AUTH_AUTH = "/auth/auth"
+// AUTH_CALLBACK_AUTHKNIGHT is the AuthKnight verification callback
+// (next_url). Replaces the ambiguous shared AUTH_AUTH path.
+const AUTH_CALLBACK_AUTHKNIGHT = "/auth/authknight-callback"
+
+// AUTH_CALLBACK_MAGICLINK is the magic-link verification callback.
+// Replaces the ambiguous shared AUTH_AUTH path.
+const AUTH_CALLBACK_MAGICLINK = "/auth/magiclink-callback"
+
 const AUTH_FORGOT_PASSWORD = "/auth/forgot-password"
 const AUTH_LOGIN = "/auth/login"
+
+// Secondary login pages: mounted when a method is enabled via
+// AUTH_LOGIN_METHODS but is not the primary method (the primary method
+// always serves AUTH_LOGIN itself).
+const AUTH_LOGIN_AUTHKNIGHT = "/auth/authknight-login"
+const AUTH_LOGIN_MAGICLINK = "/auth/magiclink-login"
+const AUTH_LOGIN_OTP = "/auth/otp-login"
+const AUTH_LOGIN_PASSWORD = "/auth/password-login"
 const AUTH_LOGOUT = "/auth/logout"
 const AUTH_PASSWORD_RESET = "/auth/password-reset"
 const AUTH_REGISTER = "/auth/register"

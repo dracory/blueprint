@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"project/internal/app"
+	"project/internal/config"
 	"project/internal/controllers/auth/shared"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -53,11 +54,19 @@ var dummyPasswordUser = func() userstore.UserInterface {
 }()
 
 type loginController struct {
-	app app.AppInterface
+	app      app.AppInterface
+	basePath string
 }
 
 func NewLoginController(application app.AppInterface) *loginController {
-	return &loginController{app: application}
+	return &loginController{app: application, basePath: links.AUTH_LOGIN}
+}
+
+// SetBasePath sets the path this controller is mounted at. Secondary
+// login methods are mounted at /auth/<method>-login so the ajax URL
+// rendered into the page must point at the same path.
+func (c *loginController) SetBasePath(basePath string) {
+	c.basePath = basePath
 }
 
 // PageHandler renders the login page. Registered via rtr.GetHTML.
@@ -86,7 +95,7 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		}
 	}
 
-	loginAjaxURL := links.AUTH_LOGIN + "?action=password-login-ajax"
+	loginAjaxURL := c.basePath + "?action=password-login-ajax"
 
 	// Optional post-login redirect target. Both `return` (OTP convention)
 	// and `back_url` (links.Auth().Login convention) are accepted. Only
@@ -114,6 +123,8 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ registerUrl }}", registerURL)
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ forgotPasswordUrl }}", links.Auth().ForgotPassword())
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
+		config.LOGIN_METHOD_PASSWORD, c.loginMethods()))
 
 	script := `
 	const LOGIN_AJAX_URL = "` + loginAjaxURL + `";
@@ -140,6 +151,15 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		},
 	})
 	return layout.ToHTML()
+}
+
+// loginMethods returns the enabled login methods from config, or nil
+// when the app/config is unavailable (e.g. in tests).
+func (c *loginController) loginMethods() []string {
+	if c.app == nil || c.app.GetConfig() == nil {
+		return nil
+	}
+	return c.app.GetConfig().GetLoginMethods()
 }
 
 // checkStores verifies the stores required by the password login flow are

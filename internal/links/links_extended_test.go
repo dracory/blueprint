@@ -597,8 +597,23 @@ func TestConstants(t *testing.T) {
 	}
 
 	// Auth constants
-	if AUTH_AUTH != "/auth/auth" {
-		t.Error("AUTH_AUTH constant incorrect")
+	if AUTH_CALLBACK_MAGICLINK != "/auth/magiclink-callback" {
+		t.Error("AUTH_CALLBACK_MAGICLINK constant incorrect")
+	}
+	if AUTH_CALLBACK_AUTHKNIGHT != "/auth/authknight-callback" {
+		t.Error("AUTH_CALLBACK_AUTHKNIGHT constant incorrect")
+	}
+	if AUTH_LOGIN_MAGICLINK != "/auth/magiclink-login" {
+		t.Error("AUTH_LOGIN_MAGICLINK constant incorrect")
+	}
+	if AUTH_LOGIN_OTP != "/auth/otp-login" {
+		t.Error("AUTH_LOGIN_OTP constant incorrect")
+	}
+	if AUTH_LOGIN_PASSWORD != "/auth/password-login" {
+		t.Error("AUTH_LOGIN_PASSWORD constant incorrect")
+	}
+	if AUTH_LOGIN_AUTHKNIGHT != "/auth/authknight-login" {
+		t.Error("AUTH_LOGIN_AUTHKNIGHT constant incorrect")
 	}
 	if AUTH_LOGIN != "/auth/login" {
 		t.Error("AUTH_LOGIN constant incorrect")

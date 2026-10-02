@@ -19,12 +19,12 @@ Allow projects to configure one or more in-house login methods (`otp`, `magiclin
 1. **Plural env var `AUTH_LOGIN_METHODS`** — comma-separated list (e.g. `password,magiclink`), parsed with `env.GetArrayLower` (env ≥ v1.4.0 splits on `,`/`;`, trims, drops empty entries, and lowercases; also accepts a JSON array). Every entry is validated against the `LOGIN_METHOD_*` constants; unknown values are collected via the `envValidator` and returned as an aggregated error from `NewFromEnv` (see decision #10).
 2. **First entry is the primary method** — it renders the main form at `AUTH_LOGIN`. Secondary methods are rendered as "alternative" links/buttons on the login page, matching the "OR — Use magic link instead" pattern.
 3. **`AUTH_LOGIN_METHOD` (singular) stays supported** — treated as a one-element list, so existing deployments and `.env` files continue to work. If both vars are set, the plural var wins and a deprecation warning is logged via `slog.Warn`.
-4. **Secondary methods get their own sub-paths** — `/auth/login/magiclink`, `/auth/login/otp`, `/auth/login/password`. The primary method always owns the bare `/auth/login` path. This keeps each method's controller, handler signatures, and tests untouched.
+4. **Secondary methods get their own flat paths** — `/auth/magiclink-login`, `/auth/otp-login`, `/auth/password-login`, `/auth/authknight-login`. The primary method always owns the bare `/auth/login` path. This keeps each method's controller, handler signatures, and tests untouched.
 5. **Feature-flag checks become membership checks** — `loginMethod == config.LOGIN_METHOD_PASSWORD` becomes `slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD)` for:
    - Mounting forgot-password/password-reset routes (`passwordRecoveryRoutes`)
    - Selecting the register controller (see Registration below)
-6. **Each method gets a dedicated callback path under `/auth/callback/`** — `/auth/auth` is currently shared ambiguously by `magiclink` and `authknight`, which is unclear and produces a duplicate-path conflict when both are enabled. Move every callback-bearing method to a self-documenting path: `magiclink` → `links.AUTH_CALLBACK_MAGICLINK` (`/auth/callback/magiclink`), `authknight` → `links.AUTH_CALLBACK_AUTHKNIGHT` (`/auth/callback/authknight`), with `links.Auth().AuthKnightLogin` pointing `next_url` at the latter. `otp` and `password` have no callback — nothing changes for them. `links.AUTH_AUTH` is removed (see Breaking Changes): the shared constant was the ambiguity. This is an intentional breaking change — existing AuthKnight app configurations must be updated to `/auth/callback/authknight`, and magic-link emails sent before upgrade will 404 (tokens are short-lived, so impact is minimal).
-7. **Callbacks mount once per method, outside the login-page loop** — `/auth/callback/magiclink` mounts iff `slices.Contains(loginMethods, LOGIN_METHOD_MAGICLINK)`; `/auth/callback/authknight` mounts iff `slices.Contains(loginMethods, LOGIN_METHOD_AUTHKNIGHT)`; independent of whether the method is primary or secondary. This removes the need for an authknight exclusivity guard — combining it with other methods is legal in v1. As a secondary method authknight appears on the login page as a "Sign in with AuthKnight" button linking to `/auth/login/authknight`, which redirects to the external service.
+6. **Each method gets a dedicated callback path as flat `/auth/<method>-callback` paths** — `/auth/auth` is currently shared ambiguously by `magiclink` and `authknight`, which is unclear and produces a duplicate-path conflict when both are enabled. Move every callback-bearing method to a self-documenting path: `magiclink` → `links.AUTH_CALLBACK_MAGICLINK` (`/auth/magiclink-callback`), `authknight` → `links.AUTH_CALLBACK_AUTHKNIGHT` (`/auth/authknight-callback`), with `links.Auth().AuthKnightLogin` pointing `next_url` at the latter. `otp` and `password` have no callback — nothing changes for them. `links.AUTH_AUTH` is removed (see Breaking Changes): the shared constant was the ambiguity. This is an intentional breaking change — existing AuthKnight app configurations must be updated to `/auth/authknight-callback`, and magic-link emails sent before upgrade will 404 (tokens are short-lived, so impact is minimal).
+7. **Callbacks mount once per method, outside the login-page loop** — `/auth/magiclink-callback` mounts iff `slices.Contains(loginMethods, LOGIN_METHOD_MAGICLINK)`; `/auth/authknight-callback` mounts iff `slices.Contains(loginMethods, LOGIN_METHOD_AUTHKNIGHT)`; independent of whether the method is primary or secondary. This removes the need for an authknight exclusivity guard — combining it with other methods is legal in v1. As a secondary method authknight appears on the login page as a "Sign in with AuthKnight" button linking to `/auth/authknight-login`, which redirects to the external service.
 8. **Unique route names** — names must be unique across the whole route table. The primary method's GET route keeps the canonical name `"Auth > Login Controller"` so reverse-URL lookups and existing tests keep working; secondary routes get suffixed names (`"Auth > Login Controller (alt)"`, `"Auth > Login MagicLink Ajax Controller (alt)"`).
 9. **Shared session login stays unchanged** — all methods converge on `shared/session_login.go` to create the session; multiple methods only change how the user proves identity, not what happens after.
 10. **Config errors are collected, not panicked** — `authConfig()` switches from `panic("FATAL: ...")` to the `envValidator` pattern already used by `appConfig(v)`, `databaseConfig(v)`, `storesConfig(v)`, and `llmConfig(v)`: signature becomes `authConfig(v *envValidator)`, validation failures go through `v.Add(...)`, and `NewFromEnv` returns the aggregated `v.Err()` at the end. This reports *all* config problems in one boot failure instead of forcing a fix-restart-repeat cycle. The existing `authConfig()` panics (invalid method, missing CSRF secret) are converted to `v.Add()` as part of this change since the signature must change anyway. The `default:` panic in `mountMethod` stays — that's a programming error (unreachable after config validation), not a config error.
@@ -44,7 +44,7 @@ func authConfig(v *envValidator) authSettings {
     // List of in-house login mechanisms (comma/semicolon-separated, or a
     // JSON array). The first entry is the primary method rendered at
     // links.AUTH_LOGIN; the rest are offered as alternatives on the login
-    // page at /auth/login/<method>.
+    // page at /auth/<method>-login.
     // Valid values: otp (default), magiclink, password, authknight.
     // env.GetArrayLower splits on ','/';', trims, drops empties, and lowercases.
     loginMethods := env.GetArrayLower(KEY_AUTH_LOGIN_METHODS)
@@ -92,8 +92,8 @@ Add `KEY_AUTH_LOGIN_METHODS = "AUTH_LOGIN_METHODS"`; keep `KEY_AUTH_LOGIN_METHOD
 Add dedicated per-method callback constants; remove the ambiguous shared one:
 
 ```go
-const AUTH_CALLBACK_MAGICLINK = "/auth/callback/magiclink"   // replaces AUTH_AUTH = "/auth/auth"
-const AUTH_CALLBACK_AUTHKNIGHT = "/auth/callback/authknight"
+const AUTH_CALLBACK_MAGICLINK = "/auth/magiclink-callback"   // replaces AUTH_AUTH = "/auth/auth"
+const AUTH_CALLBACK_AUTHKNIGHT = "/auth/authknight-callback"
 ```
 
 ```go
@@ -211,7 +211,7 @@ var loginMethodLabels = map[string]string{
 }
 ```
 
-Secondary methods link to `/auth/login/<method>`. Since the generated markup is injected into templates as trusted HTML (via `strings.ReplaceAll` on the placeholder), the helper must escape nothing itself but also must never embed dynamic/user values.
+Secondary methods link to `/auth/<method>-login`. Since the generated markup is injected into templates as trusted HTML (via `strings.ReplaceAll` on the placeholder), the helper must escape nothing itself but also must never embed dynamic/user values.
 
 ### Registration
 
@@ -230,10 +230,10 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 ## Method Interactions
 
 - **Identity is shared.** All methods authenticate the same user record; a user who registered with a password can log in via magic link (and keeps their password for next time).
-- **Magic link callback.** `/auth/callback/magiclink` is mounted exactly once if `magiclink` is anywhere in the list.
-- **AuthKnight callback.** `/auth/callback/authknight` is mounted exactly once if `authknight` is anywhere in the list. `links.Auth().AuthKnightLogin` generates the new callback URL automatically. Existing AuthKnight-only deployments that previously pinned the callback to `/auth/auth` must update their AuthKnight app configuration to `/auth/callback/authknight` when upgrading.
+- **Magic link callback.** `/auth/magiclink-callback` is mounted exactly once if `magiclink` is anywhere in the list.
+- **AuthKnight callback.** `/auth/authknight-callback` is mounted exactly once if `authknight` is anywhere in the list. `links.Auth().AuthKnightLogin` generates the new callback URL automatically. Existing AuthKnight-only deployments that previously pinned the callback to `/auth/auth` must update their AuthKnight app configuration to `/auth/authknight-callback` when upgrading.
 - **Password recovery.** `/auth/forgot-password` and `/auth/password-reset` are mounted whenever `password` is enabled.
-- **Rate limiting.** All login sub-paths inherit the existing 5 req/min IP rate limit. Note: email security scanners that pre-fetch `/auth/callback/magiclink` links will consume rate-limit quota; the token itself is safe because the magic-link controller validates IP binding before consuming it. If this proves problematic in practice, exempt `AUTH_CALLBACK_MAGICLINK` from the auth rate limiter or give it a more permissive bucket — defer to post-implementation observation.
+- **Rate limiting.** All login sub-paths inherit the existing 5 req/min IP rate limit. Note: email security scanners that pre-fetch `/auth/magiclink-callback` links will consume rate-limit quota; the token itself is safe because the magic-link controller validates IP binding before consuming it. If this proves problematic in practice, exempt `AUTH_CALLBACK_MAGICLINK` from the auth rate limiter or give it a more permissive bucket — defer to post-implementation observation.
 
 ## Files to Create/Modify
 
@@ -245,7 +245,7 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 | `internal/config/config_implementation.go` | Modify | Pass `v` to `authConfig`; implement new getters; `GetLoginMethod` returns primary |
 | `internal/links/constants.go` | Modify | Add `AUTH_CALLBACK_MAGICLINK`, `AUTH_CALLBACK_AUTHKNIGHT`; remove `AUTH_AUTH` |
 | `internal/links/auth_links.go` | Modify | `Auth()` binds to `AUTH_CALLBACK_MAGICLINK`; `AuthKnightLogin` points `next_url` at `AUTH_CALLBACK_AUTHKNIGHT` |
-| `internal/links/links_extended_test.go` | Modify | Update constant assertions for the new callback constants; `AuthKnightLogin` `next_url` contains `/auth/callback/authknight` |
+| `internal/links/links_extended_test.go` | Modify | Update constant assertions for the new callback constants; `AuthKnightLogin` `next_url` contains `/auth/authknight-callback` |
 | `internal/controllers/auth/login_magiclink/login_controller.go` | Modify | Doc comments reference `AUTH_CALLBACK_MAGICLINK`; render alternatives |
 | `internal/tasks/email_magic_link/email_magic_link_task.go` | Modify | Generated email link uses `AUTH_CALLBACK_MAGICLINK` |
 | `internal/controllers/auth/routes.go` | Modify | `mountMethod` helper, sub-path mounting, unique route names, per-method callbacks mounted once, membership checks |
@@ -266,13 +266,13 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 - `AUTH_LOGIN_METHOD` continues to work unchanged (one-element list); deprecation warning only fires when both vars are set.
 - `GetLoginMethod()` keeps returning a single string (the primary method), so existing callers don't break.
 - With a single configured method, routes, URLs, route names, and page output are identical to today (`{{ alternatives }}` is replaced with empty string).
-- Two deliberate single-method breaking changes: the magic-link callback moves `/auth/auth` → `/auth/callback/magiclink`, and the AuthKnight callback moves `/auth/auth` → `/auth/callback/authknight`. `links.AUTH_AUTH` is removed — downstream projects referencing it must switch to the new constants.
+- Two deliberate single-method breaking changes: the magic-link callback moves `/auth/auth` → `/auth/magiclink-callback`, and the AuthKnight callback moves `/auth/auth` → `/auth/authknight-callback`. `links.AUTH_AUTH` is removed — downstream projects referencing it must switch to the new constants.
 
 ### Migration Notes
 
 **Magic-link emails.** Links sent before upgrade still point at `/auth/auth`, which will no longer be mounted (404). Tokens are single-use and short-lived, so impact is limited to links sent within the token TTL window before deploy. Users can simply request a new link.
 
-**AuthKnight callback URL.** AuthKnight deployments that configured the AuthKnight service to redirect to `/auth/auth` after login must update the callback URL in the AuthKnight app dashboard to `/auth/callback/authknight`. The old path no longer exists.
+**AuthKnight callback URL.** AuthKnight deployments that configured the AuthKnight service to redirect to `/auth/auth` after login must update the callback URL in the AuthKnight app dashboard to `/auth/authknight-callback`. The old path no longer exists.
 
 ## Open Questions
 
@@ -282,15 +282,15 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 ## Testing
 
 - Config: list parsing, dedupe, order preservation, invalid entries surface in `NewFromEnv`'s aggregated error, both-vars deprecation warning, legacy singular fallback, all existing `authConfig` panics now return errors.
-- Routes: each secondary method reachable at `/auth/login/<method>`; `/auth/callback/magiclink` mounted exactly once when `magiclink` present (primary or secondary); `/auth/callback/authknight` mounted exactly once when `authknight` present; `/auth/auth` no longer mounted; `authknight,magiclink` combination produces no path conflicts; password recovery mounted when `password` is secondary; all route names unique; canonical `"Auth > Login Controller"` name preserved for primary.
+- Routes: each secondary method reachable at `/auth/<method>-login`; `/auth/magiclink-callback` mounted exactly once when `magiclink` present (primary or secondary); `/auth/authknight-callback` mounted exactly once when `authknight` present; `/auth/auth` no longer mounted; `authknight,magiclink` combination produces no path conflicts; password recovery mounted when `password` is secondary; all route names unique; canonical `"Auth > Login Controller"` name preserved for primary.
 - Login pages: alternatives section shown iff >1 method; empty placeholder when single method; links point at correct sub-paths.
-- End-to-end: `AUTH_LOGIN_METHODS=password,magiclink` — sign in with password at `/auth/login`, sign in via magic link at `/auth/login/magiclink`, both land on the same session via `shared/session_login.go`.
+- End-to-end: `AUTH_LOGIN_METHODS=password,magiclink` — sign in with password at `/auth/login`, sign in via magic link at `/auth/magiclink-login`, both land on the same session via `shared/session_login.go`.
 
 ## Verification
 
 - `go test ./internal/config/...` and `go test ./internal/controllers/auth/...` pass
 - `AUTH_LOGIN_METHOD=password` produces identical route table and HTML as before
 - `AUTH_LOGIN_METHODS=password,magiclink` serves both methods; login page shows "Use magic link instead"
-- `AUTH_LOGIN_METHODS=password,authknight` serves both methods; login page shows "Sign in with AuthKnight"; AuthKnight redirect targets `/auth/callback/authknight`
-- `AUTH_LOGIN_METHOD=authknight` verifies the callback at `/auth/callback/authknight` (not `/auth/auth` as before)
-- `AUTH_LOGIN_METHOD=magiclink` verifies the callback at `/auth/callback/magiclink` (not `/auth/auth` as before)
+- `AUTH_LOGIN_METHODS=password,authknight` serves both methods; login page shows "Sign in with AuthKnight"; AuthKnight redirect targets `/auth/authknight-callback`
+- `AUTH_LOGIN_METHOD=authknight` verifies the callback at `/auth/authknight-callback` (not `/auth/auth` as before)
+- `AUTH_LOGIN_METHOD=magiclink` verifies the callback at `/auth/magiclink-callback` (not `/auth/auth` as before)

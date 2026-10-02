@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"slices"
+
 	"project/internal/app"
 	"project/internal/config"
 	"project/internal/controllers/auth/authentication_authknight"
@@ -20,14 +22,27 @@ import (
 )
 
 func Routes(application app.AppInterface) []rtr.RouteInterface {
-	loginMethod := application.GetConfig().GetLoginMethod()
+	loginMethods := application.GetConfig().GetLoginMethods()
 
-	authRoutes := loginRoutes(application, loginMethod)
+	authRoutes := loginRoutes(application, loginMethods)
 
-	// The forgot/reset password pages only exist for the password login
-	// method — the passwordless methods have no password to recover, so no
-	// dead routes are mounted.
-	if loginMethod == config.LOGIN_METHOD_PASSWORD {
+	// Verification callbacks mount once per callback-bearing method,
+	// independent of whether the method is primary or secondary.
+	if slices.Contains(loginMethods, config.LOGIN_METHOD_MAGICLINK) {
+		authRoutes = append(authRoutes,
+			rtr.GetHTML(links.AUTH_CALLBACK_MAGICLINK, login_magiclink.NewLoginController(application).Handler).
+				SetName("Auth > MagicLink Controller"))
+	}
+	if slices.Contains(loginMethods, config.LOGIN_METHOD_AUTHKNIGHT) {
+		authRoutes = append(authRoutes,
+			rtr.GetHTML(links.AUTH_CALLBACK_AUTHKNIGHT, authentication_authknight.NewAuthenticationController(application).Handler).
+				SetName("Auth > AuthKnight Controller"))
+	}
+
+	// The forgot/reset password pages exist whenever password auth is
+	// enabled — the passwordless methods have no password to recover,
+	// so no dead routes are mounted.
+	if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 		authRoutes = append(authRoutes, passwordRecoveryRoutes(application)...)
 	}
 
@@ -47,54 +62,84 @@ func Routes(application app.AppInterface) []rtr.RouteInterface {
 		SetHTMLHandler(logout.NewLogoutController(application).AnyIndex))
 
 	if application.GetConfig().GetRegistrationEnabled() {
-		routes = append(routes, registerRoutes(application, loginMethod)...)
+		routes = append(routes, registerRoutes(application, loginMethods)...)
 	}
 
 	return routes
 }
 
-// loginRoutes mounts the login controller selected by AUTH_LOGIN_METHOD.
-// In OTP mode the AuthKnight callback route is omitted entirely so no
-// dead external dependency remains.
-func loginRoutes(application app.AppInterface, loginMethod string) []rtr.RouteInterface {
-	switch loginMethod {
-	case config.LOGIN_METHOD_AUTHKNIGHT:
-		return []rtr.RouteInterface{
-			rtr.GetHTML(links.AUTH_LOGIN, login_authknight.NewLoginController(application).Handler).
-				SetName("Auth > Login Controller"),
-			rtr.NewRoute().
-				SetName("Auth > Auth Controller").
-				SetPath(links.AUTH_AUTH).
-				SetHTMLHandler(authentication_authknight.NewAuthenticationController(application).Handler),
-		}
+// loginRoutes mounts every enabled login method. The primary method
+// (methods[0]) is mounted at links.AUTH_LOGIN; secondary methods get
+// their own paths (/auth/<method>-login).
+func loginRoutes(application app.AppInterface, loginMethods []string) []rtr.RouteInterface {
+	routes := mountMethod(application, loginMethods[0], true)
+	for _, method := range loginMethods[1:] {
+		routes = append(routes, mountMethod(application, method, false)...)
+	}
+	return routes
+}
+
+// mountMethod mounts the GET page + POST ajax routes for one login
+// method. primary=true mounts at links.AUTH_LOGIN with the canonical
+// "Auth > Login Controller" route name; secondary methods mount at their
+// dedicated paths with a " (alt)" name suffix so names stay unique.
+func mountMethod(application app.AppInterface, method string, primary bool) []rtr.RouteInterface {
+	suffix := ""
+	if !primary {
+		suffix = " (alt)"
+	}
+
+	switch method {
 	case config.LOGIN_METHOD_MAGICLINK:
-		magicLinkController := login_magiclink.NewLoginController(application)
+		basePath := links.AUTH_LOGIN
+		if !primary {
+			basePath = links.AUTH_LOGIN_MAGICLINK
+		}
+		controller := login_magiclink.NewLoginController(application)
+		controller.SetBasePath(basePath)
 		return []rtr.RouteInterface{
-			rtr.GetHTML(links.AUTH_LOGIN, magicLinkController.PageHandler).
-				SetName("Auth > Login Controller"),
-			rtr.PostJSON(links.AUTH_LOGIN, magicLinkController.AjaxHandler).
-				SetName("Auth > Login MagicLink Ajax Controller"),
-			rtr.GetHTML(links.AUTH_AUTH, magicLinkController.Handler).
-				SetName("Auth > MagicLink Controller"),
+			rtr.GetHTML(basePath, controller.PageHandler).
+				SetName("Auth > Login Controller" + suffix),
+			rtr.PostJSON(basePath, controller.AjaxHandler).
+				SetName("Auth > Login MagicLink Ajax Controller" + suffix),
 		}
 	case config.LOGIN_METHOD_OTP:
-		otpController := login_otp.NewLoginController(application)
+		basePath := links.AUTH_LOGIN
+		if !primary {
+			basePath = links.AUTH_LOGIN_OTP
+		}
+		controller := login_otp.NewLoginController(application)
+		controller.SetBasePath(basePath)
 		return []rtr.RouteInterface{
-			rtr.GetHTML(links.AUTH_LOGIN, otpController.PageHandler).
-				SetName("Auth > Login Controller"),
-			rtr.PostJSON(links.AUTH_LOGIN, otpController.AjaxHandler).
-				SetName("Auth > Login OTP Ajax Controller"),
+			rtr.GetHTML(basePath, controller.PageHandler).
+				SetName("Auth > Login Controller" + suffix),
+			rtr.PostJSON(basePath, controller.AjaxHandler).
+				SetName("Auth > Login OTP Ajax Controller" + suffix),
 		}
 	case config.LOGIN_METHOD_PASSWORD:
-		passwordController := login_password.NewLoginController(application)
+		basePath := links.AUTH_LOGIN
+		if !primary {
+			basePath = links.AUTH_LOGIN_PASSWORD
+		}
+		controller := login_password.NewLoginController(application)
+		controller.SetBasePath(basePath)
 		return []rtr.RouteInterface{
-			rtr.GetHTML(links.AUTH_LOGIN, passwordController.PageHandler).
-				SetName("Auth > Login Controller"),
-			rtr.PostJSON(links.AUTH_LOGIN, passwordController.AjaxHandler).
-				SetName("Auth > Login Password Ajax Controller"),
+			rtr.GetHTML(basePath, controller.PageHandler).
+				SetName("Auth > Login Controller" + suffix),
+			rtr.PostJSON(basePath, controller.AjaxHandler).
+				SetName("Auth > Login Password Ajax Controller" + suffix),
+		}
+	case config.LOGIN_METHOD_AUTHKNIGHT:
+		basePath := links.AUTH_LOGIN
+		if !primary {
+			basePath = links.AUTH_LOGIN_AUTHKNIGHT
+		}
+		return []rtr.RouteInterface{
+			rtr.GetHTML(basePath, login_authknight.NewLoginController(application).Handler).
+				SetName("Auth > Login Controller" + suffix),
 		}
 	default:
-		panic("invalid login method: " + loginMethod)
+		panic("invalid login method: " + method)
 	}
 }
 
@@ -115,14 +160,14 @@ func passwordRecoveryRoutes(application app.AppInterface) []rtr.RouteInterface {
 	}
 }
 
-// registerRoutes mounts the register page. In password mode it is the public
-// sign-up form that creates the account (email + password) and logs the user
-// in; in the passwordless/external modes it is the post-authentication
-// profile completion form.
-func registerRoutes(application app.AppInterface, loginMethod string) []rtr.RouteInterface {
+// registerRoutes mounts the register page. When password auth is among
+// the enabled methods it is the public sign-up form that creates the
+// account (email + password) and logs the user in; otherwise it is the
+// post-authentication profile completion form.
+func registerRoutes(application app.AppInterface, loginMethods []string) []rtr.RouteInterface {
 	var registerRoute, registerAjaxRoute rtr.RouteInterface
 
-	if loginMethod == config.LOGIN_METHOD_PASSWORD {
+	if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 		registerPasswordController := register_password.NewRegisterController(application)
 		registerRoute = rtr.GetHTML(links.AUTH_REGISTER, registerPasswordController.PageHandler).
 			SetName("Auth > Register Controller")

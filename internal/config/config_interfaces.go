@@ -107,6 +107,9 @@ type AuthConfigInterface interface {
 
 	SetLoginMethod(string)
 	GetLoginMethod() string
+
+	SetLoginMethods([]string)
+	GetLoginMethods() []string
 }
 
 // ============================================================================

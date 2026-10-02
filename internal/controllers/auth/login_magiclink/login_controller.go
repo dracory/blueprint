@@ -5,8 +5,8 @@
 //  2. POST links.AUTH_LOGIN?action=magiclink-send generates a single-use,
 //     IP-bound token, stores it in the memory cache, and enqueues
 //     EmailMagicLinkTask to deliver the link by email.
-//  3. GET links.AUTH_AUTH?token=... verifies the token (IP match +
-//     single-use), then hands off to shared.SessionLogin.
+//  3. GET links.AUTH_CALLBACK_MAGICLINK?token=... verifies the token
+//     (IP match + single-use), then hands off to shared.SessionLogin.
 package login_magiclink
 
 import (
@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"project/internal/app"
+	"project/internal/config"
 	"project/internal/controllers/auth/shared"
 	"project/internal/helpers"
 	"project/internal/layouts"
@@ -69,7 +70,8 @@ type magicLinkCacheValue struct {
 }
 
 type loginController struct {
-	app app.AppInterface
+	app      app.AppInterface
+	basePath string
 	// counterMu serializes the read-modify-write on the send-throttle
 	// counter in the memory cache (ttlcache is safe per-call, but
 	// Get-then-Set is not atomic).
@@ -77,7 +79,14 @@ type loginController struct {
 }
 
 func NewLoginController(application app.AppInterface) *loginController {
-	return &loginController{app: application}
+	return &loginController{app: application, basePath: links.AUTH_LOGIN}
+}
+
+// SetBasePath sets the path this controller is mounted at. Secondary
+// login methods are mounted at /auth/<method>-login so the ajax URL
+// rendered into the page must point at the same path.
+func (c *loginController) SetBasePath(basePath string) {
+	c.basePath = basePath
 }
 
 // PageHandler renders the login page. Registered via rtr.GetHTML.
@@ -98,7 +107,7 @@ func (c *loginController) AjaxHandler(w http.ResponseWriter, r *http.Request) st
 	return ""
 }
 
-// Handler verifies a magic link token (GET links.AUTH_AUTH?token=...).
+// Handler verifies a magic link token (GET links.AUTH_CALLBACK_MAGICLINK?token=...).
 func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string {
 	homeURL := links.Website().Home()
 
@@ -193,7 +202,7 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		}
 	}
 
-	sendAjaxURL := links.AUTH_LOGIN + "?action=magiclink-send-ajax"
+	sendAjaxURL := c.basePath + "?action=magiclink-send-ajax"
 
 	// Optional post-login redirect target. Both `return` (OTP convention)
 	// and `back_url` (links.Auth().Login convention) are accepted. Only
@@ -212,6 +221,8 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	// Replace placeholders in HTML with the actual app name (escaped —
 	// appName is developer-controlled config, but defence in depth)
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
+		config.LOGIN_METHOD_MAGICLINK, c.loginMethods()))
 
 	script := `
 	const SEND_AJAX_URL = "` + sendAjaxURL + `";
@@ -238,6 +249,15 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		},
 	})
 	return layout.ToHTML()
+}
+
+// loginMethods returns the enabled login methods from config, or nil
+// when the app/config is unavailable (e.g. in tests).
+func (c *loginController) loginMethods() []string {
+	if c.app == nil || c.app.GetConfig() == nil {
+		return nil
+	}
+	return c.app.GetConfig().GetLoginMethods()
 }
 
 // checkStores verifies the stores required by the magic link flow are

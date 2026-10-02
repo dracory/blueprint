@@ -5,27 +5,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log/slog"
-	"strings"
+
+	"github.com/samber/lo"
 )
 
 // authConfig reads authentication configuration from environment variables.
 // Validation failures are collected in env and reported together by NewFromEnv.
 func authConfig(env *envValidator) authSettings {
-	// Login Method
-	//
-	// Selects which login mechanism is mounted at links.AUTH_LOGIN.
-	// Valid values: otp (default), magiclink, password, authknight.
-	loginMethod := strings.ToLower(strings.TrimSpace(env.GetString(KEY_AUTH_LOGIN_METHOD)))
-	if loginMethod == "" {
-		loginMethod = LOGIN_METHOD_OTP
-	}
-	switch loginMethod {
-	case LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT:
-	default:
-		env.Add(fmt.Errorf("invalid %s value %q (expected one of: %s, %s, %s, %s)",
-			KEY_AUTH_LOGIN_METHOD, loginMethod,
-			LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT))
-	}
+	loginMethods := authLoginMethods(env)
 
 	// User Registration
 	//
@@ -65,13 +52,42 @@ func authConfig(env *envValidator) authSettings {
 		registrationEnabled: registrationEnabled,
 		emailsAllowedAccess: emailsAllowedAccess,
 		csrfSecret:          csrfSecret,
-		loginMethod:         loginMethod,
+		loginMethods:        loginMethods,
 	}
+}
+
+// authLoginMethods reads the enabled login mechanisms from
+// AUTH_LOGIN_METHODS (comma/semicolon-separated, or a JSON array). The
+// first entry is the primary method rendered at links.AUTH_LOGIN; the
+// rest are offered as alternatives at /auth/<method>-login.
+// Valid values: otp (default), magiclink, password, authknight.
+// Invalid entries are collected in env.
+func authLoginMethods(env *envValidator) []string {
+	loginMethods := env.GetArrayLower(KEY_AUTH_LOGIN_METHODS)
+	if len(loginMethods) == 0 {
+		loginMethods = env.GetArrayLower(KEY_AUTH_LOGIN_METHOD) // legacy singular
+	} else if len(env.GetArrayLower(KEY_AUTH_LOGIN_METHOD)) != 0 {
+		slog.Warn("Both AUTH_LOGIN_METHODS and AUTH_LOGIN_METHOD are set; " +
+			"AUTH_LOGIN_METHODS takes precedence and AUTH_LOGIN_METHOD is deprecated.")
+	}
+	if len(loginMethods) == 0 {
+		loginMethods = []string{LOGIN_METHOD_OTP}
+	}
+	for _, m := range loginMethods {
+		switch m {
+		case LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT:
+		default:
+			env.Add(fmt.Errorf("invalid %s value %q (expected a comma-separated list of: %s, %s, %s, %s)",
+				KEY_AUTH_LOGIN_METHODS, m,
+				LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT))
+		}
+	}
+	return lo.Uniq(loginMethods)
 }
 
 type authSettings struct {
 	registrationEnabled bool
 	emailsAllowedAccess []string
 	csrfSecret          string
-	loginMethod         string
+	loginMethods        []string
 }

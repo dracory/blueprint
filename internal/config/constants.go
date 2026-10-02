@@ -134,7 +134,13 @@ const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 const KEY_AUTH_REGISTRATION_ENABLED = "AUTH_REGISTRATION_ENABLED"
 const KEY_AUTH_EMAILS_ALLOWED_ACCESS = "AUTH_EMAILS_ALLOWED_ACCESS"
 const KEY_AUTH_CSRF_SECRET = "AUTH_CSRF_SECRET" // #nosec G101 -- this is an env var key name, not a credential
+// KEY_AUTH_LOGIN_METHOD selects a single login mechanism.
+// Deprecated: use KEY_AUTH_LOGIN_METHODS (comma-separated list) instead.
 const KEY_AUTH_LOGIN_METHOD = "AUTH_LOGIN_METHOD"
+
+// KEY_AUTH_LOGIN_METHODS selects one or more login mechanisms as a
+// comma-separated list; the first entry is the primary method.
+const KEY_AUTH_LOGIN_METHODS = "AUTH_LOGIN_METHODS"
 
 // ============================================================================
 // == END: Auth Configurations

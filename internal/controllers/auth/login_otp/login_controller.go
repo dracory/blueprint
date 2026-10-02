@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"project/internal/app"
+	"project/internal/config"
 	"project/internal/controllers/auth/shared"
 	"project/internal/layouts"
 	"project/internal/links"
@@ -47,7 +48,8 @@ const (
 )
 
 type loginController struct {
-	app app.AppInterface
+	app      app.AppInterface
+	basePath string
 	// counterMu serializes the read-modify-write on the send-throttle and
 	// attempt counters in the memory cache (ttlcache is safe per-call, but
 	// Get-then-Set is not atomic).
@@ -55,7 +57,14 @@ type loginController struct {
 }
 
 func NewLoginController(application app.AppInterface) *loginController {
-	return &loginController{app: application}
+	return &loginController{app: application, basePath: links.AUTH_LOGIN}
+}
+
+// SetBasePath sets the path this controller is mounted at. Secondary
+// login methods are mounted at /auth/<method>-login so the ajax URLs
+// rendered into the page must point at the same path.
+func (c *loginController) SetBasePath(basePath string) {
+	c.basePath = basePath
 }
 
 // PageHandler renders the login page. Registered via rtr.GetHTML.
@@ -87,8 +96,8 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		}
 	}
 
-	loginAjaxURL := links.AUTH_LOGIN + "?action=otp-send-ajax"
-	verifyAjaxURL := links.AUTH_LOGIN + "?action=otp-verify-ajax"
+	loginAjaxURL := c.basePath + "?action=otp-send-ajax"
+	verifyAjaxURL := c.basePath + "?action=otp-verify-ajax"
 	returnURL := r.URL.Query().Get("return")
 	if returnURL != "" && strings.HasPrefix(returnURL, "/") && !strings.HasPrefix(returnURL, "//") {
 		// QueryEscape keeps the value intact for the verify handler while
@@ -100,6 +109,8 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	// Replace placeholders in HTML with the actual app name (escaped —
 	// appName is developer-controlled config, but defence in depth)
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
+		config.LOGIN_METHOD_OTP, c.loginMethods()))
 
 	script := `
 	const LOGIN_AJAX_URL = "` + loginAjaxURL + `";
@@ -126,6 +137,15 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 		},
 	})
 	return layout.ToHTML()
+}
+
+// loginMethods returns the enabled login methods from config, or nil
+// when the app/config is unavailable (e.g. in tests).
+func (c *loginController) loginMethods() []string {
+	if c.app == nil || c.app.GetConfig() == nil {
+		return nil
+	}
+	return c.app.GetConfig().GetLoginMethods()
 }
 
 // checkStores verifies the stores required by the OTP flow are available.
