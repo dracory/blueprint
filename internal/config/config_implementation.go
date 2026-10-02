@@ -177,7 +177,7 @@ func NewFromEnv() (ConfigInterface, error) {
 	// Now load remaining config sections - they will have access to encrypted variables
 	cfg.setDatabaseConfig(databaseConfig(v))
 	cfg.setMailConfig(emailConfig())
-	cfg.setAuthConfig(authConfig())
+	cfg.setAuthConfig(authConfig(v))
 	cfg.setStoresConfig(storesConfig(v))
 	cfg.setStripeConfig(paymentConfig())
 	cfg.setLLMConfig(llmConfig(v))

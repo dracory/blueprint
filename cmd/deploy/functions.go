@@ -155,7 +155,7 @@ func SSH(sshHost, sshUser, sshKey, cmd string) (output string, err error) {
 
 	client, err := simplessh.ConnectWithKeyFile(sshHost+":22", sshUser, PrivateKeyPath(sshKey))
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	defer func() {
 		if closeErr := client.Close(); closeErr != nil {
