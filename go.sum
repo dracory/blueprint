@@ -125,6 +125,10 @@ github.com/dracory/entitystore v1.20.1 h1:Up86c4jPUZUIAdILtkiokbVxZPueXSQyCTWsIf
 github.com/dracory/entitystore v1.20.1/go.mod h1:GCP3NCuEsAR3Q2HheEgp5rnd0fGh2+w5a3fqIaITel0=
 github.com/dracory/env v1.2.0 h1:Dp+Gjmv81jJV3tKoF9wud+GRib9RYaaPUQNX1Nz1vMc=
 github.com/dracory/env v1.2.0/go.mod h1:aIvC0IB0yu9dP++i9ATs6fP5yG/U0VxSgYuT57dJGHg=
+github.com/dracory/env v1.3.0 h1:f9iwVGcjaXgGcv7hpbx9OY9XOmHEIZ0E7SJxV4L07is=
+github.com/dracory/env v1.3.0/go.mod h1:aIvC0IB0yu9dP++i9ATs6fP5yG/U0VxSgYuT57dJGHg=
+github.com/dracory/env v1.4.0 h1:ii6y2LSQFhIjbiyU16GYMhVrKhJtKili8IvSd7aRhfE=
+github.com/dracory/env v1.4.0/go.mod h1:aIvC0IB0yu9dP++i9ATs6fP5yG/U0VxSgYuT57dJGHg=
 github.com/dracory/envenc v1.5.0 h1:2RIHRDDFEVKa96vRrpnjClcYYpOmXwraCx8a5IbBF0E=
 github.com/dracory/envenc v1.5.0/go.mod h1:v16CzloqLM0BBU/4m8u3LeWh3TevUUG7QMQY4xjKpQs=
 github.com/dracory/feedstore v1.10.2 h1:KM11B6IxIY9LPJSz+04BCOb1sXeEko5jOpS6sOR1tTI=

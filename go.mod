@@ -25,7 +25,7 @@ require (
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
 	github.com/dracory/entitystore v1.20.1
-	github.com/dracory/env v1.2.0
+	github.com/dracory/env v1.4.0
 	github.com/dracory/envenc v1.5.0
 	github.com/dracory/feedstore v1.10.2
 	github.com/dracory/fileadmin v0.1.0

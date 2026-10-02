@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/dracory/env"
-	"github.com/samber/lo"
 )
 
 // authConfig reads authentication configuration from environment variables.
@@ -39,15 +38,7 @@ func authConfig() authSettings {
 	//
 	// Comma-separated list of emails allowed to access the application.
 	// If empty, all authenticated emails are allowed.
-	emailsAllowedAccess := lo.FilterMap(
-		strings.FieldsFunc(env.GetString(KEY_AUTH_EMAILS_ALLOWED_ACCESS), func(r rune) bool {
-			return r == ',' || r == ';'
-		}),
-		func(e string, _ int) (string, bool) {
-			e = strings.TrimSpace(e)
-			return e, e != ""
-		},
-	)
+	emailsAllowedAccess := env.GetArray(KEY_AUTH_EMAILS_ALLOWED_ACCESS)
 
 	// CSRF Secret
 	//
