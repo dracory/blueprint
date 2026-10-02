@@ -233,7 +233,7 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 - **Magic link callback.** `/auth/callback/magiclink` is mounted exactly once if `magiclink` is anywhere in the list.
 - **AuthKnight callback.** `/auth/callback/authknight` is mounted exactly once if `authknight` is anywhere in the list. `links.Auth().AuthKnightLogin` generates the new callback URL automatically. Existing AuthKnight-only deployments that previously pinned the callback to `/auth/auth` must update their AuthKnight app configuration to `/auth/callback/authknight` when upgrading.
 - **Password recovery.** `/auth/forgot-password` and `/auth/password-reset` are mounted whenever `password` is enabled.
-- **Rate limiting.** All login sub-paths inherit the existing 5 req/min IP rate limit. Note: email security scanners that pre-fetch `/auth/auth` links will consume rate-limit quota; the token itself is safe because the magic-link controller validates IP binding before consuming it. If this proves problematic in practice, exempt `AUTH_AUTH` from the auth rate limiter or give it a more permissive bucket — defer to post-implementation observation.
+- **Rate limiting.** All login sub-paths inherit the existing 5 req/min IP rate limit. Note: email security scanners that pre-fetch `/auth/callback/magiclink` links will consume rate-limit quota; the token itself is safe because the magic-link controller validates IP binding before consuming it. If this proves problematic in practice, exempt `AUTH_CALLBACK_MAGICLINK` from the auth rate limiter or give it a more permissive bucket — defer to post-implementation observation.
 
 ## Files to Create/Modify
 
@@ -243,9 +243,11 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 | `internal/config/constants.go` | Modify | Add `KEY_AUTH_LOGIN_METHODS`; deprecate singular key |
 | `internal/config/config_interfaces.go` | Modify | Add `GetLoginMethods()` / `SetLoginMethods()` |
 | `internal/config/config_implementation.go` | Modify | Pass `v` to `authConfig`; implement new getters; `GetLoginMethod` returns primary |
-| `internal/links/constants.go` | Modify | Add `AUTH_CALLBACK_AUTHKNIGHT = "/auth/callback/authknight"` |
-| `internal/links/auth_links.go` | Modify | `AuthKnightLogin` points `next_url` at `AUTH_CALLBACK_AUTHKNIGHT` |
-| `internal/links/links_extended_test.go` | Modify | Add `AUTH_CALLBACK_AUTHKNIGHT` constant assertion; update `AuthKnightLogin` assertions for the new `/auth/callback/authknight` `next_url` |
+| `internal/links/constants.go` | Modify | Add `AUTH_CALLBACK_MAGICLINK`, `AUTH_CALLBACK_AUTHKNIGHT`; remove `AUTH_AUTH` |
+| `internal/links/auth_links.go` | Modify | `Auth()` binds to `AUTH_CALLBACK_MAGICLINK`; `AuthKnightLogin` points `next_url` at `AUTH_CALLBACK_AUTHKNIGHT` |
+| `internal/links/links_extended_test.go` | Modify | Update constant assertions for the new callback constants; `AuthKnightLogin` `next_url` contains `/auth/callback/authknight` |
+| `internal/controllers/auth/login_magiclink/login_controller.go` | Modify | Doc comments reference `AUTH_CALLBACK_MAGICLINK`; render alternatives |
+| `internal/tasks/email_magic_link/email_magic_link_task.go` | Modify | Generated email link uses `AUTH_CALLBACK_MAGICLINK` |
 | `internal/controllers/auth/routes.go` | Modify | `mountMethod` helper, sub-path mounting, unique route names, per-method callbacks mounted once, membership checks |
 | `internal/controllers/auth/shared/login_alternatives.go` | Create | Trusted-HTML alternatives helper + method label map |
 | `internal/controllers/auth/login_password/app.html` | Modify | Add `{{ alternatives }}` placeholder |
@@ -264,11 +266,13 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 - `AUTH_LOGIN_METHOD` continues to work unchanged (one-element list); deprecation warning only fires when both vars are set.
 - `GetLoginMethod()` keeps returning a single string (the primary method), so existing callers don't break.
 - With a single configured method, routes, URLs, route names, and page output are identical to today (`{{ alternatives }}` is replaced with empty string).
-- The only deliberate single-method behavior change is the AuthKnight callback path: AuthKnight-only deployments previously using `/auth/auth` must update their AuthKnight app configuration to `/auth/callback/authknight`.
+- Two deliberate single-method breaking changes: the magic-link callback moves `/auth/auth` → `/auth/callback/magiclink`, and the AuthKnight callback moves `/auth/auth` → `/auth/callback/authknight`. `links.AUTH_AUTH` is removed — downstream projects referencing it must switch to the new constants.
 
 ### Migration Notes
 
-**AuthKnight callback URL.** AuthKnight-only deployments that configured the AuthKnight service to redirect to `/auth/auth` after login must update the callback URL in the AuthKnight app dashboard to `/auth/callback/authknight`. The old path is now reserved exclusively for the magic-link verification callback and is no longer handled by the AuthKnight flow.
+**Magic-link emails.** Links sent before upgrade still point at `/auth/auth`, which will no longer be mounted (404). Tokens are single-use and short-lived, so impact is limited to links sent within the token TTL window before deploy. Users can simply request a new link.
+
+**AuthKnight callback URL.** AuthKnight deployments that configured the AuthKnight service to redirect to `/auth/auth` after login must update the callback URL in the AuthKnight app dashboard to `/auth/callback/authknight`. The old path no longer exists.
 
 ## Open Questions
 
@@ -278,7 +282,7 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 ## Testing
 
 - Config: list parsing, dedupe, order preservation, invalid entries surface in `NewFromEnv`'s aggregated error, both-vars deprecation warning, legacy singular fallback, all existing `authConfig` panics now return errors.
-- Routes: each secondary method reachable at `/auth/login/<method>`; `/auth/auth` mounted exactly once when `magiclink` present (primary or secondary); `/auth/callback/authknight` mounted exactly once when `authknight` present; `authknight,magiclink` combination produces no path conflicts; password recovery mounted when `password` is secondary; all route names unique; canonical `"Auth > Login Controller"` name preserved for primary.
+- Routes: each secondary method reachable at `/auth/login/<method>`; `/auth/callback/magiclink` mounted exactly once when `magiclink` present (primary or secondary); `/auth/callback/authknight` mounted exactly once when `authknight` present; `/auth/auth` no longer mounted; `authknight,magiclink` combination produces no path conflicts; password recovery mounted when `password` is secondary; all route names unique; canonical `"Auth > Login Controller"` name preserved for primary.
 - Login pages: alternatives section shown iff >1 method; empty placeholder when single method; links point at correct sub-paths.
 - End-to-end: `AUTH_LOGIN_METHODS=password,magiclink` — sign in with password at `/auth/login`, sign in via magic link at `/auth/login/magiclink`, both land on the same session via `shared/session_login.go`.
 
@@ -289,3 +293,4 @@ if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
 - `AUTH_LOGIN_METHODS=password,magiclink` serves both methods; login page shows "Use magic link instead"
 - `AUTH_LOGIN_METHODS=password,authknight` serves both methods; login page shows "Sign in with AuthKnight"; AuthKnight redirect targets `/auth/callback/authknight`
 - `AUTH_LOGIN_METHOD=authknight` verifies the callback at `/auth/callback/authknight` (not `/auth/auth` as before)
+- `AUTH_LOGIN_METHOD=magiclink` verifies the callback at `/auth/callback/magiclink` (not `/auth/auth` as before)
