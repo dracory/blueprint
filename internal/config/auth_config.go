@@ -13,6 +13,22 @@ import (
 
 // authConfig reads authentication configuration from environment variables.
 func authConfig() authSettings {
+	// Login Method
+	//
+	// Selects which login mechanism is mounted at links.AUTH_LOGIN.
+	// Valid values: otp (default), magiclink, password, authknight.
+	loginMethod := strings.ToLower(strings.TrimSpace(env.GetString(KEY_AUTH_LOGIN_METHOD)))
+	if loginMethod == "" {
+		loginMethod = LOGIN_METHOD_OTP
+	}
+	switch loginMethod {
+	case LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT:
+	default:
+		panic(fmt.Sprintf("FATAL: invalid %s value %q (expected one of: %s, %s, %s, %s)",
+			KEY_AUTH_LOGIN_METHOD, loginMethod,
+			LOGIN_METHOD_OTP, LOGIN_METHOD_MAGICLINK, LOGIN_METHOD_PASSWORD, LOGIN_METHOD_AUTHKNIGHT))
+	}
+
 	// User Registration
 	//
 	// Controls whether new users can register for an account.
@@ -32,13 +48,6 @@ func authConfig() authSettings {
 			return e, e != ""
 		},
 	)
-
-	if len(emailsAllowedAccess) == 0 {
-		emailsAllowedAccess = []string{
-			"info@sinevia.com",
-			"lesichkovm@gmail.com",
-		}
-	}
 
 	// CSRF Secret
 	//
@@ -60,17 +69,11 @@ func authConfig() authSettings {
 			"Set AUTH_CSRF_SECRET in your environment for persistent CSRF protection.")
 	}
 
-	// Password Authentication
-	//
-	// Controls whether email/password authentication is enabled.
-	// When false, authentication is handled exclusively by external providers.
-	passwordAuthEnabled := env.GetBool(KEY_AUTH_PASSWORD_AUTH_ENABLED)
-
 	return authSettings{
 		registrationEnabled: registrationEnabled,
 		emailsAllowedAccess: emailsAllowedAccess,
 		csrfSecret:          csrfSecret,
-		passwordAuthEnabled: passwordAuthEnabled,
+		loginMethod:         loginMethod,
 	}
 }
 
@@ -78,37 +81,5 @@ type authSettings struct {
 	registrationEnabled bool
 	emailsAllowedAccess []string
 	csrfSecret          string
-	passwordAuthEnabled bool
+	loginMethod         string
 }
-
-// Login methods available in Blueprint.
-const (
-	// LOGIN_METHOD_AUTHKNIGHT delegates authentication to the external
-	// AuthKnight service (https://authknight.com).
-	LOGIN_METHOD_AUTHKNIGHT = "authknight"
-
-	// LOGIN_METHOD_OTP uses the in-house email one-time-password login.
-	LOGIN_METHOD_OTP = "otp"
-
-	// LOGIN_METHOD_MAGICLINK uses the in-house email magic-link login:
-	// the user receives a single-use, IP-bound login link by email.
-	LOGIN_METHOD_MAGICLINK = "magiclink"
-
-	// LOGIN_METHOD_PASSWORD uses the in-house email/password login.
-	// Requires AUTH_PASSWORD_AUTH_ENABLED=true at runtime and mounts the
-	// forgot-password and password-reset pages alongside the login page.
-	LOGIN_METHOD_PASSWORD = "password"
-)
-
-// LOGIN_METHOD selects which login mechanism is mounted at links.AUTH_LOGIN.
-//
-// This is a one-time developer decision made when scaffolding the project —
-// the same class of decision as choosing which stores to enable. It is
-// intentionally a code constant, NOT an environment variable: the
-// authentication method must never change between deployments of the same
-// build.
-//
-// Default is OTP: it keeps Blueprint fully self-contained with no reliance
-// on external services. Projects that prefer outsourced auth switch the
-// constant to LOGIN_METHOD_AUTHKNIGHT.
-const LOGIN_METHOD = LOGIN_METHOD_OTP

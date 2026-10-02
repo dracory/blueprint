@@ -24,7 +24,6 @@ func setupApp(t *testing.T) app.AppInterface {
 	cfg.SetUserStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
 	cfg.SetCacheStoreUsed(true)
-	cfg.SetPasswordAuthEnabled(true)
 	return testutils.Setup(testutils.WithCfg(cfg))
 }
 
@@ -167,18 +166,5 @@ func TestLoginController_SuccessfulLogin(t *testing.T) {
 	}
 	if data["redirect"] == "" {
 		t.Fatal("expected a redirect URL")
-	}
-}
-
-func TestLoginController_PasswordAuthDisabled(t *testing.T) {
-	cfg := testutils.DefaultConf()
-	cfg.SetUserStoreUsed(true)
-	cfg.SetSessionStoreUsed(true)
-	cfg.SetPasswordAuthEnabled(false)
-	application := testutils.Setup(testutils.WithCfg(cfg))
-
-	recorder := loginRequest(t, application, "user@example.com", "password123")
-	if recorder.Code != http.StatusForbidden {
-		t.Fatalf("expected 403, got %d", recorder.Code)
 	}
 }

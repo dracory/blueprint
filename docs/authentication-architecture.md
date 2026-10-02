@@ -6,9 +6,10 @@ The Blueprint authentication system implements a sophisticated privacy-first arc
 
 ## Login Methods
 
-Blueprint ships with three login mechanisms. The active method is selected by the
-`config.LOGIN_METHOD` constant in `internal/config/auth_config.go` — a
-compile-time, one-time developer decision (not an environment variable).
+Blueprint ships with four login mechanisms. The active method is selected by the
+`AUTH_LOGIN_METHOD` environment variable (`internal/config/auth_config.go`),
+validated at startup — an unrecognized value panics before the app serves
+requests.
 
 - **`LOGIN_METHOD_OTP` (default)** — in-house email one-time-password login,
   fully self-contained, no external services. Two routes share the same path:
@@ -46,29 +47,25 @@ compile-time, one-time developer decision (not an environment variable).
   the AuthKnight response is re-validated (must start with the app home URL)
   before being used as the post-login redirect.
 
-An unrecognized `LOGIN_METHOD` value panics at startup in `routes.go`
-rather than silently defaulting.
-
 All methods converge on the shared post-auth pipeline in
 `internal/controllers/auth/shared` (`SessionLogin`): find-or-create user
 (vault + blind index aware), session creation, auth cookie, redirect.
 
 ### Removing a Method
 
-Because `LOGIN_METHOD` is a constant, deleting the unused method's package
-produces a compile error pointing at the branch to remove in
-`internal/controllers/auth/routes.go`.
+Deleting an unused method's package produces a compile error pointing at the
+branch to remove in `internal/controllers/auth/routes.go`.
 
-- Remove OTP: set `LOGIN_METHOD = LOGIN_METHOD_AUTHKNIGHT`, then delete
+- Remove OTP: set `AUTH_LOGIN_METHOD` to another method, then delete
   `internal/controllers/auth/login_otp/`, `internal/tasks/email_otp/`,
   `internal/emails/user_email_otp.go`, and the `EmailOTPTask`
   registration/alias.
-- Remove magic link: set `LOGIN_METHOD` to another method, then delete
+- Remove magic link: set `AUTH_LOGIN_METHOD` to another method, then delete
   `internal/controllers/auth/login_magiclink/`,
   `internal/tasks/email_magic_link/`,
   `internal/emails/user_email_magic_link.go`, and the `EmailMagicLinkTask`
   registration/alias.
-- Remove AuthKnight: set `LOGIN_METHOD = LOGIN_METHOD_OTP`, then delete
+- Remove AuthKnight: set `AUTH_LOGIN_METHOD` to another method, then delete
   `internal/controllers/auth/login_authknight/`, `internal/controllers/auth/authentication_authknight/`,
   `links.authLinks.AuthKnightLogin`, and the `AUTH_AUTH` route/constant.
 
@@ -77,7 +74,7 @@ produces a compile error pointing at the branch to remove in
 ### 1. Authentication Controller (`internal/controllers/auth/`)
 
 **Primary Responsibilities:**
-- Route the selected login method (`config.LOGIN_METHOD`): in-house email
+- Route the selected login method (`AUTH_LOGIN_METHOD`): in-house email
   OTP (`login_otp/`), magic link (`login_magiclink/`), or external AuthKnight
   (`login_authknight/` + `authentication_authknight/` callback)
 - Manage user creation and session establishment via the shared pipeline

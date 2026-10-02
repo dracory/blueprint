@@ -89,7 +89,7 @@ type configImplementation struct {
 	registrationEnabled bool
 	emailsAllowedAccess []string
 	csrfSecret          string
-	passwordAuthEnabled bool
+	loginMethod         string
 
 	// i18n / Translation
 	translationLanguageDefault string
@@ -138,7 +138,9 @@ type configImplementation struct {
 
 // New constructs a new configuration instance.
 func New() ConfigInterface {
-	return &configImplementation{}
+	return &configImplementation{
+		loginMethod: LOGIN_METHOD_OTP,
+	}
 }
 
 // NewFromEnv constructs a configuration instance populated from environment variables.
@@ -322,7 +324,7 @@ func (c *configImplementation) setAuthConfig(s authSettings) {
 	c.registrationEnabled = s.registrationEnabled
 	c.emailsAllowedAccess = s.emailsAllowedAccess
 	c.csrfSecret = s.csrfSecret
-	c.passwordAuthEnabled = s.passwordAuthEnabled
+	c.loginMethod = s.loginMethod
 }
 
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
@@ -349,12 +351,12 @@ func (c *configImplementation) GetCsrfSecret() string {
 	return c.csrfSecret
 }
 
-func (c *configImplementation) SetPasswordAuthEnabled(v bool) {
-	c.passwordAuthEnabled = v
+func (c *configImplementation) SetLoginMethod(v string) {
+	c.loginMethod = v
 }
 
-func (c *configImplementation) GetPasswordAuthEnabled() bool {
-	return c.passwordAuthEnabled
+func (c *configImplementation) GetLoginMethod() string {
+	return c.loginMethod
 }
 
 // ============================================================================

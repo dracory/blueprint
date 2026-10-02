@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"project/internal/config"
 	"project/internal/links"
 	"project/internal/testutils"
 )
@@ -67,6 +68,152 @@ func TestRoutesConfiguration(t *testing.T) {
 	if !foundLogout {
 		t.Error("Logout route not found")
 	}
+}
+
+// routeEntry describes an expected (or forbidden) route for a login method.
+// A method of "*" matches routes registered for any method.
+type routeEntry struct {
+	path   string
+	method string
+}
+
+func routeMatches(route interface {
+	GetPath() string
+	GetMethod() string
+}, want routeEntry,
+) bool {
+	if route.GetPath() != want.path {
+		return false
+	}
+	return want.method == "*" || route.GetMethod() == want.method
+}
+
+// TestRoutesLoginMethodMountsCorrectRoutes verifies that each AUTH_LOGIN_METHOD
+// mounts the expected set of routes.
+func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		loginMethod string
+		expected    []routeEntry
+		forbidden   []routeEntry
+	}{
+		{
+			name:        "otp",
+			loginMethod: config.LOGIN_METHOD_OTP,
+			expected: []routeEntry{
+				{links.AUTH_LOGIN, "GET"},
+				{links.AUTH_LOGIN, "POST"},
+				{links.AUTH_LOGOUT, "*"},
+			},
+			forbidden: []routeEntry{
+				{links.AUTH_AUTH, "*"},
+				{links.AUTH_FORGOT_PASSWORD, "*"},
+				{links.AUTH_PASSWORD_RESET, "*"},
+			},
+		},
+		{
+			name:        "magiclink",
+			loginMethod: config.LOGIN_METHOD_MAGICLINK,
+			expected: []routeEntry{
+				{links.AUTH_LOGIN, "GET"},
+				{links.AUTH_LOGIN, "POST"},
+				{links.AUTH_AUTH, "*"},
+				{links.AUTH_LOGOUT, "*"},
+			},
+			forbidden: []routeEntry{
+				{links.AUTH_FORGOT_PASSWORD, "*"},
+				{links.AUTH_PASSWORD_RESET, "*"},
+			},
+		},
+		{
+			name:        "password",
+			loginMethod: config.LOGIN_METHOD_PASSWORD,
+			expected: []routeEntry{
+				{links.AUTH_LOGIN, "GET"},
+				{links.AUTH_LOGIN, "POST"},
+				{links.AUTH_FORGOT_PASSWORD, "GET"},
+				{links.AUTH_FORGOT_PASSWORD, "POST"},
+				{links.AUTH_PASSWORD_RESET, "GET"},
+				{links.AUTH_PASSWORD_RESET, "POST"},
+				{links.AUTH_LOGOUT, "*"},
+			},
+			forbidden: []routeEntry{
+				{links.AUTH_AUTH, "*"},
+			},
+		},
+		{
+			name:        "authknight",
+			loginMethod: config.LOGIN_METHOD_AUTHKNIGHT,
+			expected: []routeEntry{
+				{links.AUTH_LOGIN, "GET"},
+				{links.AUTH_AUTH, "*"},
+				{links.AUTH_LOGOUT, "*"},
+			},
+			forbidden: []routeEntry{
+				{links.AUTH_LOGIN, "POST"},
+				{links.AUTH_FORGOT_PASSWORD, "*"},
+				{links.AUTH_PASSWORD_RESET, "*"},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			cfg := testutils.DefaultConf()
+			cfg.SetLoginMethod(tt.loginMethod)
+			app := testutils.Setup(testutils.WithCfg(cfg))
+			if app == nil {
+				t.Fatal("testutils.Setup() returned nil")
+			}
+
+			routes := Routes(app)
+
+			for _, want := range tt.expected {
+				found := false
+				for _, route := range routes {
+					if routeMatches(route, want) {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("method %q: expected route %s %s not mounted", tt.loginMethod, want.method, want.path)
+				}
+			}
+
+			for _, ban := range tt.forbidden {
+				for _, route := range routes {
+					if routeMatches(route, ban) {
+						t.Errorf("method %q: unexpected route %s %s mounted", tt.loginMethod, ban.method, ban.path)
+					}
+				}
+			}
+		})
+	}
+}
+
+// TestRoutesInvalidLoginMethodPanics verifies that an unrecognized login
+// method panics instead of silently mounting nothing.
+func TestRoutesInvalidLoginMethodPanics(t *testing.T) {
+	t.Parallel()
+	cfg := testutils.DefaultConf()
+	cfg.SetLoginMethod("bogus")
+	app := testutils.Setup(testutils.WithCfg(cfg))
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("expected panic for invalid login method, got none")
+		}
+	}()
+
+	Routes(app)
 }
 
 // TestRoutesWithRegistrationEnabled verifies register route is included when enabled

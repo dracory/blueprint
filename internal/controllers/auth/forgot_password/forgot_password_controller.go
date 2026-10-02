@@ -33,7 +33,6 @@ import (
 	"project/internal/ext"
 	"project/internal/layouts"
 	"project/internal/links"
-	authrules "project/internal/rules/auth"
 	"project/internal/tasks/email_password_reset"
 
 	baselayouts "github.com/dracory/base/layouts"
@@ -167,11 +166,6 @@ func (c *forgotPasswordController) checkStores(w http.ResponseWriter) bool {
 // handleSubmit handles POST /auth/forgot-password?action=forgot-password-ajax
 func (c *forgotPasswordController) handleSubmit(w http.ResponseWriter, r *http.Request) {
 	if !c.checkStores(w) {
-		return
-	}
-
-	if rule := authrules.NewCanUsePasswordAuthRule(c.app); rule.Fails() {
-		c.sendErrorResponse(w, rule.FailMessageFirst(), http.StatusForbidden)
 		return
 	}
 

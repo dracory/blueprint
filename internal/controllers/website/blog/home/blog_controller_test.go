@@ -3,12 +3,14 @@ package home
 import (
 	"context"
 	"errors"
-	basetestutils "github.com/dracory/base/testutils"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"project/internal/testutils"
 	"strings"
 	"testing"
+
+	basetestutils "github.com/dracory/base/testutils"
 
 	"github.com/dracory/blogstore"
 )
@@ -21,7 +23,8 @@ func TestBlogController_Handler_Success(t *testing.T) {
 
 	controller := NewBlogController(app)
 
-	// Create test posts in the database
+	// Create enough test posts to span more than one page (perPage is 12),
+	// otherwise bs.Pagination renders nothing and 'page-link' never appears
 	post1 := blogstore.NewPost()
 	post1.SetTitle("Post 1")
 	post1.SetStatus(blogstore.POST_STATUS_PUBLISHED)
@@ -36,6 +39,15 @@ func TestBlogController_Handler_Success(t *testing.T) {
 	err = app.GetBlogStore().PostCreate(context.Background(), post2)
 	if err != nil {
 		t.Fatalf("Failed to create test post 2: %v", err)
+	}
+
+	for i := 3; i <= 15; i++ {
+		post := blogstore.NewPost()
+		post.SetTitle(fmt.Sprintf("Extra Post %d", i))
+		post.SetStatus(blogstore.POST_STATUS_PUBLISHED)
+		if err := app.GetBlogStore().PostCreate(context.Background(), post); err != nil {
+			t.Fatalf("Failed to create extra test post %d: %v", i, err)
+		}
 	}
 
 	// Create a draft post that should NOT appear on the page

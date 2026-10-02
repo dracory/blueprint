@@ -37,9 +37,8 @@ func main() {
 		email = aiBrowserDefaultEmail
 	}
 
-	// The allowlist falls back to hardcoded emails when empty, so the seeded
-	// email must be set before the config is loaded or
-	// EmailAllowlistMiddleware blocks it.
+	// Restrict the allowlist to the seeded email so the sandbox only ever
+	// authenticates its own fixture user.
 	_ = os.Setenv("AUTH_EMAILS_ALLOWED_ACCESS", email)
 
 	cfg, err := config.NewFromEnv()

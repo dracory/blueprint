@@ -25,9 +25,7 @@ go run ./cmd/ai-browser -with-user test@example.com -admin
   user with `SetID("ai-browser-user")` or auto-login silently does nothing.
 - `middlewares.NewEmailAllowlistMiddleware` allows the seeded user because
   `main.go` sets `AUTH_EMAILS_ALLOWED_ACCESS` to the seeded email before
-  config load. Without it, `authConfig()` falls back to a hardcoded
-  allowlist (`info@sinevia.com`, `lesichkovm@gmail.com`) that does not
-  include the seeded email.
+  config load, restricting the sandbox to its own fixture user.
 
 ## Gotchas
 

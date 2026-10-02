@@ -168,11 +168,6 @@ func (c *registerController) handleSubmit(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if rule := authrules.NewCanUsePasswordAuthRule(c.app); rule.Fails() {
-		c.sendErrorResponse(w, rule.FailMessageFirst(), http.StatusForbidden)
-		return
-	}
-
 	if err := r.ParseForm(); err != nil {
 		c.sendErrorResponse(w, "Invalid request body", http.StatusBadRequest)
 		c.logError("Failed to parse form", err)

@@ -32,6 +32,24 @@ type APIAuthenticatedSessionContextKey = basesession.APIAuthenticatedSessionCont
 // == END: Types
 // ============================================================================
 
+// Login methods available in Blueprint, selectable via AUTH_LOGIN_METHOD.
+const (
+	// LOGIN_METHOD_AUTHKNIGHT delegates authentication to the external
+	// AuthKnight service (https://authknight.com).
+	LOGIN_METHOD_AUTHKNIGHT = "authknight"
+
+	// LOGIN_METHOD_OTP uses the in-house email one-time-password login.
+	LOGIN_METHOD_OTP = "otp"
+
+	// LOGIN_METHOD_MAGICLINK uses the in-house email magic-link login:
+	// the user receives a single-use, IP-bound login link by email.
+	LOGIN_METHOD_MAGICLINK = "magiclink"
+
+	// LOGIN_METHOD_PASSWORD uses the in-house email/password login and mounts
+	// the forgot-password and password-reset pages alongside the login page.
+	LOGIN_METHOD_PASSWORD = "password"
+)
+
 // ============================================================================
 // == START: AppEnvironment constants
 // ============================================================================
@@ -116,7 +134,7 @@ const KEY_MAIL_FROM_NAME = "MAIL_FROM_NAME"
 const KEY_AUTH_REGISTRATION_ENABLED = "AUTH_REGISTRATION_ENABLED"
 const KEY_AUTH_EMAILS_ALLOWED_ACCESS = "AUTH_EMAILS_ALLOWED_ACCESS"
 const KEY_AUTH_CSRF_SECRET = "AUTH_CSRF_SECRET" // #nosec G101 -- this is an env var key name, not a credential
-const KEY_AUTH_PASSWORD_AUTH_ENABLED = "AUTH_PASSWORD_AUTH_ENABLED"
+const KEY_AUTH_LOGIN_METHOD = "AUTH_LOGIN_METHOD"
 
 // ============================================================================
 // == END: Auth Configurations

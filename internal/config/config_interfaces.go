@@ -105,8 +105,8 @@ type AuthConfigInterface interface {
 	SetCsrfSecret(string)
 	GetCsrfSecret() string
 
-	SetPasswordAuthEnabled(bool)
-	GetPasswordAuthEnabled() bool
+	SetLoginMethod(string)
+	GetLoginMethod() string
 }
 
 // ============================================================================
