@@ -265,8 +265,9 @@ func NewSqlFileStorage(db *sql.DB) (filesystem.StorageInterface, error) {
 // NewStatsStore creates a stats store with the configured table name.
 func NewStatsStore(db *sql.DB, debug bool) (statsstore.StoreInterface, error) {
 	st, err := statsstore.NewStore(statsstore.NewStoreOptions{
-		DB:               db,
-		VisitorTableName: "snv_stats_visitor",
+		DB:                db,
+		SettingsTableName: "snv_stats_settings",
+		VisitorTableName:  "snv_stats_visitor",
 	})
 	if err != nil {
 		return nil, err
