@@ -38,7 +38,7 @@ require (
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.2
 	github.com/dracory/metastore v1.11.0
-	github.com/dracory/neat v0.52.0
+	github.com/dracory/neat v0.54.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0
