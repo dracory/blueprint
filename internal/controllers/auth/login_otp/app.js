@@ -7,6 +7,7 @@ createApp({
 		const step = ref(1);
 		const isLoading = ref(false);
 		const nonce = ref('');
+		const remember = ref(false);
 
 		const otp = computed(() => otpDigits.value.join(''));
 
@@ -107,6 +108,7 @@ createApp({
 			formData.append('email', email.value);
 			formData.append('otp', otp.value);
 			formData.append('nonce', nonce.value);
+			formData.append('remember', remember.value ? 'true' : 'false');
 
 			try {
 				const response = await fetch(VERIFY_AJAX_URL, {
@@ -140,6 +142,7 @@ createApp({
 			otpDigits,
 			otp,
 			nonce,
+			remember,
 			step,
 			isLoading,
 			handleSendOtp,

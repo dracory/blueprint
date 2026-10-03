@@ -247,3 +247,36 @@ func TestAPIAuthMiddleware_Success(t *testing.T) {
 		t.Errorf("Expected status %d, got %d", http.StatusOK, res.Result().StatusCode)
 	}
 }
+
+func TestAPIAuthMiddleware_RememberSessionRejected(t *testing.T) {
+	app := testutils.Setup(
+		testutils.WithSessionStore(true),
+		testutils.WithUserStore(true),
+	)
+
+	user, err := testutils.SeedUser(app.GetUserStore(), test.USER_01)
+	if err != nil {
+		t.Fatalf("failed to seed user: %v", err)
+	}
+
+	// Remember sessions must never act as API tokens.
+	session := seedRememberSession(t, app, user, 30*24*3600)
+
+	middleware := NewAPIAuthMiddleware(app).GetHandler()
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("Authorization", session.GetKey())
+	res := httptest.NewRecorder()
+	nextCalled := false
+
+	middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		nextCalled = true
+	})).ServeHTTP(res, req)
+
+	if nextCalled {
+		t.Error("next handler should not be called for a remember session token")
+	}
+	expected := api.Error("Invalid or expired token").ToString()
+	if res.Body.String() != expected {
+		t.Errorf("Expected body '%s', got '%s'", expected, res.Body.String())
+	}
+}

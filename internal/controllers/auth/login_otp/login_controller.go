@@ -109,6 +109,7 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	// Replace placeholders in HTML with the actual app name (escaped —
 	// appName is developer-controlled config, but defence in depth)
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ rememberMe }}", shared.RememberMeCheckbox(c.app))
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
 		config.LOGIN_METHOD_OTP, c.loginMethods()))
 
@@ -344,7 +345,8 @@ func (c *loginController) handleOtpVerify(w http.ResponseWriter, r *http.Request
 	}
 
 	// Shared post-auth pipeline: find-or-create user, session, cookie, redirect
-	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "")
+	rememberMe := r.FormValue("remember") == "true"
+	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "", rememberMe)
 	if errorMessage != "" {
 		c.sendErrorResponse(w, errorMessage, http.StatusUnauthorized)
 		return

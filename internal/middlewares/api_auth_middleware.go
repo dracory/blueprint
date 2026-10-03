@@ -7,6 +7,7 @@ import (
 
 	"project/internal/app"
 	"project/internal/config"
+	"project/internal/controllers/auth/shared"
 
 	"github.com/dracory/api"
 	"github.com/dracory/rtr"
@@ -57,7 +58,9 @@ func NewAPIAuthMiddleware(app app.AppInterface) rtr.MiddlewareInterface {
 					return
 				}
 
-				if session == nil || session.IsExpired() {
+				// Remember sessions are only exchangeable by RememberMeMiddleware;
+				// accepting them here would turn them into 30-day API tokens.
+				if session == nil || session.IsExpired() || session.GetValue() == shared.RememberSessionValue {
 					if _, err := w.Write([]byte(api.Error("Invalid or expired token").ToString())); err != nil {
 						return
 					}

@@ -90,6 +90,8 @@ type configImplementation struct {
 	emailsAllowedAccess []string
 	csrfSecret          string
 	loginMethods        []string
+	rememberMeEnabled   bool
+	rememberMeDays      int
 
 	// i18n / Translation
 	translationLanguageDefault string
@@ -325,6 +327,8 @@ func (c *configImplementation) setAuthConfig(s authSettings) {
 	c.emailsAllowedAccess = s.emailsAllowedAccess
 	c.csrfSecret = s.csrfSecret
 	c.loginMethods = s.loginMethods
+	c.rememberMeEnabled = s.rememberMeEnabled
+	c.rememberMeDays = s.rememberMeDays
 }
 
 func (c *configImplementation) SetRegistrationEnabled(v bool) {
@@ -373,6 +377,26 @@ func (c *configImplementation) SetLoginMethods(v []string) {
 // GetLoginMethods returns all enabled login methods, primary first.
 func (c *configImplementation) GetLoginMethods() []string {
 	return c.loginMethods
+}
+
+func (c *configImplementation) SetRememberMeEnabled(v bool) {
+	c.rememberMeEnabled = v
+}
+
+// GetRememberMeEnabled reports whether the opt-in "remember me" persistent
+// login is enabled.
+func (c *configImplementation) GetRememberMeEnabled() bool {
+	return c.rememberMeEnabled
+}
+
+func (c *configImplementation) SetRememberMeDays(v int) {
+	c.rememberMeDays = v
+}
+
+// GetRememberMeDays returns the remember-session lifetime in days. Zero when
+// remember-me is disabled or not configured.
+func (c *configImplementation) GetRememberMeDays() int {
+	return c.rememberMeDays
 }
 
 // ============================================================================

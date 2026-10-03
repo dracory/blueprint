@@ -4,6 +4,7 @@ createApp({
 	setup() {
 		const email = ref('');
 		const password = ref('');
+		const remember = ref(false);
 		const isLoading = ref(false);
 
 		const handleLogin = async () => {
@@ -17,6 +18,7 @@ createApp({
 			const formData = new FormData();
 			formData.append('email', email.value);
 			formData.append('password', password.value);
+			formData.append('remember', remember.value ? 'true' : 'false');
 			if (RETURN_URL) {
 				formData.append('return', decodeURIComponent(RETURN_URL));
 			}
@@ -46,6 +48,7 @@ createApp({
 		return {
 			email,
 			password,
+			remember,
 			isLoading,
 			handleLogin
 		};

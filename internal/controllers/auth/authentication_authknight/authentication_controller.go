@@ -83,7 +83,7 @@ func (c *authenticationController) Handler(w http.ResponseWriter, r *http.Reques
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Authentication Provider Error. "+errorMessage, homeURL, 5)
 	}
 
-	redirectUrl, _, errorMessage := shared.SessionLogin(c.app, w, r, email, backUrl)
+	redirectUrl, _, errorMessage := shared.SessionLogin(c.app, w, r, email, backUrl, false)
 
 	if errorMessage != "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, homeURL, 5)

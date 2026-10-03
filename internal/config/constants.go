@@ -142,6 +142,18 @@ const KEY_AUTH_LOGIN_METHOD = "AUTH_LOGIN_METHOD"
 // comma-separated list; the first entry is the primary method.
 const KEY_AUTH_LOGIN_METHODS = "AUTH_LOGIN_METHODS"
 
+// KEY_AUTH_REMEMBER_ME_ENABLED enables the opt-in "remember me" checkbox on
+// the login forms, issuing a long-lived remember session alongside the
+// normal auth session.
+const KEY_AUTH_REMEMBER_ME_ENABLED = "AUTH_REMEMBER_ME_ENABLED"
+
+// KEY_AUTH_REMEMBER_ME_DAYS controls the lifetime of the remember session
+// and its cookie, in days.
+const KEY_AUTH_REMEMBER_ME_DAYS = "AUTH_REMEMBER_ME_DAYS"
+
+// COOKIE_NAME_REMEMBER_TOKEN is the cookie carrying the remember session key.
+const COOKIE_NAME_REMEMBER_TOKEN = "remember_token"
+
 // ============================================================================
 // == END: Auth Configurations
 // ============================================================================

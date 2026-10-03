@@ -32,6 +32,7 @@
                                     <input type="email" id="email" v-model="email" class="form-control border-start-0 py-3" placeholder="you@example.com" required>
                                 </div>
                             </div>
+                            {{ rememberMe }}
                             <button type="submit" class="btn btn-brand w-100 py-3 fw-bold shadow-sm" :disabled="isLoading">
                                 <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                 Send Login Link

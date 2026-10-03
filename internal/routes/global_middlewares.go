@@ -101,6 +101,9 @@ func globalMiddlewares(app app.AppInterface) []rtr.MiddlewareInterface {
 	globalMiddlewares = append(globalMiddlewares,
 		middlewares.LogRequestMiddleware(app),
 		middlewares.NewSecurityHeadersMiddleware(app),
+		// Must run before AuthMiddleware: exchanges a valid remember cookie
+		// for a fresh auth session so AuthMiddleware sees it on this request.
+		middlewares.RememberMeMiddleware(app),
 		middlewares.AuthMiddleware(app),
 		middlewares.NewStatsMiddleware(app),
 	)

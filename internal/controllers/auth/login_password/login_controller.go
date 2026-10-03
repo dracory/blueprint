@@ -123,6 +123,7 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ registerUrl }}", registerURL)
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ forgotPasswordUrl }}", links.Auth().ForgotPassword())
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ rememberMe }}", shared.RememberMeCheckbox(c.app))
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
 		config.LOGIN_METHOD_PASSWORD, c.loginMethods()))
 
@@ -245,7 +246,8 @@ func (c *loginController) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	redirectURL, _, errorMessage := shared.SessionLoginUser(c.app, w, r, user, returnURL)
+	rememberMe := r.FormValue("remember") == "true"
+	redirectURL, _, errorMessage := shared.SessionLoginUser(c.app, w, r, user, returnURL, rememberMe)
 	if errorMessage != "" {
 		status := http.StatusForbidden
 		if errorMessage == shared.MsgSessionError {

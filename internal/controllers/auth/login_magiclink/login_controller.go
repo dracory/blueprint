@@ -67,6 +67,7 @@ type magicLinkCacheValue struct {
 	IP        string `json:"ip,omitempty"`
 	Token     string `json:"token,omitempty"`
 	ReturnURL string `json:"return,omitempty"`
+	Remember  bool   `json:"remember,omitempty"`
 }
 
 type loginController struct {
@@ -173,7 +174,7 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, rule.FailMessageFirst(), homeURL, 5)
 	}
 
-	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "")
+	redirectURL, needsRegistration, errorMessage := shared.SessionLogin(c.app, w, r, email, "", value.Remember)
 	if errorMessage != "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, errorMessage, homeURL, 5)
 	}
@@ -221,6 +222,7 @@ func (c *loginController) renderLoginPage(r *http.Request) string {
 	// Replace placeholders in HTML with the actual app name (escaped —
 	// appName is developer-controlled config, but defence in depth)
 	htmlContent := strings.ReplaceAll(templateHTML, "{{ appName }}", html.EscapeString(appName))
+	htmlContent = strings.ReplaceAll(htmlContent, "{{ rememberMe }}", shared.RememberMeCheckbox(c.app))
 	htmlContent = strings.ReplaceAll(htmlContent, "{{ alternatives }}", shared.LoginAlternatives(
 		config.LOGIN_METHOD_MAGICLINK, c.loginMethods()))
 
@@ -331,6 +333,11 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 		returnURL = ""
 	}
 
+	// The remember flag travels inside the verify cache entry — not in the
+	// emailed URL — so a forwarded link cannot grant (or strip) a
+	// persistent session.
+	remember := r.FormValue("remember") == "true"
+
 	token, err := c.generateToken()
 	if err != nil {
 		c.releaseSend(email)
@@ -353,7 +360,7 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 	// - "magiclink:token:<token>" = {email, ip, return} — the verify path;
 	//   deleted on use (single-use).
 	nonceValue, _ := json.Marshal(magicLinkCacheValue{Email: email, Token: token, ReturnURL: returnURL})
-	tokenValue, _ := json.Marshal(magicLinkCacheValue{Email: email, IP: req.GetIP(r), ReturnURL: returnURL})
+	tokenValue, _ := json.Marshal(magicLinkCacheValue{Email: email, IP: req.GetIP(r), ReturnURL: returnURL, Remember: remember})
 	cache := c.app.GetMemoryCache()
 	cache.Set(cacheKeyPrefix+nonce, string(nonceValue), tokenTTL)
 	cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), tokenTTL)

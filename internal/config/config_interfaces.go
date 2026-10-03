@@ -110,6 +110,12 @@ type AuthConfigInterface interface {
 
 	SetLoginMethods([]string)
 	GetLoginMethods() []string
+
+	SetRememberMeEnabled(bool)
+	GetRememberMeEnabled() bool
+
+	SetRememberMeDays(int)
+	GetRememberMeDays() int
 }
 
 // ============================================================================

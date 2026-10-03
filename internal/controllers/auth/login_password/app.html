@@ -37,6 +37,7 @@
                                 <input type="password" id="password" v-model="password" class="form-control border-start-0 py-3" placeholder="Your password" autocomplete="current-password" required>
                             </div>
                         </div>
+                        {{ rememberMe }}
                         <button type="submit" class="btn btn-brand w-100 py-3 fw-bold shadow-sm" :disabled="isLoading">
                             <span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                             Sign In

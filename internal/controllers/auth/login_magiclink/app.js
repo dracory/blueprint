@@ -5,6 +5,7 @@ createApp({
 		const email = ref('');
 		const step = ref(1);
 		const isLoading = ref(false);
+		const remember = ref(false);
 
 		const handleSendLink = async () => {
 			if (!email.value) {
@@ -16,6 +17,7 @@ createApp({
 
 			const formData = new FormData();
 			formData.append('email', email.value);
+			formData.append('remember', remember.value ? 'true' : 'false');
 			if (RETURN_URL) {
 				formData.append('return', decodeURIComponent(RETURN_URL));
 			}
@@ -48,6 +50,7 @@ createApp({
 
 		return {
 			email,
+			remember,
 			step,
 			isLoading,
 			handleSendLink,

@@ -26,6 +26,18 @@ func authConfig(env *envValidator) authSettings {
 	// If empty, all authenticated emails are allowed.
 	emailsAllowedAccess := env.GetArray(KEY_AUTH_EMAILS_ALLOWED_ACCESS)
 
+	// Remember Me
+	//
+	// Opt-in persistent login via a long-lived remember session stored in a
+	// separate HttpOnly cookie. AUTH_REMEMBER_ME_DAYS controls the lifetime
+	// of both the session and the cookie (default 30 days).
+	rememberMeEnabled := env.GetBool(KEY_AUTH_REMEMBER_ME_ENABLED)
+	rememberMeDays := env.GetIntOrDefault(KEY_AUTH_REMEMBER_ME_DAYS, 30)
+	if rememberMeDays < 1 {
+		env.Add(fmt.Errorf("%s must be a positive number of days", KEY_AUTH_REMEMBER_ME_DAYS))
+		rememberMeDays = 30
+	}
+
 	// CSRF Secret
 	//
 	// Secret key used for CSRF token generation/validation.
@@ -53,6 +65,8 @@ func authConfig(env *envValidator) authSettings {
 		emailsAllowedAccess: emailsAllowedAccess,
 		csrfSecret:          csrfSecret,
 		loginMethods:        loginMethods,
+		rememberMeEnabled:   rememberMeEnabled,
+		rememberMeDays:      rememberMeDays,
 	}
 }
 
@@ -90,4 +104,6 @@ type authSettings struct {
 	emailsAllowedAccess []string
 	csrfSecret          string
 	loginMethods        []string
+	rememberMeEnabled   bool
+	rememberMeDays      int
 }
