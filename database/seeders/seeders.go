@@ -16,11 +16,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	settingsonce "project/database/seeders/once/settings"
-
-	// usersonce "project/database/seeders/once/users" // enable with UsersSeed below
-	settingsdata "project/database/seeders/sync/settings"
 	"project/internal/app"
+
+	// settingsonce "project/database/seeders/once/settings" // example — enable below
+	// usersonce "project/database/seeders/once/users"       // example — enable below
+	// settingsdata "project/database/seeders/sync/settings" // example — enable below
 
 	"github.com/dracory/neat/database/migrator"
 )
@@ -37,12 +37,13 @@ func SeedAll(ctx context.Context, app app.AppInterface) error {
 
 	// --- Sync seeds (fast, blocking) ---
 
-	// Canonical app settings: a handful of upserts.
-	if cfg.GetSettingStoreUsed() {
-		if err := settingsdata.Sync(ctx, app.GetSettingStore()); err != nil {
-			return fmt.Errorf("sync settings: %w", err)
-		}
-	}
+	// Example only — canonical app settings, a handful of upserts.
+	// Enable if you want these defaults enforced on every boot.
+	// if cfg.GetSettingStoreUsed() {
+	// 	if err := settingsdata.Sync(ctx, app.GetSettingStore()); err != nil {
+	// 		return fmt.Errorf("sync settings: %w", err)
+	// 	}
+	// }
 
 	// --- Once seeds (fast, blocking) ---
 
@@ -52,12 +53,12 @@ func SeedAll(ctx context.Context, app app.AppInterface) error {
 	// canonical data they depend on already exists.
 	onceSeeds := []migrator.MigrationInterface{}
 
-	// Record the install timestamp on first boot.
-	if cfg.GetSettingStoreUsed() {
-		onceSeeds = append(onceSeeds, settingsonce.NewInstalledAtSeed(app))
-	}
+	// Example only — records the install timestamp on first boot.
+	// if cfg.GetSettingStoreUsed() {
+	// 	onceSeeds = append(onceSeeds, settingsonce.NewInstalledAtSeed(app))
+	// }
 
-	// Default user accounts — DISABLED by default: seeding well-known
+	// Example only — default user accounts. DISABLED: seeding well-known
 	// credentials is a security risk if forgotten in production. Enable
 	// for local development only, and change the passwords in
 	// once/users/users.go first.
