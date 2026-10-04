@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"log/slog"
 
+	"project/database/seeders"
 	"project/internal/app"
 	"project/internal/cmsblocks"
 	"project/internal/emails"
@@ -41,6 +43,12 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 
 	if app.GetConfig().GetSessionStoreUsed() && app.IsDisabledSessionStore() {
 		return errors.New("startBackgroundProcesses session store is enabled but not initialized")
+	}
+
+	// Run all seeds (database/seeders.SeedAll): sync seeds upsert canonical
+	// data, once seeds insert-if-absent.
+	if err := seeders.SeedAll(ctx, app); err != nil {
+		return fmt.Errorf("seed data: %w", err)
 	}
 
 	if app.GetConfig().GetTaskStoreUsed() {
