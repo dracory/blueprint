@@ -1,13 +1,14 @@
 package widgets
 
 import (
-	"github.com/dracory/base/blogblocks"
 	"log/slog"
 	"net/http"
 	"project/internal/app"
 	"project/internal/helpers"
 	"project/internal/links"
 	"strings"
+
+	"github.com/dracory/base/blogblocks"
 
 	"github.com/dracory/base/cfmt"
 	"github.com/dracory/blogstore"
@@ -80,6 +81,11 @@ func (w *blogPostWidget) Render(r *http.Request, content string, params map[stri
 		if w.app.GetLogger() != nil {
 			w.app.GetLogger().Error("anyPost: post ID is missing", slog.String("uri", r.RequestURI))
 		}
+		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
+	}
+
+	if w.app.IsDisabledBlogStore() {
 		url := helpers.ToFlashWarningURL(w.app.GetCacheStore(), "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
 		return hb.Script(`window.location.href = "` + url + `"`).ToHTML()
 	}

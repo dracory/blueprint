@@ -59,6 +59,11 @@ func (c *postController) Handler(w http.ResponseWriter, r *http.Request) string 
 		return "post is missing"
 	}
 
+	if c.app.IsDisabledBlogStore() {
+		helpers.ToFlash(c.app.GetCacheStore(), w, r, "warning", "The post you are looking for no longer exists. Redirecting to the blog location...", blogsUrl, 5)
+		return "post is missing"
+	}
+
 	post, errPost := c.app.GetBlogStore().PostFindByID(r.Context(), postID)
 
 	if errPost != nil {

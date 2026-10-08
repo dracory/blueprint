@@ -54,6 +54,11 @@ func subscriptionOnlyMiddlewareHandler(app app.AppInterface) func(next http.Hand
 				return
 			}
 
+			if app.IsDisabledSubscriptionStore() {
+				api.Respond(w, r, api.Error("subscription store is not configured"))
+				return
+			}
+
 			activeSubscriptions, errSubscriptions := app.GetSubscriptionStore().
 				SubscriptionList(context.Background(), subscriptionstore.NewSubscriptionQuery().
 					SetSubscriberID(authenticatedUser.GetID()).

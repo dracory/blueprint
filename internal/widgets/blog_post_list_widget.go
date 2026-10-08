@@ -177,6 +177,10 @@ func (widget *blogPostListWidget) prepareData(r *http.Request) (data blogPostLis
 		page = 0
 	}
 
+	if widget.app.IsDisabledBlogStore() {
+		return data, "Sorry, there was an error loading the posts. Please try again later."
+	}
+
 	perPage := 12 // 3 rows x 4 posts
 
 	options := blogstore.PostQueryOptions{
