@@ -43,6 +43,9 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			return "", err
 		}
+		if country == nil {
+			return "", errors.New("country not found for iso2: " + iso2Code)
+		}
 		return country.Name(), nil
 	}
 
