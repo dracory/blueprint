@@ -6,8 +6,8 @@
 //     email + first-name form (the first name acts as a lightweight
 //     identity-verification step, like CourseThread).
 //  2. POST links.AUTH_FORGOT_PASSWORD?action=forgot-password-ajax verifies
-//     the details, generates a single-use reset token stored in the memory
-//     cache, and enqueues EmailPasswordResetTask to deliver the link.
+//     the details, generates a single-use reset token stored in the cache
+//     store, and enqueues EmailPasswordResetTask to deliver the link.
 //
 // All failure paths return an identical generic response (plus a
 // constant-time delay) to prevent email enumeration via message or timing.
@@ -61,7 +61,7 @@ const (
 	genericSuccessMsg = "If the account details match, a reset link has been sent."
 )
 
-// passwordResetCacheValue is the JSON payload stored in the memory cache.
+// passwordResetCacheValue is the JSON payload stored in the cache store.
 // The token entry ("passwordreset:token:<token>") carries the email used at
 // reset time; the nonce entry ("passwordreset:<nonce>") carries
 // email+token for the email task to resolve.
@@ -73,8 +73,7 @@ type passwordResetCacheValue struct {
 type forgotPasswordController struct {
 	app app.AppInterface
 	// counterMu serializes the read-modify-write on the send-throttle
-	// counter in the memory cache (ttlcache is safe per-call, but
-	// Get-then-Set is not atomic).
+	// counter in the cache store (Get-then-Set is not atomic).
 	counterMu sync.Mutex
 }
 
@@ -156,8 +155,8 @@ func (c *forgotPasswordController) checkStores(w http.ResponseWriter) bool {
 		c.sendErrorResponse(w, "Blind index store not initialized", http.StatusInternalServerError)
 		return false
 	}
-	if c.app.GetMemoryCache() == nil {
-		c.sendErrorResponse(w, "Memory cache not initialized", http.StatusInternalServerError)
+	if c.app.IsDisabledCacheStore() {
+		c.sendErrorResponse(w, "Cache store not initialized", http.StatusInternalServerError)
 		return false
 	}
 	return true
@@ -245,21 +244,29 @@ func (c *forgotPasswordController) handleSubmit(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Note: the memory cache is process-local — an app restart between
-	// enqueue and task execution drops the pending reset email, and issued
-	// links expire before their 15-minute TTL. Accepted trade-off matching
-	// the magic-link login.
-	//
-	// Two cache entries (JSON-encoded):
+	// Two cache entries (JSON-encoded) in the DB-backed cache store, so
+	// reset tokens survive restarts and can be resolved by a task worker
+	// running in a different process:
 	// - "passwordreset:<nonce>" = {email, token} — read by the email task so
 	//   the token is never persisted in the task queue.
 	// - "passwordreset:token:<token>" = {email} — the reset path; deleted on
 	//   use (single-use).
 	nonceValue, _ := json.Marshal(passwordResetCacheValue{Email: email, Token: token})
 	tokenValue, _ := json.Marshal(passwordResetCacheValue{Email: email})
-	cache := c.app.GetMemoryCache()
-	cache.Set(cacheKeyPrefix+nonce, string(nonceValue), tokenTTL)
-	cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), tokenTTL)
+	cache := c.app.GetCacheStore()
+	if err := cache.Set(cacheKeyPrefix+nonce, string(nonceValue), int64(tokenTTL.Seconds())); err != nil {
+		c.releaseSend(email)
+		c.logError("Failed to store reset nonce", err)
+		c.sendErrorResponse(w, "Failed to send reset link", http.StatusInternalServerError)
+		return
+	}
+	if err := cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), int64(tokenTTL.Seconds())); err != nil {
+		_ = cache.Remove(cacheKeyPrefix + nonce)
+		c.releaseSend(email)
+		c.logError("Failed to store reset token", err)
+		c.sendErrorResponse(w, "Failed to send reset link", http.StatusInternalServerError)
+		return
+	}
 
 	resetTaskHandler := email_password_reset.NewEmailPasswordResetTask(c.app)
 	resetTask, ok := resetTaskHandler.(*email_password_reset.EmailPasswordResetTask)
@@ -304,7 +311,7 @@ func (c *forgotPasswordController) tryAcquireSend(email string) bool {
 	if count >= resetMaxSends {
 		return false
 	}
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count+1), tokenTTL)
+	_ = c.app.GetCacheStore().Set(c.sendsKey(email), fmt.Sprintf("%d", count+1), int64(tokenTTL.Seconds()))
 	return true
 }
 
@@ -317,15 +324,13 @@ func (c *forgotPasswordController) releaseSend(email string) {
 	if count <= 0 {
 		return
 	}
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count-1), tokenTTL)
+	_ = c.app.GetCacheStore().Set(c.sendsKey(email), fmt.Sprintf("%d", count-1), int64(tokenTTL.Seconds()))
 }
 
 func (c *forgotPasswordController) sendCountLocked(email string) int {
 	count := 0
-	if item := c.app.GetMemoryCache().Get(c.sendsKey(email)); item != nil {
-		if s, ok := item.Value().(string); ok {
-			fmt.Sscanf(s, "%d", &count)
-		}
+	if s, err := c.app.GetCacheStore().Get(c.sendsKey(email), "0"); err == nil {
+		fmt.Sscanf(s, "%d", &count)
 	}
 	return count
 }

@@ -3,8 +3,8 @@
 //
 // Flow:
 //  1. GET links.AUTH_PASSWORD_RESET?token=... validates the single-use
-//     reset token stored by the forgot-password controller in the memory
-//     cache and renders the new-password form.
+//     reset token stored by the forgot-password controller in the cache
+//     store and renders the new-password form.
 //  2. POST links.AUTH_PASSWORD_RESET?action=password-reset-ajax validates
 //     the token again, applies the shared password policy rule, updates the
 //     user's password hash, and consumes the token.
@@ -19,6 +19,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"sync"
 
 	"project/internal/app"
 	"project/internal/controllers/auth/shared"
@@ -51,6 +52,11 @@ type passwordResetCacheValue struct {
 	Email string `json:"email"`
 }
 
+// consumeMu serializes the Get-then-Remove in consumeToken — the cache
+// store has no atomic get-and-delete, so the mutex preserves the
+// single-use guarantee in-process.
+var consumeMu sync.Mutex
+
 type passwordResetController struct {
 	app app.AppInterface
 }
@@ -75,8 +81,8 @@ func (c *passwordResetController) PageHandler(w http.ResponseWriter, r *http.Req
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `blind index store is required`, homeURL, 5)
 	}
 
-	if c.app.GetMemoryCache() == nil {
-		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `memory cache is required`, homeURL, 5)
+	if c.app.IsDisabledCacheStore() {
+		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, `cache store is required`, homeURL, 5)
 	}
 
 	token := strings.TrimSpace(req.GetStringTrimmed(r, "token"))
@@ -149,7 +155,7 @@ func (c *passwordResetController) renderPage(r *http.Request, token string) stri
 
 // handleSubmit handles POST /auth/password-reset?action=password-reset-ajax
 func (c *passwordResetController) handleSubmit(w http.ResponseWriter, r *http.Request) {
-	if c.app.IsDisabledUserStore() || c.app.GetMemoryCache() == nil {
+	if c.app.IsDisabledUserStore() || c.app.IsDisabledCacheStore() {
 		c.sendErrorResponse(w, "Required stores not initialized", http.StatusInternalServerError)
 		return
 	}
@@ -177,10 +183,10 @@ func (c *passwordResetController) handleSubmit(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	// Consume the token atomically (GetAndDelete) so two concurrent
-	// requests cannot both pass the token check — the link is single-use.
-	// If the password update below fails the user must request a fresh
-	// reset link, which is the acceptable trade-off.
+	// Consume the token (Get-then-Remove serialized by consumeMu) so two
+	// concurrent requests cannot both pass the token check — the link is
+	// single-use. If the password update below fails the user must request
+	// a fresh reset link, which is the acceptable trade-off.
 	email, err := c.consumeToken(token)
 	if err != nil {
 		c.sendErrorResponse(w, "Invalid or expired reset token", http.StatusBadRequest)
@@ -227,18 +233,12 @@ func (c *passwordResetController) handleSubmit(w http.ResponseWriter, r *http.Re
 // tokenEmail returns the email a reset token was issued for, or an error
 // when the token does not exist or has expired.
 func (c *passwordResetController) tokenEmail(ctx context.Context, token string) (string, error) {
-	cache := c.app.GetMemoryCache()
-	if cache == nil {
-		return "", errors.New("memory cache is required")
+	if c.app.IsDisabledCacheStore() {
+		return "", errors.New("cache store is required")
 	}
 
-	item := cache.Get(tokenCacheKeyPrefix + token)
-	if item == nil {
-		return "", errors.New("token not found or expired")
-	}
-
-	stored, ok := item.Value().(string)
-	if !ok {
+	stored, err := c.app.GetCacheStore().Get(tokenCacheKeyPrefix+token, "")
+	if err != nil || stored == "" {
 		return "", errors.New("token not found or expired")
 	}
 
@@ -250,21 +250,22 @@ func (c *passwordResetController) tokenEmail(ctx context.Context, token string) 
 	return value.Email, nil
 }
 
-// consumeToken atomically reads and deletes a reset token so it cannot be
-// used twice.
+// consumeToken reads and deletes a reset token so it cannot be used twice.
+// The read-modify-write is serialized by consumeMu (the cache store has no
+// atomic get-and-delete).
 func (c *passwordResetController) consumeToken(token string) (string, error) {
-	cache := c.app.GetMemoryCache()
-	if cache == nil {
-		return "", errors.New("memory cache is required")
+	if c.app.IsDisabledCacheStore() {
+		return "", errors.New("cache store is required")
 	}
 
-	item, found := cache.GetAndDelete(tokenCacheKeyPrefix + token)
-	if !found || item == nil {
-		return "", errors.New("token not found or expired")
+	consumeMu.Lock()
+	stored, err := c.app.GetCacheStore().Get(tokenCacheKeyPrefix+token, "")
+	if err == nil && stored != "" {
+		err = c.app.GetCacheStore().Remove(tokenCacheKeyPrefix + token)
 	}
+	consumeMu.Unlock()
 
-	stored, ok := item.Value().(string)
-	if !ok {
+	if err != nil || stored == "" {
 		return "", errors.New("token not found or expired")
 	}
 

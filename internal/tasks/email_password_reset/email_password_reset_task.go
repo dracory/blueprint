@@ -7,7 +7,9 @@ package email_password_reset
 //
 // The reset token is never stored in the task queue. Instead the task
 // receives the nonce under which the forgot-password controller stored
-// "email|token" in the memory cache, and resolves it at execution time.
+// "email|token" in the cache store, and resolves it at execution time.
+// The DB-backed cache store is required so the task works when executed
+// by a separate worker process.
 //
 // =================================================================
 // Example Usage:
@@ -19,7 +21,7 @@ package email_password_reset
 //    go run ./cmd/server task EmailPasswordResetTask --nonce="abc123..." --enqueue=yes
 //
 // Parameters:
-// - nonce: The nonce under which "email|token" is stored in the memory cache
+// - nonce: The nonce under which "email|token" is stored in the cache store
 //   (used when enqueued by the forgot-password controller)
 // - email: Email address to send the link to (direct execution only)
 // - token: The reset token (direct execution only)
@@ -41,8 +43,8 @@ import (
 )
 
 // passwordResetCacheValue mirrors the JSON payload written by the
-// forgot-password controller under "passwordreset:<nonce>" in the memory
-// cache.
+// forgot-password controller under "passwordreset:<nonce>" in the cache
+// store.
 type passwordResetCacheValue struct {
 	Email string `json:"email"`
 	Token string `json:"token,omitempty"`
@@ -87,7 +89,7 @@ func (handler *EmailPasswordResetTask) Description() string {
 // Enqueue adds a new password reset email task to the task queue.
 //
 // Only the nonce is stored in the task parameters. The email and token are
-// resolved from the memory cache at execution time, so the reset credential
+// resolved from the cache store at execution time, so the reset credential
 // is never persisted in the task store.
 //
 // Parameters:
@@ -151,7 +153,7 @@ func (handler *EmailPasswordResetTask) Handle() bool {
 		return true
 	}
 
-	// Resolve email+token from the memory cache when only the nonce was
+	// Resolve email+token from the cache store when only the nonce was
 	// provided (the normal path — the token is never stored in the queue).
 	if email == "" || token == "" {
 		if nonce == "" {
@@ -180,11 +182,9 @@ func (handler *EmailPasswordResetTask) Handle() bool {
 	}
 
 	// The email went out — drop the nonce entry so it does not linger in
-	// the memory cache until expiry.
-	if nonce != "" {
-		if cache := handler.app.GetMemoryCache(); cache != nil {
-			cache.Delete("passwordreset:" + nonce)
-		}
+	// the cache store until expiry.
+	if nonce != "" && handler.app.IsEnabledCacheStore() {
+		_ = handler.app.GetCacheStore().Remove("passwordreset:" + nonce)
 	}
 
 	handler.LogSuccess("Password reset email sent successfully to " + email)
@@ -193,21 +193,15 @@ func (handler *EmailPasswordResetTask) Handle() bool {
 }
 
 // resolveFromCache looks up the JSON "email/token" value stored by the
-// forgot-password controller under "passwordreset:<nonce>" in the memory
-// cache.
+// forgot-password controller under "passwordreset:<nonce>" in the cache
+// store.
 func (handler *EmailPasswordResetTask) resolveFromCache(nonce string) (email, token string) {
-	cache := handler.app.GetMemoryCache()
-	if cache == nil {
+	if handler.app.IsDisabledCacheStore() {
 		return "", ""
 	}
 
-	item := cache.Get("passwordreset:" + nonce)
-	if item == nil {
-		return "", ""
-	}
-
-	stored, ok := item.Value().(string)
-	if !ok {
+	stored, err := handler.app.GetCacheStore().Get("passwordreset:"+nonce, "")
+	if err != nil || stored == "" {
 		return "", ""
 	}
 

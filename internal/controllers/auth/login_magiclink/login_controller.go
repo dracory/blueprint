@@ -3,7 +3,7 @@
 // Flow:
 //  1. GET links.AUTH_LOGIN renders a self-contained page with an email form.
 //  2. POST links.AUTH_LOGIN?action=magiclink-send generates a single-use,
-//     IP-bound token, stores it in the memory cache, and enqueues
+//     IP-bound token, stores it in the cache store, and enqueues
 //     EmailMagicLinkTask to deliver the link by email.
 //  3. GET links.AUTH_CALLBACK_MAGICLINK?token=... verifies the token
 //     (IP match + single-use), then hands off to shared.SessionLogin.
@@ -58,7 +58,7 @@ const (
 	cacheKeyPrefix      = "magiclink:"
 )
 
-// magicLinkCacheValue is the JSON payload stored in the memory cache for
+// magicLinkCacheValue is the JSON payload stored in the cache store for
 // magic-link logins. The verify entry ("magiclink:token:<token>") carries
 // Email/IP/ReturnURL; the nonce entry ("magiclink:<nonce>") carries
 // Email/Token/ReturnURL for the email task to resolve.
@@ -74,8 +74,7 @@ type loginController struct {
 	app      app.AppInterface
 	basePath string
 	// counterMu serializes the read-modify-write on the send-throttle
-	// counter in the memory cache (ttlcache is safe per-call, but
-	// Get-then-Set is not atomic).
+	// counter in the cache store (Get-then-Set is not atomic).
 	counterMu sync.Mutex
 }
 
@@ -134,16 +133,14 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 	}
 
 	// Look up the JSON "email/ip/return" value stored under the token key.
-	cache := c.app.GetMemoryCache()
-	tokenKey := tokenCacheKeyPrefix + token
-
-	item := cache.Get(tokenKey)
-	if item == nil {
+	if c.app.IsDisabledCacheStore() {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid or expired login link", homeURL, 5)
 	}
+	cache := c.app.GetCacheStore()
+	tokenKey := tokenCacheKeyPrefix + token
 
-	stored, ok := item.Value().(string)
-	if !ok {
+	stored, err := cache.Get(tokenKey, "")
+	if err != nil || stored == "" {
 		return helpers.ToFlashError(c.app.GetCacheStore(), w, r, "Invalid or expired login link", homeURL, 5)
 	}
 
@@ -166,7 +163,7 @@ func (c *loginController) Handler(w http.ResponseWriter, r *http.Request) string
 	}
 
 	// IP matches — consume the token (single-use).
-	cache.Delete(tokenKey)
+	_ = cache.Remove(tokenKey)
 
 	// Re-check the email allowlist before logging in — the email may have
 	// been blocked since the link was issued.
@@ -281,8 +278,8 @@ func (c *loginController) checkStores(w http.ResponseWriter) bool {
 		c.sendErrorResponse(w, "Session store not initialized", http.StatusInternalServerError)
 		return false
 	}
-	if c.app.GetMemoryCache() == nil {
-		c.sendErrorResponse(w, "Memory cache not initialized", http.StatusInternalServerError)
+	if c.app.IsDisabledCacheStore() {
+		c.sendErrorResponse(w, "Cache store not initialized", http.StatusInternalServerError)
 		return false
 	}
 	return true
@@ -361,9 +358,20 @@ func (c *loginController) handleSend(w http.ResponseWriter, r *http.Request) {
 	//   deleted on use (single-use).
 	nonceValue, _ := json.Marshal(magicLinkCacheValue{Email: email, Token: token, ReturnURL: returnURL})
 	tokenValue, _ := json.Marshal(magicLinkCacheValue{Email: email, IP: req.GetIP(r), ReturnURL: returnURL, Remember: remember})
-	cache := c.app.GetMemoryCache()
-	cache.Set(cacheKeyPrefix+nonce, string(nonceValue), tokenTTL)
-	cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), tokenTTL)
+	cache := c.app.GetCacheStore()
+	if err := cache.Set(cacheKeyPrefix+nonce, string(nonceValue), int64(tokenTTL.Seconds())); err != nil {
+		c.releaseSend(email)
+		c.logError("Failed to store magic link nonce", err)
+		c.sendErrorResponse(w, "Failed to send login link", http.StatusInternalServerError)
+		return
+	}
+	if err := cache.Set(tokenCacheKeyPrefix+token, string(tokenValue), int64(tokenTTL.Seconds())); err != nil {
+		_ = cache.Remove(cacheKeyPrefix + nonce)
+		c.releaseSend(email)
+		c.logError("Failed to store magic link token", err)
+		c.sendErrorResponse(w, "Failed to send login link", http.StatusInternalServerError)
+		return
+	}
 
 	magicLinkTaskHandler := email_magic_link.NewEmailMagicLinkTask(c.app)
 	magicLinkTask, ok := magicLinkTaskHandler.(*email_magic_link.EmailMagicLinkTask)
@@ -400,7 +408,7 @@ func (c *loginController) tryAcquireSend(email string) bool {
 	if count >= magicLinkMaxSends {
 		return false
 	}
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count+1), tokenTTL)
+	_ = c.app.GetCacheStore().Set(c.sendsKey(email), fmt.Sprintf("%d", count+1), int64(tokenTTL.Seconds()))
 	return true
 }
 
@@ -413,7 +421,7 @@ func (c *loginController) releaseSend(email string) {
 	if count <= 0 {
 		return
 	}
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", count-1), tokenTTL)
+	_ = c.app.GetCacheStore().Set(c.sendsKey(email), fmt.Sprintf("%d", count-1), int64(tokenTTL.Seconds()))
 }
 
 // sendCount returns the current per-email send count.
@@ -425,10 +433,8 @@ func (c *loginController) sendCount(email string) int {
 
 func (c *loginController) sendCountLocked(email string) int {
 	count := 0
-	if item := c.app.GetMemoryCache().Get(c.sendsKey(email)); item != nil {
-		if s, ok := item.Value().(string); ok {
-			fmt.Sscanf(s, "%d", &count)
-		}
+	if s, err := c.app.GetCacheStore().Get(c.sendsKey(email), "0"); err == nil {
+		fmt.Sscanf(s, "%d", &count)
 	}
 	return count
 }

@@ -6,8 +6,9 @@ package email_magic_link
 //
 // The login token is never stored in the task queue. Instead the task
 // receives the nonce under which the login controller stored
-// "email|token|return" in the memory cache, and resolves it at execution
-// time.
+// "email|token|return" in the cache store, and resolves it at execution
+// time. The DB-backed cache store is required so the task works when
+// executed by a separate worker process.
 //
 // =================================================================
 // Example Usage:
@@ -19,7 +20,7 @@ package email_magic_link
 //    go run ./cmd/server task EmailMagicLinkTask --nonce="abc123..." --enqueue=yes
 //
 // Parameters:
-// - nonce: The nonce under which "email|token" is stored in the memory cache
+// - nonce: The nonce under which "email|token" is stored in the cache store
 //   (used when enqueued by the login controller)
 // - email: Email address to send the link to (direct execution only)
 // - token: The login token (direct execution only)
@@ -42,7 +43,7 @@ import (
 )
 
 // magicLinkCacheValue mirrors the JSON payload written by the login
-// controller under "magiclink:<nonce>" in the memory cache.
+// controller under "magiclink:<nonce>" in the cache store.
 type magicLinkCacheValue struct {
 	Email     string `json:"email"`
 	IP        string `json:"ip,omitempty"`
@@ -87,7 +88,7 @@ func (handler *EmailMagicLinkTask) Description() string {
 // Enqueue adds a new magic link email task to the task queue.
 //
 // Only the nonce is stored in the task parameters. The email, token and
-// optional return URL are resolved from the memory cache at execution time,
+// optional return URL are resolved from the cache store at execution time,
 // so the login credential is never persisted in the task store.
 //
 // Parameters:
@@ -152,7 +153,7 @@ func (handler *EmailMagicLinkTask) Handle() bool {
 		return true
 	}
 
-	// Resolve email+token from the memory cache when only the nonce was
+	// Resolve email+token from the cache store when only the nonce was
 	// provided (the normal path — the token is never stored in the queue).
 	if email == "" || token == "" {
 		if nonce == "" {
@@ -184,11 +185,9 @@ func (handler *EmailMagicLinkTask) Handle() bool {
 	}
 
 	// The email went out — drop the nonce entry so it does not linger in
-	// the memory cache until expiry.
-	if nonce != "" {
-		if cache := handler.app.GetMemoryCache(); cache != nil {
-			cache.Delete("magiclink:" + nonce)
-		}
+	// the cache store until expiry.
+	if nonce != "" && handler.app.IsEnabledCacheStore() {
+		_ = handler.app.GetCacheStore().Remove("magiclink:" + nonce)
 	}
 
 	handler.LogSuccess("Magic link email sent successfully to " + email)
@@ -197,20 +196,14 @@ func (handler *EmailMagicLinkTask) Handle() bool {
 }
 
 // resolveFromCache looks up the JSON "email/token/return" value stored by
-// the login controller under "magiclink:<nonce>" in the memory cache.
+// the login controller under "magiclink:<nonce>" in the cache store.
 func (handler *EmailMagicLinkTask) resolveFromCache(nonce string) (email, token, returnURL string) {
-	cache := handler.app.GetMemoryCache()
-	if cache == nil {
+	if handler.app.IsDisabledCacheStore() {
 		return "", "", ""
 	}
 
-	item := cache.Get("magiclink:" + nonce)
-	if item == nil {
-		return "", "", ""
-	}
-
-	stored, ok := item.Value().(string)
-	if !ok {
+	stored, err := handler.app.GetCacheStore().Get("magiclink:"+nonce, "")
+	if err != nil || stored == "" {
 		return "", "", ""
 	}
 

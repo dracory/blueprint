@@ -76,7 +76,7 @@ func decodeJSON(t *testing.T, recorder *httptest.ResponseRecorder) map[string]an
 }
 
 // sendLink performs a successful magiclink-send and returns the token read
-// directly from the memory cache via the stored nonce entry.
+// directly from the cache store via the stored token entries.
 func sendLink(t *testing.T, application app.AppInterface, email string) (token string) {
 	t.Helper()
 	form := url.Values{}
@@ -93,21 +93,30 @@ func sendLink(t *testing.T, application app.AppInterface, email string) (token s
 		t.Fatalf("magiclink-send expected success, got %v", data)
 	}
 
-	// Find the token entry the controller stored for the verify path.
-	cache := application.GetMemoryCache()
-	keys := cache.Keys()
-	for _, k := range keys {
-		if !strings.HasPrefix(k, tokenCacheKeyPrefix) {
-			continue
+	// Find the token entry the controller stored for the verify path. The
+	// cache store has no key listing, so query the table directly.
+	rows, err := application.GetDatabase().Query(
+		"SELECT cache_key, cache_value FROM snv_caches_cache WHERE cache_key LIKE ?",
+		tokenCacheKeyPrefix+"%")
+	if err != nil {
+		t.Fatalf("failed to query cache table: %q", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var key, stored string
+		if err := rows.Scan(&key, &stored); err != nil {
+			t.Fatalf("failed to scan cache row: %q", err)
 		}
-		item := cache.Get(k)
-		stored, _ := item.Value().(string)
 		var value magicLinkCacheValue
 		if err := json.Unmarshal([]byte(stored), &value); err == nil && value.Email == email {
-			return strings.TrimPrefix(k, tokenCacheKeyPrefix)
+			return strings.TrimPrefix(key, tokenCacheKeyPrefix)
 		}
 	}
-	t.Fatal("expected token entry stored in memory cache")
+	if err := rows.Err(); err != nil {
+		t.Fatalf("cache table iteration failed: %q", err)
+	}
+	t.Fatal("expected token entry stored in cache store")
 	return ""
 }
 
@@ -252,7 +261,7 @@ func TestVerify_SuccessAndSingleUse(t *testing.T) {
 	}
 
 	// Token entry must be consumed — replaying the link must fail
-	if application.GetMemoryCache().Get(tokenCacheKeyPrefix+token) != nil {
+	if v, _ := application.GetCacheStore().Get(tokenCacheKeyPrefix+token, ""); v != "" {
 		t.Fatal("expected token cache key to be deleted after successful verify")
 	}
 
