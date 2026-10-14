@@ -51,8 +51,7 @@ type loginController struct {
 	app      app.AppInterface
 	basePath string
 	// counterMu serializes the read-modify-write on the send-throttle and
-	// attempt counters in the memory cache (ttlcache is safe per-call, but
-	// Get-then-Set is not atomic).
+	// attempt counters in the cache store (Get-then-Set is not atomic).
 	counterMu sync.Mutex
 }
 
@@ -167,8 +166,8 @@ func (c *loginController) checkStores(w http.ResponseWriter) bool {
 		c.sendErrorResponse(w, "Session store not initialized", http.StatusInternalServerError)
 		return false
 	}
-	if c.app.GetMemoryCache() == nil {
-		c.sendErrorResponse(w, "Memory cache not initialized", http.StatusInternalServerError)
+	if c.app.IsDisabledCacheStore() {
+		c.sendErrorResponse(w, "Cache store not initialized", http.StatusInternalServerError)
 		return false
 	}
 	return true
@@ -235,13 +234,23 @@ func (c *loginController) handleOtpSend(w http.ResponseWriter, r *http.Request) 
 
 	// Store OTP under the nonce key. Value: "email:otp" — verified with
 	// constant-time compare on retrieval, and read by EmailOTPTask so the
-	// plaintext code is never persisted in the task queue.
-	cache := c.app.GetMemoryCache()
-	cache.Set("otp:"+nonce, email+":"+otp, otpTTL)
-	cache.Set("otp_attempts:"+nonce, "0", otpTTL)
+	// plaintext code is never persisted in the task queue. The DB-backed
+	// cache store is used so OTPs survive restarts and can be resolved by
+	// a task worker running in a different process.
+	cache := c.app.GetCacheStore()
+	if err := cache.Set("otp:"+nonce, email+":"+otp, int64(otpTTL.Seconds())); err != nil {
+		c.logError("Failed to store OTP", err)
+		c.sendErrorResponse(w, "Failed to send OTP email", http.StatusInternalServerError)
+		return
+	}
+	if err := cache.Set("otp_attempts:"+nonce, "0", int64(otpTTL.Seconds())); err != nil {
+		c.logError("Failed to store OTP attempts counter", err)
+		c.sendErrorResponse(w, "Failed to send OTP email", http.StatusInternalServerError)
+		return
+	}
 
 	// Enqueue OTP email task for background processing. Only the nonce is
-	// passed — the task resolves email+OTP from the memory cache.
+	// passed — the task resolves email+OTP from the cache store.
 	emailOTPTaskHandler := email_otp.NewEmailOTPTask(c.app)
 	emailOTPTask, ok := emailOTPTaskHandler.(*email_otp.EmailOTPTask)
 	if !ok {
@@ -289,38 +298,44 @@ func (c *loginController) handleOtpVerify(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	cache := c.app.GetMemoryCache()
+	cache := c.app.GetCacheStore()
 	cacheKey := "otp:" + nonce
 	attemptsKey := "otp_attempts:" + nonce
 
 	// Enforce per-nonce attempt limit before any cache lookup to prevent
 	// enumeration. The read-modify-write is serialized via counterMu.
 	c.counterMu.Lock()
-	attemptsItem := cache.Get(attemptsKey)
-	if attemptsItem != nil {
-		attempts, _ := attemptsItem.Value().(string)
+	attempts, err := cache.Get(attemptsKey, "")
+	if err != nil {
+		c.counterMu.Unlock()
+		c.logError("Failed to read OTP attempts counter", err)
+		c.sendErrorResponse(w, "Failed to verify OTP", http.StatusInternalServerError)
+		return
+	}
+	if attempts != "" {
 		count := 0
 		fmt.Sscanf(attempts, "%d", &count)
 		if count >= otpMaxAttempts {
 			c.counterMu.Unlock()
-			cache.Delete(cacheKey)
-			cache.Delete(attemptsKey)
+			_ = cache.Remove(cacheKey)
+			_ = cache.Remove(attemptsKey)
 			c.sendErrorResponse(w, "Too many attempts, please request a new OTP", http.StatusTooManyRequests)
 			return
 		}
-		cache.Set(attemptsKey, fmt.Sprintf("%d", count+1), otpTTL)
+		if err := cache.Set(attemptsKey, fmt.Sprintf("%d", count+1), int64(otpTTL.Seconds())); err != nil {
+			c.logError("Failed to update OTP attempts counter", err)
+		}
 	}
 	c.counterMu.Unlock()
 
 	// Look up stored "email:otp" value by nonce
-	item := cache.Get(cacheKey)
-	if item == nil {
-		c.sendErrorResponse(w, "Invalid or expired OTP", http.StatusUnauthorized)
+	stored, err := cache.Get(cacheKey, "")
+	if err != nil {
+		c.logError("Failed to read OTP", err)
+		c.sendErrorResponse(w, "Failed to verify OTP", http.StatusInternalServerError)
 		return
 	}
-
-	stored, ok := item.Value().(string)
-	if !ok {
+	if stored == "" {
 		c.sendErrorResponse(w, "Invalid or expired OTP", http.StatusUnauthorized)
 		return
 	}
@@ -333,8 +348,8 @@ func (c *loginController) handleOtpVerify(w http.ResponseWriter, r *http.Request
 	}
 
 	// OTP is valid — remove both keys from cache
-	cache.Delete(cacheKey)
-	cache.Delete(attemptsKey)
+	_ = cache.Remove(cacheKey)
+	_ = cache.Remove(attemptsKey)
 
 	// The allowlist may have changed since the OTP was sent — re-check here
 	// so a newly-blocked email cannot complete login. SessionLogin also
@@ -380,7 +395,10 @@ func (c *loginController) canSend(email string) bool {
 func (c *loginController) recordSend(email string) {
 	c.counterMu.Lock()
 	defer c.counterMu.Unlock()
-	c.app.GetMemoryCache().Set(c.sendsKey(email), fmt.Sprintf("%d", c.sendCountLocked(email)+1), otpTTL)
+	err := c.app.GetCacheStore().Set(c.sendsKey(email), fmt.Sprintf("%d", c.sendCountLocked(email)+1), int64(otpTTL.Seconds()))
+	if err != nil {
+		c.logError("Failed to update OTP send counter", err)
+	}
 }
 
 // sendCount returns the current per-email send count.
@@ -392,10 +410,8 @@ func (c *loginController) sendCount(email string) int {
 
 func (c *loginController) sendCountLocked(email string) int {
 	count := 0
-	if item := c.app.GetMemoryCache().Get(c.sendsKey(email)); item != nil {
-		if s, ok := item.Value().(string); ok {
-			fmt.Sscanf(s, "%d", &count)
-		}
+	if s, err := c.app.GetCacheStore().Get(c.sendsKey(email), "0"); err == nil {
+		fmt.Sscanf(s, "%d", &count)
 	}
 	return count
 }

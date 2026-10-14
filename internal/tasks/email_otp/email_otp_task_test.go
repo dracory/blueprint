@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 	"testing"
-	"time"
 
 	"project/internal/emails"
 	"project/internal/tasks/constants"
@@ -103,6 +102,7 @@ func TestEmailOTPTask_Handle_SendEmail(t *testing.T) {
 	cfg.SetMailUsername("")
 	cfg.SetMailPassword("")
 	cfg.SetTaskStoreUsed(true)
+	cfg.SetCacheStoreUsed(true)
 
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
@@ -117,9 +117,11 @@ func TestEmailOTPTask_Handle_SendEmail(t *testing.T) {
 		t.Fatalf("TaskHandlerAdd() expected nil error, got %q", err)
 	}
 
-	// Seed the memory cache the way the login controller does
+	// Seed the cache store the way the login controller does
 	nonce := "testnonce123"
-	app.GetMemoryCache().Set("otp:"+nonce, "user@test.com:123456", 15*time.Minute)
+	if err := app.GetCacheStore().Set("otp:"+nonce, "user@test.com:123456", 15*60); err != nil {
+		t.Fatalf("failed to seed cache store: %q", err)
+	}
 
 	handler, ok := NewEmailOTPTask(app).(*EmailOTPTask)
 	if !ok {

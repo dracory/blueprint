@@ -5,7 +5,9 @@ package email_otp
 //
 // The plaintext OTP is never stored in the task queue. Instead the task
 // receives the nonce under which the login controller stored "email:otp" in
-// the memory cache, and resolves it at execution time.
+// the cache store, and resolves it at execution time. The DB-backed cache
+// store is required so the task works when executed by a separate worker
+// process.
 //
 // =================================================================
 // Example Usage:
@@ -17,7 +19,7 @@ package email_otp
 //    go run ./cmd/server task EmailOTPTask --nonce="abc123..." --enqueue=yes
 //
 // Parameters:
-// - nonce: The nonce under which "email:otp" is stored in the memory cache
+// - nonce: The nonce under which "email:otp" is stored in the cache store
 //   (used when enqueued by the login controller)
 // - email: Email address to send the OTP to (direct execution only)
 // - otp: The 6-digit OTP code (direct execution only)
@@ -74,7 +76,7 @@ func (handler *EmailOTPTask) Description() string {
 // Enqueue adds a new OTP email task to the task queue.
 //
 // Only the nonce is stored in the task parameters. The plaintext email and
-// OTP are resolved from the memory cache at execution time, so the code is
+// OTP are resolved from the cache store at execution time, so the code is
 // never persisted in the task store.
 //
 // Parameters:
@@ -138,7 +140,7 @@ func (handler *EmailOTPTask) Handle() bool {
 		return true
 	}
 
-	// Resolve email+OTP from the memory cache when only the nonce was
+	// Resolve email+OTP from the cache store when only the nonce was
 	// provided (the normal path — the code is never stored in the queue).
 	if email == "" || otp == "" {
 		if nonce == "" {
@@ -170,20 +172,14 @@ func (handler *EmailOTPTask) Handle() bool {
 }
 
 // resolveFromCache looks up the "email:otp" value stored by the login
-// controller under "otp:<nonce>" in the memory cache.
+// controller under "otp:<nonce>" in the cache store.
 func (handler *EmailOTPTask) resolveFromCache(nonce string) (email, otp string) {
-	cache := handler.app.GetMemoryCache()
-	if cache == nil {
+	if handler.app.IsDisabledCacheStore() {
 		return "", ""
 	}
 
-	item := cache.Get("otp:" + nonce)
-	if item == nil {
-		return "", ""
-	}
-
-	stored, ok := item.Value().(string)
-	if !ok {
+	stored, err := handler.app.GetCacheStore().Get("otp:"+nonce, "")
+	if err != nil || stored == "" {
 		return "", ""
 	}
 

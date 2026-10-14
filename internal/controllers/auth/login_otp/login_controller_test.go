@@ -73,7 +73,7 @@ func decodeJSON(t *testing.T, recorder *httptest.ResponseRecorder) map[string]an
 }
 
 // sendOtp performs a successful otp-send and returns the nonce plus the OTP
-// value read directly from the memory cache.
+// value read directly from the cache store.
 func sendOtp(t *testing.T, application app.AppInterface, email string) (nonce, otp string) {
 	t.Helper()
 	form := url.Values{}
@@ -95,12 +95,11 @@ func sendOtp(t *testing.T, application app.AppInterface, email string) (nonce, o
 		t.Fatal("otp-send expected nonce in response")
 	}
 
-	item := application.GetMemoryCache().Get("otp:" + nonce)
-	if item == nil {
-		t.Fatal("expected OTP stored under nonce key in memory cache")
+	stored, err := application.GetCacheStore().Get("otp:"+nonce, "")
+	if err != nil || stored == "" {
+		t.Fatal("expected OTP stored under nonce key in cache store")
 	}
 
-	stored, _ := item.Value().(string)
 	parts := strings.SplitN(stored, ":", 2)
 	if len(parts) != 2 {
 		t.Fatalf("unexpected stored OTP value %q", stored)
@@ -416,7 +415,7 @@ func TestOtpVerify_Success(t *testing.T) {
 	}
 
 	// OTP keys must be consumed
-	if application.GetMemoryCache().Get("otp:"+nonce) != nil {
+	if v, _ := application.GetCacheStore().Get("otp:"+nonce, ""); v != "" {
 		t.Fatal("expected OTP cache key to be deleted after successful verify")
 	}
 }
