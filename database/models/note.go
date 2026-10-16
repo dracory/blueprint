@@ -27,7 +27,7 @@ const (
 // Note is an example ORM model. Datetime fields are stored as
 // ISO 8601 strings.
 type Note struct {
-	orm.ShortID
+	orm.StringID
 	Status        string `json:"status" db:"status"`
 	Title         string `json:"title" db:"title"`
 	Content       string `json:"content" db:"content"`
@@ -47,7 +47,7 @@ func (Note) TableName() string {
 func NewNote() *Note {
 	now := time.Now().UTC().Format("2006-01-02 15:04:05")
 	return &Note{
-		ShortID:       orm.ShortID{ID: uid.SafeShortID()},
+		StringID:      orm.StringID{ID: uid.SafeShortID()},
 		Status:        NOTE_STATUS_ACTIVE,
 		CreatedAt:     now,
 		UpdatedAt:     now,
