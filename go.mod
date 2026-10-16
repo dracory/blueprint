@@ -7,57 +7,57 @@ go 1.27.0
 require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
-	github.com/dracory/auditstore v1.11.0
+	github.com/dracory/auditstore v1.12.0
 	github.com/dracory/auth v0.36.0
 	github.com/dracory/base v0.42.3
-	github.com/dracory/blindindexstore v1.18.0
+	github.com/dracory/blindindexstore v1.19.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/blogadmin v0.2.0
-	github.com/dracory/blogstore v1.36.0
+	github.com/dracory/blogadmin v0.3.0
+	github.com/dracory/blogstore v1.38.0
 	github.com/dracory/bs v0.16.0
-	github.com/dracory/cachestore v1.9.1
+	github.com/dracory/cachestore v1.10.0
 	github.com/dracory/cdn v1.13.0
-	github.com/dracory/chatstore v1.5.0
+	github.com/dracory/chatstore v1.6.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.42.1
+	github.com/dracory/cmsstore v1.43.0
 	github.com/dracory/csrf v0.2.0
-	github.com/dracory/customstore v1.15.1
+	github.com/dracory/customstore v1.16.0
 	github.com/dracory/dataobject v1.7.0
 	github.com/dracory/email v0.2.0
-	github.com/dracory/entitystore v1.21.1
+	github.com/dracory/entitystore v1.22.0
 	github.com/dracory/env v1.4.0
 	github.com/dracory/envenc v1.5.0
-	github.com/dracory/feedstore v1.11.0
+	github.com/dracory/feedstore v1.12.0
 	github.com/dracory/fileadmin v0.1.0
 	github.com/dracory/filesystem v1.4.0
 	github.com/dracory/form v0.23.0
-	github.com/dracory/geostore v1.11.0
+	github.com/dracory/geostore v1.12.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.9.0
 	github.com/dracory/logadmin v0.1.0
-	github.com/dracory/logstore v1.22.2
-	github.com/dracory/metastore v1.11.0
-	github.com/dracory/neat v0.56.0
+	github.com/dracory/logstore v1.23.0
+	github.com/dracory/metastore v1.12.0
+	github.com/dracory/neat v0.57.0
 	github.com/dracory/req v0.1.0
 	github.com/dracory/rtr v1.9.0
 	github.com/dracory/rule v0.8.0
-	github.com/dracory/sessionstore v1.19.1
-	github.com/dracory/settingstore v1.12.1
-	github.com/dracory/shopadmin v0.5.0
-	github.com/dracory/shopstore v1.26.2
+	github.com/dracory/sessionstore v1.20.0
+	github.com/dracory/settingstore v1.13.0
+	github.com/dracory/shopadmin v0.6.0
+	github.com/dracory/shopstore v1.27.0
 	github.com/dracory/social v0.1.0
-	github.com/dracory/statsstore v1.31.3
+	github.com/dracory/statsstore v1.32.0
 	github.com/dracory/str v0.19.0
-	github.com/dracory/subscriptionstore v1.5.0
-	github.com/dracory/taskstore v1.32.1
+	github.com/dracory/subscriptionstore v1.6.0
+	github.com/dracory/taskstore v1.33.0
 	github.com/dracory/test v1.0.0
 	github.com/dracory/ui v0.17.0
-	github.com/dracory/uid v1.12.0
+	github.com/dracory/uid v1.13.0
 	github.com/dracory/uncdn v0.11.0
 	github.com/dracory/useradmin v0.5.1
-	github.com/dracory/userstore v1.20.1
-	github.com/dracory/vaultstore v1.5.1
+	github.com/dracory/userstore v1.21.0
+	github.com/dracory/vaultstore v1.6.0
 	github.com/dracory/websrv v0.4.0
 	github.com/dromara/carbon/v2 v2.6.18
 	github.com/faabiosr/cachego v0.26.0
@@ -114,8 +114,8 @@ require (
 	github.com/dracory/crypto v0.3.0 // indirect
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
-	github.com/dracory/sqlfilestore v1.10.0 // indirect
-	github.com/dracory/versionstore v1.7.2 // indirect
+	github.com/dracory/sqlfilestore v1.11.0 // indirect
+	github.com/dracory/versionstore v1.8.0 // indirect
 	github.com/dracory/wf v0.6.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -176,7 +176,7 @@ require (
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
-	modernc.org/libc v1.78.0 // indirect
+	modernc.org/libc v1.79.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
