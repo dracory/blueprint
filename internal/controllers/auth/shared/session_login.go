@@ -138,7 +138,8 @@ func CreateSession(application app.AppInterface, w http.ResponseWriter, r *http.
 		SetIPAddress(req.GetIP(r)).
 		SetExpiresAt(carbon.Now(carbon.UTC).AddHours(2).ToDateTimeString(carbon.UTC))
 
-	if application.GetConfig() != nil && application.GetConfig().IsEnvDevelopment() {
+	if application.GetConfig() != nil &&
+		(application.GetConfig().IsEnvDevelopment() || application.GetConfig().IsEnvLocal()) {
 		session.SetExpiresAt(carbon.Now(carbon.UTC).AddHours(4).ToDateTimeString(carbon.UTC))
 	}
 
@@ -158,7 +159,8 @@ func CreateSession(application app.AppInterface, w http.ResponseWriter, r *http.
 	// In development (HTTP), the Secure flag must be disabled so the
 	// browser sends the cookie back over plain HTTP.
 	cookieOpts := []types.CookieOption{}
-	if application.GetConfig() != nil && application.GetConfig().IsEnvDevelopment() {
+	if application.GetConfig() != nil &&
+		(application.GetConfig().IsEnvDevelopment() || application.GetConfig().IsEnvLocal()) {
 		cookieOpts = append(cookieOpts, types.WithSecure(false))
 	}
 
@@ -203,7 +205,7 @@ func IssueRememberSession(application app.AppInterface, w http.ResponseWriter, r
 		types.WithCookieName(config.COOKIE_NAME_REMEMBER_TOKEN),
 		types.WithMaxAge(days * 24 * 60 * 60),
 	}
-	if cfg.IsEnvDevelopment() {
+	if cfg.IsEnvDevelopment() || cfg.IsEnvLocal() {
 		cookieOpts = append(cookieOpts, types.WithSecure(false))
 	}
 
@@ -239,7 +241,8 @@ func RemoveRememberCookie(application app.AppInterface, w http.ResponseWriter, r
 	cookieOpts := []types.CookieOption{
 		types.WithCookieName(config.COOKIE_NAME_REMEMBER_TOKEN),
 	}
-	if application.GetConfig() != nil && application.GetConfig().IsEnvDevelopment() {
+	if application.GetConfig() != nil &&
+		(application.GetConfig().IsEnvDevelopment() || application.GetConfig().IsEnvLocal()) {
 		cookieOpts = append(cookieOpts, types.WithSecure(false))
 	}
 	auth.AuthCookieRemove(w, r, cookieOpts...)

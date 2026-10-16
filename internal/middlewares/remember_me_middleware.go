@@ -215,7 +215,7 @@ func removeRequestCookie(r *http.Request, name string) {
 // convention used for the auth cookie (plain HTTP in development).
 func expireCookie(w http.ResponseWriter, r *http.Request, name string, a app.AppInterface) {
 	secure := true
-	if a.GetConfig() != nil && a.GetConfig().IsEnvDevelopment() {
+	if a.GetConfig() != nil && (a.GetConfig().IsEnvDevelopment() || a.GetConfig().IsEnvLocal()) {
 		secure = false
 	}
 	http.SetCookie(w, &http.Cookie{
