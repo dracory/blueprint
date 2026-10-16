@@ -13,7 +13,7 @@ require (
 	github.com/dracory/blindindexstore v1.18.0
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.2.0
-	github.com/dracory/blogstore v1.35.2
+	github.com/dracory/blogstore v1.36.0
 	github.com/dracory/bs v0.16.0
 	github.com/dracory/cachestore v1.9.1
 	github.com/dracory/cdn v1.13.0
@@ -34,7 +34,7 @@ require (
 	github.com/dracory/geostore v1.11.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
-	github.com/dracory/llm v1.8.1
+	github.com/dracory/llm v1.9.0
 	github.com/dracory/logadmin v0.1.0
 	github.com/dracory/logstore v1.22.2
 	github.com/dracory/metastore v1.11.0
@@ -45,15 +45,15 @@ require (
 	github.com/dracory/sessionstore v1.19.1
 	github.com/dracory/settingstore v1.12.1
 	github.com/dracory/shopadmin v0.5.0
-	github.com/dracory/shopstore v1.26.1
+	github.com/dracory/shopstore v1.26.2
 	github.com/dracory/social v0.1.0
-	github.com/dracory/statsstore v1.31.1
+	github.com/dracory/statsstore v1.31.3
 	github.com/dracory/str v0.19.0
 	github.com/dracory/subscriptionstore v1.5.0
 	github.com/dracory/taskstore v1.32.1
 	github.com/dracory/test v1.0.0
 	github.com/dracory/ui v0.17.0
-	github.com/dracory/uid v1.11.0
+	github.com/dracory/uid v1.12.0
 	github.com/dracory/uncdn v0.11.0
 	github.com/dracory/useradmin v0.5.1
 	github.com/dracory/userstore v1.20.1
@@ -68,7 +68,7 @@ require (
 	github.com/mileusna/useragent v1.3.5
 	github.com/robertkrimen/otto v0.5.1
 	github.com/samber/lo v1.53.0
-	github.com/sfreiberg/simplessh v0.0.0-20220719182921-185eafd40485
+	github.com/sfreiberg/simplessh v0.0.0-20261012220437-bf22358868f4
 	github.com/spf13/cast v1.10.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
 	github.com/yuin/goldmark v1.8.6
@@ -159,7 +159,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/atomic v1.12.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
-	golang.org/x/exp v0.0.0-20261011100332-faecfb24eb49 // indirect
+	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
 	golang.org/x/image v0.47.0 // indirect
 	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
@@ -168,11 +168,11 @@ require (
 	golang.org/x/term v0.47.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/api v0.301.0 // indirect
-	google.golang.org/genai v1.73.0 // indirect
-	google.golang.org/genproto v0.0.0-20261005182115-fad411399dd8 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8 // indirect
+	google.golang.org/api v0.304.0 // indirect
+	google.golang.org/genai v1.75.0 // indirect
+	google.golang.org/genproto v0.0.0-20261012220534-4341edf3f941 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 // indirect
 	google.golang.org/grpc v1.84.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect

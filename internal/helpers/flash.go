@@ -21,7 +21,7 @@ func IsFlashRoute(r *http.Request) bool {
 
 // ToFlashURL return a flash message URL
 func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, message string, url string, seconds int) string {
-	id := uid.ShortID()
+	id := uid.SafeShortID()
 
 	if cacheStore == nil {
 		fmt.Println("Flash error: cache store is nil")

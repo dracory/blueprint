@@ -57,7 +57,7 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]baselayouts.Brea
 			hb.BORDER_LAYOUT_ALIGN_LEFT,
 			hb.BORDER_LAYOUT_ALIGN_MIDDLE)
 
-	id := "PageHeader" + uid.ShortID()
+	id := "PageHeader" + uid.SafeShortID()
 
 	style := hb.NewStyle(`
 		#` + id + ` .breadcrumb{

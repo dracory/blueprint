@@ -14,7 +14,7 @@ import (
 
 	"github.com/dracory/neat"
 	"github.com/dracory/neat/database/orm"
-	"github.com/dracory/neat/support/uid"
+	"github.com/dracory/uid"
 )
 
 const (
@@ -47,7 +47,7 @@ func (Note) TableName() string {
 func NewNote() *Note {
 	now := time.Now().UTC().Format("2006-01-02 15:04:05")
 	return &Note{
-		ShortID:       orm.ShortID{ID: uid.GenerateShortID()},
+		ShortID:       orm.ShortID{ID: uid.SafeShortID()},
 		Status:        NOTE_STATUS_ACTIVE,
 		CreatedAt:     now,
 		UpdatedAt:     now,
