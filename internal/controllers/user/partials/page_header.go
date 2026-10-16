@@ -2,9 +2,9 @@ package partials
 
 import (
 	"project/internal/links"
+	"uuid"
 
 	baselayouts "github.com/dracory/base/layouts"
-	"github.com/dracory/uid"
 
 	"github.com/dracory/hb"
 
@@ -57,7 +57,7 @@ func PageHeader(iconName string, title string, breadcrumbs ...[]baselayouts.Brea
 			hb.BORDER_LAYOUT_ALIGN_LEFT,
 			hb.BORDER_LAYOUT_ALIGN_MIDDLE)
 
-	id := "PageHeader" + uid.SafeShortID()
+	id := "PageHeader" + uuid.NewV7().String()
 
 	style := hb.NewStyle(`
 		#` + id + ` .breadcrumb{

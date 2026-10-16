@@ -11,10 +11,10 @@ package models
 
 import (
 	"time"
+	"uuid"
 
 	"github.com/dracory/neat"
 	"github.com/dracory/neat/database/orm"
-	"github.com/dracory/uid"
 )
 
 const (
@@ -47,7 +47,7 @@ func (Note) TableName() string {
 func NewNote() *Note {
 	now := time.Now().UTC().Format("2006-01-02 15:04:05")
 	return &Note{
-		StringID:      orm.StringID{ID: uid.SafeShortID()},
+		StringID:      orm.StringID{ID: uuid.NewV7().String()},
 		Status:        NOTE_STATUS_ACTIVE,
 		CreatedAt:     now,
 		UpdatedAt:     now,

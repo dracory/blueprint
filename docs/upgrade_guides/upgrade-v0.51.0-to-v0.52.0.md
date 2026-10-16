@@ -4,36 +4,106 @@ This guide helps LLMs and developers upgrade Blueprint applications from v0.51.0
 
 ## Overview
 
-This is a small maintenance release. All generated short IDs now use `uid.SafeShortID()` from `github.com/dracory/uid` v1.12.0 — a 14-character, vowel-free, chronologically sortable ID — instead of `uid.ShortID()` / `GenerateShortID()`. The vowel-free alphabet avoids generating accidental English words in user-facing IDs (flash message keys, DOM element IDs, ORM record IDs). Several dependencies were also bumped.
+This is a maintenance release. Blueprint's generated IDs now use Go 1.27's standard-library `uuid.NewV7()` — canonical 36-character, chronologically sortable UUIDs — instead of `uid.ShortID()` / `GenerateShortID()`. The example `Note` model also migrates from `orm.ShortID` to `orm.StringID`, and the dracory store/admin dependencies changed in this release were bumped to their latest releases.
 
 **Key Changes:**
-- `internal/helpers/flash.go` — `uid.ShortID()` → `uid.SafeShortID()`
-- `internal/controllers/user/partials/page_header.go` — `uid.ShortID()` → `uid.SafeShortID()`
-- `database/models/note.go` — `uid.GenerateShortID()` (from `github.com/dracory/neat/support/uid`) → `uid.SafeShortID()` (from `github.com/dracory/uid`)
-- Dependency updates: `blogstore` v1.35.2→v1.36.0, `llm` v1.8.1→v1.9.0, `shopstore` v1.26.1→v1.26.2, `statsstore` v1.31.1→v1.31.3, `uid` v1.11.0→v1.12.0, `google.golang.org/api` v0.301.0→v0.304.0, `google.golang.org/genai` v1.73.0→v1.75.0
+- `internal/helpers/flash.go` — `uid.ShortID()` → `uuid.NewV7().String()`
+- `internal/controllers/user/partials/page_header.go` — `uid.SafeShortID()` → `uuid.NewV7().String()`
+- `database/models/note.go` — `orm.ShortID` → `orm.StringID`; `uid.GenerateShortID()` (from `github.com/dracory/neat/support/uid`) → `uuid.NewV7().String()`
+- Dependency updates:
+  - `auditstore` v1.11.0→v1.12.0
+  - `blindindexstore` v1.18.0→v1.19.0
+  - `blogadmin` v0.2.0→v0.3.0
+  - `blogstore` v1.35.2→v1.38.0
+  - `cachestore` v1.9.1→v1.10.0
+  - `chatstore` v1.5.0→v1.6.0
+  - `cmsstore` v1.42.1→v1.43.0
+  - `customstore` v1.15.1→v1.16.0
+  - `entitystore` v1.21.1→v1.22.0
+  - `feedstore` v1.11.0→v1.12.0
+  - `geostore` v1.11.0→v1.12.0
+  - `llm` v1.8.1→v1.9.0
+  - `logstore` v1.22.2→v1.23.0
+  - `metastore` v1.11.0→v1.12.0
+  - `neat` v0.56.0→v0.57.0
+  - `sessionstore` v1.19.1→v1.20.0
+  - `settingstore` v1.12.1→v1.13.0
+  - `shopadmin` v0.5.0→v0.6.0
+  - `shopstore` v1.26.1→v1.27.0
+  - `statsstore` v1.31.1→v1.32.0
+  - `subscriptionstore` v1.5.0→v1.6.0
+  - `taskstore` v1.32.1→v1.33.0
+  - `uid` v1.11.0→v1.13.0 as an indirect dependency; Blueprint code no longer imports it
+  - `userstore` v1.20.1→v1.21.0
+  - `vaultstore` v1.5.1→v1.6.0
+  - Third-party bumps include `simplessh`, `golang.org/x/exp`, `google.golang.org/api`, `google.golang.org/genai`, `google.golang.org/genproto`, `modernc.org/libc`, `sqlfilestore`, and `versionstore`.
 
 ---
 
 ## ⚠️ Breaking Changes
 
-### 1. Short IDs are 14 characters instead of 11
+### 1. Generated IDs are UUIDv7 instead of short IDs
 
-**Change**: `uid.SafeShortID()` returns a 14-character lowercase ID (`"05fr88tc139r8t"`) encoded in a vowel-free Base 16 alphabet, versus the 11-character Crockford Base32 output of `uid.ShortID()` / `GenerateShortID()` (`"sa4rc789wxg"`).
+**Change**: Blueprint now generates user-facing IDs with Go 1.27's standard-library `uuid.NewV7()`. These are canonical 36-character UUIDs (for example, `"019a0f8e-7f3a-7f3a-8f3a-3f3a3f3a3f3a"`) instead of 11-character Crockford Base32 IDs.
+
+This applies to:
+
+- `internal/helpers/flash.go` — flash `message_id`
+- `internal/controllers/user/partials/page_header.go` — DOM element ID
+- `database/models/note.go` — example `Note` ID
 
 **Old Usage**:
 ```go
-id := uid.ShortID()           // 11 chars, Crockford Base32
-id := uid.GenerateShortID()   // neat/support/uid equivalent
+import "github.com/dracory/uid"
+
+id := uid.ShortID()
+id := uid.SafeShortID()
+id := uid.GenerateShortID()   // neat/support/uid
 ```
 
 **New Usage**:
 ```go
-id := uid.SafeShortID()       // 14 chars, vowel-free Base 16
+import "uuid"
+
+id := uuid.NewV7().String()
 ```
 
 **Action Required**:
-- If any column or field storing generated IDs is sized for exactly 11 characters, widen it to at least 14 (`VARCHAR(32)` or larger recommended). Blueprint's own usages (flash message cache keys, DOM IDs, the example `note` model's `orm.ShortID`) are unconstrained.
-- IDs remain lowercase, URL-safe, and chronologically sortable — no format validation changes needed unless you validate `uid.IsShortID()` length explicitly.
+- Update validators or storage that expect 11- or 14-character short IDs to accept canonical UUIDv7 strings.
+- Flash cache keys and page-header DOM IDs are longer, but no schema migration is required for Blueprint's own code.
+- If you copied the example `note` model, ensure its `id` column can store 36 characters (`VARCHAR(36)` or larger).
+- UUIDv7 IDs sort chronologically except when the system clock moves backwards.
+
+### 2. The example `Note` model embeds `orm.StringID`
+
+**Change**: `database/models/note.go` now embeds `orm.StringID` instead of `orm.ShortID`. This aligns the example model with the ORM's current field naming while storing a string ID generated by `uuid.NewV7().String()`.
+
+**Old Usage**:
+```go
+type Note struct {
+    orm.ShortID
+}
+
+note := &Note{
+    ShortID: orm.ShortID{ID: uid.GenerateShortID()},
+}
+```
+
+**New Usage**:
+```go
+type Note struct {
+    orm.StringID
+}
+
+note := &Note{
+    StringID: orm.StringID{ID: uuid.NewV7().String()},
+}
+```
+
+**Action Required**:
+- If your project copied the example `Note` model, update the embedded field and constructor literal.
+- Update direct field references such as `note.ShortID` to `note.StringID`, or prefer the promoted `note.ID` where possible.
+- No schema change is required: the model still stores the same `id` column.
 
 ---
 
@@ -57,37 +127,83 @@ go mod tidy
 Or pin the dracory bumps explicitly:
 
 ```bash
-go get github.com/dracory/blogstore@v1.36.0 \
+go get github.com/dracory/auditstore@v1.12.0 \
+       github.com/dracory/blindindexstore@v1.19.0 \
+       github.com/dracory/blogadmin@v0.3.0 \
+       github.com/dracory/blogstore@v1.38.0 \
+       github.com/dracory/cachestore@v1.10.0 \
+       github.com/dracory/chatstore@v1.6.0 \
+       github.com/dracory/cmsstore@v1.43.0 \
+       github.com/dracory/customstore@v1.16.0 \
+       github.com/dracory/entitystore@v1.22.0 \
+       github.com/dracory/feedstore@v1.12.0 \
+       github.com/dracory/geostore@v1.12.0 \
        github.com/dracory/llm@v1.9.0 \
-       github.com/dracory/shopstore@v1.26.2 \
-       github.com/dracory/statsstore@v1.31.3 \
-       github.com/dracory/uid@v1.12.0
+       github.com/dracory/logstore@v1.23.0 \
+       github.com/dracory/metastore@v1.12.0 \
+       github.com/dracory/neat@v0.57.0 \
+       github.com/dracory/sessionstore@v1.20.0 \
+       github.com/dracory/settingstore@v1.13.0 \
+       github.com/dracory/shopadmin@v0.6.0 \
+       github.com/dracory/shopstore@v1.27.0 \
+       github.com/dracory/statsstore@v1.32.0 \
+       github.com/dracory/subscriptionstore@v1.6.0 \
+       github.com/dracory/taskstore@v1.33.0 \
+       github.com/dracory/userstore@v1.21.0 \
+       github.com/dracory/vaultstore@v1.6.0
 go mod tidy
 ```
 
-### Step 3: Replace ID generators with `uid.SafeShortID()`
+### Step 3: Replace ID generators with UUIDv7
 
-Search your project for every place a short ID is generated and swap the call:
+Search your project for every place a Blueprint-generated short ID is produced and swap the call:
 
 ```go
 // Before
 import "github.com/dracory/uid"              // or "github.com/dracory/neat/support/uid"
 id := uid.ShortID()                          // dracory/uid
+id := uid.SafeShortID()                      // dracory/uid
 id := uid.GenerateShortID()                  // neat/support/uid
 
 // After
-import "github.com/dracory/uid"
-id := uid.SafeShortID()
+import "uuid"
+id := uuid.NewV7().String()
 ```
 
 Apply to:
 
 - `internal/helpers/flash.go` — flash `message_id`
 - `internal/controllers/user/partials/page_header.go` — DOM element ID
-- `database/models/note.go` — `NewNote()` (also switch the import from `github.com/dracory/neat/support/uid` to `github.com/dracory/uid`)
-- Any project-local code calling `uid.ShortID()`, `uid.GenerateShortID()`, or `neat.GenerateID()` for user-facing IDs
+- `database/models/note.go` — `NewNote()` (also remove the `github.com/dracory/neat/support/uid` / `github.com/dracory/uid` import)
+- Any project-local code that copied these Blueprint call sites
 
-### Step 4: Verify
+If project-local code intentionally uses `dracory/uid` for a different format, keep that dependency and leave those call sites unchanged.
+
+### Step 4: Update the example `Note` embedding
+
+If your project copied `database/models/note.go`, migrate the embedded ID field too:
+
+```go
+// Before
+type Note struct {
+    orm.ShortID
+}
+
+return &Note{
+    ShortID: orm.ShortID{ID: uuid.NewV7().String()},
+}
+
+// After
+type Note struct {
+    orm.StringID
+}
+
+return &Note{
+    StringID: orm.StringID{ID: uuid.NewV7().String()},
+}
+```
+
+### Step 5: Verify
 
 ```bash
 go mod tidy
@@ -100,32 +216,39 @@ go test ./...
 ## 🧪 Testing After Migration
 
 1. **Unit tests**: `go test ./internal/helpers/... ./internal/controllers/user/... ./database/...`
-2. **Flash messages**: trigger any flash redirect (e.g. a failed form post) and confirm the `message_id` in the URL is a 14-char lowercase ID and the message renders.
-3. **Existing rows**: IDs generated before the upgrade remain valid — `SafeShortID` only changes newly generated values; no data migration is needed.
+2. **Flash messages**: trigger any flash redirect (e.g. a failed form post) and confirm the `message_id` in the URL is a canonical UUIDv7 string and the message renders.
+3. **Existing rows**: IDs generated before the upgrade remain valid — `uuid.NewV7()` only changes newly generated values; no data migration is needed.
 
 ---
 
 ## 📝 Additional Notes
 
-- **Why vowel-free?** `SafeShortID` maps every hex letter to a non-vowel (`a`→`b` … `e`→`r`, `f`→`t`), greatly reducing accidental English words in IDs shown to users or embedded in URLs.
-- **Per-process uniqueness** is unchanged: IDs pack `(microsecond timestamp << 4) | counter`, so they sort chronologically but are not unguessable — never use them as security tokens.
-- **`neat/support/uid` still exists** and its `GenerateShortID()` still works; blueprint simply prefers `dracory/uid.SafeShortID()` for all new IDs.
+- **UUIDv7 requires Go 1.27**: `uuid.NewV7()` is in the standard `uuid` package, so no extra dependency is needed.
+- **UUIDv7 sort order** comes from the timestamp in the most significant bits; ordering is chronological except when the system clock moves backwards.
+- **Do not use UUIDs as security tokens** solely because they are hard to predict; use a dedicated token generator for authentication secrets.
+- **`github.com/dracory/uid` is now indirect** for Blueprint itself. Keep it only if project-local code still uses it.
 
 ---
 
 ## 🆘 Common Issues and Solutions
 
-### Issue: Compile error `uid.SafeShortID undefined`
+### Issue: Compile error `unknown field ShortID in struct literal of type models.Note`
 
-**Cause**: `github.com/dracory/uid` is older than v1.12.0, or the file still imports `github.com/dracory/neat/support/uid` (which has no `SafeShortID`).
+**Cause**: The copied `Note` model now embeds `orm.StringID`, but a constructor or test still initializes `ShortID`.
 
-**Solution**: `go get github.com/dracory/uid@v1.12.0` and fix the import path.
+**Solution**: Replace the field name with `StringID`, or access the promoted `ID` field instead.
 
-### Issue: Generated IDs rejected by a strict 11-char validator or DB column
+### Issue: Compile error `uuid.NewV7 undefined`
 
-**Cause**: `SafeShortID` produces 14 characters.
+**Cause**: The project is building with a Go version older than 1.27.
 
-**Solution**: Widen the column/validator to 14+ characters, or keep `uid.ShortID()` for that specific field.
+**Solution**: Upgrade to Go 1.27 or later; the `uuid` package is part of the standard library.
+
+### Issue: Generated IDs rejected by a strict short-ID validator or DB column
+
+**Cause**: `uuid.NewV7().String()` produces a canonical 36-character UUID.
+
+**Solution**: Update the validator or column to accept 36-character UUID strings for Blueprint-generated IDs.
 
 ---
 

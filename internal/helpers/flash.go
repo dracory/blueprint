@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"project/internal/links"
 	"strings"
+	"uuid"
 
 	"github.com/dracory/cachestore"
-	"github.com/dracory/uid"
 )
 
 const FLASH_ERROR = "error"
@@ -21,7 +21,7 @@ func IsFlashRoute(r *http.Request) bool {
 
 // ToFlashURL return a flash message URL
 func ToFlashURL(cacheStore cachestore.StoreInterface, messageType string, message string, url string, seconds int) string {
-	id := uid.SafeShortID()
+	id := uuid.NewV7().String()
 
 	if cacheStore == nil {
 		fmt.Println("Flash error: cache store is nil")

@@ -53,7 +53,6 @@ require (
 	github.com/dracory/taskstore v1.33.0
 	github.com/dracory/test v1.0.0
 	github.com/dracory/ui v0.17.0
-	github.com/dracory/uid v1.13.0
 	github.com/dracory/uncdn v0.11.0
 	github.com/dracory/useradmin v0.5.1
 	github.com/dracory/userstore v1.21.0
@@ -115,6 +114,7 @@ require (
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/sqlfilestore v1.11.0 // indirect
+	github.com/dracory/uid v1.13.0 // indirect
 	github.com/dracory/versionstore v1.8.0 // indirect
 	github.com/dracory/wf v0.6.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
