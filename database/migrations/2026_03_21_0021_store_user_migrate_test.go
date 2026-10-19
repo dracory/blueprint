@@ -9,8 +9,8 @@ func TestStoreUserMigrate_InterfaceMethods(t *testing.T) {
 		t.Errorf("Expected signature '2026_03_21_0021_store_user_migrate', got '%s'", migration.Signature())
 	}
 
-	if migration.Description() != "Run user store MigrateUp to create user tables" {
-		t.Errorf("Expected description 'Run user store MigrateUp to create user tables', got '%s'", migration.Description())
+	if migration.Description() != "Run user store MigrateUp to create user and role tables and seed default roles" {
+		t.Errorf("Expected description 'Run user store MigrateUp to create user and role tables and seed default roles', got '%s'", migration.Description())
 	}
 }
 
@@ -27,12 +27,11 @@ func TestStoreUserMigrate_UpWithNilApp(t *testing.T) {
 
 func TestStoreUserMigrate_DownWithNilApp(t *testing.T) {
 	migration := &StoreUserMigrate{}
-	defer func() {
-		if r := recover(); r != nil {
-			// Expected panic due to nil app
-		} else {
-			t.Error("Expected panic when app is nil")
-		}
-	}()
-	_ = migration.Down()
+	err := migration.Down()
+	if err == nil {
+		t.Fatal("Expected error when app is nil")
+	}
+	if err.Error() != "app is nil" {
+		t.Errorf("Expected error 'app is nil', got '%s'", err.Error())
+	}
 }

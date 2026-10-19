@@ -106,7 +106,6 @@ func getStoreMigrations(cfg config.ConfigInterface, reg app.AppInterface) []migr
 	}
 	if cfg.GetUserStoreUsed() {
 		migrations = append(migrations, &StoreUserMigrate{app: reg})
-		migrations = append(migrations, &StoreUserRolesMigrate{app: reg})
 	}
 	if cfg.GetVaultStoreUsed() {
 		migrations = append(migrations, &StoreVaultMigrate{app: reg})
