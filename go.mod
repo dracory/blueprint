@@ -47,7 +47,8 @@ require (
 	github.com/dracory/shopadmin v0.6.0
 	github.com/dracory/shopstore v1.27.0
 	github.com/dracory/social v0.1.0
-	github.com/dracory/statsstore v1.32.0
+	github.com/dracory/statsadmin v0.3.0
+	github.com/dracory/statsstore v1.32.1
 	github.com/dracory/str v0.19.0
 	github.com/dracory/subscriptionstore v1.6.0
 	github.com/dracory/taskstore v1.33.0

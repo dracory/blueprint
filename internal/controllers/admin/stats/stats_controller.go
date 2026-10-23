@@ -5,23 +5,23 @@ import (
 	"log/slog"
 	"net/http"
 	"project/internal/app"
-	adminlayout "project/internal/controllers/admin/layout"
+	"project/internal/controllers/admin/adapters"
 	"project/internal/helpers"
 	"project/internal/links"
 
-	baselayouts "github.com/dracory/base/layouts"
+	basesession "github.com/dracory/base/session"
 
-	"github.com/dracory/hb"
-
-	statsAdmin "github.com/dracory/statsstore/admin"
-	statsAdminShared "github.com/dracory/statsstore/admin/shared"
+	statsadmin "github.com/dracory/statsadmin"
 )
 
+// statsController wraps the external github.com/dracory/statsadmin package
+// for integration with the blueprint admin interface.
 type statsController struct {
 	logger *slog.Logger
 	app    app.AppInterface
 }
 
+// NewStatsController creates a new stats admin controller
 func NewStatsController(app app.AppInterface) *statsController {
 	var logger *slog.Logger
 	if app != nil {
@@ -33,9 +33,44 @@ func NewStatsController(app app.AppInterface) *statsController {
 	}
 }
 
+// Handler processes stats admin requests
 func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
-	geostore := c.app.GetGeoStore()
-	f := func(iso2Code string) (string, error) {
+	admin, err := statsadmin.New(statsadmin.AdminOptions{
+		Store:             c.app.GetStatsStore(),
+		Logger:            c.app.GetLogger(),
+		FuncLayout:        adapters.NewLayoutFunc(c.app),
+		HomeURL:           links.Admin().Home(),
+		WebsiteUrl:        links.Website().Home(),
+		BaseURL:           links.Admin().Stats(),
+		CountryNameByIso2: c.countryNameByIso2(r),
+		AuthUserID: func(r *http.Request) string {
+			user := basesession.GetAuthUser(r)
+			if user == nil {
+				return ""
+			}
+			return user.GetID()
+		},
+		FlashError: func(w http.ResponseWriter, r *http.Request, message string, redirectURL string, delaySeconds int) string {
+			return helpers.ToFlashError(c.app.GetCacheStore(), w, r, message, redirectURL, delaySeconds)
+		},
+	})
+
+	if err != nil {
+		if c.logger != nil {
+			c.logger.Error("At admin > statsController > Handler", "error", err.Error())
+		}
+		helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
+		return
+	}
+
+	admin.Handle(w, r)
+}
+
+// countryNameByIso2 resolves an ISO2 country code to a human-readable
+// country name using the blueprint's geostore.
+func (c *statsController) countryNameByIso2(r *http.Request) func(iso2Code string) (string, error) {
+	return func(iso2Code string) (string, error) {
+		geostore := c.app.GetGeoStore()
 		if geostore == nil {
 			return "N/A", errors.New("geostore is nil")
 		}
@@ -48,78 +83,4 @@ func (c *statsController) Handler(w http.ResponseWriter, r *http.Request) {
 		}
 		return country.Name(), nil
 	}
-
-	visitorAnalyticsAdmin, err := statsAdmin.New(statsAdmin.Options{
-		Logger:            c.app.GetLogger(),
-		Store:             c.app.GetStatsStore(),
-		Layout:            &adminLayout{app: c.app},
-		HomeURL:           links.Admin().Home(),
-		WebsiteUrl:        links.Website().Home(),
-		CountryNameByIso2: f,
-	})
-
-	if err != nil {
-		if c.logger != nil {
-			c.logger.Error("At admin > statsController > Handler", "error", err.Error())
-		}
-		helpers.ToFlashError(c.app.GetCacheStore(), w, r, err.Error(), links.Admin().Home(), 30)
-		return
-	}
-
-	visitorAnalyticsAdmin.ServeHTTP(w, r)
 }
-
-type adminLayout struct {
-	app   app.AppInterface
-	title string
-	body  string
-
-	scriptURLs []string
-	scripts    []string
-
-	styleURLs []string
-	styles    []string
-
-	countryNameByIso2 func(iso2Code string) (string, error)
-}
-
-func (a *adminLayout) SetTitle(title string) {
-	a.title = title
-}
-
-func (a *adminLayout) SetBody(body string) {
-	a.body = body
-}
-
-func (a *adminLayout) SetScriptURLs(urls []string) {
-	a.scriptURLs = urls
-}
-
-func (a *adminLayout) SetScripts(scripts []string) {
-	a.scripts = scripts
-}
-
-func (a *adminLayout) SetStyleURLs(urls []string) {
-	a.styleURLs = urls
-}
-
-func (a *adminLayout) SetStyles(styles []string) {
-	a.styles = styles
-}
-
-func (a *adminLayout) SetCountryNameByIso2(f func(iso2Code string) (string, error)) {
-	a.countryNameByIso2 = f
-}
-
-func (a *adminLayout) Render(w http.ResponseWriter, r *http.Request) string {
-	return adminlayout.New(a.app, r, baselayouts.Options{
-		Title:      a.title,
-		Content:    hb.Raw(a.body),
-		ScriptURLs: a.scriptURLs,
-		Scripts:    a.scripts,
-		StyleURLs:  a.styleURLs,
-		Styles:     a.styles,
-	}).ToHTML()
-}
-
-var _ statsAdminShared.LayoutInterface = (*adminLayout)(nil)
