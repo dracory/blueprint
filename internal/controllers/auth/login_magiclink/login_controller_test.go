@@ -101,7 +101,7 @@ func sendLink(t *testing.T, application app.AppInterface, email string) (token s
 	if err != nil {
 		t.Fatalf("failed to query cache table: %q", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var key, stored string
@@ -204,8 +204,8 @@ func TestSend_Throttle(t *testing.T) {
 			url.Values{"action": {"magiclink-send-ajax"}}, form)
 	}
 
-	if last.Code != http.StatusTooManyRequests {
-		t.Fatalf("expected 429 after %d sends, got %d", magicLinkMaxSends+1, last.Code)
+	if last == nil || last.Code != http.StatusTooManyRequests {
+		t.Fatalf("expected 429 after %d sends, got %v", magicLinkMaxSends+1, last)
 	}
 }
 

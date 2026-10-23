@@ -406,9 +406,6 @@ func (r *appImplementation) SetMetaStore(s metastore.StoreInterface) {
 
 // GetSessionStore returns the session store.
 func (r *appImplementation) GetSessionStore() sessionstore.StoreInterface {
-	if r == nil {
-		return nil
-	}
 	return r.sessionStore
 }
 func (r *appImplementation) SetSessionStore(s sessionstore.StoreInterface) {

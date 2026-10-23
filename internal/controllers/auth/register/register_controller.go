@@ -56,6 +56,10 @@ func (controller *registerController) PageHandler(w http.ResponseWriter, r *http
 	}
 
 	authUser := basesession.GetAuthUser(r)
+	if authUser == nil {
+		return helpers.ToFlashError(controller.app.GetCacheStore(), w, r,
+			"You must be logged in to access this page", links.Website().Home(), 10)
+	}
 
 	countries, err := controller.countryList(r.Context())
 	if err != nil {
@@ -210,6 +214,10 @@ func (controller *registerController) handleSave(w http.ResponseWriter, r *http.
 	}
 
 	authUser := basesession.GetAuthUser(r)
+	if authUser == nil {
+		controller.sendErrorResponse(w, "You must be logged in to access this page", http.StatusUnauthorized)
+		return
+	}
 
 	// Enforce the email allowlist on save as well — a session created
 	// before the allowlist was configured must not be able to register.
@@ -454,7 +462,7 @@ func (controller *registerController) getUserData(ctx context.Context, user user
 func (controller *registerController) sendJSONResponse(w http.ResponseWriter, data map[string]interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 // sendErrorResponse sends a JSON error response

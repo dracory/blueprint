@@ -337,6 +337,9 @@ func TestRegisterSave_Success(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if updated == nil {
+		t.Fatal("expected user to exist after registration")
+	}
 	if updated.GetFirstName() != "FirstName" || updated.GetLastName() != "LastName" {
 		t.Fatalf("name not saved: %q %q", updated.GetFirstName(), updated.GetLastName())
 	}
@@ -398,6 +401,9 @@ func TestRegisterSave_Success_WithVault(t *testing.T) {
 	updated, err := application.GetUserStore().UserFindByID(context.Background(), user.GetID())
 	if err != nil {
 		t.Fatal(err)
+	}
+	if updated == nil {
+		t.Fatal("expected user to exist after registration")
 	}
 	if updated.GetFirstName() == "FirstName" {
 		t.Fatal("expected first name to be vault-tokenized")

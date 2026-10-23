@@ -199,8 +199,8 @@ func TestOtpSend_Throttle(t *testing.T) {
 			url.Values{"action": {"otp-send-ajax"}}, form)
 	}
 
-	if last.Code != http.StatusTooManyRequests {
-		t.Fatalf("expected 429 after %d sends, got %d", otpMaxSends+1, last.Code)
+	if last == nil || last.Code != http.StatusTooManyRequests {
+		t.Fatalf("expected 429 after %d sends, got %v", otpMaxSends+1, last)
 	}
 }
 
@@ -259,8 +259,8 @@ func TestOtpVerify_TooManyAttempts(t *testing.T) {
 	for i := 0; i < otpMaxAttempts; i++ {
 		last = verifyOtp(t, application, "user@test.com", "000000", nonce)
 	}
-	if last.Code != http.StatusUnauthorized {
-		t.Fatalf("expected 401 on attempt %d, got %d", otpMaxAttempts, last.Code)
+	if last == nil || last.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401 on attempt %d, got %v", otpMaxAttempts, last)
 	}
 
 	last = verifyOtp(t, application, "user@test.com", "000000", nonce)

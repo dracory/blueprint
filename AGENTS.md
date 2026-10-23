@@ -44,7 +44,7 @@
 - **internal/rules/** - Business rule definitions
 - **internal/ext/** - External integrations
 - `/pkg` - Public libraries that can be used by external applications
-- **External admin packages** - `github.com/dracory/blogadmin` and `github.com/dracory/shopadmin` are standalone modules integrated via `internal/controllers/admin/adapters/`
+- **External admin packages** - `github.com/dracory/blogadmin`, `github.com/dracory/shopadmin`, `github.com/dracory/statsadmin`, `github.com/dracory/useradmin`, `github.com/dracory/fileadmin`, and `github.com/dracory/logadmin` are standalone modules integrated via `internal/controllers/admin/adapters/`
 
 ## Common Tasks
 - To add a new package: Create a new directory under `/pkg` with appropriate `go.mod`

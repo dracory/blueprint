@@ -302,7 +302,7 @@ func (c *passwordResetController) invalidateUserSessions(ctx context.Context, us
 func (c *passwordResetController) sendJSONResponse(w http.ResponseWriter, data map[string]interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 // sendErrorResponse sends an error response

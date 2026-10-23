@@ -23,7 +23,7 @@ func TestSeedAll_Success(t *testing.T) {
 		testutils.WithSettingStore(true),
 		testutils.WithUserStore(true),
 	)
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 
 	if err := SeedAll(context.Background(), a); err != nil {
 		t.Fatalf("SeedAll failed: %v", err)
@@ -32,7 +32,7 @@ func TestSeedAll_Success(t *testing.T) {
 
 func TestSettingsSync_Idempotent(t *testing.T) {
 	a := testutils.Setup(testutils.WithSettingStore(true))
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 
 	ctx := context.Background()
 	store := a.GetSettingStore()
@@ -71,7 +71,7 @@ func TestInstalledAtSeed_UpNilApp(t *testing.T) {
 
 func TestInstalledAtSeed_UpSuccess(t *testing.T) {
 	a := testutils.Setup(testutils.WithSettingStore(true))
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 
 	s := settingsonce.NewInstalledAtSeed(a)
 	if err := s.Up(); err != nil {
@@ -103,7 +103,7 @@ func TestUsersSeed_UpNilApp(t *testing.T) {
 
 func TestUsersSeed_UpIdempotent(t *testing.T) {
 	a := testutils.Setup(testutils.WithUserStore(true))
-	defer a.Close()
+	defer func() { _ = a.Close() }()
 
 	s := usersonce.NewUsersSeed(a)
 	if err := s.Up(); err != nil {

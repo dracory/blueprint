@@ -269,7 +269,7 @@ func (c *loginController) handleLogin(w http.ResponseWriter, r *http.Request) {
 func (c *loginController) sendJSONResponse(w http.ResponseWriter, data map[string]interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 // sendErrorResponse sends an error response

@@ -434,7 +434,7 @@ func (c *loginController) sendCount(email string) int {
 func (c *loginController) sendCountLocked(email string) int {
 	count := 0
 	if s, err := c.app.GetCacheStore().Get(c.sendsKey(email), "0"); err == nil {
-		fmt.Sscanf(s, "%d", &count)
+		_, _ = fmt.Sscanf(s, "%d", &count)
 	}
 	return count
 }
@@ -466,7 +466,7 @@ func (c *loginController) generateNonce() (string, error) {
 func (c *loginController) sendJSONResponse(w http.ResponseWriter, data map[string]interface{}, statusCode int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 // sendErrorResponse sends an error response
