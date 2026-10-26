@@ -1,9 +1,26 @@
 # AGENTS.md
 
+## AI Company Structure
+
+### AI Employees
+- **Director (MD)** - Strategic decision-making
+- **Developer (DEV)** - Platform development and implementation
+- **Designer (DES)** - UI/UX design and neo-brutalist branding
+- **Quality Assurance Controller (QAC)** - Fact-checking persona biographies (SOP-003)
+
+### AI Company Documentation
+- `/ai/` - AI company operational memory and records
+- `/ai/index.html` - Mini-site dashboard (browse all AI docs in browser)
+- `/ai/styles.css` - Shared neo-brutalist styles for all AI HTML pages
+- `/ai/company-profile.html` - Company mission, goals, and constraints
+
+## Project Overview
+SwiftAI is a modular AI orchestration platform that enables multi‑provider model management, persona handling, prompt libraries, and MCP tool integration.
+
 ## Project Setup
-- Use Go 1.27 or later
+- Use Go 1.25 or later
 - Install dependencies: `go mod download`
-- Run the application: `go run ./cmd/server`
+- Run the application: `go run main.go`
 - Run tests: `go test ./...`
 
 ## Code Style
@@ -11,50 +28,24 @@
 - Use `camelCase` for variable and function names
 - Keep lines under 100 characters
 - Document all exported functions and types
-- Write tests for new functionality
-- Test cases are difficult to maintain, use only test functions 
+- Write table‑driven tests for new functionality
+- liveflux (`internal/controllers/liveflux`) is deprecated — do not use it for
+  new code; use the shopadmin-style folder-per-controller pattern with
+  `rtr.GetHTML` / `rtr.PostJSON` instead
+
+## AI Company Layer
+- `/ai` – Filesystem-based AI company (employees, decisions, SOPs, tasks, memory). See `/ai/AGENTS.md` for operating rules.
 
 ## Project Structure
-- `/cmd` - Main application entry points
-- **cmd/server/** - Main application entry point (`main.go`), background processes, CLI mode
-- **cmd/deploy/** - Deployment utility
-- **cmd/envenc/** - Environment encryption utility
-- **cmd/loadtest/** - Load testing utility
-- **cmd/snakecase/** - String case conversion utility
-- `/docs` - Documentation files
-- `/internal` - Private application code
-- **internal/cmsblocks/** - CMS block components
-- **internal/config/** - Configuration system with Blueprint-style environment loading
-- **internal/app/** - Application instance for service management (database, cache, session, logger, geo, task, asset, user stores)
-- **internal/cli/** - CLI dispatcher using github.com/dracory/base/cli
-- **internal/routes/** - Router setup using github.com/dracory/rtr
-- **internal/controllers/** - HTTP controllers (admin, auth, liveflux, user, webhook, website)
-- **internal/controllers/admin/adapters/** - Adapters bridging external blogadmin/shopadmin packages to blueprint services (admin layout, LLM factory, customer resolver)
-- **internal/controllers/admin/layout/** - Admin section layout (navbar, menus, CRUD/page helpers) wrapping the shared page scaffold
-- **internal/layouts/** - Shared page scaffold: `NewPageLayout` (auth-aware public pages), `NewBlankLayout` (chrome-less auth pages), `NewCmsLayout` (CMS-rendered pages), `MenuItem`, `UserDisplayNames`
-- **internal/middlewares/** - HTTP middlewares
-- **internal/emails/** - Email templates and sending logic
-- **internal/tasks/** - Background task definitions
-- **internal/schedules/** - Scheduled job configuration
-- **internal/helpers/** - Utility helpers
-- **internal/testutils/** - Test utilities and fixtures
-- **internal/resources/** - Static resource handling
-- **internal/widgets/** - UI widget components
-- **internal/links/** - Link management
-- **internal/rules/** - Business rule definitions
-- **internal/ext/** - External integrations
-- `/pkg` - Public libraries that can be used by external applications
-- **External admin packages** - `github.com/dracory/blogadmin`, `github.com/dracory/shopadmin`, `github.com/dracory/statsadmin`, `github.com/dracory/useradmin`, `github.com/dracory/fileadmin`, and `github.com/dracory/logadmin` are standalone modules integrated via `internal/controllers/admin/adapters/`
+- `/cmd` – Main entry points (CLI, server)
+- `/internal` – Private application code (config, controllers, MCP client, background workers)
+- `/pkg` – Public libraries (e.g., `agentstore`)
+- `/public` – Web UI assets (dashboard, Swagger UI)
+- `/docs` – Documentation files
 
 ## Common Tasks
-- To add a new package: Create a new directory under `/pkg` with appropriate `go.mod`
-- To run linters: `golangci-lint run`
-
-## Testing
-- Run all tests: `go test ./...`
-- Run tests with coverage: `go test -coverprofile=coverage.out ./...`
-- View coverage: `go tool cover -html=coverage.out`
-- Run integration tests: `go test -tags=integration ./...`
+- Add a new package: create a new package directory under `/pkg`
+- Run linters: `golangci-lint run`
 
 ## AI Browser Sandbox
 Agents with browser automation access (Playwright / Chrome DevTools MCP) can run a
@@ -66,6 +57,12 @@ go run ./cmd/ai-browser    # serves http://127.0.0.1:34756, auto-login enabled
 
 It uses a disposable SQLite DB (`tmp/ai-browser.db`), disables all external APIs,
 and never touches real data. See `cmd/ai-browser/AGENTS.md` for details.
+
+## Testing
+- Run all tests: `go test ./...`
+- Run tests with coverage: `go test -coverprofile=coverage.out ./...`
+- View coverage: `go tool cover -html=coverage.out`
+- Run integration tests: `go test -tags=integration ./...`
 
 ## Git Workflow
 - Branch naming: `feature/your-feature-name` or `bugfix/description`
