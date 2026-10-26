@@ -125,6 +125,10 @@ github.com/dracory/blogadmin v0.3.0 h1:YiPy6EEENxLK91ejAp36oh1EsdHI0W9oiwXVlzKW4
 github.com/dracory/blogadmin v0.3.0/go.mod h1:/uH3IU8EGXMJ/k/b4ebrSWBlHUPb+q0Yc8WVi83Lc5c=
 github.com/dracory/blogstore v1.38.0 h1:ZNWTKW3nyToZgAjB7opzlrPjNVN1BMMnqssgOjbzdg0=
 github.com/dracory/blogstore v1.38.0/go.mod h1:s/6kICQZOY2Jm1e3pvuPyGW2b+kvPOrWwW/5kI37wPo=
+github.com/dracory/blogstore v1.39.0 h1:zP1y8Q6XvdYu2YnZnhDBnQt2Nnd33cXBv2zajl39Gis=
+github.com/dracory/blogstore v1.39.0/go.mod h1:s/6kICQZOY2Jm1e3pvuPyGW2b+kvPOrWwW/5kI37wPo=
+github.com/dracory/botdetect v0.3.0 h1:3lEUfEQxnDjEDV8C3j+zYvPcof5DTJLBrmM4kzqUJ58=
+github.com/dracory/botdetect v0.3.0/go.mod h1:eTRoN6MwzFfSABAOBuc429yAGujA4fe/FgyE3Kqou1w=
 github.com/dracory/bs v0.16.0 h1:TjERMa7RogNBtlXT65FFOR0S/fLwlUY05KImpBlBc9k=
 github.com/dracory/bs v0.16.0/go.mod h1:KcUgpjyIW8nKwqa3LiG3GUNoOpsjh1tC3IVjqcpODeI=
 github.com/dracory/cachestore v1.10.0 h1:O7OEn1XFRqo7dJNHIP12OdOkxhcZL4Kk8s+CATA9yPg=
@@ -153,6 +157,8 @@ github.com/dracory/entitystore v1.22.0 h1:/tO7qmBekL1qgeiTG+Fb+gGHGty1/Zi2Ht5C/U
 github.com/dracory/entitystore v1.22.0/go.mod h1:6TYBpb79Rs49pr9FZkPPyPpNZc9jA0dLqwJi81j++e8=
 github.com/dracory/entitystore v1.22.1 h1:+tdDP1+ZvwI7zF0G59RVBxM5h9SLiW86nfXRe1E++ds=
 github.com/dracory/entitystore v1.22.1/go.mod h1:6TYBpb79Rs49pr9FZkPPyPpNZc9jA0dLqwJi81j++e8=
+github.com/dracory/entitystore v1.23.0 h1:u8ftOiZc9ti5iYYW7kNlVgeo5oof1e+Yqoe7WW3MWpc=
+github.com/dracory/entitystore v1.23.0/go.mod h1:5Po335yw0eEjJ/tJJN1CjnyjRaOAOeuOofjguqSn3J4=
 github.com/dracory/env v1.4.0 h1:ii6y2LSQFhIjbiyU16GYMhVrKhJtKili8IvSd7aRhfE=
 github.com/dracory/env v1.4.0/go.mod h1:aIvC0IB0yu9dP++i9ATs6fP5yG/U0VxSgYuT57dJGHg=
 github.com/dracory/envenc v1.5.0 h1:2RIHRDDFEVKa96vRrpnjClcYYpOmXwraCx8a5IbBF0E=
@@ -185,6 +191,8 @@ github.com/dracory/metastore v1.12.0 h1:bnTLi3gHEIgMDjk6aeDQBLb0TWdRkVr0NdfTDyhJ
 github.com/dracory/metastore v1.12.0/go.mod h1:4lqGfO4zy4bhDCdokLXXSdB83X11oFa6yclrOJC5+Z4=
 github.com/dracory/neat v0.57.0 h1:476/rPguhUqtnzyly8QgF27Nz3vyIFWkHq//TYb7Vns=
 github.com/dracory/neat v0.57.0/go.mod h1:Nbkp2Y2FjMK1K53hQLQmw3h8FRdWwFnwv3466YONbOc=
+github.com/dracory/neat v0.58.0 h1:u9TzZ0w2rPu51psKUw5rJ/uawrxNt2HdgC6A/fEi64w=
+github.com/dracory/neat v0.58.0/go.mod h1:Nbkp2Y2FjMK1K53hQLQmw3h8FRdWwFnwv3466YONbOc=
 github.com/dracory/req v0.1.0 h1:5mKYnPiCUJG/JQlE/9nxk3OSH+rs8tr45ngg0LwDXsY=
 github.com/dracory/req v0.1.0/go.mod h1:XxIjAncVAKKNaVtO+4Qmd3mDfC0NIBVXqQPwwb4qhHs=
 github.com/dracory/rtr v1.9.0 h1:eNxpJsACcT9jncfEcIvgqmny5+v2JcvtngtEn7w9kJk=
@@ -217,6 +225,8 @@ github.com/dracory/statsadmin v0.3.0 h1:TjaCzmwDUiZtIveOmJA4oWn3nEw2YhCCtT6juOyu
 github.com/dracory/statsadmin v0.3.0/go.mod h1:CQJYTuASLi5ZSOYh3GZKi0yEm1YrJDMf0BIyYKjMoXY=
 github.com/dracory/statsadmin v0.5.0 h1:USrqetrJVWM1gEi1yrU+xiMAhuuGcsjMuexWLzggsFo=
 github.com/dracory/statsadmin v0.5.0/go.mod h1:rEfzJIWI3aOavkX26HEEA3Om8MYAQxH8F8cvNVYwaFc=
+github.com/dracory/statsadmin v0.7.0 h1:nMlfNJ5SLS/QHuZmyF0ojMImTlxAuu/DKvX9uPyjqaM=
+github.com/dracory/statsadmin v0.7.0/go.mod h1:EcD/A38xkFqP39D/eJrjAz4pokBe518yGILbYEzVNxY=
 github.com/dracory/statsstore v1.32.1 h1:Z8DdP4fmiISKDIfuFEWpv7WBfZZ/gmWDQnnrRYjoRRw=
 github.com/dracory/statsstore v1.32.1/go.mod h1:LuXlHNniQK5Wlok+OrSUOJIsVC1gKfrGQfzYoPWtbQU=
 github.com/dracory/statsstore v1.32.2 h1:q/ELygL7crE8ZuaCTcH1qKM6+4w3WadA6nlnYjGtYq0=
@@ -225,6 +235,8 @@ github.com/dracory/statsstore v1.32.3 h1:fPeYXpMn7BNb4m15AJVRv77fb7YburN1FRTVMuR
 github.com/dracory/statsstore v1.32.3/go.mod h1:rVcsWM55/MiAxG1SCdBW+IWQzmUAilipUDCqEySAVOo=
 github.com/dracory/statsstore v1.32.4-0.20261023072400-b013c43b831f h1:oE+cQaZmV94E8OIqSvRxHoJW2LX8jH71Bh6lORC0DQk=
 github.com/dracory/statsstore v1.32.4-0.20261023072400-b013c43b831f/go.mod h1:5/wXIdbUeHeDatTE2oT2Av4O0Nh7k0KohOo6JlGLFcM=
+github.com/dracory/statsstore v1.33.2 h1:g/qJfBoX4ZAPSmi0vPTTeABdYt/HuKa8XcjeVkUN4iA=
+github.com/dracory/statsstore v1.33.2/go.mod h1:2+LnHqKrahYYo+JxOUEoOhmnmBbpwIeyqrb/miPaUYE=
 github.com/dracory/str v0.19.0 h1:tcQ+znPofNE+OO4mPM0QVDCOYCLkf+DMyVmUBrnoJSw=
 github.com/dracory/str v0.19.0/go.mod h1:uCrCZWzm0h8eDxckF0ydWqF1hM1Ro1kZBqhi4GOff2w=
 github.com/dracory/subscriptionstore v1.6.0 h1:h8vdNBL/SZqn3WG0PyP6+0Mb2Qn7cEHfOY8x9TaSS6Y=
@@ -361,6 +373,8 @@ github.com/ncruces/go-strftime v1.1.0/go.mod h1:yVaq7iwCN09vHRrKBrrflXT0M9tTMG2K
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pkg/sftp v1.13.11 h1:0N92SLTB8JqASJB14ZLHHzFnBV8mG9zw4K7jghEFWuE=
 github.com/pkg/sftp v1.13.11/go.mod h1:uNkH9roSXglNJqM+glJJi+TQXQUm0fXFWqCFmT8hsN0=
+github.com/pkg/sftp v1.13.12 h1:Myhzy/ZzLPnCtE2F2WtDHsgs8RfgMnH2gfbHuCJhkMU=
+github.com/pkg/sftp v1.13.12/go.mod h1:uNkH9roSXglNJqM+glJJi+TQXQUm0fXFWqCFmT8hsN0=
 github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 h1:GFCKgmp0tecUJ0sJuv4pzYCqS9+RGSn52M3FUwPs+uo=
 github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10/go.mod h1:t/avpk3KcrXxUnYOhZhMXJlSEyie6gQbtLq5NM3loB8=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
@@ -547,6 +561,8 @@ modernc.org/goabi0 v0.2.0 h1:HvEowk7LxcPd0eq6mVOAEMai46V+i7Jrj13t4AzuNks=
 modernc.org/goabi0 v0.2.0/go.mod h1:CEFRnnJhKvWT1c1JTI3Avm+tgOWbkOu5oPA8eH8LnMI=
 modernc.org/libc v1.79.0 h1:9Dvvv++bAMSkSuBzuOFAatbTV5OIoq6Y6FohmD3e7q8=
 modernc.org/libc v1.79.0/go.mod h1:uT3kR61NsbeKJSLqq83GJwSnZMVLlSjyAz4DfTaBy1M=
+modernc.org/libc v1.79.1 h1:GgKnSYDT0WctfCKddw03DPUiSAiL2LZIF/fGxqqLkN0=
+modernc.org/libc v1.79.1/go.mod h1:uT3kR61NsbeKJSLqq83GJwSnZMVLlSjyAz4DfTaBy1M=
 modernc.org/mathutil v1.7.1 h1:GCZVGXdaN8gTqB1Mf/usp1Y/hSqgI2vAGGP4jZMCxOU=
 modernc.org/mathutil v1.7.1/go.mod h1:4p5IwJITfppl0G4sUEDtCr4DthTaT47/N3aT6MhfgJg=
 modernc.org/memory v1.12.1 h1:nFMiWrpStgZczNl6XI9GnIk/rWhYIyHGUaR04pGbp9g=
