@@ -31,7 +31,7 @@ require (
 	github.com/dracory/fileadmin v0.1.0
 	github.com/dracory/filesystem v1.4.0
 	github.com/dracory/form v0.23.0
-	github.com/dracory/geostore v1.13.0
+	github.com/dracory/geostore v1.14.0
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.10.0
