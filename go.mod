@@ -8,7 +8,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.0
-	github.com/dracory/auth v0.41.0
+	github.com/dracory/auth v0.43.0
 	github.com/dracory/base v0.42.3
 	github.com/dracory/blindindexstore v1.19.0
 	github.com/dracory/blockeditor v0.24.0
@@ -19,7 +19,7 @@ require (
 	github.com/dracory/cdn v1.13.0
 	github.com/dracory/chatstore v1.6.0
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.43.0
+	github.com/dracory/cmsstore v1.44.0
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.16.0
 	github.com/dracory/dataobject v1.7.0
@@ -40,7 +40,7 @@ require (
 	github.com/dracory/metastore v1.12.0
 	github.com/dracory/neat v0.58.0
 	github.com/dracory/req v0.1.0
-	github.com/dracory/rtr v1.10.1
+	github.com/dracory/rtr v1.10.2
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sessionstore v1.20.0
 	github.com/dracory/settingstore v1.14.0
@@ -56,7 +56,7 @@ require (
 	github.com/dracory/ui v0.17.0
 	github.com/dracory/uncdn v0.11.0
 	github.com/dracory/useradmin v0.5.1
-	github.com/dracory/userstore v1.21.0
+	github.com/dracory/userstore v1.22.0
 	github.com/dracory/vaultstore v1.6.0
 	github.com/dracory/websrv v0.4.0
 	github.com/dromara/carbon/v2 v2.7.0
@@ -71,7 +71,7 @@ require (
 	github.com/sfreiberg/simplessh v0.0.0-20261026194955-45a2c7a7ce3e
 	github.com/spf13/cast v1.10.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
-	github.com/yuin/goldmark v1.8.6
+	github.com/yuin/goldmark v1.8.7
 	modernc.org/sqlite v1.61.0
 )
 
@@ -80,12 +80,12 @@ require (
 	atomicgo.dev/keyboard v0.2.10 // indirect
 	atomicgo.dev/schedule v0.1.0 // indirect
 	cloud.google.com/go v0.123.0 // indirect
-	cloud.google.com/go/aiplatform v1.127.0 // indirect
-	cloud.google.com/go/auth v0.24.1 // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
+	cloud.google.com/go/aiplatform v1.127.1 // indirect
+	cloud.google.com/go/auth v0.24.2 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.3.1 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
-	cloud.google.com/go/iam v1.15.0 // indirect
-	cloud.google.com/go/longrunning v1.4.0 // indirect
+	cloud.google.com/go/iam v1.15.1 // indirect
+	cloud.google.com/go/longrunning v1.4.1 // indirect
 	cloud.google.com/go/vertexai v0.19.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/LumenResearch/uasurfer v0.3.1 // indirect
@@ -93,7 +93,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.47.5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.25 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.20.12 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.20.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.8 // indirect
@@ -170,8 +170,8 @@ require (
 	golang.org/x/term v0.47.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	google.golang.org/api v0.309.0 // indirect
-	google.golang.org/genai v1.76.0 // indirect
+	google.golang.org/api v0.310.0 // indirect
+	google.golang.org/genai v1.77.0 // indirect
 	google.golang.org/genproto v0.0.0-20261026165753-2ffab32bce7e // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e // indirect
@@ -182,5 +182,3 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
-
-replace github.com/dracory/auth => ../../_modules_dracory/auth
