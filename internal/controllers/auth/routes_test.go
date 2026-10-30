@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -14,7 +16,19 @@ func containsIgnoreCase(s, substring string) bool {
 	return strings.Contains(strings.ToLower(s), strings.ToLower(substring))
 }
 
-// TestRoutesConfiguration verifies Routes function returns correct routes with expected configuration
+// routePaths flattens route paths for membership checks.
+func routePaths(routes []interface {
+	GetPath() string
+}) map[string]bool {
+	paths := map[string]bool{}
+	for _, route := range routes {
+		paths[route.GetPath()] = true
+	}
+	return paths
+}
+
+// TestRoutesConfiguration verifies the /auth surface: the package mux
+// catch-all plus the app-owned register and logout routes.
 func TestRoutesConfiguration(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
@@ -23,328 +37,160 @@ func TestRoutesConfiguration(t *testing.T) {
 	}
 
 	routes := Routes(app)
-
-	// Should return at least 2 routes (login, logout) in OTP mode
-	if len(routes) < 2 {
-		t.Errorf("Expected at least 2 routes, got %d", len(routes))
+	if len(routes) < 4 {
+		t.Fatalf("Expected at least 4 routes (register get+post, logout, package base+catch-all), got %d", len(routes))
 	}
 
-	// Verify login route exists with correct path.
-	// With LOGIN_METHOD_OTP (the default) no callback route is mounted.
-	foundLogin := false
-	foundLoginPost := false
-	foundLogout := false
-
+	var foundPackageBase, foundCatchAll, foundLogout, foundRegister bool
 	for _, route := range routes {
-		path := route.GetPath()
-		switch path {
-		case links.AUTH_CALLBACK_MAGICLINK, links.AUTH_CALLBACK_AUTHKNIGHT:
-			t.Error("Callback route should not be present when LOGIN_METHOD is otp")
-		case links.AUTH_LOGIN:
-			switch route.GetMethod() {
-			case "GET":
-				foundLogin = true
-				if !containsIgnoreCase(route.GetName(), "login") {
-					t.Errorf("Expected login route name to contain 'login', got '%s'", route.GetName())
-				}
-			case "POST":
-				foundLoginPost = true
+		switch route.GetPath() {
+		case "/auth":
+			foundPackageBase = true
+			if !containsIgnoreCase(route.GetName(), "package") {
+				t.Errorf("Expected /auth route name to mention package, got '%s'", route.GetName())
+			}
+		case "/auth/*":
+			foundCatchAll = true
+			if len(route.GetBeforeMiddlewares()) == 0 {
+				t.Error("Expected rate-limit middleware on /auth/* catch-all")
 			}
 		case links.AUTH_LOGOUT:
 			foundLogout = true
 			if !containsIgnoreCase(route.GetName(), "logout") {
 				t.Errorf("Expected logout route name to contain 'logout', got '%s'", route.GetName())
 			}
+		case links.AUTH_REGISTER:
+			if route.GetMethod() == "GET" {
+				foundRegister = true
+			}
 		}
 	}
 
-	if !foundLogin {
-		t.Error("Login route not found")
+	if !foundPackageBase {
+		t.Error("Package base route /auth not found")
 	}
-	if !foundLoginPost {
-		t.Error("Login POST route not found (OTP AJAX endpoint)")
+	if !foundCatchAll {
+		t.Error("Package catch-all route /auth/* not found")
 	}
 	if !foundLogout {
 		t.Error("Logout route not found")
 	}
-}
-
-// routeEntry describes an expected (or forbidden) route for a login method.
-// A method of "*" matches routes registered for any method.
-type routeEntry struct {
-	path   string
-	method string
-}
-
-func routeMatches(route interface {
-	GetPath() string
-	GetMethod() string
-}, want routeEntry,
-) bool {
-	if route.GetPath() != want.path {
-		return false
+	if !foundRegister {
+		t.Error("Register route not found (registration is enabled in test config)")
 	}
-	return want.method == "*" || route.GetMethod() == want.method
 }
 
-// TestRoutesLoginMethodMountsCorrectRoutes verifies that each AUTH_LOGIN_METHOD
-// mounts the expected set of routes.
-func TestRoutesLoginMethodMountsCorrectRoutes(t *testing.T) {
+// TestRoutesNoLegacyPaths verifies the removed per-controller paths do
+// not resurface: secondary methods now live under the package's
+// /auth/login-<name> convention served by the mux, not as rtr routes.
+func TestRoutesNoLegacyPaths(t *testing.T) {
 	t.Parallel()
+	app := testutils.Setup()
 
-	tests := []struct {
-		name        string
-		loginMethod string
-		expected    []routeEntry
-		forbidden   []routeEntry
-	}{
-		{
-			name:        "otp",
-			loginMethod: config.LOGIN_METHOD_OTP,
-			expected: []routeEntry{
-				{links.AUTH_LOGIN, "GET"},
-				{links.AUTH_LOGIN, "POST"},
-				{links.AUTH_LOGOUT, "*"},
-			},
-			forbidden: []routeEntry{
-				{links.AUTH_CALLBACK_MAGICLINK, "*"},
-				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
-				{links.AUTH_FORGOT_PASSWORD, "*"},
-				{links.AUTH_PASSWORD_RESET, "*"},
-			},
-		},
-		{
-			name:        "magiclink",
-			loginMethod: config.LOGIN_METHOD_MAGICLINK,
-			expected: []routeEntry{
-				{links.AUTH_LOGIN, "GET"},
-				{links.AUTH_LOGIN, "POST"},
-				{links.AUTH_CALLBACK_MAGICLINK, "*"},
-				{links.AUTH_LOGOUT, "*"},
-			},
-			forbidden: []routeEntry{
-				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
-				{links.AUTH_FORGOT_PASSWORD, "*"},
-				{links.AUTH_PASSWORD_RESET, "*"},
-			},
-		},
-		{
-			name:        "password",
-			loginMethod: config.LOGIN_METHOD_PASSWORD,
-			expected: []routeEntry{
-				{links.AUTH_LOGIN, "GET"},
-				{links.AUTH_LOGIN, "POST"},
-				{links.AUTH_FORGOT_PASSWORD, "GET"},
-				{links.AUTH_FORGOT_PASSWORD, "POST"},
-				{links.AUTH_PASSWORD_RESET, "GET"},
-				{links.AUTH_PASSWORD_RESET, "POST"},
-				{links.AUTH_LOGOUT, "*"},
-			},
-			forbidden: []routeEntry{
-				{links.AUTH_CALLBACK_MAGICLINK, "*"},
-				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
-			},
-		},
-		{
-			name:        "authknight",
-			loginMethod: config.LOGIN_METHOD_AUTHKNIGHT,
-			expected: []routeEntry{
-				{links.AUTH_LOGIN, "GET"},
-				{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
-				{links.AUTH_LOGOUT, "*"},
-			},
-			forbidden: []routeEntry{
-				{links.AUTH_LOGIN, "POST"},
-				{links.AUTH_CALLBACK_MAGICLINK, "*"},
-				{links.AUTH_FORGOT_PASSWORD, "*"},
-				{links.AUTH_PASSWORD_RESET, "*"},
-			},
-		},
+	legacy := []string{
+		"/auth/otp-login",
+		"/auth/magiclink-login",
+		"/auth/password-login",
+		"/auth/authknight-login",
+		"/auth/forgot-password",
 	}
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			cfg := testutils.DefaultConf()
-			cfg.SetLoginMethod(tt.loginMethod)
-			app := testutils.Setup(testutils.WithCfg(cfg))
-			if app == nil {
-				t.Fatal("testutils.Setup() returned nil")
+	for _, route := range Routes(app) {
+		for _, old := range legacy {
+			if route.GetPath() == old {
+				t.Errorf("Legacy path %s should not be mounted", old)
 			}
-
-			routes := Routes(app)
-
-			for _, want := range tt.expected {
-				found := false
-				for _, route := range routes {
-					if routeMatches(route, want) {
-						found = true
-						break
-					}
-				}
-				if !found {
-					t.Errorf("method %q: expected route %s %s not mounted", tt.loginMethod, want.method, want.path)
-				}
-			}
-
-			for _, ban := range tt.forbidden {
-				for _, route := range routes {
-					if routeMatches(route, ban) {
-						t.Errorf("method %q: unexpected route %s %s mounted", tt.loginMethod, ban.method, ban.path)
-					}
-				}
-			}
-		})
+		}
 	}
 }
 
-// TestRoutesMultipleLoginMethods verifies that enabling several login
-// methods mounts the primary method at AUTH_LOGIN, secondary methods at
-// sub-paths, and each callback path exactly once.
-func TestRoutesMultipleLoginMethods(t *testing.T) {
-	t.Parallel()
-	cfg := testutils.DefaultConf()
-	cfg.SetLoginMethods([]string{config.LOGIN_METHOD_PASSWORD, config.LOGIN_METHOD_MAGICLINK})
-	app := testutils.Setup(testutils.WithCfg(cfg))
+// TestPackageMuxServesLoginPage hits the package mux handler directly to
+// confirm the composed mux serves the default OTP login page.
+func TestPackageMuxServesLoginPage(t *testing.T) {
+	app := testutils.Setup()
 	if app == nil {
 		t.Fatal("testutils.Setup() returned nil")
 	}
 
-	routes := Routes(app)
-
-	expected := []routeEntry{
-		{links.AUTH_LOGIN, "GET"}, // primary: password
-		{links.AUTH_LOGIN, "POST"},
-		{links.AUTH_LOGIN_MAGICLINK, "GET"}, // secondary
-		{links.AUTH_LOGIN_MAGICLINK, "POST"},
-		{links.AUTH_CALLBACK_MAGICLINK, "*"}, // callback mounted once
-		{links.AUTH_FORGOT_PASSWORD, "GET"},  // password enabled
-		{links.AUTH_PASSWORD_RESET, "GET"},
-		{links.AUTH_LOGOUT, "*"},
-	}
-	forbidden := []routeEntry{
-		{links.AUTH_CALLBACK_AUTHKNIGHT, "*"},
-	}
-
-	for _, want := range expected {
-		found := false
-		for _, route := range routes {
-			if routeMatches(route, want) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			t.Errorf("expected route %s %s not mounted", want.method, want.path)
+	var muxHandler func(http.ResponseWriter, *http.Request)
+	for _, route := range packageAuthRoutes(app) {
+		if route.GetPath() == "/auth/*" {
+			muxHandler = route.GetHandler()
 		}
 	}
-	for _, ban := range forbidden {
-		for _, route := range routes {
-			if routeMatches(route, ban) {
-				t.Errorf("unexpected route %s %s mounted", ban.method, ban.path)
-			}
-		}
+	if muxHandler == nil {
+		t.Fatal("catch-all package route has no handler")
 	}
 
-	// Route names must be unique across the table
+	req := httptest.NewRequest("GET", "/auth/login", nil)
+	rec := httptest.NewRecorder()
+	muxHandler(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("Expected 200 from /auth/login, got %d", rec.Code)
+	}
+	if !strings.Contains(rec.Body.String(), "<html") {
+		t.Error("Expected HTML login page from package mux")
+	}
+}
+
+// TestRoutesUniqueRouteNames ensures no duplicate route names are
+// registered across the auth route table.
+func TestRoutesUniqueRouteNames(t *testing.T) {
+	t.Parallel()
+	app := testutils.Setup()
+
 	names := map[string]int{}
-	for _, route := range routes {
+	for _, route := range Routes(app) {
 		names[route.GetName()]++
 	}
 	for name, count := range names {
 		if count > 1 {
-			t.Errorf("route name %q mounted %d times", name, count)
+			t.Errorf("Duplicate route name %q (%d registrations)", name, count)
 		}
 	}
 }
 
-// TestRoutesInvalidLoginMethodPanics verifies that an unrecognized login
-// method panics instead of silently mounting nothing.
-func TestRoutesInvalidLoginMethodPanics(t *testing.T) {
+// TestRegisterRoutesPresence verifies the register route mounts when
+// registration is enabled (the test config default).
+func TestRegisterRoutesPresence(t *testing.T) {
 	t.Parallel()
-	cfg := testutils.DefaultConf()
-	cfg.SetLoginMethod("bogus")
-	app := testutils.Setup(testutils.WithCfg(cfg))
-	if app == nil {
-		t.Fatal("testutils.Setup() returned nil")
-	}
+	app := testutils.Setup()
 
-	defer func() {
-		if r := recover(); r == nil {
-			t.Error("expected panic for invalid login method, got none")
+	var registerGet, registerPost bool
+	for _, route := range Routes(app) {
+		if route.GetPath() != links.AUTH_REGISTER {
+			continue
 		}
-	}()
-
-	Routes(app)
-}
-
-// TestRoutesWithRegistrationEnabled verifies register route is included when enabled
-func TestRoutesWithRegistrationEnabled(t *testing.T) {
-	t.Parallel()
-	app := testutils.Setup(testutils.WithUserStore(true))
-	if app == nil {
-		t.Fatal("testutils.Setup() returned nil")
-	}
-
-	routes := Routes(app)
-
-	// Should have at least 3 routes with registration enabled (login, logout, register)
-	if len(routes) < 3 {
-		t.Errorf("Expected at least 3 routes with registration enabled, got %d", len(routes))
-	}
-
-	// Verify register route exists
-	foundRegister := false
-	for _, route := range routes {
-		if route.GetPath() == links.AUTH_REGISTER {
-			foundRegister = true
-			if !containsIgnoreCase(route.GetName(), "register") {
-				t.Errorf("Expected register route name to contain 'register', got '%s'", route.GetName())
-			}
-			break
+		switch route.GetMethod() {
+		case "GET":
+			registerGet = true
+		case "POST":
+			registerPost = true
+		}
+		if len(route.GetBeforeMiddlewares()) == 0 {
+			t.Error("Expected rate-limit middleware on register route")
 		}
 	}
-
-	if !foundRegister {
-		t.Error("Register route not found when registration is enabled")
+	if !registerGet {
+		t.Error("Register GET route not found")
+	}
+	if !registerPost {
+		t.Error("Register POST route not found")
 	}
 }
 
-// TestRoutesWithRegistrationDisabled verifies register route is excluded when disabled
-func TestRoutesWithRegistrationDisabled(t *testing.T) {
+// TestLoginAlternatives verifies sibling cross-link generation for a
+// multi-method config.
+func TestLoginAlternatives(t *testing.T) {
 	t.Parallel()
-	cfg := testutils.DefaultConf()
-	cfg.SetRegistrationEnabled(false)
-	app := testutils.Setup(testutils.WithCfg(cfg))
-	if app == nil {
-		t.Fatal("testutils.Setup() returned nil")
+
+	methods := []string{config.LOGIN_METHOD_OTP, config.LOGIN_METHOD_MAGICLINK}
+	alts := loginAlternatives(methods, 0)
+	if len(alts) != 1 {
+		t.Fatalf("Expected 1 alternative for primary method, got %d", len(alts))
 	}
-
-	routes := Routes(app)
-
-	// Verify core routes are still present
-	foundLogin := false
-	foundLogout := false
-
-	// Verify register route is NOT included
-	for _, route := range routes {
-		switch route.GetPath() {
-		case links.AUTH_CALLBACK_MAGICLINK, links.AUTH_CALLBACK_AUTHKNIGHT:
-			t.Error("Callback route should not be present when LOGIN_METHOD is otp")
-		case links.AUTH_LOGIN:
-			foundLogin = true
-		case links.AUTH_LOGOUT:
-			foundLogout = true
-		case links.AUTH_REGISTER:
-			t.Error("Register route should not be present when registration is disabled")
-		}
-	}
-
-	if !foundLogin {
-		t.Error("Login route not found when registration is disabled")
-	}
-	if !foundLogout {
-		t.Error("Logout route not found when registration is disabled")
+	if alts[0].URL != "/auth/login-magiclink" {
+		t.Errorf("Expected /auth/login-magiclink, got %s", alts[0].URL)
 	}
 }

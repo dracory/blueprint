@@ -14,16 +14,16 @@ const AUTH_CALLBACK_AUTHKNIGHT = "/auth/authknight-callback"
 // Replaces the ambiguous shared AUTH_AUTH path.
 const AUTH_CALLBACK_MAGICLINK = "/auth/magiclink-callback"
 
-const AUTH_FORGOT_PASSWORD = "/auth/forgot-password"
+// AUTH_FORGOT_PASSWORD is the package's password-restore page.
+const AUTH_FORGOT_PASSWORD = "/auth/password-restore"
 const AUTH_LOGIN = "/auth/login"
 
-// Secondary login pages: mounted when a method is enabled via
-// AUTH_LOGIN_METHODS but is not the primary method (the primary method
-// always serves AUTH_LOGIN itself).
-const AUTH_LOGIN_AUTHKNIGHT = "/auth/authknight-login"
-const AUTH_LOGIN_MAGICLINK = "/auth/magiclink-login"
-const AUTH_LOGIN_OTP = "/auth/otp-login"
-const AUTH_LOGIN_PASSWORD = "/auth/password-login"
+// Secondary login pages follow the package convention: the primary
+// method serves AUTH_LOGIN, each secondary method serves /auth/login-<name>.
+const AUTH_LOGIN_AUTHKNIGHT = "/auth/login-authknight"
+const AUTH_LOGIN_MAGICLINK = "/auth/login-magiclink"
+const AUTH_LOGIN_OTP = "/auth/login-otp"
+const AUTH_LOGIN_PASSWORD = "/auth/login-password"
 const AUTH_LOGOUT = "/auth/logout"
 const AUTH_PASSWORD_RESET = "/auth/password-reset"
 const AUTH_REGISTER = "/auth/register"

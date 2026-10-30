@@ -18,14 +18,9 @@ const (
 	// EmailToAdminTaskAlias is the alias for the admin notification email task.
 	EmailToAdminTaskAlias = "EmailToAdminTask"
 
-	// EmailOTPTaskAlias is the alias for the OTP login email task.
-	EmailOTPTaskAlias = "EmailOTPTask"
-
-	// EmailMagicLinkTaskAlias is the alias for the magic link login email task.
-	EmailMagicLinkTaskAlias = "EmailMagicLinkTask"
-
-	// EmailPasswordResetTaskAlias is the alias for the password reset email task.
-	EmailPasswordResetTaskAlias = "EmailPasswordResetTask"
+	// EmailAuthDeliveryTaskAlias is the alias for the auth package email
+	// delivery task (resolves delivery keys enqueued by dracory/auth).
+	EmailAuthDeliveryTaskAlias = "AuthEmailDeliveryTask"
 
 	// EmailToAdminOnNewContactFormSubmittedTaskAlias is the alias for the
 	// contact form submission admin notification task.

@@ -8,9 +8,7 @@ import (
 	"project/internal/tasks/email_admin"
 	"project/internal/tasks/email_admin_new_contact"
 	"project/internal/tasks/email_admin_new_user_registered"
-	"project/internal/tasks/email_magic_link"
-	"project/internal/tasks/email_otp"
-	"project/internal/tasks/email_password_reset"
+	"project/internal/tasks/email_delivery"
 	"project/internal/tasks/email_test"
 	"project/internal/tasks/hello_world"
 	"project/internal/tasks/stats"
@@ -37,9 +35,7 @@ func RegisterTasks(app app.AppInterface) {
 		email_admin.NewEmailToAdminTask(app),
 		email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
 		email_admin_new_user_registered.NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
-		email_magic_link.NewEmailMagicLinkTask(app),
-		email_otp.NewEmailOTPTask(app),
-		email_password_reset.NewEmailPasswordResetTask(app),
+		email_delivery.NewAuthEmailDeliveryTask(app),
 		hello_world.NewHelloWorldTask(app),
 		stats.NewStatsVisitorEnhanceTask(app),
 	}

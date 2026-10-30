@@ -275,7 +275,7 @@ func (c *registerController) handleSubmit(w http.ResponseWriter, r *http.Request
 	}
 
 	// Log the new user in
-	redirectURL, _, errorMessage := shared.SessionLoginUser(c.app, w, r, user, returnURL, false)
+	redirectURL, _, errorMessage := shared.SessionLoginUser(c.app, w, r, user, returnURL)
 	if errorMessage != "" {
 		c.sendJSONResponse(w, map[string]interface{}{
 			"status":   "success",

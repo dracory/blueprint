@@ -21,10 +21,6 @@ type emailPasswordReset struct {
 
 // Send sends a single-use password reset link to the given email address.
 func (e *emailPasswordReset) Send(recipientEmail string, resetURL string) error {
-	appName := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
-		return e.app.GetConfig().GetAppName()
-	}).Else("")
-
 	fromEmail := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
 		return e.app.GetConfig().GetMailFromAddress()
 	}).Else("")
@@ -33,9 +29,8 @@ func (e *emailPasswordReset) Send(recipientEmail string, resetURL string) error 
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
-	emailSubject := appName + ". Your Password Reset Link"
-	emailContent := e.template(appName, resetURL)
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+	emailSubject := e.Subject()
+	finalHtml := e.BodyTemplate(emailSubject, resetURL)
 
 	return SendEmail(SendOptions{
 		From:     fromEmail,
@@ -44,6 +39,23 @@ func (e *emailPasswordReset) Send(recipientEmail string, resetURL string) error 
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
 	})
+}
+
+// Subject returns the branded password-reset email subject for the app.
+func (e *emailPasswordReset) Subject() string {
+	return lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
+		return e.app.GetConfig().GetAppName()
+	}).Else("") + ". Your Password Reset Link"
+}
+
+// BodyTemplate builds the branded password-reset body (wrapped in the
+// shared email template). Exported so the authadapters package can reuse
+// it via the auth package's FuncEmailTemplatePasswordRestore hook.
+func (e *emailPasswordReset) BodyTemplate(subject string, resetURL string) string {
+	appName := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
+		return e.app.GetConfig().GetAppName()
+	}).Else("")
+	return CreateEmailTemplate(e.app, subject, e.template(appName, resetURL))
 }
 
 func (e *emailPasswordReset) template(appName string, resetURL string) string {

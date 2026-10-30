@@ -39,35 +39,6 @@ func (l *authLinks) Login(backUrl string, params ...map[string]string) string {
 	return URL(AUTH_LOGIN, p)
 }
 
-// LoginAuthknight returns the AuthKnight login page URL, used when
-// authknight is enabled as a secondary login method (the primary method
-// is always served at Login()).
-func (l *authLinks) LoginAuthknight(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(AUTH_LOGIN_AUTHKNIGHT, p)
-}
-
-// LoginMagiclink returns the magic-link login page URL, used when
-// magiclink is enabled as a secondary login method.
-func (l *authLinks) LoginMagiclink(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(AUTH_LOGIN_MAGICLINK, p)
-}
-
-// LoginOtp returns the OTP login page URL, used when otp is enabled as a
-// secondary login method.
-func (l *authLinks) LoginOtp(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(AUTH_LOGIN_OTP, p)
-}
-
-// LoginPassword returns the password login page URL, used when password
-// is enabled as a secondary login method.
-func (l *authLinks) LoginPassword(params ...map[string]string) string {
-	p := lo.FirstOr(params, map[string]string{})
-	return URL(AUTH_LOGIN_PASSWORD, p)
-}
-
 func (l *authLinks) Logout(params ...map[string]string) string {
 	p := lo.FirstOr(params, map[string]string{})
 	return URL(AUTH_LOGOUT, p)

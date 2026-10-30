@@ -8,7 +8,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.0
-	github.com/dracory/auth v0.36.0
+	github.com/dracory/auth v0.41.0
 	github.com/dracory/base v0.42.3
 	github.com/dracory/blindindexstore v1.19.0
 	github.com/dracory/blockeditor v0.24.0
@@ -182,3 +182,5 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
+
+replace github.com/dracory/auth => ../../_modules_dracory/auth

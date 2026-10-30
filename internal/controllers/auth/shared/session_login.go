@@ -37,49 +37,6 @@ const (
 	MsgSessionError     = `Error creating session`
 )
 
-// SessionLogin performs the shared post-authentication pipeline:
-//
-//  1. Finds or creates the user by email (vault + blind index aware).
-//  2. Verifies the account exists and is active.
-//  3. Creates a session (2h production, 4h development).
-//  4. Sets the auth cookie.
-//  5. Calculates the redirect URL (admin panel, registration, or home).
-//
-// Parameters:
-//   - application: the app instance
-//   - w: the response writer (used to set the auth cookie)
-//   - r: the incoming request (used for session metadata)
-//   - email: the verified user email
-//   - backUrl: optional URL to redirect to instead of the calculated one
-//
-// Returns:
-//   - redirectURL: where to send the user on success ("" on failure)
-//   - needsRegistration: true when the user must complete registration
-//   - errorMessage: user-safe error message ("" on success)
-func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.Request, email, backUrl string, rememberMe bool) (redirectURL string, needsRegistration bool, errorMessage string) {
-	// Enforce the email allowlist before find-or-create so a non-allowed
-	// email never gets a user record, session, or registration page. The
-	// EmailAllowlistMiddleware only guards /user/* and /admin/* — without
-	// this check a blocked email could fully authenticate.
-	emailAllowed := authrules.NewEmailAllowedRule(application, email)
-	if emailAllowed.Fails() {
-		return "", false, emailAllowed.FailMessageFirst()
-	}
-
-	user, err := userFindByEmailOrCreate(application, r.Context(), email, userstore.USER_STATUS_ACTIVE)
-
-	if err != nil {
-		application.GetLogger().Error("At Shared SessionLogin > User Create Error", slog.String("error", err.Error()))
-		return "", false, MsgUserNotFound
-	}
-
-	if user == nil {
-		return "", false, MsgAccountNotFound
-	}
-
-	return SessionLoginUser(application, w, r, user, backUrl, rememberMe)
-}
-
 // SessionLoginUser performs the shared post-authentication pipeline for an
 // already-resolved user — unlike SessionLogin it never creates a user, so
 // it is the correct entry point for credential-based logins (e.g. email and
@@ -92,7 +49,7 @@ func SessionLogin(application app.AppInterface, w http.ResponseWriter, r *http.R
 //   - redirectURL: where to send the user on success ("" on failure)
 //   - needsRegistration: true when the user must complete registration
 //   - errorMessage: user-safe error message ("" on success)
-func SessionLoginUser(application app.AppInterface, w http.ResponseWriter, r *http.Request, user userstore.UserInterface, backUrl string, rememberMe bool) (redirectURL string, needsRegistration bool, errorMessage string) {
+func SessionLoginUser(application app.AppInterface, w http.ResponseWriter, r *http.Request, user userstore.UserInterface, backUrl string) (redirectURL string, needsRegistration bool, errorMessage string) {
 
 	if active := authrules.NewUserActiveRule(user); active.Fails() {
 		return "", false, MsgAccountNotActive
@@ -102,14 +59,6 @@ func SessionLoginUser(application app.AppInterface, w http.ResponseWriter, r *ht
 
 	if err != nil {
 		return "", false, MsgSessionError
-	}
-
-	if rememberMe {
-		if err := IssueRememberSession(application, w, r, user); err != nil {
-			// A failed remember session must not fail the login — the user
-			// is already authenticated; log and continue.
-			application.GetLogger().Error("At Shared SessionLogin > Remember Session Error", slog.String("error", err.Error()))
-		}
 	}
 
 	needsRegistration = !user.IsRegistrationCompleted()
@@ -169,72 +118,12 @@ func CreateSession(application app.AppInterface, w http.ResponseWriter, r *http.
 	return session, nil
 }
 
-// IssueRememberSession creates a long-lived session (AUTH_REMEMBER_ME_DAYS,
-// default 30) and places its key in the remember cookie. The session is a
-// normal sessionstore row — the RememberMeMiddleware exchanges it for a
-// short-lived auth session on the next visit and rotates it on every use.
-// No-op when remember-me is disabled in config.
-func IssueRememberSession(application app.AppInterface, w http.ResponseWriter, r *http.Request, user userstore.UserInterface) error {
-	cfg := application.GetConfig()
-	if cfg == nil || !cfg.GetRememberMeEnabled() {
-		return nil
-	}
-
-	sessionStore := application.GetSessionStore()
-	if sessionStore == nil {
-		return errors.New("session store is nil")
-	}
-
-	days := cfg.GetRememberMeDays()
-	if days < 1 {
-		days = 30
-	}
-
-	session := sessionstore.NewSession().
-		SetUserID(user.GetID()).
-		SetUserAgent(r.UserAgent()).
-		SetIPAddress(req.GetIP(r)).
-		SetValue(RememberSessionValue).
-		SetExpiresAt(carbon.Now(carbon.UTC).AddDays(days).ToDateTimeString(carbon.UTC))
-
-	if err := sessionStore.SessionCreate(r.Context(), session); err != nil {
-		return err
-	}
-
-	cookieOpts := []types.CookieOption{
-		types.WithCookieName(config.COOKIE_NAME_REMEMBER_TOKEN),
-		types.WithMaxAge(days * 24 * 60 * 60),
-	}
-	if cfg.IsEnvDevelopment() || cfg.IsEnvLocal() {
-		cookieOpts = append(cookieOpts, types.WithSecure(false))
-	}
-
-	auth.AuthCookieSet(w, r, session.GetKey(), cookieOpts...)
-
-	return nil
-}
-
 // RememberSessionValue marks a sessionstore row as a remember session via
 // its session_value column. The remember middleware only accepts marked
 // sessions, and treats a marked key in the auth cookie as a misused
 // credential — a plain session key cannot be used to mint persistent
 // sessions, and a remember key cannot act as a 30-day auth credential.
 const RememberSessionValue = "remember"
-
-// RememberMeCheckbox returns the "Remember me" checkbox markup injected
-// into the {{ rememberMe }} placeholder of login templates, or an empty
-// string when remember-me is disabled. The checkbox binds to the Vue model
-// `remember` defined in each login page's app.js.
-func RememberMeCheckbox(application app.AppInterface) string {
-	if application == nil || application.GetConfig() == nil || !application.GetConfig().GetRememberMeEnabled() {
-		return ""
-	}
-
-	return `<div class="form-check mb-4">` +
-		`<input class="form-check-input" type="checkbox" id="remember" v-model="remember">` +
-		`<label class="form-check-label small text-muted" for="remember">Remember me on this device</label>` +
-		`</div>`
-}
 
 // RemoveRememberCookie expires the remember cookie.
 func RemoveRememberCookie(application app.AppInterface, w http.ResponseWriter, r *http.Request) {

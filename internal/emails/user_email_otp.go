@@ -21,10 +21,6 @@ type emailOtp struct {
 
 // Send sends a one-time-password login code to the given email address.
 func (e *emailOtp) Send(recipientEmail string, otp string) error {
-	appName := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
-		return e.app.GetConfig().GetAppName()
-	}).Else("")
-
 	fromEmail := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
 		return e.app.GetConfig().GetMailFromAddress()
 	}).Else("")
@@ -33,9 +29,8 @@ func (e *emailOtp) Send(recipientEmail string, otp string) error {
 		return e.app.GetConfig().GetMailFromName()
 	}).Else("")
 
-	emailSubject := appName + ". Your Login Code"
-	emailContent := e.template(appName, otp)
-	finalHtml := CreateEmailTemplate(e.app, emailSubject, emailContent)
+	emailSubject := e.Subject()
+	finalHtml := e.BodyTemplate(emailSubject, otp)
 
 	return SendEmail(SendOptions{
 		From:     fromEmail,
@@ -44,6 +39,23 @@ func (e *emailOtp) Send(recipientEmail string, otp string) error {
 		Subject:  emailSubject,
 		HtmlBody: finalHtml,
 	})
+}
+
+// Subject returns the branded OTP email subject for the app.
+func (e *emailOtp) Subject() string {
+	return lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
+		return e.app.GetConfig().GetAppName()
+	}).Else("") + ". Your Login Code"
+}
+
+// BodyTemplate builds the branded OTP email body (wrapped in the shared
+// email template). Exported so the authadapters package can reuse it via
+// the auth package's FuncEmailTemplateLoginCode hook.
+func (e *emailOtp) BodyTemplate(subject string, otp string) string {
+	appName := lo.IfF(e.app != nil && e.app.GetConfig() != nil, func() string {
+		return e.app.GetConfig().GetAppName()
+	}).Else("")
+	return CreateEmailTemplate(e.app, subject, e.template(appName, otp))
 }
 
 func (e *emailOtp) template(appName string, otp string) string {
