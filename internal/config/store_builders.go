@@ -268,6 +268,10 @@ func NewStatsStore(db *sql.DB, debug bool) (statsstore.StoreInterface, error) {
 		DB:                db,
 		SettingsTableName: "snv_stats_settings",
 		VisitorTableName:  "snv_stats_visitor",
+		// VisitorCreate runs on every request via StatsMiddleware — queue
+		// the INSERT instead of paying synchronous DB write latency per
+		// request. Flushed by DrainVisitorWrites in app.Close.
+		VisitorCreateAsyncEnabled: true,
 	})
 	if err != nil {
 		return nil, err

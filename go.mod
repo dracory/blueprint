@@ -36,7 +36,7 @@ require (
 	github.com/dracory/liveflux v0.26.0
 	github.com/dracory/llm v1.10.0
 	github.com/dracory/logadmin v0.2.1
-	github.com/dracory/logstore v1.23.2
+	github.com/dracory/logstore v1.24.0
 	github.com/dracory/metastore v1.12.2
 	github.com/dracory/neat v0.61.0
 	github.com/dracory/req v0.1.0
@@ -48,7 +48,7 @@ require (
 	github.com/dracory/shopstore v1.27.2
 	github.com/dracory/social v0.1.0
 	github.com/dracory/statsadmin v0.9.2
-	github.com/dracory/statsstore v1.34.2
+	github.com/dracory/statsstore v1.35.0
 	github.com/dracory/str v0.19.0
 	github.com/dracory/subscriptionstore v1.6.2
 	github.com/dracory/taskstore v1.33.2

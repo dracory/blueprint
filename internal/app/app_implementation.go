@@ -54,6 +54,10 @@ type appImplementation struct {
 	// Loggers
 	databaseLogger *slog.Logger
 	consoleLogger  *slog.Logger
+	// asyncLogHandler is the handler inside databaseLogger when the log
+	// store is enabled. *slog.Logger doesn't expose Drain(), so the raw
+	// handler is kept here purely to flush queued records in Close().
+	asyncLogHandler *logstore.SlogAsyncHandler
 
 	// Caches (instance-scoped)
 	memoryCache *ttlcache.Cache[string, any]
@@ -159,7 +163,11 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 	}
 
 	if app.IsEnabledLogStore() {
-		app.SetLogger(slog.New(logstore.NewSlogHandler(app.GetLogStore())))
+		// The logstore handler does a synchronous DB INSERT per record —
+		// use the async variant so logging never blocks the request path
+		// on a DB write. Drained in Close before the DB shuts down.
+		app.asyncLogHandler = logstore.NewSlogAsyncHandler(app.GetLogStore())
+		app.SetLogger(slog.New(app.asyncLogHandler))
 	}
 
 	// Mirror caches into internal/cache for transitional compatibility
@@ -173,6 +181,16 @@ func New(cfg config.ConfigInterface) (AppInterface, error) {
 func (r *appImplementation) Close() error {
 	if r == nil {
 		return nil
+	}
+
+	// Flush buffered log records and visitor writes before the database
+	// closes so pending writes don't fail against a closed connection.
+	if r.asyncLogHandler != nil {
+		r.asyncLogHandler.Drain()
+		r.asyncLogHandler = nil
+	}
+	if r.statsStore != nil {
+		r.statsStore.DrainVisitorWrites()
 	}
 
 	if r.neatDB == nil {
