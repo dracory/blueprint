@@ -28,7 +28,7 @@ func routePaths(routes []interface {
 }
 
 // TestRoutesConfiguration verifies the /auth surface: the package mux
-// catch-all plus the app-owned register and logout routes.
+// base + catch-all only — register and logout are served by the package.
 func TestRoutesConfiguration(t *testing.T) {
 	t.Parallel()
 	app := testutils.Setup()
@@ -37,11 +37,11 @@ func TestRoutesConfiguration(t *testing.T) {
 	}
 
 	routes := Routes(app)
-	if len(routes) < 4 {
-		t.Fatalf("Expected at least 4 routes (register get+post, logout, package base+catch-all), got %d", len(routes))
+	if len(routes) < 2 {
+		t.Fatalf("Expected at least 2 routes (package base+catch-all), got %d", len(routes))
 	}
 
-	var foundPackageBase, foundCatchAll, foundLogout, foundRegister bool
+	var foundPackageBase, foundCatchAll bool
 	for _, route := range routes {
 		switch route.GetPath() {
 		case "/auth":
@@ -54,15 +54,6 @@ func TestRoutesConfiguration(t *testing.T) {
 			if len(route.GetBeforeMiddlewares()) == 0 {
 				t.Error("Expected rate-limit middleware on /auth/* catch-all")
 			}
-		case links.AUTH_LOGOUT:
-			foundLogout = true
-			if !containsIgnoreCase(route.GetName(), "logout") {
-				t.Errorf("Expected logout route name to contain 'logout', got '%s'", route.GetName())
-			}
-		case links.AUTH_REGISTER:
-			if route.GetMethod() == "GET" {
-				foundRegister = true
-			}
 		}
 	}
 
@@ -71,12 +62,6 @@ func TestRoutesConfiguration(t *testing.T) {
 	}
 	if !foundCatchAll {
 		t.Error("Package catch-all route /auth/* not found")
-	}
-	if !foundLogout {
-		t.Error("Logout route not found")
-	}
-	if !foundRegister {
-		t.Error("Register route not found (registration is enabled in test config)")
 	}
 }
 
@@ -151,32 +136,33 @@ func TestRoutesUniqueRouteNames(t *testing.T) {
 	}
 }
 
-// TestRegisterRoutesPresence verifies the register route mounts when
-// registration is enabled (the test config default).
-func TestRegisterRoutesPresence(t *testing.T) {
-	t.Parallel()
+// TestPackageMuxServesRegister hits the package mux directly to confirm
+// /auth/register resolves to a package-served page.
+func TestPackageMuxServesRegister(t *testing.T) {
 	app := testutils.Setup()
+	if app == nil {
+		t.Fatal("testutils.Setup() returned nil")
+	}
 
-	var registerGet, registerPost bool
-	for _, route := range Routes(app) {
-		if route.GetPath() != links.AUTH_REGISTER {
-			continue
-		}
-		switch route.GetMethod() {
-		case "GET":
-			registerGet = true
-		case "POST":
-			registerPost = true
-		}
-		if len(route.GetBeforeMiddlewares()) == 0 {
-			t.Error("Expected rate-limit middleware on register route")
+	var muxHandler func(http.ResponseWriter, *http.Request)
+	for _, route := range packageAuthRoutes(app) {
+		if route.GetPath() == "/auth/*" {
+			muxHandler = route.GetHandler()
 		}
 	}
-	if !registerGet {
-		t.Error("Register GET route not found")
+	if muxHandler == nil {
+		t.Fatal("catch-all package route has no handler")
 	}
-	if !registerPost {
-		t.Error("Register POST route not found")
+
+	req := httptest.NewRequest("GET", links.AUTH_REGISTER, nil)
+	rec := httptest.NewRecorder()
+	muxHandler(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("Expected 200 from %s, got %d", links.AUTH_REGISTER, rec.Code)
+	}
+	if !strings.Contains(rec.Body.String(), "<html") {
+		t.Error("Expected HTML register page from package mux")
 	}
 }
 

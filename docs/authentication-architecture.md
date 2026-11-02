@@ -81,10 +81,12 @@ branch to remove in `internal/controllers/auth/routes.go` (`mountMethod`).
   `links.authLinks.AuthKnightLogin`, and the `AUTH_CALLBACK_AUTHKNIGHT`
   route/constant.
 
-**Registration note:** whenever `password` is among the enabled methods, the
-register page uses the password-based sign-up form — even when another method
-is primary. `AUTH_LOGIN_METHODS=otp,password` therefore registers users with
-email + password.
+**Registration note:** registration is fully package-owned — `/auth/register`
+serves the sign-up form for anonymous requesters and the profile-completion
+form for authenticated users with incomplete registration (gated by the
+`RegistrationComplete` post-auth hook; profile saves go through
+`FuncUserProfileUpdate`/`FuncUserEmailGet`, vault-aware). An incomplete user
+is redirected to `/auth/register` after login.
 
 ## Architecture Components
 
@@ -180,9 +182,11 @@ err := blindIndexStore.SearchValueCreate(ctx, searchValue)
 - 12,000 requests per hour
 
 **Authentication-Specific Limits:**
-- Auth/Login: 5 requests per minute per IP
-- Registration: 3 requests per minute per IP
-- Logout: No additional limits (relies on global limits)
+- Whole `/auth` surface: 30 requests per minute per IP (kept loose — a single
+  OTP journey legitimately needs ~5 requests); the dracory/auth package
+  additionally rate-limits sensitive API endpoints and throttles email sends
+  internally (3 sends per email per 5-minute window)
+- Logout: No additional limits (served by the package; relies on the above)
 
 ## Security Controls
 

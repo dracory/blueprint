@@ -13,7 +13,6 @@ import (
 	"project/database/migrations"
 	"project/internal/cli"
 
-	// "project/internal/cmsblocks"
 	"project/internal/app"
 	"project/internal/config"
 	"project/internal/routes"

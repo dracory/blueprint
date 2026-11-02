@@ -1,15 +1,11 @@
 package auth
 
 import (
-	"slices"
 	"strings"
 
 	"project/internal/app"
 	"project/internal/authadapters"
 	"project/internal/config"
-	"project/internal/controllers/auth/logout"
-	"project/internal/controllers/auth/register"
-	"project/internal/controllers/auth/register_password"
 	"project/internal/links"
 
 	authpkg "github.com/dracory/auth"
@@ -18,35 +14,17 @@ import (
 	rtrMiddleware "github.com/dracory/rtr/middlewares"
 )
 
-// Routes builds the /auth surface. The standalone dracory/auth package
-// serves every login method plus its built-in pages through one mux
-// (mounted as a catch-all). App-owned routes mount first so they win on
-// their exact paths: register (profile completion + project rules) and
-// logout (remember-session cleanup).
+// Routes builds the /auth surface. The dracory/auth package serves every
+// login method plus its built-in pages (login, register, register-code
+// verify, logout) through one mux, mounted as a catch-all on /auth/*.
+// No app-owned overrides: an authenticated requester on /auth/register
+// gets the package's profile-completion form (verified email read-only).
 func Routes(application app.AppInterface) []rtr.RouteInterface {
-	loginMethods := application.GetConfig().GetLoginMethods()
-
-	routes := []rtr.RouteInterface{}
-
-	if application.GetConfig().GetRegistrationEnabled() {
-		routes = append(routes, registerRoutes(application, loginMethods)...)
-	}
-
-	// Logout stays a local controller — it clears admin's remember
-	// session/cookie in addition to the auth session, and is not
-	// rate-limited (not security-sensitive).
-	routes = append(routes, rtr.NewRoute().
-		SetName("Auth > Logout Controller").
-		SetPath(links.AUTH_LOGOUT).
-		SetHTMLHandler(logout.NewLogoutController(application).AnyIndex))
-
-	return append(routes, packageAuthRoutes(application)...)
+	return packageAuthRoutes(application)
 }
 
 // packageAuthRoutes composes the enabled login methods into the package's
-// multi-method mux and mounts it on /auth/*. Admin's logout and register
-// routes still mount ahead of it (they add behaviour the package lacks:
-// remember-cookie cleanup, project rules) as thin wrappers.
+// multi-method mux and mounts it on /auth/*.
 func packageAuthRoutes(application app.AppInterface) []rtr.RouteInterface {
 	loginMethods := application.GetConfig().GetLoginMethods()
 
@@ -92,8 +70,12 @@ func packageAuthRoutes(application app.AppInterface) []rtr.RouteInterface {
 	mux := mma.Router()
 
 	stricter := []rtr.MiddlewareInterface{
-		// 5 requests per minute against brute force on auth endpoints
-		rtrMiddleware.RateLimitByIPMiddleware(5, 60),
+		// Coarse IP cap on the whole /auth surface. Kept loose (30/min)
+		// because a single OTP journey legitimately needs ~5 requests
+		// (login page → send → verify page → verify → redirect); the
+		// package additionally rate-limits the sensitive API endpoints
+		// and throttles email sends internally.
+		rtrMiddleware.RateLimitByIPMiddleware(30, 60),
 	}
 	base := rtr.NewRoute().SetPath("/auth").SetHandler(mux.ServeHTTP).SetName("Auth > Package")
 	base.AddBeforeMiddlewares(stricter)
@@ -174,34 +156,4 @@ func applyBranding(application app.AppInterface, a any, alternatives []types.Log
 	s.SetBrandName(strings.ToUpper(application.GetConfig().GetAppName()))
 	s.SetBrandTagline("")
 	s.SetLoginAlternatives(alternatives)
-}
-
-// registerRoutes mounts the register page. When password auth is among
-// the enabled methods it is the public sign-up form that creates the
-// account (email + password) and logs the user in; otherwise it is the
-// post-authentication profile completion form.
-func registerRoutes(application app.AppInterface, loginMethods []string) []rtr.RouteInterface {
-	var registerRoute, registerAjaxRoute rtr.RouteInterface
-
-	if slices.Contains(loginMethods, config.LOGIN_METHOD_PASSWORD) {
-		registerPasswordController := register_password.NewRegisterController(application)
-		registerRoute = rtr.GetHTML(links.AUTH_REGISTER, registerPasswordController.PageHandler).
-			SetName("Auth > Register Controller")
-		registerAjaxRoute = rtr.PostJSON(links.AUTH_REGISTER, registerPasswordController.AjaxHandler).
-			SetName("Auth > Register Ajax Controller")
-	} else {
-		registerController := register.NewRegisterController(application)
-		registerRoute = rtr.GetHTML(links.AUTH_REGISTER, registerController.PageHandler).
-			SetName("Auth > Register Controller")
-		registerAjaxRoute = rtr.PostJSON(links.AUTH_REGISTER, registerController.AjaxHandler).
-			SetName("Auth > Register Ajax Controller")
-	}
-
-	// 10 requests per minute to allow for legitimate interactions
-	// (country/timezone selection)
-	middlewares := []rtr.MiddlewareInterface{rtrMiddleware.RateLimitByIPMiddleware(10, 60)}
-	registerRoute.AddBeforeMiddlewares(middlewares)
-	registerAjaxRoute.AddBeforeMiddlewares(middlewares)
-
-	return []rtr.RouteInterface{registerRoute, registerAjaxRoute}
 }

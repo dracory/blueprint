@@ -30,6 +30,12 @@ func BuildPasswordlessAuth(application app.AppInterface) (types.AuthPasswordless
 	sessions := &SessionStoreAdapter{Store: application.GetSessionStore()}
 
 	cfg := types.ConfigPasswordless{
+		ConfigRateLimiting: types.ConfigRateLimiting{
+			// 3 sends per email per 5-minute sliding window (shared across
+			// login-otp, register, magic-link, password-restore sends).
+			MaxEmailSends:   3,
+			EmailSendWindow: 5 * time.Minute,
+		},
 		ConfigShared: types.ConfigShared{
 			EnableRegistration:   application.GetConfig().GetRegistrationEnabled(),
 			Endpoint:             "/auth",
@@ -105,7 +111,10 @@ func BuildPasswordlessAuth(application app.AppInterface) (types.AuthPasswordless
 			if user == nil {
 				return nil
 			}
-			return nil
+			if err := userNamesSet(application, ctx, user, firstName, lastName); err != nil {
+				return err
+			}
+			return application.GetUserStore().UserUpdate(ctx, user)
 		},
 	}
 
@@ -119,6 +128,8 @@ func BuildPasswordlessAuth(application app.AppInterface) (types.AuthPasswordless
 		impl.SetFuncTemporaryKeyDelete(tempKeys.Delete)
 		impl.SetPostAuthHooks(postAuthHooks(application, sessions))
 		impl.SetFuncEmailEnqueue(emailEnqueue(application))
+		impl.SetFuncUserProfileUpdate(funcUserProfileUpdate(application))
+		impl.SetFuncUserEmailGet(funcUserEmailGet(application))
 		rememberMeSettings(application, impl)
 	}
 	return a, nil
@@ -132,6 +143,8 @@ type sessionSetter interface {
 	SetFuncTemporaryKeyDelete(func(key string) error)
 	SetPostAuthHooks(types.PostAuthHooks)
 	SetFuncEmailEnqueue(func(ctx context.Context, deliveryKey string) error)
+	SetFuncUserProfileUpdate(func(ctx context.Context, userID string, firstName string, lastName string, options types.UserAuthOptions) error)
+	SetFuncUserEmailGet(func(ctx context.Context, userID string, options types.UserAuthOptions) (string, error))
 	SetRememberMeEnabled(bool)
 	SetRememberMeDays(int)
 	SetRememberCookieName(string)
@@ -164,6 +177,88 @@ func emailEnqueue(application app.AppInterface) func(ctx context.Context, delive
 		)
 		return err
 	}
+}
+
+// funcUserProfileUpdate persists the registration-completion form for an
+// existing authenticated user — the package's /auth/register serves this
+// branch when the requester already has a session (e.g. created by an
+// OTP or magic-link login, email already verified). Updates never create
+// a user.
+func funcUserProfileUpdate(application app.AppInterface) func(ctx context.Context, userID string, firstName string, lastName string, options types.UserAuthOptions) error {
+	return func(ctx context.Context, userID string, firstName string, lastName string, options types.UserAuthOptions) error {
+		user, err := application.GetUserStore().UserFindByID(ctx, userID)
+		if err != nil {
+			return err
+		}
+		if user == nil {
+			return errors.New("user not found")
+		}
+		if err := userNamesSet(application, ctx, user, firstName, lastName); err != nil {
+			return err
+		}
+		if err := application.GetUserStore().UserUpdate(ctx, user); err != nil {
+			return err
+		}
+
+		// Drop the auth middleware's cached user — it holds the
+		// pre-update object (empty names) for up to 5 minutes, which
+		// would keep redirecting the user back to registration.
+		if cache := application.GetMemoryCache(); cache != nil {
+			cache.Delete("auth:user:" + userID)
+		}
+		return nil
+	}
+}
+
+// funcUserEmailGet resolves a user's plaintext email for display on the
+// completion form — vault-aware, reads through the token when the vault
+// is enabled.
+func funcUserEmailGet(application app.AppInterface) func(ctx context.Context, userID string, options types.UserAuthOptions) (string, error) {
+	return func(ctx context.Context, userID string, options types.UserAuthOptions) (string, error) {
+		user, err := application.GetUserStore().UserFindByID(ctx, userID)
+		if err != nil || user == nil {
+			return "", err
+		}
+		email := user.GetEmail()
+		if !application.GetConfig().GetUserStoreVaultEnabled() || email == "" {
+			return email, nil
+		}
+		if application.IsDisabledVaultStore() {
+			return "", errors.New("vault store is nil")
+		}
+		return application.GetVaultStore().TokenRead(ctx, email, application.GetConfig().GetVaultStoreKey())
+	}
+}
+
+// userNamesSet applies first/last name to the user, vault-tokenizing the
+// values when the vault store is enabled.
+func userNamesSet(application app.AppInterface, ctx context.Context, user userstore.UserInterface, firstName string, lastName string) error {
+	if !application.GetConfig().GetUserStoreVaultEnabled() {
+		user.SetFirstName(firstName)
+		user.SetLastName(lastName)
+		return nil
+	}
+
+	if application.IsDisabledVaultStore() {
+		return errors.New("vault store is not configured")
+	}
+
+	tokenize := func(value string) (string, error) {
+		return application.GetVaultStore().TokenCreate(ctx, value, application.GetConfig().GetVaultStoreKey(), 20)
+	}
+
+	firstNameToken, err := tokenize(firstName)
+	if err != nil {
+		return err
+	}
+	lastNameToken, err := tokenize(lastName)
+	if err != nil {
+		return err
+	}
+
+	user.SetFirstName(firstNameToken)
+	user.SetLastName(lastNameToken)
+	return nil
 }
 
 // secureFlag returns the Secure cookie flag for the environment —
@@ -207,12 +302,16 @@ func postAuthHooks(application app.AppInterface, sessions *SessionStoreAdapter) 
 				userstore.USER_ROLE_SUPERUSER) {
 				redirectURL = links.Admin().Home()
 			}
-			if !user.IsRegistrationCompleted() {
-				redirectURL = helpers.ToFlashInfoURL(application.GetCacheStore(),
-					"Thank you for logging in. Please complete your data to finish your registration",
-					links.Auth().Register(), 5)
-			}
 			return redirectURL
+		},
+		// Package-owned gate: incomplete registration → /auth/register
+		// completion form (verified email read-only).
+		RegistrationComplete: func(ctx context.Context, userID string) (bool, error) {
+			user, err := application.GetUserStore().UserFindByID(ctx, userID)
+			if err != nil || user == nil {
+				return false, err
+			}
+			return user.IsRegistrationCompleted(), nil
 		},
 		SetAuthCookie: func(w http.ResponseWriter, r *http.Request, token string) {
 			opts := []types.CookieOption{}
@@ -292,6 +391,10 @@ func BuildPasswordAuth(application app.AppInterface) (types.AuthPasswordInterfac
 	sessions := &SessionStoreAdapter{Store: application.GetSessionStore()}
 
 	cfg := types.ConfigUsernameAndPassword{
+		ConfigRateLimiting: types.ConfigRateLimiting{
+			MaxEmailSends:   3,
+			EmailSendWindow: 5 * time.Minute,
+		},
 		ConfigShared: types.ConfigShared{
 			EnableRegistration:   application.GetConfig().GetRegistrationEnabled(),
 			Endpoint:             "/auth",
@@ -406,6 +509,8 @@ func BuildPasswordAuth(application app.AppInterface) (types.AuthPasswordInterfac
 		impl.SetFuncTemporaryKeyDelete(tempKeys.Delete)
 		impl.SetPostAuthHooks(postAuthHooks(application, sessions))
 		impl.SetFuncEmailEnqueue(emailEnqueue(application))
+		impl.SetFuncUserProfileUpdate(funcUserProfileUpdate(application))
+		impl.SetFuncUserEmailGet(funcUserEmailGet(application))
 		rememberMeSettings(application, impl)
 	}
 	return a, nil
@@ -483,6 +588,8 @@ func BuildAuthKnightAuth(application app.AppInterface) (types.AuthAuthKnightInte
 		impl.SetFuncTemporaryKeyDelete(tempKeys.Delete)
 		impl.SetPostAuthHooks(hooks)
 		impl.SetFuncEmailEnqueue(emailEnqueue(application))
+		impl.SetFuncUserProfileUpdate(funcUserProfileUpdate(application))
+		impl.SetFuncUserEmailGet(funcUserEmailGet(application))
 		rememberMeSettings(application, impl)
 	}
 	return a, nil

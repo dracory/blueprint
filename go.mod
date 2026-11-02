@@ -8,7 +8,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.2
-	github.com/dracory/auth v0.44.0
+	github.com/dracory/auth v0.47.0
 	github.com/dracory/base v0.42.3
 	github.com/dracory/blindindexstore v1.19.2
 	github.com/dracory/blockeditor v0.24.0
@@ -19,7 +19,8 @@ require (
 	github.com/dracory/cdn v1.13.0
 	github.com/dracory/chatstore v1.6.2
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsstore v1.44.2
+	github.com/dracory/cmsblocks v0.0.0
+	github.com/dracory/cmsstore v1.45.0
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.16.2
 	github.com/dracory/dataobject v1.7.0
@@ -46,7 +47,6 @@ require (
 	github.com/dracory/settingstore v1.14.2
 	github.com/dracory/shopadmin v0.9.1
 	github.com/dracory/shopstore v1.27.2
-	github.com/dracory/social v0.1.0
 	github.com/dracory/statsadmin v0.9.2
 	github.com/dracory/statsstore v1.35.0
 	github.com/dracory/str v0.19.0
@@ -115,6 +115,7 @@ require (
 	github.com/dracory/crypto v0.3.0 // indirect
 	github.com/dracory/database v0.8.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
+	github.com/dracory/social v0.1.0 // indirect
 	github.com/dracory/sqlfilestore v1.11.2 // indirect
 	github.com/dracory/uid v1.14.0 // indirect
 	github.com/dracory/versionstore v1.8.2 // indirect
@@ -182,3 +183,5 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
+
+replace github.com/dracory/cmsblocks => ../../_modules_dracory/cmsblocks
