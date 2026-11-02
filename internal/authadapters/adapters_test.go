@@ -126,9 +126,9 @@ func TestSessionStoreAdapter_DeleteByUserID(t *testing.T) {
 	}
 }
 
-// TestBuildPasswordlessAuth verifies the builder returns a wired impl
+// TestBuildOtpAuth verifies the builder returns a wired impl
 // without panicking on a fully-stored test app.
-func TestBuildPasswordlessAuth(t *testing.T) {
+func TestBuildOtpAuth(t *testing.T) {
 	cfg := testutils.DefaultConf()
 	cfg.SetUserStoreUsed(true)
 	cfg.SetSessionStoreUsed(true)
@@ -136,15 +136,15 @@ func TestBuildPasswordlessAuth(t *testing.T) {
 	cfg.SetTaskStoreUsed(true)
 	application := testutils.Setup(testutils.WithCfg(cfg))
 
-	a, err := BuildPasswordlessAuth(application)
+	a, err := BuildOtpAuth(application)
 	if err != nil {
-		t.Fatalf("BuildPasswordlessAuth: %v", err)
+		t.Fatalf("BuildOtpAuth: %v", err)
 	}
 	if a == nil {
-		t.Fatal("BuildPasswordlessAuth returned nil")
+		t.Fatal("BuildOtpAuth returned nil")
 	}
-	if !a.IsPasswordless() {
-		t.Error("expected passwordless auth impl")
+	if !a.IsOtp() {
+		t.Error("expected OTP auth impl")
 	}
 }
 

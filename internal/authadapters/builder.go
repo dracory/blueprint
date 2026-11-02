@@ -22,14 +22,14 @@ import (
 	"github.com/dracory/userstore"
 )
 
-// BuildPasswordlessAuth constructs the package's passwordless auth instance
+// BuildOtpAuth constructs the package's OTP auth instance
 // wired to admin's stores via the adapters — the single AuthSharedInterface
 // that the multi-method mounts and PostAuthHooks hang off.
-func BuildPasswordlessAuth(application app.AppInterface) (types.AuthPasswordlessInterface, error) {
+func BuildOtpAuth(application app.AppInterface) (types.AuthOtpInterface, error) {
 	tempKeys := &TempKeyAdapter{Store: application.GetCacheStore()}
 	sessions := &SessionStoreAdapter{Store: application.GetSessionStore()}
 
-	cfg := types.ConfigPasswordless{
+	cfg := types.ConfigOtp{
 		ConfigRateLimiting: types.ConfigRateLimiting{
 			// 3 sends per email per 5-minute sliding window (shared across
 			// login-otp, register, magic-link, password-restore sends).
@@ -118,7 +118,7 @@ func BuildPasswordlessAuth(application app.AppInterface) (types.AuthPasswordless
 		},
 	}
 
-	a, err := auth.NewPasswordlessAuth(cfg)
+	a, err := auth.NewOtpAuth(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +384,7 @@ func IssueRememberSession(application app.AppInterface, sessions *SessionStoreAd
 }
 
 // BuildPasswordAuth constructs the package's username(email)+password auth
-// instance wired to admin's stores — parallel to BuildPasswordlessAuth so
+// instance wired to admin's stores — parallel to BuildOtpAuth so
 // multi-method mounts can mix both impls.
 func BuildPasswordAuth(application app.AppInterface) (types.AuthPasswordInterface, error) {
 	tempKeys := &TempKeyAdapter{Store: application.GetCacheStore()}

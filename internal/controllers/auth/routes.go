@@ -33,7 +33,7 @@ func packageAuthRoutes(application app.AppInterface) []rtr.RouteInterface {
 		alternatives := loginAlternatives(loginMethods, i)
 		switch name {
 		case config.LOGIN_METHOD_OTP, config.LOGIN_METHOD_MAGICLINK:
-			a, err := authadapters.BuildPasswordlessAuth(application)
+			a, err := authadapters.BuildOtpAuth(application)
 			if err != nil {
 				panic("auth package: " + err.Error())
 			}

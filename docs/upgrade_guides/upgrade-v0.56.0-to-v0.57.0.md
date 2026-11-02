@@ -7,9 +7,9 @@ This guide helps LLMs and developers upgrade Blueprint applications from v0.56.0
 This release extracts more Blueprint-owned code into standalone `dracory/*` packages:
 
 **Key Changes:**
-- **Auth register & logout moved into `dracory/auth` v0.47.0** — the package now serves `/auth/register` (both the password sign-up form and the post-authentication profile-completion form) and `/auth/logout` itself. Blueprint's local controllers `internal/controllers/auth/register`, `internal/controllers/auth/register_password`, and `internal/controllers/auth/logout` are deleted
+- **Auth register & logout moved into `dracory/auth` v0.49.0** — the package now serves `/auth/register` (both the password sign-up form and the post-authentication profile-completion form) and `/auth/logout` itself. Blueprint's local controllers `internal/controllers/auth/register`, `internal/controllers/auth/register_password`, and `internal/controllers/auth/logout` are deleted
 - **`internal/cmsblocks` block types extracted to `github.com/dracory/cmsblocks` v0.1.0** — `blogpost`, `blogpostlist`, and `search` blocks now live in the external package; `CmsAddBlockTypes` only injects stores and a post-URL builder
-- `github.com/dracory/auth` v0.44.0 → v0.47.0
+- `github.com/dracory/auth` v0.44.0 → v0.49.0 (renames `Passwordless` → `Otp` throughout: `ConfigPasswordless` → `ConfigOtp`, `AuthPasswordlessInterface` → `AuthOtpInterface`, `NewPasswordlessAuth` → `NewOtpAuth`, `IsPasswordless` → `IsOtp`)
 - `github.com/dracory/cmsstore` v1.44.2 → v1.45.0
 - `github.com/dracory/cmsblocks` v0.1.0 (new dependency)
 - `github.com/dracory/social` v0.1.0 moved from direct to indirect (pulled in by `dracory/auth`)
@@ -78,7 +78,31 @@ rtrMiddleware.RateLimitByIPMiddleware(30, 60)
 - Update the `stricter` middleware slice in `packageAuthRoutes`
 - Configure the package's own email-send throttle via `ConfigRateLimiting` (see below) — do not rely on the coarse IP cap to stop mail floods
 
-### 3. `CmsAddBlockTypes` — block implementations moved to `dracory/cmsblocks`
+### 3. `dracory/auth` renames `Passwordless` → `Otp`
+
+**Change**: In v0.49.0 the package renamed its OTP (passwordless) API surface for consistency. Any project code that references the old names must be updated.
+
+| Old name | New name |
+|----------|----------|
+| `types.ConfigPasswordless` | `types.ConfigOtp` |
+| `types.AuthPasswordlessInterface` | `types.AuthOtpInterface` |
+| `auth.NewPasswordlessAuth` | `auth.NewOtpAuth` |
+| `IsPasswordless()` | `IsOtp()` |
+
+Blueprint also renamed its own builder to match: `authadapters.BuildPasswordlessAuth` → `authadapters.BuildOtpAuth`.
+
+**Action Required**:
+
+```bash
+grep -rln "Passwordless" internal/ | xargs sed -i \
+  -e 's/AuthPasswordlessInterface/AuthOtpInterface/g' \
+  -e 's/ConfigPasswordless/ConfigOtp/g' \
+  -e 's/NewPasswordlessAuth/NewOtpAuth/g' \
+  -e 's/BuildPasswordlessAuth/BuildOtpAuth/g' \
+  -e 's/IsPasswordless()/IsOtp()/g'
+```
+
+### 4. `CmsAddBlockTypes` — block implementations moved to `dracory/cmsblocks`
 
 **Change**: `internal/cmsblocks/blogpost`, `internal/cmsblocks/blogpostlist`, and `internal/cmsblocks/search` are deleted. The same block types are now provided by `github.com/dracory/cmsblocks` v0.1.0. Registration requires injecting a post-URL builder via `SetPostURLFunc` (the package doesn't know your app's link helpers).
 
@@ -141,7 +165,7 @@ cmsstore.RegisterCustomBlockType(searchBlock)
 ### Step 1: Update dependencies
 
 ```bash
-go get github.com/dracory/auth@v0.47.0
+go get github.com/dracory/auth@v0.49.0
 go get github.com/dracory/cmsblocks@v0.1.0
 go get github.com/dracory/cmsstore@v1.45.0
 go mod tidy
@@ -159,10 +183,10 @@ Update `internal/controllers/auth/routes.go`: drop the `registerRoutes`/`logout`
 
 ### Step 3: Wire the new package hooks in `internal/authadapters/builder.go`
 
-For each of `BuildPasswordlessAuth`, `BuildPasswordAuth`, and `BuildAuthKnightAuth`:
+For each of `BuildOtpAuth`, `BuildPasswordAuth`, and `BuildAuthKnightAuth`:
 
 ```go
-cfg := types.ConfigPasswordless{ // or ConfigUsernameAndPassword
+cfg := types.ConfigOtp{ // or ConfigUsernameAndPassword
 	ConfigRateLimiting: types.ConfigRateLimiting{
 		// 3 sends per email per 5-minute sliding window (shared across
 		// login-otp, register, magic-link, password-restore sends).
@@ -223,7 +247,7 @@ go test ./...
 ## 🧪 Testing After Migration
 
 1. **Unit Tests**: `go test ./...` — all suites should pass unchanged
-2. **Auth flows**: verify register (password sign-up), register-as-profile-completion after OTP/magic-link login, login, logout, and remember-me on `dracory/auth` v0.47.0
+2. **Auth flows**: verify register (password sign-up), register-as-profile-completion after OTP/magic-link login, login, logout, and remember-me on `dracory/auth` v0.49.0
 3. **Rate limiting**: confirm repeated OTP/magic-link sends get throttled after 3 sends per email per 5 minutes
 4. **CMS blocks**: render a page containing Blog Post, Blog Post List, and Search blocks; confirm post links point at your site's `links.Website().BlogPost` URLs
 5. **Registration completion**: log in with a user missing first/last name → should be redirected to `/auth/register`, submit names → redirected onward, names persisted (and vault-tokenized if `UserStoreVaultEnabled`)

@@ -8,7 +8,7 @@ import (
 )
 
 // FuncEmailSend adapts the app's generic email sender to the auth
-// package's passwordless email hook signature.
+// package's email hook signature.
 func FuncEmailSend(application app.AppInterface) func(ctx context.Context, email string, subject string, body string) error {
 	return func(ctx context.Context, email string, subject string, body string) error {
 		return emails.SendEmail(emails.SendOptions{
