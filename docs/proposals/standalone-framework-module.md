@@ -119,8 +119,7 @@ contains only `cms_add_block_types.go`, which injects the stores + link func;
 tests moved with the blocks, backed by a package-local in-memory SQLite store
 helper (`internal/teststore`) instead of `testutils`.
 
-**Saving**: ~2,900 lines (12 files). Blueprint depends on the package via a
-local `replace` directive until the repo is tagged.
+**Saving**: ~2,900 lines (12 files). Released as `dracory/cmsblocks` v0.1.0.
 
 ### 1.7 Widgets & shortcodes → `dracory/widgets`
 
