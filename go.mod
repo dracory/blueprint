@@ -19,7 +19,7 @@ require (
 	github.com/dracory/cdn v1.13.0
 	github.com/dracory/chatstore v1.6.2
 	github.com/dracory/cmd v0.2.0
-	github.com/dracory/cmsblocks v0.0.0
+	github.com/dracory/cmsblocks v0.1.0
 	github.com/dracory/cmsstore v1.45.0
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.16.2
@@ -183,5 +183,3 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
-
-replace github.com/dracory/cmsblocks => ../../_modules_dracory/cmsblocks
