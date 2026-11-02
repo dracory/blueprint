@@ -56,7 +56,7 @@ go test ./...
 go build -o ./tmp/main ./cmd/server
 
 # Generate upgrade guide using AI skill
-# (See .windsurf/workflows/upgrade-guide-generator.md)
+# (See .agents/skills/upgrade-guide-generator/SKILL.md)
 ```
 
 ### 4. Release

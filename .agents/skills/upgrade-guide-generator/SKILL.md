@@ -1,4 +1,5 @@
 ---
+name: upgrade-guide-generator
 description: Generate comprehensive upgrade guide between two Blueprint versions
 ---
 
