@@ -230,6 +230,9 @@ func TestBlogController_PageRendering(t *testing.T) {
 		postCount: 25,
 		page:      0,
 		perPage:   12,
+		imageURLs: map[string]string{
+			"1": "http://example.com/img.png",
+		},
 	}
 
 	// --- Execute ---

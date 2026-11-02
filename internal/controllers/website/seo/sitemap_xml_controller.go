@@ -7,11 +7,19 @@ import (
 	"project/internal/app"
 	"project/internal/links"
 	"strings"
+	"time"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/neat"
 	"github.com/dromara/carbon/v2"
 	"github.com/samber/lo"
+)
+
+const (
+	// sitemapMemCacheKey/TTL back the in-memory copy of the built XML so
+	// repeat crawler hits avoid the blog store SELECTs entirely.
+	sitemapMemCacheKey = "website:sitemap.xml:mem"
+	sitemapMemCacheTTL = time.Hour
 )
 
 type sitemapXmlController struct {
@@ -25,9 +33,36 @@ func NewSitemapXmlController(app app.AppInterface) *sitemapXmlController {
 
 func (c sitemapXmlController) Handler(w http.ResponseWriter, r *http.Request) string {
 	w.Header().Set("Content-Type", "text/xml")
-	body := c.buildSitemapXML(w, r)
+	w.Header().Set("Cache-Control", "public, max-age=3600")
+	body := c.cachedSitemapXML(w, r)
 	_, _ = w.Write([]byte(body))
 	return ""
+}
+
+// cachedSitemapXML serves the sitemap from the memory cache when possible.
+// Crawlers hit the sitemap constantly and the document only changes when a
+// post is published, so a 1h TTL is safe; on expiry one request rebuilds
+// and repopulates the cache.
+func (c sitemapXmlController) cachedSitemapXML(w http.ResponseWriter, r *http.Request) string {
+	if c.app != nil {
+		if mc := c.app.GetMemoryCache(); mc != nil {
+			if item := mc.Get(sitemapMemCacheKey); item != nil {
+				if cached, ok := item.Value().(string); ok && cached != "" {
+					return cached
+				}
+			}
+		}
+	}
+
+	body := c.buildSitemapXML(w, r)
+
+	if c.app != nil {
+		if mc := c.app.GetMemoryCache(); mc != nil {
+			mc.Set(sitemapMemCacheKey, body, sitemapMemCacheTTL)
+		}
+	}
+
+	return body
 }
 
 func (c sitemapXmlController) buildSitemapXML(w http.ResponseWriter, r *http.Request) string {

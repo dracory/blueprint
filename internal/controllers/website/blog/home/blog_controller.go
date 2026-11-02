@@ -10,6 +10,8 @@ import (
 	"project/internal/helpers"
 	"project/internal/layouts"
 	"project/internal/links"
+	"project/internal/rules"
+	"time"
 
 	"github.com/dracory/blogstore"
 	"github.com/dracory/bs"
@@ -25,11 +27,16 @@ type blogController struct {
 	app app.AppInterface
 }
 
+// blogHomeCacheTTL is the memory-cache lifetime for each blog index page's
+// post list/count/image data. Posts change rarely, so an hour is safe.
+const blogHomeCacheTTL = time.Hour
+
 type blogControllerData struct {
 	postList  []blogstore.PostInterface
 	postCount int64
 	page      int
 	perPage   int
+	imageURLs map[string]string
 }
 
 func NewBlogController(app app.AppInterface) *blogController {
@@ -79,7 +86,7 @@ func (controller *blogController) page(r *http.Request, data blogControllerData)
 	})
 
 	columnCards := lo.Map(data.postList, func(post blogstore.PostInterface, index int) hb.TagInterface {
-		return cardPost(ctx, controller.app, post)
+		return cardPost(ctx, controller.app, post, data.imageURLs[post.GetID()])
 	})
 
 	section := hb.Section().
@@ -115,6 +122,17 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 		return data, "Sorry, the blog is currently unavailable. Please try again later."
 	}
 
+	// Blog content changes rarely, so each page's post list/count/images is
+	// served from the memory cache.
+	cacheKey := "blog:home:page:" + cast.ToString(page)
+	if mc := controller.app.GetMemoryCache(); mc != nil {
+		if item := mc.Get(cacheKey); item != nil {
+			if cached, ok := item.Value().(blogControllerData); ok {
+				return cached, ""
+			}
+		}
+	}
+
 	options := blogstore.PostQueryOptions{
 		Status:    blogstore.POST_STATUS_PUBLISHED,
 		SortOrder: "DESC",
@@ -141,6 +159,14 @@ func (controller blogController) prepareData(r *http.Request) (data blogControll
 	data.perPage = perPage
 	data.postList = postList
 	data.postCount = postCount
+
+	// Batch-resolve card images in a single MediaList query to avoid an
+	// N+1 media lookup per post.
+	data.imageURLs = rules.PostImageURLs(r.Context(), blogStore, postList)
+
+	if mc := controller.app.GetMemoryCache(); mc != nil {
+		mc.Set(cacheKey, data, blogHomeCacheTTL)
+	}
 
 	return data, ""
 }

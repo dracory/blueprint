@@ -11,7 +11,7 @@ import (
 	"github.com/samber/lo"
 )
 
-func cardPost(ctx context.Context, app app.AppInterface, post blogstore.PostInterface) hb.TagInterface {
+func cardPost(ctx context.Context, app app.AppInterface, post blogstore.PostInterface, imageURL string) hb.TagInterface {
 
 	publishedAt := lo.Ternary(post.GetPublishedAt() == "", "", post.GetPublishedAtCarbon().Format("d M, Y"))
 
@@ -38,7 +38,7 @@ func cardPost(ctx context.Context, app app.AppInterface, post blogstore.PostInte
 
 	card := hb.Div().
 		Class("card rounded-4 h-100 overflow-hidden").
-		Child(postImage(ctx, app, post)).
+		Child(postImage(ctx, app, post, imageURL)).
 		Child(hb.Div().
 			Class("card-body p-4").
 			Child(postTitle).
@@ -59,8 +59,8 @@ func cardPost(ctx context.Context, app app.AppInterface, post blogstore.PostInte
 
 }
 
-func postImage(ctx context.Context, app app.AppInterface, post blogstore.PostInterface) *hb.Tag {
-	thumbnailURL := shared.SizedThumbnailURL(ctx, app, post, "300", "200", "80")
+func postImage(ctx context.Context, app app.AppInterface, post blogstore.PostInterface, imageURL string) *hb.Tag {
+	thumbnailURL := shared.SizedThumbnailURLForImage(ctx, app, imageURL, "300", "200", "80")
 
 	postImage := hb.Image(``).
 		Class("card-img-top").

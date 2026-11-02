@@ -17,6 +17,13 @@ func SizedThumbnailURL(ctx context.Context, app app.AppInterface, post blogstore
 		postImageURL = post.GetImageUrlOrDefault()
 	}
 
+	return SizedThumbnailURLForImage(ctx, app, postImageURL, width, height, quality)
+}
+
+// SizedThumbnailURLForImage is SizedThumbnailURL with a pre-resolved image
+// URL — used by list pages that batch-resolve post images in one query
+// instead of hitting the media table per card.
+func SizedThumbnailURLForImage(ctx context.Context, app app.AppInterface, postImageURL, width, height, quality string) string {
 	extension := ImageExtension(postImageURL)
 
 	if app == nil {

@@ -25,3 +25,50 @@ func PostImageURL(ctx context.Context, store blogstore.StoreInterface, post blog
 
 	return post.GetImageUrl()
 }
+
+// PostImageURLs resolves image URLs for a batch of posts with a single
+// MediaList query — calling PostImageURL per post is an N+1 (one media
+// query per card) that added a database round-trip for every card on the
+// blog index. Returns postID -> image URL, same precedence as
+// PostImageURL: first media by sequence, else the post's ImageUrl.
+func PostImageURLs(ctx context.Context, store blogstore.StoreInterface, posts []blogstore.PostInterface) map[string]string {
+	out := map[string]string{}
+	if store == nil || len(posts) == 0 {
+		return out
+	}
+
+	postIDs := make([]string, 0, len(posts))
+	for _, post := range posts {
+		if post != nil {
+			postIDs = append(postIDs, post.GetID())
+		}
+	}
+
+	media, err := store.MediaList(ctx, blogstore.MediaQueryOptions{
+		EntityIDIn: postIDs,
+		OrderBy:    "sequence",
+		SortOrder:  "ASC",
+	})
+
+	// First media per entity wins — ascending sequence order.
+	mediaByEntity := map[string]blogstore.MediaInterface{}
+	if err == nil {
+		for _, m := range media {
+			if _, exists := mediaByEntity[m.GetEntityID()]; !exists {
+				mediaByEntity[m.GetEntityID()] = m
+			}
+		}
+	}
+
+	for _, post := range posts {
+		if post == nil {
+			continue
+		}
+		if m := mediaByEntity[post.GetID()]; m != nil {
+			out[post.GetID()] = m.GetURL()
+			continue
+		}
+		out[post.GetID()] = post.GetImageUrl()
+	}
+	return out
+}

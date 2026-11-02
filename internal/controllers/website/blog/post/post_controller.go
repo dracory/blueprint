@@ -287,9 +287,24 @@ func (c *postController) recommendationsSection(post blogstore.PostInterface) hb
 		Limit:     18,
 	}
 
-	postList, err := c.app.GetBlogStore().PostList(context.Background(), options)
-	if err != nil {
-		return hb.Div()
+	// The recommendations pool is the same published-post list on every post
+	// page — cache it in memory (posts change rarely, see blog home).
+	const recommendationsCacheKey = "blog:recommendations"
+	var postList []blogstore.PostInterface
+	if mc := c.app.GetMemoryCache(); mc != nil {
+		if item := mc.Get(recommendationsCacheKey); item != nil {
+			postList, _ = item.Value().([]blogstore.PostInterface)
+		}
+	}
+	if postList == nil {
+		var err error
+		postList, err = c.app.GetBlogStore().PostList(context.Background(), options)
+		if err != nil {
+			return hb.Div()
+		}
+		if mc := c.app.GetMemoryCache(); mc != nil {
+			mc.Set(recommendationsCacheKey, postList, time.Hour)
+		}
 	}
 
 	filtered := make([]blogstore.PostInterface, 0, len(postList))
