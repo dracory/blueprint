@@ -87,6 +87,8 @@ github.com/dracory/auditstore v1.12.2 h1:EZnrBvfwffg3Wi5boW1JrVsqPnixE8a+NCXxZu+
 github.com/dracory/auditstore v1.12.2/go.mod h1:d8v7Xw9jXi6Tncsn0jwUxbWGHWYLUzRgbcvA4aIdspk=
 github.com/dracory/auth v0.49.0 h1:LPASIkhgnZlsjvXPySXEqhwPtvrlKmC/LK2ONnFp524=
 github.com/dracory/auth v0.49.0/go.mod h1:N16GTEawhuexCMmzmYar4a2lBCDc0DW3LCWtlM1X22A=
+github.com/dracory/auth v0.50.0 h1:RuhqyOv18GQE08glgindzVJ0bNWhuUXoDOtn4WBmsxE=
+github.com/dracory/auth v0.50.0/go.mod h1:N16GTEawhuexCMmzmYar4a2lBCDc0DW3LCWtlM1X22A=
 github.com/dracory/base v0.42.3 h1:T2ihbS3n+kXfVvCgSCE5jn9eCRi0X2bTfUrgGWPYXU4=
 github.com/dracory/base v0.42.3/go.mod h1:zsBDngKm5fYz1viVny94T/1AYYJHIDl2WWw97HIL45M=
 github.com/dracory/blindindexstore v1.19.2 h1:qahHF9JTRgC8vws5kitEfkb1NIdDlv3DP7Bz+9QpxXs=
@@ -131,6 +133,8 @@ github.com/dracory/email v0.2.0 h1:snYZrlU8dMYxZ7iVGPmbjs2LtntCxTMoP2Enc79AlPQ=
 github.com/dracory/email v0.2.0/go.mod h1:f3mtW3pkf5AzPIQJtX4bkt/bsVEaS9nwppMdMd8BLvE=
 github.com/dracory/email v0.3.0 h1:teQ56lmcYc5z+zmbo46mmiNfKGjhSv99AnIpaEZyLhs=
 github.com/dracory/email v0.3.0/go.mod h1:nsZNY04yhxNR5nCvd7cFLHLKjLOuek5XRq4C/cdoP1A=
+github.com/dracory/email v0.4.0 h1:fRhYN7e0Rm/gOZ8V+TxgYWzcfsgaHVUxFPwsDzo/Pdo=
+github.com/dracory/email v0.4.0/go.mod h1:nsZNY04yhxNR5nCvd7cFLHLKjLOuek5XRq4C/cdoP1A=
 github.com/dracory/entitystore v1.23.2 h1:MWCZsFT5ARRrgOy5O/cmoqx7ctXI/REGseYlL+fISZk=
 github.com/dracory/entitystore v1.23.2/go.mod h1:/gd1Ar4ofrqROk21vMvEuM0I3uJsoLi54PSKICyhXxc=
 github.com/dracory/entitystore v1.24.0 h1:9xMoBRwuPH8prrCTfoucMXB6dYxuO7AOn22rjh9PNaE=
@@ -177,6 +181,8 @@ github.com/dracory/settingstore v1.14.2 h1:yXFSwaIuE1lpr16NCQa/cFTAE7oEcKCcmATQI
 github.com/dracory/settingstore v1.14.2/go.mod h1:BubgNZw8dLEwJQxZGYMGr+ANhctxuIGFfYyz+csr7/g=
 github.com/dracory/shopadmin v0.9.1 h1:PXyTYB729zxu/t1lkuvfIrPbTgdwfXGqUa0bsvMUp/g=
 github.com/dracory/shopadmin v0.9.1/go.mod h1:nYJSd8+2iwJc7f9otte4oXUm/wcijAsHpuxsrbpNytA=
+github.com/dracory/shopadmin v0.10.0 h1:dIkLxi4EVINmFSIYDjA42deh8sBJRlk90KTXsTNmYmY=
+github.com/dracory/shopadmin v0.10.0/go.mod h1:nYJSd8+2iwJc7f9otte4oXUm/wcijAsHpuxsrbpNytA=
 github.com/dracory/shopstore v1.27.2 h1:Umn9PxYiyQwscbli8NYyXh0A1Sfok7kFbxMtmZm7mlA=
 github.com/dracory/shopstore v1.27.2/go.mod h1:afU+Uv/kFNMv6fQi8DBqbcgPYx/wXYZYb0x0OKLWK7Q=
 github.com/dracory/shortcode v0.5.0 h1:RbnLPjDyMqzGS4Y3BO8UaAd/jV146u8ZhhSVsYMJbqc=

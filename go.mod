@@ -8,7 +8,7 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.2
-	github.com/dracory/auth v0.49.0
+	github.com/dracory/auth v0.50.0
 	github.com/dracory/base v0.42.3
 	github.com/dracory/blindindexstore v1.19.2
 	github.com/dracory/blockeditor v0.24.0
@@ -24,7 +24,7 @@ require (
 	github.com/dracory/csrf v0.2.0
 	github.com/dracory/customstore v1.16.2
 	github.com/dracory/dataobject v1.7.0
-	github.com/dracory/email v0.3.0
+	github.com/dracory/email v0.4.0
 	github.com/dracory/entitystore v1.24.0
 	github.com/dracory/env v1.4.0
 	github.com/dracory/envenc v1.5.0
@@ -45,7 +45,7 @@ require (
 	github.com/dracory/rule v0.8.0
 	github.com/dracory/sessionstore v1.20.2
 	github.com/dracory/settingstore v1.14.2
-	github.com/dracory/shopadmin v0.9.1
+	github.com/dracory/shopadmin v0.10.0
 	github.com/dracory/shopstore v1.27.2
 	github.com/dracory/statsadmin v0.10.0
 	github.com/dracory/statsstore v1.35.0
