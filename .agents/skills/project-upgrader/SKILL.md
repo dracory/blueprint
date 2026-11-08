@@ -63,6 +63,7 @@ If `<project_path>` is not known, ask the user to provide it.
      - Variable names and comments referencing the old name.
      - Error message strings referencing the old name.
    - **Completeness check** — When a feature is added to blueprint (e.g., a new middleware, a test file for a migration), check if the project has it. Missing test files are a common sign of an incomplete upgrade.
+   - **Dependency-vs-code split check** — A project can be *partially* upgraded in a way neither the version constant nor file lists reveal: `go.mod` may already carry a guide's dependency bumps while none of that guide's code changes were applied (or vice versa). Compare the project's `go.mod` versions against each candidate guide's dependency step AND check whether the guide's code changes are present — treat the two as independent axes.
    - If structural discrepancies are found, **do not trust the version constant alone**. Read the relevant upgrade guide(s) to determine what file changes were expected, and treat the project as if it needs those guides applied.
    - Examples of structural mismatches:
      - The project claims `0.29.0` but still has `internal/config/load.go`, `functions.go`, and `defaults.go` while blueprint has `app_config.go`, `database_config.go`, etc. — the project likely missed the v0.18.0→v0.19.0 config restructure.
@@ -128,14 +129,21 @@ For each applicable upgrade guide:
 2. **Read the guide carefully** to understand all changes required.
 3. **Before applying each change**, check whether the feature or change already exists in the target project files. If it does, **skip that step** to avoid duplication or conflicts.
 4. **Apply the changes** to the target project:
-   - Update dependencies in `go.mod`.
+   - Update dependencies in `go.mod`. Treat a guide's pinned versions as *minimums*, not exact targets — if the project already has a newer version of the same package, keep it and skip that bump.
    - Apply breaking changes.
    - Update import paths.
    - Modify configuration files.
    - Add, remove, or refactor code as instructed.
 5. **Use Blueprint as reference** — if in doubt, compare with the corresponding files in `<blueprint_path>`.
+   - **Diff first, then copy when clean**: for each file a guide touches, run `diff` between the project and blueprint versions. If the only differences are the guide's own changes (i.e., the project has no custom drift in that file and both repos share the module path), copying blueprint's file verbatim is the safest and fastest way to apply the step. If the diff shows project-specific changes, apply the guide's edits manually instead.
 
 ### 6. Update Version Constant
+
+When upgrading through multiple intermediate versions sequentially, update the
+project's version constant after each completed guide (e.g., set it to
+`0.21.0` after the v0.20.0→v0.21.0 guide is done). This makes an interrupted
+multi-version upgrade resumable — the constant always reflects the last fully
+applied guide.
 
 After all applicable guides have been completed, update the project's version constant in:
 
@@ -206,12 +214,16 @@ Before finishing, confirm:
 ### Issue: Feature already exists in project
 **Solution**: Skip that step in the upgrade guide to avoid duplication.
 
+### Issue: Shell variable expansion silently stripped (WSL only)
+**Symptom**: When the agent shell runs under WSL, commands like `for dir in ...; do echo "$dir"; done` print empty strings — the tool wrapper strips `$var` expansions, even inside heredocs written to files. Not observed on native Windows shells.
+**Solution**: Escape variables as `\$var` in shell commands, or avoid loops and run plain `diff`/`ls` commands per directory.
+
 ## Important Rules
 
 - **Always run structural validation** after reading version constants. Compare the actual files in `internal/config` (and other key directories) against the Blueprint reference. Do not rely solely on the version constant.
 - **Always check for existing features** before applying a change from an upgrade guide. Skip steps that are already present in the project.
 - **Evaluate guide applicability before applying**. A guide may be skipped if its proposed changes are already present, conflict with newer package APIs, or are superseded by a later guide's approach. Document the reason for any skipped guides.
-- **Update the version constant once at the end** to the latest Blueprint version after all applicable guides are completed.
+- **Update the version constant after each applied guide** so the constant always reflects the last fully applied version; it must end at the latest Blueprint version after all applicable guides are completed.
 - **Prefer Blueprint files as reference** when the upgrade guide is ambiguous.
 - **Ask the user for clarification** when uncertain about how to apply a change, which guide to prioritize, or whether to skip a step. Do not guess or make assumptions that could break the project.
 - **Avoid bulk changes**. Apply changes incrementally and verify each step compiles and passes tests before moving on. Large sweeping changes across many files at once increase the risk of creating an unrecoverable mess.

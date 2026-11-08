@@ -1,24 +1,7 @@
 # AGENTS.md
 
-## AI Company Structure
-
-### AI Employees
-- **Director (MD)** - Strategic decision-making
-- **Developer (DEV)** - Platform development and implementation
-- **Designer (DES)** - UI/UX design and neo-brutalist branding
-- **Quality Assurance Controller (QAC)** - Fact-checking persona biographies (SOP-003)
-
-### AI Company Documentation
-- `/ai/` - AI company operational memory and records
-- `/ai/index.html` - Mini-site dashboard (browse all AI docs in browser)
-- `/ai/styles.css` - Shared neo-brutalist styles for all AI HTML pages
-- `/ai/company-profile.html` - Company mission, goals, and constraints
-
-## Project Overview
-SwiftAI is a modular AI orchestration platform that enables multi‑provider model management, persona handling, prompt libraries, and MCP tool integration.
-
 ## Project Setup
-- Use Go 1.25 or later
+- Use Go 1.27 or later
 - Install dependencies: `go mod download`
 - Run the application: `go run main.go`
 - Run tests: `go test ./...`
