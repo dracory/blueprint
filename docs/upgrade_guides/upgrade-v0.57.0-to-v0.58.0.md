@@ -11,17 +11,19 @@ This release is a **performance release** for the public website surface, plus r
 - **N+1 fix on blog cards** — new `rules.PostImageURLs()` resolves card images for the whole page in a single `MediaList` query; `cardPost`/`postImage` now take a pre-resolved `imageURL`; new `shared.SizedThumbnailURLForImage()` variant
 - **Post recommendations caching** — the "keep reading" pool (same 18 published posts on every post page) is cached in memory (1h TTL)
 - **sitemap.xml caching** — the built XML is cached in memory (1h TTL) and `Cache-Control: public, max-age=3600` is sent so crawlers mostly never reach the origin
-- `github.com/dracory/auth` v0.47.0 → v0.49.0 (renames `Passwordless` → `Otp` throughout — same rename documented in the v0.56→v0.57 guide; the v0.57.0 tag itself still carried the old names)
-- Dependency bumps: `blogadmin` v0.3.2 → v0.5.0, `cmsblocks` v0.1.0 → v0.1.1, `email` v0.2.0 → v0.3.0, `entitystore` v1.23.2 → v1.24.0, `logadmin` v0.2.1 → v0.4.0, `statsadmin` v0.9.2 → v0.10.0, `taskstore` v1.33.2 → v1.35.0, `useradmin` v0.5.1 → v0.8.0, `modernc.org/libc` v1.79.1 → v1.80.0
-- AI agent skills consolidated under `.agents/skills/` (`.windsurf` / `.devin` skill copies removed)
+- `github.com/dracory/auth` v0.47.0 → v0.51.0 (renames `Passwordless` → `Otp` throughout — same rename documented in the v0.56→v0.57 guide; the v0.57.0 tag itself still carried the old names)
+- Dependency bumps: `blogadmin` v0.3.2 → v0.5.0, `cmsblocks` v0.1.0 → v0.1.1, `email` v0.2.0 → v0.4.0, `entitystore` v1.23.2 → v1.24.0, `logadmin` v0.2.1 → v0.4.0, `shopadmin` v0.9.1 → v0.10.0, `statsadmin` v0.9.2 → v0.10.0, `taskstore` v1.33.2 → v1.35.0, `useradmin` v0.5.1 → v0.8.0, `carbon/v2` v2.7.0 → v2.7.1, `modernc.org/sqlite` v1.61.1 → v1.62.0, `modernc.org/libc` v1.79.1 → v1.80.1
+- `.env.example` cleanup — obsolete AI-provider vars removed, `MAIL_USERNAME`/`MAIL_PASSWORD` placeholders emptied, `DB_SSL_MODE` documented default corrected to `require`, maintenance-mode docs clarified, supported `DB_DRIVER` values listed
+- Housekeeping — `AGENTS.md` trimmed of stale AI-company/SwiftAI content and corrected to Go 1.27 (matching `go.mod`); `.devin/rules.yaml`, `.gemini/settings.json`, and `docs/upgrade_guides/upgrade_prompt.md` removed
+- AI agent skills consolidated under `.agents/skills/` (`.windsurf` / `.devin` skill copies removed); `project-upgrader` skill gained dependency-vs-code split checks and per-guide version-constant updates
 
 ---
 
 ## ⚠️ Breaking Changes
 
-### 1. `dracory/auth` renames `Passwordless` → `Otp` (v0.49.0)
+### 1. `dracory/auth` renames `Passwordless` → `Otp` (v0.49.0+)
 
-**Change**: The auth package's OTP (passwordless) API surface was renamed in v0.49.0. This was already documented in the v0.56→v0.57 guide, but the `v0.57.0` tag itself still shipped auth v0.47.0 — if you did not already apply that section, apply it now.
+**Change**: The auth package's OTP (passwordless) API surface was renamed in v0.49.0 (v0.58.0 ships v0.51.0). This was already documented in the v0.56→v0.57 guide, but the `v0.57.0` tag itself still shipped auth v0.47.0 — if you did not already apply that section, apply it now.
 
 | Old name | New name |
 |----------|----------|
@@ -109,12 +111,13 @@ data := blogControllerData{
 ### Step 1: Update dependencies
 
 ```bash
-go get github.com/dracory/auth@v0.49.0
+go get github.com/dracory/auth@v0.51.0
 go get github.com/dracory/blogadmin@v0.5.0
 go get github.com/dracory/cmsblocks@v0.1.1
-go get github.com/dracory/email@v0.3.0
+go get github.com/dracory/email@v0.4.0
 go get github.com/dracory/entitystore@v1.24.0
 go get github.com/dracory/logadmin@v0.4.0
+go get github.com/dracory/shopadmin@v0.10.0
 go get github.com/dracory/statsadmin@v0.10.0
 go get github.com/dracory/taskstore@v1.35.0
 go get github.com/dracory/useradmin@v0.8.0
@@ -198,11 +201,21 @@ if postList == nil {
 
 Wrap `buildSitemapXML` in `sitemap_xml_controller.go` behind a memory-cache check (`website:sitemap.xml:mem`, 1h) and add `w.Header().Set("Cache-Control", "public, max-age=3600")` to the handler. Guard the cache read/write with `c.app != nil` — tests construct the controller without an app.
 
-### Step 7: Move skills (optional)
+### Step 7: Sync `.env.example` (and your `.env` if needed)
+
+Copy the cleaned-up sections from this version's `.env.example`:
+
+- `MAIL_USERNAME` / `MAIL_PASSWORD` placeholders changed from `"not_required"` to `""` — if your `.env` still carries the placeholder, clear it (a literal `"not_required"` username would be sent to the SMTP server).
+- The `*_API_USED` / `*_API_DEFAULT_MODEL` blocks (Anthropic, Gemini, OpenAI, OpenRouter, Vertex AI) were removed from the example file. **They are still read by `internal/config/llm_config.go`** — if your project uses an LLM provider, keep those variables in your `.env`; they are simply no longer advertised to every install.
+- `DB_SSL_MODE` documented default corrected to `require` (the code already defaulted to `require` via `env.GetStringOrDefault` — this was a doc fix, not a behavior change).
+- `DB_DRIVER` comment now lists all supported drivers: `sqlite, turso, mysql, mariadb, postgres, oracle, sqlserver`.
+- Maintenance-mode comments clarified: enablement is env flag **or** state file; the state file is polled every 30s and supports `message`, `retry_after_seconds`, `exclude_ips`, `exclude_paths`.
+
+### Step 8: Move skills (optional)
 
 If your project copied Blueprint's `.windsurf/` or `.devin/skills/` skill directories, they now live under `.agents/skills/`. Update any references (e.g. `docs/version_workflow.md` now points at `.agents/skills/upgrade-guide-generator/SKILL.md`).
 
-### Step 8: Tidy, build, test
+### Step 9: Tidy, build, test
 
 ```bash
 go mod tidy
@@ -228,14 +241,18 @@ go test ./...
 
 - **Cache invalidation**: all new caches use a 1h TTL with no explicit invalidation. If your project writes posts via an admin UI or import task and needs immediate visibility, either shorten the TTL or delete the keys (`blog:home:page:*`, `blog:recommendations`, `website:sitemap.xml:mem`) on publish.
 - **No DB-backed layer**: unlike a cache-store solution, memory-cache entries don't survive restart — first request after boot pays the queries. That's deliberate: content correctness on cold start beats warmth.
-- **Admin packages jumped two+ minors** (`blogadmin`, `useradmin`, `logadmin`, `statsadmin`, `email`) but required zero code changes in Blueprint — they're version bumps only. If you call their APIs directly, skim each package's changelog for renamed options.
+- **Admin packages jumped two+ minors** (`blogadmin`, `useradmin`, `logadmin`, `statsadmin`, `email`, `shopadmin`) but required zero code changes in Blueprint — they're version bumps only. If you call their APIs directly, skim each package's changelog for renamed options.
+- **LLM env vars still live**: `*_API_USED` / `*_API_DEFAULT_MODEL` were removed from `.env.example` only. `internal/config/llm_config.go` still reads and conditionally requires them, so existing `.env` files keep working unchanged.
+- **Repo hygiene**: `AGENTS.md` lost its stale AI-company/SwiftAI preamble and now correctly requires Go 1.27 (matching `go.mod`'s `go 1.27.0` directive). `.devin/rules.yaml`, `.gemini/settings.json`, and `docs/upgrade_guides/upgrade_prompt.md` were deleted — remove them from your project too if you copied them.
 - `docs/version_workflow.md` now references `.agents/skills/` for the guide-generator skill.
 
 ## 🆘 Common Issues and Solutions
 
 | Issue | Solution |
 |-------|----------|
-| `undefined: BuildPasswordlessAuth` / `types.ConfigPasswordless` | Apply the Otp rename (Breaking Change 1) and `go get github.com/dracory/auth@v0.49.0` |
+| `undefined: BuildPasswordlessAuth` / `types.ConfigPasswordless` | Apply the Otp rename (Breaking Change 1) and `go get github.com/dracory/auth@v0.51.0` |
+| SMTP auth failure after upgrading | Check `.env` — `MAIL_USERNAME`/`MAIL_PASSWORD` may still contain the old `"not_required"` placeholder; set them to `""` or real credentials |
+| LLM provider stopped validating after copying new `.env.example` | The `*_API_USED`/`*_API_DEFAULT_MODEL` vars were removed from the example but are still read by config — restore them in your `.env` |
 | Blog card test fails on missing thumbnail URL | Populate `imageURLs` in the `blogControllerData` fixture (Breaking Change 3) |
 | Sitemap test panics with nil app | The cache path guards on `c.app != nil`; keep your controller constructible without an app or pass a test app via `testutils.Setup()` |
 | Stale blog content after publishing a post | Expected — 1h TTL. Delete the cache keys on publish or shorten `blogHomeCacheTTL` |
