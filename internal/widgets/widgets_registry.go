@@ -1,6 +1,11 @@
 package widgets
 
-import "project/internal/app"
+import (
+	"project/internal/app"
+	"project/internal/links"
+
+	basewidgets "github.com/dracory/base/widgets"
+)
 
 // WidgetRegistry returns a list of all widgets
 //
@@ -12,13 +17,11 @@ import "project/internal/app"
 // Returns:
 //   - []Widget - A list of all widgets
 func WidgetRegistry(app app.AppInterface) []Widget {
-	return []Widget{
-		NewAuthenticatedWidget(app),
-		// NewContactFormWidget(app),
-		// NewTermsOfUseWidget(app),
-		NewUnauthenticatedWidget(app),
-		NewVisibleWidget(app),
-		NewPrintWidget(app),
-		NewBlockeditorWidget(app),
-	}
+	return basewidgets.WidgetRegistry(basewidgets.RegistryOptions{
+		IsEnvironment: func(environment string) bool {
+			config := app.GetConfig()
+			return config != nil && config.GetAppEnv() == environment
+		},
+		WidgetURL: links.Website().Widget,
+	})
 }

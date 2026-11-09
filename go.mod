@@ -9,7 +9,7 @@ require (
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.2
 	github.com/dracory/auth v0.51.0
-	github.com/dracory/base v0.43.0
+	github.com/dracory/base v0.44.0
 	github.com/dracory/blindindexstore v1.19.2
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.5.0
@@ -54,7 +54,7 @@ require (
 	github.com/dracory/taskstore v1.35.0
 	github.com/dracory/test v1.0.0
 	github.com/dracory/ui v0.17.0
-	github.com/dracory/uncdn v0.11.0
+	github.com/dracory/uncdn v0.12.0
 	github.com/dracory/useradmin v0.8.0
 	github.com/dracory/userstore v1.22.2
 	github.com/dracory/vaultstore v1.6.2

@@ -62,7 +62,7 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 
 **Expected saving**: ~3,900 lines across ~30 files.
 
-### 1.4 Widgets & shortcodes → `dracory/widgets`
+### 1.4 Widgets & shortcodes → `dracory/base/widgets` — **done (generic widgets)**
 
 | Files | LOC (non-test / test) |
 | :--- | :--- |
@@ -73,6 +73,8 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 **How**: extract `widgets_registry` + `cms_add_shortcodes` into `dracory/widgets`; feature widgets move with their packages (contact widget → `dracory/contact`, blog widgets → `dracory/blog`).
 
 **Expected saving**: ~2,100 lines (19 files).
+
+**Outcome (Nov 2026)**: `Widget` interface, `WidgetRegistry(RegistryOptions)`, and the generic widgets (authenticated, unauthenticated, visible, print, blockeditor, terms-of-use, contact-form) moved to `dracory/base/widgets` — ~1,000 lines removed. `Widget` is structurally identical to `cmsstore.ShortcodeInterface` so no store dependency was needed. Feature widgets (`blog_post*`, `testimonials`) stay in `internal/widgets` pending `dracory/blog`; `cms_add_shortcodes` stays as the config-gated shim.
 
 ### 1.5 Background tasks → the packages that own their domain
 
