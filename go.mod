@@ -5,13 +5,11 @@ go 1.27.0
 // replace github.com/dracory/base => ../../_modules_dracory/base
 
 require (
-	github.com/disintegration/imaging v1.6.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.2
 	github.com/dracory/auth v0.51.0
 	github.com/dracory/base v0.44.0
 	github.com/dracory/blindindexstore v1.19.2
-	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/blogadmin v0.5.0
 	github.com/dracory/blogstore v1.39.2
 	github.com/dracory/bs v0.16.0
@@ -31,7 +29,6 @@ require (
 	github.com/dracory/feedstore v1.12.2
 	github.com/dracory/fileadmin v0.1.0
 	github.com/dracory/filesystem v1.4.0
-	github.com/dracory/form v0.23.0
 	github.com/dracory/geostore v1.14.2
 	github.com/dracory/hb v1.88.0
 	github.com/dracory/liveflux v0.26.0
@@ -66,7 +63,6 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.4.1
 	github.com/lmittmann/tint v1.2.1
 	github.com/mileusna/useragent v1.3.5
-	github.com/robertkrimen/otto v0.5.1
 	github.com/samber/lo v1.53.0
 	github.com/sfreiberg/simplessh v0.0.0-20261026194955-45a2c7a7ce3e
 	github.com/spf13/cast v1.10.0
@@ -110,10 +106,13 @@ require (
 	github.com/darkoatanasovski/htmltags v1.0.0 // indirect
 	github.com/dave/dst v0.28.0 // indirect
 	github.com/davidmz/go-pageant v1.0.2 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/dracory/arr v0.2.0 // indirect
+	github.com/dracory/blockeditor v0.24.0 // indirect
 	github.com/dracory/botdetect v0.6.0 // indirect
 	github.com/dracory/crypto v0.3.0 // indirect
 	github.com/dracory/database v0.8.0 // indirect
+	github.com/dracory/form v0.23.0 // indirect
 	github.com/dracory/shortcode v0.5.0 // indirect
 	github.com/dracory/social v0.1.0 // indirect
 	github.com/dracory/sqlfilestore v1.11.2 // indirect
@@ -146,6 +145,7 @@ require (
 	github.com/pkg/sftp v1.13.12 // indirect
 	github.com/pterm/pterm v0.12.84 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/robertkrimen/otto v0.5.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sashabaranov/go-openai v1.43.0 // indirect
 	github.com/stripe/stripe-go/v86 v86.4.2 // indirect
