@@ -1,7 +1,7 @@
-package main
+package helpers
 
 import "os"
 
-func isCliMode() bool {
+func IsCliMode() bool {
 	return len(os.Args) > 1
 }

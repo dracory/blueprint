@@ -10,9 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"project/cmd/server/background"
+	"project/cmd/server/helpers"
 	"project/database/migrations"
 	"project/internal/cli"
-
 	"project/internal/app"
 	"project/internal/config"
 	"project/internal/routes"
@@ -75,7 +76,7 @@ func main() {
 
 	tasks.RegisterTasks(app) // Register the task handlers
 
-	if isCliMode() {
+	if helpers.IsCliMode() {
 		if len(os.Args) < 2 {
 			return
 		}
@@ -90,8 +91,8 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	background := newBackgroundGroup(ctx)
-	if err := startBackgroundProcesses(ctx, background, app); err != nil {
+	backgroundGroup := background.NewBackgroundGroup(ctx)
+	if err := background.StartBackgroundProcesses(ctx, backgroundGroup, app); err != nil {
 		cfmt.Errorln("Failed to start background processes:", err.Error())
 		return
 	}
@@ -106,7 +107,7 @@ func main() {
 
 	if err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
-		background.stop()
+		backgroundGroup.Stop()
 		return
 	}
 
@@ -118,11 +119,11 @@ func main() {
 	case <-sigs:
 		fmt.Println("Shutdown signal received, draining background workers")
 		cancel()
-	case <-background.Done():
+	case <-backgroundGroup.Done():
 		cancel()
 	}
 
-	background.stop()
+	backgroundGroup.Stop()
 	if server != nil {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()

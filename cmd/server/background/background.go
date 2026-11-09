@@ -1,4 +1,4 @@
-package main
+package background
 
 import (
 	"context"
@@ -13,7 +13,7 @@ type backgroundGroup struct {
 	once   sync.Once
 }
 
-func newBackgroundGroup(parent context.Context) *backgroundGroup {
+func NewBackgroundGroup(parent context.Context) *backgroundGroup {
 	if parent == nil {
 		parent = context.Background()
 	}
@@ -29,7 +29,7 @@ func (g *backgroundGroup) Go(fn func(ctx context.Context)) {
 	}()
 }
 
-func (g *backgroundGroup) stop() {
+func (g *backgroundGroup) Stop() {
 	g.once.Do(func() {
 		g.cancel()
 		g.wg.Wait()

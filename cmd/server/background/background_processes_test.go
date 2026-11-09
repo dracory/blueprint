@@ -1,4 +1,4 @@
-package main
+package background
 
 import (
 	"context"
@@ -19,12 +19,12 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Should not panic
-	if err := startBackgroundProcesses(ctx, group, app); err != nil {
-		t.Fatalf("startBackgroundProcesses returned error: %v", err)
+	if err := StartBackgroundProcesses(ctx, group, app); err != nil {
+		t.Fatalf("StartBackgroundProcesses returned error: %v", err)
 	}
 
 	if app.IsDisabledCacheStore() {
@@ -39,12 +39,12 @@ func TestStartBackgroundProcesses_NilRegistry(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
-	err := startBackgroundProcesses(ctx, group, nil)
+	err := StartBackgroundProcesses(ctx, group, nil)
 	if err == nil {
-		t.Error("startBackgroundProcesses with nil app should return error")
+		t.Error("StartBackgroundProcesses with nil app should return error")
 	}
 }
 
@@ -52,18 +52,18 @@ func TestStartBackgroundProcesses_NilConfig(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create a minimal mock app without config
 	app := testutils.Setup()
 
 	// This will likely fail because we can't easily mock GetConfig() returning nil
 	// But let's at least test the flow
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	// Should not error because testutils.Setup() provides a valid config
 	if err != nil {
-		t.Logf("startBackgroundProcesses returned error (expected for test setup): %v", err)
+		t.Logf("StartBackgroundProcesses returned error (expected for test setup): %v", err)
 	}
 }
 
@@ -71,8 +71,8 @@ func TestStartBackgroundProcesses_MinimalConfig(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create app with minimal config but all required stores disabled
 	cfg := testutils.DefaultConf()
@@ -82,9 +82,9 @@ func TestStartBackgroundProcesses_MinimalConfig(t *testing.T) {
 	cfg.SetUserStoreUsed(false)
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Logf("startBackgroundProcesses with minimal config returned error: %v", err)
+		t.Logf("StartBackgroundProcesses with minimal config returned error: %v", err)
 	}
 }
 
@@ -92,16 +92,16 @@ func TestStartBackgroundProcesses_NilDatabase(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create a mock app with nil database
 	app := testutils.Setup()
 	// We can't easily set database to nil, so this test documents the expected behavior
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	// Should succeed since testutils.Setup provides a valid database
 	if err != nil {
-		t.Logf("startBackgroundProcesses with valid setup returned error: %v", err)
+		t.Logf("StartBackgroundProcesses with valid setup returned error: %v", err)
 	}
 }
 
@@ -109,8 +109,8 @@ func TestStartBackgroundProcesses_TaskStoreEnabledButNil(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create app with task store enabled but not initialized
 	cfg := testutils.DefaultConf()
@@ -123,9 +123,9 @@ func TestStartBackgroundProcesses_TaskStoreEnabledButNil(t *testing.T) {
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// This should fail because task store is enabled but nil
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err == nil {
-		t.Logf("startBackgroundProcesses with enabled but nil task store should return error, but testutils may initialize it")
+		t.Logf("StartBackgroundProcesses with enabled but nil task store should return error, but testutils may initialize it")
 	}
 }
 
@@ -133,8 +133,8 @@ func TestStartBackgroundProcesses_CacheStoreEnabledButNil(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create app with cache store enabled but not initialized
 	cfg := testutils.DefaultConf()
@@ -146,9 +146,9 @@ func TestStartBackgroundProcesses_CacheStoreEnabledButNil(t *testing.T) {
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// This should fail because cache store is enabled but nil
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err == nil {
-		t.Logf("startBackgroundProcesses with enabled but nil cache store should return error, but testutils may initialize it")
+		t.Logf("StartBackgroundProcesses with enabled but nil cache store should return error, but testutils may initialize it")
 	}
 }
 
@@ -156,8 +156,8 @@ func TestStartBackgroundProcesses_SessionStoreEnabledButNil(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create app with session store enabled but not initialized
 	cfg := testutils.DefaultConf()
@@ -169,9 +169,9 @@ func TestStartBackgroundProcesses_SessionStoreEnabledButNil(t *testing.T) {
 	app := testutils.Setup(testutils.WithCfg(cfg))
 
 	// This should fail because session store is enabled but nil
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err == nil {
-		t.Logf("startBackgroundProcesses with enabled but nil session store should return error, but testutils may initialize it")
+		t.Logf("StartBackgroundProcesses with enabled but nil session store should return error, but testutils may initialize it")
 	}
 }
 
@@ -179,8 +179,8 @@ func TestStartBackgroundProcesses_AllStoresEnabled(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Create app with all stores enabled
 	app := testutils.Setup(
@@ -190,9 +190,9 @@ func TestStartBackgroundProcesses_AllStoresEnabled(t *testing.T) {
 		testutils.WithUserStore(true),
 	)
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Fatalf("startBackgroundProcesses with all stores enabled returned error: %v", err)
+		t.Fatalf("StartBackgroundProcesses with all stores enabled returned error: %v", err)
 	}
 
 	// Verify all stores are initialized
@@ -211,16 +211,16 @@ func TestStartBackgroundProcesses_OnlyTaskStore(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 	)
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Fatalf("startBackgroundProcesses with task store returned error: %v", err)
+		t.Fatalf("StartBackgroundProcesses with task store returned error: %v", err)
 	}
 
 	if app.IsDisabledTaskStore() {
@@ -232,16 +232,16 @@ func TestStartBackgroundProcesses_OnlyCacheStore(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	app := testutils.Setup(
 		testutils.WithCacheStore(true),
 	)
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Fatalf("startBackgroundProcesses with cache store returned error: %v", err)
+		t.Fatalf("StartBackgroundProcesses with cache store returned error: %v", err)
 	}
 
 	if app.IsDisabledCacheStore() {
@@ -253,16 +253,16 @@ func TestStartBackgroundProcesses_OnlySessionStore(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	app := testutils.Setup(
 		testutils.WithSessionStore(true),
 	)
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Fatalf("startBackgroundProcesses with session store returned error: %v", err)
+		t.Fatalf("StartBackgroundProcesses with session store returned error: %v", err)
 	}
 
 	if app.IsDisabledSessionStore() {
@@ -274,17 +274,17 @@ func TestStartBackgroundProcesses_TaskAndCacheStores(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	app := testutils.Setup(
 		testutils.WithTaskStore(true),
 		testutils.WithCacheStore(true),
 	)
 
-	err := startBackgroundProcesses(ctx, group, app)
+	err := StartBackgroundProcesses(ctx, group, app)
 	if err != nil {
-		t.Fatalf("startBackgroundProcesses with task and cache stores returned error: %v", err)
+		t.Fatalf("StartBackgroundProcesses with task and cache stores returned error: %v", err)
 	}
 
 	if app.IsDisabledTaskStore() {

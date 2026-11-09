@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"project/cmd/server/background"
+	"project/cmd/server/helpers"
 	"project/internal/testutils"
 
 	"github.com/dracory/sessionstore"
@@ -57,18 +59,18 @@ func TestIsCliMode(t *testing.T) {
 	defer func() { os.Args = original }()
 
 	os.Args = []string{"ai-browser"}
-	if isCliMode() {
+	if helpers.IsCliMode() {
 		t.Error("isCliMode() = true, want false with no extra args")
 	}
 
 	os.Args = []string{"ai-browser", "-admin"}
-	if !isCliMode() {
+	if !helpers.IsCliMode() {
 		t.Error("isCliMode() = false, want true with extra args")
 	}
 }
 
 func TestBackgroundGroupRunsAndStops(t *testing.T) {
-	group := newBackgroundGroup(context.Background())
+	group := background.NewBackgroundGroup(context.Background())
 
 	started := make(chan struct{})
 	group.Go(func(ctx context.Context) {
@@ -82,7 +84,7 @@ func TestBackgroundGroupRunsAndStops(t *testing.T) {
 		t.Fatal("goroutine did not start")
 	}
 
-	group.stop()
+	group.Stop()
 
 	select {
 	case <-group.Done():
@@ -92,24 +94,24 @@ func TestBackgroundGroupRunsAndStops(t *testing.T) {
 }
 
 func TestBackgroundGroupNilParent(t *testing.T) {
-	group := newBackgroundGroup(nil)
+	group := background.NewBackgroundGroup(nil)
 	if group == nil {
 		t.Fatal("newBackgroundGroup(nil) returned nil")
 	}
-	group.stop()
+	group.Stop()
 }
 
 func TestBackgroundGroupStopIsIdempotent(t *testing.T) {
-	group := newBackgroundGroup(context.Background())
-	group.stop()
-	group.stop() // must not panic or deadlock
+	group := background.NewBackgroundGroup(context.Background())
+	group.Stop()
+	group.Stop() // must not panic or deadlock
 }
 
 func TestStartBackgroundProcessesNilApp(t *testing.T) {
-	group := newBackgroundGroup(context.Background())
-	defer group.stop()
+	group := background.NewBackgroundGroup(context.Background())
+	defer group.Stop()
 
-	err := startBackgroundProcesses(context.Background(), group, nil)
+	err := background.StartBackgroundProcesses(context.Background(), group, nil)
 	if err == nil || !strings.Contains(err.Error(), "nil app") {
 		t.Fatalf("expected nil app error, got %v", err)
 	}
@@ -123,10 +125,10 @@ func TestStartBackgroundProcesses(t *testing.T) {
 	)
 	defer app.Close()
 
-	group := newBackgroundGroup(context.Background())
-	defer group.stop()
+	group := background.NewBackgroundGroup(context.Background())
+	defer group.Stop()
 
-	if err := startBackgroundProcesses(context.Background(), group, app); err != nil {
+	if err := background.StartBackgroundProcesses(context.Background(), group, app); err != nil {
 		t.Fatalf("startBackgroundProcesses failed: %v", err)
 	}
 }

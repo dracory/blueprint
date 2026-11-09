@@ -1,4 +1,4 @@
-package main
+package background
 
 import (
 	"context"
@@ -11,8 +11,8 @@ func TestBackgroundGroup(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Test that Done() channel works
 	select {
@@ -25,11 +25,11 @@ func TestBackgroundGroup(t *testing.T) {
 
 func TestBackgroundGroup_Stop(t *testing.T) {
 	ctx := context.Background()
-	group := newBackgroundGroup(ctx)
+	group := NewBackgroundGroup(ctx)
 
 	// Test stop multiple times (should not panic)
-	group.stop()
-	group.stop() // Second call should be no-op
+	group.Stop()
+	group.Stop() // Second call should be no-op
 
 	// Verify Done channel is closed
 	select {
@@ -44,8 +44,8 @@ func TestBackgroundGroup_Go(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	done := make(chan bool)
 	group.Go(func(ctx context.Context) {
@@ -62,8 +62,8 @@ func TestBackgroundGroup_Go(t *testing.T) {
 
 func TestBackgroundGroup_NilParent(t *testing.T) {
 	// Test that nil parent context defaults to Background
-	group := newBackgroundGroup(context.TODO())
-	defer group.stop()
+	group := NewBackgroundGroup(context.TODO())
+	defer group.Stop()
 
 	if group.ctx == nil {
 		t.Error("Context should not be nil")
@@ -72,8 +72,8 @@ func TestBackgroundGroup_NilParent(t *testing.T) {
 
 func TestBackgroundGroup_ContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	executed := false
 	group.Go(func(ctx context.Context) {
@@ -88,7 +88,7 @@ func TestBackgroundGroup_ContextCancellation(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	// Stop and verify goroutine was executed
-	group.stop()
+	group.Stop()
 
 	if !executed {
 		t.Error("Goroutine should have been executed and context should be cancelled")
@@ -99,8 +99,8 @@ func TestBackgroundGroup_MultipleGoroutines(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	counter := 0
 	done := make(chan bool, 3)
@@ -129,12 +129,12 @@ func TestBackgroundGroup_MultipleGoroutines(t *testing.T) {
 
 func TestBackgroundGroup_StopIdempotent(t *testing.T) {
 	ctx := context.Background()
-	group := newBackgroundGroup(ctx)
+	group := NewBackgroundGroup(ctx)
 
 	// Call stop multiple times - should not panic
-	group.stop()
-	group.stop()
-	group.stop()
+	group.Stop()
+	group.Stop()
+	group.Stop()
 
 	// Verify Done channel is still closed
 	select {
@@ -149,7 +149,7 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	group := newBackgroundGroup(ctx)
+	group := NewBackgroundGroup(ctx)
 
 	// Track execution order with mutex for thread safety
 	var mu sync.Mutex
@@ -173,7 +173,7 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 	}
 
 	// Stop should wait for all goroutines
-	group.stop()
+	group.Stop()
 
 	if len(executed) != 3 {
 		t.Errorf("Expected 3 goroutines to execute, got %d", len(executed))
@@ -182,8 +182,8 @@ func TestBackgroundGroup_WaitGroupSync(t *testing.T) {
 
 func TestBackgroundGroup_GoWithContextDone(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
-	group := newBackgroundGroup(ctx)
-	defer group.stop()
+	group := NewBackgroundGroup(ctx)
+	defer group.Stop()
 
 	// Cancel context immediately
 	cancel()
@@ -200,7 +200,7 @@ func TestBackgroundGroup_GoWithContextDone(t *testing.T) {
 
 	// Give goroutine time to execute
 	time.Sleep(50 * time.Millisecond)
-	group.stop()
+	group.Stop()
 
 	if !executed {
 		t.Error("Goroutine should have detected context cancellation")
@@ -208,8 +208,8 @@ func TestBackgroundGroup_GoWithContextDone(t *testing.T) {
 }
 
 func TestNewBackgroundGroup_WithTODOContext(t *testing.T) {
-	group := newBackgroundGroup(context.TODO())
-	defer group.stop()
+	group := NewBackgroundGroup(context.TODO())
+	defer group.Stop()
 
 	if group.ctx == nil {
 		t.Error("Context should not be nil")

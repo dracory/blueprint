@@ -1,4 +1,4 @@
-package main
+package background
 
 import (
 	"context"
@@ -18,8 +18,8 @@ import (
 	"github.com/dracory/taskstore"
 )
 
-func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app app.AppInterface) error {
-	_ = ctx
+func StartBackgroundProcesses(ctx context.Context, group *backgroundGroup, app app.AppInterface) error {
+	_ = ctx // Suppress unused parameter warning, use it when needed for context cancellation or propagation
 
 	if app == nil {
 		return errors.New("startBackgroundProcesses called with nil app")
@@ -55,10 +55,12 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 		if app.IsEnabledTaskStore() {
 			ts := app.GetTaskStore()
 			group.Go(func(ctx context.Context) {
+				// Run the default task queue worker loop using the updated TaskQueue API
+				// 10 workers, 2-second polling interval
 				runner := taskstore.NewTaskQueueRunner(ts, taskstore.TaskQueueRunnerOptions{
+					QueueName:       taskstore.DefaultQueueName,
 					IntervalSeconds: 2,
 					UnstuckMinutes:  2,
-					QueueName:       taskstore.DefaultQueueName,
 					MaxConcurrency:  10,
 					Logger:          log.Default(),
 				})
@@ -66,7 +68,6 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 			})
 		}
 	}
-
 	if app.GetConfig().GetCacheStoreUsed() {
 		if app.IsEnabledCacheStore() {
 			cs := app.GetCacheStore()
@@ -93,10 +94,11 @@ func startBackgroundProcesses(ctx context.Context, group *backgroundGroup, app a
 		schedules.StartAsync(ctx, app)
 	})
 
+	// Initialize email sender
 	emails.InitEmailSender(app)
-	middlewares.CmsAddMiddlewares(app)
-	widgets.CmsAddShortcodes(app)
-	cmsblocks.CmsAddBlockTypes(app)
+	middlewares.CmsAddMiddlewares(app) // Add CMS middlewares
+	widgets.CmsAddShortcodes(app)      // Add CMS shortcodes
+	cmsblocks.CmsAddBlockTypes(app)    // Add CMS block types
 
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"project/cmd/server/background"
 	"project/database/migrations"
 	"project/internal/app"
 	"project/internal/config"
@@ -79,9 +80,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	background := newBackgroundGroup(ctx)
-	if err := startBackgroundProcesses(ctx, background, appInstance); err != nil {
-		cfmt.Errorln("Background processes failed to start:", err.Error())
+	backgroundGroup := background.NewBackgroundGroup(ctx)
+	if err := background.StartBackgroundProcesses(ctx, backgroundGroup, appInstance); err != nil {
+		cfmt.Errorln("Failed to start background processes:", err.Error())
 		cfmt.Infoln("Continuing without background processes...")
 	}
 
@@ -94,10 +95,11 @@ func main() {
 
 	if err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
-		background.stop()
+		backgroundGroup.Stop()
 		return
 	}
 
+	// Listen for OS signals to gracefully drain background work
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
@@ -105,11 +107,11 @@ func main() {
 	case <-sigs:
 		fmt.Println("Shutdown signal received, draining background workers")
 		cancel()
-	case <-background.Done():
+	case <-backgroundGroup.Done():
 		cancel()
 	}
 
-	background.stop()
+	backgroundGroup.Stop()
 	if server != nil {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
