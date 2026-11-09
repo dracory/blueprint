@@ -30,26 +30,6 @@ Every extraction follows the same shape, proven by auth and the admin packages:
 
 Ordered by size of win and lowest risk. Each section lists the exact files that move.
 
-### 1.1 Shared asset serving → `dracory/filesrv` (new)
-
-| Files | LOC (non-test / test) |
-| :--- | :--- |
-| `internal/controllers/shared/thumb/` | 722 / 1,541 |
-| `internal/controllers/shared/file/` | 145 / 469 |
-| `internal/controllers/shared/media/` | 145 / 297 |
-| `internal/controllers/shared/cdn/` | 191 / 144 |
-| `internal/controllers/shared/flash/` | 134 / 351 |
-| `internal/controllers/shared/resource/` | ~68 / ~68 |
-| `internal/controllers/shared/theme/` | ~60 / ~30 |
-| `internal/controllers/shared/page_not_found/` | 93 / — |
-| `internal/controllers/shared/routes.go` | 85 / 93 |
-
-**Why**: thumbnail generation/proxying (imaging + caching + safe-path handling), file and media download, CDN asset proxying, flash-message endpoints, embedded resource serving — pure HTTP infrastructure with zero project specificity. `thumb` alone is the biggest non-test file outside admin plus the biggest test file in the repo (1,541 lines).
-
-**How**: one package, e.g. `filesrv.New(Options{MediaRoot, CacheStore, Logger, FuncLayout, ThemeDir ...})` exposing `ThumbHandler`, `FileHandler`, `MediaHandler`, `CDNHandler`, `FlashHandler`, `NotFoundHandler`. The app's `shared/routes.go` becomes a route table only.
-
-**Expected saving**: ~4,600 lines (17 files) — the single largest extraction available.
-
 ### 1.2 User account area → `dracory/useraccount`
 
 | Files | LOC (non-test / test) |
@@ -192,7 +172,6 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 
 | Extraction | Files | LOC removed (non-test + test) | Pattern precedent |
 | :--- | :--- | :--- | :--- |
-| 1.1 `dracory/filesrv` (shared serving) | ~17 | ~4,600 | — |
 | 1.2 `dracory/useraccount` | ~11 | ~2,800 | useradmin |
 | 1.3 Website frontends (blog/shop/contact/seo/cms/swagger) | ~30 | ~3,900 | store+admin pairs |
 | 1.4 `dracory/widgets` | 19 | ~2,100 | — |
@@ -210,7 +189,7 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 | Phase | Contents | Why first/last |
 | :--- | :--- | :--- |
 | **A** | 1.7 liveflux delete | Same pattern as shipped extractions |
-| **B** | 1.1 filesrv, 1.2 useraccount, 1.3 frontends | Big, self-contained, few cross-deps |
+| **B** | 1.2 useraccount, 1.3 frontends | Big, self-contained, few cross-deps |
 | **C** | 1.4 widgets, 1.5 tasks, 1.6 middlewares | Touch many packages; easier once frontends exist |
 | **D** | 2.x tool CLIs, then 2.3 framework core | The core is the highest-coupling extraction; do it last |
 

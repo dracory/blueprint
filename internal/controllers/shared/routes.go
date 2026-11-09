@@ -3,17 +3,16 @@ package shared
 import (
 	"net/http"
 	"project/internal/app"
-	"project/internal/controllers/shared/cdn"
-	"project/internal/controllers/shared/file"
 	"project/internal/controllers/shared/flash"
-	"project/internal/controllers/shared/media"
 	"project/internal/controllers/shared/page_not_found"
-	"project/internal/controllers/shared/resource"
 	"project/internal/controllers/shared/theme"
-	"project/internal/controllers/shared/thumb"
 	"project/internal/links"
+	"project/internal/resources"
+
+	"github.com/dracory/base/fileserve"
 
 	"github.com/dracory/rtr"
+	"github.com/dracory/uncdn"
 )
 
 func Routes(app app.AppInterface) []rtr.RouteInterface {
@@ -21,13 +20,13 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		SetName("Shared > CDN Controller").
 		SetPath("/cdn/:name").
 		SetMethod(http.MethodGet).
-		SetHandler(cdn.NewCdnController().Handler)
+		SetHandler(uncdn.CdnHandler())
 
 	files := rtr.NewRoute().
 		SetName("Shared > Files Controller").
 		SetPath(links.FILES).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(file.NewFileController(app.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(fileserve.FileHandler(app.GetSqlFileStorage()))
 
 	flash := rtr.NewRoute().
 		SetName("Shared > Flash Controller").
@@ -38,12 +37,12 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		SetName("Shared > Media Controller").
 		SetPath(links.MEDIA).
 		SetMethod(http.MethodGet).
-		SetHTMLHandler(media.NewMediaController(app.GetSqlFileStorage()).Handler)
+		SetHTMLHandler(fileserve.FileHandler(app.GetSqlFileStorage()))
 
-	resources := rtr.NewRoute().
+	resourcesRoute := rtr.NewRoute().
 		SetName("Shared > Resources Controller").
 		SetPath(links.RESOURCES).
-		SetHTMLHandler(resource.NewResourceController().Handler)
+		SetHTMLHandler(fileserve.ResourceHandler(resources.Resource, page_not_found.PageNotFoundController(nil).Handler))
 
 	themeRoute := rtr.NewRoute().
 		SetName("Shared > Theme Controller").
@@ -53,17 +52,32 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 	thumbRoute := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path").
-		SetHTMLHandler(thumb.NewThumbController(app).Handler)
+		SetHTMLHandler(fileserve.ThumbHandler(fileserve.ThumbOptions{
+			Logger:         app.GetLogger(),
+			Cache:          app.GetFileCache(),
+			Storage:        app.GetSqlFileStorage(),
+			ResourceReader: resources.ToBytes,
+		}))
 
 	thumbRoutePathCarchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/:extension/:size/:quality/:path...").
-		SetHTMLHandler(thumb.NewThumbController(app).Handler)
+		SetHTMLHandler(fileserve.ThumbHandler(fileserve.ThumbOptions{
+			Logger:         app.GetLogger(),
+			Cache:          app.GetFileCache(),
+			Storage:        app.GetSqlFileStorage(),
+			ResourceReader: resources.ToBytes,
+		}))
 
 	thumbCatchAll := rtr.NewRoute().
 		SetName("Shared > Thumb Controller").
 		SetPath("/th/*").
-		SetHTMLHandler(thumb.NewThumbController(app).Handler)
+		SetHTMLHandler(fileserve.ThumbHandler(fileserve.ThumbOptions{
+			Logger:         app.GetLogger(),
+			Cache:          app.GetFileCache(),
+			Storage:        app.GetSqlFileStorage(),
+			ResourceReader: resources.ToBytes,
+		}))
 
 	pageNotFound := rtr.NewRoute().
 		SetName("Shared > Page Not Found Controller").
@@ -75,7 +89,7 @@ func Routes(app app.AppInterface) []rtr.RouteInterface {
 		files,
 		flash,
 		media,
-		resources,
+		resourcesRoute,
 		themeRoute,
 		thumbRoute,
 		thumbRoutePathCarchAll,
