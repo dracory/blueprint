@@ -2,7 +2,7 @@
 
 ## Status
 
-Revised proposal (supersedes the August 2026 draft). Grounded in the codebase as of v0.55.0; updated post-v0.56.0 to reflect the shipped registration extraction (§1.1).
+Revised proposal (supersedes the August 2026 draft). Lists only the **remaining** extractions; shipped items (registration → `dracory/auth` v0.56.0, media manager → `dracory/fileadmin` v0.59.0, CMS blocks → `dracory/cmsblocks` v0.1.0) are recorded in the upgrade guides.
 
 ## Executive Summary
 
@@ -30,35 +30,7 @@ Every extraction follows the same shape, proven by auth and the admin packages:
 
 Ordered by size of win and lowest risk. Each section lists the exact files that move.
 
-### 1.1 Registration → `dracory/auth` (finish the auth extraction) — ✅ SHIPPED (v0.56.0, via `dracory/auth` v0.47.0)
-
-**Done:** `internal/controllers/auth/{register,register_password,logout}` deleted — the package mux now serves sign-up, profile completion (via `FuncUserProfileUpdate`/`FuncUserEmailGet` + `RegistrationComplete` gate), and logout including remember-session cleanup. `routes.go` is a thin method-composition file; `ConfigRateLimiting` moved send-throttling into the package.
-
-**Remaining (small):**
-
-| Files | Why it stays / what could still move |
-| :--- | :--- |
-| `internal/controllers/auth/shared/session_login.go` (~500 LOC) | Still backs `RememberMeMiddleware` + `IssueRememberSession`/`IssueAuthSession` adapters. Candidate to move into `dracory/auth` as exported session-issuing helpers — the remember middleware already lives there. |
-| `internal/rules/auth/` (~200 LOC) | `CanRegisterRule` still feeds `authadapters` + `email_allowlist_middleware`; could become a package `FuncValidationRules` hook. |
-| `internal/controllers/auth/routes.go` (~160 LOC) | Thin composition — stays (method list is a project choice). |
-| `internal/authadapters/` (~1,000 LOC) | Injection glue — stays by design. |
-
-**Remaining saving**: ~700 lines if `session_login` + `rules/auth` move.
-
-### 1.2 Media manager admin → `dracory/mediaadmin`
-
-| Files | LOC (non-test / test) |
-| :--- | :--- |
-| `internal/controllers/admin/media/media_manager_controller.go` | 1,026 / 601 |
-| `internal/controllers/admin/media/routes.go` | 23 / — |
-
-**Why**: a self-contained file/media manager (upload, rename, delete, directory ops against `cfg.GetMediaRoot()` via `dracory/filesystem` + `dracory/cdn`) — identical in shape to `fileadmin`, which is already external. Largest single file left in `internal/controllers`.
-
-**How**: `mediaadmin.New(Options{MediaRoot, FuncLayout, FlashRedirect, AdminHomeURL, ...})` + `admin.Handle(w, r)`, copying the `users_controller.go` wrapper (66 lines) almost verbatim.
-
-**Expected saving**: ~1,650 lines.
-
-### 1.3 Shared asset serving → `dracory/filesrv` (new)
+### 1.1 Shared asset serving → `dracory/filesrv` (new)
 
 | Files | LOC (non-test / test) |
 | :--- | :--- |
@@ -78,7 +50,7 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 
 **Expected saving**: ~4,600 lines (17 files) — the single largest extraction available.
 
-### 1.4 User account area → `dracory/useraccount`
+### 1.2 User account area → `dracory/useraccount`
 
 | Files | LOC (non-test / test) |
 | :--- | :--- |
@@ -93,7 +65,7 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 
 **Expected saving**: ~2,800 lines (11 files).
 
-### 1.5 Website frontends → companion packages for existing stores
+### 1.3 Website frontends → companion packages for existing stores
 
 | Area | Files | LOC (non-test / test) | Target |
 | :--- | :--- | :--- | :--- |
@@ -110,18 +82,7 @@ Ordered by size of win and lowest risk. Each section lists the exact files that 
 
 **Expected saving**: ~3,900 lines across ~30 files.
 
-### 1.6 CMS block types → `dracory/cmsblocks` — ✅ SHIPPED
-
-Moved to `github.com/dracory/cmsblocks` (new repo). The only app coupling was
-`links.Website().BlogPost(id, slug)` — resolved with `SetPostURLFunc` on each
-block type (default `/blog/post/{id}/{slug}`). `internal/cmsblocks/` now
-contains only `cms_add_block_types.go`, which injects the stores + link func;
-tests moved with the blocks, backed by a package-local in-memory SQLite store
-helper (`internal/teststore`) instead of `testutils`.
-
-**Saving**: ~2,900 lines (12 files). Released as `dracory/cmsblocks` v0.1.0.
-
-### 1.7 Widgets & shortcodes → `dracory/widgets`
+### 1.4 Widgets & shortcodes → `dracory/widgets`
 
 | Files | LOC (non-test / test) |
 | :--- | :--- |
@@ -133,7 +94,7 @@ helper (`internal/teststore`) instead of `testutils`.
 
 **Expected saving**: ~2,100 lines (19 files).
 
-### 1.8 Background tasks → the packages that own their domain
+### 1.5 Background tasks → the packages that own their domain
 
 | Task | LOC (non-test / test) | Target |
 | :--- | :--- | :--- |
@@ -148,7 +109,7 @@ helper (`internal/teststore`) instead of `testutils`.
 
 **Expected saving**: ~2,500–3,000 lines; `register_tasks.go` stays (wiring is a project choice).
 
-### 1.9 Generic middlewares → `dracory/middlewares`
+### 1.6 Generic middlewares → `dracory/middlewares`
 
 | Middleware | LOC (non-test / test) | Target |
 | :--- | :--- | :--- |
@@ -161,14 +122,14 @@ helper (`internal/teststore`) instead of `testutils`.
 | `email_allowlist_middleware.go` | ~90 / 327 | `dracory/auth` |
 | `api_auth_middleware.go` | 103 / 282 | `dracory/auth` already ships `ApiAuthOrErrorMiddleware` — replace |
 | `auth_`, `user_`, `admin_middleware` | ~300 / ~1,100 | thin app wrappers over `dracory/auth` middlewares + role checks — mostly stay (role-table glue) |
-| `ai_browser_auto_login` | 102 / 177 | move with `cmd/ai-browser` (see 2.3) |
+| `ai_browser_auto_login` | 102 / 177 | move with `cmd/ai-browser` (see 2.2) |
 | `cms_add_middlewares`, `cms_layout_middleware` | ~90 | `dracory/cms` |
 
 **Why**: security headers, HTTPS redirect, maintenance gate, request logging, per-domain middlewares are framework plumbing; `dracory/auth` already exports auth middlewares so several local ones become thin aliases.
 
 **Expected saving**: ~2,500–3,000 lines.
 
-### 1.10 Remaining small packages
+### 1.7 Remaining small packages
 
 | Area | LOC | Target |
 | :--- | :--- | :--- |
@@ -231,29 +192,26 @@ helper (`internal/teststore`) instead of `testutils`.
 
 | Extraction | Files | LOC removed (non-test + test) | Pattern precedent |
 | :--- | :--- | :--- | :--- |
-| ~~1.1 Registration → `dracory/auth`~~ ✅ shipped | ~2 | ~700 | auth v0.47.0 |
-| 1.2 `dracory/mediaadmin` | 3 | ~1,650 | fileadmin/useradmin |
-| 1.3 `dracory/filesrv` (shared serving) | ~17 | ~4,600 | — |
-| 1.4 `dracory/useraccount` | ~11 | ~2,800 | useradmin |
-| 1.5 Website frontends (blog/shop/contact/seo/cms/swagger) | ~30 | ~3,900 | store+admin pairs |
-| ~~1.6 `dracory/cmsblocks`~~ ✅ shipped | 12 | ~2,900 | cmsstore block types |
-| 1.7 `dracory/widgets` | 19 | ~2,100 | — |
-| 1.8 Tasks → owning packages | ~20 | ~2,800 | email_delivery → auth |
-| 1.9 Middlewares | ~15 | ~2,800 | dracory/auth middlewares |
-| 1.10 Small (ext, testutils, emails mech, liveflux del, cli) | ~25 | ~2,500 | dracory/test exists |
+| 1.1 `dracory/filesrv` (shared serving) | ~17 | ~4,600 | — |
+| 1.2 `dracory/useraccount` | ~11 | ~2,800 | useradmin |
+| 1.3 Website frontends (blog/shop/contact/seo/cms/swagger) | ~30 | ~3,900 | store+admin pairs |
+| 1.4 `dracory/widgets` | 19 | ~2,100 | — |
+| 1.5 Tasks → owning packages | ~20 | ~2,800 | email_delivery → auth |
+| 1.6 Middlewares | ~15 | ~2,800 | dracory/auth middlewares |
+| 1.7 Small (ext, testutils, emails mech, liveflux del, cli) | ~25 | ~2,500 | dracory/test exists |
 | 2.1–2.2 Tool CLIs (deploy/envenc/loadtest/ai-browser) | ~16 | ~2,800 | — |
 | 2.3 Framework core (app/config/cli) | ~30 | ~5,000 | — |
-| **Total externalizable** | **~190 files** | **~32,300 LOC** | |
+| **Total externalizable** | **~175 files** | **~27,000 LOC** | |
 
-**Result**: a cloned Blueprint project drops from ~537 files / ~57k LOC to roughly **~200 files / ~23k LOC** — almost entirely config, links, layouts, routes wiring, migrations, and adapters — while each feature upgrades independently via `go get`.
+**Result**: a cloned Blueprint project drops to roughly **~200 files / ~23k LOC** — almost entirely config, links, layouts, routes wiring, migrations, and adapters — while each feature upgrades independently via `go get`.
 
 ## Suggested phasing
 
 | Phase | Contents | Why first/last |
 | :--- | :--- | :--- |
-| **A** | ~~1.1 registration→auth~~ (shipped), 1.2 mediaadmin, 1.10 liveflux delete | Same pattern as shipped extractions |
-| **B** | 1.3 filesrv, 1.4 useraccount, 1.5 frontends | Big, self-contained, few cross-deps |
-| **C** | ~~1.6 cmsblocks~~ (shipped), 1.7 widgets, 1.8 tasks, 1.9 middlewares | Touch many packages; easier once frontends exist |
+| **A** | 1.7 liveflux delete | Same pattern as shipped extractions |
+| **B** | 1.1 filesrv, 1.2 useraccount, 1.3 frontends | Big, self-contained, few cross-deps |
+| **C** | 1.4 widgets, 1.5 tasks, 1.6 middlewares | Touch many packages; easier once frontends exist |
 | **D** | 2.x tool CLIs, then 2.3 framework core | The core is the highest-coupling extraction; do it last |
 
 ## Advantages over the previous draft
