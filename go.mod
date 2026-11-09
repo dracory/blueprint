@@ -1,6 +1,6 @@
 module project
 
-go 1.27.0
+go 1.27.3
 
 // replace github.com/dracory/base => ../../_modules_dracory/base
 
