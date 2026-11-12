@@ -46,6 +46,9 @@ and never touches real data. See `cmd/ai-browser/AGENTS.md` for details.
 - Run tests with coverage: `go test -coverprofile=coverage.out ./...`
 - View coverage: `go tool cover -html=coverage.out`
 - Run integration tests: `go test -tags=integration ./...`
+- Browser e2e (self-contained in `/e2e`): `task e2e` (Playwright) or
+  `task e2e:rod` (go-rod); both auto-start `e2e/browser` on :34757. See
+  `e2e/README.md`
 
 ## Git Workflow
 - Branch naming: `feature/your-feature-name` or `bugfix/description`

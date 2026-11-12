@@ -15,6 +15,7 @@ This release continues the standalone-package extraction: the shared asset-servi
 - `internal/widgets/` generic widgets (authenticated, unauthenticated, visible, print, blockeditor, terms-of-use, contact-form) → `dracory/base/widgets`; `Widget` is now an alias for `basewidgets.Widget` and `WidgetRegistry` delegates with injected `RegistryOptions`
 - Dependencies: `dracory/base v0.44.0`, `dracory/uncdn v0.12.0`
 - ~2,400 lines of controller code + ~2,100 lines of tests removed from the template
+- New `e2e/` folder: sandboxed app instance (`e2e/browser`) plus two interchangeable browser-test suites — Playwright (`e2e/tests`) and go-rod (`e2e/rod`)
 
 ---
 
@@ -178,6 +179,40 @@ Manual smoke checks:
 - `GET /files/<path>` and `GET /media/<path>` serve stored files
 - `GET /resources/<path>` serves embedded assets; missing/private paths 404
 - A CMS page containing `[x-authenticated]`, `[x-visible environment="..."]`, `[x-print]` renders as before
+
+---
+
+## 🆕 New: Browser e2e testing (`e2e/`)
+
+Everything for end-to-end testing lives in `e2e/` and is **opt-in** — nothing
+in the main app depends on it, so upgrading is just copying the folder.
+
+```
+e2e/
+  browser/            # `e2e-browser` command — sandboxed app for tests
+  rod/                # go-rod suite (pure Go)         → go test -v ./e2e/rod
+  tests/              # Playwright suite (TypeScript)  → npx playwright test
+  playwright.config.ts, package.json, README.md
+```
+
+- `go run ./e2e/browser` serves the app on `http://127.0.0.1:34757` with a
+  disposable SQLite DB (`tmp/e2e-browser.db`), all external APIs disabled, a
+  seeded admin (`e2e-browser@blueprint.local` / `password123`), and
+  `AUTH_LOGIN_METHODS=password`. Flags: `-reset` (wipe DB), `-with-user`,
+  `-admin`. Refuses to start when `APP_ENV=production`. Unlike
+  `cmd/ai-browser` it uses the **regular router** — no auto-login — so tests
+  exercise real auth flows.
+- **Playwright suite**: `playwright.config.ts` auto-starts the server via
+  `webServer` and uses bundled headless Chromium (`channel: 'chromium'`).
+- **rod suite**: pure-Go alternative for projects that don't want a Node
+  toolchain. `TestMain` builds and starts `e2e/browser` itself; uses
+  Playwright's `chromium_headless_shell` if present, else rod's managed
+  Chromium (override with `CHROME_BIN`).
+- Taskfile tasks: `task e2e-browser`, `task e2e`, `task e2e:rod`,
+  `task e2e:install`.
+
+If you adopt it, copy `e2e/` and the four task blocks in `taskfile.yml`; no
+other migration is needed.
 
 ---
 
