@@ -29,3 +29,14 @@ test.describe('authentication', () => {
     await expect(page).toHaveURL(/\/user/, { timeout: 10_000 });
   });
 });
+
+test.describe('authorization', () => {
+  test('regular user cannot access /admin', async ({ page }) => {
+    await login(page, USER_EMAIL);
+    await expect(page).toHaveURL(/\/user/, { timeout: 10_000 });
+
+    // AdminMiddleware redirects non-admins to "/" with a flash error.
+    await page.goto('/admin');
+    await expect(page).not.toHaveURL(/\/admin/, { timeout: 10_000 });
+  });
+});

@@ -97,6 +97,24 @@ func TestSeededUserLandsOnUser(t *testing.T) {
 	waitForPath(t, page, "/user")
 }
 
+func TestSeededUserCannotAccessAdmin(t *testing.T) {
+	page := login(t, seedUserEmail)
+	waitForPath(t, page, "/user")
+
+	// AdminMiddleware redirects non-admins to "/" with a flash error.
+	page.MustNavigate(baseURL + "/admin").MustWaitLoad()
+
+	deadline := time.Now().Add(10 * time.Second)
+	for time.Now().Before(deadline) {
+		url := page.MustInfo().URL
+		if !strings.Contains(url, "/admin") {
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	t.Fatalf("regular user should not stay on /admin, still on %s", page.MustInfo().URL)
+}
+
 // login opens the login page, submits the seeded credentials, and returns
 // the page for further assertions.
 func login(t *testing.T, email string) *rod.Page {
