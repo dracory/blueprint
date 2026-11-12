@@ -8,7 +8,8 @@ against. Everything for e2e lives in this folder.
 - `browser/` — `e2e-browser` Go command: sandboxed app on
   `http://127.0.0.1:34757` with a disposable SQLite DB (`tmp/e2e-browser.db`).
   Unlike `cmd/ai-browser` it uses the **regular router** (no auto-login), so
-  tests exercise real auth flows. Seeded admin: `e2e-browser@blueprint.local` /
+  tests exercise real auth flows. Seeded users: `e2e-admin@blueprint.local`
+  (admin) and `e2e-user@blueprint.local` (regular user), both
   `password123`. Flags: `-reset` wipes the DB before start; `-with-user`,
   `-admin` mirror ai-browser. Never runs when `APP_ENV=production`.
 - `tests/` — Playwright specs.

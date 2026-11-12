@@ -197,7 +197,8 @@ e2e/
 
 - `go run ./e2e/browser` serves the app on `http://127.0.0.1:34757` with a
   disposable SQLite DB (`tmp/e2e-browser.db`), all external APIs disabled, a
-  seeded admin (`e2e-browser@blueprint.local` / `password123`), and
+  seeded users (`e2e-admin@blueprint.local` admin, `e2e-user@blueprint.local`
+  regular user, both `password123`), and
   `AUTH_LOGIN_METHODS=password`. Flags: `-reset` (wipe DB), `-with-user`,
   `-admin`. Refuses to start when `APP_ENV=production`. Unlike
   `cmd/ai-browser` it uses the **regular router** — no auto-login — so tests

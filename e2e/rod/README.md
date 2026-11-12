@@ -12,7 +12,8 @@ Node dependency.
 - `TestMain` builds `../browser` to `tmp/e2e-browser-bin`, starts it with
   `-reset` (fresh SQLite DB), waits for `http://127.0.0.1:34757`, then kills
   it after the run.
-- Same seeded credentials as Playwright: `e2e-browser@blueprint.local` /
+- Same seeded credentials as Playwright: `e2e-admin@blueprint.local` (admin)
+  and `e2e-user@blueprint.local` (regular user), both
   `password123`.
 
 ## Run
