@@ -53,14 +53,13 @@ func main() {
 		resetDatabase()
 	}
 
-	email := withUser
-	if email == "" {
-		email = e2eDefaultEmail
+	// Restrict the allowlist to the seeded fixture emails so the sandbox only
+	// ever authenticates its own users.
+	allowlist := e2eAdminEmail + "," + e2eUserEmail
+	if withUser != "" {
+		allowlist += "," + withUser
 	}
-
-	// Restrict the allowlist to the seeded email so the sandbox only ever
-	// authenticates its own fixture user.
-	_ = os.Setenv("AUTH_EMAILS_ALLOWED_ACCESS", email)
+	_ = os.Setenv("AUTH_EMAILS_ALLOWED_ACCESS", allowlist)
 
 	cfg, err := config.NewFromEnv()
 	if err != nil {
@@ -90,8 +89,8 @@ func main() {
 		return
 	}
 
-	if err := seedUserAndSession(appInstance, email, isAdmin || withUser == ""); err != nil {
-		fmt.Printf("Failed to seed user and session: %v\n", err)
+	if _, err := seedFixtures(appInstance, withUser, isAdmin); err != nil {
+		fmt.Printf("Failed to seed users and sessions: %v\n", err)
 		return
 	}
 

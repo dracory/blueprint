@@ -11,10 +11,11 @@ import (
 	"github.com/go-rod/rod/lib/launcher"
 )
 
-// Credentials of the user seeded by e2e/browser (seed.go).
+// Credentials of the users seeded by e2e/browser (seed.go).
 const (
-	seedEmail    = "e2e-browser@blueprint.local"
-	seedPassword = "password123"
+	seedAdminEmail = "e2e-admin@blueprint.local"
+	seedUserEmail  = "e2e-user@blueprint.local"
+	seedPassword   = "password123"
 )
 
 // // Launch a new browser with default options, and connect to it.
@@ -86,37 +87,48 @@ func TestHomePageLoads(t *testing.T) {
 	}
 }
 
-func TestSeededAdminCanLogin(t *testing.T) {
+func TestSeededAdminLandsOnAdmin(t *testing.T) {
+	page := login(t, seedAdminEmail)
+	waitForPath(t, page, "/admin")
+}
+
+func TestSeededUserLandsOnUser(t *testing.T) {
+	page := login(t, seedUserEmail)
+	waitForPath(t, page, "/user")
+}
+
+// login opens the login page, submits the seeded credentials, and returns
+// the page for further assertions.
+func login(t *testing.T, email string) *rod.Page {
+	t.Helper()
 	page := newPage(t)
 
 	page.MustNavigate(baseURL + "/auth/login").MustWaitLoad()
 
-	page.MustElement(`input[name="email"]`).MustInput(seedEmail)
+	page.MustElement(`input[name="email"]`).MustInput(email)
 	page.MustElement(`input[name="password"]`).MustInput(seedPassword)
 
 	// The dracory/auth package submits via JS onclick, not a submit button:
 	// <button class="ButtonLogin ...">. Try likely candidates in order.
-	clicked := false
 	for _, sel := range []string{`button.ButtonLogin`, `button[type="submit"]`, `input[type="submit"]`} {
 		if el, err := page.Element(sel); err == nil {
 			el.MustClick()
-			clicked = true
-			break
+			return page
 		}
 	}
-	if !clicked {
-		t.Fatal("no login submit button found")
-	}
+	t.Fatal("no login submit button found")
+	return nil
+}
 
-	// The seeded user is an administrator, which lands on /admin; a plain
-	// user would land on /user.
+// waitForPath polls the page URL until it contains wantPath.
+func waitForPath(t *testing.T, page *rod.Page, wantPath string) {
+	t.Helper()
 	deadline := time.Now().Add(10 * time.Second)
 	for time.Now().Before(deadline) {
-		url := page.MustInfo().URL
-		if strings.Contains(url, "/admin") || strings.Contains(url, "/user") {
+		if strings.Contains(page.MustInfo().URL, wantPath) {
 			return
 		}
 		time.Sleep(200 * time.Millisecond)
 	}
-	t.Fatalf("expected redirect to /admin or /user, still on %s", page.MustInfo().URL)
+	t.Fatalf("expected redirect containing %q, still on %s", wantPath, page.MustInfo().URL)
 }

@@ -18,12 +18,47 @@ import (
 	"github.com/dromara/carbon/v2"
 )
 
-const e2eDefaultEmail = "e2e-browser@blueprint.local"
+// Seeded fixture users. Both are always created so tests can cover the
+// admin redirect (/admin) and the regular-user redirect (/user).
+const (
+	e2eAdminEmail = "e2e-admin@blueprint.local"
+	e2eAdminID    = "e2e-admin-user"
+	e2eUserEmail  = "e2e-user@blueprint.local"
+	e2eUserID     = "e2e-regular-user"
+)
 
-// e2eUserID is the fixed ID of the seeded fixture user.
-const e2eUserID = "e2e-browser-user"
+const e2ePassword = "password123"
 
-func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error {
+// seedFixtures creates the standard admin + regular user (and an optional
+// extra user) and returns the emails that must be on the auth allowlist.
+func seedFixtures(app app.AppInterface, withUser string, isAdmin bool) ([]string, error) {
+	fixtures := []struct {
+		email   string
+		id      string
+		isAdmin bool
+	}{
+		{e2eAdminEmail, e2eAdminID, true},
+		{e2eUserEmail, e2eUserID, false},
+	}
+	if withUser != "" {
+		fixtures = append(fixtures, struct {
+			email   string
+			id      string
+			isAdmin bool
+		}{withUser, "e2e-custom-user", isAdmin})
+	}
+
+	emails := []string{}
+	for _, f := range fixtures {
+		if err := seedUserAndSession(app, f.email, f.id, f.isAdmin); err != nil {
+			return nil, err
+		}
+		emails = append(emails, f.email)
+	}
+	return emails, nil
+}
+
+func seedUserAndSession(app app.AppInterface, email string, userID string, isAdmin bool) error {
 	ctx := context.Background()
 
 	if app.IsDisabledUserStore() {
@@ -39,7 +74,7 @@ func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error 
 	}
 
 	if user == nil {
-		user, err = createUser(ctx, app, email, isAdmin)
+		user, err = createUser(ctx, app, email, userID, isAdmin)
 		if err != nil {
 			return fmt.Errorf("failed to create user: %w", err)
 		}
@@ -76,7 +111,7 @@ func seedUserAndSession(app app.AppInterface, email string, isAdmin bool) error 
 	cfmt.Infoln("E2E Browser Seed Credentials")
 	cfmt.Infoln("==================================================")
 	cfmt.Infoln("Email:      ", email)
-	cfmt.Infoln("Password:   ", "password123")
+	cfmt.Infoln("Password:   ", e2ePassword)
 	cfmt.Infoln("Role:       ", role)
 	cfmt.Infoln("User ID:    ", user.GetID())
 	cfmt.Infoln("Session Key:", session.GetKey())
@@ -111,22 +146,22 @@ func findUserByEmail(ctx context.Context, app app.AppInterface, email string) (u
 	return app.GetUserStore().UserFindByEmail(ctx, email)
 }
 
-func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin bool) (userstore.UserInterface, error) {
+func createUser(ctx context.Context, app app.AppInterface, email string, userID string, isAdmin bool) (userstore.UserInterface, error) {
 	role := userstore.USER_ROLE_USER
 	if isAdmin {
 		role = userstore.USER_ROLE_ADMINISTRATOR
 	}
 
 	user := userstore.NewUser().
-		SetID(e2eUserID).
+		SetID(userID).
 		SetEmail(email).
 		SetStatus(userstore.USER_STATUS_ACTIVE).
-		SetFirstName("AI").
+		SetFirstName("E2E").
 		SetLastName("Browser").
 		SetCountry("US").
 		SetTimezone("UTC")
 
-	if err := user.SetPasswordAndHash("password123"); err != nil {
+	if err := user.SetPasswordAndHash(e2ePassword); err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
@@ -152,7 +187,7 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 			return nil, fmt.Errorf("failed to create email token: %w", err)
 		}
 
-		firstNameToken, err := app.GetVaultStore().TokenCreate(ctx, "AI", app.GetConfig().GetVaultStoreKey(), 20)
+		firstNameToken, err := app.GetVaultStore().TokenCreate(ctx, "E2E", app.GetConfig().GetVaultStoreKey(), 20)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create first name token: %w", err)
 		}
@@ -178,7 +213,7 @@ func createUser(ctx context.Context, app app.AppInterface, email string, isAdmin
 
 		firstNameSearchValue := blindindexstore.NewSearchValue().
 			SetSourceReferenceID(user.GetID()).
-			SetSearchValue("AI")
+			SetSearchValue("E2E")
 		if err := app.GetBlindIndexStoreFirstName().SearchValueCreate(ctx, firstNameSearchValue); err != nil {
 			return nil, fmt.Errorf("failed to create first name blind index: %w", err)
 		}
