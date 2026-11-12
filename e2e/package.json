@@ -1,0 +1,14 @@
+{
+  "name": "blueprint-e2e",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "server": "go run ./browser"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

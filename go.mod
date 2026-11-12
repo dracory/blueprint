@@ -59,6 +59,7 @@ require (
 	github.com/dromara/carbon/v2 v2.7.1
 	github.com/faabiosr/cachego v0.26.0
 	github.com/go-co-op/gocron v1.37.0
+	github.com/go-rod/rod v0.116.2
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/jellydator/ttlcache/v3 v3.4.1
 	github.com/lmittmann/tint v1.2.1
@@ -153,6 +154,11 @@ require (
 	github.com/tidwall/gjson v1.20.1 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.2 // indirect
+	github.com/ysmood/fetchup v0.2.3 // indirect
+	github.com/ysmood/goob v0.4.0 // indirect
+	github.com/ysmood/got v0.40.0 // indirect
+	github.com/ysmood/gson v0.7.3 // indirect
+	github.com/ysmood/leakless v0.9.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0 // indirect

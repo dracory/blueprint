@@ -131,6 +131,29 @@ tasks:
     cmds:
       - air
 
+  e2e-browser:
+    desc: Start the sandboxed app for e2e tests (http://127.0.0.1:34757)
+    cmds:
+      - go run ./e2e/browser {{.CLI_ARGS}}
+
+  e2e:
+    desc: Run Playwright e2e tests (auto-starts e2e-browser)
+    dir: e2e
+    cmds:
+      - npx playwright test
+
+  e2e:install:
+    desc: Install e2e dependencies and Playwright browsers
+    dir: e2e
+    cmds:
+      - npm install
+      - npx playwright install chromium
+
+  e2e:rod:
+    desc: Run go-rod e2e tests (builds e2e-browser, uses system Chrome)
+    cmds:
+      - go test -v ./e2e/rod {{.CLI_ARGS}}
+
   # ======================================================================== #
   # END: Development                                                         #
   # ======================================================================== #
