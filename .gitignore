@@ -60,4 +60,3 @@ old/
 __debug_bin*
 .playwright-mcp/
 nul
-e2e/tests/auth.spec.ts
