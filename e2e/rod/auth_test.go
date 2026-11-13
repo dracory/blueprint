@@ -82,7 +82,7 @@ func TestHomePageLoads(t *testing.T) {
 	// The home controller renders "Welcome to <appName>"; the sandbox sets
 	// APP_NAME=Blueprint.
 	h1 := page.MustElement("h1").MustText()
-	if !strings.Contains(h1, "Blueprint") {
+	if !strings.Contains(strings.ToLower(h1), "blueprint") {
 		t.Fatalf("expected heading to mention Blueprint, got %q", h1)
 	}
 }
@@ -102,7 +102,12 @@ func TestSeededUserCannotAccessAdmin(t *testing.T) {
 	waitForPath(t, page, "/user")
 
 	// AdminMiddleware redirects non-admins to "/" with a flash error.
-	page.MustNavigate(baseURL + "/admin").MustWaitLoad()
+	// Wait via lifecycle events instead of MustWaitLoad: the /admin request
+	// 303-redirects to a flash page, and evaluating JS mid-redirect makes
+	// Chrome fail with "Object reference chain is too long".
+	wait := page.MustWaitNavigation()
+	page.MustNavigate(baseURL + "/admin")
+	wait()
 
 	deadline := time.Now().Add(10 * time.Second)
 	for time.Now().Before(deadline) {

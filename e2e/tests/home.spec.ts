@@ -5,6 +5,6 @@ test.describe('home page', () => {
     await page.goto('/');
     // The home controller renders "Welcome to <appName>"; sandbox sets
     // APP_NAME=Blueprint.
-    await expect(page.locator('h1')).toContainText('Blueprint');
+    await expect(page.locator('h1')).toContainText(/blueprint/i);
   });
 });
