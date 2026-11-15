@@ -15,7 +15,7 @@ export default defineConfig({
   webServer: {
     // `go run ./e2e/browser` run from the repository root.
     command: 'go run ./e2e/browser',
-    cwd: '..',
+    cwd: '../..',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

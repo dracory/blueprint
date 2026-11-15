@@ -5,6 +5,7 @@ go 1.27.3
 // replace github.com/dracory/base => ../../_modules_dracory/base
 
 require (
+	github.com/chromedp/chromedp v0.14.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/auditstore v1.12.2
 	github.com/dracory/auth v0.51.0
@@ -101,6 +102,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.114.9 // indirect
 	github.com/aws/smithy-go v1.28.8 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327 // indirect
+	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/coder/websocket v1.8.15 // indirect
 	github.com/containerd/console v1.0.5 // indirect
@@ -125,8 +128,12 @@ require (
 	github.com/felixge/httpsnoop v1.1.0 // indirect
 	github.com/flosch/pongo2/v6 v6.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.16 // indirect
+	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect

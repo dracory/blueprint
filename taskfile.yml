@@ -138,13 +138,13 @@ tasks:
 
   e2e:
     desc: Run Playwright e2e tests (auto-starts e2e-browser)
-    dir: e2e
+    dir: e2e/playwright
     cmds:
       - npx playwright test
 
   e2e:install:
     desc: Install e2e dependencies and Playwright browsers
-    dir: e2e
+    dir: e2e/playwright
     cmds:
       - npm install
       - npx playwright install chromium
@@ -153,6 +153,11 @@ tasks:
     desc: Run go-rod e2e tests (builds e2e-browser, uses system Chrome)
     cmds:
       - go test -v ./e2e/rod {{.CLI_ARGS}}
+
+  e2e:chromedp:
+    desc: Run chromedp e2e tests (builds e2e-browser, uses system Chrome)
+    cmds:
+      - go test -v ./e2e/chromedp {{.CLI_ARGS}}
 
   # ======================================================================== #
   # END: Development                                                         #
