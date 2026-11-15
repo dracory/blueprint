@@ -15,7 +15,7 @@ This release continues the standalone-package extraction: the shared asset-servi
 - `internal/widgets/` generic widgets (authenticated, unauthenticated, visible, print, blockeditor, terms-of-use, contact-form) → `dracory/base/widgets`; `Widget` is now an alias for `basewidgets.Widget` and `WidgetRegistry` delegates with injected `RegistryOptions`
 - Dependencies: `dracory/base v0.44.0`, `dracory/uncdn v0.12.0`
 - ~2,400 lines of controller code + ~2,100 lines of tests removed from the template
-- New `e2e/` folder: sandboxed app instance (`e2e/browser`) plus two interchangeable browser-test suites — Playwright (`e2e/tests`) and go-rod (`e2e/rod`)
+- New `e2e/` folder: sandboxed app instance (`e2e/browser`) plus three interchangeable browser-test suites — chromedp (`e2e/chromedp`, recommended), Playwright (`e2e/playwright`), and go-rod (`e2e/rod`)
 
 ---
 
@@ -190,10 +190,16 @@ in the main app depends on it, so upgrading is just copying the folder.
 ```
 e2e/
   browser/            # `e2e-browser` command — sandboxed app for tests
-  rod/                # go-rod suite (pure Go)         → go test -v ./e2e/rod
-  tests/              # Playwright suite (TypeScript)  → npx playwright test
-  playwright.config.ts, package.json, README.md
+  chromedp/           # chromedp suite (pure Go, recommended) → go test -v ./e2e/chromedp
+  playwright/         # Playwright suite (TypeScript)         → npx playwright test
+  rod/                # go-rod suite (pure Go)                → go test -v ./e2e/rod
 ```
+
+The blueprint ships all three so projects can compare them — **a real
+project should pick one suite and delete the other two** (each is
+self-contained). Recommendation order: chromedp (pure Go, no Node, no helper
+binaries), then Playwright (best debugging/CI tooling, requires Node), then
+rod (only if you need its interception API or auto-downloaded browser).
 
 - `go run ./e2e/browser` serves the app on `http://127.0.0.1:34757` with a
   disposable SQLite DB (`tmp/e2e-browser.db`), all external APIs disabled, a
@@ -203,17 +209,24 @@ e2e/
   `-admin`. Refuses to start when `APP_ENV=production`. Unlike
   `cmd/ai-browser` it uses the **regular router** — no auto-login — so tests
   exercise real auth flows.
+- **chromedp suite**: pure-Go default. `TestMain` builds and starts
+  `e2e/browser` itself and launches one shared headless Chrome (tab per
+  test). Browser resolution: `CHROME_BIN`, Playwright's
+  `chromium_headless_shell` (Windows/WSL/Linux), else system Chrome.
 - **Playwright suite**: `playwright.config.ts` auto-starts the server via
   `webServer` and uses bundled headless Chromium (`channel: 'chromium'`).
-- **rod suite**: pure-Go alternative for projects that don't want a Node
-  toolchain. `TestMain` builds and starts `e2e/browser` itself; uses
-  Playwright's `chromium_headless_shell` if present, else rod's managed
-  Chromium (override with `CHROME_BIN`).
-- Taskfile tasks: `task e2e-browser`, `task e2e`, `task e2e:rod`,
-  `task e2e:install`.
+- **rod suite**: pure-Go alternative; also builds/starts `e2e/browser` itself
+  and shares one browser across tests. Uses Playwright's
+  `chromium_headless_shell` if present (incl. WSL→Windows interop), else
+  rod's managed Chromium (override with `CHROME_BIN`). Runs `Leakless(false)`
+  because rod's `leakless.exe` helper is flagged as a trojan by Windows
+  Defender (go-rod#325).
+- Taskfile tasks: `task e2e-browser`, `task e2e`, `task e2e:chromedp`,
+  `task e2e:rod`, `task e2e:install`.
 
-If you adopt it, copy `e2e/` and the four task blocks in `taskfile.yml`; no
-other migration is needed.
+If you adopt it, copy `e2e/` and the five task blocks in `taskfile.yml`, add
+`github.com/chromedp/chromedp` (and/or `github.com/go-rod/rod`) to your
+`go.mod`; no other migration is needed.
 
 ---
 
