@@ -8,12 +8,20 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/go-rod/rod"
+	"github.com/go-rod/rod/lib/launcher"
 )
 
 const baseURL = "http://127.0.0.1:34757"
+
+// sharedBrowser is launched once in TestMain; each test opens a fresh tab on
+// it so tests don't pay full Chrome startup per test.
+var sharedBrowser *rod.Browser
 
 func TestMain(m *testing.M) {
 	// Build the sandboxed app once; killing `go run` would only kill the
@@ -48,7 +56,28 @@ func TestMain(m *testing.M) {
 		os.Exit(1)
 	}
 
+	// One shared browser process for the entire test run.
+	// Leakless(false) avoids rod's leakless.exe helper, which Windows
+	// Defender flags as a trojan (known false positive, go-rod#325).
+	// Cleanup is handled by l.Kill below instead.
+	l := launcher.New().Headless(true).Leakless(false)
+	if bin := chromeBin(); bin != "" {
+		l = l.Bin(bin)
+	}
+	u := l.MustLaunch()
+
+	sharedBrowser = rod.New().ControlURL(u)
+	if err := sharedBrowser.Connect(); err != nil {
+		fmt.Println("failed to connect to browser:", err)
+		l.Kill()
+		_ = cmd.Process.Kill()
+		os.Exit(1)
+	}
+
 	code := m.Run()
+
+	_ = sharedBrowser.Close()
+	l.Kill()
 	_ = cmd.Process.Kill()
 	os.Exit(code)
 }
@@ -64,4 +93,30 @@ func waitForServer(url string, timeout time.Duration) error {
 		time.Sleep(500 * time.Millisecond)
 	}
 	return fmt.Errorf("timeout after %s", timeout)
+}
+
+// chromeBin resolves a headless Chromium binary. Order: CHROME_BIN env,
+// Playwright's downloaded headless shell, empty (rod auto-downloads a
+// managed Chromium to ~/.cache/rod).
+func chromeBin() string {
+	if b := os.Getenv("CHROME_BIN"); b != "" {
+		return b
+	}
+	patterns := []string{
+		// Windows
+		filepath.Join(os.Getenv("LOCALAPPDATA"),
+			"ms-playwright/chromium_headless_shell-*/chrome-headless-shell-win64/chrome-headless-shell.exe"),
+		// WSL: Windows-side Playwright shell via interop (the Linux shell
+		// may be present but unusable due to missing libs like libnspr4)
+		"/mnt/*/Users/*/AppData/Local/ms-playwright/chromium_headless_shell-*/chrome-headless-shell-win64/chrome-headless-shell.exe",
+		// Linux
+		filepath.Join(os.Getenv("HOME"),
+			".cache/ms-playwright/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell"),
+	}
+	for _, pattern := range patterns {
+		if matches, _ := filepath.Glob(pattern); len(matches) > 0 {
+			return matches[len(matches)-1]
+		}
+	}
+	return ""
 }
