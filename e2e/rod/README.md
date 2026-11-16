@@ -12,6 +12,10 @@ Node dependency.
 - `TestMain` builds `../browser` to `tmp/e2e-browser-bin`, starts it with
   `-reset` (fresh SQLite DB), waits for `http://127.0.0.1:34757`, then kills
   it after the run.
+- One shared headless browser serves the whole run; each test gets a fresh
+  tab via `newPage(t)` — launching a browser per test costs ~30s/test.
+- Chrome resolution: `CHROME_BIN`, then Playwright's `chromium_headless_shell`
+  (Windows, WSL-interop, Linux), else rod's managed download.
 - Same seeded credentials as Playwright: `e2e-admin@blueprint.local` (admin)
   and `e2e-user@blueprint.local` (regular user), both
   `password123`.

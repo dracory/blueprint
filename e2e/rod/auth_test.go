@@ -1,14 +1,11 @@
 package rod
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/go-rod/rod"
-	"github.com/go-rod/rod/lib/launcher"
 )
 
 // Credentials of the users seeded by e2e/browser (seed.go).
@@ -18,51 +15,21 @@ const (
 	seedPassword   = "password123"
 )
 
-// // Launch a new browser with default options, and connect to it.
-// 	browser := rod.New().MustConnect()
-
+// newPage opens a fresh tab on the shared browser launched by TestMain.
+// Cleanup closes the tab only — the browser lives for the whole run.
 func newPage(t *testing.T) *rod.Page {
 	t.Helper()
 
-	// Leakless(false) avoids rod's leakless.exe helper, which Windows
-	// Defender flags as a trojan (known false positive, go-rod#325).
-	// Cleanup is handled by l.Kill in t.Cleanup instead.
-	l := launcher.New().Headless(true).Leakless(false)
-	if bin := chromeBin(); bin != "" {
-		l = l.Bin(bin)
-	}
-	u := l.MustLaunch()
-	t.Cleanup(l.Kill)
-
-	browser := rod.New().ControlURL(u).MustConnect()
-	t.Cleanup(func() { _ = browser.Close() })
+	page := sharedBrowser.MustPage()
 
 	// Timeout returns a new page value — it must be assigned once here so
 	// every subsequent call (Element, MustElement, ...) inherits it.
-	return browser.MustPage().Timeout(15 * time.Second)
-}
+	page = page.Timeout(15 * time.Second)
 
-// chromeBin resolves a headless Chromium binary. Order: CHROME_BIN env,
-// Playwright's downloaded headless shell, empty (rod auto-downloads a
-// managed Chromium to ~/.cache/rod).
-func chromeBin() string {
-	if b := os.Getenv("CHROME_BIN"); b != "" {
-		return b
-	}
-	patterns := []string{
-		// Linux
-		filepath.Join(os.Getenv("HOME"),
-			".cache/ms-playwright/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell"),
-		// Windows
-		filepath.Join(os.Getenv("LOCALAPPDATA"),
-			"ms-playwright/chromium_headless_shell-*/chrome-headless-shell-win64/chrome-headless-shell.exe"),
-	}
-	for _, pattern := range patterns {
-		if matches, _ := filepath.Glob(pattern); len(matches) > 0 {
-			return matches[len(matches)-1]
-		}
-	}
-	return ""
+	// Page.Close returns an error rather than panicking, unlike MustClose
+	// which would panic on an already-dead page.
+	t.Cleanup(func() { _ = page.Close() })
+	return page
 }
 
 func TestLoginPageLoads(t *testing.T) {
