@@ -3,6 +3,5 @@
         "geostore"
     ],
     "liveServer.settings.port": 5501,
-    "kiroAgent.configureMCP": "Disabled",
-    "python.terminal.useEnvFile": true
+    "kiroAgent.configureMCP": "Disabled"
 }
