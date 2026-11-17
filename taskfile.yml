@@ -62,23 +62,23 @@ tasks:
   #     - gcloud builds submit --tag gcr.io/YOURPROJECT/YOURPACKAGENAME
   #     - gcloud run deploy YOURAPPNAME --image gcr.io/YOURPROJECT/YOURPACKAGENAME --platform managed --region europe-west4 --allow-unauthenticated
 
-  deploy-live:
-    desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
-    cmds:
-      - go run ./cmd/deploy
-      - cmd: powershell -Command "Start-Process '{{.LIVEURL}}'"
-        platforms: [windows]
-      - cmd: open {{.LIVEURL}}
-        platforms: [darwin]
-      - cmd: xdg-open {{.LIVEURL}}
-        platforms: [linux]
-      - echo "Open {{.LIVEURL}} to view the app"
-      - echo "Done!"
-    silent: true
+  # deploy-live:
+  #   desc: Builds and deploys the app to VM (i.e. Digital Ocean) via SSH
+  #   cmds:
+  #     - go run ./cmd/deploy
+  #     - cmd: powershell -Command "Start-Process '{{.LIVEURL}}'"
+  #       platforms: [windows]
+  #     - cmd: open {{.LIVEURL}}
+  #       platforms: [darwin]
+  #     - cmd: xdg-open {{.LIVEURL}}
+  #       platforms: [linux]
+  #     - echo "Open {{.LIVEURL}} to view the app"
+  #     - echo "Done!"
+  #   silent: true
 
   # Alternative deployment via Dokploy webhook (Hetzner).
   # To use: uncomment DEPLOY_WEBHOOK_URL in vars above and set your webhook URL.
-  deploy-dokploy:
+  deploy-live:
     desc: Triggers a deployment via Dokploy webhook (Hetzner)
     cmds:
       - echo "Triggering Dokploy deployment webhook..."
