@@ -13,7 +13,7 @@ vars:
   DATETIME: '{{now | date "20060102_150405"}}'
   LIVEURL: https://dracory.com
   # Uncomment and set your Dokploy webhook URL to use deploy-dokploy task
-  # DEPLOY_WEBHOOK_URL: https://your-dokploy-server/api/deploy/YOUR_WEBHOOK_TOKEN
+  DEPLOY_WEBHOOK_URL: https://dokploy.rem.land/api/deploy/WktcqOADGpnJXxcMeWw1F
 
 tasks:
   # ======================================================================== #
