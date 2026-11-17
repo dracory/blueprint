@@ -236,13 +236,15 @@ func NewSettingStore(db *sql.DB) (settingstore.StoreInterface, error) {
 // NewShopStore creates a shop store with the configured table names.
 func NewShopStore(db *sql.DB, debug bool) (shopstore.StoreInterface, error) {
 	st, err := shopstore.NewStore(shopstore.NewStoreOptions{
-		DB:                     db,
-		CategoryTableName:      "snv_shop_category",
-		DiscountTableName:      "snv_shop_discount",
-		MediaTableName:         "snv_shop_media",
-		OrderTableName:         "snv_shop_order",
-		OrderLineItemTableName: "snv_shop_order_line_item",
-		ProductTableName:       "snv_shop_product",
+		DB:                       db,
+		CategoryTableName:        "snv_shop_category",
+		DiscountTableName:        "snv_shop_discount",
+		MediaTableName:           "snv_shop_media",
+		OrderTableName:           "snv_shop_order",
+		OrderLineItemTableName:   "snv_shop_order_line_item",
+		ProductTableName:         "snv_shop_product",
+		ProductCategoryTableName: "snv_shop_product_category",
+		SettingTableName:         "snv_shop_setting",
 	})
 	if err != nil {
 		return nil, err
