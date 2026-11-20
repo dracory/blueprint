@@ -24,6 +24,7 @@ import (
 // Returns:
 // - none
 func RegisterTasks(app app.AppInterface) {
+	// Check if app is nil or task store is disabled
 	if app == nil || app.IsDisabledTaskStore() {
 		return
 	}
@@ -38,6 +39,9 @@ func RegisterTasks(app app.AppInterface) {
 	}
 
 	// Conditional tasks that are registered based on enabled features
+
+	// Only register blind index rebuild task if user store and vault store are enabled
+	// and at least one blind index store is enabled
 	if app.IsEnabledUserStore() && app.IsEnabledVaultStore() &&
 		(app.IsEnabledBlindIndexStoreEmail() ||
 			app.IsEnabledBlindIndexStoreFirstName() ||
@@ -45,18 +49,22 @@ func RegisterTasks(app app.AppInterface) {
 		tasks = append(tasks, blind_index_rebuild.NewBlindIndexRebuildTask(app))
 	}
 
+	// Only register new user registered email task if user store is enabled
 	if app.IsEnabledUserStore() {
 		tasks = append(tasks, email_admin_new_user_registered.NewEmailToAdminOnNewUserRegisteredTaskHandler(app))
 	}
 
+	// Only register email delivery task if cache store is enabled
 	if app.IsEnabledCacheStore() {
 		tasks = append(tasks, email_delivery.NewAuthEmailDeliveryTask(app))
 	}
 
+	// Only register stats task if stats store is enabled
 	if app.IsEnabledStatsStore() {
 		tasks = append(tasks, stats.NewStatsVisitorEnhanceTask(app))
 	}
 
+	// Register all tasks
 	for _, task := range tasks {
 		err := app.GetTaskStore().TaskHandlerAdd(context.Background(), task, true)
 
