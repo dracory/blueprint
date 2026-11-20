@@ -22,6 +22,10 @@ func queueClearJob(app app.AppInterface) {
 		return
 	}
 
+	if app.IsDisabledStatsStore() {
+		return
+	}
+
 	alias := tasksStats.NewStatsVisitorEnhanceTask(app).Alias()
 
 	taskDefinition, err := app.GetTaskStore().TaskDefinitionFindByAlias(context.Background(), alias)

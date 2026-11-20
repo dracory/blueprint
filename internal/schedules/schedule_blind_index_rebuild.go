@@ -14,6 +14,13 @@ func scheduleBlindIndexRebuildTask(app app.AppInterface) {
 		return
 	}
 
+	if app.IsDisabledUserStore() || app.IsDisabledVaultStore() ||
+		(app.IsDisabledBlindIndexStoreEmail() &&
+			app.IsDisabledBlindIndexStoreFirstName() &&
+			app.IsDisabledBlindIndexStoreLastName()) {
+		return
+	}
+
 	_, err := blind_index_rebuild.NewBlindIndexRebuildTask(app).
 		Enqueue(blind_index_rebuild.BlindIndexAll)
 

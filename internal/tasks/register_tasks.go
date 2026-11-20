@@ -28,16 +28,33 @@ func RegisterTasks(app app.AppInterface) {
 		return
 	}
 
+	// Base tasks that are always registered
 	tasks := []taskstore.TaskHandlerInterface{
-		blind_index_rebuild.NewBlindIndexRebuildTask(app),
 		clean_up.NewCleanUpTask(app),
 		email_test.NewEmailTestTask(app),
 		email_admin.NewEmailToAdminTask(app),
 		email_admin_new_contact.NewEmailToAdminOnNewContactFormSubmittedTaskHandler(app),
-		email_admin_new_user_registered.NewEmailToAdminOnNewUserRegisteredTaskHandler(app),
-		email_delivery.NewAuthEmailDeliveryTask(app),
 		hello_world.NewHelloWorldTask(app),
-		stats.NewStatsVisitorEnhanceTask(app),
+	}
+
+	// Conditional tasks that are registered based on enabled features
+	if app.IsEnabledUserStore() && app.IsEnabledVaultStore() &&
+		(app.IsEnabledBlindIndexStoreEmail() ||
+			app.IsEnabledBlindIndexStoreFirstName() ||
+			app.IsEnabledBlindIndexStoreLastName()) {
+		tasks = append(tasks, blind_index_rebuild.NewBlindIndexRebuildTask(app))
+	}
+
+	if app.IsEnabledUserStore() {
+		tasks = append(tasks, email_admin_new_user_registered.NewEmailToAdminOnNewUserRegisteredTaskHandler(app))
+	}
+
+	if app.IsEnabledCacheStore() {
+		tasks = append(tasks, email_delivery.NewAuthEmailDeliveryTask(app))
+	}
+
+	if app.IsEnabledStatsStore() {
+		tasks = append(tasks, stats.NewStatsVisitorEnhanceTask(app))
 	}
 
 	for _, task := range tasks {

@@ -19,6 +19,10 @@ func scheduleStatsVisitorEnhanceTask(app app.AppInterface) {
 		return
 	}
 
+	if app.IsDisabledStatsStore() {
+		return
+	}
+
 	_, err := taskStats.NewStatsVisitorEnhanceTask(app).Enqueue()
 	if err != nil {
 		cfmt.Errorln(err.Error())
